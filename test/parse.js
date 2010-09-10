@@ -42,10 +42,25 @@ exports['short capture'] = function (assert) {
     );
 };
 
+exports['short captures'] = function (assert) {
+    assert.deepEqual(
+        optimist.parse([ '-h', 'localhost', '-p', '555' ]),
+        { h : 'localhost', p : '555', _ : [] }
+    );
+};
+
+
 exports['long capture'] = function (assert) {
     assert.deepEqual(
         optimist.parse([ '--pow=xixxle' ]),
         { pow : 'xixxle', _ : [] }
+    );
+};
+
+exports['long captures'] = function (assert) {
+    assert.deepEqual(
+        optimist.parse([ '--host=localhost', '--port=555' ]),
+        { host : 'localhost', port : '555', _ : [] }
     );
 };
 
