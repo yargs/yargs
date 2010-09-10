@@ -63,9 +63,9 @@ exports['short and long'] = function (assert) {
     );
 };
 
-exports.not = function (assert) {
+exports.no = function (assert) {
     assert.deepEqual(
-        optimist.parse([ '--not-moo' ]),
+        optimist.parse([ '--no-moo' ]),
         { moo : false, _ : [] }
     );
 };
@@ -75,7 +75,7 @@ exports.comprehensive = function (assert) {
     assert.deepEqual(
         optimist.parse([
             '--name=meowmers', 'bare', '-cats', 'woo', '-h', 'awesome',
-            '-b', '--bool', '--not-meep',
+            '-b', '--bool', '--no-meep',
             '--', '--not-a-flag', 'eek'
         ]),
         {
