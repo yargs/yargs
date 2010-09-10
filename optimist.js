@@ -54,7 +54,7 @@ function Argv (args) {
         else {
             self.argv._.push(arg);
         }
-    });
+    }
     
     self.parse = Argv;
     
@@ -66,7 +66,12 @@ function Argv (args) {
     
     function fail (msg) {
         if (usage) console.error(
-            usage.replace('$0', process.argv.slice(0,2).join(' '))
+            // not very robust:
+            usage.replace(/\$0/g,
+                process.env._.match(/\/(node|env)$/)
+                ? process.argv.slice(0,2).join(' ')
+                : process.env._
+            )
         );
         console.error(msg);
         process.exit();
