@@ -1,7 +1,7 @@
 {
     "name" : "optimist",
-    "version" : "0.0.1",
-    "descrption" : "Light-weight option parsing",
+    "version" : "0.0.2",
+    "description" : "Light-weight option parsing",
     "modules" : {
         "index" : "./optimist.js",
     },
