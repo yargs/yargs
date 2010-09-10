@@ -9,5 +9,6 @@
         "type" : "git",
         "url" : "http://github.com/substack/node-optimist.git"
     },
+    "license" : "MIT/X11",
     "engine" : ["node >=0.1.100"]
 }
