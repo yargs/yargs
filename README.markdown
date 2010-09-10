@@ -28,7 +28,6 @@ xup.js:
     $ ./xup.js --rif=55 --xup=9.52
     Buy more riffiwobbles
 
-
 But wait! There's more! You can do short options:
 -------------------------------------------------
  
@@ -43,7 +42,7 @@ short.js:
     $ ./short.js -x 10 -y 21
     (10,21)
 
-And booleans, both long and short:
+And booleans, both long and short (and grouped):
 ----------------------------------
 
 bool.js:
@@ -53,20 +52,21 @@ bool.js:
     var argv = require('optimist').argv;
 
     if (argv.s) {
-        sys.print(argv.fr
-            ? 'Le chat dit: '
-            : 'The cow says: '
-        );
+        sys.print(argv.fr ? 'Le chat dit: ' : 'The cat says: ');
     }
-    console.log(argv.fr ? 'miaou' : 'meow');
+    console.log(
+        (argv.fr ? 'miaou' : 'meow') + (argv.p ? '.' : '')
+    );
 
 ***
     $ ./bool.js -s
     The cat says: meow
+    
+    $ ./bool.js -sp
+    The cat says: meow.
 
-    $ ./bool.js -s --fr
-    Le chat dit: miaou
-
+    $ ./bool.js -sp --fr
+    Le chat dit: miaou.
 
 And non-hypenated options too! Just use `argv._`!
 -------------------------------------------------
