@@ -1,0 +1,13 @@
+{
+    "name" : "optimist",
+    "version" : "0.0.1",
+    "descrption" : "Light-weight option parsing",
+    "modules" : {
+        "index" : "./optimist.js",
+    },
+    "repository" : {
+        "type" : "git",
+        "url" : "http://github.com/substack/node-optimist.git"
+    },
+    "engine" : ["node >=0.1.100"]
+}
