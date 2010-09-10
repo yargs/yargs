@@ -110,5 +110,9 @@ function Argv (args) {
         return self;
     };
     
+    self.parse = function (args) {
+        return Argv(args).argv;
+    };
+    
     return self;
 };
