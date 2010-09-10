@@ -1,8 +1,21 @@
-module.exports = new Argv(process.argv.slice(2));
-    
+module.exports = Argv;
+
+/*  Hack an instance of Argv with process.argv into Argv
+    so people an do
+        require('optimist')(['--beeble=1','-z','zizzle']).argv
+    to parse a list of args and
+        require('optimist').argv
+    to get a parsed version of process.argv.
+*/
+var inst = Argv(process.argv.slice(2));
+Object.keys(inst).forEach(function (key) {
+    Argv[key] = typeof inst[key] == 'function'
+        ? inst[key].bind(inst)
+        : inst[key];
+});
+
 function Argv (args) {
-    if (!(this instanceof Argv)) return new Argv(args);
-    var self = this;
+    var self = {};
     self.argv = { _ : [] };
     
     function set (key, value) {
@@ -56,8 +69,6 @@ function Argv (args) {
         }
     }
     
-    self.parse = Argv;
-    
     var usage;
     self.usage = function (msg) {
         usage = msg;
@@ -98,4 +109,6 @@ function Argv (args) {
         }
         return self;
     };
+    
+    return self;
 };
