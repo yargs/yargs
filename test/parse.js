@@ -85,12 +85,19 @@ exports.no = function (assert) {
     );
 };
  
+exports.multi = function (assert) {
+    assert.deepEqual(
+        optimist.parse([ '-v', 'a', '-v', 'b', '-v', 'c' ]),
+        { v : ['a','b','c'], _ : [] }
+    );
+};
  
 exports.comprehensive = function (assert) {
     assert.deepEqual(
         optimist.parse([
-            '--name=meowmers', 'bare', '-cats', 'woo', '-h', 'awesome',
-            '-b', '--bool', '--no-meep',
+            '--name=meowmers', 'bare', '-cats', 'woo',
+            '-h', 'awesome', '--multi=quux',
+            '-b', '--bool', '--no-meep', '--multi=baz',
             '--', '--not-a-flag', 'eek'
         ]),
         {
@@ -101,6 +108,7 @@ exports.comprehensive = function (assert) {
             h : 'awesome',
             b : true,
             bool : true,
+            multi : [ 'quux', 'baz' ],
             meep : false,
             name : 'meowmers',
             _ : [ 'bare', '--not-a-flag', 'eek' ],
