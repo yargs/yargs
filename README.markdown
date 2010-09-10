@@ -8,7 +8,7 @@ and -whistlz of program usage but think optstrings are a waste of time.
 But all hope is not lost, dear reader, because there is Optimist, proving that
 option parsing doesn't have to suck (as much).
 
-With Optimist, the options are just a hash! No optstrings required.
+With Optimist, the options are just a hash! No optstrings attached.
 -------------------------------------------------------------------
 
 xup.js:
