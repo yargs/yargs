@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
 var argv = require('optimist')
-    .usage('Usage: $0 --foo=x --bar=y')
-    .demand(['foo','bar'])
+    .usage('Usage: $0 -x [num] -y [num]')
+    .demand(['x','y'])
     .argv;
 
-console.log(argv.foo / argv.bar);
+console.log(argv.x / argv.y);

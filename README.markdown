@@ -6,17 +6,17 @@ parsing. More specifically, this module is for people who like all the --bells
 and -whistlz of program usage but think optstrings are a waste of time.
 
 But all hope is not lost, dear reader, because there is Optimist, proving that
-option parsing doesn't have to suck, even though it usually does.
+option parsing doesn't have to suck (as much).
 
 With Optimist, the options are just a hash! No optstrings required.
 -------------------------------------------------------------------
 
-bizzlewup.js:
+xup.js:
 
     #!/usr/bin/env node
     var argv = require('optimist').argv;
 
-    if (argv.fubblemip - 5 * argv.xuppox > 7.138) {
+    if (argv.rif - 5 * argv.xup > 7.138) {
         console.log('Buy more riffiwobbles');
     }
     else {
@@ -24,7 +24,8 @@ bizzlewup.js:
     }
 
 ***
-    $ ./bizzlewup.js --fubblemip=55 --xuppox=9.52
+
+    $ ./xup.js --rif=55 --xup=9.52
     Buy more riffiwobbles
 
 
@@ -42,6 +43,31 @@ short.js:
     $ ./short.js -x 10 -y 21
     (10,21)
 
+And booleans, both long and short:
+----------------------------------
+
+bool.js:
+
+    #!/usr/bin/env node
+    var sys = require('sys');
+    var argv = require('optimist').argv;
+
+    if (argv.s) {
+        sys.print(argv.fr
+            ? 'Le chat dit: '
+            : 'The cow says: '
+        );
+    }
+    console.log(argv.fr ? 'miaou' : 'meow');
+
+***
+    $ ./bool.js -s
+    The cat says: meow
+
+    $ ./bool.js -s --fr
+    Le chat dit: miaou
+
+
 And non-hypenated options too! Just use `argv._`!
 -------------------------------------------------
  
@@ -53,6 +79,7 @@ nonopt.js:
     console.log(argv._);
 
 ***
+
     $ ./nonopt.js -x 6.82 -y 3.35 moo
     (6.82,3.35)
     [ 'moo' ]
@@ -60,6 +87,27 @@ nonopt.js:
     $ ./nonopt.js foo -x 0.54 bar -y 1.12 baz
     (0.54,1.12)
     [ 'foo', 'bar', 'baz' ]
+
+Plus, Optimist comes with .usage() and .demand()!
+-------------------------------------------------
+
+divide.js:
+    #!/usr/bin/env node
+    var argv = require('optimist')
+        .usage('Usage: $0 -x [num] -y [num]')
+        .demand(['x','y'])
+        .argv;
+    
+    console.log(argv.x / argv.y);
+
+***
+ 
+    $ ./divide.js -x 55 -y 11
+    5
+    
+    $ ./divide.js -x 4.91 -z 2.51
+    Usage: ./divide.js -x [num] -y [num]
+    Missing arguments: y
 
 Installation
 ============
