@@ -3,7 +3,7 @@
     "version" : "0.0.3",
     "description" : "Light-weight option parsing with an argv hash. No optstrings attached.",
     "modules" : {
-        "index" : "./optimist.js",
+        "index" : "./lib/optimist.js",
     },
     "repository" : {
         "type" : "git",
