@@ -29,7 +29,42 @@ exports.usagePass = function (assert) {
         logs : [],
         exit : false,
     });
-}
+};
+
+exports.checkPass = function (assert) {
+    var r = checkUsage(function () {
+        return optimist('-x 10 -y 20'.split(' '))
+            .usage('Usage: $0 -x NUM -y NUM')
+            .check(function (argv) {
+                return 'x' in argv && 'y' in argv
+            })
+            .argv;
+    });
+    assert.deepEqual(r, {
+        result : { _ : [], x : 10, y : 20 },
+        errors : [],
+        logs : [],
+        exit : false,
+    });
+};
+
+exports.checkFail = function (assert) {
+    var r = checkUsage(function () {
+        return optimist('-x 10 -z 20'.split(' '))
+            .usage('Usage: $0 -x NUM -y NUM')
+            .check(function (argv) {
+                if (!('x' in argv)) throw 'You forgot about -x';
+                if (!('y' in argv)) throw 'You forgot about -y';
+            })
+            .argv;
+    });
+    assert.deepEqual(r, {
+        result : { _ : [], x : 10, z : 20 },
+        errors : [ 'Usage: ./usage -x NUM -y NUM', 'You forgot about -y' ],
+        logs : [],
+        exit: true,
+    });
+};
 
 function checkUsage (f) {
     var _process = process;
