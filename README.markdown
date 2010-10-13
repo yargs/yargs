@@ -112,11 +112,17 @@ divide.js:
 Installation
 ============
 
+With [npm](http://github.com/isaacs/npm), just do:
     npm install optimist
  
-or clone this project on github
+or clone this project on github:
 
     git clone http://github.com/substack/node-optimist.git
+
+To run the tests with [expresso](http://github.com/visionmedia/expresso),
+just do:
+    
+    expresso
 
 Inspired By
 ===========
