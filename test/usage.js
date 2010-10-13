@@ -9,7 +9,7 @@ exports.usageFail = function (assert) {
             .argv;
     });
     assert.deepEqual(r, {
-        result : { _ : [], x : 10, z : 20 },
+        result : { x : 10, z : 20, _ : [], $0 : './usage' },
         errors : [ 'Usage: ./usage -x NUM -y NUM', 'Missing arguments: y' ],
         logs : [],
         exit: true,
@@ -24,7 +24,7 @@ exports.usagePass = function (assert) {
             .argv;
     });
     assert.deepEqual(r, {
-        result : { _ : [], x : 10, y : 20 },
+        result : { x : 10, y : 20, _ : [], $0 : './usage' },
         errors : [],
         logs : [],
         exit : false,
@@ -41,7 +41,7 @@ exports.checkPass = function (assert) {
             .argv;
     });
     assert.deepEqual(r, {
-        result : { _ : [], x : 10, y : 20 },
+        result : { x : 10, y : 20, _ : [], $0 : './usage' },
         errors : [],
         logs : [],
         exit : false,
@@ -59,7 +59,7 @@ exports.checkFail = function (assert) {
             .argv;
     });
     assert.deepEqual(r, {
-        result : { _ : [], x : 10, z : 20 },
+        result : { x : 10, z : 20, _ : [], $0 : './usage' },
         errors : [ 'Usage: ./usage -x NUM -y NUM', 'You forgot about -y' ],
         logs : [],
         exit: true,
