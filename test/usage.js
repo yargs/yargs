@@ -66,6 +66,21 @@ exports.checkFail = function (assert) {
     });
 };
 
+exports.rebase = function (assert) {
+    assert.equal(
+        optimist.rebase('/home/substack', '/home/substack/foo/bar/baz'),
+        './foo/bar/baz'
+    );
+    assert.equal(
+        optimist.rebase('/home/substack/foo/bar/baz', '/home/substack'),
+        '../../..'
+    );
+    assert.equal(
+        optimist.rebase('/home/substack/foo', '/home/substack/pow/zoom.txt'),
+        '../pow/zoom.txt'
+    );
+};
+
 function checkUsage (f) {
     var _process = process;
     process = Hash.copy(process);
