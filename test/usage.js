@@ -48,6 +48,21 @@ exports.checkPass = function (assert) {
     });
 };
 
+exports.countPass = function (assert) {
+    var r = checkUsage(function () {
+        return optimist('1 2 3 --moo'.split(' '))
+            .usage('Usage: $0 [x] [y] [z] {OPTIONS}')
+            .demand(3)
+            .argv;
+    });
+    assert.deepEqual(r, {
+        result : { _ : [ '1', '2', '3' ], moo : true, $0 : './usage' },
+        errors : [],
+        logs : [],
+        exit : false,
+    });
+};
+
 exports.checkFail = function (assert) {
     var r = checkUsage(function () {
         return optimist('-x 10 -z 20'.split(' '))
