@@ -48,6 +48,24 @@ exports.checkPass = function (assert) {
     });
 };
 
+exports.checkFail = function (assert) {
+    var r = checkUsage(function () {
+        return optimist('-x 10 -z 20'.split(' '))
+            .usage('Usage: $0 -x NUM -y NUM')
+            .check(function (argv) {
+                if (!('x' in argv)) throw 'You forgot about -x';
+                if (!('y' in argv)) throw 'You forgot about -y';
+            })
+            .argv;
+    });
+    assert.deepEqual(r, {
+        result : { x : 10, z : 20, _ : [], $0 : './usage' },
+        errors : [ 'Usage: ./usage -x NUM -y NUM', 'You forgot about -y' ],
+        logs : [],
+        exit: true,
+    });
+};
+
 exports.countPass = function (assert) {
     var r = checkUsage(function () {
         return optimist('1 2 3 --moo'.split(' '))
@@ -63,19 +81,19 @@ exports.countPass = function (assert) {
     });
 };
 
-exports.checkFail = function (assert) {
+exports.countFail = function (assert) {
     var r = checkUsage(function () {
-        return optimist('-x 10 -z 20'.split(' '))
-            .usage('Usage: $0 -x NUM -y NUM')
-            .check(function (argv) {
-                if (!('x' in argv)) throw 'You forgot about -x';
-                if (!('y' in argv)) throw 'You forgot about -y';
-            })
+        return optimist('1 2 --moo'.split(' '))
+            .usage('Usage: $0 [x] [y] [z] {OPTIONS}')
+            .demand(3)
             .argv;
     });
     assert.deepEqual(r, {
-        result : { x : 10, z : 20, _ : [], $0 : './usage' },
-        errors : [ 'Usage: ./usage -x NUM -y NUM', 'You forgot about -y' ],
+        result : { _ : [ '1', '2' ], moo : true, $0 : './usage' },
+        errors : [
+            'Usage: ./usage [x] [y] [z] {OPTIONS}',
+            'Not enough arguments, expected 3, but only found 2'
+        ],
         logs : [],
         exit: true,
     });
