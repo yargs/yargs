@@ -36,7 +36,8 @@ exports.checkPass = function (assert) {
         return optimist('-x 10 -y 20'.split(' '))
             .usage('Usage: $0 -x NUM -y NUM')
             .check(function (argv) {
-                return 'x' in argv && 'y' in argv
+                if (!('x' in argv)) throw 'You forgot about -x';
+                if (!('y' in argv)) throw 'You forgot about -y';
             })
             .argv;
     });
@@ -61,6 +62,47 @@ exports.checkFail = function (assert) {
     assert.deepEqual(r, {
         result : { x : 10, z : 20, _ : [], $0 : './usage' },
         errors : [ 'Usage: ./usage -x NUM -y NUM', 'You forgot about -y' ],
+        logs : [],
+        exit: true,
+    });
+};
+
+exports.checkCondPass = function (assert) {
+    function checker (argv) {
+        return 'x' in argv && 'y' in argv;
+    }
+    
+    var r = checkUsage(function () {
+        return optimist('-x 10 -y 20'.split(' '))
+            .usage('Usage: $0 -x NUM -y NUM')
+            .check(checker)
+            .argv;
+    });
+    assert.deepEqual(r, {
+        result : { x : 10, y : 20, _ : [], $0 : './usage' },
+        errors : [],
+        logs : [],
+        exit : false,
+    });
+};
+
+exports.checkCondFail = function (assert) {
+    function checker (argv) {
+        return 'x' in argv && 'y' in argv;
+    }
+    
+    var r = checkUsage(function () {
+        return optimist('-x 10 -z 20'.split(' '))
+            .usage('Usage: $0 -x NUM -y NUM')
+            .check(checker)
+            .argv;
+    });
+    assert.deepEqual(r, {
+        result : { x : 10, z : 20, _ : [], $0 : './usage' },
+        errors : [
+            'Usage: ./usage -x NUM -y NUM',
+            'Argument check failed: ' + checker.toString()
+        ],
         logs : [],
         exit: true,
     });
