@@ -5,8 +5,7 @@ Optimist is a node.js library for option parsing for people who hate option
 parsing. More specifically, this module is for people who like all the --bells
 and -whistlz of program usage but think optstrings are a waste of time.
 
-But all hope is not lost, dear reader, because there is Optimist, proving that
-option parsing doesn't have to suck (as much).
+With optimist, option parsing doesn't have to suck (as much).
 
 With Optimist, the options are just a hash! No optstrings attached.
 -------------------------------------------------------------------
@@ -26,6 +25,9 @@ xup.js:
 ***
 
     $ ./xup.js --rif=55 --xup=9.52
+    Buy more riffiwobbles
+    
+    $ ./xup.js --rif 55 --xup 9.52
     Buy more riffiwobbles
 
 But wait! There's more! You can do short options:
@@ -108,6 +110,42 @@ divide.js:
     $ ./divide.js -x 4.91 -z 2.51
     Usage: ./divide.js -x [num] -y [num]
     Missing arguments: y
+
+EVEN MORE HOLY COW
+------------------
+
+default_singles.js:
+    #!/usr/bin/env node
+    var argv = require('optimist')
+        .default('x', 10)
+        .default('y', 10)
+        .argv
+    ;
+    
+    var x = parseInt(argv.x, 10);
+    var y = parseInt(argv.y, 10);
+    console.log(x + y);
+
+***
+
+    $ ./default_singles.js -x 5
+    15
+
+default_hash.js:
+    #!/usr/bin/env node
+    var argv = require('optimist')
+        .default({ x : 10, y : 10 })
+        .argv
+    ;
+    
+    var x = parseInt(argv.x, 10);
+    var y = parseInt(argv.y, 10);
+    console.log(x + y);
+
+***
+
+    $ ./default_hash.js -y 7
+    17
 
 Installation
 ============
