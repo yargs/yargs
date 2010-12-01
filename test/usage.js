@@ -141,6 +141,42 @@ exports.countFail = function (assert) {
     });
 };
 
+exports.defaultSingles = function (assert) {
+    var r = checkUsage(function () {
+        return optimist('--foo 50 --baz 70 --powsy'.split(' '))
+            .default('foo', 5)
+            .default('bar', 6)
+            .default('baz', 7)
+            .argv
+        ;
+    });
+    assert.eql(r.result, {
+        foo : '50',
+        bar : 6,
+        baz : '70',
+        powsy : true,
+        _ : [],
+        $0 : './usage',
+    });
+};
+
+exports.defaultHash = function (assert) {
+    var r = checkUsage(function () {
+        return optimist('--foo 50 --baz 70'.split(' '))
+            .default({ foo : 10, bar : 20, quux : 30 })
+            .argv
+        ;
+    });
+    assert.eql(r.result, {
+        foo : '50',
+        bar : 20,
+        baz : 70,
+        quux : 30,
+        _ : [],
+        $0 : './usage',
+    });
+};
+
 exports.rebase = function (assert) {
     assert.equal(
         optimist.rebase('/home/substack', '/home/substack/foo/bar/baz'),
