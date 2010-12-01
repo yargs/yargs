@@ -49,15 +49,28 @@ exports['short captures'] = function (assert) {
     );
 };
 
+exports['long capture sp'] = function (assert) {
+    assert.deepEqual(
+        optimist.parse([ '--pow', 'xixxle' ]),
+        { pow : 'xixxle', _ : [], $0 : 'expresso' }
+    );
+};
 
-exports['long capture'] = function (assert) {
+exports['long capture eq'] = function (assert) {
     assert.deepEqual(
         optimist.parse([ '--pow=xixxle' ]),
         { pow : 'xixxle', _ : [], $0 : 'expresso' }
     );
 };
 
-exports['long captures'] = function (assert) {
+exports['long captures sp'] = function (assert) {
+    assert.deepEqual(
+        optimist.parse([ '--host', 'localhost', '--port', '555' ]),
+        { host : 'localhost', port : '555', _ : [], $0 : 'expresso' }
+    );
+};
+
+exports['long captures eq'] = function (assert) {
     assert.deepEqual(
         optimist.parse([ '--host=localhost', '--port=555' ]),
         { host : 'localhost', port : '555', _ : [], $0 : 'expresso' }
@@ -103,6 +116,7 @@ exports.comprehensive = function (assert) {
         optimist.parse([
             '--name=meowmers', 'bare', '-cats', 'woo',
             '-h', 'awesome', '--multi=quux',
+            '--key', 'value',
             '-b', '--bool', '--no-meep', '--multi=baz',
             '--', '--not-a-flag', 'eek'
         ]),
@@ -114,6 +128,7 @@ exports.comprehensive = function (assert) {
             h : 'awesome',
             b : true,
             bool : true,
+            key : 'value',
             multi : [ 'quux', 'baz' ],
             meep : false,
             name : 'meowmers',
