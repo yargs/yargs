@@ -9,6 +9,17 @@
         "type" : "git",
         "url" : "http://github.com/substack/node-optimist.git"
     },
+    "keywords" : [
+        "argument",
+        "option",
+        "parser",
+        "parsing"
+    ],
+    "author" : {
+        "name" : "James Halliday",
+        "email" : "mail@substack.net",
+        "url" : "http://substack.net"
+    },
     "license" : "MIT/X11",
     "engine" : ["node >=0.1.100"]
 }
