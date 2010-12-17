@@ -137,3 +137,26 @@ exports.comprehensive = function (assert) {
         }
     );
 };
+
+exports.nums = function (assert) {
+    var argv = optimist.parse([
+        '-x', '1234',
+        '-y', '5.67',
+        '-z', '1e7',
+        '-w', '10f',
+        '789',
+    ]);
+    assert.eql(argv, {
+        x : 1234,
+        y : 5.67,
+        z : 1e7,
+        w : '10f',
+        _ : [ 789 ],
+        $0 : 'expresso'
+    });
+    assert.eql(typeof argv.x, 'number');
+    assert.eql(typeof argv.y, 'number');
+    assert.eql(typeof argv.z, 'number');
+    assert.eql(typeof argv.w, 'string');
+    assert.eql(typeof argv._[0], 'number');
+};
