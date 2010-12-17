@@ -1,84 +1,84 @@
 var optimist = require('optimist');
 
 exports['short boolean'] = function (assert) {
-    assert.deepEqual(
+    assert.eql(
         optimist.parse([ '-b' ]),
         { b : true, _ : [], $0 : 'expresso' }
     );
 };
 
 exports['long boolean'] = function (assert) {
-    assert.deepEqual(
+    assert.eql(
         optimist.parse([ '--bool' ]),
         { bool : true, _ : [], $0 : 'expresso' }
     );
 };
     
 exports.bare = function (assert) {
-    assert.deepEqual(
+    assert.eql(
         optimist.parse([ 'foo', 'bar', 'baz' ]),
         { _ : [ 'foo', 'bar', 'baz' ], $0 : 'expresso' }
     );
 };
 
 exports['short group'] = function (assert) {
-    assert.deepEqual(
+    assert.eql(
         optimist.parse([ '-cats' ]),
         { c : true, a : true, t : true, s : true, _ : [], $0 : 'expresso' }
     );
 };
 
 exports['short group next'] = function (assert) {
-    assert.deepEqual(
+    assert.eql(
         optimist.parse([ '-cats', 'meow' ]),
         { c : true, a : true, t : true, s : 'meow', _ : [], $0 : 'expresso' }
     );
 };
  
 exports['short capture'] = function (assert) {
-    assert.deepEqual(
+    assert.eql(
         optimist.parse([ '-h', 'localhost' ]),
         { h : 'localhost', _ : [], $0 : 'expresso' }
     );
 };
 
 exports['short captures'] = function (assert) {
-    assert.deepEqual(
+    assert.eql(
         optimist.parse([ '-h', 'localhost', '-p', '555' ]),
-        { h : 'localhost', p : '555', _ : [], $0 : 'expresso' }
+        { h : 'localhost', p : 555, _ : [], $0 : 'expresso' }
     );
 };
 
 exports['long capture sp'] = function (assert) {
-    assert.deepEqual(
+    assert.eql(
         optimist.parse([ '--pow', 'xixxle' ]),
         { pow : 'xixxle', _ : [], $0 : 'expresso' }
     );
 };
 
 exports['long capture eq'] = function (assert) {
-    assert.deepEqual(
+    assert.eql(
         optimist.parse([ '--pow=xixxle' ]),
         { pow : 'xixxle', _ : [], $0 : 'expresso' }
     );
 };
 
 exports['long captures sp'] = function (assert) {
-    assert.deepEqual(
+    assert.eql(
         optimist.parse([ '--host', 'localhost', '--port', '555' ]),
-        { host : 'localhost', port : '555', _ : [], $0 : 'expresso' }
+        { host : 'localhost', port : 555, _ : [], $0 : 'expresso' }
     );
 };
 
 exports['long captures eq'] = function (assert) {
-    assert.deepEqual(
+    assert.eql(
         optimist.parse([ '--host=localhost', '--port=555' ]),
-        { host : 'localhost', port : '555', _ : [], $0 : 'expresso' }
+        { host : 'localhost', port : 555, _ : [], $0 : 'expresso' }
     );
 };
 
 exports['mixed short bool and capture'] = function (assert) {
-    assert.deepEqual(
+    assert.eql(
         optimist.parse([ '-h', 'localhost', '-fp', '555', 'script.js' ]),
         {
             f : true, p : 555, h : 'localhost',
@@ -88,7 +88,7 @@ exports['mixed short bool and capture'] = function (assert) {
 };
  
 exports['short and long'] = function (assert) {
-    assert.deepEqual(
+    assert.eql(
         optimist.parse([ '-h', 'localhost', '-fp', '555', 'script.js' ]),
         {
             f : true, p : 555, h : 'localhost',
@@ -98,21 +98,21 @@ exports['short and long'] = function (assert) {
 };
 
 exports.no = function (assert) {
-    assert.deepEqual(
+    assert.eql(
         optimist.parse([ '--no-moo' ]),
         { moo : false, _ : [], $0 : 'expresso' }
     );
 };
  
 exports.multi = function (assert) {
-    assert.deepEqual(
+    assert.eql(
         optimist.parse([ '-v', 'a', '-v', 'b', '-v', 'c' ]),
         { v : ['a','b','c'], _ : [], $0 : 'expresso' }
     );
 };
  
 exports.comprehensive = function (assert) {
-    assert.deepEqual(
+    assert.eql(
         optimist.parse([
             '--name=meowmers', 'bare', '-cats', 'woo',
             '-h', 'awesome', '--multi=quux',
