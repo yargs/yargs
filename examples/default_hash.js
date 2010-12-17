@@ -5,6 +5,4 @@ var argv = require('optimist')
     .argv
 ;
 
-var x = parseInt(argv.x, 10);
-var y = parseInt(argv.y, 10);
-console.log(x + y);
+console.log(argv.x + argv.y);

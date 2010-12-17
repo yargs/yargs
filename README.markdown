@@ -27,8 +27,8 @@ xup.js:
     $ ./xup.js --rif=55 --xup=9.52
     Buy more riffiwobbles
     
-    $ ./xup.js --rif 55 --xup 9.52
-    Buy more riffiwobbles
+    $ ./xup.js --rif 12 --xup 8.1
+    Sell the xupptumblers
 
 But wait! There's more! You can do short options:
 -------------------------------------------------
@@ -121,10 +121,7 @@ default_singles.js:
         .default('y', 10)
         .argv
     ;
-    
-    var x = parseInt(argv.x, 10);
-    var y = parseInt(argv.y, 10);
-    console.log(x + y);
+    console.log(argv.x + argv.y);
 
 ***
 
@@ -137,15 +134,20 @@ default_hash.js:
         .default({ x : 10, y : 10 })
         .argv
     ;
-    
-    var x = parseInt(argv.x, 10);
-    var y = parseInt(argv.y, 10);
-    console.log(x + y);
+    console.log(argv.x + argv.y);
 
 ***
 
     $ ./default_hash.js -y 7
     17
+
+Notes
+=====
+
+Every argument that looks like a number (`!isNaN(Number(arg))`) is converted to
+one. This way you can just `net.createConnection(argv.port)` and you can add
+numbers out of `argv` with `+` without having that mean concatenation,
+which is super frustrating.
 
 Installation
 ============
