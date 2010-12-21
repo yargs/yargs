@@ -1,10 +1,9 @@
 var optimist = require('optimist');
 
 exports['short boolean'] = function (assert) {
-    assert.eql(
-        optimist.parse([ '-b' ]),
-        { b : true, _ : [], $0 : 'expresso' }
-    );
+    var parse = optimist.parse([ '-b' ]);
+    assert.eql(parse, { b : true, _ : [], $0 : 'expresso' });
+    assert.eql(typeof parse.b, 'boolean');
 };
 
 exports['long boolean'] = function (assert) {
