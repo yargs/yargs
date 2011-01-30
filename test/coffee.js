@@ -4,7 +4,7 @@ var Script = process.binding('evals').Script;
 var Hash = require('traverse/hash');
 
 exports.coffee = function (assert) {
-    fs.readFile(__dirname + '/../lib/optimist.js', function (err, src) {
+    fs.readFile(__dirname + '/../index.js', function (err, src) {
         if (err) assert.fail(err);
         var context = {
             require : require,

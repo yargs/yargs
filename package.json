@@ -1,10 +1,8 @@
 {
     "name" : "optimist",
-    "version" : "0.1.3",
+    "version" : "0.1.4",
     "description" : "Light-weight option parsing with an argv hash. No optstrings attached.",
-    "modules" : {
-        "index" : "./lib/optimist.js",
-    },
+    "main" : "./index.js",
     "repository" : {
         "type" : "git",
         "url" : "http://github.com/substack/node-optimist.git"
