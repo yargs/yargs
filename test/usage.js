@@ -200,17 +200,19 @@ function checkUsage (f) {
     process.env = Hash.merge(process.env, { _ : 'node' });
     process.argv = [ './usage' ];
     
-    var _console = console;
-    console = Hash.copy(console);
     var errors = [];
     var logs = [];
+    
+    console._error = console.error;
     console.error = function (msg) { errors.push(msg) };
+    console._log = console.log;
     console.log = function (msg) { logs.push(msg) };
     
     var result = f();
     
     process = _process;
-    console = _console;
+    console.error = console._error;
+    console.log = console._log;
     
     return {
         errors : errors,
