@@ -2,37 +2,41 @@ var spawn = require('child_process').spawn;
 var assert = require('assert');
 
 exports.dotSlashEmpty = function () {
-    var to = setTimeout(function () {
-        assert.fail('Never got stdout data.')
-    }, 1000);
-    
-    var oldDir = process.cwd();
-    process.chdir(__dirname + '/_');
-    var bin = spawn('./bin.js');
-    process.chdir(oldDir);
-    
-    bin.stderr.on('data', assert.fail);
-    bin.stdout.on('data', function (buf) {
-        clearTimeout(to);
-        var _ = JSON.parse(buf.toString());
-        assert.eql(_, []);
-    });
+    testCmd('./bin.js', []);
 };
 
 exports.dotSlashArgs = function () {
+    testCmd('./bin.js', [ 'a', 'b', 'c' ]);
+};
+
+exports.nodeEmpty = function () {
+    testCmd('node bin.js', []);
+};
+
+exports.nodeArgs = function () {
+    testCmd('node bin.js', [ 'x', 'y', 'z' ]);
+};
+
+function testCmd (cmd, args) {
     var to = setTimeout(function () {
         assert.fail('Never got stdout data.')
     }, 1000);
     
     var oldDir = process.cwd();
     process.chdir(__dirname + '/_');
-    var bin = spawn('./bin.js', ['a','b','c']);
+    
+    var cmds = cmd.split(' ');
+    
+    var bin = spawn(cmds[0], cmds.slice(1).concat(args.map(String)));
     process.chdir(oldDir);
     
-    bin.stderr.on('data', assert.fail);
+    bin.stderr.on('data', function (err) {
+        assert.fail(err.toString());
+    });
+    
     bin.stdout.on('data', function (buf) {
         clearTimeout(to);
         var _ = JSON.parse(buf.toString());
-        assert.eql(_, ['a','b','c']);
+        assert.eql(_.map(String), args.map(String));
     });
 };
