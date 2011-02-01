@@ -2,7 +2,7 @@ module.exports = Argv;
 var path = require('path');
 
 // Hack to work when loaded with CoffeeScript
-if (process.argv.length < 2 || process.argv[0] != 'node') {
+if (process.argv.length < 2 || !process.argv[0].match(/(?:^|\/)node$/)) {
     process.argv = ['coffee', ''].concat(process.argv);
 }
 

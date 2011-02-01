@@ -44,7 +44,7 @@ exports.whichNodeArgs = function () {
 function testCmd (cmd, args) {
     var to = setTimeout(function () {
         assert.fail('Never got stdout data.')
-    }, 1000);
+    }, 5000);
     
     var oldDir = process.cwd();
     process.chdir(__dirname + '/_');
@@ -63,4 +63,4 @@ function testCmd (cmd, args) {
         var _ = JSON.parse(buf.toString());
         assert.eql(_.map(String), args.map(String));
     });
-};
+}
