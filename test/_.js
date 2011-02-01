@@ -17,6 +17,18 @@ exports.nodeArgs = function () {
     testCmd('node bin.js', [ 'x', 'y', 'z' ]);
 };
 
+exports.whichNodeEmpty = function () {
+    var which = spawn('which', ['node']);
+    
+    which.stdout.on('data', function (buf) {
+        testCmd(buf.toString().trim() + ' bin.js', []);
+    });
+    
+    which.stderr.on('data', function (err) {
+        assert.fail(err.toString());
+    });
+};
+
 function testCmd (cmd, args) {
     var to = setTimeout(function () {
         assert.fail('Never got stdout data.')
