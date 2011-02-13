@@ -165,3 +165,20 @@ exports['flag boolean'] = function (assert) {
     assert.eql(parse, { t : true, _ : [ 'moo' ], $0 : 'expresso' });
     assert.eql(typeof parse.t, 'boolean');
 };
+
+exports['boolean groups'] = function (assert) {
+    var parse = optimist([ '-x', '-z', 'one', 'two', 'three' ])
+        .boolean(['x','y','z']).argv;
+    
+    assert.eql(parse, {
+        x : true,
+        y : false,
+        z : true,
+        _ : [ 'one', 'two', 'three' ],
+        $0 : 'expresso',
+    });
+    
+    assert.eql(typeof parse.x, 'boolean');
+    assert.eql(typeof parse.y, 'boolean');
+    assert.eql(typeof parse.z, 'boolean');
+};
