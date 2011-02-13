@@ -159,3 +159,9 @@ exports.nums = function (assert) {
     assert.eql(typeof argv.w, 'string');
     assert.eql(typeof argv._[0], 'number');
 };
+
+exports['flag boolean'] = function (assert) {
+    var parse = optimist([ '-t', 'moo' ]).boolean(['t']).argv;
+    assert.eql(parse, { t : true, _ : [ 'moo' ], $0 : 'expresso' });
+    assert.eql(typeof parse.t, 'boolean');
+};

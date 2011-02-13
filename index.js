@@ -58,6 +58,24 @@ function Argv (args, cwd) {
         }
     }
     
+    self.boolean = function (bools) {
+        if (!Array.isArray(bools)) {
+            bools = [].slice.call(arguments);
+        }
+        
+        bools.forEach(function (name) {
+            if (self.argv[name] === undefined) {
+                self.argv[name] = false;
+            }
+            else {
+                self.argv._.push(self.argv[name]);
+                self.argv[name] = true;
+            }
+        });
+        
+        return self;
+    };
+    
     for (var i = 0; i < args.length; i++) {
         var arg = args[i];
         
