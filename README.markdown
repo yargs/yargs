@@ -141,6 +141,37 @@ default_hash.js:
     $ ./default_hash.js -y 7
     17
 
+And if you really want to get all descriptive about it...
+---------------------------------------------------------
+
+boolean_single.js
+    #!/usr/bin/env node
+    var argv = require('optimist')
+        .boolean('v')
+        .argv
+    ;
+    console.dir(argv);
+
+***
+    $ ./boolean_single.js -v foo bar baz
+    true
+    [ 'bar', 'baz', 'foo' ]
+
+boolean_double.js
+
+    #!/usr/bin/env node
+    var argv = require('optimist')
+        .boolean(['x','y','z'])
+        .argv
+    ;
+    console.dir([ argv.x, argv.y, argv.z ]);
+    console.dir(argv._);
+
+***
+    $ ./boolean_double.js -x -z one two three
+    [ true, false, true ]
+    [ 'one', 'two', 'three' ]
+
 Notes
 =====
 
