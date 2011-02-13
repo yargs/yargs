@@ -41,8 +41,6 @@ function Argv (args, cwd) {
         );
     }
     
-    self.argv = { _ : [], $0 : self.$0 };
-    
     function set (key, val) {
         var num = Number(val);
         var value = typeof val !== 'string' || isNaN(num) ? val : num;
@@ -58,70 +56,81 @@ function Argv (args, cwd) {
         }
     }
     
+    var flags = { bools : {} };
+    
     self.boolean = function (bools) {
         if (!Array.isArray(bools)) {
             bools = [].slice.call(arguments);
         }
         
         bools.forEach(function (name) {
-            if (self.argv[name] === undefined) {
+            flags.bools[name] = true;
+        });
+        
+        rescan();
+        
+        bools.forEach(function (name) {
+            if (!self.argv[name]) {
                 self.argv[name] = false;
-            }
-            else {
-                self.argv._.push(self.argv[name]);
-                self.argv[name] = true;
             }
         });
         
         return self;
     };
     
-    for (var i = 0; i < args.length; i++) {
-        var arg = args[i];
+    function rescan () {
+        self.argv = { _ : [], $0 : self.$0 };
         
-        if (arg == '--') {
-            self.argv._.push.apply(self.argv._, args.slice(i + 1));
-            break;
-        }
-        else if (arg.match(/^--.+=/)) {
-            var m = arg.match(/^--([^=]+)=(.*)/);
-            set(m[1], m[2]);
-        }
-        else if (arg.match(/^--no-.+/)) {
-            var key = arg.match(/^--no-(.+)/)[1];
-            set(key, false);
-        }
-        else if (arg.match(/^--.+/)) {
-            var key = arg.match(/^--(.+)/)[1];
-            var next = args[i + 1];
-            if (next !== undefined && !next.match(/^-/)) {
-                set(key, next);
-                i++;
+        for (var i = 0; i < args.length; i++) {
+            var arg = args[i];
+            
+            if (arg == '--') {
+                self.argv._.push.apply(self.argv._, args.slice(i + 1));
+                break;
+            }
+            else if (arg.match(/^--.+=/)) {
+                var m = arg.match(/^--([^=]+)=(.*)/);
+                set(m[1], m[2]);
+            }
+            else if (arg.match(/^--no-.+/)) {
+                var key = arg.match(/^--no-(.+)/)[1];
+                set(key, false);
+            }
+            else if (arg.match(/^--.+/)) {
+                var key = arg.match(/^--(.+)/)[1];
+                var next = args[i + 1];
+                if (next !== undefined && !next.match(/^-/)
+                && !flags.bools[key]) {
+                    set(key, next);
+                    i++;
+                }
+                else {
+                    set(key, true);
+                }
+            }
+            else if (arg.match(/^-[^-]+/)) {
+                arg.slice(1,-1).split('').forEach(function (letter) {
+                    set(letter, true);
+                });
+                
+                var key = arg.slice(-1)[0];
+                
+                if (args[i+1] && !args[i+1].match(/^-/)
+                && !flags.bools[key]) {
+                    set(key, args[i+1]);
+                    i++;
+                }
+                else {
+                    set(key, true);
+                }
             }
             else {
-                set(key, true);
+                var n = Number(arg);
+                self.argv._.push(isNaN(n) ? arg : n);
             }
-        }
-        else if (arg.match(/^-[^-]+/)) {
-            arg.slice(1,-1).split('').forEach(function (letter) {
-                set(letter, true);
-            });
-            
-            var key = arg.slice(-1)[0];
-            
-            if (args[i+1] && !args[i+1].match(/^-/)) {
-                set(key, args[i+1]);
-                i++;
-            }
-            else {
-                set(key, true);
-            }
-        }
-        else {
-            var n = Number(arg);
-            self.argv._.push(isNaN(n) ? arg : n);
         }
     }
+    rescan();
     
     var usage;
     self.usage = function (msg) {
