@@ -199,6 +199,19 @@ function Argv (args, cwd) {
         return Argv(args).argv;
     };
     
+    self.camelCase = function () {
+        for (var key in self.argv) {
+            var camelCasedKey = key.replace(/-([a-z])/g, function ($0, firstLetter) {
+                return firstLetter.toUpperCase();
+            });
+            if (camelCasedKey !== key) {
+                self.argv[camelCasedKey] = self.argv[key];
+                delete self.argv[key];
+            }
+        }
+        return self;
+    };
+    
     return self;
 };
 
