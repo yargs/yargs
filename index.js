@@ -43,7 +43,9 @@ function Argv (args, cwd) {
     
     function set (key, val) {
         var num = Number(val);
-        var value = typeof val !== 'string' || isNaN(num) ? val : num;
+        var value = typeof val !== 'string'
+            || isNaN(num) && !flags.strings[key]
+            ? val : num;
         
         if (key in self.argv) {
             if (!Array.isArray(self.argv[key])) {
@@ -56,7 +58,7 @@ function Argv (args, cwd) {
         }
     }
     
-    var flags = { bools : {} };
+    var flags = { bools : {}, strings : {} };
     
     self.boolean = function (bools) {
         if (!Array.isArray(bools)) {
@@ -74,6 +76,20 @@ function Argv (args, cwd) {
                 self.argv[name] = false;
             }
         });
+        
+        return self;
+    };
+    
+    self.string = function (strings) {
+        if (!Array.isArray(strings)) {
+            strings = [].slice.call(arguments);
+        }
+        
+        strings.forEach(function (name) {
+            flags.strings[name] = true;
+        });
+        
+        rescan();
         
         return self;
     };

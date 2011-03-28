@@ -1,4 +1,5 @@
 var optimist = require('optimist');
+var assert = require('assert');
 
 exports['short boolean'] = function (assert) {
     var parse = optimist.parse([ '-b' ]);
@@ -184,4 +185,14 @@ exports['boolean groups'] = function (assert) {
     assert.eql(typeof parse.x, 'boolean');
     assert.eql(typeof parse.y, 'boolean');
     assert.eql(typeof parse.z, 'boolean');
+};
+
+exports.strings = function () {
+    var s = optimist([ '-s', '0001234' ]).string('s').argv.s;
+    assert.eql(s, '0001234');
+    assert.eql(typeof s, 'string');
+    
+    var x = optimist([ '-x', '56' ]).string('x').argv.x;
+    assert.eql(x, '56');
+    assert.eql(typeof x, 'string');
 };
