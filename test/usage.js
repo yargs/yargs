@@ -1,4 +1,4 @@
-var Hash = require('traverse/hash');
+var Hash = require('hashish');
 var optimist = require('optimist');
 
 exports.usageFail = function (assert) {

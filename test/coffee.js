@@ -1,7 +1,7 @@
 // coffee script style arguments where process.argv is .splice(2)'d
 var fs = require('fs');
 var Script = process.binding('evals').Script;
-var Hash = require('traverse/hash');
+var Hash = require('hashish');
 
 exports.coffee = function (assert) {
     fs.readFile(__dirname + '/../index.js', function (err, src) {

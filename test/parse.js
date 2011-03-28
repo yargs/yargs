@@ -143,6 +143,7 @@ exports.nums = function (assert) {
         '-y', '5.67',
         '-z', '1e7',
         '-w', '10f',
+        '--hex', '0xdeadbeef',
         '789',
     ]);
     assert.eql(argv, {
@@ -150,6 +151,7 @@ exports.nums = function (assert) {
         y : 5.67,
         z : 1e7,
         w : '10f',
+        hex : 0xdeadbeef,
         _ : [ 789 ],
         $0 : 'expresso'
     });
@@ -157,6 +159,7 @@ exports.nums = function (assert) {
     assert.eql(typeof argv.y, 'number');
     assert.eql(typeof argv.z, 'number');
     assert.eql(typeof argv.w, 'string');
+    assert.eql(typeof argv.hex, 'number');
     assert.eql(typeof argv._[0], 'number');
 };
 
