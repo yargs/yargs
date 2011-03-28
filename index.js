@@ -3,7 +3,7 @@ var path = require('path');
 
 // Hack to work when loaded with CoffeeScript
 if (process.argv.length < 2
-|| !process.argv[0].match(/(?:^|\/)node(?:-?\d+(?:\.\d+)*)?$/)) {
+|| !process.argv[0].match(/(?:^|\/)node(?:_g)?(?:-?\d+(?:\.\d+)*)?$/)) {
     process.argv = ['coffee', ''].concat(process.argv);
 }
 
