@@ -3,7 +3,7 @@ var path = require('path');
 
 // Hack to work when loaded with CoffeeScript
 if (process.argv.length < 2
-|| !process.argv[0].match(/(?:^|\/)node(?:-?\d+(?:\.\d+)*)?$/)) {
+|| !process.argv[0].match(/(?:^|\/)node(?:_g)?(?:-?\d+(?:\.\d+)*)?$/)) {
     process.argv = ['coffee', ''].concat(process.argv);
 }
 
@@ -212,6 +212,19 @@ function Argv (args, cwd) {
     
     self.parse = function (args) {
         return Argv(args).argv;
+    };
+    
+    self.camelCase = function () {
+        for (var key in self.argv) {
+            var camelCasedKey = key.replace(/-([a-z])/g, function ($0, firstLetter) {
+                return firstLetter.toUpperCase();
+            });
+            if (camelCasedKey !== key) {
+                self.argv[camelCasedKey] = self.argv[key];
+                delete self.argv[key];
+            }
+        }
+        return self;
     };
     
     return self;
