@@ -43,9 +43,8 @@ function Argv (args, cwd) {
     
     function set (key, val) {
         var num = Number(val);
-        var value = typeof val !== 'string'
-            || isNaN(num) && !flags.strings[key]
-            ? val : num;
+        var value = typeof val !== 'string' || isNaN(num) ? val : num;
+        if (flags.strings[key]) value = val;
         
         if (key in self.argv) {
             if (!Array.isArray(self.argv[key])) {
