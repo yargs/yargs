@@ -9,9 +9,12 @@
     },
     "keywords" : [
         "argument",
+        "args",
         "option",
         "parser",
-        "parsing"
+        "parsing",
+        "cli",
+        "command"
     ],
     "author" : {
         "name" : "James Halliday",
