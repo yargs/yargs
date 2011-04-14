@@ -124,19 +124,31 @@ function Argv (args, cwd) {
                 }
             }
             else if (arg.match(/^-[^-]+/)) {
-                arg.slice(1,-1).split('').forEach(function (letter) {
-                    set(letter, true);
-                });
+                var letters = arg.slice(1,-1).split('');
                 
-                var key = arg.slice(-1)[0];
-                
-                if (args[i+1] && !args[i+1].match(/^-/)
-                && !flags.bools[key]) {
-                    set(key, args[i+1]);
-                    i++;
+                var broken = false;
+                for (var j = 0; j < letters.length; j++) {
+                    if (letters[j+1] && letters[j+1].match(/\W/)) {
+                        set(letters[j], arg.slice(j+2));
+                        broken = true;
+                        break;
+                    }
+                    else {
+                        set(letters[j], true);
+                    }
                 }
-                else {
-                    set(key, true);
+                
+                if (!broken) {
+                    var key = arg.slice(-1)[0];
+                    
+                    if (args[i+1] && !args[i+1].match(/^-/)
+                    && !flags.bools[key]) {
+                        set(key, args[i+1]);
+                        i++;
+                    }
+                    else {
+                        set(key, true);
+                    }
                 }
             }
             else {
