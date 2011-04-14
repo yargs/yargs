@@ -1,83 +1,83 @@
 var optimist = require('optimist');
 var assert = require('assert');
 
-exports['short boolean'] = function (assert) {
+exports['short boolean'] = function () {
     var parse = optimist.parse([ '-b' ]);
     assert.eql(parse, { b : true, _ : [], $0 : 'expresso' });
     assert.eql(typeof parse.b, 'boolean');
 };
 
-exports['long boolean'] = function (assert) {
+exports['long boolean'] = function () {
     assert.eql(
         optimist.parse([ '--bool' ]),
         { bool : true, _ : [], $0 : 'expresso' }
     );
 };
     
-exports.bare = function (assert) {
+exports.bare = function () {
     assert.eql(
         optimist.parse([ 'foo', 'bar', 'baz' ]),
         { _ : [ 'foo', 'bar', 'baz' ], $0 : 'expresso' }
     );
 };
 
-exports['short group'] = function (assert) {
+exports['short group'] = function () {
     assert.eql(
         optimist.parse([ '-cats' ]),
         { c : true, a : true, t : true, s : true, _ : [], $0 : 'expresso' }
     );
 };
 
-exports['short group next'] = function (assert) {
+exports['short group next'] = function () {
     assert.eql(
         optimist.parse([ '-cats', 'meow' ]),
         { c : true, a : true, t : true, s : 'meow', _ : [], $0 : 'expresso' }
     );
 };
  
-exports['short capture'] = function (assert) {
+exports['short capture'] = function () {
     assert.eql(
         optimist.parse([ '-h', 'localhost' ]),
         { h : 'localhost', _ : [], $0 : 'expresso' }
     );
 };
 
-exports['short captures'] = function (assert) {
+exports['short captures'] = function () {
     assert.eql(
         optimist.parse([ '-h', 'localhost', '-p', '555' ]),
         { h : 'localhost', p : 555, _ : [], $0 : 'expresso' }
     );
 };
 
-exports['long capture sp'] = function (assert) {
+exports['long capture sp'] = function () {
     assert.eql(
         optimist.parse([ '--pow', 'xixxle' ]),
         { pow : 'xixxle', _ : [], $0 : 'expresso' }
     );
 };
 
-exports['long capture eq'] = function (assert) {
+exports['long capture eq'] = function () {
     assert.eql(
         optimist.parse([ '--pow=xixxle' ]),
         { pow : 'xixxle', _ : [], $0 : 'expresso' }
     );
 };
 
-exports['long captures sp'] = function (assert) {
+exports['long captures sp'] = function () {
     assert.eql(
         optimist.parse([ '--host', 'localhost', '--port', '555' ]),
         { host : 'localhost', port : 555, _ : [], $0 : 'expresso' }
     );
 };
 
-exports['long captures eq'] = function (assert) {
+exports['long captures eq'] = function () {
     assert.eql(
         optimist.parse([ '--host=localhost', '--port=555' ]),
         { host : 'localhost', port : 555, _ : [], $0 : 'expresso' }
     );
 };
 
-exports['mixed short bool and capture'] = function (assert) {
+exports['mixed short bool and capture'] = function () {
     assert.eql(
         optimist.parse([ '-h', 'localhost', '-fp', '555', 'script.js' ]),
         {
@@ -87,7 +87,7 @@ exports['mixed short bool and capture'] = function (assert) {
     );
 };
  
-exports['short and long'] = function (assert) {
+exports['short and long'] = function () {
     assert.eql(
         optimist.parse([ '-h', 'localhost', '-fp', '555', 'script.js' ]),
         {
@@ -97,21 +97,21 @@ exports['short and long'] = function (assert) {
     );
 };
 
-exports.no = function (assert) {
+exports.no = function () {
     assert.eql(
         optimist.parse([ '--no-moo' ]),
         { moo : false, _ : [], $0 : 'expresso' }
     );
 };
  
-exports.multi = function (assert) {
+exports.multi = function () {
     assert.eql(
         optimist.parse([ '-v', 'a', '-v', 'b', '-v', 'c' ]),
         { v : ['a','b','c'], _ : [], $0 : 'expresso' }
     );
 };
  
-exports.comprehensive = function (assert) {
+exports.comprehensive = function () {
     assert.eql(
         optimist.parse([
             '--name=meowmers', 'bare', '-cats', 'woo',
@@ -138,7 +138,7 @@ exports.comprehensive = function (assert) {
     );
 };
 
-exports.nums = function (assert) {
+exports.nums = function () {
     var argv = optimist.parse([
         '-x', '1234',
         '-y', '5.67',
@@ -164,13 +164,13 @@ exports.nums = function (assert) {
     assert.eql(typeof argv._[0], 'number');
 };
 
-exports['flag boolean'] = function (assert) {
+exports['flag boolean'] = function () {
     var parse = optimist([ '-t', 'moo' ]).boolean(['t']).argv;
     assert.eql(parse, { t : true, _ : [ 'moo' ], $0 : 'expresso' });
     assert.eql(typeof parse.t, 'boolean');
 };
 
-exports['boolean groups'] = function (assert) {
+exports['boolean groups'] = function () {
     var parse = optimist([ '-x', '-z', 'one', 'two', 'three' ])
         .boolean(['x','y','z']).argv;
     
@@ -195,4 +195,11 @@ exports.strings = function () {
     var x = optimist([ '-x', '56' ]).string('x').argv.x;
     assert.eql(x, '56');
     assert.eql(typeof x, 'string');
+};
+
+exports.slashBreak = function () {
+    assert.eql(
+        optimist.parse([ '-I/foo/bar/baz' ]),
+        { I : '/foo/bar/baz', _ : [], $0 : 'expresso' }
+    );
 };
