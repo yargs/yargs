@@ -202,4 +202,8 @@ exports.slashBreak = function () {
         optimist.parse([ '-I/foo/bar/baz' ]),
         { I : '/foo/bar/baz', _ : [], $0 : 'expresso' }
     );
+    assert.eql(
+        optimist.parse([ '-xyz/foo/bar/baz' ]),
+        { x : true, y : true, z : '/foo/bar/baz', _ : [], $0 : 'expresso' }
+    );
 };
