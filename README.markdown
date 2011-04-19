@@ -61,6 +61,7 @@ bool.js:
     );
 
 ***
+
     $ ./bool.js -s
     The cat says: meow
     
@@ -94,6 +95,7 @@ Plus, Optimist comes with .usage() and .demand()!
 -------------------------------------------------
 
 divide.js:
+
     #!/usr/bin/env node
     var argv = require('optimist')
         .usage('Usage: $0 -x [num] -y [num]')
@@ -115,6 +117,7 @@ EVEN MORE HOLY COW
 ------------------
 
 default_singles.js:
+
     #!/usr/bin/env node
     var argv = require('optimist')
         .default('x', 10)
@@ -129,6 +132,7 @@ default_singles.js:
     15
 
 default_hash.js:
+
     #!/usr/bin/env node
     var argv = require('optimist')
         .default({ x : 10, y : 10 })
@@ -145,6 +149,7 @@ And if you really want to get all descriptive about it...
 ---------------------------------------------------------
 
 boolean_single.js
+
     #!/usr/bin/env node
     var argv = require('optimist')
         .boolean('v')
