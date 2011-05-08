@@ -1,7 +1,8 @@
 var Hash = require('hashish');
 var optimist = require('optimist');
+var assert = require('assert');
 
-exports.usageFail = function (assert) {
+exports.usageFail = function () {
     var r = checkUsage(function () {
         return optimist('-x 10 -z 20'.split(' '))
             .usage('Usage: $0 -x NUM -y NUM')
@@ -16,7 +17,7 @@ exports.usageFail = function (assert) {
     });
 };
 
-exports.usagePass = function (assert) {
+exports.usagePass = function () {
     var r = checkUsage(function () {
         return optimist('-x 10 -y 20'.split(' '))
             .usage('Usage: $0 -x NUM -y NUM')
@@ -31,7 +32,7 @@ exports.usagePass = function (assert) {
     });
 };
 
-exports.checkPass = function (assert) {
+exports.checkPass = function () {
     var r = checkUsage(function () {
         return optimist('-x 10 -y 20'.split(' '))
             .usage('Usage: $0 -x NUM -y NUM')
@@ -49,7 +50,7 @@ exports.checkPass = function (assert) {
     });
 };
 
-exports.checkFail = function (assert) {
+exports.checkFail = function () {
     var r = checkUsage(function () {
         return optimist('-x 10 -z 20'.split(' '))
             .usage('Usage: $0 -x NUM -y NUM')
@@ -67,7 +68,7 @@ exports.checkFail = function (assert) {
     });
 };
 
-exports.checkCondPass = function (assert) {
+exports.checkCondPass = function () {
     function checker (argv) {
         return 'x' in argv && 'y' in argv;
     }
@@ -86,7 +87,7 @@ exports.checkCondPass = function (assert) {
     });
 };
 
-exports.checkCondFail = function (assert) {
+exports.checkCondFail = function () {
     function checker (argv) {
         return 'x' in argv && 'y' in argv;
     }
@@ -108,7 +109,7 @@ exports.checkCondFail = function (assert) {
     });
 };
 
-exports.countPass = function (assert) {
+exports.countPass = function () {
     var r = checkUsage(function () {
         return optimist('1 2 3 --moo'.split(' '))
             .usage('Usage: $0 [x] [y] [z] {OPTIONS}')
@@ -123,7 +124,7 @@ exports.countPass = function (assert) {
     });
 };
 
-exports.countFail = function (assert) {
+exports.countFail = function () {
     var r = checkUsage(function () {
         return optimist('1 2 --moo'.split(' '))
             .usage('Usage: $0 [x] [y] [z] {OPTIONS}')
@@ -141,7 +142,7 @@ exports.countFail = function (assert) {
     });
 };
 
-exports.defaultSingles = function (assert) {
+exports.defaultSingles = function () {
     var r = checkUsage(function () {
         return optimist('--foo 50 --baz 70 --powsy'.split(' '))
             .default('foo', 5)
@@ -160,7 +161,7 @@ exports.defaultSingles = function (assert) {
     });
 };
 
-exports.defaultHash = function (assert) {
+exports.defaultHash = function () {
     var r = checkUsage(function () {
         return optimist('--foo 50 --baz 70'.split(' '))
             .default({ foo : 10, bar : 20, quux : 30 })
@@ -177,7 +178,7 @@ exports.defaultHash = function (assert) {
     });
 };
 
-exports.rebase = function (assert) {
+exports.rebase = function () {
     assert.equal(
         optimist.rebase('/home/substack', '/home/substack/foo/bar/baz'),
         './foo/bar/baz'

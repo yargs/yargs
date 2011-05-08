@@ -1,12 +1,6 @@
 module.exports = Argv;
 var path = require('path');
 
-// Hack to work when loaded with CoffeeScript
-if (process.argv.length < 2
-|| !process.argv[0].match(/(?:^|\/)node(?:[^A-Za-z]|$)/)) {
-    process.argv = ['coffee', ''].concat(process.argv);
-}
-
 /*  Hack an instance of Argv with process.argv into Argv
     so people an do
         require('optimist')(['--beeble=1','-z','zizzle']).argv
