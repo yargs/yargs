@@ -162,7 +162,8 @@ function Argv (args, cwd) {
     function fail (msg) {
         if (usage) console.error(usage.replace(/\$0/g, self.$0))
         console.error(msg);
-        process.exit();
+        self.showHelp();
+        process.exit(1);
     }
     
     self.check = function (f) {
@@ -232,6 +233,147 @@ function Argv (args, cwd) {
         }
         return self;
     };
+    
+    function longestElement (a) {
+        var l = 0;
+        for (var i = 0; i < a.length; i++) {
+            if (a[l].length < a[i].length) {
+                l = i;
+            }
+        }
+
+        return a[l].length;
+    }
+    
+    self.describe = function (desc, opts) {
+        if (!opts && typeof desc === 'object') {
+            opts = desc;
+            desc = null;
+        }
+      
+        self.description = desc;
+        return opts ? self.options(opts) : self;
+    }
+    
+    self.options = function (opts) {
+        var required = [],
+            strings = [],
+            bools = [];
+    
+        self.options = opts;
+      
+        Object.keys(opts).forEach(function (key) {
+          var o = opts[key],
+              oargs = [key]
+            
+          if (o.short && o.short !== key) {
+              oargs.unshift(o.short);
+          }
+        
+          if (o.required) {
+              required = required.concat(oargs);
+          }
+        
+          if (o.boolean) {
+              bools = bools.concat(oargs);
+          }
+          else if (o.string) {
+              strings = strings.concat(oargs);
+          }
+        
+          if (o.default) {
+              //
+              // If this argument has default values then set it
+              // internally on this `Argv` instance for both the verbose
+              // and `short` option (if provided).
+              //
+              oargs.forEach(function (a) {
+                  self.default(a, o.default);
+              });
+          }
+        });
+      
+        if (required.length > 0) {
+            //
+            // If required properties have been supplied, 
+            // then demand them immediately. 
+            //
+            // TODO: Patch `.demand()` so that it can discern between
+            // multiple options for each real option. (e.g. `.demand(['a', 'about'])`
+            // fails when it is really the same argument.
+            //
+            self.demand(required);
+        }
+      
+        if (bools.length > 0) {
+            self.boolean(bools);
+        }
+      
+        if (strings.length > 0) {
+            self.string(strings);
+        }
+      
+        return self;
+    };
+    
+    self.showHelp = function (padding) {
+        if (self.description) {
+            console.log(self.description + '\n'); 
+        }
+      
+        if (self.options && Object.keys(self.options).length > 0) {
+            var help = Object.keys(self.options).map(function (key) {
+                var o = self.options[key],
+                    hargs = [o.short, key]; 
+          
+                hargs = hargs.filter(function (a) { 
+                    return a; 
+                }).map(function (a) {
+                    return a.length === 1 ? '-' + a : '--' + a;
+                }).join(', ');
+          
+                return {
+                    args: hargs,
+                    description: o.description,
+                    default: o.default
+                };
+            })
+        
+            padding = padding || 2;
+        
+            var larg = longestElement(help.map(function (h) { return h.args })),
+                described = help.filter(function (h) { return h.description }),
+                more = help.filter(function (h) { return !h.description });
+        
+            function printOpt (h) {
+              var hdesc = h.description || '';
+          
+              if (h.args.length < larg) {
+                  h.args += new Array(larg - h.args.length + 1).join(' ');
+              }
+          
+              if (padding) {
+                  hdesc = new Array(padding + 1).join(' ') + hdesc;
+              }
+          
+              return [
+                  '  ' + h.args,
+                  hdesc,
+                  h.default ? '[' + h.default + ']' : ''
+              ].join(' ');
+            }
+        
+            if (described.length > 0) {
+                console.log('options:');
+                console.log(described.map(printOpt).join('\n'));
+            }
+        
+            if (more.length > 0) {
+                console.log('\nmore options:');
+                console.log(more.map(printOpt).join('\n'));
+            }
+        }
+    }
     
     return self;
 };
