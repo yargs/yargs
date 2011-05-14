@@ -75,6 +75,11 @@ function Argv (args, cwd) {
                 aliases[x[key]] = key;
             });
         }
+        else if (Array.isArray(y)) {
+            y.forEach(function (yy) {
+                self.alias(x, y);
+            });
+        }
         else {
             aliases[x] = y;
             aliases[y] = x;
@@ -107,9 +112,12 @@ function Argv (args, cwd) {
             opts = msg;
             msg = null;
         }
-      
+        
         usage = msg;
-        return opts ? self.options(opts) : self;
+        
+        if (opts) self.options(opts);
+        
+        return self;
     };
     
     function fail (msg) {
@@ -172,64 +180,22 @@ function Argv (args, cwd) {
         return a[l].length;
     }
     
-    var options = null;
-    
     self.options = function (opts) {
-        var required = [],
-            strings = [],
-            bools = [];
-    
-        self.options = opts;
-        
         Object.keys(opts).forEach(function (key) {
-            var o = opts[key];
-            var oargs = [key];
+            var opt = opts[key];
             
-            if (o.short && o.short !== key) {
-                oargs.unshift(o.short);
-            }
+            if (opt.alias) self.alias(key, opt.alias);
+            if (opt.demand) self.demand(key);
+            if (opt.default) self.default(key, opt.default);
             
-            if (o.required) {
-                required = required.concat(oargs);
+            if (opt.boolean || opt.type === 'boolean') {
+                self.boolean(key);
             }
-            
-            if (o.boolean) {
-                bools = bools.concat(oargs);
-            }
-            else if (o.string) {
-                strings = strings.concat(oargs);
-            }
-            
-            if (o.default) {
-                // If this argument has default values then set it
-                // internally on this `Argv` instance for both the verbose
-                // and `short` option (if provided).
-                //
-                oargs.forEach(function (a) {
-                    self.default(a, o.default);
-                });
+            if (opt.string || opt.type === 'string') {
+                self.string(key);
             }
         });
         
-        if (required.length > 0) {
-            // If required properties have been supplied, 
-            // then demand them immediately. 
-            //
-            // TODO: Patch `.demand()` so that it can discern between
-            // multiple options for each real option. (e.g. `.demand(['a', 'about'])`
-            // fails when it is really the same argument.
-            //
-            self.demand(required);
-        }
-      
-        if (bools.length > 0) {
-            self.boolean(bools);
-        }
-      
-        if (strings.length > 0) {
-            self.string(strings);
-        }
-      
         return self;
     };
     
