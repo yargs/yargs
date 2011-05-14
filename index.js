@@ -227,9 +227,10 @@ function Argv (args, cwd) {
     
     self.camelCase = function () {
         for (var key in self.argv) {
-            var camelCasedKey = key.replace(/-([a-z])/g, function ($0, firstLetter) {
-                return firstLetter.toUpperCase();
+            var camelCasedKey = key.replace(/-([a-z])/g, function (_, c) {
+                return c.toUpperCase();
             });
+            
             if (camelCasedKey !== key) {
                 self.argv[camelCasedKey] = self.argv[key];
                 delete self.argv[key];
@@ -249,46 +250,46 @@ function Argv (args, cwd) {
         return a[l].length;
     }
     
+    var options = null;
+    
     self.options = function (opts) {
         var required = [],
             strings = [],
             bools = [];
     
         self.options = opts;
-      
+        
         Object.keys(opts).forEach(function (key) {
-          var o = opts[key],
-              oargs = [key]
+            var o = opts[key];
+            var oargs = [key];
             
-          if (o.short && o.short !== key) {
-              oargs.unshift(o.short);
-          }
-        
-          if (o.required) {
-              required = required.concat(oargs);
-          }
-        
-          if (o.boolean) {
-              bools = bools.concat(oargs);
-          }
-          else if (o.string) {
-              strings = strings.concat(oargs);
-          }
-        
-          if (o.default) {
-              //
-              // If this argument has default values then set it
-              // internally on this `Argv` instance for both the verbose
-              // and `short` option (if provided).
-              //
-              oargs.forEach(function (a) {
-                  self.default(a, o.default);
-              });
-          }
+            if (o.short && o.short !== key) {
+                oargs.unshift(o.short);
+            }
+            
+            if (o.required) {
+                required = required.concat(oargs);
+            }
+            
+            if (o.boolean) {
+                bools = bools.concat(oargs);
+            }
+            else if (o.string) {
+                strings = strings.concat(oargs);
+            }
+            
+            if (o.default) {
+                // If this argument has default values then set it
+                // internally on this `Argv` instance for both the verbose
+                // and `short` option (if provided).
+                //
+                oargs.forEach(function (a) {
+                    self.default(a, o.default);
+                });
+            }
         });
-      
+        
         if (required.length > 0) {
-            //
             // If required properties have been supplied, 
             // then demand them immediately. 
             //
@@ -312,14 +313,14 @@ function Argv (args, cwd) {
     
     self.showHelp = function (padding) {
         if (usage) {
-          console.error(usage.replace(/\$0/g, self.$0));
+            console.error(usage.replace(/\$0/g, self.$0));
         }
-      
+        
         if (self.options && Object.keys(self.options).length > 0) {
             var help = Object.keys(self.options).map(function (key) {
-                var o = self.options[key],
-                    hargs = [o.short, key]; 
-          
+                var o = self.options[key];
+                var hargs = [o.short, key]; 
+                
                 hargs = hargs.filter(function (a) { 
                     return a; 
                 }).map(function (a) {

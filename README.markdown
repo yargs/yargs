@@ -1,4 +1,4 @@
-Optimist
+optimist
 ========
 
 Optimist is a node.js library for option parsing for people who hate option
@@ -177,7 +177,7 @@ boolean_double.js
     [ true, false, true ]
     [ 'one', 'two', 'three' ]
 
-Notes
+notes
 =====
 
 Every argument that looks like a number (`!isNaN(Number(arg))`) is converted to
@@ -185,7 +185,7 @@ one. This way you can just `net.createConnection(argv.port)` and you can add
 numbers out of `argv` with `+` without having that mean concatenation,
 which is super frustrating.
 
-Installation
+installation
 ============
 
 With [npm](http://github.com/isaacs/npm), just do:
@@ -200,7 +200,7 @@ just do:
     
     expresso
 
-Inspired By
+inspired By
 ===========
 
 This module is loosely inspired by Perl's
