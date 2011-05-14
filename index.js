@@ -49,6 +49,10 @@ function Argv (args, cwd) {
         else {
             self.argv[key] = value;
         }
+        
+        if (aliases[key]) {
+            self.argv[aliases[key]] = self.argv[key];
+        }
     }
     
     var flags = { bools : {}, strings : {} };
@@ -85,6 +89,20 @@ function Argv (args, cwd) {
         rescan();
         
         return self;
+    };
+    
+    var aliases = {};
+    self.alias = function (x, y) {
+        if (typeof x === 'object') {
+            Object.keys(x).forEach(function (key) {
+                aliases[key] = x[key];
+                aliases[x[key]] = key;
+            });
+        }
+        else {
+            aliases[x] = y;
+            aliases[y] = x;
+        }
     };
     
     function rescan () {
@@ -333,13 +351,13 @@ function Argv (args, cwd) {
                     default: o.default
                 };
             })
-        
+            
             padding = padding || 2;
-        
-            var larg = longestElement(help.map(function (h) { return h.args })),
-                described = help.filter(function (h) { return h.description }),
-                more = help.filter(function (h) { return !h.description });
-        
+            
+            var larg = longestElement(help.map(function (h) { return h.args }));
+            var described = help.filter(function (h) { return h.description });
+            var more = help.filter(function (h) { return !h.description });
+            
             function printOpt (h) {
               var hdesc = h.description || '';
           
