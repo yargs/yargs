@@ -1,12 +1,13 @@
 var path = require('path');
 
 /*  Hack an instance of Argv with process.argv into Argv
-    so people an do
+    so people can do
         require('optimist')(['--beeble=1','-z','zizzle']).argv
     to parse a list of args and
         require('optimist').argv
     to get a parsed version of process.argv.
 */
+
 var inst = Argv(process.argv.slice(2));
 Object.keys(inst).forEach(function (key) {
     Argv[key] = typeof inst[key] == 'function'
@@ -219,7 +220,7 @@ function Argv (args, cwd) {
     
     self.showHelp = function () {
         if (usage) {
-            console.error(usage.replace(/\$0/g, self.$0));
+            console.error(usage.replace(/\$0/g, self.$0) + '\n');
         }
         
         var keys = Object.keys(
@@ -246,7 +247,7 @@ function Argv (args, cwd) {
             console.error('  ' + switches + '  ' + [
                 type,
                 demanded[key]
-                    ? '[required parameter]'
+                    ? '[required]'
                     : null
                 ,
                 defaults[key]
@@ -260,60 +261,6 @@ function Argv (args, cwd) {
             console.error();
         });
         
-/*
-        if (self.options && Object.keys(self.options).length > 0) {
-            var help = Object.keys(self.options).map(function (key) {
-                var o = self.options[key];
-                var hargs = [o.short, key]; 
-                
-                hargs = hargs.filter(function (a) { 
-                    return a; 
-                }).map(function (a) {
-                    return a.length === 1 ? '-' + a : '--' + a;
-                }).join(', ');
-          
-                return {
-                    args: hargs,
-                    description: o.description,
-                    default: o.default
-                };
-            })
-            
-            padding = padding || 2;
-            
-            var larg = longestElement(help.map(function (h) { return h.args }));
-            var described = help.filter(function (h) { return h.description });
-            var more = help.filter(function (h) { return !h.description });
-            
-            function printOpt (h) {
-              var hdesc = h.description || '';
-          
-              if (h.args.length < larg) {
-                  h.args += new Array(larg - h.args.length + 1).join(' ');
-              }
-          
-              if (padding) {
-                  hdesc = new Array(padding + 1).join(' ') + hdesc;
-              }
-          
-              return [
-                  '  ' + h.args,
-                  hdesc,
-                  h.default ? '[' + h.default + ']' : ''
-              ].join(' ');
-            }
-        
-            if (described.length > 0) {
-                console.log('options:');
-                console.log(described.map(printOpt).join('\n'));
-            }
-        
-            if (more.length > 0) {
-                console.log('\nmore options:');
-                console.log(more.map(printOpt).join('\n'));
-            }
-        }
-*/
     };
     
     Object.defineProperty(self, 'argv', {
