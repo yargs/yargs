@@ -47,12 +47,6 @@ function Argv (args, cwd) {
             flags.bools[name] = true;
         });
         
-        bools.forEach(function (name) {
-            if (!self.argv[name]) {
-                self.argv[name] = false;
-            }
-        });
-        
         return self;
     };
     
