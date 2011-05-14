@@ -1,6 +1,6 @@
 var optimist = require('./../index');
 
-var argv = optimist.describe('This is my awesome program', {
+var argv = optimist.usage('This is my awesome program', {
   'about': {
     description: 'Provide some details about the author of this program',
     required: true,

@@ -154,13 +154,17 @@ function Argv (args, cwd) {
     rescan();
     
     var usage;
-    self.usage = function (msg) {
+    self.usage = function (msg, opts) {
+        if (!opts && typeof msg === 'object') {
+            opts = msg;
+            msg = null;
+        }
+      
         usage = msg;
-        return self;
+        return opts ? self.options(opts) : self;
     };
     
     function fail (msg) {
-        if (usage) console.error(usage.replace(/\$0/g, self.$0))
         console.error(msg);
         self.showHelp();
         process.exit(1);
@@ -245,16 +249,6 @@ function Argv (args, cwd) {
         return a[l].length;
     }
     
-    self.describe = function (desc, opts) {
-        if (!opts && typeof desc === 'object') {
-            opts = desc;
-            desc = null;
-        }
-      
-        self.description = desc;
-        return opts ? self.options(opts) : self;
-    }
-    
     self.options = function (opts) {
         var required = [],
             strings = [],
@@ -317,8 +311,8 @@ function Argv (args, cwd) {
     };
     
     self.showHelp = function (padding) {
-        if (self.description) {
-            console.log(self.description + '\n'); 
+        if (usage) {
+          console.error(usage.replace(/\$0/g, self.$0));
         }
       
         if (self.options && Object.keys(self.options).length > 0) {
