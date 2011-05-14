@@ -218,9 +218,16 @@ function Argv (args, cwd) {
         return self;
     };
     
-    self.showHelp = function () {
+    self.showHelp = function (fn) {
+        if (!fn) fn = console.error;
+        fn(self.help());
+    };
+    
+    self.help = function () {
+        var help = [];
+        
         if (usage) {
-            console.error(usage.replace(/\$0/g, self.$0) + '\n');
+            help.push(usage.replace(/\$0/g, self.$0), '');
         }
         
         var keys = Object.keys(
@@ -244,7 +251,7 @@ function Argv (args, cwd) {
             if (flags.bools[key]) type = '[boolean]';
             if (flags.strings[key]) type = '[string]';
             
-            console.error('  ' + switches + '  ' + [
+            help.push('  ' + switches + '  ' + [
                 type,
                 demanded[key]
                     ? '[required]'
@@ -257,9 +264,11 @@ function Argv (args, cwd) {
             ].filter(Boolean).join('  '));
             
             var desc = descriptions[key];
-            if (desc) console.error('    ' + desc);
-            console.error();
+            if (desc) help.push('    ' + desc);
+            help.push('');
         });
+        
+        return help.join('\n');
         
     };
     
