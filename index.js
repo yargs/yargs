@@ -180,8 +180,13 @@ function Argv (args, cwd) {
         return a[l].length;
     }
     
-    self.options = function (opts) {
-        Object.keys(opts).forEach(function (key) {
+    self.options = function (key, opt) {
+        if (typeof key === 'object') {
+            Object.keys(key).forEach(function (k) {
+                self.options(k, key[k]);
+            });
+        }
+        else {
             var opt = opts[key];
             
             if (opt.alias) self.alias(key, opt.alias);
@@ -194,7 +199,12 @@ function Argv (args, cwd) {
             if (opt.string || opt.type === 'string') {
                 self.string(key);
             }
-        });
+            
+            var desc = opt.describe || opt.description || opt.desc;
+            if (desc) {
+                self.describe(key, desc);
+            }
+        }
         
         return self;
     };
