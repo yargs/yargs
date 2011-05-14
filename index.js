@@ -35,26 +35,6 @@ function Argv (args, cwd) {
         );
     }
     
-    function set (key, val) {
-        var num = Number(val);
-        var value = typeof val !== 'string' || isNaN(num) ? val : num;
-        if (flags.strings[key]) value = val;
-        
-        if (key in self.argv) {
-            if (!Array.isArray(self.argv[key])) {
-                self.argv[key] = [ self.argv[key] ];
-            }
-            self.argv[key].push(value);
-        }
-        else {
-            self.argv[key] = value;
-        }
-        
-        if (aliases[key]) {
-            self.argv[aliases[key]] = self.argv[key];
-        }
-    }
-    
     var flags = { bools : {}, strings : {} };
     
     self.boolean = function (bools) {
@@ -65,8 +45,6 @@ function Argv (args, cwd) {
         bools.forEach(function (name) {
             flags.bools[name] = true;
         });
-        
-        rescan();
         
         bools.forEach(function (name) {
             if (!self.argv[name]) {
@@ -86,8 +64,6 @@ function Argv (args, cwd) {
             flags.strings[name] = true;
         });
         
-        rescan();
-        
         return self;
     };
     
@@ -104,75 +80,26 @@ function Argv (args, cwd) {
             aliases[y] = x;
         }
         
-        rescan();
         return self;
     };
     
-    function rescan () {
-        self.argv = { _ : [], $0 : self.$0 };
-        
-        for (var i = 0; i < args.length; i++) {
-            var arg = args[i];
-            
-            if (arg == '--') {
-                self.argv._.push.apply(self.argv._, args.slice(i + 1));
-                break;
-            }
-            else if (arg.match(/^--.+=/)) {
-                var m = arg.match(/^--([^=]+)=(.*)/);
-                set(m[1], m[2]);
-            }
-            else if (arg.match(/^--no-.+/)) {
-                var key = arg.match(/^--no-(.+)/)[1];
-                set(key, false);
-            }
-            else if (arg.match(/^--.+/)) {
-                var key = arg.match(/^--(.+)/)[1];
-                var next = args[i + 1];
-                if (next !== undefined && !next.match(/^-/)
-                && !flags.bools[key]) {
-                    set(key, next);
-                    i++;
-                }
-                else {
-                    set(key, true);
-                }
-            }
-            else if (arg.match(/^-[^-]+/)) {
-                var letters = arg.slice(1,-1).split('');
-                
-                var broken = false;
-                for (var j = 0; j < letters.length; j++) {
-                    if (letters[j+1] && letters[j+1].match(/\W/)) {
-                        set(letters[j], arg.slice(j+2));
-                        broken = true;
-                        break;
-                    }
-                    else {
-                        set(letters[j], true);
-                    }
-                }
-                
-                if (!broken) {
-                    var key = arg.slice(-1)[0];
-                    
-                    if (args[i+1] && !args[i+1].match(/^-/)
-                    && !flags.bools[key]) {
-                        set(key, args[i+1]);
-                        i++;
-                    }
-                    else {
-                        set(key, true);
-                    }
-                }
-            }
-            else {
-                var n = Number(arg);
-                self.argv._.push(isNaN(n) ? arg : n);
-            }
+    var demanded = {};
+    self.demand = function (keys, cb) {
+        if (typeof keys == 'number') {
+            if (!demanded._) demanded._ = 0;
+            demanded._ += keys;
         }
-    }
-    rescan();
+        else if (Array.isArray(keys)) {
+            keys.forEach(function (key) {
+                self.demand(key);
+            });
+        }
+        else {
+            demanded[keys] = true;
+        }
+        
+        return self;
+    };
     
     var usage;
     self.usage = function (msg, opts) {
@@ -199,32 +126,6 @@ function Argv (args, cwd) {
         }
         catch (err) { fail(err) }
         
-        return self;
-    };
-    
-    self.demand = function (keys, cb) {
-        if (typeof keys == 'number') {
-            return self.demandCount(keys, cb);
-        }
-        
-        var missing = [];
-        keys.forEach(function (key) {
-            if (!(key in self.argv)) missing.push(key);
-        });
-        
-        if (missing.length > 0) {
-            if (cb) cb(missing);
-            else fail('Missing arguments: ' + missing.join(' '));
-        }
-        return self;
-    };
-    
-    self.demandCount = function (count, cb) {
-        if (self.argv._.length < count) {
-            if (cb) cb(self.argv._.length);
-            else fail('Not enough arguments, expected '
-                + count + ', but only found ' + self.argv._.length);
-        }
         return self;
     };
     
@@ -389,6 +290,113 @@ function Argv (args, cwd) {
                 console.log(more.map(printOpt).join('\n'));
             }
         }
+    }
+    
+    Object.defineProperty(self, 'argv', {
+        get : parseArgs,
+        enumerable : true,
+    });
+    
+    function parseArgs () {
+        var argv = { _ : [], $0 : self.$0 };
+        
+        function setArg (key, val) {
+            var num = Number(val);
+            var value = typeof val !== 'string' || isNaN(num) ? val : num;
+            if (flags.strings[key]) value = val;
+            
+            if (key in argv) {
+                if (!Array.isArray(argv[key])) {
+                    argv[key] = [ argv[key] ];
+                }
+                argv[key].push(value);
+            }
+            else {
+                argv[key] = value;
+            }
+            
+            if (aliases[key]) {
+                argv[aliases[key]] = argv[key];
+            }
+        }
+        
+        for (var i = 0; i < args.length; i++) {
+            var arg = args[i];
+            
+            if (arg === '--') {
+                argv._.push.apply(argv._, args.slice(i + 1));
+                break;
+            }
+            else if (arg.match(/^--.+=/)) {
+                var m = arg.match(/^--([^=]+)=(.*)/);
+                setArg(m[1], m[2]);
+            }
+            else if (arg.match(/^--no-.+/)) {
+                var key = arg.match(/^--no-(.+)/)[1];
+                setArg(key, false);
+            }
+            else if (arg.match(/^--.+/)) {
+                var key = arg.match(/^--(.+)/)[1];
+                var next = args[i + 1];
+                if (next !== undefined && !next.match(/^-/)
+                && !flags.bools[key]) {
+                    setArg(key, next);
+                    i++;
+                }
+                else {
+                    setArg(key, true);
+                }
+            }
+            else if (arg.match(/^-[^-]+/)) {
+                var letters = arg.slice(1,-1).split('');
+                
+                var broken = false;
+                for (var j = 0; j < letters.length; j++) {
+                    if (letters[j+1] && letters[j+1].match(/\W/)) {
+                        setArg(letters[j], arg.slice(j+2));
+                        broken = true;
+                        break;
+                    }
+                    else {
+                        setArg(letters[j], true);
+                    }
+                }
+                
+                if (!broken) {
+                    var key = arg.slice(-1)[0];
+                    
+                    if (args[i+1] && !args[i+1].match(/^-/)
+                    && !flags.bools[key]) {
+                        setArg(key, args[i+1]);
+                        i++;
+                    }
+                    else {
+                        setArg(key, true);
+                    }
+                }
+            }
+            else {
+                var n = Number(arg);
+                argv._.push(isNaN(n) ? arg : n);
+            }
+        }
+        
+        if (demanded._ && argv._.length < demanded._) {
+            fail('Not enough non-option arguments: got '
+                + argv._.length + ', need at least ' + demanded._
+            );
+        }
+        
+        var missing = [];
+        Object.keys(demanded).forEach(function (key) {
+            if (!argv[key]) missing.push(key);
+        });
+        
+        if (missing.length) {
+            fail('Missing required arguments: ' + missing.join(', '));
+        }
+        
+        return argv;
     }
     
     return self;
