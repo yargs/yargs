@@ -156,6 +156,7 @@ function Argv (args, cwd) {
         else {
             descriptions[key] = desc;
         }
+        return self;
     };
     
     self.parse = function (args) {
@@ -218,11 +219,42 @@ function Argv (args, cwd) {
     
     self.showHelp = function () {
         if (usage) {
-            console.log(usage.replace(/\$0/g, self.$0));
+            console.error(usage.replace(/\$0/g, self.$0));
         }
         
-        var keys = Object.keys(descriptions).concat();
-        console.log();
+        var keys = Object.keys(descriptions)
+            .concat(Object.keys(demanded))
+            .concat(Object.keys(defaults))
+        ;
+        
+        keys.forEach(function (key) {
+            var switches = [ key ].concat(aliases[key] || [])
+                .map(function (sw) {
+                    return (sw.length > 1 ? '--' : '-') + sw
+                })
+                .join(', ')
+            ;
+            var type = null;
+            if (flags.bools[key]) type = '[boolean]';
+            if (flags.strings[key]) type = '[string]';
+            
+            console.error('  ' + switches + '  ' + [
+                type,
+                demanded[key]
+                    ? '[required parameter]'
+                    : null
+                ,
+                defaults[key]
+                    ? '[default: ' + JSON.stringify(defaults[key]) + ']'
+                    : null
+                ,
+            ].filter(Boolean).join('  '));
+            
+            var desc = descriptions[key];
+            if (desc) console.error('    ' + desc);
+            console.error();
+        });
+        
 /*
         if (self.options && Object.keys(self.options).length > 0) {
             var help = Object.keys(self.options).map(function (key) {
