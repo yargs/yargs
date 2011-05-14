@@ -11,7 +11,10 @@ exports.usageFail = function () {
     });
     assert.deepEqual(r, {
         result : { x : 10, z : 20, _ : [], $0 : './usage' },
-        errors : [ 'Usage: ./usage -x NUM -y NUM', 'Missing arguments: y' ],
+        errors : [
+            'Usage: ./usage -x NUM -y NUM',
+            'Missing required arguments: y',
+        ],
         logs : [],
         exit: true,
     });
@@ -135,7 +138,7 @@ exports.countFail = function () {
         result : { _ : [ '1', '2' ], moo : true, $0 : './usage' },
         errors : [
             'Usage: ./usage [x] [y] [z] {OPTIONS}',
-            'Not enough arguments, expected 3, but only found 2'
+            'Not enough non-option arguments: got 2, need at least 3',
         ],
         logs : [],
         exit: true,
