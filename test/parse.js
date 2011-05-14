@@ -207,3 +207,13 @@ exports.slashBreak = function () {
         { x : true, y : true, z : '/foo/bar/baz', _ : [], $0 : 'expresso' }
     );
 };
+
+exports.alias = function () {
+    var argv = optimist([ '-f', '11', '--zoom', '55' ])
+        .alias('z', 'zoom')
+        .argv
+    ;
+    assert.equal(argv.zoom, 55);
+    assert.equal(argv.z, argv.zoom);
+    assert.equal(argv.f, 11);
+};

@@ -103,6 +103,8 @@ function Argv (args, cwd) {
             aliases[x] = y;
             aliases[y] = x;
         }
+        
+        return self;
     };
     
     function rescan () {
