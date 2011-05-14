@@ -126,14 +126,9 @@ function Argv (args, cwd) {
         process.exit(1);
     }
     
+    var checks = [];
     self.check = function (f) {
-        try {
-            if (f(self.argv) === false) fail(
-                'Argument check failed: ' + f.toString()
-            );
-        }
-        catch (err) { fail(err) }
-        
+        checks.push(f);
         return self;
     };
     
@@ -141,7 +136,7 @@ function Argv (args, cwd) {
     self.default = function (key, value) {
         if (typeof key === 'object') {
             Object.keys(key).forEach(function (k) {
-                defaults[k] = key[k];
+                self.default(k, key[k]);
             });
         }
         else {
@@ -149,6 +144,18 @@ function Argv (args, cwd) {
         }
         
         return self;
+    };
+    
+    var descriptions = {};
+    self.describe = function (key, desc) {
+        if (typeof key === 'object') {
+            Object.keys(key).forEach(function (k) {
+                self.describe(k, key[k]);
+            });
+        }
+        else {
+            descriptions[key] = desc;
+        }
     };
     
     self.parse = function (args) {
@@ -209,11 +216,14 @@ function Argv (args, cwd) {
         return self;
     };
     
-    self.showHelp = function (padding) {
+    self.showHelp = function () {
         if (usage) {
-            console.error(usage.replace(/\$0/g, self.$0));
+            console.log(usage.replace(/\$0/g, self.$0));
         }
         
+        var keys = Object.keys(descriptions).concat();
+        console.log();
+/*
         if (self.options && Object.keys(self.options).length > 0) {
             var help = Object.keys(self.options).map(function (key) {
                 var o = self.options[key];
@@ -266,7 +276,8 @@ function Argv (args, cwd) {
                 console.log(more.map(printOpt).join('\n'));
             }
         }
-    }
+*/
+    };
     
     Object.defineProperty(self, 'argv', {
         get : parseArgs,
@@ -380,6 +391,17 @@ function Argv (args, cwd) {
         if (missing.length) {
             fail('Missing required arguments: ' + missing.join(', '));
         }
+        
+        checks.forEach(function (f) {
+            try {
+                if (f(argv) === false) {
+                    fail('Argument check failed: ' + f.toString());
+                }
+            }
+            catch (err) {
+                fail(err)
+            }
+        });
         
         return argv;
     }
