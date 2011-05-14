@@ -299,13 +299,16 @@ function Argv (args, cwd) {
     
     function parseArgs () {
         var argv = { _ : [], $0 : self.$0 };
+        Object.keys(flags.bools).forEach(function (key) {
+            setArg(key, false);
+        });
         
         function setArg (key, val) {
             var num = Number(val);
             var value = typeof val !== 'string' || isNaN(num) ? val : num;
             if (flags.strings[key]) value = val;
             
-            if (key in argv) {
+            if (key in argv && !flags.bools[key]) {
                 if (!Array.isArray(argv[key])) {
                     argv[key] = [ argv[key] ];
                 }
