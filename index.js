@@ -1,4 +1,3 @@
-module.exports = Argv;
 var path = require('path');
 
 /*  Hack an instance of Argv with process.argv into Argv
@@ -15,6 +14,7 @@ Object.keys(inst).forEach(function (key) {
         : inst[key];
 });
 
+var exports = module.exports = Argv;
 function Argv (args, cwd) {
     var self = {};
     if (!cwd) cwd = process.cwd();
@@ -165,8 +165,8 @@ function Argv (args, cwd) {
     };
     
     function fail (msg) {
-        console.error(msg);
         self.showHelp();
+        if (msg) console.error(msg);
         process.exit(1);
     }
     
@@ -374,7 +374,7 @@ function Argv (args, cwd) {
 
 // rebase an absolute path to a relative one with respect to a base directory
 // exported for tests
-module.exports.rebase = rebase;
+exports.rebase = rebase;
 function rebase (base, dir) {
     var ds = path.normalize(dir).split('/').slice(1);
     var bs = path.normalize(base).split('/').slice(1);
