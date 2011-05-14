@@ -129,17 +129,17 @@ function Argv (args, cwd) {
         return self;
     };
     
+    var defaults = {};
     self.default = function (key, value) {
         if (typeof key === 'object') {
             Object.keys(key).forEach(function (k) {
-                self.default(k, key[k]);
+                defaults[k] = key[k];
             });
         }
         else {
-            if (self.argv[key] === undefined) {
-                self.argv[key] = value;
-            }
+            defaults[key] = value;
         }
+        
         return self;
     };
     
@@ -383,6 +383,12 @@ function Argv (args, cwd) {
                 argv._.push(isNaN(n) ? arg : n);
             }
         }
+        
+        Object.keys(defaults).forEach(function (key) {
+            if (!(key in argv)) {
+                argv[key] = defaults[key];
+            }
+        });
         
         if (demanded._ && argv._.length < demanded._) {
             fail('Not enough non-option arguments: got '
