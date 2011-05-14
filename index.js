@@ -222,10 +222,15 @@ function Argv (args, cwd) {
             console.error(usage.replace(/\$0/g, self.$0));
         }
         
-        var keys = Object.keys(descriptions)
+        var keys = Object.keys(
+            Object.keys(descriptions)
             .concat(Object.keys(demanded))
             .concat(Object.keys(defaults))
-        ;
+            .reduce(function (acc, key) {
+                acc[key] = true;
+                return acc;
+            }, {})
+        );
         
         keys.forEach(function (key) {
             var switches = [ key ].concat(aliases[key] || [])
