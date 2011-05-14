@@ -178,17 +178,6 @@ function Argv (args, cwd) {
         return self;
     };
     
-    function longestElement (a) {
-        var l = 0;
-        for (var i = 0; i < a.length; i++) {
-            if (a[l].length < a[i].length) {
-                l = i;
-            }
-        }
-
-        return a[l].length;
-    }
-    
     self.options = function (key, opt) {
         if (typeof key === 'object') {
             Object.keys(key).forEach(function (k) {
@@ -269,7 +258,6 @@ function Argv (args, cwd) {
         });
         
         return help.join('\n');
-        
     };
     
     Object.defineProperty(self, 'argv', {
