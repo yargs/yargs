@@ -70,12 +70,22 @@ exports.checkFail = function () {
             })
             .argv;
     });
-    assert.deepEqual(r, {
-        result : { x : 10, z : 20, _ : [], $0 : './usage' },
-        errors : [ 'Usage: ./usage -x NUM -y NUM', 'You forgot about -y' ],
-        logs : [],
-        exit: true,
-    });
+    
+    assert.deepEqual(
+        r.result,
+        { x : 10, z : 20, _ : [], $0 : './usage' }
+    );
+    
+    assert.deepEqual(
+        r.errors.join('\n').split(/\n+/),
+        [
+            'Usage: ./usage -x NUM -y NUM',
+            'You forgot about -y'
+        ]
+    );
+    
+    assert.deepEqual(r.logs, []);
+    assert.ok(r.exit);
 };
 
 exports.checkCondPass = function () {
@@ -108,15 +118,20 @@ exports.checkCondFail = function () {
             .check(checker)
             .argv;
     });
-    assert.deepEqual(r, {
-        result : { x : 10, z : 20, _ : [], $0 : './usage' },
-        errors : [
-            'Usage: ./usage -x NUM -y NUM',
-            'Argument check failed: ' + checker.toString()
-        ],
-        logs : [],
-        exit: true,
-    });
+    
+    assert.deepEqual(
+        r.result,
+        { x : 10, z : 20, _ : [], $0 : './usage' }
+    );
+    
+    assert.deepEqual(
+        r.errors.join('\n').split(/\n+/).join('\n'),
+        'Usage: ./usage -x NUM -y NUM\n'
+        + 'Argument check failed: ' + checker.toString()
+    );
+    
+    assert.deepEqual(r.logs, []);
+    assert.ok(r.exit);
 };
 
 exports.countPass = function () {
