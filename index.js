@@ -165,8 +165,6 @@ function Argv (args, cwd) {
             });
         }
         else {
-            var opt = opts[key];
-            
             if (opt.alias) self.alias(key, opt.alias);
             if (opt.demand) self.demand(key);
             if (opt.default) self.default(key, opt.default);

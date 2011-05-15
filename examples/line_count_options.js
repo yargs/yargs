@@ -1,10 +1,17 @@
 #!/usr/bin/env node
 var argv = require('optimist')
     .usage('Count the lines in a file.\nUsage: $0')
-    .options('f', {
-        demand : true,
-        alias : 'file',
-        description : 'Load a file'
+    .options({
+        file : {
+            demand : true,
+            alias : 'f',
+            description : 'Load a file'
+        },
+        base : {
+            alias : 'b',
+            description : 'Numeric base to use for output',
+            default : 10,
+        },
     })
     .argv
 ;
@@ -18,5 +25,5 @@ s.on('data', function (buf) {
 });
 
 s.on('end', function () {
-    console.log(lines);
+    console.log(lines.toString(argv.base));
 });
