@@ -22,5 +22,7 @@
         "url" : "http://substack.net"
     },
     "license" : "MIT/X11",
-    "engine" : ["node >=0.1.100"]
+    "engine" : {
+        "node" : ">=0.4"
+    }
 }
