@@ -141,15 +141,21 @@ exports.countFail = function () {
             .demand(3)
             .argv;
     });
-    assert.deepEqual(r, {
-        result : { _ : [ '1', '2' ], moo : true, $0 : './usage' },
-        errors : [
+    assert.deepEqual(
+        r.result,
+        { _ : [ '1', '2' ], moo : true, $0 : './usage' }
+    );
+    
+    assert.deepEqual(
+        r.errors.join('\n').split(/\n+/),
+        [
             'Usage: ./usage [x] [y] [z] {OPTIONS}',
             'Not enough non-option arguments: got 2, need at least 3',
-        ],
-        logs : [],
-        exit: true,
-    });
+        ]
+    );
+    
+    assert.deepEqual(r.logs, []);
+    assert.ok(r.exit);
 };
 
 exports.defaultSingles = function () {

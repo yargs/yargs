@@ -204,7 +204,7 @@ function Argv (args, cwd) {
             .concat(Object.keys(demanded))
             .concat(Object.keys(defaults))
             .reduce(function (acc, key) {
-                acc[key] = true;
+                if (key !== '_') acc[key] = true;
                 return acc;
             }, {})
         );
