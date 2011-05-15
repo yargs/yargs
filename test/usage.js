@@ -9,15 +9,22 @@ exports.usageFail = function () {
             .demand(['x','y'])
             .argv;
     });
-    assert.deepEqual(r, {
-        result : { x : 10, z : 20, _ : [], $0 : './usage' },
-        errors : [
+    assert.deepEqual(
+        r.result,
+        { x : 10, z : 20, _ : [], $0 : './usage' }
+    );
+    
+    assert.deepEqual(
+        r.errors.join('\n').split(/\n+/),
+        [
             'Usage: ./usage -x NUM -y NUM',
+            '  -x  [required]',
+            '  -y  [required]',
             'Missing required arguments: y',
-        ],
-        logs : [],
-        exit: true,
-    });
+        ]
+    );
+    assert.deepEqual(r.logs, []);
+    assert.ok(r.exit);
 };
 
 exports.usagePass = function () {
