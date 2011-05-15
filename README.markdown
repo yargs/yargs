@@ -110,8 +110,13 @@ divide.js:
     5
     
     $ ./divide.js -x 4.91 -z 2.51
-    Usage: ./divide.js -x [num] -y [num]
-    Missing arguments: y
+    Usage: node ./examples/divide.js -x [num] -y [num]
+
+      -x  [required]
+
+      -y  [required]
+
+    Missing required arguments: y
 
 EVEN MORE HOLY COW
 ------------------
@@ -158,6 +163,7 @@ boolean_single.js
     console.dir(argv);
 
 ***
+
     $ ./boolean_single.js -v foo bar baz
     true
     [ 'bar', 'baz', 'foo' ]
@@ -173,9 +179,56 @@ boolean_double.js
     console.dir(argv._);
 
 ***
+
     $ ./boolean_double.js -x -z one two three
     [ true, false, true ]
     [ 'one', 'two', 'three' ]
+
+Optimist is here to help...
+---------------------------
+
+You can describe parameters for help messages and set aliases. Optimist figures
+out how to format a handy help string automatically.
+
+line_count.js
+
+    #!/usr/bin/env node
+    var argv = require('optimist')
+        .usage('Count the lines in a file.\nUsage: $0')
+        .demand('f')
+        .alias('f', 'file')
+        .describe('f', 'Load a file')
+        .argv
+    ;
+
+    var fs = require('fs');
+    var s = fs.createReadStream(argv.file);
+
+    var lines = 0;
+    s.on('data', function (buf) {
+        lines += buf.toString().match(/\n/g).length;
+    });
+
+    s.on('end', function () {
+        console.log(lines);
+    });
+
+***
+
+    $ node line_count.js
+    Count the lines in a file.
+    Usage: node ./line_count.js
+    
+      -f, --file  [required]
+        Load a file
+    
+    Missing required arguments: f
+    
+    $ node line_count.js --file line_count.js 
+    20
+    
+    $ node line_count.js -f line_count.js 
+    20
 
 notes
 =====
