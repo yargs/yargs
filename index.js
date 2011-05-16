@@ -66,8 +66,7 @@ function Argv (args, cwd) {
     self.alias = function (x, y) {
         if (typeof x === 'object') {
             Object.keys(x).forEach(function (key) {
-                aliases[key] = x[key];
-                aliases[x[key]] = key;
+                self.alias(key, x[key]);
             });
         }
         else if (Array.isArray(y)) {
@@ -76,8 +75,9 @@ function Argv (args, cwd) {
             });
         }
         else {
-            aliases[x] = y;
-            aliases[y] = x;
+            var zs = (aliases[x] || []).concat(aliases[y] || []).concat(x, y);
+            aliases[x] = zs.filter(function (z) { return z != x });
+            aliases[y] = zs.filter(function (z) { return z != y });
         }
         
         return self;
@@ -285,9 +285,9 @@ function Argv (args, cwd) {
                 argv[key] = value;
             }
             
-            if (aliases[key]) {
-                argv[aliases[key]] = argv[key];
-            }
+            (aliases[key] || []).forEach(function (x) {
+                argv[x] = argv[key];
+            });
         }
         
         for (var i = 0; i < args.length; i++) {
