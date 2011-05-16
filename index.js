@@ -1,4 +1,5 @@
 var path = require('path');
+var wordwrap = require('wordwrap');
 
 /*  Hack an instance of Argv with process.argv into Argv
     so people can do
@@ -185,6 +186,12 @@ function Argv (args, cwd) {
         return self;
     };
     
+    var wrap = null;
+    self.wrap = function (cols) {
+        wrap = cols;
+        return self;
+    };
+    
     self.showHelp = function (fn) {
         if (!fn) fn = console.error;
         fn(self.help());
@@ -228,23 +235,38 @@ function Argv (args, cwd) {
         keys.forEach(function (key) {
             var kswitch = switches[key];
             var desc = descriptions[key] || '';
-            var dpadding = new Array(
-                Math.max(desclen - desc.length + 1, 0)
-            ).join(' ');
+            
+            if (wrap) {
+                desc = wordwrap(switchlen + 4, wrap)(desc)
+                    .slice(switchlen + 4)
+                ;
+            }
             
             var spadding = new Array(
                 Math.max(switchlen - kswitch.length + 3, 0)
             ).join(' ');
+            
+            var dpadding = new Array(
+                Math.max(desclen - desc.length + 1, 0)
+            ).join(' ');
+            
             var type = null;
             
             if (flags.bools[key]) type = '[boolean]';
             if (flags.strings[key]) type = '[string]';
-            if (dpadding.length > 0) desc += dpadding;
+            
+            if (!wrap && dpadding.length > 0) {
+                desc += dpadding;
+            }
             
             var prelude = '  ' + kswitch + spadding;
             var body = [
                 desc,
                 type,
+                wrap
+                    ? '\n' + new Array(prelude.length + 3).join(' ')
+                    : null
+                ,
                 demanded[key]
                     ? '[required]'
                     : null
