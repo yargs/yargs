@@ -218,12 +218,12 @@ line_count.js
     $ node line_count.js
     Count the lines in a file.
     Usage: node ./line_count.js
-    
-      -f, --file  [required]
-        Load a file
-    
+
+    options:
+      -f, --file  Load a file  [required]
+
     Missing required arguments: f
-    
+
     $ node line_count.js --file line_count.js 
     20
     
