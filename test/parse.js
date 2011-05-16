@@ -217,3 +217,14 @@ exports.alias = function () {
     assert.equal(argv.z, argv.zoom);
     assert.equal(argv.f, 11);
 };
+
+exports.multiAlias = function () {
+    var argv = optimist([ '-f', '11', '--zoom', '55' ])
+        .alias('z', [ 'zm', 'zoom' ])
+        .argv
+    ;
+    assert.equal(argv.zoom, 55);
+    assert.equal(argv.z, argv.zoom);
+    assert.equal(argv.z, argv.zm);
+    assert.equal(argv.f, 11);
+};
