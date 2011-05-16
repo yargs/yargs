@@ -191,10 +191,10 @@ function Argv (args, cwd) {
     };
     
     self.help = function () {
-        var help = [];
+        var help = ['options:'];
         
         if (usage) {
-            help.push(usage.replace(/\$0/g, self.$0), '');
+            help.unshift(usage.replace(/\$0/g, self.$0), '');
         }
         
         var keys = Object.keys(
@@ -207,18 +207,37 @@ function Argv (args, cwd) {
             }, {})
         );
         
+        var switches = {};
         keys.forEach(function (key) {
-            var switches = [ key ].concat(aliases[key] || [])
-                .map(function (sw) {
-                    return (sw.length > 1 ? '--' : '-') + sw
-                })
-                .join(', ')
-            ;
-            var type = null;
+          switches[key] = [ key ].concat(aliases[key] || [])
+              .map(function (sw) {
+                  return (sw.length > 1 ? '--' : '-') + sw
+              })
+              .join(', ')
+          ;
+        });
+        
+        var switchlen = longest(Object.keys(switches).map(function (s) {
+            return switches[s];
+        }));
+        
+        var desclen = longest(Object.keys(descriptions).map(function (d) { 
+            return descriptions[d];
+        }));
+        
+        keys.forEach(function (key) {
+            var kswitch = switches[key],
+                desc = descriptions[key],
+                dpadding = new Array(desclen - desc.length + 1).join(' '),
+                spadding = new Array(switchlen - kswitch.length + 3).join(' '),
+                type = null;
+                
             if (flags.bools[key]) type = '[boolean]';
             if (flags.strings[key]) type = '[string]';
+            if (dpadding.length > 0) desc += dpadding;
             
-            help.push('  ' + switches + '  ' + [
+            help.push('  ' + kswitch + spadding + [
+                desc,
                 type,
                 demanded[key]
                     ? '[required]'
@@ -229,12 +248,9 @@ function Argv (args, cwd) {
                     : null
                 ,
             ].filter(Boolean).join('  '));
-            
-            var desc = descriptions[key];
-            if (desc) help.push('    ' + desc);
-            help.push('');
         });
         
+        help.push('');
         return help.join('\n');
     };
     
@@ -365,6 +381,17 @@ function Argv (args, cwd) {
         return argv;
     }
     
+    function longest (a) {
+        var l = 0;
+        for (var i = 0; i < a.length; i++) {
+            if (a[l].length < a[i].length) {
+                l = i;
+            }
+        }
+
+        return a[l].length;
+    }
+    
     return self;
 };
 
@@ -382,4 +409,4 @@ function rebase (base, dir) {
         bs.map(function () { return '..' }).concat(ds).join('/')
     ).replace(/\/$/,'').replace(/^$/, '.');
     return p.match(/^[.\/]/) ? p : './' + p;
-}
+};
