@@ -9,8 +9,10 @@ var argv = require('optimist')
         + " Required even. So you'd better specify it."
     )
     .alias('b', 'base')
-    .describe('b', 'Numeric base to display the final output in.')
+    .describe('b', 'Numeric base to display the number of lines in')
     .default('b', 10)
+    .describe('x', 'Super-secret optional parameter which is secret')
+    .default('x', '')
     .argv
 ;
 

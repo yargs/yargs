@@ -260,22 +260,33 @@ function Argv (args, cwd) {
             }
             
             var prelude = '  ' + kswitch + spadding;
-            var body = [
-                desc,
+            var extra = [
                 type,
-                wrap
-                    ? '\n' + new Array(prelude.length + 3).join(' ')
-                    : null
-                ,
                 demanded[key]
                     ? '[required]'
                     : null
                 ,
-                defaults[key]
+                defaults[key] !== undefined
                     ? '[default: ' + JSON.stringify(defaults[key]) + ']'
                     : null
                 ,
             ].filter(Boolean).join('  ');
+            
+            var body = [ desc, extra ].filter(Boolean).join('  ');
+            
+            if (wrap) {
+                var dlines = desc.split('\n');
+                var dlen = dlines.slice(-1)[0].length
+                    + (dlines.length === 1 ? prelude.length : 0)
+                
+                body = desc + (dlen + extra.length > wrap - 2
+                    ? '\n'
+                        + new Array(wrap - extra.length + 1).join(' ')
+                        + extra
+                    : new Array(wrap - extra.length - dlen + 1).join(' ')
+                        + extra
+                );
+            }
             
             help.push(prelude + body);
         });
