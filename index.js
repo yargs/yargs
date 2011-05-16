@@ -191,7 +191,7 @@ function Argv (args, cwd) {
     };
     
     self.help = function () {
-        var help = ['options:'];
+        var help = ['Options:'];
         
         if (usage) {
             help.unshift(usage.replace(/\$0/g, self.$0), '');
