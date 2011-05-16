@@ -207,31 +207,36 @@ function Argv (args, cwd) {
             }, {})
         );
         
-        var switches = {};
-        keys.forEach(function (key) {
-          switches[key] = [ key ].concat(aliases[key] || [])
-              .map(function (sw) {
-                  return (sw.length > 1 ? '--' : '-') + sw
-              })
-              .join(', ')
-          ;
-        });
+        var switches = keys.reduce(function (acc, key) {
+            acc[key] = [ key ].concat(aliases[key] || [])
+                .map(function (sw) {
+                    return (sw.length > 1 ? '--' : '-') + sw
+                })
+                .join(', ')
+            ;
+            return acc;
+        }, {});
         
         var switchlen = longest(Object.keys(switches).map(function (s) {
-            return switches[s];
+            return switches[s] || '';
         }));
         
         var desclen = longest(Object.keys(descriptions).map(function (d) { 
-            return descriptions[d];
+            return descriptions[d] || '';
         }));
         
         keys.forEach(function (key) {
-            var kswitch = switches[key],
-                desc = descriptions[key],
-                dpadding = new Array(desclen - desc.length + 1).join(' '),
-                spadding = new Array(switchlen - kswitch.length + 3).join(' '),
-                type = null;
-                
+            var kswitch = switches[key];
+            var desc = descriptions[key] || '';
+            var dpadding = new Array(
+                Math.max(desclen - desc.length + 1, 0)
+            ).join(' ');
+            
+            var spadding = new Array(
+                Math.max(switchlen - kswitch.length + 3, 0)
+            ).join(' ');
+            var type = null;
+            
             if (flags.bools[key]) type = '[boolean]';
             if (flags.strings[key]) type = '[string]';
             if (dpadding.length > 0) desc += dpadding;
@@ -381,15 +386,11 @@ function Argv (args, cwd) {
         return argv;
     }
     
-    function longest (a) {
-        var l = 0;
-        for (var i = 0; i < a.length; i++) {
-            if (a[l].length < a[i].length) {
-                l = i;
-            }
-        }
-
-        return a[l].length;
+    function longest (xs) {
+        return Math.max.apply(
+            null,
+            xs.map(function (x) { return x.length })
+        );
     }
     
     return self;
