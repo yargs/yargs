@@ -18,6 +18,7 @@ exports.usageFail = function () {
         r.errors.join('\n').split(/\n+/),
         [
             'Usage: ./usage -x NUM -y NUM',
+            'Options:',
             '  -x  [required]',
             '  -y  [required]',
             'Missing required arguments: y',

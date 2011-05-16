@@ -191,12 +191,6 @@ function Argv (args, cwd) {
     };
     
     self.help = function () {
-        var help = ['Options:'];
-        
-        if (usage) {
-            help.unshift(usage.replace(/\$0/g, self.$0), '');
-        }
-        
         var keys = Object.keys(
             Object.keys(descriptions)
             .concat(Object.keys(demanded))
@@ -206,6 +200,12 @@ function Argv (args, cwd) {
                 return acc;
             }, {})
         );
+        
+        var help = keys.length ? [ 'Options:' ] : [];
+        
+        if (usage) {
+            help.unshift(usage.replace(/\$0/g, self.$0), '');
+        }
         
         var switches = keys.reduce(function (acc, key) {
             acc[key] = [ key ].concat(aliases[key] || [])
@@ -241,7 +241,8 @@ function Argv (args, cwd) {
             if (flags.strings[key]) type = '[string]';
             if (dpadding.length > 0) desc += dpadding;
             
-            help.push('  ' + kswitch + spadding + [
+            var prelude = '  ' + kswitch + spadding;
+            var body = [
                 desc,
                 type,
                 demanded[key]
@@ -252,7 +253,9 @@ function Argv (args, cwd) {
                     ? '[default: ' + JSON.stringify(defaults[key]) + ']'
                     : null
                 ,
-            ].filter(Boolean).join('  '));
+            ].filter(Boolean).join('  ');
+            
+            help.push(prelude + body);
         });
         
         help.push('');
