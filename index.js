@@ -72,7 +72,7 @@ function Argv (args, cwd) {
         }
         else if (Array.isArray(y)) {
             y.forEach(function (yy) {
-                self.alias(x, y);
+                self.alias(x, yy);
             });
         }
         else {
