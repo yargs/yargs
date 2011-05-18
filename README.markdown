@@ -7,6 +7,9 @@ and -whistlz of program usage but think optstrings are a waste of time.
 
 With optimist, option parsing doesn't have to suck (as much).
 
+examples
+========
+
 With Optimist, the options are just a hash! No optstrings attached.
 -------------------------------------------------------------------
 
@@ -249,6 +252,158 @@ s.on('end', function () {
     
     $ node line_count.js -f line_count.js 
     20
+
+methods
+=======
+
+By itself,
+
+````javascript
+require('optimist').argv
+`````
+
+will use `process.argv` array to construct the `argv` object.
+
+You can pass in the `process.argv` yourself:
+
+````javascript
+require('optimist')([ '-x', '1', '-y', '2' ]).argv
+````
+
+or use .parse() to do the same thing:
+
+````javascript
+require('optimist').parse([ '-x', '1', '-y', '2' ])
+````
+
+The rest of these methods below come in just before the terminating `.argv`.
+
+.alias(key, alias)
+------------------
+
+Set key names as equivalent such that updates to a key will propagate to aliases
+and vice-versa.
+
+Optionally `.alias()` can take an object that maps keys to aliases.
+
+.default(key, value)
+--------------------
+
+Set `argv[key]` to `value` if no option was specified on `process.argv`.
+
+Optionally `.default()` can take an object that maps keys to default values.
+
+.demand(key)
+------------
+
+If `key` is a string, show the usage information and exit if `key` wasn't
+specified in `process.argv`.
+
+If `key` is a number, demand at least as many non-option arguments, which show
+up in `argv._`.
+
+If `key` is an Array, demand each element.
+
+.describe(key, desc)
+--------------------
+
+Describe a `key` for the generated usage information.
+
+Optionally `.describe()` can take an object that maps keys to descriptions.
+
+.options(key, opt)
+------------------
+
+Instead of chaining together `.alias().demand().default()`, you can specify
+keys in `opt` for each of the chainable methods.
+
+For example:
+
+````javascript
+var argv = require('optimist')
+    .options('f', {
+        alias : 'file',
+        default : '/etc/passwd',
+    })
+    .argv
+;
+````
+
+is the same as
+
+````javascript
+var argv = require('optimist')
+    .alias('f', 'file')
+    .default('f', '/etc/passwd')
+    .argv
+;
+````
+
+Optionally `.options()` can take an object that maps keys to `opt` parameters.
+
+.usage(message)
+---------------
+
+Set a usage message to show which commands to use. Inside `message`, the string
+`$0` will get interpolated to the current script name or node command for the
+present script similar to how `$0` works in bash or perl.
+
+.check(fn)
+----------
+
+Check that certain conditions are met in the provided arguments.
+
+If `fn` throws or returns `false`, show the thrown error, usage information, and
+exit.
+
+.boolean(key)
+-------------
+
+Interpret `key` as a boolean. If a non-flag option follows `key` in
+`process.argv`, that string won't get set as the value of `key`.
+
+If `key` never shows up as a flag in `process.arguments`, `argv[key]` will be
+`false`.
+
+If `key` is an Array, interpret all the elements as booleans.
+
+.string(key)
+------------
+
+Tell the parser logic not to interpret `key` as a number or boolean.
+This can be useful if you need to preserve leading zeros in an input.
+
+If `key` is an Array, interpret all the elements as strings.
+
+.wrap(columns)
+--------------
+
+Format usage output to wrap at `columns` many columns.
+
+.help()
+-------
+
+Return the generated usage string.
+
+.showHelp(fn=console.error)
+---------------------------
+
+Print the usage data using `fn` for printing.
+
+.parse(args)
+------------
+
+Parse `args` instead of `process.argv`. Returns the `argv` object.
+
+.argv
+-----
+
+Get the arguments as a plain old object.
+
+Arguments without a corresponding flag show up in the `argv._` array.
+
+The script name or node command is available at `argv.$0` similarly to how `$0`
+works in bash or perl.
 
 notes
 =====

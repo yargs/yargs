@@ -85,7 +85,7 @@ function Argv (args, cwd) {
     };
     
     var demanded = {};
-    self.demand = function (keys, cb) {
+    self.demand = function (keys) {
         if (typeof keys == 'number') {
             if (!demanded._) demanded._ = 0;
             demanded._ += keys;
