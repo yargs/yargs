@@ -122,11 +122,11 @@ console.log(argv.x / argv.y);
     $ ./divide.js -x 55 -y 11
     5
     
-    $ ./divide.js -x 4.91 -z 2.51
-    Usage: node ./examples/divide.js -x [num] -y [num]
+    $ node ./divide.js -x 4.91 -z 2.51
+    Usage: node ./divide.js -x [num] -y [num]
 
+    Options:
       -x  [required]
-
       -y  [required]
 
     Missing required arguments: y
@@ -413,8 +413,6 @@ stop parsing
 
 Use `--` to stop parsing flags and stuff the remainder into `argv._`.
 
-example:
-
     $ node examples/reflect.js -a 1 -b 2 -- -c 3 -d 4
     { _: [ '-c', '3', '-d', '4' ],
       '$0': 'node ./examples/reflect.js',
@@ -446,8 +444,6 @@ duplicates
 
 If you specify a flag multiple times it will get turned into an array containing
 all the values in order.
-
-example:
 
     $ node examples/reflect.js -x 5 -x 8 -x 0
     { _: [],
