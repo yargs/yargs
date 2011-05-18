@@ -12,15 +12,17 @@ With Optimist, the options are just a hash! No optstrings attached.
 
 xup.js:
 
-    #!/usr/bin/env node
-    var argv = require('optimist').argv;
+````javascript
+#!/usr/bin/env node
+var argv = require('optimist').argv;
 
-    if (argv.rif - 5 * argv.xup > 7.138) {
-        console.log('Buy more riffiwobbles');
-    }
-    else {
-        console.log('Sell the xupptumblers');
-    }
+if (argv.rif - 5 * argv.xup > 7.138) {
+    console.log('Buy more riffiwobbles');
+}
+else {
+    console.log('Sell the xupptumblers');
+}
+````
 
 ***
 
@@ -35,9 +37,11 @@ But wait! There's more! You can do short options:
  
 short.js:
 
-    #!/usr/bin/env node
-    var argv = require('optimist').argv;
-    console.log('(%d,%d)', argv.x, argv.y);
+````javascript
+#!/usr/bin/env node
+var argv = require('optimist').argv;
+console.log('(%d,%d)', argv.x, argv.y);
+````
 
 ***
 
@@ -49,16 +53,18 @@ And booleans, both long and short (and grouped):
 
 bool.js:
 
-    #!/usr/bin/env node
-    var sys = require('sys');
-    var argv = require('optimist').argv;
+````javascript
+#!/usr/bin/env node
+var sys = require('sys');
+var argv = require('optimist').argv;
 
-    if (argv.s) {
-        sys.print(argv.fr ? 'Le chat dit: ' : 'The cat says: ');
-    }
-    console.log(
-        (argv.fr ? 'miaou' : 'meow') + (argv.p ? '.' : '')
-    );
+if (argv.s) {
+    sys.print(argv.fr ? 'Le chat dit: ' : 'The cat says: ');
+}
+console.log(
+    (argv.fr ? 'miaou' : 'meow') + (argv.p ? '.' : '')
+);
+````
 
 ***
 
@@ -76,10 +82,12 @@ And non-hypenated options too! Just use `argv._`!
  
 nonopt.js:
 
-    #!/usr/bin/env node
-    var argv = require('optimist').argv;
-    console.log('(%d,%d)', argv.x, argv.y);
-    console.log(argv._);
+````javascript
+#!/usr/bin/env node
+var argv = require('optimist').argv;
+console.log('(%d,%d)', argv.x, argv.y);
+console.log(argv._);
+````
 
 ***
 
@@ -96,13 +104,15 @@ Plus, Optimist comes with .usage() and .demand()!
 
 divide.js:
 
-    #!/usr/bin/env node
-    var argv = require('optimist')
-        .usage('Usage: $0 -x [num] -y [num]')
-        .demand(['x','y'])
-        .argv;
-    
-    console.log(argv.x / argv.y);
+````javascript
+#!/usr/bin/env node
+var argv = require('optimist')
+    .usage('Usage: $0 -x [num] -y [num]')
+    .demand(['x','y'])
+    .argv;
+
+console.log(argv.x / argv.y);
+````
 
 ***
  
@@ -123,13 +133,15 @@ EVEN MORE HOLY COW
 
 default_singles.js:
 
-    #!/usr/bin/env node
-    var argv = require('optimist')
-        .default('x', 10)
-        .default('y', 10)
-        .argv
-    ;
-    console.log(argv.x + argv.y);
+````javascript
+#!/usr/bin/env node
+var argv = require('optimist')
+    .default('x', 10)
+    .default('y', 10)
+    .argv
+;
+console.log(argv.x + argv.y);
+````
 
 ***
 
@@ -138,12 +150,14 @@ default_singles.js:
 
 default_hash.js:
 
-    #!/usr/bin/env node
-    var argv = require('optimist')
-        .default({ x : 10, y : 10 })
-        .argv
-    ;
-    console.log(argv.x + argv.y);
+````javascript
+#!/usr/bin/env node
+var argv = require('optimist')
+    .default({ x : 10, y : 10 })
+    .argv
+;
+console.log(argv.x + argv.y);
+````
 
 ***
 
@@ -155,12 +169,14 @@ And if you really want to get all descriptive about it...
 
 boolean_single.js
 
-    #!/usr/bin/env node
-    var argv = require('optimist')
-        .boolean('v')
-        .argv
-    ;
-    console.dir(argv);
+````javascript
+#!/usr/bin/env node
+var argv = require('optimist')
+    .boolean('v')
+    .argv
+;
+console.dir(argv);
+````
 
 ***
 
@@ -170,13 +186,15 @@ boolean_single.js
 
 boolean_double.js
 
-    #!/usr/bin/env node
-    var argv = require('optimist')
-        .boolean(['x','y','z'])
-        .argv
-    ;
-    console.dir([ argv.x, argv.y, argv.z ]);
-    console.dir(argv._);
+````javascript
+#!/usr/bin/env node
+var argv = require('optimist')
+    .boolean(['x','y','z'])
+    .argv
+;
+console.dir([ argv.x, argv.y, argv.z ]);
+console.dir(argv._);
+````
 
 ***
 
@@ -192,26 +210,28 @@ out how to format a handy help string automatically.
 
 line_count.js
 
-    #!/usr/bin/env node
-    var argv = require('optimist')
-        .usage('Count the lines in a file.\nUsage: $0')
-        .demand('f')
-        .alias('f', 'file')
-        .describe('f', 'Load a file')
-        .argv
-    ;
+````javascript
+#!/usr/bin/env node
+var argv = require('optimist')
+    .usage('Count the lines in a file.\nUsage: $0')
+    .demand('f')
+    .alias('f', 'file')
+    .describe('f', 'Load a file')
+    .argv
+;
 
-    var fs = require('fs');
-    var s = fs.createReadStream(argv.file);
+var fs = require('fs');
+var s = fs.createReadStream(argv.file);
 
-    var lines = 0;
-    s.on('data', function (buf) {
-        lines += buf.toString().match(/\n/g).length;
-    });
+var lines = 0;
+s.on('data', function (buf) {
+    lines += buf.toString().match(/\n/g).length;
+});
 
-    s.on('end', function () {
-        console.log(lines);
-    });
+s.on('end', function () {
+    console.log(lines);
+});
+````
 
 ***
 
