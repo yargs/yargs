@@ -405,13 +405,54 @@ Arguments without a corresponding flag show up in the `argv._` array.
 The script name or node command is available at `argv.$0` similarly to how `$0`
 works in bash or perl.
 
-notes
-=====
+parsing tricks
+==============
+
+stop parsing
+------------
+
+Use `--` to stop parsing flags and stuff the remainder into `argv._`.
+
+example:
+
+    $ node examples/reflect.js -a 1 -b 2 -- -c 3 -d 4
+    { _: [ '-c', '3', '-d', '4' ],
+      '$0': 'node ./examples/reflect.js',
+      a: 1,
+      b: 2 }
+
+negate fields
+-------------
+
+If you want to explicity set a field to false instead of just leaving it
+undefined or to override a default you can do `--no-key`.
+
+    $ node examples/reflect.js -a --no-b
+    { _: [],
+      '$0': 'node ./examples/reflect.js',
+      a: true,
+      b: false }
+
+numbers
+-------
 
 Every argument that looks like a number (`!isNaN(Number(arg))`) is converted to
 one. This way you can just `net.createConnection(argv.port)` and you can add
 numbers out of `argv` with `+` without having that mean concatenation,
 which is super frustrating.
+
+duplicates
+----------
+
+If you specify a flag multiple times it will get turned into an array containing
+all the values in order.
+
+example:
+
+    $ node examples/reflect.js -x 5 -x 8 -x 0
+    { _: [],
+      '$0': 'node ./examples/reflect.js',
+        x: [ 5, 8, 0 ] }
 
 installation
 ============
