@@ -12,6 +12,7 @@
         "wordwrap" : ">=0.0.1 <0.1"
     },
     "devDependencies" : {
+        "hashish": "0.0.x",
         "expresso" : "=0.7.x"
     },
     "repository" : {

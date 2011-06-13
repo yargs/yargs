@@ -1,4 +1,4 @@
-var optimist = require('optimist');
+var optimist = require('../index');
 var assert = require('assert');
 
 exports['short boolean'] = function () {
