@@ -228,3 +228,25 @@ exports.multiAlias = function () {
     assert.equal(argv.z, argv.zm);
     assert.equal(argv.f, 11);
 };
+
+exports['boolean default true'] = function () {
+    var argv = optimist.options({
+        sometrue: {
+            boolean: true,
+            default: true
+        }
+    }).argv;
+  
+    assert.equal(argv.sometrue, true);
+};
+
+exports['boolean default false'] = function () {
+    var argv = optimist.options({
+        somefalse: {
+            boolean: true,
+            default: false
+        }
+    }).argv;
+
+    assert.equal(argv.somefalse, false);
+};

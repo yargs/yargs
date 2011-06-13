@@ -303,7 +303,7 @@ function Argv (args, cwd) {
     function parseArgs () {
         var argv = { _ : [], $0 : self.$0 };
         Object.keys(flags.bools).forEach(function (key) {
-            setArg(key, false);
+            setArg(key, defaults[key] || false);
         });
         
         function setArg (key, val) {
