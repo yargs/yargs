@@ -170,6 +170,39 @@ exports['flag boolean'] = function () {
     assert.eql(typeof parse.t, 'boolean');
 };
 
+exports['flag boolean value'] = function () {
+    var parse = optimist(['--verbose', 'false', 'moo', '-t', 'true'])
+        .boolean(['t', 'verbose']).default('verbose', true).argv;
+    
+    assert.eql(parse, {
+        verbose: false,
+        t: true,
+        _: ['moo'],
+        $0 : 'expresso'
+    });
+    
+    assert.eql(typeof parse.verbose, 'boolean');
+    assert.eql(typeof parse.t, 'boolean');
+};
+
+exports['flag boolean default false'] = function () {
+    var parse = optimist(['moo'])
+        .boolean(['t', 'verbose'])
+        .default('verbose', false)
+        .default('t', false).argv;
+    
+    assert.eql(parse, {
+        verbose: false,
+        t: false,
+        _: ['moo'],
+        $0 : 'expresso'
+    });
+    
+    assert.eql(typeof parse.verbose, 'boolean');
+    assert.eql(typeof parse.t, 'boolean');
+    
+};
+
 exports['boolean groups'] = function () {
     var parse = optimist([ '-x', '-z', 'one', 'two', 'three' ])
         .boolean(['x','y','z']).argv;
@@ -179,7 +212,7 @@ exports['boolean groups'] = function () {
         y : false,
         z : true,
         _ : [ 'one', 'two', 'three' ],
-        $0 : 'expresso',
+        $0 : 'expresso'
     });
     
     assert.eql(typeof parse.x, 'boolean');
