@@ -349,6 +349,10 @@ function Argv (args, cwd) {
                     setArg(key, next);
                     i++;
                 }
+                else if (flags.bools[key] && /true|false/.test(next)) {
+                    setArg(key, next === 'true');
+                    i++;
+                }
                 else {
                     setArg(key, true);
                 }
@@ -374,6 +378,10 @@ function Argv (args, cwd) {
                     if (args[i+1] && !args[i+1].match(/^-/)
                     && !flags.bools[key]) {
                         setArg(key, args[i+1]);
+                        i++;
+                    }
+                    else if (args[i+1] && flags.bools[key] && /true|false/.test(args[i+1])) {
+                        setArg(key, args[i+1] === 'true');
                         i++;
                     }
                     else {
