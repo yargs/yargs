@@ -159,7 +159,7 @@ function Argv (args, cwd) {
         return Argv(args).argv;
     };
     
-    self.options = function (key, opt) {
+    self.option = self.options = function (key, opt) {
         if (typeof key === 'object') {
             Object.keys(key).forEach(function (k) {
                 self.options(k, key[k]);

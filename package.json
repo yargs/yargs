@@ -1,6 +1,6 @@
 {
     "name" : "optimist",
-    "version" : "0.2.5",
+    "version" : "0.2.6",
     "description" : "Light-weight option parsing with an argv hash. No optstrings attached.",
     "main" : "./index.js",
     "directories" : {
