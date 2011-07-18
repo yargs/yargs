@@ -35,6 +35,8 @@ else {
     $ ./xup.js --rif 12 --xup 8.1
     Sell the xupptumblers
 
+![This one's optimistic.](http://substack.net/images/optimistic.png)
+
 But wait! There's more! You can do short options:
 -------------------------------------------------
  
