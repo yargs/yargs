@@ -230,6 +230,15 @@ exports.strings = function () {
     assert.eql(typeof x, 'string');
 };
 
+exports.stringArgs = function () {
+    var s = optimist([ '  ', '  ' ]).string('_').argv._;
+    assert.eql(s.length, 2);
+    assert.eql(typeof s[0], 'string');
+    assert.eql(s[0], '  ');
+    assert.eql(typeof s[1], 'string');
+    assert.eql(s[1], '  ');
+};
+
 exports.slashBreak = function () {
     assert.eql(
         optimist.parse([ '-I/foo/bar/baz' ]),

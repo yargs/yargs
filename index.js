@@ -391,7 +391,7 @@ function Argv (args, cwd) {
             }
             else {
                 var n = Number(arg);
-                argv._.push(isNaN(n) ? arg : n);
+                argv._.push(flags.strings['_'] || isNaN(n) ? arg : n);
             }
         }
         
