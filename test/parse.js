@@ -1,79 +1,89 @@
 var optimist = require('../index');
 var assert = require('assert');
+var path = require('path');
+
+var localExpresso = path.normalize(
+    __dirname + '/../node_modules/.bin/expresso'
+);
+
+var expresso = process.argv[1] === localExpresso
+    ? 'node ./node_modules/.bin/expresso'
+    : 'expresso'
+;
 
 exports['short boolean'] = function () {
     var parse = optimist.parse([ '-b' ]);
-    assert.eql(parse, { b : true, _ : [], $0 : 'expresso' });
+    assert.eql(parse, { b : true, _ : [], $0 : expresso });
     assert.eql(typeof parse.b, 'boolean');
 };
 
 exports['long boolean'] = function () {
     assert.eql(
         optimist.parse([ '--bool' ]),
-        { bool : true, _ : [], $0 : 'expresso' }
+        { bool : true, _ : [], $0 : expresso }
     );
 };
     
 exports.bare = function () {
     assert.eql(
         optimist.parse([ 'foo', 'bar', 'baz' ]),
-        { _ : [ 'foo', 'bar', 'baz' ], $0 : 'expresso' }
+        { _ : [ 'foo', 'bar', 'baz' ], $0 : expresso }
     );
 };
 
 exports['short group'] = function () {
     assert.eql(
         optimist.parse([ '-cats' ]),
-        { c : true, a : true, t : true, s : true, _ : [], $0 : 'expresso' }
+        { c : true, a : true, t : true, s : true, _ : [], $0 : expresso }
     );
 };
 
 exports['short group next'] = function () {
     assert.eql(
         optimist.parse([ '-cats', 'meow' ]),
-        { c : true, a : true, t : true, s : 'meow', _ : [], $0 : 'expresso' }
+        { c : true, a : true, t : true, s : 'meow', _ : [], $0 : expresso }
     );
 };
  
 exports['short capture'] = function () {
     assert.eql(
         optimist.parse([ '-h', 'localhost' ]),
-        { h : 'localhost', _ : [], $0 : 'expresso' }
+        { h : 'localhost', _ : [], $0 : expresso }
     );
 };
 
 exports['short captures'] = function () {
     assert.eql(
         optimist.parse([ '-h', 'localhost', '-p', '555' ]),
-        { h : 'localhost', p : 555, _ : [], $0 : 'expresso' }
+        { h : 'localhost', p : 555, _ : [], $0 : expresso }
     );
 };
 
 exports['long capture sp'] = function () {
     assert.eql(
         optimist.parse([ '--pow', 'xixxle' ]),
-        { pow : 'xixxle', _ : [], $0 : 'expresso' }
+        { pow : 'xixxle', _ : [], $0 : expresso }
     );
 };
 
 exports['long capture eq'] = function () {
     assert.eql(
         optimist.parse([ '--pow=xixxle' ]),
-        { pow : 'xixxle', _ : [], $0 : 'expresso' }
+        { pow : 'xixxle', _ : [], $0 : expresso }
     );
 };
 
 exports['long captures sp'] = function () {
     assert.eql(
         optimist.parse([ '--host', 'localhost', '--port', '555' ]),
-        { host : 'localhost', port : 555, _ : [], $0 : 'expresso' }
+        { host : 'localhost', port : 555, _ : [], $0 : expresso }
     );
 };
 
 exports['long captures eq'] = function () {
     assert.eql(
         optimist.parse([ '--host=localhost', '--port=555' ]),
-        { host : 'localhost', port : 555, _ : [], $0 : 'expresso' }
+        { host : 'localhost', port : 555, _ : [], $0 : expresso }
     );
 };
 
@@ -82,7 +92,7 @@ exports['mixed short bool and capture'] = function () {
         optimist.parse([ '-h', 'localhost', '-fp', '555', 'script.js' ]),
         {
             f : true, p : 555, h : 'localhost',
-            _ : [ 'script.js' ], $0 : 'expresso',
+            _ : [ 'script.js' ], $0 : expresso,
         }
     );
 };
@@ -92,7 +102,7 @@ exports['short and long'] = function () {
         optimist.parse([ '-h', 'localhost', '-fp', '555', 'script.js' ]),
         {
             f : true, p : 555, h : 'localhost',
-            _ : [ 'script.js' ], $0 : 'expresso',
+            _ : [ 'script.js' ], $0 : expresso,
         }
     );
 };
@@ -100,14 +110,14 @@ exports['short and long'] = function () {
 exports.no = function () {
     assert.eql(
         optimist.parse([ '--no-moo' ]),
-        { moo : false, _ : [], $0 : 'expresso' }
+        { moo : false, _ : [], $0 : expresso }
     );
 };
  
 exports.multi = function () {
     assert.eql(
         optimist.parse([ '-v', 'a', '-v', 'b', '-v', 'c' ]),
-        { v : ['a','b','c'], _ : [], $0 : 'expresso' }
+        { v : ['a','b','c'], _ : [], $0 : expresso }
     );
 };
  
@@ -133,7 +143,7 @@ exports.comprehensive = function () {
             meep : false,
             name : 'meowmers',
             _ : [ 'bare', '--not-a-flag', 'eek' ],
-            $0 : 'expresso'
+            $0 : expresso
         }
     );
 };
@@ -154,7 +164,7 @@ exports.nums = function () {
         w : '10f',
         hex : 0xdeadbeef,
         _ : [ 789 ],
-        $0 : 'expresso'
+        $0 : expresso
     });
     assert.eql(typeof argv.x, 'number');
     assert.eql(typeof argv.y, 'number');
@@ -166,7 +176,7 @@ exports.nums = function () {
 
 exports['flag boolean'] = function () {
     var parse = optimist([ '-t', 'moo' ]).boolean(['t']).argv;
-    assert.eql(parse, { t : true, _ : [ 'moo' ], $0 : 'expresso' });
+    assert.eql(parse, { t : true, _ : [ 'moo' ], $0 : expresso });
     assert.eql(typeof parse.t, 'boolean');
 };
 
@@ -178,7 +188,7 @@ exports['flag boolean value'] = function () {
         verbose: false,
         t: true,
         _: ['moo'],
-        $0 : 'expresso'
+        $0 : expresso
     });
     
     assert.eql(typeof parse.verbose, 'boolean');
@@ -195,7 +205,7 @@ exports['flag boolean default false'] = function () {
         verbose: false,
         t: false,
         _: ['moo'],
-        $0 : 'expresso'
+        $0 : expresso
     });
     
     assert.eql(typeof parse.verbose, 'boolean');
@@ -212,7 +222,7 @@ exports['boolean groups'] = function () {
         y : false,
         z : true,
         _ : [ 'one', 'two', 'three' ],
-        $0 : 'expresso'
+        $0 : expresso
     });
     
     assert.eql(typeof parse.x, 'boolean');
@@ -242,11 +252,11 @@ exports.stringArgs = function () {
 exports.slashBreak = function () {
     assert.eql(
         optimist.parse([ '-I/foo/bar/baz' ]),
-        { I : '/foo/bar/baz', _ : [], $0 : 'expresso' }
+        { I : '/foo/bar/baz', _ : [], $0 : expresso }
     );
     assert.eql(
         optimist.parse([ '-xyz/foo/bar/baz' ]),
-        { x : true, y : true, z : '/foo/bar/baz', _ : [], $0 : 'expresso' }
+        { x : true, y : true, z : '/foo/bar/baz', _ : [], $0 : expresso }
     );
 };
 
