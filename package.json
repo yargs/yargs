@@ -1,6 +1,6 @@
 {
     "name" : "optimist",
-    "version" : "0.2.7",
+    "version" : "0.2.8",
     "description" : "Light-weight option parsing with an argv hash. No optstrings attached.",
     "main" : "./index.js",
     "directories" : {
@@ -14,6 +14,9 @@
     "devDependencies" : {
         "hashish": "0.0.x",
         "expresso" : "0.7.x"
+    },
+    "scripts" : {
+        "test" : "expresso"
     },
     "repository" : {
         "type" : "git",
