@@ -302,3 +302,21 @@ exports['boolean default false'] = function () {
 
     assert.equal(argv.somefalse, false);
 };
+
+exports['nested dotted objects'] = function () {
+    var argv = optimist([
+        '--foo.bar', '3', '--foo.baz', '4',
+        '--foo.quux.quibble', '5', '--foo.quux.o_O',
+        '--beep.boop'
+    ]).argv;
+    
+    assert.deepEqual(argv.foo, {
+        bar : 3,
+        baz : 4,
+        quux : {
+            quibble : 5,
+            quux : { o_O : true },
+        },
+    });
+    assert.deepEqual(argv.beep, { boop : true });
+};
