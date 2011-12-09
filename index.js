@@ -311,15 +311,7 @@ function Argv (args, cwd) {
             var value = typeof val !== 'string' || isNaN(num) ? val : num;
             if (flags.strings[key]) value = val;
             
-            if (key in argv && !flags.bools[key]) {
-                if (!Array.isArray(argv[key])) {
-                    argv[key] = [ argv[key] ];
-                }
-                argv[key].push(value);
-            }
-            else {
-                argv[key] = value;
-            }
+            setKey(argv, key.split('.'), value);
             
             (aliases[key] || []).forEach(function (x) {
                 argv[x] = argv[key];
@@ -455,3 +447,22 @@ function rebase (base, dir) {
     ).replace(/\/$/,'').replace(/^$/, '.');
     return p.match(/^[.\/]/) ? p : './' + p;
 };
+
+function setKey (obj, keys, value) {
+    var o = obj;
+    keys.slice(0,-1).forEach(function (key) {
+        if (o[key] === undefined) o[key] = {};
+        o = o[key];
+    });
+    
+    var key = keys[keys.length - 1];
+    if (o[key] === undefined || typeof o[key] === 'boolean') {
+        o[key] = value;
+    }
+    else if (Array.isArray(o[key])) {
+        o[key].push(value);
+    }
+    else {
+        o[key] = [ o[key], value ];
+    }
+}
