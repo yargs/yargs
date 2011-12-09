@@ -315,7 +315,7 @@ exports['nested dotted objects'] = function () {
         baz : 4,
         quux : {
             quibble : 5,
-            quux : { o_O : true },
+            o_O : true
         },
     });
     assert.deepEqual(argv.beep, { boop : true });
