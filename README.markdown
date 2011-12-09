@@ -452,6 +452,17 @@ all the values in order.
       '$0': 'node ./examples/reflect.js',
         x: [ 5, 8, 0 ] }
 
+dot notation
+------------
+
+When you use dots (`.`s) in argument names, an implicit object path is assumed.
+This lets you organize arguments into nested objects.
+
+     $ node examples/reflect.js --foo.bar.baz=33 --foo.quux=5
+     { _: [],
+       '$0': 'node ./examples/reflect.js',
+         foo: { bar: { baz: 33 }, quux: 5 } }
+
 installation
 ============
 
