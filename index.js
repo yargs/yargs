@@ -168,7 +168,9 @@ function Argv (args, cwd) {
         else {
             if (opt.alias) self.alias(key, opt.alias);
             if (opt.demand) self.demand(key);
-            if (typeof opt.default!='undefined') self.default(key, opt.default);
+            if (typeof opt.default !== 'undefined') {
+                self.default(key, opt.default);
+            }
             
             if (opt.boolean || opt.type === 'boolean') {
                 self.boolean(key);
