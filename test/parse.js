@@ -2,7 +2,7 @@ var optimist = require('../index');
 var path = require('path');
 var test = require('tap').test;
 
-var expresso = 'node ./test/parse.js';
+var expresso = 'node ./parse.js';
 
 test('short boolean', function (t) {
     var parse = optimist.parse([ '-b' ]);

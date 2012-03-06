@@ -16,7 +16,7 @@
         "expresso" : "0.7.x"
     },
     "scripts" : {
-        "test" : "expresso"
+        "test" : "tap ./test/*.js"
     },
     "repository" : {
         "type" : "git",
