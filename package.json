@@ -13,7 +13,7 @@
     },
     "devDependencies" : {
         "hashish": "0.0.x",
-        "expresso" : "0.7.x"
+        "tap" : "0.2.x"
     },
     "scripts" : {
         "test" : "tap ./test/*.js"
