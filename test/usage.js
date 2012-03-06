@@ -29,6 +29,7 @@ test('usageFail', function (t) {
     t.end();
 });
 
+
 test('usagePass', function (t) {
     var r = checkUsage(function () {
         return optimist('-x 10 -y 20'.split(' '))
@@ -237,9 +238,13 @@ test('rebase', function (t) {
 });
 
 function checkUsage (f) {
-    var _process = process;
-    process = Hash.copy(process);
+
     var exit = false;
+
+    process._exit = process.exit;
+    process._env = process.env;
+    process._argv = process.argv;
+
     process.exit = function (t) { exit = true };
     process.env = Hash.merge(process.env, { _ : 'node' });
     process.argv = [ './usage' ];
@@ -254,7 +259,10 @@ function checkUsage (f) {
     
     var result = f();
     
-    process = _process;
+    process.exit = process._exit;
+    process.env = process._env;
+    process.argv = process._argv;
+
     console.error = console._error;
     console.log = console._log;
     
