@@ -320,3 +320,47 @@ exports['nested dotted objects'] = function () {
     });
     assert.deepEqual(argv.beep, { boop : true });
 };
+
+exports['boolean and alias with chainable api'] = function () {
+    var aliased = [ '-h', 'derp' ];
+    var regular = [ '--herp',  'derp' ];
+    var opts = {
+        herp: { alias: 'h', boolean: true }
+    };
+    var aliasedArgv = optimist(aliased)
+        .boolean('herp')
+        .alias('h')
+        .argv;
+    var propertyArgv = optimist(regular)
+        .boolean('herp')
+        .alias('h')
+        .argv;
+    var expected = {
+        herp: true,
+        _: [ 'derp' ],
+        '$0': expresso,
+    };
+
+    assert.eql(aliasedArgv, expected);
+    assert.eql(propertyArgv, expected);
+};
+
+exports['boolean and alias with options hash'] = function () {
+    var aliased = [ '-h', 'derp' ];
+    var regular = [ '--herp', 'derp' ];
+    var opts = {
+        herp: { alias: 'h', boolean: true }
+    };
+    var aliasedArgv = optimist(aliased)
+      .options(opts)
+      .argv;
+    var regularArgv = optimist(regular).options(opts).argv;
+    var expected = {
+        herp: true,
+        _: [ 'derp' ],
+        '$0': expresso,
+    };
+
+    assert.eql(aliasedArgv, expected);
+    assert.eql(propertyArgv, expected);
+}
