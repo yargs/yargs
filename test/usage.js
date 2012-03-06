@@ -1,20 +1,20 @@
 var Hash = require('hashish');
 var optimist = require('../index');
-var assert = require('assert');
+var test = require('tap').test;
 
-exports.usageFail = function () {
+test('usageFail', function (t) {
     var r = checkUsage(function () {
         return optimist('-x 10 -z 20'.split(' '))
             .usage('Usage: $0 -x NUM -y NUM')
             .demand(['x','y'])
             .argv;
     });
-    assert.deepEqual(
+    t.same(
         r.result,
         { x : 10, z : 20, _ : [], $0 : './usage' }
     );
     
-    assert.deepEqual(
+    t.same(
         r.errors.join('\n').split(/\n+/),
         [
             'Usage: ./usage -x NUM -y NUM',
@@ -24,26 +24,28 @@ exports.usageFail = function () {
             'Missing required arguments: y',
         ]
     );
-    assert.deepEqual(r.logs, []);
-    assert.ok(r.exit);
-};
+    t.same(r.logs, []);
+    t.ok(r.exit);
+    t.end();
+});
 
-exports.usagePass = function () {
+test('usagePass', function (t) {
     var r = checkUsage(function () {
         return optimist('-x 10 -y 20'.split(' '))
             .usage('Usage: $0 -x NUM -y NUM')
             .demand(['x','y'])
             .argv;
     });
-    assert.deepEqual(r, {
+    t.same(r, {
         result : { x : 10, y : 20, _ : [], $0 : './usage' },
         errors : [],
         logs : [],
         exit : false,
     });
-};
+    t.end();
+});
 
-exports.checkPass = function () {
+test('checkPass', function (t) {
     var r = checkUsage(function () {
         return optimist('-x 10 -y 20'.split(' '))
             .usage('Usage: $0 -x NUM -y NUM')
@@ -53,15 +55,16 @@ exports.checkPass = function () {
             })
             .argv;
     });
-    assert.deepEqual(r, {
+    t.same(r, {
         result : { x : 10, y : 20, _ : [], $0 : './usage' },
         errors : [],
         logs : [],
         exit : false,
     });
-};
+    t.end();
+});
 
-exports.checkFail = function () {
+test('checkFail', function (t) {
     var r = checkUsage(function () {
         return optimist('-x 10 -z 20'.split(' '))
             .usage('Usage: $0 -x NUM -y NUM')
@@ -72,12 +75,12 @@ exports.checkFail = function () {
             .argv;
     });
     
-    assert.deepEqual(
+    t.same(
         r.result,
         { x : 10, z : 20, _ : [], $0 : './usage' }
     );
     
-    assert.deepEqual(
+    t.same(
         r.errors.join('\n').split(/\n+/),
         [
             'Usage: ./usage -x NUM -y NUM',
@@ -85,11 +88,12 @@ exports.checkFail = function () {
         ]
     );
     
-    assert.deepEqual(r.logs, []);
-    assert.ok(r.exit);
-};
+    t.same(r.logs, []);
+    t.ok(r.exit);
+    t.end();
+});
 
-exports.checkCondPass = function () {
+test('checkCondPass', function (t) {
     function checker (argv) {
         return 'x' in argv && 'y' in argv;
     }
@@ -100,15 +104,16 @@ exports.checkCondPass = function () {
             .check(checker)
             .argv;
     });
-    assert.deepEqual(r, {
+    t.same(r, {
         result : { x : 10, y : 20, _ : [], $0 : './usage' },
         errors : [],
         logs : [],
         exit : false,
     });
-};
+    t.end();
+});
 
-exports.checkCondFail = function () {
+test('checkCondFail', function (t) {
     function checker (argv) {
         return 'x' in argv && 'y' in argv;
     }
@@ -120,49 +125,51 @@ exports.checkCondFail = function () {
             .argv;
     });
     
-    assert.deepEqual(
+    t.same(
         r.result,
         { x : 10, z : 20, _ : [], $0 : './usage' }
     );
     
-    assert.deepEqual(
+    t.same(
         r.errors.join('\n').split(/\n+/).join('\n'),
         'Usage: ./usage -x NUM -y NUM\n'
         + 'Argument check failed: ' + checker.toString()
     );
     
-    assert.deepEqual(r.logs, []);
-    assert.ok(r.exit);
-};
+    t.same(r.logs, []);
+    t.ok(r.exit);
+    t.end();
+});
 
-exports.countPass = function () {
+test('countPass', function (t) {
     var r = checkUsage(function () {
         return optimist('1 2 3 --moo'.split(' '))
             .usage('Usage: $0 [x] [y] [z] {OPTIONS}')
             .demand(3)
             .argv;
     });
-    assert.deepEqual(r, {
+    t.same(r, {
         result : { _ : [ '1', '2', '3' ], moo : true, $0 : './usage' },
         errors : [],
         logs : [],
         exit : false,
     });
-};
+    t.end();
+});
 
-exports.countFail = function () {
+test('countFail', function (t) {
     var r = checkUsage(function () {
         return optimist('1 2 --moo'.split(' '))
             .usage('Usage: $0 [x] [y] [z] {OPTIONS}')
             .demand(3)
             .argv;
     });
-    assert.deepEqual(
+    t.same(
         r.result,
         { _ : [ '1', '2' ], moo : true, $0 : './usage' }
     );
     
-    assert.deepEqual(
+    t.same(
         r.errors.join('\n').split(/\n+/),
         [
             'Usage: ./usage [x] [y] [z] {OPTIONS}',
@@ -170,11 +177,12 @@ exports.countFail = function () {
         ]
     );
     
-    assert.deepEqual(r.logs, []);
-    assert.ok(r.exit);
-};
+    t.same(r.logs, []);
+    t.ok(r.exit);
+    t.end();
+});
 
-exports.defaultSingles = function () {
+test('defaultSingles', function (t) {
     var r = checkUsage(function () {
         return optimist('--foo 50 --baz 70 --powsy'.split(' '))
             .default('foo', 5)
@@ -183,7 +191,7 @@ exports.defaultSingles = function () {
             .argv
         ;
     });
-    assert.eql(r.result, {
+    t.same(r.result, {
         foo : '50',
         bar : 6,
         baz : '70',
@@ -191,16 +199,17 @@ exports.defaultSingles = function () {
         _ : [],
         $0 : './usage',
     });
-};
+    t.end();
+});
 
-exports.defaultHash = function () {
+test('defaultHash', function (t) {
     var r = checkUsage(function () {
         return optimist('--foo 50 --baz 70'.split(' '))
             .default({ foo : 10, bar : 20, quux : 30 })
             .argv
         ;
     });
-    assert.eql(r.result, {
+    t.equal(r.result, {
         foo : '50',
         bar : 20,
         baz : 70,
@@ -208,28 +217,30 @@ exports.defaultHash = function () {
         _ : [],
         $0 : './usage',
     });
-};
+    t.end();
+});
 
-exports.rebase = function () {
-    assert.equal(
+test('rebase', function (t) {
+    t.equal(
         optimist.rebase('/home/substack', '/home/substack/foo/bar/baz'),
         './foo/bar/baz'
     );
-    assert.equal(
+    t.equal(
         optimist.rebase('/home/substack/foo/bar/baz', '/home/substack'),
         '../../..'
     );
-    assert.equal(
+    t.equal(
         optimist.rebase('/home/substack/foo', '/home/substack/pow/zoom.txt'),
         '../pow/zoom.txt'
     );
-};
+    t.end();
+});
 
 function checkUsage (f) {
     var _process = process;
     process = Hash.copy(process);
     var exit = false;
-    process.exit = function () { exit = true };
+    process.exit = function (t) { exit = true };
     process.env = Hash.merge(process.env, { _ : 'node' });
     process.argv = [ './usage' ];
     
