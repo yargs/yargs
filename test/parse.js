@@ -1,15 +1,8 @@
 var optimist = require('../index');
-var assert = require('assert');
 var path = require('path');
+var test = require('tap').test;
 
-var localExpresso = path.normalize(
-    __dirname + '/../node_modules/.bin/expresso'
-);
-
-var expresso = process.argv[1] === localExpresso
-    ? 'node ./node_modules/.bin/expresso'
-    : 'expresso'
-;
+var expresso = 'node ./test/parse.js';
 
 exports['short boolean'] = function () {
     var parse = optimist.parse([ '-b' ]);
@@ -321,7 +314,7 @@ exports['nested dotted objects'] = function () {
     assert.deepEqual(argv.beep, { boop : true });
 };
 
-exports['boolean and alias with chainable api'] = function () {
+test('boolean and alias with chainable api', function (t) {
     var aliased = [ '-h', 'derp' ];
     var regular = [ '--herp',  'derp' ];
     var opts = {
@@ -337,15 +330,18 @@ exports['boolean and alias with chainable api'] = function () {
         .argv;
     var expected = {
         herp: true,
-        _: [ 'derp' ],
+        h: true,
+        '_': [ 'derp' ],
         '$0': expresso,
     };
 
-    assert.eql(aliasedArgv, expected);
-    assert.eql(propertyArgv, expected);
-};
+    t.same(aliasedArgv, expected);
 
-exports['boolean and alias with options hash'] = function () {
+    t.same(propertyArgv, expected); 
+    t.end();
+});
+
+test('boolean and alias with options hash', function (t) {
     var aliased = [ '-h', 'derp' ];
     var regular = [ '--herp', 'derp' ];
     var opts = {
@@ -354,13 +350,16 @@ exports['boolean and alias with options hash'] = function () {
     var aliasedArgv = optimist(aliased)
       .options(opts)
       .argv;
-    var regularArgv = optimist(regular).options(opts).argv;
+    var propertyArgv = optimist(regular).options(opts).argv;
     var expected = {
         herp: true,
-        _: [ 'derp' ],
+        h: true,
+        '_': [ 'derp' ],
         '$0': expresso,
     };
 
-    assert.eql(aliasedArgv, expected);
-    assert.eql(propertyArgv, expected);
-}
+    t.same(aliasedArgv, expected);
+    t.same(propertyArgv, expected);
+
+    t.end();
+});
