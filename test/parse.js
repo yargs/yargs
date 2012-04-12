@@ -351,11 +351,11 @@ test('boolean and alias with chainable api', function (t) {
     };
     var aliasedArgv = optimist(aliased)
         .boolean('herp')
-        .alias('h')
+        .alias('h', 'herp')
         .argv;
     var propertyArgv = optimist(regular)
         .boolean('herp')
-        .alias('h')
+        .alias('h', 'herp')
         .argv;
     var expected = {
         herp: true,

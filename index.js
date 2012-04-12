@@ -370,7 +370,8 @@ function Argv (args, cwd) {
                     var key = arg.slice(-1)[0];
                     
                     if (args[i+1] && !args[i+1].match(/^-/)
-                    && !flags.bools[key]) {
+                    && !flags.bools[key]
+                    && (aliases[key] ? !flags.bools[aliases[key]] : true)) {
                         setArg(key, args[i+1]);
                         i++;
                     }
