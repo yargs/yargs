@@ -210,13 +210,13 @@ test('defaultHash', function (t) {
             .argv
         ;
     });
-    t.equal(r.result, {
-        foo : '50',
-        bar : 20,
-        baz : 70,
-        quux : 30,
+    t.same(r.result, {
         _ : [],
         $0 : './usage',
+        foo : 50,
+        baz : 70,
+        bar : 20,
+        quux : 30,
     });
     t.end();
 });
