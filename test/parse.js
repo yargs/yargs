@@ -391,3 +391,30 @@ test('boolean and alias with options hash', function (t) {
 
     t.end();
 });
+
+test('boolean and alias using explicit true', function (t) {
+    var aliased = [ '-h', 'true' ];
+    var regular = [ '--herp',  'true' ];
+    var opts = {
+        herp: { alias: 'h', boolean: true }
+    };
+    var aliasedArgv = optimist(aliased)
+        .boolean('h')
+        .alias('h', 'herp')
+        .argv;
+    var propertyArgv = optimist(regular)
+        .boolean('h')
+        .alias('h', 'herp')
+        .argv;
+    var expected = {
+        herp: true,
+        h: true,
+        '_': [ ],
+        '$0': expresso,
+    };
+
+    t.same(aliasedArgv, expected);
+    t.same(propertyArgv, expected); 
+    t.end();
+});
+
