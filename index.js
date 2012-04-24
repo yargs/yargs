@@ -339,11 +339,12 @@ function Argv (args, cwd) {
                 var key = arg.match(/^--(.+)/)[1];
                 var next = args[i + 1];
                 if (next !== undefined && !next.match(/^-/)
-                && !flags.bools[key]) {
+                && !flags.bools[key]
+                && (aliases[key] ? !flags.bools[aliases[key]] : true)) {
                     setArg(key, next);
                     i++;
                 }
-                else if (flags.bools[key] && /true|false/.test(next)) {
+                else if (/true|false/.test(next)) {
                     setArg(key, next === 'true');
                     i++;
                 }
@@ -375,7 +376,7 @@ function Argv (args, cwd) {
                         setArg(key, args[i+1]);
                         i++;
                     }
-                    else if (args[i+1] && flags.bools[key] && /true|false/.test(args[i+1])) {
+                    else if (args[i+1] && /true|false/.test(args[i+1])) {
                         setArg(key, args[i+1] === 'true');
                         i++;
                     }
