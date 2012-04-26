@@ -393,6 +393,9 @@ function Argv (args, cwd) {
         Object.keys(defaults).forEach(function (key) {
             if (!(key in argv)) {
                 argv[key] = defaults[key];
+                if (key in aliases) {
+                    argv[aliases[key]] = defaults[key];
+                }
             }
         });
         
