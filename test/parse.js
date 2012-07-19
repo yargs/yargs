@@ -2,11 +2,11 @@ var optimist = require('../index');
 var path = require('path');
 var test = require('tap').test;
 
-var expresso = 'node ./parse.js';
+var $0 = 'node ./' + path.relative(process.cwd(), __filename);
 
 test('short boolean', function (t) {
     var parse = optimist.parse([ '-b' ]);
-    t.same(parse, { b : true, _ : [], $0 : expresso });
+    t.same(parse, { b : true, _ : [], $0 : $0 });
     t.same(typeof parse.b, 'boolean');
     t.end();
 });
@@ -14,7 +14,7 @@ test('short boolean', function (t) {
 test('long boolean', function (t) {
     t.same(
         optimist.parse([ '--bool' ]),
-        { bool : true, _ : [], $0 : expresso }
+        { bool : true, _ : [], $0 : $0 }
     );
     t.end();
 });
@@ -22,7 +22,7 @@ test('long boolean', function (t) {
 test('bare', function (t) {
     t.same(
         optimist.parse([ 'foo', 'bar', 'baz' ]),
-        { _ : [ 'foo', 'bar', 'baz' ], $0 : expresso }
+        { _ : [ 'foo', 'bar', 'baz' ], $0 : $0 }
     );
     t.end();
 });
@@ -30,7 +30,7 @@ test('bare', function (t) {
 test('short group', function (t) {
     t.same(
         optimist.parse([ '-cats' ]),
-        { c : true, a : true, t : true, s : true, _ : [], $0 : expresso }
+        { c : true, a : true, t : true, s : true, _ : [], $0 : $0 }
     );
     t.end();
 });
@@ -38,7 +38,7 @@ test('short group', function (t) {
 test('short group next', function (t) {
     t.same(
         optimist.parse([ '-cats', 'meow' ]),
-        { c : true, a : true, t : true, s : 'meow', _ : [], $0 : expresso }
+        { c : true, a : true, t : true, s : 'meow', _ : [], $0 : $0 }
     );
     t.end();
 });
@@ -46,7 +46,7 @@ test('short group next', function (t) {
 test('short capture', function (t) {
     t.same(
         optimist.parse([ '-h', 'localhost' ]),
-        { h : 'localhost', _ : [], $0 : expresso }
+        { h : 'localhost', _ : [], $0 : $0 }
     );
     t.end();
 });
@@ -54,7 +54,7 @@ test('short capture', function (t) {
 test('short captures', function (t) {
     t.same(
         optimist.parse([ '-h', 'localhost', '-p', '555' ]),
-        { h : 'localhost', p : 555, _ : [], $0 : expresso }
+        { h : 'localhost', p : 555, _ : [], $0 : $0 }
     );
     t.end();
 });
@@ -62,7 +62,7 @@ test('short captures', function (t) {
 test('long capture sp', function (t) {
     t.same(
         optimist.parse([ '--pow', 'xixxle' ]),
-        { pow : 'xixxle', _ : [], $0 : expresso }
+        { pow : 'xixxle', _ : [], $0 : $0 }
     );
     t.end();
 });
@@ -70,7 +70,7 @@ test('long capture sp', function (t) {
 test('long capture eq', function (t) {
     t.same(
         optimist.parse([ '--pow=xixxle' ]),
-        { pow : 'xixxle', _ : [], $0 : expresso }
+        { pow : 'xixxle', _ : [], $0 : $0 }
     );
     t.end()
 });
@@ -78,7 +78,7 @@ test('long capture eq', function (t) {
 test('long captures sp', function (t) {
     t.same(
         optimist.parse([ '--host', 'localhost', '--port', '555' ]),
-        { host : 'localhost', port : 555, _ : [], $0 : expresso }
+        { host : 'localhost', port : 555, _ : [], $0 : $0 }
     );
     t.end();
 });
@@ -86,7 +86,7 @@ test('long captures sp', function (t) {
 test('long captures eq', function (t) {
     t.same(
         optimist.parse([ '--host=localhost', '--port=555' ]),
-        { host : 'localhost', port : 555, _ : [], $0 : expresso }
+        { host : 'localhost', port : 555, _ : [], $0 : $0 }
     );
     t.end();
 });
@@ -96,7 +96,7 @@ test('mixed short bool and capture', function (t) {
         optimist.parse([ '-h', 'localhost', '-fp', '555', 'script.js' ]),
         {
             f : true, p : 555, h : 'localhost',
-            _ : [ 'script.js' ], $0 : expresso,
+            _ : [ 'script.js' ], $0 : $0,
         }
     );
     t.end();
@@ -107,7 +107,7 @@ test('short and long', function (t) {
         optimist.parse([ '-h', 'localhost', '-fp', '555', 'script.js' ]),
         {
             f : true, p : 555, h : 'localhost',
-            _ : [ 'script.js' ], $0 : expresso,
+            _ : [ 'script.js' ], $0 : $0,
         }
     );
     t.end();
@@ -116,7 +116,7 @@ test('short and long', function (t) {
 test('no', function (t) {
     t.same(
         optimist.parse([ '--no-moo' ]),
-        { moo : false, _ : [], $0 : expresso }
+        { moo : false, _ : [], $0 : $0 }
     );
     t.end();
 });
@@ -124,7 +124,7 @@ test('no', function (t) {
 test('multi', function (t) {
     t.same(
         optimist.parse([ '-v', 'a', '-v', 'b', '-v', 'c' ]),
-        { v : ['a','b','c'], _ : [], $0 : expresso }
+        { v : ['a','b','c'], _ : [], $0 : $0 }
     );
     t.end();
 });
@@ -151,7 +151,7 @@ test('comprehensive', function (t) {
             meep : false,
             name : 'meowmers',
             _ : [ 'bare', '--not-a-flag', 'eek' ],
-            $0 : expresso
+            $0 : $0
         }
     );
     t.end();
@@ -173,7 +173,7 @@ test('nums', function (t) {
         w : '10f',
         hex : 0xdeadbeef,
         _ : [ 789 ],
-        $0 : expresso
+        $0 : $0
     });
     t.same(typeof argv.x, 'number');
     t.same(typeof argv.y, 'number');
@@ -186,7 +186,7 @@ test('nums', function (t) {
 
 test('flag boolean', function (t) {
     var parse = optimist([ '-t', 'moo' ]).boolean(['t']).argv;
-    t.same(parse, { t : true, _ : [ 'moo' ], $0 : expresso });
+    t.same(parse, { t : true, _ : [ 'moo' ], $0 : $0 });
     t.same(typeof parse.t, 'boolean');
     t.end();
 });
@@ -199,7 +199,7 @@ test('flag boolean value', function (t) {
         verbose: false,
         t: true,
         _: ['moo'],
-        $0 : expresso
+        $0 : $0
     });
     
     t.same(typeof parse.verbose, 'boolean');
@@ -217,7 +217,7 @@ test('flag boolean default false', function (t) {
         verbose: false,
         t: false,
         _: ['moo'],
-        $0 : expresso
+        $0 : $0
     });
     
     t.same(typeof parse.verbose, 'boolean');
@@ -235,7 +235,7 @@ test('boolean groups', function (t) {
         y : false,
         z : true,
         _ : [ 'one', 'two', 'three' ],
-        $0 : expresso
+        $0 : $0
     });
     
     t.same(typeof parse.x, 'boolean');
@@ -268,11 +268,11 @@ test('stringArgs', function (t) {
 test('slashBreak', function (t) {
     t.same(
         optimist.parse([ '-I/foo/bar/baz' ]),
-        { I : '/foo/bar/baz', _ : [], $0 : expresso }
+        { I : '/foo/bar/baz', _ : [], $0 : $0 }
     );
     t.same(
         optimist.parse([ '-xyz/foo/bar/baz' ]),
-        { x : true, y : true, z : '/foo/bar/baz', _ : [], $0 : expresso }
+        { x : true, y : true, z : '/foo/bar/baz', _ : [], $0 : $0 }
     );
     t.end();
 });
@@ -361,7 +361,7 @@ test('boolean and alias with chainable api', function (t) {
         herp: true,
         h: true,
         '_': [ 'derp' ],
-        '$0': expresso,
+        '$0': $0,
     };
 
     t.same(aliasedArgv, expected);
@@ -383,7 +383,7 @@ test('boolean and alias with options hash', function (t) {
         herp: true,
         h: true,
         '_': [ 'derp' ],
-        '$0': expresso,
+        '$0': $0,
     };
 
     t.same(aliasedArgv, expected);
@@ -410,7 +410,7 @@ test('boolean and alias using explicit true', function (t) {
         herp: true,
         h: true,
         '_': [ ],
-        '$0': expresso,
+        '$0': $0,
     };
 
     t.same(aliasedArgv, expected);
