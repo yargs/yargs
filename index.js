@@ -31,7 +31,7 @@ function Argv (args, cwd) {
         .join(' ')
     ;
     
-    if (process.argv[1] == process.env._) {
+    if (process.env._ != undefined && process.argv[1] == process.env._) {
         self.$0 = process.env._.replace(
             path.dirname(process.execPath) + '/', ''
         );
