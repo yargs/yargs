@@ -418,3 +418,16 @@ test('boolean and alias using explicit true', function (t) {
     t.end();
 });
 
+// regression, see https://github.com/substack/node-optimist/issues/71
+test('boolean and --x=true', function(t) {
+    var parsed = optimist(['--boool', '--other=true']).boolean('boool').argv;
+
+    t.same(parsed.boool, true);
+    t.same(parsed.other, 'true');
+
+    parsed = optimist(['--boool', '--other=false']).boolean('boool').argv;
+
+    t.same(parsed.boool, true);
+    t.same(parsed.other, 'false');
+    t.end();
+});

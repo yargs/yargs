@@ -344,7 +344,7 @@ function Argv (args, cwd) {
                     setArg(key, next);
                     i++;
                 }
-                else if (/true|false/.test(next)) {
+                else if (/^(true|false)$/.test(next)) {
                     setArg(key, next === 'true');
                     i++;
                 }
