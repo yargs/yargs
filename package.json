@@ -1,19 +1,14 @@
 {
     "name" : "optimist",
-    "version" : "0.3.5",
+    "version" : "0.3.6",
     "description" : "Light-weight option parsing with an argv hash. No optstrings attached.",
     "main" : "./index.js",
-    "directories" : {
-        "lib" : ".",
-        "test" : "test",
-        "example" : "example"
-    },
     "dependencies" : {
         "wordwrap" : "~0.0.2"
     },
     "devDependencies" : {
         "hashish": "~0.0.4",
-        "tap" : "~0.2.4"
+        "tap" : "~0.4.0"
     },
     "scripts" : {
         "test" : "tap ./test/*.js"
