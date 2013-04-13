@@ -360,6 +360,13 @@ function Argv (args, cwd) {
                 
                 var broken = false;
                 for (var j = 0; j < letters.length; j++) {
+                    var next = arg.slice(j+2);
+                    if (/[A-Za-z]/.test(letters[j])
+                    && /-?\d+(\.\d*)?(e-?\d+)?$/.test(next)) {
+                        setArg(letters[j], next);
+                        break;
+                    }
+                    
                     if (letters[j+1] && letters[j+1].match(/\W/)) {
                         setArg(letters[j], arg.slice(j+2));
                         broken = true;
