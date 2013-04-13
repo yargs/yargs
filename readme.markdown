@@ -465,6 +465,19 @@ This lets you organize arguments into nested objects.
        '$0': 'node ./examples/reflect.js',
          foo: { bar: { baz: 33 }, quux: 5 } }
 
+short numbers
+-------------
+
+Short numeric `head -n5` style argument work too:
+
+    $ node reflect.js -n123 -m456
+    { '3': true,
+      '6': true,
+      _: [],
+      '$0': 'node ./reflect.js',
+      n: 123,
+      m: 456 }
+
 installation
 ============
 
