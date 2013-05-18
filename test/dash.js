@@ -13,7 +13,7 @@ test('-', function (t) {
     );
     t.deepEqual(
         fix(optimist.parse([ '-f-' ])),
-        { f: '-' }
+        { f: '-', _: [] }
     );
 });
 
