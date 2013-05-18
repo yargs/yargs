@@ -361,6 +361,12 @@ function Argv (args, cwd) {
                 var broken = false;
                 for (var j = 0; j < letters.length; j++) {
                     var next = arg.slice(j+2);
+                    
+                    if (next === '-') {
+                        setArg(letters[j], next)
+                        continue;
+                    }
+                    
                     if (/[A-Za-z]/.test(letters[j])
                     && /-?\d+(\.\d*)?(e-?\d+)?$/.test(next)) {
                         setArg(letters[j], next);
@@ -377,8 +383,8 @@ function Argv (args, cwd) {
                     }
                 }
                 
-                if (!broken) {
-                    var key = arg.slice(-1)[0];
+                var key = arg.slice(-1)[0];
+                if (!broken && key !== '-') {
                     
                     if (args[i+1] && !args[i+1].match(/^-/)
                     && !flags.bools[key]
