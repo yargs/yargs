@@ -2,7 +2,7 @@ var optimist = require('../index');
 var test = require('tap').test;
 
 test('-', function (t) {
-    t.plan(3);
+    t.plan(5);
     t.deepEqual(
         fix(optimist.parse([ '-n', '-' ])),
         { n: '-', _: [] }
@@ -14,6 +14,14 @@ test('-', function (t) {
     t.deepEqual(
         fix(optimist.parse([ '-f-' ])),
         { f: '-', _: [] }
+    );
+    t.deepEqual(
+        fix(optimist([ '-b', '-' ]).boolean('b').argv),
+        { b: true, _: [ '-' ] }
+    );
+    t.deepEqual(
+        fix(optimist([ '-s', '-' ]).string('s').argv),
+        { s: '-', _: [] }
     );
 });
 
