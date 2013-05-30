@@ -155,8 +155,9 @@ function Argv (args, cwd) {
         return self;
     };
     
-    self.parse = function (args) {
-        return Argv(args).argv;
+    self.parse = function (args_) {
+        args = args_;
+        return self.argv;
     };
     
     self.option = self.options = function (key, opt) {
