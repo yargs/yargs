@@ -310,10 +310,9 @@ function Argv (args, cwd) {
         });
         
         function setArg (key, val) {
-            var num = Number(val);
-            var value = typeof val !== 'string' || isNaN(num) ? val : num;
-            if (flags.strings[key]) value = val;
-            
+            var value = !flags.strings[key] && isNumber(val)
+                ? Number(val) : val
+            ;
             setKey(argv, key.split('.'), value);
             
             (aliases[key] || []).forEach(function (x) {
@@ -403,8 +402,9 @@ function Argv (args, cwd) {
                 }
             }
             else {
-                var n = Number(arg);
-                argv._.push(flags.strings['_'] || isNaN(n) ? arg : n);
+                argv._.push(
+                    flags.strings['_'] || !isNumber(arg) ? arg : Number(arg)
+                );
             }
         }
         
@@ -489,4 +489,10 @@ function setKey (obj, keys, value) {
     else {
         o[key] = [ o[key], value ];
     }
+}
+
+function isNumber (x) {
+    if (typeof x === 'number') return true;
+    if (/^0x[0-9a-f]+$/i.test(x)) return true;
+    return /^[-+]?(?:\d+(?:\.\d*)?|\.\d+)(e[-+]?\d+)?$/.test(x);
 }
