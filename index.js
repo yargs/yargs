@@ -1,5 +1,5 @@
 var path = require('path');
-var wordwrap = require('wordwrap');
+var wordwrap = require('./lib/wordwrap');
 
 /*  Hack an instance of Argv with process.argv into Argv
     so people can do
