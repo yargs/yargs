@@ -184,7 +184,7 @@ function Argv (processArgs, cwd) {
         var keys = Object.keys(
             Object.keys(descriptions)
             .concat(Object.keys(demanded))
-            .concat(Object.keys(defaults))
+            .concat(Object.keys(options.default))
             .reduce(function (acc, key) {
                 if (key !== '_') acc[key] = true;
                 return acc;
@@ -198,7 +198,7 @@ function Argv (processArgs, cwd) {
         }
         
         var switches = keys.reduce(function (acc, key) {
-            acc[key] = [ key ].concat(aliases[key] || [])
+            acc[key] = [ key ].concat(options.alias[key] || [])
                 .map(function (sw) {
                     return (sw.length > 1 ? '--' : '-') + sw
                 })
@@ -235,8 +235,8 @@ function Argv (processArgs, cwd) {
             
             var type = null;
             
-            if (flags.bools[key]) type = '[boolean]';
-            if (flags.strings[key]) type = '[string]';
+            if (options.boolean[key]) type = '[boolean]';
+            if (options.string[key]) type = '[string]';
             
             if (!wrap && dpadding.length > 0) {
                 desc += dpadding;
@@ -249,8 +249,8 @@ function Argv (processArgs, cwd) {
                     ? '[required]'
                     : null
                 ,
-                defaults[key] !== undefined
-                    ? '[default: ' + JSON.stringify(defaults[key]) + ']'
+                options.default[key] !== undefined
+                    ? '[default: ' + JSON.stringify(options.default[key]) + ']'
                     : null
                 ,
             ].filter(Boolean).join('  ');
