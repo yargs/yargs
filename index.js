@@ -74,8 +74,7 @@ function Argv (processArgs, cwd) {
             });
         }
         else {
-            if (!options.alias[x]) options.alias[x] = [];
-            options.alias[x].push.apply(options.alias[x], y);
+            options.alias[x] = (options.alias[x] || []).concat(y);
         }
         return self;
     };
