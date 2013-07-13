@@ -357,6 +357,8 @@ present script similar to how `$0` works in bash or perl.
 
 Check that certain conditions are met in the provided arguments.
 
+`fn` is called with one argument, the parsed `argv` hash.
+
 If `fn` throws or returns `false`, show the thrown error, usage information, and
 exit.
 
