@@ -389,10 +389,30 @@ Format usage output to wrap at `columns` many columns.
 
 Return the generated usage string.
 
+Example:
+
+```
+var optimist = require("optimist")
+       .usage("$0 -operand1 number -operand2 number -operation [add|subtract]");
+console.log(optimist.help());
+```
+
+Later on, ```argv``` can be retrived with ```optimist.argv```
+
 .showHelp(fn=console.error)
 ---------------------------
 
 Print the usage data using `fn` for printing.
+
+Example:
+
+```
+var optimist = require("optimist")
+       .usage("$0 -operand1 number -operand2 number -operation [add|subtract]");
+optimist.showHelp();
+```
+
+Later on, ```argv``` can be retrived with ```optimist.argv```
 
 .parse(args)
 ------------
@@ -482,6 +502,7 @@ installation
 ============
 
 With [npm](http://github.com/isaacs/npm), just do:
+
     npm install optimist
  
 or clone this project on github:
