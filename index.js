@@ -37,13 +37,17 @@ function Argv (processArgs, cwd) {
             path.dirname(process.execPath) + '/', ''
         );
     }
-    
-    var options = {
-        boolean: [],
-        string: [],
-        alias: {},
-        default: []
+
+    var options;
+    self.resetOptions = function () {
+        options = {
+            boolean: [],
+            string: [],
+            alias: {},
+            default: []
+        };
     };
+    self.resetOptions();
     
     self.boolean = function (bools) {
         options.boolean.push.apply(options.boolean, [].concat(bools));
