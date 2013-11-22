@@ -49,6 +49,7 @@ function Argv (processArgs, cwd) {
             normalize: [],
             config: []
         };
+        return self;
     };
     self.resetOptions();
     
@@ -135,6 +136,7 @@ function Argv (processArgs, cwd) {
         } else {
             implied[key] = value;
         }
+        return self;
     };
 
     var usage;
@@ -223,6 +225,7 @@ function Argv (processArgs, cwd) {
     self.showHelp = function (fn) {
         if (!fn) fn = console.error.bind(console);
         fn(self.help());
+        return self;
     };
     
     self.help = function () {
