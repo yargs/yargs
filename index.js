@@ -139,7 +139,9 @@ function Argv (processArgs, cwd) {
         checks.push(f);
         return self;
     };
-    
+
+    self.defaults = self.default;
+
     var descriptions = {};
     self.describe = function (key, desc) {
         if (typeof key === 'object') {
