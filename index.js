@@ -125,7 +125,18 @@ function Argv (processArgs, cwd) {
         
         return self;
     };
-    
+
+    var implied = {};
+    self.implies = function (key, value) {
+        if (typeof key === 'object') {
+            Object.keys(key).forEach(function (k) {
+                self.implies(k, key[k]);
+            });
+        } else {
+            implied[key] = value;
+        }
+    };
+
     var usage;
     self.usage = function (msg, opts) {
         if (!opts && typeof msg === 'object') {
@@ -388,6 +399,53 @@ function Argv (processArgs, cwd) {
                 fail(err)
             }
         });
+
+        var implyFail = [];
+        Object.keys(implied).forEach(function (key) {
+            var num, origKey = key, value = implied[key];
+
+            // convert string '1' to number 1
+            var num = Number(key);
+            key = isNaN(num) ? key : num;
+
+            if (typeof key === 'number') {
+                // check length of argv._
+                key = argv._.length >= key;
+            } else if (key.match(/^--no-.+/)) {
+                // check if key doesn't exist
+                key = key.match(/^--no-(.+)/)[1];
+                key = !argv[key];
+            } else {
+                // check if key exists
+                key = argv[key];
+            }
+
+            num = Number(value);
+            value = isNaN(num) ? value : num;
+
+            if (typeof value === 'number') {
+                value = argv._.length >= value;
+            } else if (value.match(/^--no-.+/)) {
+                value = value.match(/^--no-(.+)/)[1];
+                value = !argv[value];
+            } else {
+                value = argv[value];
+            }
+
+            if (key && !value) {
+                implyFail.push(origKey);
+            }
+        });
+
+        if (implyFail.length) {
+            var msg = 'Implications failed:\n';
+
+            implyFail.forEach(function (key) {
+                msg += ('  ' + key + ' -> ' + implied[key] + '\n');
+            });
+
+            fail(msg);
+        }
         
         return argv;
     }
