@@ -297,7 +297,10 @@ function Argv (processArgs, cwd) {
     });
     
     function parseArgs (args) {
-        var argv = minimist(args, options);
+        var parsed = minimist(args, options),
+            argv = parsed.argv,
+            aliases = parsed.aliases;
+
         argv.$0 = self.$0;
         
         if (demanded._ && argv._.length < demanded._) {
@@ -317,7 +320,7 @@ function Argv (processArgs, cwd) {
         
         checks.forEach(function (f) {
             try {
-                if (f(argv) === false) {
+                if (f(argv, aliases) === false) {
                     fail('Argument check failed: ' + f.toString());
                 }
             }
