@@ -45,13 +45,19 @@ function Argv (processArgs, cwd) {
             string: [],
             alias: {},
             default: [],
-            count: []
+            count: [],
+            normalize: []
         };
     };
     self.resetOptions();
     
     self.boolean = function (bools) {
         options.boolean.push.apply(options.boolean, [].concat(bools));
+        return self;
+    };
+
+    self.normalize = function (strings) {
+        options.normalize.push.apply(options.normalize, [].concat(strings));
         return self;
     };
     
@@ -250,7 +256,9 @@ function Argv (processArgs, cwd) {
             var type = null;
             
             if (options.boolean[key]) type = '[boolean]';
+            if (options.count[key]) type = '[count]';
             if (options.string[key]) type = '[string]';
+            if (options.normalize[key]) type = '[string]';
             
             if (!wrap && dpadding.length > 0) {
                 desc += dpadding;

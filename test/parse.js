@@ -275,6 +275,21 @@ test('stringArgs', function (t) {
     t.end();
 });
 
+test('normalize', function (t) {
+    var a = optimist([ '-s', '/tmp/../' ]).alias('s', 'save').normalize('s').argv;
+    t.same(a.s, '/');
+    t.same(a.save, '/');
+    t.end();
+});
+
+test('normalize setter', function (t) {
+    var a = optimist(['-s']).normalize('s').argv;
+    t.same(a.s, true);
+    a.s = '/path/to/new/dir/../../';
+    t.same(a.s, '/path/to/');
+    t.end();
+});
+
 test('slashBreak', function (t) {
     t.same(
         optimist.parse([ '-I/foo/bar/baz' ]),
