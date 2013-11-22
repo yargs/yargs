@@ -221,7 +221,7 @@ function Argv (processArgs, cwd) {
     };
     
     self.showHelp = function (fn) {
-        if (!fn) fn = console.error;
+        if (!fn) fn = console.error.bind(console);
         fn(self.help());
     };
     
