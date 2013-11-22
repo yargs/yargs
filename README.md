@@ -441,6 +441,12 @@ This can be useful if you need to preserve leading zeros in an input.
 
 If `key` is an Array, interpret all the elements as strings.
 
+.config(key)
+------------
+
+Tells the parser to interpret `key` as a path to a JSON config file. The file
+is loaded and parsed, and its properties are set as arguments.
+
 .wrap(columns)
 --------------
 

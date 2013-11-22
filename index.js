@@ -46,7 +46,8 @@ function Argv (processArgs, cwd) {
             alias: {},
             default: [],
             count: [],
-            normalize: []
+            normalize: [],
+            config: []
         };
     };
     self.resetOptions();
@@ -58,6 +59,11 @@ function Argv (processArgs, cwd) {
 
     self.normalize = function (strings) {
         options.normalize.push.apply(options.normalize, [].concat(strings));
+        return self;
+    };
+
+    self.config = function (configs) {
+        options.config.push.apply(options.config, [].concat(configs));
         return self;
     };
 
@@ -304,7 +310,6 @@ function Argv (processArgs, cwd) {
                 options.default[key] !== undefined
                     ? '[default: ' + JSON.stringify(options.default[key]) + ']'
                     : null
-                ,
             ].filter(Boolean).join('  ');
             
             var body = [ desc, extra ].filter(Boolean).join('  ');
@@ -332,7 +337,7 @@ function Argv (processArgs, cwd) {
     
     Object.defineProperty(self, 'argv', {
         get : function () { return parseArgs(processArgs) },
-        enumerable : true,
+        enumerable : true
     });
     
     function parseArgs (args) {

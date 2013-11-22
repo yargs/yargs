@@ -313,6 +313,19 @@ test('alias', function (t) {
     t.end();
 });
 
+test('config', function (t) {
+    var argv = optimist([ '--settings', 'config.json', '--foo', 'bar' ])
+        .alias('z', 'zoom')
+        .config('settings')
+        .argv;
+
+    t.equal(argv.herp, 'derp');
+    t.equal(argv.zoom, 55);
+    t.equal(argv.foo[0], 'baz');
+    t.equal(argv.foo[1], 'bar');
+    t.end();
+});
+
 test('multiAlias', function (t) {
     var argv = optimist([ '-f', '11', '--zoom', '55' ])
         .alias('z', [ 'zm', 'zoom' ])
