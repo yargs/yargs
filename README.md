@@ -291,6 +291,8 @@ Set key names as equivalent such that updates to a key will propagate to aliases
 and vice-versa.
 
 Optionally `.alias()` can take an object that maps keys to aliases.
+Each key of this object should be the canonical version of the option, and each
+value should be a string or an array of strings.
 
 .default(key, value)
 --------------------
@@ -358,6 +360,8 @@ present script similar to how `$0` works in bash or perl.
 ----------
 
 Check that certain conditions are met in the provided arguments.
+
+`fn` is called with one argument, the parsed `argv` hash.
 
 If `fn` throws or returns `false`, show the thrown error, usage information, and
 exit.
