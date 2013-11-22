@@ -152,11 +152,23 @@ function Argv (processArgs, cwd) {
         
         return self;
     };
-    
+
+    var fails = [];
+    self.fail = function (f) {
+        fails.push(f);
+        return self;
+    };
+
     function fail (msg) {
-        self.showHelp();
-        if (msg) console.error(msg);
-        process.exit(1);
+        if (fails.length) {
+            fails.forEach(function (f) {
+                f(msg);
+            });
+        } else {
+            self.showHelp();
+            if (msg) console.error(msg);
+            process.exit(1);
+        }
     }
     
     var checks = [];
