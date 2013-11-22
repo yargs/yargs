@@ -386,7 +386,7 @@ function Argv (processArgs, cwd) {
         
         var missing = null;
         Object.keys(demanded).forEach(function (key) {
-            if (!argv[key]) {
+            if (!argv.hasOwnProperty(key)) {
                 missing = missing || {};
                 missing[key] = demanded[key];
             }
