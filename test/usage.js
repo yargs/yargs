@@ -21,7 +21,7 @@ test('usageFail', function (t) {
             'Options:',
             '  -x  [required]',
             '  -y  [required]',
-            'Missing required arguments: y',
+            'Missing required arguments: y'
         ]
     );
     t.same(r.logs, []);
@@ -29,6 +29,33 @@ test('usageFail', function (t) {
     t.end();
 });
 
+test('usageFailWithMessage', function (t) {
+    var r = checkUsage(function () {
+        return optimist('-z 20'.split(' '))
+            .usage('Usage: $0 -x NUM -y NUM')
+            .demand(['x','y'], 'x and y are both required to multiply all the things')
+            .argv;
+    });
+    t.same(
+        r.result,
+        { z: 20, _: [], $0: './usage' }
+    );
+
+    t.same(
+        r.errors.join('\n').split(/\n+/),
+        [
+            'Usage: ./usage -x NUM -y NUM',
+            'Options:',
+            '  -x  [required]',
+            '  -y  [required]',
+            'Missing required arguments: x, y',
+            'x and y are both required to multiply all the things'
+        ]
+    );
+    t.same(r.logs, []);
+    t.ok(r.exit);
+    t.end();
+});
 
 test('usagePass', function (t) {
     var r = checkUsage(function () {
@@ -41,7 +68,7 @@ test('usagePass', function (t) {
         result : { x : 10, y : 20, _ : [], $0 : './usage' },
         errors : [],
         logs : [],
-        exit : false,
+        exit : false
     });
     t.end();
 });
@@ -60,7 +87,7 @@ test('checkPass', function (t) {
         result : { x : 10, y : 20, _ : [], $0 : './usage' },
         errors : [],
         logs : [],
-        exit : false,
+        exit : false
     });
     t.end();
 });
@@ -109,7 +136,7 @@ test('checkCondPass', function (t) {
         result : { x : 10, y : 20, _ : [], $0 : './usage' },
         errors : [],
         logs : [],
-        exit : false,
+        exit : false
     });
     t.end();
 });
@@ -153,7 +180,7 @@ test('countPass', function (t) {
         result : { _ : [ '1', '2', '3' ], moo : true, $0 : './usage' },
         errors : [],
         logs : [],
-        exit : false,
+        exit : false
     });
     t.end();
 });
@@ -174,7 +201,32 @@ test('countFail', function (t) {
         r.errors.join('\n').split(/\n+/),
         [
             'Usage: ./usage [x] [y] [z] {OPTIONS}',
-            'Not enough non-option arguments: got 2, need at least 3',
+            'Not enough non-option arguments: got 2, need at least 3'
+        ]
+    );
+
+    t.same(r.logs, []);
+    t.ok(r.exit);
+    t.end();
+});
+
+test('countFailWithMessage', function (t) {
+    var r = checkUsage(function () {
+        return optimist('src --moo'.split(' '))
+            .usage('Usage: $0 [x] [y] [z] {OPTIONS} <src> <dest> [extra_files...]')
+            .demand(2, 'src and dest files are both required')
+            .argv;
+    });
+    t.same(
+        r.result,
+        { _: ['src'], moo: true, $0: './usage' }
+    );
+
+    t.same(
+        r.errors.join('\n').split(/\n+/),
+        [
+            'Usage: ./usage [x] [y] [z] {OPTIONS} <src> <dest> [extra_files...]',
+            'src and dest files are both required'
         ]
     );
 
@@ -198,7 +250,7 @@ test('defaultSingles', function (t) {
         baz : '70',
         powsy : true,
         _ : [],
-        $0 : './usage',
+        $0 : './usage'
     });
     t.end();
 });
@@ -215,7 +267,7 @@ test('defaultAliases', function (t) {
         f : '5',
         foo : '5',
         _ : [],
-        $0 : './usage',
+        $0 : './usage'
     });
     t.end();
 });
@@ -233,7 +285,7 @@ test('defaultHash', function (t) {
         foo : 50,
         baz : 70,
         bar : 20,
-        quux : 30,
+        quux : 30
     });
     t.end();
 });
@@ -287,6 +339,6 @@ function checkUsage (f) {
         errors : errors,
         logs : logs,
         exit : exit,
-        result : result,
+        result : result
     };
 };

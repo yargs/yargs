@@ -342,7 +342,7 @@ Set `argv[key]` to `value` if no option was specified on `process.argv`.
 
 Optionally `.default()` can take an object that maps keys to default values.
 
-.demand(key)
+.demand(key, [msg])
 ------------
 
 If `key` is a string, show the usage information and exit if `key` wasn't
@@ -352,6 +352,9 @@ If `key` is a number, demand at least as many non-option arguments, which show
 up in `argv._`.
 
 If `key` is an Array, demand each element.
+
+If `msg` is supplied, it will be printed when the argument is missing,
+instead of the standard error message. This is especially helpful for the non-option arguments in `argv._`.
 
 .describe(key, desc)
 --------------------
