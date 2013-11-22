@@ -104,11 +104,8 @@ test('mixed short bool and capture', function (t) {
  
 test('short and long', function (t) {
     t.same(
-        optimist.parse([ '-h', 'localhost', '-fp', '555', 'script.js' ]),
-        {
-            f : true, p : 555, h : 'localhost',
-            _ : [ 'script.js' ], $0 : $0,
-        }
+        optimist.parse([ '-h', 'localhost', '--port', '555' ]),
+        { h : 'localhost', port : 555, _ : [], $0 : $0 }
     );
     t.end();
 });
