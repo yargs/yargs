@@ -182,14 +182,16 @@ var argv = require('optimist')
     .boolean('v')
     .argv
 ;
-console.dir(argv);
+console.dir(argv.v);
+console.dir(argv._);
 ````
 
 ***
 
     $ ./boolean_single.js -v foo bar baz
     true
-    [ 'bar', 'baz', 'foo' ]
+    [ 'foo', 'bar', 'baz' ]
+    
 
 boolean_double.js
 
