@@ -1,6 +1,6 @@
 var path = require('path');
 var minimist = require('minimist');
-var wordwrap = require('wordwrap');
+var wordwrap = require('./lib/wordwrap');
 
 /*  Hack an instance of Argv with process.argv into Argv
     so people can do
