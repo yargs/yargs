@@ -106,6 +106,47 @@ console.log(argv._);
     (0.54,1.12)
     [ 'foo', 'bar', 'baz' ]
 
+Order now, and as a special bonus Optimist will count boolean options!
+----------------------------------------------------------------------
+
+count.js
+
+````javascript
+#!/usr/bin/env node
+var argv = require('optimist')
+    .count('verbose')
+    .alias('v', 'verbose')
+    .argv;
+
+VERBOSE_LEVEL = argv.verbose;
+
+function WARN()  { VERBOSE_LEVEL >= 0 && console.log.apply(console, arguments); }
+function INFO()  { VERBOSE_LEVEL >= 1 && console.log.apply(console, arguments); }
+function DEBUG() { VERBOSE_LEVEL >= 2 && console.log.apply(console, arguments); }
+
+WARN("Showing only important stuff");
+INFO("Showing semi-mportant stuff too");
+DEBUG("Extra chatty mode");
+````
+
+***
+    $ node count.js
+    Showing only important stuff
+
+    $ node count.js -v
+    Showing only important stuff
+    Showing semi-important stuff too
+
+    $ node count.js -vv
+    Showing only important stuff
+    Showing semi-important stuff too
+    Extra chatty mode
+
+    $ node count.js -v --verbose
+    Showing only important stuff
+    Showing semi-important stuff too
+    Extra chatty mode
+
 Plus, Optimist comes with .usage() and .demand()!
 -------------------------------------------------
 

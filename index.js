@@ -1,5 +1,5 @@
 var path = require('path');
-var minimist = require('minimist');
+var minimist = require('./lib/minimist');
 var wordwrap = require('./lib/wordwrap');
 
 /*  Hack an instance of Argv with process.argv into Argv
@@ -44,7 +44,8 @@ function Argv (processArgs, cwd) {
             boolean: [],
             string: [],
             alias: {},
-            default: []
+            default: [],
+            count: []
         };
     };
     self.resetOptions();
@@ -80,6 +81,11 @@ function Argv (processArgs, cwd) {
         else {
             options.alias[x] = (options.alias[x] || []).concat(y);
         }
+        return self;
+    };
+
+    self.count = function(counts) {
+        options.count.push.apply(options.count, [].concat(counts));
         return self;
     };
     
@@ -162,6 +168,9 @@ function Argv (processArgs, cwd) {
             }
             if (opt.string || opt.type === 'string') {
                 self.string(key);
+            }
+            if (opt.count || opt.type === 'count') {
+                self.count(key);
             }
             
             var desc = opt.describe || opt.description || opt.desc;
