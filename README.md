@@ -264,6 +264,7 @@ line_count.js
 #!/usr/bin/env node
 var argv = require('optimist')
     .usage('Count the lines in a file.\nUsage: $0')
+    .example('$0 -f', 'count the lines in the given file')
     .demand('f')
     .alias('f', 'file')
     .describe('f', 'Load a file')
@@ -288,6 +289,9 @@ s.on('end', function () {
     $ node line_count.js
     Count the lines in a file.
     Usage: node ./line_count.js
+
+    Examples:
+      node ./line_count.js -f   count the lines in the given file
 
     Options:
       -f, --file  Load a file  [required]
@@ -399,6 +403,14 @@ Optionally `.options()` can take an object that maps keys to `opt` parameters.
 Set a usage message to show which commands to use. Inside `message`, the string
 `$0` will get interpolated to the current script name or node command for the
 present script similar to how `$0` works in bash or perl.
+
+.example(cmd, desc)
+-------------------
+
+Give some example invocations of your program. Inside `cmd`, the string
+`$0` will get interpolated to the current script name or node command for the
+present script similar to how `$0` works in bash or perl.
+Examples will be printed out as part of the help message.
 
 .check(fn)
 ----------

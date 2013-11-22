@@ -290,6 +290,39 @@ test('defaultHash', function (t) {
     t.end();
 });
 
+
+test('exampleFail', function (t) {
+    var r = checkUsage(function () {
+        return optimist('')
+            .example("$0 something", "description")
+            .example("$0 something else", "other description")
+            .demand(['y'])
+            .argv;
+    });
+    t.same(
+        r.result,
+        { _ : [], $0 : './usage' }
+    );
+
+    t.same(
+        r.errors.join('\n').split(/\n/),
+        [
+            'Examples:',
+            '  ./usage something         description',
+            '  ./usage something else    other description',
+            '',
+            '',
+            'Options:',
+            '  -y  [required]',
+            '',
+            'Missing required arguments: y'
+        ]
+    );
+    t.same(r.logs, []);
+    t.ok(r.exit);
+    t.end();
+});
+
 test('rebase', function (t) {
     t.equal(
         optimist.rebase('/home/substack', '/home/substack/foo/bar/baz'),
