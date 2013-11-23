@@ -2,7 +2,7 @@ yargs
 ========
 
 Yargs is a node.js library fer option parsin' fer hearties who hate option
-parsin'. This here module is for hearties who like all the --bells
+parsin'. This here module is for scallywags who like all the --bells
 and -whistlz of program usage but think optstrings are a waste of yer time.
 
 With yargs, option parsing doesn't have to suck (as much).
