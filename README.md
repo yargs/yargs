@@ -1,52 +1,54 @@
-optimist
+yargs
 ========
 
-Optimist is a node.js library for option parsing for people who hate option
-parsing. More specifically, this module is for people who like all the --bells
-and -whistlz of program usage but think optstrings are a waste of time.
+Yargs is a node.js library fer option parsin' fer hearties who hate option
+parsin'. This here module is for hearties who like all the --bells
+and -whistlz of program usage but think optstrings are a waste of yer time.
 
-With optimist, option parsing doesn't have to suck (as much).
+With yargs, option parsing doesn't have to suck (as much).
 
-[![build status](https://secure.travis-ci.org/substack/node-optimist.png)](http://travis-ci.org/substack/node-optimist)
+[![Build Status](https://travis-ci.org/chevex/yargs.png)](https://travis-ci.org/chevex/yargs)
+[![Dependencies Status](https://gemnasium.com/Chevex/yargs.png)](https://gemnasium.com/Chevex/yargs)
+[![NPM version](https://badge.fury.io/js/yargs.png)](http://badge.fury.io/js/yargs)
 
 examples
 ========
 
-With Optimist, the options are just a hash! No optstrings attached.
+With yargs, the options are just a hash! No optstrings attached.
 -------------------------------------------------------------------
 
 xup.js:
 
 ````javascript
 #!/usr/bin/env node
-var argv = require('optimist').argv;
+var argv = require('yargs').argv;
 
 if (argv.rif - 5 * argv.xup > 7.138) {
-    console.log('Buy more riffiwobbles');
+    console.log('Plunder more riffiwobbles!');
 }
 else {
-    console.log('Sell the xupptumblers');
+    console.log('Drop the xupptumblers!');
 }
 ````
 
 ***
 
     $ ./xup.js --rif=55 --xup=9.52
-    Buy more riffiwobbles
+    Plunder more riffiwobbles!
     
     $ ./xup.js --rif 12 --xup 8.1
-    Sell the xupptumblers
+    Drop the xupptumblers!
 
-![This one's optimistic.](http://substack.net/images/optimistic.png)
+![Joe was one optimistic pirate.](http://i.imgur.com/wAm9e5N.png)
 
-But wait! There's more! You can do short options:
+But wait! Ther's more! Ye can do short options:
 -------------------------------------------------
  
 short.js:
 
 ````javascript
 #!/usr/bin/env node
-var argv = require('optimist').argv;
+var argv = require('yargs').argv;
 console.log('(%d,%d)', argv.x, argv.y);
 ````
 
@@ -63,26 +65,26 @@ bool.js:
 ````javascript
 #!/usr/bin/env node
 var util = require('util');
-var argv = require('optimist').argv;
+var argv = require('yargs').argv;
 
 if (argv.s) {
-    util.print(argv.fr ? 'Le chat dit: ' : 'The cat says: ');
+    util.print(argv.fr ? 'Le perroquet dit: ' : 'The parrot says: ');
 }
 console.log(
-    (argv.fr ? 'miaou' : 'meow') + (argv.p ? '.' : '')
+    (argv.fr ? 'couac' : 'squawk') + (argv.p ? '!' : '')
 );
 ````
 
 ***
 
     $ ./bool.js -s
-    The cat says: meow
+    The parrot says: squawk
     
     $ ./bool.js -sp
-    The cat says: meow.
+    The parrot says: squawk!
 
     $ ./bool.js -sp --fr
-    Le chat dit: miaou.
+    Le perroquet dit: couac!
 
 And non-hyphenated options too! Just use `argv._`!
 -------------------------------------------------
@@ -91,29 +93,29 @@ nonopt.js:
 
 ````javascript
 #!/usr/bin/env node
-var argv = require('optimist').argv;
+var argv = require('yargs').argv;
 console.log('(%d,%d)', argv.x, argv.y);
 console.log(argv._);
 ````
 
 ***
 
-    $ ./nonopt.js -x 6.82 -y 3.35 moo
+    $ ./nonopt.js -x 6.82 -y 3.35 rum
     (6.82,3.35)
-    [ 'moo' ]
+    [ 'rum' ]
     
-    $ ./nonopt.js foo -x 0.54 bar -y 1.12 baz
+    $ ./nonopt.js "me hearties" -x 0.54 yo -y 1.12 ho
     (0.54,1.12)
-    [ 'foo', 'bar', 'baz' ]
+    [ 'me hearties', 'yo', 'ho' ]
 
-Order now, and as a special bonus Optimist will count boolean options!
+Yargs even counts yer gold doubooleans!
 ----------------------------------------------------------------------
 
 count.js
 
 ````javascript
 #!/usr/bin/env node
-var argv = require('optimist')
+var argv = require('yargs')
     .count('verbose')
     .alias('v', 'verbose')
     .argv;
@@ -147,14 +149,14 @@ DEBUG("Extra chatty mode");
     Showing semi-important stuff too
     Extra chatty mode
 
-Plus, Optimist comes with .usage() and .demand()!
+Plus, yargs comes with .usage() and .demand()!
 -------------------------------------------------
 
 divide.js:
 
 ````javascript
 #!/usr/bin/env node
-var argv = require('optimist')
+var argv = require('yargs')
     .usage('Usage: $0 -x [num] -y [num]')
     .demand(['x','y'])
     .argv;
@@ -181,7 +183,7 @@ Then demand some non-hypenated arguments!
 
 demand_count.js:
 	#!/usr/bin/env node
-	var argv = require('optimist')
+	var argv = require('yargs')
 		.demandCount(2)
 		.argv;
 	console.dir(argv)
@@ -195,14 +197,14 @@ demand_count.js:
 	$ ./demand_count.js a b c
 	{ _: [ 'a', 'b', 'c' ], '$0': 'node ./demand_count.js' }
 
-EVEN MORE HOLY COW
+EVEN MORE SHIVER ME TIMBERS!
 ------------------
 
 default_singles.js:
 
 ````javascript
 #!/usr/bin/env node
-var argv = require('optimist')
+var argv = require('yargs')
     .default('x', 10)
     .default('y', 10)
     .argv
@@ -219,7 +221,7 @@ default_hash.js:
 
 ````javascript
 #!/usr/bin/env node
-var argv = require('optimist')
+var argv = require('yargs')
     .default({ x : 10, y : 10 })
     .argv
 ;
@@ -231,14 +233,14 @@ console.log(argv.x + argv.y);
     $ ./default_hash.js -y 7
     17
 
-And if you really want to get all descriptive about it...
+And if ye really want ter get all descriptive abouts it...
 ---------------------------------------------------------
 
 boolean_single.js
 
 ````javascript
 #!/usr/bin/env node
-var argv = require('optimist')
+var argv = require('yargs')
     .boolean('v')
     .argv
 ;
@@ -248,16 +250,16 @@ console.dir(argv._);
 
 ***
 
-    $ ./boolean_single.js -v foo bar baz
+    $ ./boolean_single.js -v "me hearties" yo ho
     true
-    [ 'foo', 'bar', 'baz' ]
+    [ 'me hearties', 'yo', 'ho' ]
     
 
 boolean_double.js
 
 ````javascript
 #!/usr/bin/env node
-var argv = require('optimist')
+var argv = require('yargs')
     .boolean(['x','y','z'])
     .argv
 ;
@@ -271,17 +273,17 @@ console.dir(argv._);
     [ true, false, true ]
     [ 'one', 'two', 'three' ]
 
-Optimist is here to help...
+Yargs is here ter help ye...
 ---------------------------
 
-You can describe parameters for help messages and set aliases. Optimist figures
-out how to format a handy help string automatically.
+Ye can describe parameters fer help messages and set aliases. Yargs figures
+out how ter format a handy help string automatically.
 
 line_count.js
 
 ````javascript
 #!/usr/bin/env node
-var argv = require('optimist')
+var argv = require('yargs')
     .usage('Count the lines in a file.\nUsage: $0')
     .example('$0 -f', 'count the lines in the given file')
     .demand('f')
@@ -329,7 +331,7 @@ methods
 By itself,
 
 ````javascript
-require('optimist').argv
+require('yargs').argv
 `````
 
 will use `process.argv` array to construct the `argv` object.
@@ -337,13 +339,13 @@ will use `process.argv` array to construct the `argv` object.
 You can pass in the `process.argv` yourself:
 
 ````javascript
-require('optimist')([ '-x', '1', '-y', '2' ]).argv
+require('yargs')([ '-x', '1', '-y', '2' ]).argv
 ````
 
 or use .parse() to do the same thing:
 
 ````javascript
-require('optimist').parse([ '-x', '1', '-y', '2' ])
+require('yargs').parse([ '-x', '1', '-y', '2' ])
 ````
 
 The rest of these methods below come in just before the terminating `.argv`.
@@ -395,7 +397,7 @@ keys in `opt` for each of the chainable methods.
 For example:
 
 ````javascript
-var argv = require('optimist')
+var argv = require('yargs')
     .options('f', {
         alias : 'file',
         default : '/etc/passwd',
@@ -407,7 +409,7 @@ var argv = require('optimist')
 is the same as
 
 ````javascript
-var argv = require('optimist')
+var argv = require('yargs')
     .alias('f', 'file')
     .default('f', '/etc/passwd')
     .argv
@@ -479,12 +481,12 @@ Return the generated usage string.
 Example:
 
 ```
-var optimist = require("optimist")
+var yargs = require("yargs")
        .usage("$0 -operand1 number -operand2 number -operation [add|subtract]");
-console.log(optimist.help());
+console.log(yargs.help());
 ```
 
-Later on, ```argv``` can be retrived with ```optimist.argv```
+Later on, ```argv``` can be retrived with ```yargs.argv```
 
 .showHelp(fn=console.error)
 ---------------------------
@@ -494,12 +496,12 @@ Print the usage data using `fn` for printing.
 Example:
 
 ```
-var optimist = require("optimist")
+var yargs = require("yargs")
        .usage("$0 -operand1 number -operand2 number -operation [add|subtract]");
-optimist.showHelp();
+yargs.showHelp();
 ```
 
-Later on, ```argv``` can be retrived with ```optimist.argv```
+Later on, ```argv``` can be retrived with ```yargs.argv```
 
 .parse(args)
 ------------
@@ -590,11 +592,11 @@ installation
 
 With [npm](http://github.com/isaacs/npm), just do:
 
-    npm install optimist
+    npm install yargs
  
 or clone this project on github:
 
-    git clone http://github.com/substack/node-optimist.git
+    git clone http://github.com/chevex/yargs.git
 
 To run the tests with [expresso](http://github.com/visionmedia/expresso),
 just do:

@@ -4,9 +4,9 @@ var wordwrap = require('./lib/wordwrap');
 
 /*  Hack an instance of Argv with process.argv into Argv
     so people can do
-        require('optimist')(['--beeble=1','-z','zizzle']).argv
+        require('yargs')(['--beeble=1','-z','zizzle']).argv
     to parse a list of args and
-        require('optimist').argv
+        require('yargs').argv
     to get a parsed version of process.argv.
 */
 

@@ -1,5 +1,5 @@
 {
-    "name" : "optimist",
+    "name" : "yargs",
     "version" : "0.6.0",
     "description" : "Light-weight option parsing with an argv hash. No optstrings attached.",
     "main" : "./index.js",
@@ -15,7 +15,7 @@
     },
     "repository" : {
         "type" : "git",
-        "url" : "http://github.com/substack/node-optimist.git"
+        "url" : "http://github.com/chevex/yargs.git"
     },
     "keywords" : [
         "argument",
@@ -27,9 +27,9 @@
         "command"
     ],
     "author" : {
-        "name" : "James Halliday",
-        "email" : "mail@substack.net",
-        "url" : "http://substack.net"
+        "name" : "Alex Ford (forked from James Halliday)",
+        "email" : "Alex.Ford@CodeTunnel.com",
+        "url" : "http://CodeTunnel.com"
     },
     "license" : "MIT/X11",
     "engine" : {
