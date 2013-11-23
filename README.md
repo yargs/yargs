@@ -11,6 +11,8 @@ With yargs, option parsing doesn't have to suck (as much).
 [![Dependencies Status](https://gemnasium.com/Chevex/yargs.png)](https://gemnasium.com/Chevex/yargs)
 [![NPM version](https://badge.fury.io/js/yargs.png)](http://badge.fury.io/js/yargs)
 
+> NOTE: Yargs is a fork of [optimist](https://github.com/substack/node-optimist) by [substack (James Halliday)](https://github.com/substack). It is obvious that substack is stretched pretty thin maintaining over 300 modules on npm at the time of this writing. So rather than complain in the project issue tracker I thought I'd just pick up the torch and maintain a proper fork. Currently the project is totally backward compatible with optimist but this may change in the future (if it does I will update this notice to inform you of this). For now though, enjoy optimist with about 5 months worth of fixes rolled in.
+
 examples
 ========
 
