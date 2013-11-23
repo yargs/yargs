@@ -407,8 +407,11 @@ function Argv (processArgs, cwd) {
         
         checks.forEach(function (f) {
             try {
-                if (f(argv, aliases) === false) {
+                var result = f(argv, aliases);
+                if (result === false) {
                     fail('Argument check failed: ' + f.toString());
+                } else if (typeof result === 'string') {
+                    fail(result);
                 }
             }
             catch (err) {
