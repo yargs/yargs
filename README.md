@@ -41,7 +41,7 @@ else {
     $ ./xup.js --rif 12 --xup 8.1
     Drop the xupptumblers!
 
-![Joe was one optimistic pirate.](http://i.imgur.com/wdxrFor.png)
+![Joe was one optimistic pirate.](http://i.imgur.com/0BfP23G.png)
 
 But wait! Ther's more! Ye can do short options:
 -------------------------------------------------
