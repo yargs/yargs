@@ -155,9 +155,11 @@ function Argv (processArgs, cwd) {
             
             if (opt.boolean || opt.type === 'boolean') {
                 self.boolean(key);
+                if (opt.alias) self.boolean(opt.alias);
             }
             if (opt.string || opt.type === 'string') {
                 self.string(key);
+                if (opt.alias) self.string(opt.alias);
             }
             
             var desc = opt.describe || opt.description || opt.desc;
