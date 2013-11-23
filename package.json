@@ -1,38 +1,38 @@
 {
-    "name" : "yargs",
-    "version" : "0.6.0",
-    "description" : "Light-weight option parsing with an argv hash. No optstrings attached.",
-    "main" : "./index.js",
-    "dependencies" : {
-        "minimist" : "~0.0.1"
-    },
-    "devDependencies" : {
-        "hashish": "~0.0.4",
-        "tap" : "~0.4.0"
-    },
-    "scripts" : {
-        "test" : "tap ./test/*.js"
-    },
-    "repository" : {
-        "type" : "git",
-        "url" : "http://github.com/chevex/yargs.git"
-    },
-    "keywords" : [
-        "argument",
-        "args",
-        "option",
-        "parser",
-        "parsing",
-        "cli",
-        "command"
-    ],
-    "author" : {
-        "name" : "Alex Ford (forked from James Halliday)",
-        "email" : "Alex.Ford@CodeTunnel.com",
-        "url" : "http://CodeTunnel.com"
-    },
-    "license" : "MIT/X11",
-    "engine" : {
-        "node" : ">=0.4"
-    }
+  "name": "yargs",
+  "version": "1.0.0",
+  "description": "Light-weight option parsing with an argv hash. No optstrings attached.",
+  "main": "./index.js",
+  "dependencies": {
+    "minimist": "~0.0.1"
+  },
+  "devDependencies": {
+    "hashish": "~0.0.4",
+    "tap": "~0.4.0"
+  },
+  "scripts": {
+    "test": "tap ./test/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/chevex/yargs.git"
+  },
+  "keywords": [
+    "argument",
+    "args",
+    "option",
+    "parser",
+    "parsing",
+    "cli",
+    "command"
+  ],
+  "author": {
+    "name": "Alex Ford (forked from James Halliday)",
+    "email": "Alex.Ford@CodeTunnel.com",
+    "url": "http://CodeTunnel.com"
+  },
+  "license": "MIT/X11",
+  "engine": {
+    "node": ">=0.4"
+  }
 }
