@@ -336,8 +336,8 @@ function Argv (processArgs, cwd) {
                     : null
                 ,
                 options.default[key] !== undefined
-                    ? '[default: ' + (typeof defaults[key] === 'string' ?
-                    JSON.stringify : String)(defaults[key]) + ']'
+                    ? '[default: ' + (typeof options.default[key] === 'string' ?
+                    JSON.stringify : String)(options.default[key]) + ']'
                     : null
             ].filter(Boolean).join('  ');
             
