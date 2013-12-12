@@ -1,11 +1,9 @@
 yargs
 ========
 
-Yargs is a node.js library fer option parsin' fer hearties who hate option
-parsin'. This here module is for scallywags who like all the --bells
-and -whistlz of program usage but think optstrings are a waste of yer time.
+Yargs be a node.js library fer hearties tryin' ter parse optstrings against their will where even the boo box be not enough to coerce them. This here module is fer scallywags lookin' ter plunder all the sunken -shipz of their --treasures thru program usage but be tired of optstrings disincling to acquiesce to yer requests.
 
-With yargs, option parsing doesn't have to suck (as much).
+With yargs, ye be havin' a map that leads straight to yer treasure! Treasure of course, being a simple option hash.
 
 [![Build Status](https://travis-ci.org/chevex/yargs.png)](https://travis-ci.org/chevex/yargs)
 [![Dependencies Status](https://gemnasium.com/Chevex/yargs.png)](https://gemnasium.com/Chevex/yargs)
@@ -16,7 +14,7 @@ With yargs, option parsing doesn't have to suck (as much).
 examples
 ========
 
-With yargs, the options are just a hash! No optstrings attached.
+With yargs, the options be just a hash! No optstrings be attached.
 -------------------------------------------------------------------
 
 xup.js:
@@ -43,7 +41,7 @@ else {
 
 ![Joe was one optimistic pirate.](http://i.imgur.com/4WFGVJ9.png)
 
-But wait! Ther's more! Ye can do short options:
+But don' walk the plank jus' yet! Ther' be more! Ye can do short options:
 -------------------------------------------------
  
 short.js:
@@ -59,7 +57,7 @@ console.log('(%d,%d)', argv.x, argv.y);
     $ ./short.js -x 10 -y 21
     (10,21)
 
-And booleans, both long and short (and grouped):
+And gold doubooleans, both long an' short (an' grouped!):
 ----------------------------------
 
 bool.js:
@@ -151,7 +149,7 @@ DEBUG("Extra chatty mode");
     Showing semi-important stuff too
     Extra chatty mode
 
-Plus, yargs comes with .usage() and .demand()!
+Tell yer friends how ter use yer options and make demands from yer enemies.
 -------------------------------------------------
 
 divide.js:
@@ -180,7 +178,7 @@ console.log(argv.x / argv.y);
 
     Missing required arguments: y
 
-Then demand some non-hypenated arguments!
+After yer demands have been met, demand more! Ask for non-hypenated arguments!
 -----------------------------------------
 
 demand_count.js:
@@ -235,7 +233,7 @@ console.log(argv.x + argv.y);
     $ ./default_hash.js -y 7
     17
 
-And if ye really want ter get all descriptive abouts it...
+And if ye really want ter get all descriptive about it...
 ---------------------------------------------------------
 
 boolean_single.js
