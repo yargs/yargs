@@ -182,11 +182,14 @@ After yer demands have been met, demand more! Ask for non-hypenated arguments!
 -----------------------------------------
 
 demand_count.js:
-	#!/usr/bin/env node
-	var argv = require('yargs')
-		.demandCount(2)
-		.argv;
-	console.dir(argv)
+
+````javascript
+#!/usr/bin/env node
+var argv = require('yargs')
+    .demandCount(2)
+    .argv;
+console.dir(argv)
+````
 
 ***
 
