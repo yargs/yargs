@@ -12,9 +12,17 @@ var wordwrap = require('./lib/wordwrap');
 
 var inst = Argv(process.argv.slice(2));
 Object.keys(inst).forEach(function (key) {
-    Argv[key] = typeof inst[key] == 'function'
-        ? inst[key].bind(inst)
-        : inst[key];
+    if (key === 'argv') {
+        Object.defineProperty(Argv, 'argv', {
+            get: function() { return inst.argv; },
+            enumerable: true,
+        });
+    }
+    else {
+        Argv[key] = typeof inst[key] == 'function'
+            ? inst[key].bind(inst)
+            : inst[key];
+    }
 });
 
 var exports = module.exports = Argv;
