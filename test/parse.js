@@ -4,10 +4,6 @@ var should = require('chai').should(),
 
 describe('parse', function () {
 
-    beforeEach(function (done) {
-        setTimeout(done, 75);
-    });
-
     it('should pass when specifying a "short boolean"', function () {
         var parse = yargs.parse([ '-b' ]);
         parse.should.have.property('b').to.be.ok.and.be.a('boolean');
