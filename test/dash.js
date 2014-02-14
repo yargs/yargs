@@ -1,5 +1,5 @@
 var should = require('chai').should(),
-    yargsLib = require('../index');
+    yargs = require('../index');
 
 describe('-', function () {
 
