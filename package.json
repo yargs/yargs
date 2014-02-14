@@ -7,11 +7,12 @@
     "minimist": "~0.0.1"
   },
   "devDependencies": {
-    "hashish": "~0.0.4",
-    "tap": "~0.4.0"
+      "hashish": "*",
+      "mocha": "*",
+      "chai": "*"
   },
   "scripts": {
-    "test": "tap ./test/*.js"
+      "test": "mocha -R nyan"
   },
   "repository": {
     "type": "git",

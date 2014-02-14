@@ -1,31 +1,35 @@
-var optimist = require('../index');
-var test = require('tap').test;
+var should = require('chai').should(),
+    yargsLib = require('../index');
 
-test('-', function (t) {
-    t.plan(5);
-    t.deepEqual(
-        fix(optimist.parse([ '-n', '-' ])),
-        { n: '-', _: [] }
-    );
-    t.deepEqual(
-        fix(optimist.parse([ '-' ])),
-        { _: [ '-' ] }
-    );
-    t.deepEqual(
-        fix(optimist.parse([ '-f-' ])),
-        { f: '-', _: [] }
-    );
-    t.deepEqual(
-        fix(optimist([ '-b', '-' ]).boolean('b').argv),
-        { b: true, _: [ '-' ] }
-    );
-    t.deepEqual(
-        fix(optimist([ '-s', '-' ]).string('s').argv),
-        { s: '-', _: [] }
-    );
+describe('-', function () {
+
+    it('should set - as value of n', function () {
+        var argv = yargs.parse(['-n', '-']);
+        argv.should.have.property('n', '-');
+        argv.should.have.property('_').with.length(0);
+    });
+
+    it('should set - as a non-hyphenated value', function () {
+        var argv = yargs.parse(['-']);
+        argv.should.have.property('_').and.deep.equal(['-']);
+    });
+
+    it('should set - as a value of f', function () {
+        var argv = yargs.parse(['-f-']);
+        argv.should.have.property('f', '-');
+        argv.should.have.property('_').with.length(0);
+    });
+
+    it('should set b to true and set - as a non-hyphenated value when b is set as a boolean', function () {
+        var argv = yargs(['-b', '-']).boolean('b').argv;
+        argv.should.have.property('b', true);
+        argv.should.have.property('_').and.deep.equal(['-']);
+    });
+
+    it('should set - as the value of s when s is set as a string', function () {
+        var argv = yargs([ '-s', '-' ]).string('s').argv;
+        argv.should.have.property('s', '-');
+        argv.should.have.property('_').with.length(0);
+    });
+
 });
-
-function fix (obj) {
-    delete obj.$0;
-    return obj;
-}

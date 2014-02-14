@@ -1,71 +1,64 @@
-var spawn = require('child_process').spawn;
-var test = require('tap').test;
+var spawn = require('child_process').spawn,
+    should = require('chai').should();
 
-test('dotSlashEmpty', testCmd('./bin.js', []));
+describe('bin script', function () {
 
-test('dotSlashArgs', testCmd('./bin.js', [ 'a', 'b', 'c' ]));
-
-test('nodeEmpty', testCmd('node bin.js', []));
-
-test('nodeArgs', testCmd('node bin.js', [ 'x', 'y', 'z' ]));
-
-test('whichNodeEmpty', function (t) {
-    var which = spawn('which', ['node']);
-    
-    which.stdout.on('data', function (buf) {
-        t.test(
-            testCmd(buf.toString().trim() + ' bin.js', [])
-        );
-        t.end();
+    it('should run as a shell script with no arguments', function (done) {
+        testCmd('./bin.js', [], done);
     });
-    
-    which.stderr.on('data', function (err) {
-        assert.error(err);
-        t.end();
+
+    it('should run as a shell script with arguments', function (done) {
+        testCmd('./bin.js', [ 'a', 'b', 'c' ], done);
     });
+
+    it('should run as a node script with no arguments', function (done) {
+        testCmd('node bin.js', [], done);
+    });
+
+    it('should run as a node script with arguments', function (done) {
+        testCmd('node bin.js', [ 'x', 'y', 'z' ], done);
+    });
+
+    describe('path returned by "which"', function () {
+
+        beforeEach(function () {
+            this.which = spawn('which', ['node']);
+        });
+
+        it('should match the actual path to the script file', function (done) {
+            this.which.stdout.on('data', function (buf) {
+                testCmd(buf.toString().trim() + ' bin.js', [], done);
+            });
+            this.which.stderr.on('data', done);
+        });
+
+        it('should match the actual path to the script file, with arguments', function (done) {
+            this.which.stdout.on('data', function (buf) {
+                testCmd(buf.toString().trim() + ' bin.js', [ 'q', 'r' ], done);
+            });
+            this.which.stderr.on('data', done);
+        });
+
+    });
+
 });
 
-test('whichNodeArgs', function (t) {
-    var which = spawn('which', ['node']);
+function testCmd(cmd, args, done) {
 
-    which.stdout.on('data', function (buf) {
-        t.test(
-            testCmd(buf.toString().trim() + ' bin.js', [ 'q', 'r' ])
-        );
-        t.end();
-    });
+    var oldDir = process.cwd();
+    process.chdir(__dirname + '/_');
     
-    which.stderr.on('data', function (err) {
-        t.error(err);
-        t.end();
+    var cmds = cmd.split(' ');
+    
+    var bin = spawn(cmds[0], cmds.slice(1).concat(args.map(String)));
+    process.chdir(oldDir);
+    
+    bin.stderr.on('data', done);
+    
+    bin.stdout.on('data', function (buf) {
+        var _ = JSON.parse(buf.toString());
+        _.map(String).should.deep.equal(args.map(String));
+        done();
     });
-});
 
-function testCmd (cmd, args) {
-
-    return function (t) {
-        var to = setTimeout(function () {
-            assert.fail('Never got stdout data.')
-        }, 5000);
-        
-        var oldDir = process.cwd();
-        process.chdir(__dirname + '/_');
-        
-        var cmds = cmd.split(' ');
-        
-        var bin = spawn(cmds[0], cmds.slice(1).concat(args.map(String)));
-        process.chdir(oldDir);
-        
-        bin.stderr.on('data', function (err) {
-            t.error(err);
-            t.end();
-        });
-        
-        bin.stdout.on('data', function (buf) {
-            clearTimeout(to);
-            var _ = JSON.parse(buf.toString());
-            t.same(_.map(String), args.map(String));
-            t.end();
-        });
-    };
 }

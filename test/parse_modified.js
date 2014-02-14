@@ -1,14 +1,16 @@
-var optimist = require('../');
-var test = require('tap').test;
+var should = require('chai').should(),
+    yargs = require('../');
 
-test('parse with modifier functions' , function (t) {
-    t.plan(1);
-    
-    var argv = optimist().boolean('b').parse([ '-b', '123' ]);
-    t.deepEqual(fix(argv), { b: true, _: ['123'] });
+describe('parse', function () {
+
+    describe('boolean modifier function', function () {
+
+        it('should prevent yargs from sucking in the next option as the value of the first option', function () {
+            var argv = yargs().boolean('b').parse([ '-b', '123' ]);
+            argv.should.have.property('b', true);
+            argv.should.have.property('_').and.deep.equal([123]);
+        });
+
+    });
+
 });
-
-function fix (obj) {
-    delete obj.$0;
-    return obj;
-}

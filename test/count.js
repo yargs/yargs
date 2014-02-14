@@ -1,25 +1,28 @@
-var optimist = require('../index');
-var path = require('path');
-var test = require('tap').test;
+var should = require('chai').should()
+    yargs = require('../index');
 
-var $0 = 'node ./' + path.relative(process.cwd(), __filename);
+describe('count', function () {
 
-test('count', function(t) {
-    var parsed;
+    it('should count the number of times a boolean is present', function () {
+        var parsed;
 
-    parsed = optimist(['-x']).count('verbose').argv;
-    console.error(parsed);
-    t.same(parsed.verbose, 0);
+        parsed = yargs(['-x']).count('verbose').argv;
+        parsed.verbose.should.equal(0);
 
-    parsed = optimist(['--verbose']).count('verbose').argv;
-    t.same(parsed.verbose, 1);
+        parsed = yargs(['--verbose']).count('verbose').argv;
+        parsed.verbose.should.equal(1);
 
-    parsed = optimist(['--verbose', '--verbose']).count('verbose').argv;
-    t.same(parsed.verbose, 2);
+        parsed = yargs(['--verbose', '--verbose']).count('verbose').argv;
+        parsed.verbose.should.equal(2);
 
-    // w/alias
-    parsed = optimist(['--verbose', '--verbose', '-v', '--verbose']).count('verbose').alias('v', 'verbose').argv;
-    t.same(parsed.verbose, 4);
+        parsed = yargs(['-vvv']).alias('v', 'verbose').count('verbose').argv;
+        parsed.verbose.should.equal(3);
 
-    t.end();
+        parsed = yargs(['--verbose', '--verbose', '-v', '--verbose']).count('verbose').alias('v', 'verbose').argv;
+        parsed.verbose.should.equal(4);
+
+        parsed = yargs(['--verbose', '--verbose', '-v', '-vv']).count('verbose').alias('v', 'verbose').argv;
+        parsed.verbose.should.equal(5);
+    });
+
 });

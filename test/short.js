@@ -1,16 +1,20 @@
-var optimist = require('../index');
-var test = require('tap').test;
+var should = require('chai').should(),
+    yargs = require('../');
 
-test('-n123', function (t) {
-    t.plan(1);
-    var parse = optimist.parse([ '-n123' ]);
-    t.equal(parse.n, 123);
-});
+describe('short options', function () {
 
-test('-123', function (t) {
-    t.plan(3);
-    var parse = optimist.parse([ '-123', '456' ]);
-    t.equal(parse['1'], true);
-    t.equal(parse['2'], true);
-    t.equal(parse['3'], 456);
+    it ('should set n to the numeric value 123', function () {
+        var argv = yargs.parse([ '-n123' ]);
+        should.exist(argv);
+        argv.should.have.property('n', 123);
+    });
+
+    it ('should set option "1" to true, option "2" to true, and option "3" to numeric value 456', function () {
+        var argv = yargs.parse([ '-123', '456' ]);
+        should.exist(argv);
+        argv.should.have.property('1', true);
+        argv.should.have.property('2', true);
+        argv.should.have.property('3', 456);
+    });
+
 });
