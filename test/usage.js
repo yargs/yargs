@@ -1,434 +1,359 @@
-var Hash = require('hashish');
-var optimist = require('../index');
-var test = require('tap').test;
+var should = require('chai').should(),
+    Hash = require('hashish'),
+    yargs = require('../');
 
-test('usageFail', function (t) {
-    var r = checkUsage(function () {
-        return optimist('-x 10 -z 20'.split(' '))
-            .usage('Usage: $0 -x NUM -y NUM')
-            .demand(['x','y'])
-            .argv;
-    });
-    t.same(
-        r.result,
-        { x : 10, z : 20, _ : [], $0 : './usage' }
-    );
+describe('usage', function () {
 
-    t.same(
-        r.errors.join('\n').split(/\n+/),
-        [
+    it ('should show an error along with the missing arguments on demand fail', function () {
+        var r = checkUsage(function () {
+            return yargs('-x 10 -z 20'.split(' '))
+                .usage('Usage: $0 -x NUM -y NUM')
+                .demand(['x','y'])
+                .argv;
+        });
+        r.result.should.have.property('x', 10);
+        r.result.should.have.property('z', 20);
+        r.result.should.have.property('_').with.length(0);
+        r.errors.join('\n').split(/\n+/).should.deep.equal([
             'Usage: ./usage -x NUM -y NUM',
             'Options:',
             '  -x  [required]',
             '  -y  [required]',
             'Missing required arguments: y'
-        ]
-    );
-    t.same(r.logs, []);
-    t.ok(r.exit);
-    t.end();
-});
-
-test('usageFailWithMessage', function (t) {
-    var r = checkUsage(function () {
-        return optimist('-z 20'.split(' '))
-            .usage('Usage: $0 -x NUM -y NUM')
-            .demand(['x','y'], 'x and y are both required to multiply all the things')
-            .argv;
+        ]);
+        r.logs.should.have.length(0);
+        r.exit.should.be.ok;
     });
-    t.same(
-        r.result,
-        { z: 20, _: [], $0: './usage' }
-    );
 
-    t.same(
-        r.errors.join('\n').split(/\n+/),
-        [
+    it('should show an error along with a custom message on demand fail', function () {
+        var r = checkUsage(function () {
+            return yargs('-z 20'.split(' '))
+                .usage('Usage: $0 -x NUM -y NUM')
+                .demand(['x','y'], 'x and y are both required to multiply all the things')
+                .argv;
+        });
+        r.result.should.have.property('z', 20);
+        r.result.should.have.property('_').with.length(0);
+        r.errors.join('\n').split(/\n+/).should.deep.equal([
             'Usage: ./usage -x NUM -y NUM',
             'Options:',
             '  -x  [required]',
             '  -y  [required]',
             'Missing required arguments: x, y',
             'x and y are both required to multiply all the things'
-        ]
-    );
-    t.same(r.logs, []);
-    t.ok(r.exit);
-    t.end();
-});
-
-test('usagePass', function (t) {
-    var r = checkUsage(function () {
-        return optimist('-x 10 -y 20'.split(' '))
-            .usage('Usage: $0 -x NUM -y NUM')
-            .demand(['x','y'])
-            .argv;
-    });
-    t.same(r, {
-        result : { x : 10, y : 20, _ : [], $0 : './usage' },
-        errors : [],
-        logs : [],
-        exit : false
-    });
-    t.end();
-});
-
-test('checkPass', function (t) {
-    var r = checkUsage(function () {
-        return optimist('-x 10 -y 20'.split(' '))
-            .usage('Usage: $0 -x NUM -y NUM')
-            .check(function (argv) {
-                if (!('x' in argv)) throw 'You forgot about -x';
-                if (!('y' in argv)) throw 'You forgot about -y';
-            })
-            .argv;
-    });
-    t.same(r, {
-        result : { x : 10, y : 20, _ : [], $0 : './usage' },
-        errors : [],
-        logs : [],
-        exit : false
-    });
-    t.end();
-});
-
-test('checkFail', function (t) {
-    var r = checkUsage(function () {
-        return optimist('-x 10 -z 20'.split(' '))
-            .usage('Usage: $0 -x NUM -y NUM')
-            .check(function (argv) {
-                if (!('x' in argv)) throw 'You forgot about -x';
-                if (!('y' in argv)) throw 'You forgot about -y';
-            })
-            .argv;
+        ]);
+        r.logs.should.have.length(0);
+        r.exit.should.be.ok;
     });
 
-    t.same(
-        r.result,
-        { x : 10, z : 20, _ : [], $0 : './usage' }
-    );
+    it('should return valid values when demand passes', function () {
+        var r = checkUsage(function () {
+            return yargs('-x 10 -y 20'.split(' '))
+                .usage('Usage: $0 -x NUM -y NUM')
+                .demand(['x','y'])
+                .argv;
+        });
+        r.should.have.property('result');
+        r.result.should.have.property('x', 10);
+        r.result.should.have.property('y', 20)
+        r.result.should.have.property('_').with.length(0);
+        r.should.have.property('errors').with.length(0);
+        r.should.have.property('logs').with.length(0);
+        r.should.have.property('exit', false);
+    });
 
-    t.same(
-        r.errors.join('\n').split(/\n+/),
-        [
+    it('should return valid values when check passes', function () {
+        var r = checkUsage(function () {
+            return yargs('-x 10 -y 20'.split(' '))
+                .usage('Usage: $0 -x NUM -y NUM')
+                .check(function (argv) {
+                    if (!('x' in argv)) throw 'You forgot about -x';
+                    if (!('y' in argv)) throw 'You forgot about -y';
+                })
+                .argv;
+        });
+        r.should.have.property('result');
+        r.result.should.have.property('x', 10);
+        r.result.should.have.property('y', 20);
+        r.result.should.have.property('_').with.length(0);
+        r.should.have.property('errors').with.length(0);
+        r.should.have.property('logs').with.length(0);
+        r.should.have.property('exit', false);
+    });
+
+    it('should display missing arguments when check fails with a thrown exception', function () {
+        var r = checkUsage(function () {
+            return yargs('-x 10 -z 20'.split(' '))
+                .usage('Usage: $0 -x NUM -y NUM')
+                .check(function (argv) {
+                    if (!('x' in argv)) throw 'You forgot about -x';
+                    if (!('y' in argv)) throw 'You forgot about -y';
+                })
+                .argv;
+        });
+        r.should.have.property('result');
+        r.result.should.have.property('x', 10);
+        r.result.should.have.property('z', 20);
+        r.result.should.have.property('_').with.length(0);
+        r.errors.join('\n').split(/\n+/).should.deep.equal([
             'Usage: ./usage -x NUM -y NUM',
             'You forgot about -y'
-        ]
-    );
-
-    t.same(r.logs, []);
-    t.ok(r.exit);
-    t.end();
-});
-
-test('checkFailReturn', function (t) {
-    var r = checkUsage(function () {
-        return optimist('-x 10 -z 20'.split(' '))
-            .usage('Usage: $0 -x NUM -y NUM')
-            .check(function (argv) {
-                if (!('x' in argv)) return 'You forgot about -x';
-                if (!('y' in argv)) return 'You forgot about -y';
-            })
-            .argv;
+        ]);
+        r.should.have.property('logs').with.length(0);
+        r.should.have.property('exit').and.be.ok;
     });
 
-    t.same(
-        r.result,
-        { x : 10, z : 20, _ : [], $0 : './usage' }
-    );
-
-    t.same(
-        r.errors.join('\n').split(/\n+/),
-        [
+    it('should display missing arguments when check fails with a return value', function () {
+        var r = checkUsage(function () {
+            return yargs('-x 10 -z 20'.split(' '))
+                .usage('Usage: $0 -x NUM -y NUM')
+                .check(function (argv) {
+                    if (!('x' in argv)) return 'You forgot about -x';
+                    if (!('y' in argv)) return 'You forgot about -y';
+                })
+                .argv;
+        });
+        r.should.have.property('result');
+        r.result.should.have.property('x', 10);
+        r.result.should.have.property('z', 20);
+        r.result.should.have.property('_').with.length(0);
+        r.should.have.property('logs').with.length(0);
+        r.should.have.property('exit').and.be.ok;
+        r.should.have.property('errors');
+        r.errors.join('\n').split(/\n+/).should.deep.equal([
             'Usage: ./usage -x NUM -y NUM',
             'You forgot about -y'
-        ]
-    );
-
-    t.same(r.logs, []);
-    t.ok(r.exit);
-    t.end();
-});
-
-exports.checkFailReturn = function () {
-    var r = checkUsage(function () {
-        return optimist('-x 10 -z 20'.split(' '))
-            .usage('Usage: $0 -x NUM -y NUM')
-            .check(function (argv) {
-                if (!('x' in argv)) return 'You forgot about -x';
-                if (!('y' in argv)) return 'You forgot about -y';
-            })
-            .argv;
+        ]);
     });
 
-    assert.deepEqual(
-        r.result,
-        { x : 10, z : 20, _ : [], $0 : './usage' }
-    );
-
-    assert.deepEqual(
-        r.errors.join('\n').split(/\n+/),
-        [
+    exports.checkFailReturn = function () {
+        var r = checkUsage(function () {
+            return yargs('-x 10 -z 20'.split(' '))
+                .usage('Usage: $0 -x NUM -y NUM')
+                .check(function (argv) {
+                    if (!('x' in argv)) return 'You forgot about -x';
+                    if (!('y' in argv)) return 'You forgot about -y';
+                })
+                .argv;
+        });
+        r.should.have.property('result');
+        r.result.should.have.property('x', 10);
+        r.result.should.have.property('z', 20);
+        r.result.should.have.property('_').with.length(0);
+        r.should.have.property('logs').with.length(0);
+        r.should.have.property('exit').and.be.ok;
+        r.should.have.property('errors');
+        r.errors.join('\n').split(/\n+/).should.deep.equal([
             'Usage: ./usage -x NUM -y NUM',
             'You forgot about -y'
-        ]
-    );
+        ]);
+    };
 
-    assert.deepEqual(r.logs, []);
-    assert.ok(r.exit);
-};
-
-test('checkCondPass', function (t) {
-    function checker (argv) {
-        return 'x' in argv && 'y' in argv;
-    }
-
-    var r = checkUsage(function () {
-        return optimist('-x 10 -y 20'.split(' '))
-            .usage('Usage: $0 -x NUM -y NUM')
-            .check(checker)
-            .argv;
-    });
-    t.same(r, {
-        result : { x : 10, y : 20, _ : [], $0 : './usage' },
-        errors : [],
-        logs : [],
-        exit : false
-    });
-    t.end();
-});
-
-test('checkCondFail', function (t) {
-    function checker (argv) {
-        return 'x' in argv && 'y' in argv;
-    }
-
-    var r = checkUsage(function () {
-        return optimist('-x 10 -z 20'.split(' '))
-            .usage('Usage: $0 -x NUM -y NUM')
-            .check(checker)
-            .argv;
+    it('should return a valid result when check condition passes', function () {
+        function checker (argv) {
+            return 'x' in argv && 'y' in argv;
+        }
+        var r = checkUsage(function () {
+            return yargs('-x 10 -y 20'.split(' '))
+                .usage('Usage: $0 -x NUM -y NUM')
+                .check(checker)
+                .argv;
+        });
+        r.should.have.property('result');
+        r.result.should.have.property('x', 10);
+        r.result.should.have.property('y', 20);
+        r.result.should.have.property('_').with.length(0);
+        r.should.have.property('errors').with.length(0);
+        r.should.have.property('logs').with.length(0);
+        r.should.have.property('exit', false);
     });
 
-    t.same(
-        r.result,
-        { x : 10, z : 20, _ : [], $0 : './usage' }
-    );
-
-    t.same(
-        r.errors.join('\n').split(/\n+/).join('\n'),
-        'Usage: ./usage -x NUM -y NUM\n'
-        + 'Argument check failed: ' + checker.toString()
-    );
-
-    t.same(r.logs, []);
-    t.ok(r.exit);
-    t.end();
-});
-
-test('countPass', function (t) {
-    var r = checkUsage(function () {
-        return optimist('1 2 3 --moo'.split(' '))
-            .usage('Usage: $0 [x] [y] [z] {OPTIONS}')
-            .demand(3)
-            .argv;
+    it('should display a failed message when check condition fails', function () {
+        function checker (argv) {
+            return 'x' in argv && 'y' in argv;
+        }
+        var r = checkUsage(function () {
+            return yargs('-x 10 -z 20'.split(' '))
+                .usage('Usage: $0 -x NUM -y NUM')
+                .check(checker)
+                .argv;
+        });
+        r.should.have.property('result');
+        r.result.should.have.property('x', 10);
+        r.result.should.have.property('z', 20);
+        r.result.should.have.property('_').with.length(0);
+        r.should.have.property('logs').with.length(0);
+        r.should.have.property('exit').and.be.ok;
+        r.should.have.property('errors');
+        r.errors.join('\n').split(/\n+/).join('\n').should.equal(
+            'Usage: ./usage -x NUM -y NUM\n'
+            + 'Argument check failed: ' + checker.toString()
+        );
     });
-    t.same(r, {
-        result : { _ : [ '1', '2', '3' ], moo : true, $0 : './usage' },
-        errors : [],
-        logs : [],
-        exit : false
-    });
-    t.end();
-});
 
-test('countFail', function (t) {
-    var r = checkUsage(function () {
-        return optimist('1 2 --moo'.split(' '))
-            .usage('Usage: $0 [x] [y] [z] {OPTIONS}')
-            .demand(3)
-            .argv;
+    it('should return a valid result when demanding a count of non-hyphenated values', function () {
+        var r = checkUsage(function () {
+            return yargs('1 2 3 --moo'.split(' '))
+                .usage('Usage: $0 [x] [y] [z] {OPTIONS}')
+                .demand(3)
+                .argv;
+        });
+        r.should.have.property('result');
+        r.should.have.property('errors').with.length(0);
+        r.should.have.property('logs').with.length(0);
+        r.should.have.property('exit', false);
+        r.result.should.have.property('_').and.deep.equal([1,2,3]);
+        r.result.should.have.property('moo', true);
     });
-    t.same(
-        r.result,
-        { _ : [ '1', '2' ], moo : true, $0 : './usage' }
-    );
 
-    t.same(
-        r.errors.join('\n').split(/\n+/),
-        [
+    it('should return a failure message when not enough non-hyphenated arguments are found after a demand count', function () {
+        var r = checkUsage(function () {
+            return yargs('1 2 --moo'.split(' '))
+                .usage('Usage: $0 [x] [y] [z] {OPTIONS}')
+                .demand(3)
+                .argv;
+        });
+        r.should.have.property('result');
+        r.should.have.property('logs').with.length(0);
+        r.should.have.property('exit').and.be.ok;
+        r.result.should.have.property('_').and.deep.equal([1,2]);
+        r.result.should.have.property('moo', true);
+        r.should.have.property('errors');
+        r.errors.join('\n').split(/\n+/).should.deep.equal([
             'Usage: ./usage [x] [y] [z] {OPTIONS}',
             'Not enough non-option arguments: got 2, need at least 3'
-        ]
-    );
-
-    t.same(r.logs, []);
-    t.ok(r.exit);
-    t.end();
-});
-
-test('countFailWithMessage', function (t) {
-    var r = checkUsage(function () {
-        return optimist('src --moo'.split(' '))
-            .usage('Usage: $0 [x] [y] [z] {OPTIONS} <src> <dest> [extra_files...]')
-            .demand(2, 'src and dest files are both required')
-            .argv;
+        ]);
     });
-    t.same(
-        r.result,
-        { _: ['src'], moo: true, $0: './usage' }
-    );
 
-    t.same(
-        r.errors.join('\n').split(/\n+/),
-        [
+    it('should return a custom failure message when not enough non-hyphenated arguments are found after a demand count', function () {
+        var r = checkUsage(function () {
+            return yargs('src --moo'.split(' '))
+                .usage('Usage: $0 [x] [y] [z] {OPTIONS} <src> <dest> [extra_files...]')
+                .demand(2, 'src and dest files are both required')
+                .argv;
+        });
+        r.should.have.property('result');
+        r.should.have.property('logs').with.length(0);
+        r.should.have.property('exit').and.be.ok;
+        r.result.should.have.property('_').and.deep.equal(['src']);
+        r.result.should.have.property('moo', true);
+        r.should.have.property('errors');
+        r.errors.join('\n').split(/\n+/).should.deep.equal([
             'Usage: ./usage [x] [y] [z] {OPTIONS} <src> <dest> [extra_files...]',
             'src and dest files are both required'
-        ]
-    );
-
-    t.same(r.logs, []);
-    t.ok(r.exit);
-    t.end();
-});
-
-test('defaultSingles', function (t) {
-    var r = checkUsage(function () {
-        return optimist('--foo 50 --baz 70 --powsy'.split(' '))
-            .default('foo', 5)
-            .default('bar', 6)
-            .default('baz', 7)
-            .argv
-        ;
+        ]);
     });
-    t.same(r.result, {
-        foo : '50',
-        bar : 6,
-        baz : '70',
-        powsy : true,
-        _ : [],
-        $0 : './usage'
-    });
-    t.end();
-});
 
-test('defaultAliases', function (t) {
-    var r = checkUsage(function () {
-        return optimist('')
-            .alias('f', 'foo')
-            .default('f', 5)
-            .argv
-        ;
+    it('should return a valid result when setting defaults for singles', function () {
+        var r = checkUsage(function () {
+            return yargs('--foo 50 --baz 70 --powsy'.split(' '))
+                .default('foo', 5)
+                .default('bar', 6)
+                .default('baz', 7)
+                .argv
+            ;
+        });
+        r.should.have.property('result');
+        r.result.should.have.property('foo', 50);
+        r.result.should.have.property('bar', 6);
+        r.result.should.have.property('baz', 70);
+        r.result.should.have.property('powsy', true);
+        r.result.should.have.property('_').with.length(0);
     });
-    t.same(r.result, {
-        f : '5',
-        foo : '5',
-        _ : [],
-        $0 : './usage'
-    });
-    t.end();
-});
 
-test('defaultHash', function (t) {
-    var r = checkUsage(function () {
-        return optimist('--foo 50 --baz 70'.split(' '))
-            .default({ foo : 10, bar : 20, quux : 30 })
-            .argv
-        ;
+    it('should return a valid result when default is set for an alias', function () {
+        var r = checkUsage(function () {
+            return yargs('')
+                .alias('f', 'foo')
+                .default('f', 5)
+                .argv
+            ;
+        });
+        r.should.have.property('result');
+        r.result.should.have.property('f', 5);
+        r.result.should.have.property('foo', 5);
+        r.result.should.have.property('_').with.length(0);
     });
-    t.same(r.result, {
-        _ : [],
-        $0 : './usage',
-        foo : 50,
-        baz : 70,
-        bar : 20,
-        quux : 30
+
+    it('should allow you to set default values for a hash of options', function () {
+        var r = checkUsage(function () {
+            return yargs('--foo 50 --baz 70'.split(' '))
+                .default({ foo : 10, bar : 20, quux : 30 })
+                .argv
+            ;
+        });
+        r.should.have.property('result');
+        r.result.should.have.property('_').with.length(0);
+        r.result.should.have.property('foo', 50);
+        r.result.should.have.property('baz', 70);
+        r.result.should.have.property('bar', 20);
+        r.result.should.have.property('quux', 30);
     });
-    t.end();
-});
 
-
-test('exampleFail', function (t) {
-    var r = checkUsage(function () {
-        return optimist('')
-            .example("$0 something", "description")
-            .example("$0 something else", "other description")
-            .demand(['y'])
-            .argv;
-    });
-    t.same(
-        r.result,
-        { _ : [], $0 : './usage' }
-    );
-
-    t.same(
-        r.errors.join('\n').split(/\n/),
-        [
+    it('should display example on fail', function () {
+        var r = checkUsage(function () {
+            return yargs('')
+                .example("$0 something", "description")
+                .example("$0 something else", "other description")
+                .demand(['y'])
+                .argv;
+        });
+        r.should.have.property('result');
+        r.result.should.have.property('_').with.length(0);
+        r.should.have.property('errors');
+        r.should.have.property('logs').with.length(0);
+        r.should.have.property('exit').and.be.ok;
+        r.errors.join('\n').split(/\n+/).should.deep.equal([
             'Examples:',
             '  ./usage something         description',
             '  ./usage something else    other description',
-            '',
-            '',
             'Options:',
             '  -y  [required]',
-            '',
             'Missing required arguments: y'
-        ]
-    );
-    t.same(r.logs, []);
-    t.ok(r.exit);
-    t.end();
-});
+        ]);
+    });
 
-test('rebase', function (t) {
-    t.equal(
-        optimist.rebase('/home/substack', '/home/substack/foo/bar/baz'),
-        './foo/bar/baz'
-    );
-    t.equal(
-        optimist.rebase('/home/substack/foo/bar/baz', '/home/substack'),
-        '../../..'
-    );
-    t.equal(
-        optimist.rebase('/home/substack/foo', '/home/substack/pow/zoom.txt'),
-        '../pow/zoom.txt'
-    );
-    t.end();
-});
+    it('should succeed when rebase', function () {
+        yargs.rebase('/home/chevex', '/home/chevex/foo/bar/baz').should.equal('./foo/bar/baz');
+        yargs.rebase('/home/chevex/foo/bar/baz', '/home/chevex').should.equal('../../..');
+        yargs.rebase('/home/chevex/foo', '/home/chevex/pow/zoom.txt').should.equal('../pow/zoom.txt');
+    });
 
-function checkUsage (f) {
+    function checkUsage (f) {
 
-    var exit = false;
+        var exit = false;
 
-    process._exit = process.exit;
-    process._env = process.env;
-    process._argv = process.argv;
+        process._exit = process.exit;
+        process._env = process.env;
+        process._argv = process.argv;
 
-    process.exit = function (t) { exit = true };
-    process.env = Hash.merge(process.env, { _ : 'node' });
-    process.argv = [ './usage' ];
+        process.exit = function () { exit = true };
+        process.env = Hash.merge(process.env, { _ : 'node' });
+        process.argv = [ './usage' ];
 
-    var errors = [];
-    var logs = [];
+        var errors = [];
+        var logs = [];
 
-    console._error = console.error;
-    console.error = function (msg) { errors.push(msg) };
-    console._log = console.log;
-    console.log = function (msg) { logs.push(msg) };
+        console._error = console.error;
+        console.error = function (msg) { errors.push(msg) };
+        console._log = console.log;
+        console.log = function (msg) { logs.push(msg) };
 
-    var result = f();
+        var result = f();
 
-    process.exit = process._exit;
-    process.env = process._env;
-    process.argv = process._argv;
+        process.exit = process._exit;
+        process.env = process._env;
+        process.argv = process._argv;
 
-    console.error = console._error;
-    console.log = console._log;
+        console.error = console._error;
+        console.log = console._log;
 
-    return {
-        errors : errors,
-        logs : logs,
-        exit : exit,
-        result : result
+        return {
+            errors : errors,
+            logs : logs,
+            exit : exit,
+            result : result
+        };
     };
-};
+
+});

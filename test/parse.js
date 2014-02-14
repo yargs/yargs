@@ -1,471 +1,359 @@
-var optimist = require('../index');
-var path = require('path');
-var test = require('tap').test;
+var should = require('chai').should(),
+    yargs = require('../'),
+    path = require('path');
 
-var $0 = 'node ./' + path.relative(process.cwd(), __filename);
+describe('parse', function () {
 
-test('short boolean', function (t) {
-    var parse = optimist.parse([ '-b' ]);
-    t.same(parse, { b : true, _ : [], $0 : $0 });
-    t.same(typeof parse.b, 'boolean');
-    t.end();
-});
+    beforeEach(function (done) {
+        setTimeout(done, 75);
+    });
 
-test('long boolean', function (t) {
-    t.same(
-        optimist.parse([ '--bool' ]),
-        { bool : true, _ : [], $0 : $0 }
-    );
-    t.end();
-});
-    
-test('bare', function (t) {
-    t.same(
-        optimist.parse([ 'foo', 'bar', 'baz' ]),
-        { _ : [ 'foo', 'bar', 'baz' ], $0 : $0 }
-    );
-    t.end();
-});
+    it('should pass when specifying a "short boolean"', function () {
+        var parse = yargs.parse([ '-b' ]);
+        parse.should.have.property('b').to.be.ok.and.be.a('boolean');
+        parse.should.have.property('_').with.length(0);
+    });
 
-test('short group', function (t) {
-    t.same(
-        optimist.parse([ '-cats' ]),
-        { c : true, a : true, t : true, s : true, _ : [], $0 : $0 }
-    );
-    t.end();
-});
+    it('should pass when specifying a "long boolean"', function () {
+        var parse = yargs.parse(['--bool']);
+        parse.should.have.property('bool', true);
+        parse.should.have.property('_').with.length(0);
+    });
+        
+    it('should place bare options in the _ array', function () {
+        var parse = yargs.parse(['foo', 'bar', 'baz']);
+        parse.should.have.property('_').and.deep.equal(['foo','bar','baz']);
+    });
 
-test('short group next', function (t) {
-    t.same(
-        optimist.parse([ '-cats', 'meow' ]),
-        { c : true, a : true, t : true, s : 'meow', _ : [], $0 : $0 }
-    );
-    t.end();
-});
- 
-test('short capture', function (t) {
-    t.same(
-        optimist.parse([ '-h', 'localhost' ]),
-        { h : 'localhost', _ : [], $0 : $0 }
-    );
-    t.end();
-});
+    it('should expand grouped short options to a hash with a key for each', function () {
+        var parse = yargs.parse(['-cats']);
+        parse.should.have.property('c', true);
+        parse.should.have.property('a', true);
+        parse.should.have.property('t', true);
+        parse.should.have.property('s', true);
+        parse.should.have.property('_').with.length(0);
+    });
 
-test('short captures', function (t) {
-    t.same(
-        optimist.parse([ '-h', 'localhost', '-p', '555' ]),
-        { h : 'localhost', p : 555, _ : [], $0 : $0 }
-    );
-    t.end();
-});
+    it('should set the value of the final option in a group to the next supplied value', function () {
+        var parse = yargs.parse(['-cats', 'meow']);
+        parse.should.have.property('c', true);
+        parse.should.have.property('a', true);
+        parse.should.have.property('t', true);
+        parse.should.have.property('s', 'meow');
+        parse.should.have.property('_').with.length(0);
+    });
+     
+    it('should set the value of a single short option to the next supplied value', function () {
+        var parse = yargs.parse(['-h', 'localhost']);
+        parse.should.have.property('h', 'localhost');
+        parse.should.have.property('_').with.length(0);
+    });
 
-test('long capture sp', function (t) {
-    t.same(
-        optimist.parse([ '--pow', 'xixxle' ]),
-        { pow : 'xixxle', _ : [], $0 : $0 }
-    );
-    t.end();
-});
+    it('should set the value of multiple single short options to the next supplied values relative to each', function () {
+        var parse = yargs.parse(['-h', 'localhost', '-p', '555']);
+        parse.should.have.property('h', 'localhost');
+        parse.should.have.property('p', 555);
+        parse.should.have.property('_').with.length(0);
+    });
 
-test('long capture eq', function (t) {
-    t.same(
-        optimist.parse([ '--pow=xixxle' ]),
-        { pow : 'xixxle', _ : [], $0 : $0 }
-    );
-    t.end()
-});
+    it('should set the value of a single long option to the next supplied value', function () {
+        var parse = yargs.parse(['--pow', 'xixxle']);
+        parse.should.have.property('pow', 'xixxle');
+        parse.should.have.property('_').with.length(0);
+    });
 
-test('long captures sp', function (t) {
-    t.same(
-        optimist.parse([ '--host', 'localhost', '--port', '555' ]),
-        { host : 'localhost', port : 555, _ : [], $0 : $0 }
-    );
-    t.end();
-});
+    it('should set the value of a single long option if an = was used', function () {
+        var parse = yargs.parse(['--pow=xixxle']);
+        parse.should.have.property('pow', 'xixxle');
+        parse.should.have.property('_').with.length(0);
+    });
 
-test('long captures eq', function (t) {
-    t.same(
-        optimist.parse([ '--host=localhost', '--port=555' ]),
-        { host : 'localhost', port : 555, _ : [], $0 : $0 }
-    );
-    t.end();
-});
+    it('should set the value of multiple long options to the next supplied values relative to each', function () {
+        var parse = yargs.parse(['--host', 'localhost', '--port', '555']);
+        parse.should.have.property('host', 'localhost');
+        parse.should.have.property('port', 555);
+        parse.should.have.property('_').with.length(0);
+    });
 
-test('mixed short bool and capture', function (t) {
-    t.same(
-        optimist.parse([ '-h', 'localhost', '-fp', '555', 'script.js' ]),
-        {
-            f : true, p : 555, h : 'localhost',
-            _ : [ 'script.js' ], $0 : $0,
-        }
-    );
-    t.end();
-});
- 
-test('short and long', function (t) {
-    t.same(
-        optimist.parse([ '-h', 'localhost', '--port', '555' ]),
-        { h : 'localhost', port : 555, _ : [], $0 : $0 }
-    );
-    t.end();
-});
+    it('should set the value of multiple long options if = signs were used', function () {
+        var parse = yargs.parse(['--host=localhost', '--port=555']);
+        parse.should.have.property('host', 'localhost');
+        parse.should.have.property('port', 555);
+        parse.should.have.property('_').with.length(0);
+    });
 
-test('no', function (t) {
-    t.same(
-        optimist.parse([ '--no-moo' ]),
-        { moo : false, _ : [], $0 : $0 }
-    );
-    t.end();
-});
- 
-test('multi', function (t) {
-    t.same(
-        optimist.parse([ '-v', 'a', '-v', 'b', '-v', 'c' ]),
-        { v : ['a','b','c'], _ : [], $0 : $0 }
-    );
-    t.end();
-});
- 
-test('comprehensive', function (t) {
-    t.same(
-        optimist.parse([
+    it('should still set values appropriately if a mix of short, long, and grouped short options are specified', function () {
+        var parse = yargs.parse(['-h', 'localhost', '-fp', '555', 'script.js']);
+        parse.should.have.property('f', true);
+        parse.should.have.property('p', 555);
+        parse.should.have.property('h', 'localhost');
+        parse.should.have.property('_').and.deep.equal(['script.js']);
+    });
+     
+    it('should still set values appropriately if a mix of short and long options are specified', function () {
+        var parse = yargs.parse(['-h', 'localhost', '--port', '555']);
+        parse.should.have.property('h', 'localhost');
+        parse.should.have.property('port', 555);
+        parse.should.have.property('_').with.length(0);
+    });
+
+    it('should explicitly set a boolean option to false if preceeded by "--no-"', function () {
+        var parse = yargs.parse(['--no-moo']);
+        parse.should.have.property('moo', false);
+        parse.should.have.property('_').with.length(0);
+    });
+     
+    it('should group values into an array if the same option is specified multiple times', function () {
+        var parse = yargs.parse(['-v', 'a', '-v', 'b', '-v', 'c' ]);
+        parse.should.have.property('v').and.deep.equal(['a','b','c']);
+        parse.should.have.property('_').with.length(0);
+    });
+     
+    it('should still set values appropriately if we supply a comprehensive list of various types of options', function () {
+        var parse = yargs.parse([
             '--name=meowmers', 'bare', '-cats', 'woo',
             '-h', 'awesome', '--multi=quux',
             '--key', 'value',
             '-b', '--bool', '--no-meep', '--multi=baz',
             '--', '--not-a-flag', 'eek'
-        ]),
-        {
-            c : true,
-            a : true,
-            t : true,
-            s : 'woo',
-            h : 'awesome',
-            b : true,
-            bool : true,
-            key : 'value',
-            multi : [ 'quux', 'baz' ],
-            meep : false,
-            name : 'meowmers',
-            _ : [ 'bare', '--not-a-flag', 'eek' ],
-            $0 : $0
-        }
-    );
-    t.end();
-});
-
-test('nums', function (t) {
-    var argv = optimist.parse([
-        '-x', '1234',
-        '-y', '5.67',
-        '-z', '1e7',
-        '-w', '10f',
-        '--hex', '0xdeadbeef',
-        '789',
-    ]);
-    t.same(argv, {
-        x : 1234,
-        y : 5.67,
-        z : 1e7,
-        w : '10f',
-        hex : 0xdeadbeef,
-        _ : [ 789 ],
-        $0 : $0
+        ]);
+        parse.should.have.property('c', true);
+        parse.should.have.property('a', true);
+        parse.should.have.property('t', true);
+        parse.should.have.property('s', 'woo');
+        parse.should.have.property('h', 'awesome');
+        parse.should.have.property('b', true);
+        parse.should.have.property('bool', true);
+        parse.should.have.property('key', 'value');
+        parse.should.have.property('multi').and.deep.equal(['quux', 'baz']);
+        parse.should.have.property('meep', false);
+        parse.should.have.property('name', 'meowmers');
+        parse.should.have.property('_').and.deep.equal(['bare', '--not-a-flag', 'eek']);
     });
-    t.same(typeof argv.x, 'number');
-    t.same(typeof argv.y, 'number');
-    t.same(typeof argv.z, 'number');
-    t.same(typeof argv.w, 'string');
-    t.same(typeof argv.hex, 'number');
-    t.same(typeof argv._[0], 'number');
-    t.end();
-});
 
-test('flag boolean', function (t) {
-    var parse = optimist([ '-t', 'moo' ]).boolean(['t']).argv;
-    t.same(parse, { t : true, _ : [ 'moo' ], $0 : $0 });
-    t.same(typeof parse.t, 'boolean');
-    t.end();
-});
-
-test('flag boolean value', function (t) {
-    var parse = optimist(['--verbose', 'false', 'moo', '-t', 'true'])
-        .boolean(['t', 'verbose']).default('verbose', true).argv;
-    
-    t.same(parse, {
-        verbose: false,
-        t: true,
-        _: ['moo'],
-        $0 : $0
+    it('should parse numbers appropriately', function () {
+        var argv = yargs.parse([
+            '-x', '1234',
+            '-y', '5.67',
+            '-z', '1e7',
+            '-w', '10f',
+            '--hex', '0xdeadbeef',
+            '789',
+        ]);
+        argv.should.have.property('x', 1234).and.be.a('number');
+        argv.should.have.property('y', 5.67).and.be.a('number');
+        argv.should.have.property('z', 1e7).and.be.a('number');
+        argv.should.have.property('w', '10f').and.be.a('string');
+        argv.should.have.property('hex', 0xdeadbeef).and.be.a('number');
+        argv.should.have.property('_').and.deep.equal([789]);
+        argv._[0].should.be.a('number');
     });
-    
-    t.same(typeof parse.verbose, 'boolean');
-    t.same(typeof parse.t, 'boolean');
-    t.end();
-});
 
-test('flag boolean default false', function (t) {
-    var parse = optimist(['moo'])
-        .boolean(['t', 'verbose'])
-        .default('verbose', false)
-        .default('t', false).argv;
-    
-    t.same(parse, {
-        verbose: false,
-        t: false,
-        _: ['moo'],
-        $0 : $0
+    it('should not set the next value as the value of a short option if that option is explicitly defined as a boolean', function () {
+        var parse = yargs([ '-t', 'moo' ]).boolean(['t']).argv;
+        parse.should.have.property('t', true).and.be.a('boolean');
+        parse.should.have.property('_').and.deep.equal(['moo']);
     });
-    
-    t.same(typeof parse.verbose, 'boolean');
-    t.same(typeof parse.t, 'boolean');
-    t.end();
 
-});
-
-test('boolean groups', function (t) {
-    var parse = optimist([ '-x', '-z', 'one', 'two', 'three' ])
-        .boolean(['x','y','z']).argv;
-    
-    t.same(parse, {
-        x : true,
-        y : false,
-        z : true,
-        _ : [ 'one', 'two', 'three' ],
-        $0 : $0
+    it('should set boolean options values if the next value is "true" or "false"', function () {
+        var parse = yargs(['--verbose', 'false', 'moo', '-t', 'true'])
+            .boolean(['t', 'verbose']).default('verbose', true).argv;
+        parse.should.have.property('verbose', false).and.be.a('boolean');
+        parse.should.have.property('t', true).and.be.a('boolean');
+        parse.should.have.property('_').and.deep.equal(['moo']);
     });
-    
-    t.same(typeof parse.x, 'boolean');
-    t.same(typeof parse.y, 'boolean');
-    t.same(typeof parse.z, 'boolean');
-    t.end();
-});
 
-test('newlines in params' , function (t) {
-    var args = optimist.parse([ '-s', "X\nX" ])
-    t.same(args, { _ : [], s : "X\nX", $0 : $0 });
-
-    // reproduce in bash:
-    // VALUE="new
-    // line"
-    // node program.js --s="$VALUE"
-    args = optimist.parse([ "--s=X\nX" ])
-    t.same(args, { _ : [], s : "X\nX", $0 : $0 });
-    t.end();
-});
-
-test('strings' , function (t) {
-    var s = optimist([ '-s', '0001234' ]).string('s').argv.s;
-    t.same(s, '0001234');
-    t.same(typeof s, 'string');
-    
-    var x = optimist([ '-x', '56' ]).string('x').argv.x;
-    t.same(x, '56');
-    t.same(typeof x, 'string');
-    t.end();
-});
-
-test('stringArgs', function (t) {
-    var s = optimist([ '  ', '  ' ]).string('_').argv._;
-    t.same(s.length, 2);
-    t.same(typeof s[0], 'string');
-    t.same(s[0], '  ');
-    t.same(typeof s[1], 'string');
-    t.same(s[1], '  ');
-    t.end();
-});
-
-test('normalize', function (t) {
-    var a = optimist([ '-s', '/tmp/../' ]).alias('s', 'save').normalize('s').argv;
-    t.same(a.s, '/');
-    t.same(a.save, '/');
-    t.end();
-});
-
-test('normalize setter', function (t) {
-    var a = optimist(['-s']).normalize('s').argv;
-    t.same(a.s, true);
-    a.s = '/path/to/new/dir/../../';
-    t.same(a.s, '/path/to/');
-    t.end();
-});
-
-test('slashBreak', function (t) {
-    t.same(
-        optimist.parse([ '-I/foo/bar/baz' ]),
-        { I : '/foo/bar/baz', _ : [], $0 : $0 }
-    );
-    t.same(
-        optimist.parse([ '-xyz/foo/bar/baz' ]),
-        { x : true, y : true, z : '/foo/bar/baz', _ : [], $0 : $0 }
-    );
-    t.end();
-});
-
-test('alias', function (t) {
-    var argv = optimist([ '-f', '11', '--zoom', '55' ])
-        .alias('z', 'zoom')
-        .argv
-    ;
-    t.equal(argv.zoom, 55);
-    t.equal(argv.z, argv.zoom);
-    t.equal(argv.f, 11);
-    t.end();
-});
-
-test('config', function (t) {
-    var argv = optimist([ '--settings', 'config.json', '--foo', 'bar' ])
-        .alias('z', 'zoom')
-        .config('settings')
-        .argv;
-
-    t.equal(argv.herp, 'derp');
-    t.equal(argv.zoom, 55);
-    t.equal(argv.foo[0], 'baz');
-    t.equal(argv.foo[1], 'bar');
-    t.end();
-});
-
-test('multiAlias', function (t) {
-    var argv = optimist([ '-f', '11', '--zoom', '55' ])
-        .alias('z', [ 'zm', 'zoom' ])
-        .argv
-    ;
-    t.equal(argv.zoom, 55);
-    t.equal(argv.z, argv.zoom);
-    t.equal(argv.z, argv.zm);
-    t.equal(argv.f, 11);
-    t.end();
-});
-
-test('boolean default true', function (t) {
-    var argv = optimist.options({
-        sometrue: {
-            boolean: true,
-            default: true
-        }
-    }).argv;
-  
-    t.equal(argv.sometrue, true);
-    t.end();
-});
-
-test('boolean default false', function (t) {
-    var argv = optimist.options({
-        somefalse: {
-            boolean: true,
-            default: false
-        }
-    }).argv;
-
-    t.equal(argv.somefalse, false);
-    t.end();
-});
-
-test('nested dotted objects', function (t) {
-    var argv = optimist([
-        '--foo.bar', '3', '--foo.baz', '4',
-        '--foo.quux.quibble', '5', '--foo.quux.o_O',
-        '--beep.boop'
-    ]).argv;
-    
-    t.same(argv.foo, {
-        bar : 3,
-        baz : 4,
-        quux : {
-            quibble : 5,
-            o_O : true
-        },
+    it('should set boolean options to false by default', function () {
+        var parse = yargs(['moo'])
+            .boolean(['t', 'verbose'])
+            .default('verbose', false)
+            .default('t', false).argv;
+        parse.should.have.property('verbose', false).and.be.a('boolean');
+        parse.should.have.property('t', false).and.be.a('boolean');
+        parse.should.have.property('_').and.deep.equal(['moo']);
     });
-    t.same(argv.beep, { boop : true });
-    t.end();
-});
 
-test('boolean and alias with chainable api', function (t) {
-    var aliased = [ '-h', 'derp' ];
-    var regular = [ '--herp',  'derp' ];
-    var opts = {
-        herp: { alias: 'h', boolean: true }
-    };
-    var aliasedArgv = optimist(aliased)
-        .boolean('herp')
-        .alias('h', 'herp')
-        .argv;
-    var propertyArgv = optimist(regular)
-        .boolean('herp')
-        .alias('h', 'herp')
-        .argv;
-    var expected = {
-        herp: true,
-        h: true,
-        '_': [ 'derp' ],
-        '$0': $0,
-    };
+    it('should allow defining options as boolean in groups', function () {
+        var parse = yargs([ '-x', '-z', 'one', 'two', 'three' ])
+            .boolean(['x','y','z']).argv;
+        parse.should.have.property('x', true).and.be.a('boolean');
+        parse.should.have.property('y', false).and.be.a('boolean');
+        parse.should.have.property('z', true).and.be.a('boolean');
+        parse.should.have.property('_').and.deep.equal(['one','two','three']);
+    });
 
-    t.same(aliasedArgv, expected);
-    t.same(propertyArgv, expected); 
-    t.end();
-});
+    it('should preserve newlines in option values' , function () {
+        var args = yargs.parse(['-s', "X\nX"]);
+        args.should.have.property('_').with.length(0);
+        args.should.have.property('s', 'X\nX');
+        // reproduce in bash:
+        // VALUE="new
+        // line"
+        // node program.js --s="$VALUE"
+        args = yargs.parse(["--s=X\nX"]);
+        args.should.have.property('_').with.length(0);
+        args.should.have.property('s', 'X\nX');
+    });
 
-test('boolean and alias with options hash', function (t) {
-    var aliased = [ '-h', 'derp' ];
-    var regular = [ '--herp', 'derp' ];
-    var opts = {
-        herp: { alias: 'h', boolean: true }
-    };
-    var aliasedArgv = optimist(aliased)
-      .options(opts)
-      .argv;
-    var propertyArgv = optimist(regular).options(opts).argv;
-    var expected = {
-        herp: true,
-        h: true,
-        '_': [ 'derp' ],
-        '$0': $0,
-    };
+    it('should not convert numbers to type number if explicitly defined as strings' , function () {
+        var s = yargs([ '-s', '0001234' ]).string('s').argv.s;
+        s.should.be.a('string').and.equal('0001234');
+        var x = yargs([ '-x', '56' ]).string('x').argv.x;
+        x.should.be.a('string').and.equal('56');
+    });
 
-    t.same(aliasedArgv, expected);
-    t.same(propertyArgv, expected);
+    it('should leave all non-hyphenated values as strings if _ is defined as a string', function () {
+        var s = yargs([ '  ', '  ' ]).string('_').argv._;
+        s.should.have.length(2);
+        s[0].should.be.a('string').and.equal('  ');
+        s[1].should.be.a('string').and.equal('  ');
+    });
 
-    t.end();
-});
+    it('should normalize redundant paths', function () {
+        var a = yargs([ '-s', '/tmp/../' ]).alias('s', 'save').normalize('s').argv;
+        a.should.have.property('s', '/');
+        a.should.have.property('save', '/');
+    });
 
-test('boolean and alias using explicit true', function (t) {
-    var aliased = [ '-h', 'true' ];
-    var regular = [ '--herp',  'true' ];
-    var opts = {
-        herp: { alias: 'h', boolean: true }
-    };
-    var aliasedArgv = optimist(aliased)
-        .boolean('h')
-        .alias('h', 'herp')
-        .argv;
-    var propertyArgv = optimist(regular)
-        .boolean('h')
-        .alias('h', 'herp')
-        .argv;
-    var expected = {
-        herp: true,
-        h: true,
-        '_': [ ],
-        '$0': $0,
-    };
+    it('should normalize redundant paths when a value is later assigned', function () {
+        var a = yargs(['-s']).normalize('s').argv;
+        a.should.have.property('s', true);
+        a.s = '/path/to/new/dir/../../';
+        a.s.should.equal('/path/to/');
+    });
 
-    t.same(aliasedArgv, expected);
-    t.same(propertyArgv, expected); 
-    t.end();
-});
+    it('should assign data after forward slash to the option before the slash', function () {
+        var parse = yargs.parse(['-I/foo/bar/baz']);
+        parse.should.have.property('_').with.length(0);
+        parse.should.have.property('I', '/foo/bar/baz');
+        parse = yargs.parse(['-xyz/foo/bar/baz']);
+        parse.should.have.property('x', true);
+        parse.should.have.property('y', true);
+        parse.should.have.property('z', '/foo/bar/baz');
+        parse.should.have.property('_').with.length(0);
+    });
 
-// regression, see https://github.com/substack/node-optimist/issues/71
-test('boolean and --x=true', function(t) {
-    var parsed = optimist(['--boool', '--other=true']).boolean('boool').argv;
+    it('should set alias value to the same value as the full option', function () {
+        var argv = yargs([ '-f', '11', '--zoom', '55' ])
+            .alias('z', 'zoom')
+            .argv;
+        argv.should.have.property('zoom', 55);
+        argv.should.have.property('z', 55);
+        argv.should.have.property('f', 11);
+    });
 
-    t.same(parsed.boool, true);
-    t.same(parsed.other, 'true');
+    /*
+     *it('should load options and values from a file when config is used', function () {
+     *    var argv = yargs([ '--settings', '../test/config.json', '--foo', 'bar' ])
+     *        .alias('z', 'zoom')
+     *        .config('settings')
+     *        .argv;
+     *    argv.should.have.property('herp', 'derp');
+     *    argv.should.have.property('zoom', 55);
+     *    argv.should.have.property('foo').and.deep.equal(['baz','bar']);
+     *});
+     */
 
-    parsed = optimist(['--boool', '--other=false']).boolean('boool').argv;
+    it('should allow multiple aliases to be specified', function () {
+        var argv = yargs([ '-f', '11', '--zoom', '55' ])
+            .alias('z', [ 'zm', 'zoom' ])
+            .argv;
+        argv.should.have.property('zoom', 55);
+        argv.should.have.property('z', 55);
+        argv.should.have.property('zm', 55);
+        argv.should.have.property('f', 11);
+    });
 
-    t.same(parsed.boool, true);
-    t.same(parsed.other, 'false');
-    t.end();
+    it('should define option as boolean and set default to true', function () {
+        var argv = yargs.options({
+            sometrue: {
+                boolean: true,
+                default: true
+            }
+        }).argv;
+        argv.should.have.property('sometrue', true);
+    });
+
+    it('should define option as boolean and set default to false', function () {
+        var argv = yargs.options({
+            somefalse: {
+                boolean: true,
+                default: false
+            }
+        }).argv;
+        argv.should.have.property('somefalse', false);
+    });
+
+    it('should allow object graph traversal via dot notation', function () {
+        var argv = yargs([
+            '--foo.bar', '3', '--foo.baz', '4',
+            '--foo.quux.quibble', '5', '--foo.quux.o_O',
+            '--beep.boop'
+        ]).argv;
+        argv.should.have.property('foo').and.deep.equal({
+            bar: 3,
+            baz: 4,
+            quux: {
+                quibble: 5,
+                o_O: true
+            }
+        });
+        argv.should.have.property('beep').and.deep.equal({ boop: true });
+    });
+
+    it('should allow booleans and aliases to be defined with chainable api', function () {
+        var aliased = [ '-h', 'derp' ],
+            regular = [ '--herp',  'derp' ],
+            opts = {
+                herp: { alias: 'h', boolean: true }
+            },
+            aliasedArgv = yargs(aliased).boolean('herp').alias('h', 'herp').argv,
+            propertyArgv = yargs(regular).boolean('herp').alias('h', 'herp').argv;
+        aliasedArgv.should.have.property('herp', true);
+        aliasedArgv.should.have.property('h', true);
+        aliasedArgv.should.have.property('_').and.deep.equal(['derp']);
+        propertyArgv.should.have.property('herp', true);
+        propertyArgv.should.have.property('h', true);
+        propertyArgv.should.have.property('_').and.deep.equal(['derp']);
+    });
+
+    it('should allow booleans and aliases to be defined with options hash', function () {
+        var aliased = [ '-h', 'derp' ],
+            regular = [ '--herp', 'derp' ],
+            opts = {
+                herp: { alias: 'h', boolean: true }
+            },
+            aliasedArgv = yargs(aliased).options(opts).argv,
+            propertyArgv = yargs(regular).options(opts).argv;
+        aliasedArgv.should.have.property('herp', true);
+        aliasedArgv.should.have.property('h', true);
+        aliasedArgv.should.have.property('_').and.deep.equal(['derp']);
+        propertyArgv.should.have.property('herp', true);
+        propertyArgv.should.have.property('h', true);
+        propertyArgv.should.have.property('_').and.deep.equal(['derp']);
+    });
+
+    it('should set boolean and alias using explicit true', function () {
+        var aliased = [ '-h', 'true' ],
+            regular = [ '--herp',  'true' ],
+            opts = {
+                herp: { alias: 'h', boolean: true }
+            },
+            aliasedArgv = yargs(aliased).boolean('h').alias('h', 'herp').argv,
+            propertyArgv = yargs(regular).boolean('h').alias('h', 'herp').argv;
+        aliasedArgv.should.have.property('herp', true);
+        aliasedArgv.should.have.property('h', true);
+        aliasedArgv.should.have.property('_').with.length(0);
+    });
+
+    // regression, see https://github.com/substack/node-optimist/issues/71
+    it('should set boolean and --x=true', function() {
+        var parsed = yargs(['--boool', '--other=true']).boolean('boool').argv;
+        parsed.should.have.property('boool', true);
+        parsed.should.have.property('other', 'true');
+        parsed = yargs(['--boool', '--other=false']).boolean('boool').argv;
+        parsed.should.have.property('boool', true);
+        parsed.should.have.property('other', 'false');
+    });
+
 });
