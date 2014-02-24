@@ -290,6 +290,127 @@ describe('usage', function () {
         r.result.should.have.property('quux', 30);
     });
 
+    context("with strict() option set", function () {
+        it('should fail given an option argument that is not demanded', function () {
+            var r = checkUsage(function () {
+                opts = {
+                    foo: { demand: 'foo option', alias: 'f' },
+                    bar: { demand: 'bar option', alias: 'b' }
+                };
+
+                return yargs('-f 10 --bar 20 --baz 30'.split(' '))
+                    .usage('Usage: $0 [options]', opts)
+                    .strict()
+                    .argv;
+            });
+
+            r.should.have.property('result');
+            r.result.should.have.property('_').with.length(0);
+            r.result.should.have.property('f', 10);
+            r.result.should.have.property('foo', 10);
+            r.result.should.have.property('b', 20);
+            r.result.should.have.property('bar', 20);
+            r.result.should.have.property('baz', 30);
+            r.should.have.property('errors');
+            r.errors.join('\n').split(/\n+/).should.deep.equal([
+                'Usage: ./usage [options]',
+                'Options:',
+                '  --foo, -f  [required]',
+                '  --bar, -b  [required]',
+                'Unknown argument: baz',
+            ]);
+            r.should.have.property('logs').with.length(0);
+            r.should.have.property('exit').and.be.ok;
+        });
+
+        it('should fail given an option argument without a corresponding description', function () {
+            var r = checkUsage(function () {
+                opts = {
+                    foo: { description: 'foo option', alias: 'f' },
+                    bar: { description: 'bar option', alias: 'b' }
+                };
+
+                return yargs('-f 10 --bar 20 --baz 30'.split(' '))
+                    .usage('Usage: $0 [options]', opts)
+                    .strict()
+                    .argv;
+            });
+
+            r.should.have.property('result');
+            r.result.should.have.property('_').with.length(0);
+            r.result.should.have.property('f', 10);
+            r.result.should.have.property('foo', 10);
+            r.result.should.have.property('b', 20);
+            r.result.should.have.property('bar', 20);
+            r.result.should.have.property('baz', 30);
+            r.should.have.property('errors');
+            r.errors.join('\n').split(/\n+/).should.deep.equal([
+                'Usage: ./usage [options]',
+                'Options:',
+                '  --foo, -f  foo option',
+                '  --bar, -b  bar option',
+                'Unknown argument: baz',
+            ]);
+            r.should.have.property('logs').with.length(0);
+            r.should.have.property('exit').and.be.ok;
+        });
+
+        it('should fail given multiple option arguments without corresponding descriptions', function () {
+            var r = checkUsage(function () {
+                opts = {
+                    foo: { description: 'foo option', alias: 'f' },
+                    bar: { description: 'bar option', alias: 'b' }
+                };
+
+                return yargs('-f 10 --bar 20 --baz 30 -q 40'.split(' '))
+                    .usage('Usage: $0 [options]', opts)
+                    .strict()
+                    .argv;
+            });
+
+            r.should.have.property('result');
+            r.result.should.have.property('_').with.length(0);
+            r.result.should.have.property('f', 10);
+            r.result.should.have.property('foo', 10);
+            r.result.should.have.property('b', 20);
+            r.result.should.have.property('bar', 20);
+            r.result.should.have.property('baz', 30);
+            r.result.should.have.property('q', 40);
+            r.should.have.property('errors');
+            r.errors.join('\n').split(/\n+/).should.deep.equal([
+                'Usage: ./usage [options]',
+                'Options:',
+                '  --foo, -f  foo option',
+                '  --bar, -b  bar option',
+                'Unknown arguments: baz, q',
+            ]);
+            r.should.have.property('logs').with.length(0);
+            r.should.have.property('exit').and.be.ok;
+        });
+
+        it('should pass given option arguments with corresponding descriptions', function () {
+            var r = checkUsage(function () {
+                opts = {
+                    foo: { description: 'foo option' },
+                    bar: { description: 'bar option' }
+                };
+
+                return yargs('--foo 10 --bar 20'.split(' '))
+                    .usage('Usage: $0 [options]', opts)
+                    .strict()
+                    .argv;
+            });
+
+            r.should.have.property('result');
+            r.result.should.have.property('foo', 10);
+            r.result.should.have.property('bar', 20)
+            r.result.should.have.property('_').with.length(0);
+            r.should.have.property('errors').with.length(0);
+            r.should.have.property('logs').with.length(0);
+            r.should.have.property('exit', false);
+        });
+    });
+
     it('should display example on fail', function () {
         var r = checkUsage(function () {
             return yargs('')
