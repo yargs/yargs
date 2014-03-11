@@ -45,6 +45,7 @@ function Argv (processArgs, cwd) {
             string: [],
             alias: {},
             default: [],
+            requiresArg: [],
             count: [],
             normalize: [],
             config: []
@@ -124,6 +125,11 @@ function Argv (processArgs, cwd) {
             demanded[keys] = { msg: msg };
         }
         
+        return self;
+    };
+
+    self.requiresArg = function (requiresArgs) {
+        options.requiresArg.push.apply(options.requiresArg, [].concat(requiresArgs));
         return self;
     };
 
@@ -224,6 +230,10 @@ function Argv (processArgs, cwd) {
             var desc = opt.describe || opt.description || opt.desc;
             if (desc) {
                 self.describe(key, desc);
+            }
+
+            if (opt.requiresArg) {
+                self.requiresArg(key);
             }
         }
         
@@ -383,6 +393,27 @@ function Argv (processArgs, cwd) {
                 fail('Not enough non-option arguments: got '
                     + argv._.length + ', need at least ' + demanded._.count
                 );
+            }
+        }
+
+        if (options.requiresArg.length > 0) {
+            var missingRequiredArgs = [];
+
+            options.requiresArg.forEach(function(key) {
+                var value = argv[key];
+
+                // minimist sets --foo value to true / --no-foo to false
+                if (value === true || value === false) {
+                    missingRequiredArgs.push(key);
+                }
+            });
+
+            if (missingRequiredArgs.length == 1) {
+                fail("Missing argument value: " + missingRequiredArgs[0]);
+            }
+            else if (missingRequiredArgs.length > 1) {
+                message = "Missing argument values: " + missingRequiredArgs.join(", ");
+                fail(message);
             }
         }
         

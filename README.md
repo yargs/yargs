@@ -384,6 +384,16 @@ If `key` is an Array, demand each element.
 If `msg` is supplied, it will be printed when the argument is missing,
 instead of the standard error message. This is especially helpful for the non-option arguments in `argv._`.
 
+.requiresArg(key)
+-----------------
+
+Specifies either a single option key (string), or an array of options that
+must be followed by option values. If any option value is missing, show the
+usage information and exit.
+
+The default behaviour is to set the value of any key not followed by an
+option value to `true`.
+
 .describe(key, desc)
 --------------------
 
