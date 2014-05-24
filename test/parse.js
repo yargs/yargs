@@ -352,4 +352,25 @@ describe('parse', function () {
         parsed.should.have.property('other', 'false');
     });
 
+    it('should set default value if alias is present', function () {
+      var parseMethod, parsed;
+
+      parseMethod = yargs.options({
+        flag: {
+          alias: "f",
+          type: "boolean",
+          default: true
+        }
+      }).parse;
+
+      parsed = parseMethod([]);
+      parsed.should.have.property('flag', true)
+
+      parsed = parseMethod(['extra']);
+      parsed.should.have.property('flag', true)
+
+      parsed = parseMethod(['--flag', 'extra']);
+      parsed.should.have.property('flag', true)
+    });
+
 });
