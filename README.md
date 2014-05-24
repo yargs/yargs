@@ -421,12 +421,14 @@ var argv = require('yargs')
 
 Optionally `.options()` can take an object that maps keys to `opt` parameters.
 
-.usage(message)
----------------
+.usage(message, opts)
+---------------------
 
 Set a usage message to show which commands to use. Inside `message`, the string
 `$0` will get interpolated to the current script name or node command for the
 present script similar to how `$0` works in bash or perl.
+
+`opts` is optional and acts like calling `.options(opts)`.
 
 .example(cmd, desc)
 -------------------
