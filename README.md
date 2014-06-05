@@ -496,10 +496,14 @@ Format usage output to wrap at `columns` many columns.
 Any command-line argument given that is not demanded, or does not have a
 corresponding description, will be reported as an error.
 
-.help()
--------
+.help([option, [description]])
+------------------------------
 
-Return the generated usage string.
+Add an option (e.g., `--help`) that displays the usage string and exits the
+process. If present, the `description` parameter customises the description of
+the help option in the usage string.
+
+If invoked without parameters, `.help` returns the generated usage string.
 
 Example:
 
@@ -510,6 +514,13 @@ console.log(yargs.help());
 ```
 
 Later on, ```argv``` can be retrived with ```yargs.argv```
+
+.version(version, option, [description])
+----------------------------------------
+
+Add an option (e.g., `--version`) that displays the version number (given by the
+`version` parameter) and exits the process. If present, the `description`
+parameter customises the description of the version option in the usage string.
 
 .showHelp(fn=console.error)
 ---------------------------

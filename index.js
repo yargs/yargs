@@ -226,7 +226,7 @@ function Argv (processArgs, cwd) {
             if (opt.count || opt.type === 'count') {
                 self.count(key);
             }
-            
+
             var desc = opt.describe || opt.description || opt.desc;
             if (desc) {
                 self.describe(key, desc);
@@ -236,10 +236,10 @@ function Argv (processArgs, cwd) {
                 self.requiresArg(key);
             }
         }
-        
+
         return self;
     };
-    
+
     var wrap = null;
     self.wrap = function (cols) {
         wrap = cols;
@@ -257,8 +257,28 @@ function Argv (processArgs, cwd) {
         fn(self.help());
         return self;
     };
-    
+
+    var version = null;
+    var versionOpt = null;
+    self.version = function (ver, opt, msg) {
+        version = ver;
+        versionOpt = opt;
+        self.describe(opt, msg || 'Show version number');
+        return self;
+    };
+
+    var helpOpt = null;
+    self.addHelpOpt = function (opt, msg) {
+        helpOpt = opt;
+        self.describe(opt, msg || 'Show help');
+        return self;
+    };
+
     self.help = function () {
+        if (arguments.length > 0) {
+            return self.addHelpOpt.apply(self, arguments);
+        }
+
         var keys = Object.keys(
             Object.keys(descriptions)
             .concat(Object.keys(demanded))
@@ -396,6 +416,17 @@ function Argv (processArgs, cwd) {
             aliases = parsed.aliases;
 
         argv.$0 = self.$0;
+
+        Object.keys(argv).forEach(function(key) {
+            if (key === helpOpt) {
+                self.showHelp(console.log);
+                process.exit(0);
+            }
+            else if (key === versionOpt) {
+                console.log(version);
+                process.exit(0);
+            }
+        });
 
         if (demanded._ && argv._.length < demanded._.count) {
             if (demanded._.msg) {
