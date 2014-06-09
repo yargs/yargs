@@ -171,8 +171,16 @@ function Argv (processArgs, cwd) {
                 f(msg);
             });
         } else {
-            self.showHelp();
+            if (showHelpOnFail) {
+                self.showHelp();
+            }
             if (msg) console.error(msg);
+            if (failMessage) {
+                if (msg) {
+                    console.error("");
+                }
+                console.error(failMessage);
+            }
             process.exit(1);
         }
     }
@@ -273,6 +281,22 @@ function Argv (processArgs, cwd) {
         self.describe(opt, msg || 'Show help');
         return self;
     };
+
+    var failMessage = null;
+    var showHelpOnFail = true;
+    self.showHelpOnFail = function (enabled, message) {
+        if (typeof enabled === 'string') {
+            enabled = true;
+            message = enabled;
+        }
+        else if (typeof enabled === 'undefined') {
+            enabled = true;
+        }
+        failMessage = message;
+        showHelpOnFail = enabled;
+        return self;
+    };
+
 
     self.help = function () {
         if (arguments.length > 0) {

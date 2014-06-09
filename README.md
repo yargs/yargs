@@ -522,6 +522,36 @@ Add an option (e.g., `--version`) that displays the version number (given by the
 `version` parameter) and exits the process. If present, the `description`
 parameter customises the description of the version option in the usage string.
 
+.showHelpOnFail(enable, [message])
+----------------------------------
+
+By default, yargs outputs a usage string if any error is detected. Use the
+`.showHelpOnFail` method to customize this behaviour. if `enable` is `false`,
+the usage string is not output. If the `message` parameter is present, this
+message is output after the error message.
+
+line_count.js
+
+````javascript
+#!/usr/bin/env node
+var argv = require('yargs')
+    .usage('Count the lines in a file.\nUsage: $0')
+    .demand('f')
+    .alias('f', 'file')
+    .describe('f', 'Load a file')
+    .showHelpOnFail(false, "Specify --help for available options")
+    .argv;
+
+// etc.
+````
+
+***
+
+    $ node line_count.js --file
+    Missing argument value: f
+
+    Specify --help for available options
+
 .showHelp(fn=console.error)
 ---------------------------
 
