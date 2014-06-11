@@ -372,7 +372,7 @@ Set `argv[key]` to `value` if no option was specified on `process.argv`.
 
 Optionally `.default()` can take an object that maps keys to default values.
 
-.demand(key, [msg])
+.demand(key, [boolean | msg])
 ------------
 
 If `key` is a string, show the usage information and exit if `key` wasn't
@@ -383,8 +383,11 @@ up in `argv._`.
 
 If `key` is an Array, demand each element.
 
-If `msg` is supplied, it will be printed when the argument is missing,
+If a `msg` string is given, it will be printed when the argument is missing,
 instead of the standard error message. This is especially helpful for the non-option arguments in `argv._`.
+
+If a `boolean` value is given, it controls whether the option is demanded;
+this is useful when using `.options()` to specify command line parameters.
 
 .requiresArg(key)
 -----------------

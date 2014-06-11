@@ -532,6 +532,32 @@ describe('usage', function () {
         ]);
     });
 
+    it('should allow demand option with boolean flag', function () {
+        var r = checkUsage(function () {
+            return yargs('-y 10 -z 20'.split(' '))
+                .usage('Usage: $0 -x NUM [-y NUM]')
+                .options({
+                    'x': { description: 'an option',      demand: true  },
+                    'y': { description: 'another option', demand: false }
+                })
+                .argv;
+        });
+        r.result.should.have.property('y', 10);
+        r.result.should.have.property('z', 20);
+        r.result.should.have.property('_').with.length(0);
+        r.errors.join('\n').split(/\n/).should.deep.equal([
+            'Usage: ./usage -x NUM [-y NUM]',
+            '',
+            'Options:',
+            '  -x  an option       [required]',
+            '  -y  another option',
+            '',
+            'Missing required arguments: x'
+        ]);
+        r.logs.should.have.length(0);
+        r.exit.should.be.ok;
+    });
+
     it('should succeed when rebase', function () {
         yargs.rebase('/home/chevex', '/home/chevex/foo/bar/baz').should.equal('./foo/bar/baz');
         yargs.rebase('/home/chevex/foo/bar/baz', '/home/chevex').should.equal('../../..');

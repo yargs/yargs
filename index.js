@@ -122,7 +122,12 @@ function Argv (processArgs, cwd) {
             });
         }
         else {
-            demanded[keys] = { msg: msg };
+            if (typeof msg === 'string') {
+                demanded[keys] = { msg: msg };
+            }
+            else if (msg === true || typeof msg === 'undefined') {
+                demanded[keys] = { msg: null };
+            }
         }
         
         return self;
