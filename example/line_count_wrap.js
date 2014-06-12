@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-var argv = require('optimist')
+var argv = require('yargs')
     .usage('Count the lines in a file.\nUsage: $0')
     .wrap(80)
     .demand('f')

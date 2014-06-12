@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-var argv = require('../index')
+var argv = require('yargs')
     .usage('Usage: $0 -x [num] -y [num] -w [msg] -h [msg]')
     .implies({
         x: 'y',

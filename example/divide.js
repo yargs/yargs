@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-var argv = require('optimist')
+var argv = require('yargs')
     .usage('Usage: $0 -x [num] -y [num]')
     .demand(['x','y'])
     .argv;

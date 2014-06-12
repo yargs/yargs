@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-var argv = require('optimist')
+var argv = require('yargs')
     .demand(2)
     .argv;
 console.dir(argv)

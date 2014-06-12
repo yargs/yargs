@@ -1,4 +1,4 @@
-var optimist = require('./../index');
+var optimist = require('yargs');
 
 var argv = optimist.usage('This is my awesome program', {
   'about': {
