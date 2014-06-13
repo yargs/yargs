@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-var argv = require('optimist').argv;
+var argv = require('yargs').argv;
 
 if (argv.rif - 5 * argv.xup > 7.138) {
     console.log('Buy more riffiwobbles');
@@ -7,4 +7,3 @@ if (argv.rif - 5 * argv.xup > 7.138) {
 else {
     console.log('Sell the xupptumblers');
 }
-

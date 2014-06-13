@@ -1,6 +1,6 @@
-var optimist = require('./../index');
+var yargs = require('yargs');
 
-var argv = optimist.usage('This is my awesome program', {
+var argv = yargs.usage('This is my awesome program', {
   'about': {
     description: 'Provide some details about the author of this program',
     required: true,
@@ -13,7 +13,7 @@ var argv = optimist.usage('This is my awesome program', {
   }
 }).argv;
 
-optimist.showHelp();
+yargs.showHelp();
 
 console.log('\n\nInspecting options');
 console.dir(argv);
