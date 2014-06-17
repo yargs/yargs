@@ -372,8 +372,12 @@ Set `argv[key]` to `value` if no option was specified on `process.argv`.
 
 Optionally `.default()` can take an object that maps keys to default values.
 
-.demand(key, [boolean | msg])
-------------
+.demand(key, [msg | boolean])
+-----------------------------
+.require(key, [msg | boolean])
+------------------------------
+.required(key, [msg | boolean])
+-------------------------------
 
 If `key` is a string, show the usage information and exit if `key` wasn't
 specified in `process.argv`.
