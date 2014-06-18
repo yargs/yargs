@@ -478,6 +478,12 @@ is loaded and parsed, and its properties are set as arguments.
 
 Format usage output to wrap at `columns` many columns.
 
+.strict()
+---------
+
+Any command-line argument given that is not demanded, or does not have a
+corresponding description, will be reported as an error.
+
 .help()
 -------
 
