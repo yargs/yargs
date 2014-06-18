@@ -275,6 +275,22 @@ describe('usage', function () {
         r.result.should.have.property('_').with.length(0);
     });
 
+    it('should print a single line when failing and default is set for an alias', function() {
+        var r = checkUsage(function() {
+            return yargs('')
+                .alias('f', 'foo')
+                .default('f', 5)
+                .demand(1)
+                .argv
+            ;
+        });
+        r.errors.join('\n').split(/\n+/).should.deep.equal([
+            'Options:',
+            '  -f, --foo  [default: 5]',
+            'Not enough non-option arguments: got 0, need at least 1',
+        ]);
+    });
+
     it('should allow you to set default values for a hash of options', function () {
         var r = checkUsage(function () {
             return yargs('--foo 50 --baz 70'.split(' '))
