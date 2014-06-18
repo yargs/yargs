@@ -287,6 +287,11 @@ function Argv (processArgs, cwd) {
             help.unshift(usage.replace(/\$0/g, self.$0), '');
         }
 
+        keys = keys.filter(function(key) {
+            return Object.keys(options.alias).every(function(alias) {
+                return -1 == options.alias[alias].indexOf(key);
+            });
+        });
         var switches = keys.reduce(function (acc, key) {
             acc[key] = [ key ].concat(options.alias[key] || [])
                 .map(function (sw) {
@@ -296,7 +301,7 @@ function Argv (processArgs, cwd) {
             ;
             return acc;
         }, {});
-        
+
         var switchlen = longest(Object.keys(switches).map(function (s) {
             return switches[s] || '';
         }));
