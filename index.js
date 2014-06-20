@@ -245,6 +245,12 @@ function Argv (processArgs, cwd) {
         wrap = cols;
         return self;
     };
+
+    var strict = false;
+    self.strict = function () {
+        strict = true;
+        return self;
+    };
     
     self.showHelp = function (fn) {
         if (!fn) fn = console.error.bind(console);
@@ -291,6 +297,11 @@ function Argv (processArgs, cwd) {
             help.unshift(usage.replace(/\$0/g, self.$0), '');
         }
 
+        keys = keys.filter(function(key) {
+            return Object.keys(options.alias).every(function(alias) {
+                return -1 == options.alias[alias].indexOf(key);
+            });
+        });
         var switches = keys.reduce(function (acc, key) {
             acc[key] = [ key ].concat(options.alias[key] || [])
                 .map(function (sw) {
@@ -300,7 +311,7 @@ function Argv (processArgs, cwd) {
             ;
             return acc;
         }, {});
-        
+
         var switchlen = longest(Object.keys(switches).map(function (s) {
             return switches[s] || '';
         }));
@@ -437,7 +448,35 @@ function Argv (processArgs, cwd) {
 
             fail('Missing required arguments: ' + Object.keys(missing).join(', ') + customMsg);
         }
-        
+
+        if (strict) {
+            var unknown = [];
+
+            var aliases = {};
+
+            Object.keys(options.alias).forEach(function (key) {
+                options.alias[key].forEach(function (alias) {
+                    aliases[alias] = key;
+                });
+            });
+
+            Object.keys(argv).forEach(function (key) {
+                if (key !== "$0" && key !== "_" &&
+                    !descriptions.hasOwnProperty(key) &&
+                    !demanded.hasOwnProperty(key) &&
+                    !aliases.hasOwnProperty(key)) {
+                    unknown.push(key);
+                }
+            });
+
+            if (unknown.length == 1) {
+                fail("Unknown argument: " + unknown[0]);
+            }
+            else if (unknown.length > 1) {
+                fail("Unknown arguments: " + unknown.join(", "));
+            }
+        }
+
         checks.forEach(function (f) {
             try {
                 var result = f(argv, aliases);
