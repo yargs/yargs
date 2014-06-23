@@ -306,6 +306,88 @@ describe('usage', function () {
         r.result.should.have.property('quux', 30);
     });
 
+    describe('required arguments', function () {
+        describe('with options object', function () {
+            it('should show a failure message if a required option is missing', function () {
+                var r = checkUsage(function () {
+                    var opts = {
+                        foo: { description: 'foo option', alias: 'f', requiresArg: true },
+                        bar: { description: 'bar option', alias: 'b', requiresArg: true }
+                    };
+
+                    return yargs('-f --bar 20'.split(' '))
+                        .usage('Usage: $0 [options]', opts)
+                        .argv;
+                });
+                r.should.have.property('result');
+                r.result.should.have.property('_').with.length(0);
+                r.should.have.property('errors');
+                r.should.have.property('logs').with.length(0);
+                r.should.have.property('exit').and.be.ok;
+                r.errors.join('\n').split(/\n+/).should.deep.equal([
+                    'Usage: ./usage [options]',
+                    'Options:',
+                    '  --foo, -f  foo option',
+                    '  --bar, -b  bar option',
+                    'Missing argument value: foo',
+                ]);
+            });
+
+            it('should show a failure message if more than one required option is missing', function () {
+                var r = checkUsage(function () {
+                    var opts = {
+                        foo: { description: 'foo option', alias: 'f', requiresArg: true },
+                        bar: { description: 'bar option', alias: 'b', requiresArg: true }
+                    };
+
+                    return yargs('-f --bar'.split(' '))
+                        .usage('Usage: $0 [options]', opts)
+                        .argv;
+                });
+                r.should.have.property('result');
+                r.result.should.have.property('_').with.length(0);
+                r.should.have.property('errors');
+                r.should.have.property('logs').with.length(0);
+                r.should.have.property('exit').and.be.ok;
+                r.errors.join('\n').split(/\n+/).should.deep.equal([
+                    'Usage: ./usage [options]',
+                    'Options:',
+                    '  --foo, -f  foo option',
+                    '  --bar, -b  bar option',
+                    'Missing argument values: foo, bar',
+                ]);
+            });
+        });
+
+        describe('with requiresArg method', function () {
+            it('should show a failure message if a required option is missing', function () {
+                var r = checkUsage(function () {
+                    var opts = {
+                        foo: { description: 'foo option', alias: 'f' },
+                        bar: { description: 'bar option', alias: 'b' }
+                    };
+
+                    return yargs('-f --bar 20'.split(' '))
+                        .usage('Usage: $0 [options]', opts)
+                        .requiresArg(['foo', 'bar'])
+                        .argv;
+                });
+                r.should.have.property('result');
+                r.result.should.have.property('_').with.length(0);
+                r.should.have.property('errors');
+                r.should.have.property('logs').with.length(0);
+                r.should.have.property('exit').and.be.ok;
+                r.errors.join('\n').split(/\n+/).should.deep.equal([
+                    'Usage: ./usage [options]',
+                    'Options:',
+                    '  --foo, -f  foo option',
+                    '  --bar, -b  bar option',
+                    'Missing argument value: foo',
+                ]);
+            });
+        });
+    });
+
     context("with strict() option set", function () {
         it('should fail given an option argument that is not demanded', function () {
             var r = checkUsage(function () {
