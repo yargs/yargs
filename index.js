@@ -454,8 +454,8 @@ function Argv (processArgs, cwd) {
 
             var aliases = {};
 
-            Object.keys(options.alias).forEach(function (key) {
-                options.alias[key].forEach(function (alias) {
+            Object.keys(parsed.aliases).forEach(function (key) {
+                parsed.aliases[key].forEach(function (alias) {
                     aliases[alias] = key;
                 });
             });
