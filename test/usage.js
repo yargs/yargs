@@ -532,7 +532,7 @@ describe('usage', function () {
         ]);
     });
 
-    it('should allow demand option with boolean flag', function () {
+   it('should allow demand option with boolean flag', function () {
         var r = checkUsage(function () {
             return yargs('-y 10 -z 20'.split(' '))
                 .usage('Usage: $0 -x NUM [-y NUM]')
@@ -556,6 +556,74 @@ describe('usage', function () {
         ]);
         r.logs.should.have.length(0);
         r.exit.should.be.ok;
+    });
+
+    describe('help option', function () {
+        it('should display usage', function () {
+            var r = checkUsage(function () {
+                return yargs(['--help'])
+                    .demand(['y'])
+                    .help('help')
+                    .argv;
+            });
+            r.should.have.property('result');
+            r.result.should.have.property('_').with.length(0);
+            r.should.have.property('errors');
+            r.should.have.property('logs').with.length(1);
+            r.should.have.property('exit').and.be.ok;
+            r.logs.join('\n').split(/\n+/).should.deep.equal([
+                'Options:',
+                '  --help  Show help',
+                '  -y                 [required]',
+                ''
+            ]);
+        });
+    });
+
+    describe('version option', function () {
+        it('should display version', function () {
+            var r = checkUsage(function () {
+                return yargs(['--version'])
+                    .version('1.0.1', 'version', 'Show version number')
+                    .argv;
+            });
+            r.should.have.property('result');
+            r.result.should.have.property('_').with.length(0);
+            r.should.have.property('errors');
+            r.should.have.property('logs').with.length(1);
+            r.should.have.property('exit').and.be.ok;
+            r.logs.join('\n').split(/\n+/).should.deep.equal([
+                '1.0.1'
+            ]);
+        });
+    });
+
+    describe('showHelpOnFail', function () {
+        it('should display user supplied message', function () {
+            var opts = {
+                foo: { desc: 'foo option', alias: 'f' },
+                bar: { desc: 'bar option', alias: 'b' }
+            };
+
+            var r = checkUsage(function () {
+                return yargs(['--foo'])
+                    .usage('Usage: $0 [options]')
+                    .options(opts)
+                    .demand(['foo', 'bar'])
+                    .showHelpOnFail(false, "Specify --help for available options")
+                    .argv;
+            });
+            r.should.have.property('result');
+            r.result.should.have.property('_').with.length(0);
+            r.should.have.property('errors');
+            r.should.have.property('logs').with.length(0);
+            r.should.have.property('exit').and.be.ok;
+            r.errors.join('\n').split(/\n/).should.deep.equal([
+                'Missing required arguments: bar',
+                '',
+                'Specify --help for available options'
+            ]);
+        });
     });
 
     it('should succeed when rebase', function () {

@@ -176,8 +176,16 @@ function Argv (processArgs, cwd) {
                 f(msg);
             });
         } else {
-            self.showHelp();
+            if (showHelpOnFail) {
+                self.showHelp();
+            }
             if (msg) console.error(msg);
+            if (failMessage) {
+                if (msg) {
+                    console.error("");
+                }
+                console.error(failMessage);
+            }
             process.exit(1);
         }
     }
@@ -231,7 +239,7 @@ function Argv (processArgs, cwd) {
             if (opt.count || opt.type === 'count') {
                 self.count(key);
             }
-            
+
             var desc = opt.describe || opt.description || opt.desc;
             if (desc) {
                 self.describe(key, desc);
@@ -241,10 +249,10 @@ function Argv (processArgs, cwd) {
                 self.requiresArg(key);
             }
         }
-        
+
         return self;
     };
-    
+
     var wrap = null;
     self.wrap = function (cols) {
         wrap = cols;
@@ -262,8 +270,44 @@ function Argv (processArgs, cwd) {
         fn(self.help());
         return self;
     };
-    
+
+    var version = null;
+    var versionOpt = null;
+    self.version = function (ver, opt, msg) {
+        version = ver;
+        versionOpt = opt;
+        self.describe(opt, msg || 'Show version number');
+        return self;
+    };
+
+    var helpOpt = null;
+    self.addHelpOpt = function (opt, msg) {
+        helpOpt = opt;
+        self.describe(opt, msg || 'Show help');
+        return self;
+    };
+
+    var failMessage = null;
+    var showHelpOnFail = true;
+    self.showHelpOnFail = function (enabled, message) {
+        if (typeof enabled === 'string') {
+            enabled = true;
+            message = enabled;
+        }
+        else if (typeof enabled === 'undefined') {
+            enabled = true;
+        }
+        failMessage = message;
+        showHelpOnFail = enabled;
+        return self;
+    };
+
+
     self.help = function () {
+        if (arguments.length > 0) {
+            return self.addHelpOpt.apply(self, arguments);
+        }
+
         var keys = Object.keys(
             Object.keys(descriptions)
             .concat(Object.keys(demanded))
@@ -402,6 +446,17 @@ function Argv (processArgs, cwd) {
 
         argv.$0 = self.$0;
 
+        Object.keys(argv).forEach(function(key) {
+            if (key === helpOpt) {
+                self.showHelp(console.log);
+                process.exit(0);
+            }
+            else if (key === versionOpt) {
+                console.log(version);
+                process.exit(0);
+            }
+        });
+
         if (demanded._ && argv._.length < demanded._.count) {
             if (demanded._.msg) {
                 fail(demanded._.msg);
@@ -459,8 +514,8 @@ function Argv (processArgs, cwd) {
 
             var aliases = {};
 
-            Object.keys(options.alias).forEach(function (key) {
-                options.alias[key].forEach(function (alias) {
+            Object.keys(parsed.aliases).forEach(function (key) {
+                parsed.aliases[key].forEach(function (alias) {
                     aliases[alias] = key;
                 });
             });
