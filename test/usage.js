@@ -4,62 +4,89 @@ var should = require('chai').should(),
 
 describe('usage', function () {
 
-    it ('should show an error along with the missing arguments on demand fail', function () {
-        var r = checkUsage(function () {
-            return yargs('-x 10 -z 20'.split(' '))
-                .usage('Usage: $0 -x NUM -y NUM')
-                .demand(['x','y'])
-                .argv;
-        });
-        r.result.should.have.property('x', 10);
-        r.result.should.have.property('z', 20);
-        r.result.should.have.property('_').with.length(0);
-        r.errors.join('\n').split(/\n+/).should.deep.equal([
-            'Usage: ./usage -x NUM -y NUM',
-            'Options:',
-            '  -x  [required]',
-            '  -y  [required]',
-            'Missing required arguments: y'
-        ]);
-        r.logs.should.have.length(0);
-        r.exit.should.be.ok;
-    });
+    describe('demand options', function () {
+        describe('using .demand()', function () {
+            it ('should show an error along with the missing arguments on demand fail', function () {
+                var r = checkUsage(function () {
+                    return yargs('-x 10 -z 20'.split(' '))
+                        .usage('Usage: $0 -x NUM -y NUM')
+                        .demand(['x','y'])
+                        .argv;
+                });
+                r.result.should.have.property('x', 10);
+                r.result.should.have.property('z', 20);
+                r.result.should.have.property('_').with.length(0);
+                r.errors.join('\n').split(/\n+/).should.deep.equal([
+                    'Usage: ./usage -x NUM -y NUM',
+                    'Options:',
+                    '  -x  [required]',
+                    '  -y  [required]',
+                    'Missing required arguments: y'
+                ]);
+                r.logs.should.have.length(0);
+                r.exit.should.be.ok;
+            });
 
-    it('should show an error along with a custom message on demand fail', function () {
-        var r = checkUsage(function () {
-            return yargs('-z 20'.split(' '))
-                .usage('Usage: $0 -x NUM -y NUM')
-                .demand(['x','y'], 'x and y are both required to multiply all the things')
-                .argv;
+            describe('using .require()', function() {
+                it ('should show an error along with the missing arguments on demand fail', function () {
+                    var r = checkUsage(function () {
+                        return yargs('-x 10 -z 20'.split(' '))
+                            .usage('Usage: $0 -x NUM -y NUM')
+                            .require(['x','y'])
+                            .argv;
+                    });
+                    r.result.should.have.property('x', 10);
+                    r.result.should.have.property('z', 20);
+                    r.result.should.have.property('_').with.length(0);
+                    r.errors.join('\n').split(/\n+/).should.deep.equal([
+                        'Usage: ./usage -x NUM -y NUM',
+                        'Options:',
+                        '  -x  [required]',
+                        '  -y  [required]',
+                        'Missing required arguments: y'
+                    ]);
+                    r.logs.should.have.length(0);
+                    r.exit.should.be.ok;
+                });
+            });
         });
-        r.result.should.have.property('z', 20);
-        r.result.should.have.property('_').with.length(0);
-        r.errors.join('\n').split(/\n+/).should.deep.equal([
-            'Usage: ./usage -x NUM -y NUM',
-            'Options:',
-            '  -x  [required]',
-            '  -y  [required]',
-            'Missing required arguments: x, y',
-            'x and y are both required to multiply all the things'
-        ]);
-        r.logs.should.have.length(0);
-        r.exit.should.be.ok;
-    });
 
-    it('should return valid values when demand passes', function () {
-        var r = checkUsage(function () {
-            return yargs('-x 10 -y 20'.split(' '))
-                .usage('Usage: $0 -x NUM -y NUM')
-                .demand(['x','y'])
-                .argv;
+        it('should show an error along with a custom message on demand fail', function () {
+            var r = checkUsage(function () {
+                return yargs('-z 20'.split(' '))
+                    .usage('Usage: $0 -x NUM -y NUM')
+                    .demand(['x','y'], 'x and y are both required to multiply all the things')
+                    .argv;
+            });
+            r.result.should.have.property('z', 20);
+            r.result.should.have.property('_').with.length(0);
+            r.errors.join('\n').split(/\n+/).should.deep.equal([
+                'Usage: ./usage -x NUM -y NUM',
+                'Options:',
+                '  -x  [required]',
+                '  -y  [required]',
+                'Missing required arguments: x, y',
+                'x and y are both required to multiply all the things'
+            ]);
+            r.logs.should.have.length(0);
+            r.exit.should.be.ok;
         });
-        r.should.have.property('result');
-        r.result.should.have.property('x', 10);
-        r.result.should.have.property('y', 20)
-        r.result.should.have.property('_').with.length(0);
-        r.should.have.property('errors').with.length(0);
-        r.should.have.property('logs').with.length(0);
-        r.should.have.property('exit', false);
+
+        it('should return valid values when demand passes', function () {
+            var r = checkUsage(function () {
+                return yargs('-x 10 -y 20'.split(' '))
+                    .usage('Usage: $0 -x NUM -y NUM')
+                    .demand(['x','y'])
+                    .argv;
+            });
+            r.should.have.property('result');
+            r.result.should.have.property('x', 10);
+            r.result.should.have.property('y', 20)
+            r.result.should.have.property('_').with.length(0);
+            r.should.have.property('errors').with.length(0);
+            r.should.have.property('logs').with.length(0);
+            r.should.have.property('exit', false);
+        });
     });
 
     it('should return valid values when check passes', function () {
@@ -530,6 +557,80 @@ describe('usage', function () {
             '  -y  [required]',
             'Missing required arguments: y'
         ]);
+    });
+
+    describe('demand option with boolean flag', function () {
+        describe('with demand option', function () {
+            it('should report missing required arguments', function () {
+                var r = checkUsage(function () {
+                    return yargs('-y 10 -z 20'.split(' '))
+                        .usage('Usage: $0 -x NUM [-y NUM]')
+                        .options({
+                            'x': { description: 'an option',      demand: true  },
+                            'y': { description: 'another option', demand: false }
+                        })
+                        .argv;
+                });
+                r.result.should.have.property('y', 10);
+                r.result.should.have.property('z', 20);
+                r.result.should.have.property('_').with.length(0);
+                r.errors.join('\n').split(/\n/).should.deep.equal([
+                    'Usage: ./usage -x NUM [-y NUM]',
+                    '',
+                    'Options:',
+                    '  -x  an option       [required]',
+                    '  -y  another option',
+                    '',
+                    'Missing required arguments: x'
+                ]);
+                r.logs.should.have.length(0);
+                r.exit.should.be.ok;
+            });
+        });
+
+        describe('with required option', function () {
+            it('should report missing required arguments', function () {
+                var r = checkUsage(function () {
+                    return yargs('-y 10 -z 20'.split(' '))
+                        .usage('Usage: $0 -x NUM [-y NUM]')
+                        .options({
+                            'x': { description: 'an option',      required: true  },
+                            'y': { description: 'another option', required: false }
+                        })
+                        .argv;
+                });
+                r.result.should.have.property('y', 10);
+                r.result.should.have.property('z', 20);
+                r.result.should.have.property('_').with.length(0);
+                r.errors.join('\n').split(/\n/).should.deep.equal([
+                    'Usage: ./usage -x NUM [-y NUM]',
+                    '',
+                    'Options:',
+                    '  -x  an option       [required]',
+                    '  -y  another option',
+                    '',
+                    'Missing required arguments: x'
+                ]);
+                r.logs.should.have.length(0);
+                r.exit.should.be.ok;
+            });
+        });
+
+        it('should not report missing required arguments when given an alias', function () {
+            var r = checkUsage(function () {
+                return yargs('-w 10'.split(' '))
+                    .usage('Usage: $0 --width NUM [--height NUM]')
+                    .options({
+                        'width':  { description: 'Width',  alias: 'w', demand: true  },
+                        'height': { description: 'Height', alias: 'h', demand: false }
+                    })
+                    .argv;
+            });
+            r.result.should.have.property('w', 10);
+            r.result.should.have.property('_').with.length(0);
+            r.should.have.property('errors').with.length(0);
+            r.logs.should.have.length(0);
+        });
     });
 
     describe('help option', function () {
