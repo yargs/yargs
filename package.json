@@ -30,6 +30,22 @@
     "email": "Alex.Ford@CodeTunnel.com",
     "url": "http://CodeTunnel.com"
   },
+  "contributors": [
+    {
+      "name": "Chris Needham",
+      "email": "chris@chrisneedham.com",
+      "url": "http://chrisneedham.com"
+    },
+    {
+      "name": "James Nylen",
+      "email": "jnylen@gmail.com",
+      "url": "https://github.com/nylen"
+    },
+    {
+      "name": "Benjamin Horsleben",
+      "url": "https://github.com/fizker"
+    }
+  ],
   "license": "MIT/X11",
   "engine": {
     "node": ">=0.4"
