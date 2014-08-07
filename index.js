@@ -515,31 +515,7 @@ function Argv (processArgs, cwd) {
         }
 
         if (strict) {
-            var unknown = [];
-
-            var aliases = {};
-
-            Object.keys(parsed.aliases).forEach(function (key) {
-                parsed.aliases[key].forEach(function (alias) {
-                    aliases[alias] = key;
-                });
-            });
-
-            Object.keys(argv).forEach(function (key) {
-                if (key !== "$0" && key !== "_" &&
-                    !descriptions.hasOwnProperty(key) &&
-                    !demanded.hasOwnProperty(key) &&
-                    !aliases.hasOwnProperty(key)) {
-                    unknown.push(key);
-                }
-            });
-
-            if (unknown.length == 1) {
-                fail("Unknown argument: " + unknown[0]);
-            }
-            else if (unknown.length > 1) {
-                fail("Unknown arguments: " + unknown.join(", "));
-            }
+            checkStrict(parsed);
         }
 
         checks.forEach(function (f) {
@@ -604,6 +580,36 @@ function Argv (processArgs, cwd) {
         }
         
         return argv;
+    }
+
+    function checkStrict (parsed) {
+        var argv = parsed.argv;
+
+        var unknown = [];
+
+        var aliases = {};
+
+        Object.keys(parsed.aliases).forEach(function (key) {
+            parsed.aliases[key].forEach(function (alias) {
+                aliases[alias] = key;
+            });
+        });
+
+        Object.keys(argv).forEach(function (key) {
+            if (key !== "$0" && key !== "_" &&
+                !descriptions.hasOwnProperty(key) &&
+                !demanded.hasOwnProperty(key) &&
+                !aliases.hasOwnProperty(key)) {
+                unknown.push(key);
+            }
+        });
+
+        if (unknown.length == 1) {
+            fail("Unknown argument: " + unknown[0]);
+        }
+        else if (unknown.length > 1) {
+            fail("Unknown arguments: " + unknown.join(", "));
+        }
     }
     
     function longest (xs) {
