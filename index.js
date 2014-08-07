@@ -610,14 +610,6 @@ function Argv (processArgs, cwd) {
         else if (unknown.length > 1) {
             fail("Unknown arguments: " + unknown.join(", "));
         }
-
-        Object.keys(argv).forEach(function (key) {
-            if (key !== "$0" && key !== "_" &&
-                !optionAliases.hasOwnProperty(key) &&
-                Array.isArray(argv[key])) {
-                fail("Repeated option: " + key);
-            }
-        });
     }
     
     function longest (xs) {
