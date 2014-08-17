@@ -492,10 +492,11 @@ If `key` is an Array, interpret all the elements as strings.
 Tells the parser to interpret `key` as a path to a JSON config file. The file
 is loaded and parsed, and its properties are set as arguments.
 
-.wrap(columns)
+.wrap([columns])
 --------------
 
-Format usage output to wrap at `columns` many columns.
+Format usage output to wrap at `columns` many columns (auto-detect or 80 if not
+specified).
 
 .strict()
 ---------

@@ -260,6 +260,10 @@ function Argv (processArgs, cwd) {
 
     var wrap = null;
     self.wrap = function (cols) {
+        if (!cols) {
+            var size = require('window-size');
+            cols = Math.min(size && size.width || 80, 100);
+        }
         wrap = cols;
         return self;
     };
@@ -269,7 +273,7 @@ function Argv (processArgs, cwd) {
         strict = true;
         return self;
     };
-    
+
     self.showHelp = function (fn) {
         if (!fn) fn = console.error.bind(console);
         fn(self.help());

@@ -3,7 +3,9 @@
   "version": "1.3.1",
   "description": "Light-weight option parsing with an argv hash. No optstrings attached.",
   "main": "./index.js",
-  "dependencies": {},
+  "dependencies": {
+    "window-size": "^0.1.0"
+  },
   "devDependencies": {
     "hashish": "*",
     "mocha": "*",
