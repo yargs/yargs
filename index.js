@@ -462,7 +462,7 @@ function Argv (processArgs, cwd) {
                 process.exit(0);
             }
             else if (key === versionOpt) {
-                console.log(version);
+                process.stdout.write(version);
                 process.exit(0);
             }
         });

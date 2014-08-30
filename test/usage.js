@@ -737,10 +737,12 @@ describe('usage', function () {
         process._exit = process.exit;
         process._env = process.env;
         process._argv = process.argv;
+        process.stdout._write = process.stdout.write;
 
         process.exit = function () { exit = true };
         process.env = Hash.merge(process.env, { _ : 'node' });
         process.argv = [ './usage' ];
+        process.stdout.write = function (msg) { logs.push(msg) };
 
         var errors = [];
         var logs = [];
@@ -755,6 +757,7 @@ describe('usage', function () {
         process.exit = process._exit;
         process.env = process._env;
         process.argv = process._argv;
+        process.stdout.write = process.stdout._write;
 
         console.error = console._error;
         console.log = console._log;
