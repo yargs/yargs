@@ -351,9 +351,12 @@ function Argv (processArgs, cwd) {
             help.unshift(usage.replace(/\$0/g, self.$0), '');
         }
 
+        var aliasKeys = (Object.keys(options.alias) || [])
+            .concat(Object.keys(self.parsed.newAliases) || []);
+
         keys = keys.filter(function(key) {
-            return Object.keys(options.alias).every(function(alias) {
-                return -1 == options.alias[alias].indexOf(key);
+            return !self.parsed.newAliases[key] && aliasKeys.every(function(alias) {
+                return -1 == (options.alias[alias] || []).indexOf(key);
             });
         });
         var switches = keys.reduce(function (acc, key) {
@@ -450,6 +453,8 @@ function Argv (processArgs, cwd) {
             aliases = parsed.aliases;
 
         argv.$0 = self.$0;
+
+        self.parsed = parsed;
 
         Object.keys(argv).forEach(function(key) {
             if (key === helpOpt) {

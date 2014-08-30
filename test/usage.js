@@ -653,6 +653,29 @@ describe('usage', function () {
                 ''
             ]);
         });
+
+        it('should not show both dashed and camelCase aliases', function () {
+            var r = checkUsage(function () {
+                return yargs(['--help'])
+                    .usage('Usage: $0 options')
+                    .help('help')
+                    .describe('some-opt', 'Some option')
+                    .default('some-opt', 2)
+                    .argv;
+            });
+            r.should.have.property('result');
+            r.result.should.have.property('_').with.length(0);
+            r.should.have.property('exit').and.be.ok;
+            r.should.have.property('errors').with.length(0);
+            r.should.have.property('logs');
+            r.logs.join('\n').split(/\n+/).should.deep.equal([
+                'Usage: ./usage options',
+                'Options:',
+                '  --help      Show help  ',
+                '  --some-opt  Some option  [default: 2]',
+                ''
+            ]);
+        });
     });
 
     describe('version option', function () {
