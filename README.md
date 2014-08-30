@@ -1,7 +1,7 @@
 yargs
 ========
 
-Yargs be a node.js library fer hearties tryin' ter parse optstrings against their will where even the boo box be not enough to coerce them. This here module is fer scallywags lookin' ter plunder all the sunken -shipz of their --treasures thru program usage but be tired of optstrings disincling to acquiesce to yer requests.
+Yargs be a node.js library fer hearties tryin' ter parse optstrings.
 
 With yargs, ye be havin' a map that leads straight to yer treasure! Treasure of course, being a simple option hash.
 
@@ -16,7 +16,7 @@ With yargs, ye be havin' a map that leads straight to yer treasure! Treasure of 
 examples
 ========
 
-With yargs, the options be just a hash! No optstrings be attached.
+With yargs, the options be just a hash!
 -------------------------------------------------------------------
 
 xup.js:
@@ -43,7 +43,7 @@ else {
 
 ![Joe was one optimistic pirate.](http://i.imgur.com/4WFGVJ9.png)
 
-But don' walk the plank jus' yet! Ther' be more! Ye can do short options:
+But don't walk the plank just yet! There be more! You can do short options:
 -------------------------------------------------
  
 short.js:
@@ -59,7 +59,7 @@ console.log('(%d,%d)', argv.x, argv.y);
     $ ./short.js -x 10 -y 21
     (10,21)
 
-And gold doubooleans, both long an' short (an' grouped!):
+And booleans, both long, short, and even grouped:
 ----------------------------------
 
 bool.js:
@@ -110,7 +110,7 @@ console.log(argv._);
     (0.54,1.12)
     [ 'me hearties', 'yo', 'ho' ]
 
-Yargs even counts yer gold doubooleans!
+Yargs even counts your booleans!
 ----------------------------------------------------------------------
 
 count.js
@@ -151,7 +151,7 @@ DEBUG("Extra chatty mode");
     Showing semi-important stuff too
     Extra chatty mode
 
-Tell yer friends how ter use yer options and make demands from yer enemies.
+Tell users how to use yer options and make demands.
 -------------------------------------------------
 
 divide.js:
@@ -238,7 +238,7 @@ console.log(argv.x + argv.y);
     $ ./default_hash.js -y 7
     17
 
-And if ye really want ter get all descriptive about it...
+And if you really want to get all descriptive about it...
 ---------------------------------------------------------
 
 boolean_single.js
@@ -278,7 +278,7 @@ console.dir(argv._);
     [ true, false, true ]
     [ 'one', 'two', 'three' ]
 
-Yargs is here ter help ye...
+Yargs is here to help you...
 ---------------------------
 
 Ye can describe parameters fer help messages and set aliases. Yargs figures
