@@ -231,6 +231,7 @@ function Argv (processArgs, cwd) {
 
             if (typeof opt.default !== 'undefined') {
                 self.default(key, opt.default);
+                if (opt.alias) self.default(opt.alias, opt.default);
             }
             
             if (opt.boolean || opt.type === 'boolean') {
@@ -248,6 +249,7 @@ function Argv (processArgs, cwd) {
             var desc = opt.describe || opt.description || opt.desc;
             if (desc) {
                 self.describe(key, desc);
+                if (opt.alias) self.boolean(opt.alias, desc);
             }
 
             if (opt.requiresArg) {
