@@ -410,6 +410,8 @@ Describe a `key` for the generated usage information.
 
 Optionally `.describe()` can take an object that maps keys to descriptions.
 
+.option(key, opt)
+-----------------
 .options(key, opt)
 ------------------
 
@@ -420,7 +422,7 @@ For example:
 
 ````javascript
 var argv = require('yargs')
-    .options('f', {
+    .option('f', {
         alias : 'file',
         default : '/etc/passwd',
     })
