@@ -15,7 +15,7 @@ describe('parse', function () {
         parse.should.have.property('bool', true);
         parse.should.have.property('_').with.length(0);
     });
-        
+
     it('should place bare options in the _ array', function () {
         var parse = yargs.parse(['foo', 'bar', 'baz']);
         parse.should.have.property('_').and.deep.equal(['foo','bar','baz']);
@@ -38,7 +38,7 @@ describe('parse', function () {
         parse.should.have.property('s', 'meow');
         parse.should.have.property('_').with.length(0);
     });
-     
+
     it('should set the value of a single short option to the next supplied value', function () {
         var parse = yargs.parse(['-h', 'localhost']);
         parse.should.have.property('h', 'localhost');
@@ -85,7 +85,7 @@ describe('parse', function () {
         parse.should.have.property('h', 'localhost');
         parse.should.have.property('_').and.deep.equal(['script.js']);
     });
-     
+
     it('should still set values appropriately if a mix of short and long options are specified', function () {
         var parse = yargs.parse(['-h', 'localhost', '--port', '555']);
         parse.should.have.property('h', 'localhost');
@@ -98,13 +98,13 @@ describe('parse', function () {
         parse.should.have.property('moo', false);
         parse.should.have.property('_').with.length(0);
     });
-     
+
     it('should group values into an array if the same option is specified multiple times', function () {
         var parse = yargs.parse(['-v', 'a', '-v', 'b', '-v', 'c' ]);
         parse.should.have.property('v').and.deep.equal(['a','b','c']);
         parse.should.have.property('_').with.length(0);
     });
-     
+
     it('should still set values appropriately if we supply a comprehensive list of various types of options', function () {
         var parse = yargs.parse([
             '--name=meowmers', 'bare', '-cats', 'woo',
@@ -350,6 +350,40 @@ describe('parse', function () {
         parsed = yargs(['--boool', '--other=false']).boolean('boool').argv;
         parsed.should.have.property('boool', true);
         parsed.should.have.property('other', 'false');
+    });
+
+    // regression, see https://github.com/chevex/yargs/issues/63
+    it('should not add the same key to argv multiple times, when creating camel-case aliases', function() {
+      var yargs = require('../')(['--health-check=banana', '--second-key', 'apple', '-t=blarg'])
+          .options('h', {
+            alias: 'health-check',
+            description: 'health check',
+            default: 'apple'
+          })
+          .options('second-key', {
+            alias: 's',
+            description: 'second key',
+            default: 'banana'
+          })
+          .options('third-key', {
+            alias: 't',
+            description: 'third key',
+            default: 'third'
+          })
+
+      // before this fix, yargs failed parsing
+      // one but not all forms of an arg.
+      yargs.argv.secondKey.should.eql('apple');
+      yargs.argv.s.should.eql('apple');
+      yargs.argv['second-key'].should.eql('apple');
+
+      yargs.argv.healthCheck.should.eql('banana');
+      yargs.argv.h.should.eql('banana');
+      yargs.argv['health-check'].should.eql('banana');
+
+      yargs.argv.thirdKey.should.eql('blarg');
+      yargs.argv.t.should.eql('blarg');
+      yargs.argv['third-key'].should.eql('blarg');
     });
 
 });
