@@ -353,23 +353,37 @@ describe('parse', function () {
     });
 
     // regression, see https://github.com/chevex/yargs/issues/63
-    it('should not add alias multiple times to argv, if argv is called multiple times', function() {
-      var yargs = require('../')(['--health-check=/banana', '--second-key', '/apple'])
+    it('should not add the same key to argv multiple times, when creating camel-case aliases', function() {
+      var yargs = require('../')(['--health-check=banana', '--second-key', 'apple', '-t=blarg'])
           .options('h', {
             alias: 'health-check',
             description: 'health check',
-            default: '/apple'
+            default: 'apple'
           })
           .options('second-key', {
             alias: 's',
             description: 'second key',
-            default: '/banana'
-          });
+            default: 'banana'
+          })
+          .options('third-key', {
+            alias: 't',
+            description: 'third key',
+            default: 'third'
+          })
 
-      yargs.argv;
+      // before this fix, yargs failed parsing
+      // one but not all forms of an arg.
+      yargs.argv.secondKey.should.eql('apple');
+      yargs.argv.s.should.eql('apple');
+      yargs.argv['second-key'].should.eql('apple');
 
-      yargs.argv.secondKey.should.eql('/apple');
-      yargs.argv.healthCheck.should.eql('/banana');
+      yargs.argv.healthCheck.should.eql('banana');
+      yargs.argv.h.should.eql('banana');
+      yargs.argv['health-check'].should.eql('banana');
+
+      yargs.argv.thirdKey.should.eql('blarg');
+      yargs.argv.t.should.eql('blarg');
+      yargs.argv['third-key'].should.eql('blarg');
     });
 
 });
