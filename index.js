@@ -186,7 +186,11 @@ function Argv (processArgs, cwd) {
                 }
                 console.error(failMessage);
             }
-            process.exit(1);
+            if (exitProcess){
+                process.exit(1);
+            }else{
+              throw new Error(msg);
+            }
         }
     }
     
@@ -306,7 +310,15 @@ function Argv (processArgs, cwd) {
         showHelpOnFail = enabled;
         return self;
     };
-
+    
+    var exitProcess = true;
+    self.exitProcess = function (enabled) {
+        if (typeof enabled !== 'boolean') {
+            enabled = true;
+        }
+        exitProcess = enabled;
+        return self;
+    };
 
     self.help = function () {
         if (arguments.length > 0) {
@@ -459,11 +471,15 @@ function Argv (processArgs, cwd) {
         Object.keys(argv).forEach(function(key) {
             if (key === helpOpt) {
                 self.showHelp(console.log);
-                process.exit(0);
+                if (exitProcess){
+                    process.exit(0);
+                }
             }
             else if (key === versionOpt) {
                 process.stdout.write(version);
-                process.exit(0);
+                if (exitProcess){
+                    process.exit(0);
+                }
             }
         });
 

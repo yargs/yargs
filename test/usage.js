@@ -723,6 +723,28 @@ describe('usage', function () {
             ]);
         });
     });
+    
+    describe('exitProcess', function () {
+        it('should not call process.exit on error if disabled', function () {
+            var opts = {
+                foo: { desc: 'foo option', alias: 'f' },
+            };
+
+            var r = checkUsage(function () {
+                return yargs(['--foo'])
+                    .exitProcess(false)
+                    .usage('Usage: $0 [options]')
+                    .options(opts)
+                    .demand(['foo'])
+                    .argv;
+            });
+            r.should.have.property('result');
+            r.result.should.have.property('_').with.length(0);
+            r.should.have.property('errors');
+            r.should.have.property('logs').with.length(0);
+            r.should.have.property('exit').and.be.false;
+        });
+    });
 
     it('should succeed when rebase', function () {
         yargs.rebase('/home/chevex', '/home/chevex/foo/bar/baz').should.equal('./foo/bar/baz');

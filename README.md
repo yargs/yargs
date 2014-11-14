@@ -574,6 +574,11 @@ yargs.showHelp();
 
 Later on, ```argv``` can be retrived with ```yargs.argv```
 
+.exitProcess(enable)
+----------------------------------
+
+By default, yargs exits the process when the user passes a help flag, uses the `.version` functionality or when validation fails. Calling `.exitProcess(false)` disables this behavior, enabling further actions after yargs have been validated.
+
 .parse(args)
 ------------
 
