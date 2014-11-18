@@ -386,4 +386,16 @@ describe('parse', function () {
       yargs.argv['third-key'].should.eql('blarg');
     });
 
+    // regression, see https://github.com/chevex/yargs/issues/66
+    it('should set boolean options values if next value is "true" or "false" with = as separator', function() {
+      var argv = require('../')(['--bool=false'])
+          .options({'b': {
+            alias: 'bool',
+            boolean: true,
+            default: true
+          }})
+          .argv;
+
+      argv.bool.should.eql(false);
+    });
 });
