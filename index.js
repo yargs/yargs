@@ -21,7 +21,7 @@ var exports = module.exports = Argv;
 function Argv (processArgs, cwd) {
     var self = {};
     if (!cwd) cwd = process.cwd();
-
+    
     self.$0 = process.argv
         .slice(0,2)
         .map(function (x) {
@@ -31,7 +31,7 @@ function Argv (processArgs, cwd) {
         })
         .join(' ')
     ;
-
+    
     if (process.env._ != undefined && process.argv[1] == process.env._) {
         self.$0 = process.env._.replace(
             path.dirname(process.execPath) + '/', ''
@@ -53,7 +53,7 @@ function Argv (processArgs, cwd) {
         return self;
     };
     self.resetOptions();
-
+    
     self.boolean = function (bools) {
         options.boolean.push.apply(options.boolean, [].concat(bools));
         return self;
@@ -74,12 +74,12 @@ function Argv (processArgs, cwd) {
         examples.push([cmd, description]);
         return self;
     };
-
+    
     self.string = function (strings) {
         options.string.push.apply(options.string, [].concat(strings));
         return self;
     };
-
+    
     self.default = function (key, value) {
         if (typeof key === 'object') {
             Object.keys(key).forEach(function (k) {
@@ -91,7 +91,7 @@ function Argv (processArgs, cwd) {
         }
         return self;
     };
-
+    
     self.alias = function (x, y) {
         if (typeof x === 'object') {
             Object.keys(x).forEach(function (key) {
@@ -108,7 +108,7 @@ function Argv (processArgs, cwd) {
         options.count.push.apply(options.count, [].concat(counts));
         return self;
     };
-
+    
     var demanded = {};
     self.demand = self.required = self.require = function (keys, msg) {
         if (typeof keys == 'number') {
@@ -129,7 +129,7 @@ function Argv (processArgs, cwd) {
                 demanded[keys] = { msg: null };
             }
         }
-
+        
         return self;
     };
 
@@ -156,11 +156,11 @@ function Argv (processArgs, cwd) {
             opts = msg;
             msg = null;
         }
-
+        
         usage = msg;
-
+        
         if (opts) self.options(opts);
-
+        
         return self;
     };
 
@@ -193,7 +193,7 @@ function Argv (processArgs, cwd) {
             }
         }
     }
-
+    
     var checks = [];
     self.check = function (f) {
         checks.push(f);
@@ -214,11 +214,11 @@ function Argv (processArgs, cwd) {
         }
         return self;
     };
-
+    
     self.parse = function (args) {
         return parseArgs(args);
     };
-
+    
     self.option = self.options = function (key, opt) {
         if (typeof key === 'object') {
             Object.keys(key).forEach(function (k) {
@@ -236,7 +236,7 @@ function Argv (processArgs, cwd) {
             if (typeof opt.default !== 'undefined') {
                 self.default(key, opt.default);
             }
-
+            
             if (opt.boolean || opt.type === 'boolean') {
                 self.boolean(key);
                 if (opt.alias) self.boolean(opt.alias);
@@ -273,7 +273,7 @@ function Argv (processArgs, cwd) {
         strict = true;
         return self;
     };
-
+    
     self.showHelp = function (fn) {
         if (!fn) fn = console.error.bind(console);
         fn(self.help());
@@ -310,7 +310,7 @@ function Argv (processArgs, cwd) {
         showHelpOnFail = enabled;
         return self;
     };
-
+    
     var exitProcess = true;
     self.exitProcess = function (enabled) {
         if (typeof enabled !== 'boolean') {
@@ -334,7 +334,7 @@ function Argv (processArgs, cwd) {
                 return acc;
             }, {})
         );
-
+        
         var help = keys.length ? [ 'Options:' ] : [];
 
         if (examples.length) {
@@ -384,40 +384,40 @@ function Argv (processArgs, cwd) {
         var switchlen = longest(Object.keys(switches).map(function (s) {
             return switches[s] || '';
         }));
-
-        var desclen = longest(Object.keys(descriptions).map(function (d) {
+        
+        var desclen = longest(Object.keys(descriptions).map(function (d) { 
             return descriptions[d] || '';
         }));
-
+        
         keys.forEach(function (key) {
             var kswitch = switches[key];
             var desc = descriptions[key] || '';
-
+            
             if (wrap) {
                 desc = wordwrap(switchlen + 4, wrap)(desc)
                     .slice(switchlen + 4)
                 ;
             }
-
+            
             var spadding = new Array(
                 Math.max(switchlen - kswitch.length + 3, 0)
             ).join(' ');
-
+            
             var dpadding = new Array(
                 Math.max(desclen - desc.length + 1, 0)
             ).join(' ');
-
+            
             var type = null;
-
+            
             if (options.boolean[key]) type = '[boolean]';
             if (options.count[key]) type = '[count]';
             if (options.string[key]) type = '[string]';
             if (options.normalize[key]) type = '[string]';
-
+            
             if (!wrap && dpadding.length > 0) {
                 desc += dpadding;
             }
-
+            
             var prelude = '  ' + kswitch + spadding;
             var extra = [
                 type,
@@ -430,14 +430,14 @@ function Argv (processArgs, cwd) {
                     JSON.stringify : String)(options.default[key]) + ']'
                     : null
             ].filter(Boolean).join('  ');
-
+            
             var body = [ desc, extra ].filter(Boolean).join('  ');
-
+            
             if (wrap) {
                 var dlines = desc.split('\n');
                 var dlen = dlines.slice(-1)[0].length
                     + (dlines.length === 1 ? prelude.length : 0)
-
+                
                 body = desc + (dlen + extra.length > wrap - 2
                     ? '\n'
                         + new Array(wrap - extra.length + 1).join(' ')
@@ -446,19 +446,19 @@ function Argv (processArgs, cwd) {
                         + extra
                 );
             }
-
+            
             help.push(prelude + body);
         });
-
+        
         if (keys.length) help.push('');
         return help.join('\n');
     };
-
+    
     Object.defineProperty(self, 'argv', {
         get : function () { return parseArgs(processArgs) },
         enumerable : true
     });
-
+    
     function parseArgs (args) {
         var parsed = minimist(args, options),
             argv = parsed.argv,
@@ -513,7 +513,7 @@ function Argv (processArgs, cwd) {
                 fail(message);
             }
         }
-
+        
         var missing = null;
         Object.keys(demanded).forEach(function (key) {
             if (!argv.hasOwnProperty(key)) {
@@ -521,7 +521,7 @@ function Argv (processArgs, cwd) {
                 missing[key] = demanded[key];
             }
         });
-
+        
         if (missing) {
             var customMsgs = [];
             Object.keys(missing).forEach(function(key) {
@@ -623,17 +623,17 @@ function Argv (processArgs, cwd) {
 
             fail(msg);
         }
-
+        
         return argv;
     }
-
+    
     function longest (xs) {
         return Math.max.apply(
             null,
             xs.map(function (x) { return x.length })
         );
     }
-
+    
     return self;
 };
 
@@ -643,10 +643,10 @@ exports.rebase = rebase;
 function rebase (base, dir) {
     var ds = path.normalize(dir).split('/').slice(1);
     var bs = path.normalize(base).split('/').slice(1);
-
+    
     for (var i = 0; ds[i] && ds[i] == bs[i]; i++);
     ds.splice(0, i); bs.splice(0, i);
-
+    
     var p = path.normalize(
         bs.map(function () { return '..' }).concat(ds).join('/')
     ).replace(/\/$/,'').replace(/^$/, '.');
