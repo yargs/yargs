@@ -233,7 +233,7 @@ function Argv (processArgs, cwd) {
                 self.demand(key, demand);
             }
 
-            if (typeof opt.default !== 'undefined') {
+            if ('default' in opt) {
                 self.default(key, opt.default);
             }
             
