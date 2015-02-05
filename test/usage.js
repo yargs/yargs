@@ -418,7 +418,7 @@ describe('usage', function () {
     context("with strict() option set", function () {
         it('should fail given an option argument that is not demanded', function () {
             var r = checkUsage(function () {
-                opts = {
+                var opts = {
                     foo: { demand: 'foo option', alias: 'f' },
                     bar: { demand: 'bar option', alias: 'b' }
                 };
@@ -450,7 +450,7 @@ describe('usage', function () {
 
         it('should fail given an option argument without a corresponding description', function () {
             var r = checkUsage(function () {
-                opts = {
+                var opts = {
                     foo: { description: 'foo option', alias: 'f' },
                     bar: { description: 'bar option', alias: 'b' }
                 };
@@ -482,7 +482,7 @@ describe('usage', function () {
 
         it('should fail given multiple option arguments without corresponding descriptions', function () {
             var r = checkUsage(function () {
-                opts = {
+                var opts = {
                     foo: { description: 'foo option', alias: 'f' },
                     bar: { description: 'bar option', alias: 'b' }
                 };
@@ -515,7 +515,7 @@ describe('usage', function () {
 
         it('should pass given option arguments with corresponding descriptions', function () {
             var r = checkUsage(function () {
-                opts = {
+                var opts = {
                     foo: { description: 'foo option' },
                     bar: { description: 'bar option' }
                 };
@@ -723,7 +723,7 @@ describe('usage', function () {
             ]);
         });
     });
-    
+
     describe('exitProcess', function () {
         it('should not call process.exit on error if disabled', function () {
             var opts = {
@@ -754,35 +754,34 @@ describe('usage', function () {
 
     function checkUsage (f) {
 
-        var exit = false;
-
-        process._exit = process.exit;
-        process._env = process.env;
-        process._argv = process.argv;
-        process.stdout._write = process.stdout.write;
+        var exit = false,
+          _write = process.stdout.write,
+          _exit = process.exit,
+          _env = process.env,
+          _argv = process.argv,
+          _error = console.error,
+          _log = console.log;
 
         process.exit = function () { exit = true };
         process.env = Hash.merge(process.env, { _ : 'node' });
         process.argv = [ './usage' ];
-        process.stdout.write = function (msg) { logs.push(msg) };
+        process.stdout.write = function (msg) { logs.push(msg) }
 
         var errors = [];
         var logs = [];
 
-        console._error = console.error;
         console.error = function (msg) { errors.push(msg) };
-        console._log = console.log;
         console.log = function (msg) { logs.push(msg) };
 
         var result = f();
 
-        process.exit = process._exit;
-        process.env = process._env;
-        process.argv = process._argv;
-        process.stdout.write = process.stdout._write;
+        process.exit = _exit;
+        process.env = _env;
+        process.argv = _argv;
+        process.stdout.write = _write;
 
-        console.error = console._error;
-        console.log = console._log;
+        console.error = _error;
+        console.log = _log;
 
         return {
             errors : errors,
