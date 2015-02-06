@@ -752,6 +752,15 @@ describe('usage', function () {
         yargs.rebase('/home/chevex/foo', '/home/chevex/pow/zoom.txt').should.equal('../pow/zoom.txt');
     });
 
+    // Fixes: https://github.com/chevex/yargs/issues/71
+    it('should not raise an exception if help called on empty arguments', function() {
+      var r = checkUsage(function () {
+        return yargs([]).usage('foo').help();
+      });
+
+      r.result.should.match(/foo/);
+    });
+
     function checkUsage (f) {
 
         var exit = false,

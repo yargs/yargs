@@ -321,6 +321,8 @@ function Argv (processArgs, cwd) {
     };
 
     self.help = function () {
+        if (!self.parsed) parseArgs(processArgs); // run parser, if it has not already been executed.
+
         if (arguments.length > 0) {
             return self.addHelpOpt.apply(self, arguments);
         }
