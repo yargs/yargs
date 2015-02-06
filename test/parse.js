@@ -198,6 +198,18 @@ describe('parse', function () {
         x.should.be.a('string').and.equal('56');
     });
 
+    // Fixes: https://github.com/chevex/yargs/issues/68
+    it('should parse flag arguments with no right-hand-value as strings, if defined as strings' , function () {
+        var s = yargs([ '-s' ]).string('s').argv.s;
+        s.should.be.a('string').and.equal('');
+
+        s = yargs([ '-sf' ]).string('s').argv.s;
+        s.should.be.a('string').and.equal('');
+
+        s = yargs([ '--string' ]).string('string').argv.string;
+        s.should.be.a('string').and.equal('');
+    });
+
     it('should leave all non-hyphenated values as strings if _ is defined as a string', function () {
         var s = yargs([ '  ', '  ' ]).string('_').argv._;
         s.should.have.length(2);
