@@ -246,7 +246,7 @@ describe('parse', function () {
 
         argv.should.have.property('herp', 'derp');
         argv.should.have.property('zoom', 55);
-        argv.should.have.property('foo').and.deep.equal(['bar', 'baz']);
+        argv.should.have.property('foo').and.deep.equal('bar');
     });
 
     // See: https://github.com/chevex/yargs/issues/12
@@ -259,7 +259,33 @@ describe('parse', function () {
 
         argv.should.have.property('herp', 'derp');
         argv.should.have.property('zoom', 55);
-        argv.should.have.property('foo').and.deep.equal(['bar', 'baz']);
+        argv.should.have.property('foo').and.deep.equal('bar');
+    });
+
+    it('should use value from config file, if argv value is using default value', function () {
+        var argv = yargs([])
+            .alias('z', 'zoom')
+            .config('settings')
+            .default('settings', path.resolve(__dirname, './config.json'))
+            .default('foo', 'banana')
+            .argv;
+
+        argv.should.have.property('herp', 'derp');
+        argv.should.have.property('zoom', 55);
+        argv.should.have.property('foo').and.deep.equal('baz');
+    });
+
+    it('should use cli value, if cli value is set and both cli and default value match', function () {
+        var argv = yargs(['--foo', 'banana'])
+            .alias('z', 'zoom')
+            .config('settings')
+            .default('settings', path.resolve(__dirname, './config.json'))
+            .default('foo', 'banana')
+            .argv;
+
+        argv.should.have.property('herp', 'derp');
+        argv.should.have.property('zoom', 55);
+        argv.should.have.property('foo').and.deep.equal('banana');
     });
 
     it('should allow multiple aliases to be specified', function () {
