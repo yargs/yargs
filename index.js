@@ -44,7 +44,7 @@ function Argv (processArgs, cwd) {
             boolean: [],
             string: [],
             alias: {},
-            default: [],
+            default: {},
             requiresArg: [],
             count: [],
             normalize: [],
