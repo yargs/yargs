@@ -507,7 +507,7 @@ Interpret `key` as a boolean. If a non-flag option follows `key` in
 `process.argv`, that string won't get set as the value of `key`.
 
 If `key` never shows up as a flag in `process.arguments`, `argv[key]` will be
-`false`.
+`false` unless an explicit `default(key, undefined)` being set.
 
 If `key` is an Array, interpret all the elements as booleans.
 
