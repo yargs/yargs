@@ -1,6 +1,6 @@
 {
   "name": "yargs",
-  "version": "1.3.3",
+  "version": "2.1.1",
   "description": "Light-weight option parsing with an argv hash. No optstrings attached.",
   "main": "./index.js",
   "files": [
@@ -10,16 +10,31 @@
   ],
   "dependencies": {},
   "devDependencies": {
-    "hashish": "*",
-    "mocha": "*",
-    "chai": "*"
+    "blanket": "^1.1.6",
+    "chai": "^1.10.0",
+    "hashish": "0.0.4",
+    "mocha": "^2.1.0",
+    "mocoverage": "^1.0.0"
   },
   "scripts": {
-    "test": "mocha -R nyan"
+    "test": "mocha --check-leaks --ui exports --require blanket -R mocoverage"
   },
   "repository": {
     "type": "git",
     "url": "http://github.com/chevex/yargs.git"
+  },
+  "config": {
+    "blanket": {
+      "pattern": [
+        "lib",
+        "index.js"
+      ],
+      "data-cover-never": [
+        "node_modules",
+        "test"
+      ],
+      "output-reporter": "spec"
+    }
   },
   "keywords": [
     "argument",

@@ -198,6 +198,18 @@ describe('parse', function () {
         x.should.be.a('string').and.equal('56');
     });
 
+    // Fixes: https://github.com/chevex/yargs/issues/68
+    it('should parse flag arguments with no right-hand-value as strings, if defined as strings' , function () {
+        var s = yargs([ '-s' ]).string('s').argv.s;
+        s.should.be.a('string').and.equal('');
+
+        s = yargs([ '-sf' ]).string('s').argv.s;
+        s.should.be.a('string').and.equal('');
+
+        s = yargs([ '--string' ]).string('string').argv.string;
+        s.should.be.a('string').and.equal('');
+    });
+
     it('should leave all non-hyphenated values as strings if _ is defined as a string', function () {
         var s = yargs([ '  ', '  ' ]).string('_').argv._;
         s.should.have.length(2);
@@ -238,17 +250,55 @@ describe('parse', function () {
         argv.should.have.property('f', 11);
     });
 
-    /*
-     *it('should load options and values from a file when config is used', function () {
-     *    var argv = yargs([ '--settings', '../test/config.json', '--foo', 'bar' ])
-     *        .alias('z', 'zoom')
-     *        .config('settings')
-     *        .argv;
-     *    argv.should.have.property('herp', 'derp');
-     *    argv.should.have.property('zoom', 55);
-     *    argv.should.have.property('foo').and.deep.equal(['baz','bar']);
-     *});
-     */
+    it('should load options and values from a file when config is used', function () {
+        var argv = yargs([ '--settings', path.resolve(__dirname, './config.json'), '--foo', 'bar' ])
+            .alias('z', 'zoom')
+            .config('settings')
+            .argv;
+
+        argv.should.have.property('herp', 'derp');
+        argv.should.have.property('zoom', 55);
+        argv.should.have.property('foo').and.deep.equal('bar');
+    });
+
+    // See: https://github.com/chevex/yargs/issues/12
+    it('should load options and values from default config if specified', function () {
+        var argv = yargs([ '--foo', 'bar' ])
+            .alias('z', 'zoom')
+            .config('settings')
+            .default('settings', path.resolve(__dirname, './config.json'))
+            .argv;
+
+        argv.should.have.property('herp', 'derp');
+        argv.should.have.property('zoom', 55);
+        argv.should.have.property('foo').and.deep.equal('bar');
+    });
+
+    it('should use value from config file, if argv value is using default value', function () {
+        var argv = yargs([])
+            .alias('z', 'zoom')
+            .config('settings')
+            .default('settings', path.resolve(__dirname, './config.json'))
+            .default('foo', 'banana')
+            .argv;
+
+        argv.should.have.property('herp', 'derp');
+        argv.should.have.property('zoom', 55);
+        argv.should.have.property('foo').and.deep.equal('baz');
+    });
+
+    it('should use cli value, if cli value is set and both cli and default value match', function () {
+        var argv = yargs(['--foo', 'banana'])
+            .alias('z', 'zoom')
+            .config('settings')
+            .default('settings', path.resolve(__dirname, './config.json'))
+            .default('foo', 'banana')
+            .argv;
+
+        argv.should.have.property('herp', 'derp');
+        argv.should.have.property('zoom', 55);
+        argv.should.have.property('foo').and.deep.equal('banana');
+    });
 
     it('should allow multiple aliases to be specified', function () {
         var argv = yargs([ '-f', '11', '--zoom', '55' ])
@@ -386,4 +436,16 @@ describe('parse', function () {
       yargs.argv['third-key'].should.eql('blarg');
     });
 
+    // regression, see https://github.com/chevex/yargs/issues/66
+    it('should set boolean options values if next value is "true" or "false" with = as separator', function() {
+      var argv = require('../')(['--bool=false'])
+          .options({'b': {
+            alias: 'bool',
+            boolean: true,
+            default: true
+          }})
+          .argv;
+
+      argv.bool.should.eql(false);
+    });
 });
