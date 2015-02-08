@@ -1,4 +1,4 @@
-var should = require('chai').should(),
+/*var should = require('chai').should(),
     checkUsage = require('./helpers/utils').checkOutput,
     yargs = require('../');
 
@@ -794,3 +794,4 @@ describe('usage tests', function () {
         });
     });
 });
+*/
