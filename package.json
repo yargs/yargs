@@ -1,6 +1,6 @@
 {
   "name": "yargs",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "Light-weight option parsing with an argv hash. No optstrings attached.",
   "main": "./index.js",
   "files": [
