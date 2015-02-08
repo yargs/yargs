@@ -559,9 +559,6 @@ describe('parser tests', function () {
 
             checkNoArgs(args, true);
             checkExtraArg(args, true);
-            // This test case should fail, because we didn't specify that the
-            // option is a boolean
-            // checkStringArg(args, true);
         });
 
         describe('for typed options without aliases', function () {
@@ -589,6 +586,59 @@ describe('parser tests', function () {
             checkNoArgs(args, true);
             checkExtraArg(args, true);
             checkStringArg(args, true);
+        });
+
+        describe('for boolean options', function() {
+            [true, false, undefined].forEach(function(def) {
+                describe('with explicit ' + def + ' default', function() {
+                    var argv = yargs().options({
+                          flag: {
+                              type    : 'boolean',
+                              default : def
+                          }
+                      }),
+                      argv2 = yargs()
+                        .boolean(['flag'])
+                        .default('flag', def);
+
+                    it('should set true if --flag in arg', function() {
+                        argv.parse(['--flag']).flag.should.be.true;
+                        argv2.parse(['--flag']).flag.should.be.true;
+                    });
+
+                    it('should set false if --no-flag in arg', function() {
+                        argv.parse(['--no-flag']).flag.should.be.false;
+                        argv2.parse(['--no-flag']).flag.should.be.false;
+                    });
+
+                    it('should set ' + def + ' if no flag in arg', function() {
+                        should.equal(argv.parse([ ]).flag, def);
+                        should.equal(argv2.parse([ ]).flag, def);
+                    });
+                });
+            });
+
+            describe('with implied false default', function() {
+                var argv = yargs().options({
+                    flag: {type    : 'boolean'}
+                  }),
+                  argv2 = yargs().boolean(['flag']);
+
+                it('should set true if --flag in arg', function() {
+                    argv.parse(['--flag']).flag.should.be.true;
+                    argv2.parse(['--flag']).flag.should.be.true;
+                });
+
+                it('should set false if --no-flag in arg', function() {
+                    argv.parse(['--no-flag']).flag.should.be.false;
+                    argv2.parse(['--no-flag']).flag.should.be.false;
+                });
+
+                it('should set false if no flag in arg', function() {
+                    argv.parse([ ]).flag.should.be.false;
+                    argv2.parse([ ]).flag.should.be.false;
+                });
+            });
         });
     });
 

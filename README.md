@@ -506,8 +506,8 @@ Method to execute when a failure occurs, rather then printing the failure messag
 Interpret `key` as a boolean. If a non-flag option follows `key` in
 `process.argv`, that string won't get set as the value of `key`.
 
-If `key` never shows up as a flag in `process.arguments`, `argv[key]` will be
-`false` unless an explicit `default(key, undefined)` being set.
+`key` will default to `false`, unless an `default(key, undefined)` is
+explicitly set.
 
 If `key` is an Array, interpret all the elements as booleans.
 
