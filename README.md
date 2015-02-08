@@ -37,7 +37,7 @@ else {
 
     $ ./xup.js --rif=55 --xup=9.52
     Plunder more riffiwobbles!
-    
+
     $ ./xup.js --rif 12 --xup 8.1
     Drop the xupptumblers!
 
@@ -45,7 +45,7 @@ else {
 
 But don't walk the plank just yet! There be more! You can do short options:
 -------------------------------------------------
- 
+
 short.js:
 
 ````javascript
@@ -81,7 +81,7 @@ console.log(
 
     $ ./bool.js -s
     The parrot says: squawk
-    
+
     $ ./bool.js -sp
     The parrot says: squawk!
 
@@ -90,7 +90,7 @@ console.log(
 
 And non-hyphenated options too! Just use `argv._`!
 -------------------------------------------------
- 
+
 nonopt.js:
 
 ````javascript
@@ -105,7 +105,7 @@ console.log(argv._);
     $ ./nonopt.js -x 6.82 -y 3.35 rum
     (6.82,3.35)
     [ 'rum' ]
-    
+
     $ ./nonopt.js "me hearties" -x 0.54 yo -y 1.12 ho
     (0.54,1.12)
     [ 'me hearties', 'yo', 'ho' ]
@@ -167,10 +167,10 @@ console.log(argv.x / argv.y);
 ````
 
 ***
- 
+
     $ ./divide.js -x 55 -y 11
     5
-    
+
     $ node ./divide.js -x 4.91 -z 2.51
     Usage: node ./divide.js -x [num] -y [num]
 
@@ -258,7 +258,7 @@ console.dir(argv._);
     $ ./boolean_single.js -v "me hearties" yo ho
     true
     [ 'me hearties', 'yo', 'ho' ]
-    
+
 
 boolean_double.js
 
@@ -324,10 +324,10 @@ s.on('end', function () {
 
     Missing required arguments: f
 
-    $ node line_count.js --file line_count.js 
+    $ node line_count.js --file line_count.js
     20
-    
-    $ node line_count.js -f line_count.js 
+
+    $ node line_count.js -f line_count.js
     20
 
 methods
@@ -487,6 +487,9 @@ Tell the parser logic not to interpret `key` as a number or boolean.
 This can be useful if you need to preserve leading zeros in an input.
 
 If `key` is an Array, interpret all the elements as strings.
+
+`.string('_')` will result in non-hyphenated arguments being interpreted as strings,
+regardless of whether they resemble numbers.
 
 .config(key)
 ------------
@@ -671,17 +674,17 @@ installation
 With [npm](http://github.com/isaacs/npm), just do:
 
     npm install yargs
- 
+
 or clone this project on github:
 
     git clone http://github.com/chevex/yargs.git
 
 To run the tests with [expresso](http://github.com/visionmedia/expresso),
 just do:
-    
+
     expresso
 
-inspired By
+inspired by
 ===========
 
 This module is loosely inspired by Perl's
