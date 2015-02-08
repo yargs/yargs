@@ -415,7 +415,7 @@ Optionally `.describe()` can take an object that maps keys to descriptions.
 .options(key, opt)
 ------------------
 
-Instead of chaining together `.alias().demand().default()`, you can specify
+Instead of chaining together `.alias().demand().default().describe().string()`, you can specify
 keys in `opt` for each of the chainable methods.
 
 For example:
@@ -424,7 +424,10 @@ For example:
 var argv = require('yargs')
     .option('f', {
         alias : 'file',
-        default : '/etc/passwd',
+        demand: true,
+        default: '/etc/passwd',
+        describe: 'x marks the spot',
+        type: 'string'
     })
     .argv
 ;
@@ -441,6 +444,21 @@ var argv = require('yargs')
 ````
 
 Optionally `.options()` can take an object that maps keys to `opt` parameters.
+
+````javascript
+var argv = require('yargs')
+    .options({
+      'f': {
+        alias: 'file',
+        demand: true,
+        default: '/etc/passwd',
+        describe: 'x marks the spot',
+        type: 'string'
+      }
+    })
+    .argv
+;
+````
 
 .usage(message, opts)
 ---------------------
