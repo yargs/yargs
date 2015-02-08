@@ -14,8 +14,10 @@
   "devDependencies": {
     "blanket": "^1.1.6",
     "chai": "^1.10.0",
+    "coveralls": "^2.11.2",
     "hashish": "0.0.4",
     "mocha": "^2.1.0",
+    "mocha-lcov-reporter": "0.0.1",
     "mocoverage": "^1.0.0"
   },
   "scripts": {
