@@ -1,6 +1,6 @@
 var path = require('path');
-var minimist = require('./lib/minimist');
-var wordwrap = require('./lib/wordwrap');
+var parser = require('./lib/parser');
+var wordwrap = require('wordwrap');
 
 /*  Hack an instance of Argv with process.argv into Argv
     so people can do
@@ -189,7 +189,7 @@ function Argv (processArgs, cwd) {
             if (exitProcess){
                 process.exit(1);
             }else{
-              throw new Error(msg);
+                throw new Error(msg);
             }
         }
     }
@@ -300,8 +300,8 @@ function Argv (processArgs, cwd) {
     var showHelpOnFail = true;
     self.showHelpOnFail = function (enabled, message) {
         if (typeof enabled === 'string') {
-            enabled = true;
             message = enabled;
+            enabled = true;
         }
         else if (typeof enabled === 'undefined') {
             enabled = true;
@@ -440,13 +440,17 @@ function Argv (processArgs, cwd) {
                 var dlen = dlines.slice(-1)[0].length
                     + (dlines.length === 1 ? prelude.length : 0)
 
-                body = desc + (dlen + extra.length > wrap - 2
-                    ? '\n'
-                        + new Array(wrap - extra.length + 1).join(' ')
-                        + extra
-                    : new Array(wrap - extra.length - dlen + 1).join(' ')
-                        + extra
-                );
+                if (extra.length > wrap) {
+                    body = desc + '\n' + wordwrap(switchlen + 4, wrap)(extra)
+                } else {
+                    body = desc + (dlen + extra.length > wrap - 2
+                        ? '\n'
+                            + new Array(wrap - extra.length + 1).join(' ')
+                            + extra
+                        : new Array(wrap - extra.length - dlen + 1).join(' ')
+                            + extra
+                    );
+                }
             }
 
             help.push(prelude + body);
@@ -457,12 +461,22 @@ function Argv (processArgs, cwd) {
     };
 
     Object.defineProperty(self, 'argv', {
-        get : function () { return parseArgs(processArgs) },
+        get : function () {
+          var args = null;
+
+          try {
+            args = parseArgs(processArgs);
+          } catch (err) {
+            fail(err.message);
+          }
+
+          return args;
+        },
         enumerable : true
     });
 
     function parseArgs (args) {
-        var parsed = minimist(args, options),
+        var parsed = parser(args, options),
             argv = parsed.argv,
             aliases = parsed.aliases;
 
@@ -501,7 +515,7 @@ function Argv (processArgs, cwd) {
             options.requiresArg.forEach(function(key) {
                 var value = argv[key];
 
-                // minimist sets --foo value to true / --no-foo to false
+                // parser sets --foo value to true / --no-foo to false
                 if (value === true || value === false) {
                     missingRequiredArgs.push(key);
                 }

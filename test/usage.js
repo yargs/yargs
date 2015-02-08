@@ -1,8 +1,8 @@
 var should = require('chai').should(),
-    Hash = require('hashish'),
+    checkUsage = require('./helpers/utils').checkOutput,
     yargs = require('../');
 
-describe('usage', function () {
+describe('usage tests', function () {
 
     describe('demand options', function () {
         describe('using .demand()', function () {
@@ -754,50 +754,43 @@ describe('usage', function () {
 
     // Fixes: https://github.com/chevex/yargs/issues/71
     it('should not raise an exception if help called on empty arguments', function() {
-      var r = checkUsage(function () {
-        return yargs([]).usage('foo').help();
-      });
+        var r = checkUsage(function () {
+          return yargs([]).usage('foo').help();
+        });
 
-      r.result.should.match(/foo/);
+        r.result.should.match(/foo/);
     });
 
-    function checkUsage (f) {
+    describe('wrap', function() {
+        it('should wrap argument descriptions onto multiple lines', function() {
+            var r = checkUsage(function () {
+                return yargs([])
+                  .option('fairly-long-option', {
+                    alias: 'f',
+                    default: 'fairly long default',
+                    description: 'npm prefix used to locate globally installed npm packages'
+                  })
+                  .demand('foo')
+                  .wrap(40)
+                  .argv;
+            });
 
-        var exit = false,
-          _write = process.stdout.write,
-          _exit = process.exit,
-          _env = process.env,
-          _argv = process.argv,
-          _error = console.error,
-          _log = console.log;
+            r.errors[0].split('\n').forEach(function(line, i) {
+              if (!i || !line) return; // ignore first and last line.
+              line.length.should.gt(30);
+              line.length.should.lte(40);
+            });
+        });
 
-        process.exit = function () { exit = true };
-        process.env = Hash.merge(process.env, { _ : 'node' });
-        process.argv = [ './usage' ];
-        process.stdout.write = function (msg) { logs.push(msg) }
-
-        var errors = [];
-        var logs = [];
-
-        console.error = function (msg) { errors.push(msg) };
-        console.log = function (msg) { logs.push(msg) };
-
-        var result = f();
-
-        process.exit = _exit;
-        process.env = _env;
-        process.argv = _argv;
-        process.stdout.write = _write;
-
-        console.error = _error;
-        console.log = _log;
-
-        return {
-            errors : errors,
-            logs : logs,
-            exit : exit,
-            result : result
-        };
-    };
-
+        it('should not raise an exception when long default and description are provided', function() {
+            return yargs([])
+              .option('fairly-long-option', {
+                alias: 'f',
+                default: 'npm prefix used to locate globally installed npm packages',
+                description: 'npm prefix used to locate globally installed npm packages'
+              })
+              .wrap(40)
+              .help()
+        });
+    });
 });

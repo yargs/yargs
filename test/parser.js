@@ -1,8 +1,9 @@
 var should = require('chai').should(),
+    expect = require('chai').expect,
     yargs = require('../'),
     path = require('path');
 
-describe('parse', function () {
+describe('parser tests', function () {
 
     it('should pass when specifying a "short boolean"', function () {
         var parse = yargs.parse([ '-b' ]);
@@ -250,54 +251,69 @@ describe('parse', function () {
         argv.should.have.property('f', 11);
     });
 
-    it('should load options and values from a file when config is used', function () {
-        var argv = yargs([ '--settings', path.resolve(__dirname, './config.json'), '--foo', 'bar' ])
+    describe('config', function() {
+        var jsonPath = path.resolve(__dirname, './fixtures/config.json');
+
+        // See: https://github.com/chevex/yargs/issues/12
+        it('should load options and values from default config if specified', function () {
+            var argv = yargs([ '--foo', 'bar' ])
+                .alias('z', 'zoom')
+                .config('settings')
+                .default('settings', jsonPath)
+                .argv;
+
+            argv.should.have.property('herp', 'derp');
+            argv.should.have.property('zoom', 55);
+            argv.should.have.property('foo').and.deep.equal('bar');
+        });
+
+        it('should use value from config file, if argv value is using default value', function () {
+            var argv = yargs([])
+                .alias('z', 'zoom')
+                .config('settings')
+                .default('settings', jsonPath)
+                .default('foo', 'banana')
+                .argv;
+
+            argv.should.have.property('herp', 'derp');
+            argv.should.have.property('zoom', 55);
+            argv.should.have.property('foo').and.deep.equal('baz');
+        });
+
+        it('should use cli value, if cli value is set and both cli and default value match', function () {
+            var argv = yargs(['--foo', 'banana'])
+                .alias('z', 'zoom')
+                .config('settings')
+                .default('settings', jsonPath)
+                .default('foo', 'banana')
+                .argv;
+
+            argv.should.have.property('herp', 'derp');
+            argv.should.have.property('zoom', 55);
+            argv.should.have.property('foo').and.deep.equal('banana');
+        });
+
+        it('should load options and values from a file when config is used', function () {
+            var argv = yargs([ '--settings', jsonPath, '--foo', 'bar' ])
+                .alias('z', 'zoom')
+                .config('settings')
+                .argv;
+
+            argv.should.have.property('herp', 'derp');
+            argv.should.have.property('zoom', 55);
+            argv.should.have.property('foo').and.deep.equal('bar');
+        });
+
+        it('should raise an appropriate error if JSON file is not found', function(done) {
+          var argv = yargs([ '--settings', 'fake.json', '--foo', 'bar' ])
             .alias('z', 'zoom')
             .config('settings')
+            .fail(function(msg) {
+              msg.should.eql('invalid json config file: fake.json');
+              return done();
+            })
             .argv;
-
-        argv.should.have.property('herp', 'derp');
-        argv.should.have.property('zoom', 55);
-        argv.should.have.property('foo').and.deep.equal('bar');
-    });
-
-    // See: https://github.com/chevex/yargs/issues/12
-    it('should load options and values from default config if specified', function () {
-        var argv = yargs([ '--foo', 'bar' ])
-            .alias('z', 'zoom')
-            .config('settings')
-            .default('settings', path.resolve(__dirname, './config.json'))
-            .argv;
-
-        argv.should.have.property('herp', 'derp');
-        argv.should.have.property('zoom', 55);
-        argv.should.have.property('foo').and.deep.equal('bar');
-    });
-
-    it('should use value from config file, if argv value is using default value', function () {
-        var argv = yargs([])
-            .alias('z', 'zoom')
-            .config('settings')
-            .default('settings', path.resolve(__dirname, './config.json'))
-            .default('foo', 'banana')
-            .argv;
-
-        argv.should.have.property('herp', 'derp');
-        argv.should.have.property('zoom', 55);
-        argv.should.have.property('foo').and.deep.equal('baz');
-    });
-
-    it('should use cli value, if cli value is set and both cli and default value match', function () {
-        var argv = yargs(['--foo', 'banana'])
-            .alias('z', 'zoom')
-            .config('settings')
-            .default('settings', path.resolve(__dirname, './config.json'))
-            .default('foo', 'banana')
-            .argv;
-
-        argv.should.have.property('herp', 'derp');
-        argv.should.have.property('zoom', 55);
-        argv.should.have.property('foo').and.deep.equal('banana');
+        });
     });
 
     it('should allow multiple aliases to be specified', function () {
@@ -330,22 +346,39 @@ describe('parse', function () {
         argv.should.have.property('somefalse', false);
     });
 
-    it('should allow object graph traversal via dot notation', function () {
-        var argv = yargs([
-            '--foo.bar', '3', '--foo.baz', '4',
-            '--foo.quux.quibble', '5', '--foo.quux.o_O',
-            '--beep.boop'
-        ]).argv;
-        argv.should.have.property('foo').and.deep.equal({
-            bar: 3,
-            baz: 4,
-            quux: {
-                quibble: 5,
-                o_O: true
-            }
+    describe('dot notation', function() {
+        it('should allow object graph traversal via dot notation', function () {
+            var argv = yargs([
+                '--foo.bar', '3', '--foo.baz', '4',
+                '--foo.quux.quibble', '5', '--foo.quux.o_O',
+                '--beep.boop'
+            ]).argv;
+            argv.should.have.property('foo').and.deep.equal({
+                bar: 3,
+                baz: 4,
+                quux: {
+                    quibble: 5,
+                    o_O: true
+                }
+            });
+            argv.should.have.property('beep').and.deep.equal({ boop: true });
         });
-        argv.should.have.property('beep').and.deep.equal({ boop: true });
-    });
+
+        it('should apply defaults to dot notation arguments', function () {
+            var argv = yargs([])
+              .default('foo.bar', 99)
+              .argv;
+            argv.foo.bar.should.eql(99);
+        });
+
+        it('should respect .string() for dot notation arguments', function () {
+            var argv = yargs(['--foo.bar', '99', '--bar.foo=99'])
+              .string('foo.bar')
+              .argv;
+            argv.foo.bar.should.eql('99');
+            argv.bar.foo.should.eql(99);
+        });
+    })
 
     it('should allow booleans and aliases to be defined with chainable api', function () {
         var aliased = [ '-h', 'derp' ],
@@ -447,5 +480,295 @@ describe('parse', function () {
           .argv;
 
       argv.bool.should.eql(false);
+    });
+
+    describe('short options', function () {
+        it ('should set n to the numeric value 123', function () {
+            var argv = yargs.parse([ '-n123' ]);
+            should.exist(argv);
+            argv.should.have.property('n', 123);
+        });
+
+        it ('should set option "1" to true, option "2" to true, and option "3" to numeric value 456', function () {
+            var argv = yargs.parse([ '-123', '456' ]);
+            should.exist(argv);
+            argv.should.have.property('1', true);
+            argv.should.have.property('2', true);
+            argv.should.have.property('3', 456);
+        });
+    });
+
+    describe('whitespace', function () {
+        it('should be whitespace', function () {
+            var argv = yargs.parse([ '-x', '\t' ]);
+            should.exist(argv);
+            argv.should.have.property('x', '\t');
+        });
+    });
+
+    describe('boolean modifier function', function () {
+        it('should prevent yargs from sucking in the next option as the value of the first option', function () {
+            // Arrange & Act
+            var result = yargs().boolean('b').parse([ '-b', '123' ]);
+            // Assert
+            result.should.have.property('b').that.is.a('boolean').and.is.true;
+            result.should.have.property('_').and.deep.equal([123]);
+        });
+    });
+
+    describe('defaults', function () {
+        function checkNoArgs(argv, hasAlias) {
+            it('should set defaults if no args', function() {
+                var result = argv.parse([ ]);
+                result.should.have.property('flag', true);
+                if (hasAlias) {
+                    result.should.have.property('f', true);
+                }
+            });
+        }
+
+        function checkExtraArg(argv, hasAlias) {
+            it('should set defaults if one extra arg', function() {
+                var result = argv.parse([ 'extra' ]);
+                result.should.have.property('flag', true);
+                result.should.have.property('_').and.deep.equal(['extra']);
+                if (hasAlias) {
+                    result.should.have.property('f', true);
+                }
+            });
+        }
+
+        function checkStringArg(argv, hasAlias) {
+            it('should set defaults even if arg looks like a string', function() {
+                var result = argv.parse([ '--flag', 'extra' ]);
+                result.should.have.property('flag', true);
+                result.should.have.property('_').and.deep.equal(['extra']);
+                if (hasAlias) {
+                    result.should.have.property('f', true);
+                }
+            });
+        }
+
+        describe('for options with aliases', function () {
+            var args = yargs().options({
+                flag : {
+                    alias   : 'f',
+                    default : true
+                }
+            });
+
+            checkNoArgs(args, true);
+            checkExtraArg(args, true);
+            // This test case should fail, because we didn't specify that the
+            // option is a boolean
+            // checkStringArg(args, true);
+        });
+
+        describe('for typed options without aliases', function () {
+            var args = yargs().options({
+                flag : {
+                    type    : 'boolean',
+                    default : true
+                }
+            });
+
+            checkNoArgs(args);
+            checkExtraArg(args);
+            checkStringArg(args);
+        });
+
+        describe('for typed options with aliases', function () {
+            var args = yargs().options({
+                flag : {
+                    alias   : 'f',
+                    type    : 'boolean',
+                    default : true
+                }
+            });
+
+            checkNoArgs(args, true);
+            checkExtraArg(args, true);
+            checkStringArg(args, true);
+        });
+    });
+
+    describe('camelCase', function () {
+
+        function runTests (yargs, strict) {
+
+            if (!strict) {
+                // Skip this test in strict mode because this option is not specified
+                it('should provide options with dashes as camelCase properties', function () {
+                    var result = yargs()
+                        .parse([ '--some-option' ]);
+
+                    result.should.have.property('some-option').that.is.a('boolean').and.is.true;
+                    result.should.have.property('someOption' ).that.is.a('boolean').and.is.true;
+                });
+            }
+
+            it('should provide count options with dashes as camelCase properties', function () {
+                var result = yargs()
+                    .option('some-option', {
+                        describe : 'some option',
+                        type     : 'count'
+                    })
+                    .parse([ '--some-option', '--some-option', '--some-option' ]);
+
+                result.should.have.property('some-option', 3);
+                result.should.have.property('someOption' , 3);
+            });
+
+            it('should provide options with dashes and aliases as camelCase properties', function () {
+                var result = yargs()
+                    .option('some-option', {
+                        alias    : 'o',
+                        describe : 'some option'
+                    })
+                    .parse([ '--some-option' ]);
+
+                result.should.have.property('some-option').that.is.a('boolean').and.is.true;
+                result.should.have.property('someOption' ).that.is.a('boolean').and.is.true;
+            });
+
+            it('should provide defaults of options with dashes as camelCase properties', function() {
+                var result = yargs()
+                    .option('some-option', {
+                        describe : 'some option',
+                        default  : 'asdf'
+                    })
+                    .parse([ ]);
+
+                result.should.have.property('some-option', 'asdf');
+                result.should.have.property('someOption' , 'asdf');
+            });
+
+            it('should provide aliases of options with dashes as camelCase properties', function() {
+                var result = yargs()
+                    .option('some-option', {
+                        alias    : 'o',
+                        describe : 'some option',
+                        default  : 'asdf'
+                    })
+                    .parse([ ]);
+
+                result.should.have.property('o', 'asdf');
+                result.should.have.property('some-option', 'asdf');
+                result.should.have.property('someOption' , 'asdf');
+            });
+
+            it('should provide aliases of options with dashes as camelCase properties', function() {
+                var result = yargs()
+                    .option('o', {
+                        alias    : 'some-option',
+                        describe : 'some option',
+                        default  : 'asdf'
+                    })
+                    .parse([ ]);
+
+                result.should.have.property('o', 'asdf');
+                result.should.have.property('some-option', 'asdf');
+                result.should.have.property('someOption' , 'asdf');
+            });
+
+            it('should provide aliases with dashes as camelCase properties', function() {
+                var result = yargs()
+                    .option('o', {
+                        alias    : 'some-option',
+                        describe : 'some option'
+                    })
+                    .parse([ '--some-option', 'val' ]);
+
+                result.should.have.property('o'          ).that.is.a('string').and.equals('val');
+                result.should.have.property('some-option').that.is.a('string').and.equals('val');
+                result.should.have.property('someOption' ).that.is.a('string').and.equals('val');
+            });
+
+        }
+
+        describe('dashes and camelCase', function () {
+            runTests(function() {
+                return yargs();
+            });
+        });
+
+        describe('dashes and camelCase (strict)', function () {
+            runTests(function() {
+                // Special handling for failure messages, because normally a
+                // failure calls process.exit(1);
+                return yargs().strict().fail(function(msg) {
+                    throw new Error(msg);
+                });
+            }, true);
+
+            // See https://github.com/chevex/yargs/issues/31
+            it('should not fail when options with defaults are missing', function () {
+                var result = yargs()
+                    .fail(function(msg) {
+                        throw new Error(msg);
+                    })
+                    .option('some-option', {
+                        describe : 'some option',
+                        default  : 80
+                    })
+                    .strict()
+                    .parse([ ]);
+            });
+        });
+    });
+
+    describe('-', function () {
+        it('should set - as value of n', function () {
+            var argv = yargs.parse(['-n', '-']);
+            argv.should.have.property('n', '-');
+            argv.should.have.property('_').with.length(0);
+        });
+
+        it('should set - as a non-hyphenated value', function () {
+            var argv = yargs.parse(['-']);
+            argv.should.have.property('_').and.deep.equal(['-']);
+        });
+
+        it('should set - as a value of f', function () {
+            var argv = yargs.parse(['-f-']);
+            argv.should.have.property('f', '-');
+            argv.should.have.property('_').with.length(0);
+        });
+
+        it('should set b to true and set - as a non-hyphenated value when b is set as a boolean', function () {
+            var argv = yargs(['-b', '-']).boolean('b').argv;
+            argv.should.have.property('b', true);
+            argv.should.have.property('_').and.deep.equal(['-']);
+        });
+
+        it('should set - as the value of s when s is set as a string', function () {
+            var argv = yargs([ '-s', '-' ]).string('s').argv;
+            argv.should.have.property('s', '-');
+            argv.should.have.property('_').with.length(0);
+        });
+    });
+
+    describe('count', function () {
+        it('should count the number of times a boolean is present', function () {
+            var parsed;
+
+            parsed = yargs(['-x']).count('verbose').argv;
+            parsed.verbose.should.equal(0);
+
+            parsed = yargs(['--verbose']).count('verbose').argv;
+            parsed.verbose.should.equal(1);
+
+            parsed = yargs(['--verbose', '--verbose']).count('verbose').argv;
+            parsed.verbose.should.equal(2);
+
+            parsed = yargs(['-vvv']).alias('v', 'verbose').count('verbose').argv;
+            parsed.verbose.should.equal(3);
+
+            parsed = yargs(['--verbose', '--verbose', '-v', '--verbose']).count('verbose').alias('v', 'verbose').argv;
+            parsed.verbose.should.equal(4);
+
+            parsed = yargs(['--verbose', '--verbose', '-v', '-vv']).count('verbose').alias('v', 'verbose').argv;
+            parsed.verbose.should.equal(5);
+        });
     });
 });
