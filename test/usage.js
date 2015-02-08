@@ -747,7 +747,7 @@ describe('usage', function () {
     });
 
     it('should succeed when rebase', function () {
-        yargs.rebase('/home/chevex', '/home/chevex/foo/bar/baz').should.equal('./foo/bar/baz');
+        yargs.rebase('/home/chevex', '/home/chevex/foo/bar/baz').should.equal('foo/bar/baz');
         yargs.rebase('/home/chevex/foo/bar/baz', '/home/chevex').should.equal('../../..');
         yargs.rebase('/home/chevex/foo', '/home/chevex/pow/zoom.txt').should.equal('../pow/zoom.txt');
     });

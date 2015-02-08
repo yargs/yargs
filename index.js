@@ -643,14 +643,5 @@ function Argv (processArgs, cwd) {
 // exported for tests
 exports.rebase = rebase;
 function rebase (base, dir) {
-    var ds = path.normalize(dir).split('/').slice(1);
-    var bs = path.normalize(base).split('/').slice(1);
-
-    for (var i = 0; ds[i] && ds[i] == bs[i]; i++);
-    ds.splice(0, i); bs.splice(0, i);
-
-    var p = path.normalize(
-        bs.map(function () { return '..' }).concat(ds).join('/')
-    ).replace(/\/$/,'').replace(/^$/, '.');
-    return p.match(/^[.\/]/) ? p : './' + p;
+  return path.relative(base, dir);
 };
