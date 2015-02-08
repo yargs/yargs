@@ -8,7 +8,9 @@
     "lib",
     "LICENSE"
   ],
-  "dependencies": {},
+  "dependencies": {
+    "wordwrap": "0.0.2"
+  },
   "devDependencies": {
     "blanket": "^1.1.6",
     "chai": "^1.10.0",

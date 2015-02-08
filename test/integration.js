@@ -1,7 +1,7 @@
 var spawn = require('child_process').spawn,
     should = require('chai').should();
 
-describe('bin script', function () {
+describe('integration tests', function () {
 
     it('should run as a shell script with no arguments', function (done) {
         testCmd('./bin.js', [], done);
@@ -44,21 +44,19 @@ describe('bin script', function () {
 });
 
 function testCmd(cmd, args, done) {
-
     var oldDir = process.cwd();
-    process.chdir(__dirname + '/_');
-    
+    process.chdir(__dirname + '/fixtures');
+
     var cmds = cmd.split(' ');
-    
+
     var bin = spawn(cmds[0], cmds.slice(1).concat(args.map(String)));
     process.chdir(oldDir);
-    
+
     bin.stderr.on('data', done);
-    
+
     bin.stdout.on('data', function (buf) {
         var _ = JSON.parse(buf.toString());
         _.map(String).should.deep.equal(args.map(String));
         done();
     });
-
 }

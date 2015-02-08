@@ -403,6 +403,13 @@ usage information and exit.
 The default behaviour is to set the value of any key not followed by an
 option value to `true`.
 
+.implies(x, y)
+--------------
+
+Given the key `x` is set, it is required that the key `y` is set.
+
+implies can also accept an object specifying multiple implications.
+
 .describe(key, desc)
 --------------------
 
@@ -468,6 +475,13 @@ Check that certain conditions are met in the provided arguments.
 
 If `fn` throws or returns `false`, show the thrown error, usage information, and
 exit.
+
+.fail(fn)
+---------
+
+Method to execute when a failure occurs, rather then printing the failure message.
+
+`fn` is called with the failure message that would have been printed.
 
 .boolean(key)
 -------------
