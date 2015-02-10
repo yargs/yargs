@@ -551,7 +551,7 @@ describe('usage tests', function () {
         r.should.have.property('exit').and.be.ok;
         r.errors.join('\n').split(/\n+/).should.deep.equal([
             'Examples:',
-            '  ./usage something         description',
+            '  ./usage something         description      ',
             '  ./usage something else    other description',
             'Options:',
             '  -y  [required]',

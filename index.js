@@ -75,7 +75,7 @@ function Argv (processArgs, cwd) {
 
     var examples = [];
     self.example = function (cmd, description) {
-        examples.push([cmd, description]);
+        examples.push([cmd, description || '']);
         return self;
     };
     self.getExamples = function() {
