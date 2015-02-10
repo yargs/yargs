@@ -14,7 +14,6 @@ exports.checkOutput = function(f) {
     process.exit = function () { exit = true };
     process.env = Hash.merge(process.env, { _ : 'node' });
     process.argv = [ './usage' ];
-    process.stdout.write = function (msg) { logs.push(msg) }
 
     var errors = [];
     var logs = [];
@@ -27,7 +26,6 @@ exports.checkOutput = function(f) {
     process.exit = _exit;
     process.env = _env;
     process.argv = _argv;
-    process.stdout.write = _write;
 
     console.error = _error;
     console.log = _log;

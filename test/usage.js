@@ -690,7 +690,7 @@ describe('usage tests', function () {
             r.should.have.property('errors');
             r.should.have.property('logs').with.length(1);
             r.should.have.property('exit').and.be.ok;
-            r.logs[0].should.eql('1.0.1\n');
+            r.logs[0].should.eql('1.0.1');
         });
     });
 

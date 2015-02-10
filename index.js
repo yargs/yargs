@@ -336,7 +336,7 @@ function Argv (processArgs, cwd) {
 
         Object.keys(argv).forEach(function(key) {
             if (key === helpOpt) {
-                self.showHelp(console.log);
+                self.showHelp('log');
                 if (exitProcess){
                     process.exit(0);
                 }
