@@ -11,6 +11,7 @@ describe('usage tests', function () {
                     return yargs('-x 10 -z 20'.split(' '))
                         .usage('Usage: $0 -x NUM -y NUM')
                         .demand(['x','y'])
+                        .wrap(null)
                         .argv;
                 });
                 r.result.should.have.property('x', 10);
@@ -33,6 +34,7 @@ describe('usage tests', function () {
                         return yargs('-x 10 -z 20'.split(' '))
                             .usage('Usage: $0 -x NUM -y NUM')
                             .require(['x','y'])
+                            .wrap(null)
                             .argv;
                     });
                     r.result.should.have.property('x', 10);
@@ -56,6 +58,7 @@ describe('usage tests', function () {
                 return yargs('-z 20'.split(' '))
                     .usage('Usage: $0 -x NUM -y NUM')
                     .demand(['x','y'], 'x and y are both required to multiply all the things')
+                    .wrap(null)
                     .argv;
             });
             r.result.should.have.property('z', 20);
@@ -77,6 +80,7 @@ describe('usage tests', function () {
                 return yargs('-x 10 -y 20'.split(' '))
                     .usage('Usage: $0 -x NUM -y NUM')
                     .demand(['x','y'])
+                    .wrap(null)
                     .argv;
             });
             r.should.have.property('result');
@@ -308,6 +312,7 @@ describe('usage tests', function () {
                 .alias('f', 'foo')
                 .default('f', 5)
                 .demand(1)
+                .wrap(null)
                 .argv
             ;
         });
@@ -344,6 +349,7 @@ describe('usage tests', function () {
 
                     return yargs('-f --bar 20'.split(' '))
                         .usage('Usage: $0 [options]', opts)
+                        .wrap(null)
                         .argv;
                 });
                 r.should.have.property('result');
@@ -369,6 +375,7 @@ describe('usage tests', function () {
 
                     return yargs('-f --bar'.split(' '))
                         .usage('Usage: $0 [options]', opts)
+                        .wrap(null)
                         .argv;
                 });
                 r.should.have.property('result');
@@ -397,6 +404,7 @@ describe('usage tests', function () {
                     return yargs('-f --bar 20'.split(' '))
                         .usage('Usage: $0 [options]', opts)
                         .requiresArg(['foo', 'bar'])
+                        .wrap(null)
                         .argv;
                 });
                 r.should.have.property('result');
@@ -426,6 +434,7 @@ describe('usage tests', function () {
                 return yargs('-f 10 --bar 20 --baz 30'.split(' '))
                     .usage('Usage: $0 [options]', opts)
                     .strict()
+                    .wrap(null)
                     .argv;
             });
 
@@ -458,6 +467,7 @@ describe('usage tests', function () {
                 return yargs('-f 10 --bar 20 --baz 30'.split(' '))
                     .usage('Usage: $0 [options]', opts)
                     .strict()
+                    .wrap(null)
                     .argv;
             });
 
@@ -490,6 +500,7 @@ describe('usage tests', function () {
                 return yargs('-f 10 --bar 20 --baz 30 -q 40'.split(' '))
                     .usage('Usage: $0 [options]', opts)
                     .strict()
+                    .wrap(null)
                     .argv;
             });
 
@@ -542,6 +553,7 @@ describe('usage tests', function () {
                 .example("$0 something", "description")
                 .example("$0 something else", "other description")
                 .demand(['y'])
+                .wrap(null)
                 .argv;
         });
         r.should.have.property('result');
@@ -569,6 +581,7 @@ describe('usage tests', function () {
                             'x': { description: 'an option',      demand: true  },
                             'y': { description: 'another option', demand: false }
                         })
+                        .wrap(null)
                         .argv;
                 });
                 r.result.should.have.property('y', 10);
@@ -597,6 +610,7 @@ describe('usage tests', function () {
                             'x': { description: 'an option',      required: true  },
                             'y': { description: 'another option', required: false }
                         })
+                        .wrap(null)
                         .argv;
                 });
                 r.result.should.have.property('y', 10);
@@ -624,6 +638,7 @@ describe('usage tests', function () {
                         'width':  { description: 'Width',  alias: 'w', demand: true  },
                         'height': { description: 'Height', alias: 'h', demand: false }
                     })
+                    .wrap(null)
                     .argv;
             });
             r.result.should.have.property('w', 10);
@@ -639,6 +654,7 @@ describe('usage tests', function () {
                 return yargs(['--help'])
                     .demand(['y'])
                     .help('help')
+                    .wrap(null)
                     .argv;
             });
             r.should.have.property('result');
@@ -661,6 +677,7 @@ describe('usage tests', function () {
                     .help('help')
                     .describe('some-opt', 'Some option')
                     .default('some-opt', 2)
+                    .wrap(null)
                     .argv;
             });
             r.should.have.property('result');
@@ -683,6 +700,7 @@ describe('usage tests', function () {
             var r = checkUsage(function () {
                 return yargs(['--version'])
                     .version('1.0.1', 'version', 'Show version number')
+                    .wrap(null)
                     .argv;
             });
             r.should.have.property('result');
@@ -707,6 +725,7 @@ describe('usage tests', function () {
                     .options(opts)
                     .demand(['foo', 'bar'])
                     .showHelpOnFail(false, "Specify --help for available options")
+                    .wrap(null)
                     .argv;
             });
             r.should.have.property('result');
@@ -734,6 +753,7 @@ describe('usage tests', function () {
                     .usage('Usage: $0 [options]')
                     .options(opts)
                     .demand(['foo'])
+                    .wrap(null)
                     .argv;
             });
             r.should.have.property('result');
@@ -765,7 +785,7 @@ describe('usage tests', function () {
                 return yargs([])
                   .option('fairly-long-option', {
                     alias: 'f',
-                    default: 'fairly long default',
+                    default: 'fairly-long-default',
                     description: 'npm prefix used to locate globally installed npm packages'
                   })
                   .demand('foo')
@@ -780,6 +800,25 @@ describe('usage tests', function () {
             });
         });
 
+        it('should wrap based on window-size if no wrap is provided', function() {
+            var width = require('window-size').width;
+
+            var r = checkUsage(function () {
+                return yargs([])
+                  .option('fairly-long-option', {
+                    alias: 'f',
+                    // create a giant string that should wrap.
+                    description: new Array(width * 5).join('s')
+                  })
+                  .demand('foo')
+                  .argv;
+            });
+
+            // the long description should cause several line
+            // breaks when wrapped.
+            r.errors[0].split('\n').length.should.gt(4);
+        });
+
         it('should not raise an exception when long default and description are provided', function() {
             return yargs([])
               .option('fairly-long-option', {
@@ -789,6 +828,19 @@ describe('usage tests', function () {
               })
               .wrap(40)
               .help()
+        });
+
+        it('should wrap the usage string', function() {
+            var r = checkUsage(function () {
+                return yargs([])
+                  .usage('i am a fairly long usage string look at me go.')
+                  .demand('foo')
+                  .wrap(20)
+                  .argv;
+            });
+
+            // the long usage string should cause line-breaks.
+            r.errors[0].split('\n').length.should.gt(6);
         });
     });
 });

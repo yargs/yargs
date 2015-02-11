@@ -4,7 +4,6 @@ var Hash = require('hashish');
 // assert against it.
 exports.checkOutput = function(f) {
     var exit = false,
-      _write = process.stdout.write,
       _exit = process.exit,
       _env = process.env,
       _argv = process.argv,

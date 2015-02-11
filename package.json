@@ -9,6 +9,7 @@
     "LICENSE"
   ],
   "dependencies": {
+    "window-size": "0.1.0",
     "wordwrap": "0.0.2"
   },
   "devDependencies": {

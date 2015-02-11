@@ -43,6 +43,7 @@ describe('yargs dsl tests', function () {
             x: 'really cool key'
           })
           .demand('x')
+          .wrap(null)
           .argv
       });
 
