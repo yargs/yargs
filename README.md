@@ -475,6 +475,21 @@ present script similar to how `$0` works in bash or perl.
 
 `opts` is optional and acts like calling `.options(opts)`.
 
+.command(cmd, desc)
+-------------------
+
+Document the commands exposed by your application (stored in the `_` variable).
+
+As an example, here's how the npm cli might document some of its commands:
+
+```js
+var argv = require('yargs')
+  .usage('npm <command>')
+  .command('install', 'install a package!')
+  .command('publish', 'publish a new version of your package')
+  .argv;
+```
+
 .example(cmd, desc)
 -------------------
 
@@ -482,6 +497,17 @@ Give some example invocations of your program. Inside `cmd`, the string
 `$0` will get interpolated to the current script name or node command for the
 present script similar to how `$0` works in bash or perl.
 Examples will be printed out as part of the help message.
+
+
+.epilogue(str)
+--------------
+
+A message to print at the end of the usage instructions, e.g.,
+
+```js
+var argv = require('yargs')
+  .epilogue('for more information, find our manual at http://example.com');
+```
 
 .check(fn)
 ----------
@@ -522,6 +548,12 @@ If `key` is an Array, interpret all the elements as strings.
 `.string('_')` will result in non-hyphenated arguments being interpreted as strings,
 regardless of whether they resemble numbers.
 
+.array(key)
+----------
+
+Tell the parser to interpret `key` as an array. If `.array('foo')` is set,
+`--foo bar` will be parsed as `['bar']` rather than as `'bar'`.
+
 .config(key)
 ------------
 
@@ -532,6 +564,9 @@ is loaded and parsed, and its properties are set as arguments.
 --------------
 
 Format usage output to wrap at `columns` many columns.
+
+By default wrap will be set to `Math.min(80, windowWidth)`. Use `.wrap(null)` to
+specify no column limit.
 
 .strict()
 ---------

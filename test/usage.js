@@ -116,6 +116,7 @@ describe('usage tests', function () {
         var r = checkUsage(function () {
             return yargs('-x 10 -z 20'.split(' '))
                 .usage('Usage: $0 -x NUM -y NUM')
+                .wrap(null)
                 .check(function (argv) {
                     if (!('x' in argv)) throw 'You forgot about -x';
                     if (!('y' in argv)) throw 'You forgot about -y';
@@ -138,6 +139,7 @@ describe('usage tests', function () {
         var r = checkUsage(function () {
             return yargs('-x 10 -z 20'.split(' '))
                 .usage('Usage: $0 -x NUM -y NUM')
+                .wrap(null)
                 .check(function (argv) {
                     if (!('x' in argv)) return 'You forgot about -x';
                     if (!('y' in argv)) return 'You forgot about -y';
@@ -161,6 +163,7 @@ describe('usage tests', function () {
         var r = checkUsage(function () {
             return yargs('-x 10 -z 20'.split(' '))
                 .usage('Usage: $0 -x NUM -y NUM')
+                .wrap(null)
                 .check(function (argv) {
                     if (!('x' in argv)) return 'You forgot about -x';
                     if (!('y' in argv)) return 'You forgot about -y';
@@ -207,6 +210,7 @@ describe('usage tests', function () {
             return yargs('-x 10 -z 20'.split(' '))
                 .usage('Usage: $0 -x NUM -y NUM')
                 .check(checker)
+                .wrap(null)
                 .argv;
         });
         r.should.have.property('result');
@@ -242,6 +246,7 @@ describe('usage tests', function () {
             return yargs('1 2 --moo'.split(' '))
                 .usage('Usage: $0 [x] [y] [z] {OPTIONS}')
                 .demand(3)
+                .wrap(null)
                 .argv;
         });
         r.should.have.property('result');
@@ -261,6 +266,7 @@ describe('usage tests', function () {
             return yargs('src --moo'.split(' '))
                 .usage('Usage: $0 [x] [y] [z] {OPTIONS} <src> <dest> [extra_files...]')
                 .demand(2, 'src and dest files are both required')
+                .wrap(null)
                 .argv;
         });
         r.should.have.property('result');
@@ -562,11 +568,11 @@ describe('usage tests', function () {
         r.should.have.property('logs').with.length(0);
         r.should.have.property('exit').and.be.ok;
         r.errors.join('\n').split(/\n+/).should.deep.equal([
+            'Options:',
+            '  -y  [required]',
             'Examples:',
             '  ./usage something         description      ',
             '  ./usage something else    other description',
-            'Options:',
-            '  -y  [required]',
             'Missing required arguments: y'
         ]);
     });
@@ -842,5 +848,46 @@ describe('usage tests', function () {
             // the long usage string should cause line-breaks.
             r.errors[0].split('\n').length.should.gt(6);
         });
+    });
+
+    describe('commands', function() {
+      it('should output a list of available commands', function () {
+          var r = checkUsage(function () {
+              return yargs('')
+                  .command("upload", "upload something")
+                  .command("download", "download something from somewhere")
+                  .demand('y')
+                  .wrap(null)
+                  .argv;
+          });
+
+          r.errors.join('\n').split(/\n+/).should.deep.equal([
+              'Commands:',
+              '  upload      upload something                 ',
+              '  download    download something from somewhere',
+              'Options:',
+              '  -y  [required]',
+              'Missing required arguments: y'
+          ]);
+      });
+    });
+
+    describe('epilogue', function() {
+      it('should display an epilog message at the end of the usage instructions', function () {
+          var r = checkUsage(function () {
+              return yargs('')
+                  .epilog("for more info view the manual at http://example.com")
+                  .demand('y')
+                  .wrap(null)
+                  .argv;
+          });
+
+          r.errors.join('\n').split(/\n+/).should.deep.equal([
+              'Options:',
+              '  -y  [required]',
+              'for more info view the manual at http://example.com',
+              'Missing required arguments: y'
+          ]);
+      });
     });
 });

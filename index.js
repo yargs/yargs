@@ -45,6 +45,7 @@ function Argv (processArgs, cwd) {
     var options;
     self.resetOptions = function () {
         options = {
+            array: [],
             boolean: [],
             string: [],
             alias: {},
@@ -63,6 +64,11 @@ function Argv (processArgs, cwd) {
         return self;
     };
 
+    self.array = function (arrays) {
+        options.array.push.apply(options.array, [].concat(arrays));
+        return self;
+    }
+
     self.normalize = function (strings) {
         options.normalize.push.apply(options.normalize, [].concat(strings));
         return self;
@@ -73,14 +79,15 @@ function Argv (processArgs, cwd) {
         return self;
     };
 
-    var examples = [];
     self.example = function (cmd, description) {
-        examples.push([cmd, description || '']);
+        usage.example(cmd, description);
         return self;
     };
-    self.getExamples = function() {
-        return examples;
-    }
+
+    self.command = function (cmd, description) {
+        usage.command(cmd, description);
+        return self;
+    };
 
     self.string = function (strings) {
         options.string.push.apply(options.string, [].concat(strings));
@@ -148,20 +155,10 @@ function Argv (processArgs, cwd) {
         return self;
     };
 
-    var implied = {};
     self.implies = function (key, value) {
-        if (typeof key === 'object') {
-            Object.keys(key).forEach(function (k) {
-                self.implies(k, key[k]);
-            });
-        } else {
-            implied[key] = value;
-        }
+        validation.implies(key, value);
         return self;
     };
-    self.getImplied = function() {
-        return implied;
-    }
 
     self.usage = function (msg, opts) {
         if (!opts && typeof msg === 'object') {
@@ -169,10 +166,15 @@ function Argv (processArgs, cwd) {
             msg = null;
         }
 
-        usage.usage(msg)
+        usage.usage(msg);
 
         if (opts) self.options(opts);
 
+        return self;
+    };
+
+    self.epilogue = self.epilog = function (msg) {
+        usage.epilog(msg);
         return self;
     };
 
@@ -188,20 +190,9 @@ function Argv (processArgs, cwd) {
 
     self.defaults = self.default;
 
-    var descriptions = {};
     self.describe = function (key, desc) {
-        if (typeof key === 'object') {
-            Object.keys(key).forEach(function (k) {
-                self.describe(k, key[k]);
-            });
-        }
-        else {
-            descriptions[key] = desc;
-        }
+        usage.describe(key, desc);
         return self;
-    };
-    self.getDescriptions = function() {
-        return descriptions;
     };
 
     self.parse = function (args) {
@@ -221,14 +212,16 @@ function Argv (processArgs, cwd) {
             if (demand) {
                 self.demand(key, demand);
             }
-
             if ('default' in opt) {
                 self.default(key, opt.default);
             }
-
             if (opt.boolean || opt.type === 'boolean') {
                 self.boolean(key);
                 if (opt.alias) self.boolean(opt.alias);
+            }
+            if (opt.array || opt.type === 'array') {
+                self.array(key);
+                if (opt.alias) self.array(opt.alias);
             }
             if (opt.string || opt.type === 'string') {
                 self.string(key);
