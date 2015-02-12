@@ -485,8 +485,8 @@ As an example, here's how the npm cli might document some of its commands:
 ```js
 var argv = require('yargs')
   .usage('npm <command>')
-  .command('install', 'install a package!')
-  .command('publish', 'publish a new version of your package')
+  .command('install', 'tis a mighty fine package to install')
+  .command('publish', 'shiver me timbers, should you be sharing all that')
   .argv;
 ```
 
@@ -516,7 +516,7 @@ Check that certain conditions are met in the provided arguments.
 
 `fn` is called with two arguments, the parsed `argv` hash and an array of options and their aliases.
 
-If `fn` throws or returns `false`, show the thrown error, usage information, and
+If `fn` throws or returns a non-truthy value, show the thrown error, usage information, and
 exit.
 
 .fail(fn)

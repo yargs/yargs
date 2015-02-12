@@ -100,6 +100,7 @@ describe('usage tests', function () {
                 .check(function (argv) {
                     if (!('x' in argv)) throw 'You forgot about -x';
                     if (!('y' in argv)) throw 'You forgot about -y';
+                    else return true;
                 })
                 .argv;
         });
