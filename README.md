@@ -501,6 +501,8 @@ Examples will be printed out as part of the help message.
 
 .epilogue(str)
 --------------
+.epilog(str)
+------------
 
 A message to print at the end of the usage instructions, e.g.,
 
