@@ -1,6 +1,7 @@
 var path = require('path');
-var parser = require('./lib/parser');
-var wordwrap = require('wordwrap');
+var Parser = require('./lib/parser');
+var Usage = require('./lib/usage');
+var Validation = require('./lib/validation');
 
 /*  Hack an instance of Argv with process.argv into Argv
     so people can do
@@ -20,6 +21,9 @@ Object.keys(inst).forEach(function (key) {
 var exports = module.exports = Argv;
 function Argv (processArgs, cwd) {
     var self = {};
+    var usage = Usage(self);
+    var validation = Validation(self, usage);
+
     if (!cwd) cwd = process.cwd();
 
     self.$0 = process.argv
@@ -41,6 +45,7 @@ function Argv (processArgs, cwd) {
     var options;
     self.resetOptions = function () {
         options = {
+            array: [],
             boolean: [],
             string: [],
             alias: {},
@@ -59,6 +64,11 @@ function Argv (processArgs, cwd) {
         return self;
     };
 
+    self.array = function (arrays) {
+        options.array.push.apply(options.array, [].concat(arrays));
+        return self;
+    }
+
     self.normalize = function (strings) {
         options.normalize.push.apply(options.normalize, [].concat(strings));
         return self;
@@ -69,9 +79,13 @@ function Argv (processArgs, cwd) {
         return self;
     };
 
-    var examples = [];
     self.example = function (cmd, description) {
-        examples.push([cmd, description]);
+        usage.example(cmd, description);
+        return self;
+    };
+
+    self.command = function (cmd, description) {
+        usage.command(cmd, description);
         return self;
     };
 
@@ -132,86 +146,52 @@ function Argv (processArgs, cwd) {
 
         return self;
     };
+    self.getDemanded = function() {
+        return demanded;
+    };
 
     self.requiresArg = function (requiresArgs) {
         options.requiresArg.push.apply(options.requiresArg, [].concat(requiresArgs));
         return self;
     };
 
-    var implied = {};
     self.implies = function (key, value) {
-        if (typeof key === 'object') {
-            Object.keys(key).forEach(function (k) {
-                self.implies(k, key[k]);
-            });
-        } else {
-            implied[key] = value;
-        }
+        validation.implies(key, value);
         return self;
     };
 
-    var usage;
     self.usage = function (msg, opts) {
         if (!opts && typeof msg === 'object') {
             opts = msg;
             msg = null;
         }
 
-        usage = msg;
+        usage.usage(msg);
 
         if (opts) self.options(opts);
 
         return self;
     };
 
-    var fails = [];
-    self.fail = function (f) {
-        fails.push(f);
+    self.epilogue = self.epilog = function (msg) {
+        usage.epilog(msg);
         return self;
     };
 
-    function fail (msg) {
-        if (fails.length) {
-            fails.forEach(function (f) {
-                f(msg);
-            });
-        } else {
-            if (showHelpOnFail) {
-                self.showHelp();
-            }
-            if (msg) console.error(msg);
-            if (failMessage) {
-                if (msg) {
-                    console.error("");
-                }
-                console.error(failMessage);
-            }
-            if (exitProcess){
-                process.exit(1);
-            }else{
-                throw new Error(msg);
-            }
-        }
-    }
+    self.fail = function (f) {
+        usage.failFn(f);
+        return self;
+    };
 
-    var checks = [];
     self.check = function (f) {
-        checks.push(f);
+        validation.check(f);
         return self;
     };
 
     self.defaults = self.default;
 
-    var descriptions = {};
     self.describe = function (key, desc) {
-        if (typeof key === 'object') {
-            Object.keys(key).forEach(function (k) {
-                self.describe(k, key[k]);
-            });
-        }
-        else {
-            descriptions[key] = desc;
-        }
+        usage.describe(key, desc);
         return self;
     };
 
@@ -232,14 +212,16 @@ function Argv (processArgs, cwd) {
             if (demand) {
                 self.demand(key, demand);
             }
-
             if ('default' in opt) {
                 self.default(key, opt.default);
             }
-
             if (opt.boolean || opt.type === 'boolean') {
                 self.boolean(key);
                 if (opt.alias) self.boolean(opt.alias);
+            }
+            if (opt.array || opt.type === 'array') {
+                self.array(key);
+                if (opt.alias) self.array(opt.alias);
             }
             if (opt.string || opt.type === 'string') {
                 self.string(key);
@@ -261,10 +243,12 @@ function Argv (processArgs, cwd) {
 
         return self;
     };
+    self.getOptions = function() {
+        return options;
+    };
 
-    var wrap = null;
     self.wrap = function (cols) {
-        wrap = cols;
+        usage.wrap(cols);
         return self;
     };
 
@@ -275,16 +259,14 @@ function Argv (processArgs, cwd) {
     };
 
     self.showHelp = function (fn) {
-        if (!fn) fn = console.error.bind(console);
-        fn(self.help());
+        usage.showHelp(fn);
         return self;
     };
 
-    var version = null;
     var versionOpt = null;
     self.version = function (ver, opt, msg) {
-        version = ver;
         versionOpt = opt;
+        usage.version(ver);
         self.describe(opt, msg || 'Show version number');
         return self;
     };
@@ -296,18 +278,8 @@ function Argv (processArgs, cwd) {
         return self;
     };
 
-    var failMessage = null;
-    var showHelpOnFail = true;
     self.showHelpOnFail = function (enabled, message) {
-        if (typeof enabled === 'string') {
-            message = enabled;
-            enabled = true;
-        }
-        else if (typeof enabled === 'undefined') {
-            enabled = true;
-        }
-        failMessage = message;
-        showHelpOnFail = enabled;
+        usage.showHelpOnFail(enabled, message);
         return self;
     };
 
@@ -319,145 +291,16 @@ function Argv (processArgs, cwd) {
         exitProcess = enabled;
         return self;
     };
+    self.getExitProcess = function () {
+        return exitProcess;
+    }
 
     self.help = function () {
+        if (arguments.length > 0) return self.addHelpOpt.apply(self, arguments);
+
         if (!self.parsed) parseArgs(processArgs); // run parser, if it has not already been executed.
 
-        if (arguments.length > 0) {
-            return self.addHelpOpt.apply(self, arguments);
-        }
-
-        var keys = Object.keys(
-            Object.keys(descriptions)
-            .concat(Object.keys(demanded))
-            .concat(Object.keys(options.default))
-            .reduce(function (acc, key) {
-                if (key !== '_') acc[key] = true;
-                return acc;
-            }, {})
-        );
-
-        var help = keys.length ? [ 'Options:' ] : [];
-
-        if (examples.length) {
-            help.unshift('');
-            examples.forEach(function (example) {
-                example[0] = example[0].replace(/\$0/g, self.$0);
-            });
-
-            var commandlen = longest(examples.map(function (a) {
-                return a[0];
-            }));
-
-            var exampleLines = examples.map(function(example) {
-                var command = example[0];
-                var description = example[1];
-                command += Array(commandlen + 5 - command.length).join(' ');
-                return '  ' + command + description;
-            });
-
-            exampleLines.push('');
-            help = exampleLines.concat(help);
-            help.unshift('Examples:');
-        }
-
-        if (usage) {
-            help.unshift(usage.replace(/\$0/g, self.$0), '');
-        }
-
-        var aliasKeys = (Object.keys(options.alias) || [])
-            .concat(Object.keys(self.parsed.newAliases) || []);
-
-        keys = keys.filter(function(key) {
-            return !self.parsed.newAliases[key] && aliasKeys.every(function(alias) {
-                return -1 == (options.alias[alias] || []).indexOf(key);
-            });
-        });
-        var switches = keys.reduce(function (acc, key) {
-            acc[key] = [ key ].concat(options.alias[key] || [])
-                .map(function (sw) {
-                    return (sw.length > 1 ? '--' : '-') + sw
-                })
-                .join(', ')
-            ;
-            return acc;
-        }, {});
-
-        var switchlen = longest(Object.keys(switches).map(function (s) {
-            return switches[s] || '';
-        }));
-
-        var desclen = longest(Object.keys(descriptions).map(function (d) {
-            return descriptions[d] || '';
-        }));
-
-        keys.forEach(function (key) {
-            var kswitch = switches[key];
-            var desc = descriptions[key] || '';
-
-            if (wrap) {
-                desc = wordwrap(switchlen + 4, wrap)(desc)
-                    .slice(switchlen + 4)
-                ;
-            }
-
-            var spadding = new Array(
-                Math.max(switchlen - kswitch.length + 3, 0)
-            ).join(' ');
-
-            var dpadding = new Array(
-                Math.max(desclen - desc.length + 1, 0)
-            ).join(' ');
-
-            var type = null;
-
-            if (options.boolean[key]) type = '[boolean]';
-            if (options.count[key]) type = '[count]';
-            if (options.string[key]) type = '[string]';
-            if (options.normalize[key]) type = '[string]';
-
-            if (!wrap && dpadding.length > 0) {
-                desc += dpadding;
-            }
-
-            var prelude = '  ' + kswitch + spadding;
-            var extra = [
-                type,
-                demanded[key]
-                    ? '[required]'
-                    : null
-                ,
-                options.default[key] !== undefined
-                    ? '[default: ' + (typeof options.default[key] === 'string' ?
-                    JSON.stringify : String)(options.default[key]) + ']'
-                    : null
-            ].filter(Boolean).join('  ');
-
-            var body = [ desc, extra ].filter(Boolean).join('  ');
-
-            if (wrap) {
-                var dlines = desc.split('\n');
-                var dlen = dlines.slice(-1)[0].length
-                    + (dlines.length === 1 ? prelude.length : 0)
-
-                if (extra.length > wrap) {
-                    body = desc + '\n' + wordwrap(switchlen + 4, wrap)(extra)
-                } else {
-                    body = desc + (dlen + extra.length > wrap - 2
-                        ? '\n'
-                            + new Array(wrap - extra.length + 1).join(' ')
-                            + extra
-                        : new Array(wrap - extra.length - dlen + 1).join(' ')
-                            + extra
-                    );
-                }
-            }
-
-            help.push(prelude + body);
-        });
-
-        if (keys.length) help.push('');
-        return help.join('\n');
+        return usage.help();
     };
 
     Object.defineProperty(self, 'argv', {
@@ -467,7 +310,7 @@ function Argv (processArgs, cwd) {
           try {
             args = parseArgs(processArgs);
           } catch (err) {
-            fail(err.message);
+            usage.fail(err.message);
           }
 
           return args;
@@ -476,7 +319,7 @@ function Argv (processArgs, cwd) {
     });
 
     function parseArgs (args) {
-        var parsed = parser(args, options),
+        var parsed = Parser(args, options),
             argv = parsed.argv,
             aliases = parsed.aliases;
 
@@ -486,168 +329,31 @@ function Argv (processArgs, cwd) {
 
         Object.keys(argv).forEach(function(key) {
             if (key === helpOpt) {
-                self.showHelp(console.log);
+                self.showHelp('log');
                 if (exitProcess){
                     process.exit(0);
                 }
             }
             else if (key === versionOpt) {
-                process.stdout.write(version);
+                usage.showVersion();
                 if (exitProcess){
                     process.exit(0);
                 }
             }
         });
 
-        if (demanded._ && argv._.length < demanded._.count) {
-            if (demanded._.msg) {
-                fail(demanded._.msg);
-            } else {
-                fail('Not enough non-option arguments: got '
-                    + argv._.length + ', need at least ' + demanded._.count
-                );
-            }
-        }
-
-        if (options.requiresArg.length > 0) {
-            var missingRequiredArgs = [];
-
-            options.requiresArg.forEach(function(key) {
-                var value = argv[key];
-
-                // parser sets --foo value to true / --no-foo to false
-                if (value === true || value === false) {
-                    missingRequiredArgs.push(key);
-                }
-            });
-
-            if (missingRequiredArgs.length == 1) {
-                fail("Missing argument value: " + missingRequiredArgs[0]);
-            }
-            else if (missingRequiredArgs.length > 1) {
-                var message = "Missing argument values: " + missingRequiredArgs.join(", ");
-                fail(message);
-            }
-        }
-
-        var missing = null;
-        Object.keys(demanded).forEach(function (key) {
-            if (!argv.hasOwnProperty(key)) {
-                missing = missing || {};
-                missing[key] = demanded[key];
-            }
-        });
-
-        if (missing) {
-            var customMsgs = [];
-            Object.keys(missing).forEach(function(key) {
-                var msg = missing[key].msg;
-                if (msg && customMsgs.indexOf(msg) < 0) {
-                    customMsgs.push(msg);
-                }
-            });
-            var customMsg = customMsgs.length ? '\n' + customMsgs.join('\n') : '';
-
-            fail('Missing required arguments: ' + Object.keys(missing).join(', ') + customMsg);
-        }
+        validation.nonOptionCount(argv);
+        validation.missingArgumentValue(argv);
+        validation.requiredArguments(argv);
 
         if (strict) {
-            var unknown = [];
-
-            var aliases = {};
-
-            Object.keys(parsed.aliases).forEach(function (key) {
-                parsed.aliases[key].forEach(function (alias) {
-                    aliases[alias] = key;
-                });
-            });
-
-            Object.keys(argv).forEach(function (key) {
-                if (key !== "$0" && key !== "_" &&
-                    !descriptions.hasOwnProperty(key) &&
-                    !demanded.hasOwnProperty(key) &&
-                    !aliases.hasOwnProperty(key)) {
-                    unknown.push(key);
-                }
-            });
-
-            if (unknown.length == 1) {
-                fail("Unknown argument: " + unknown[0]);
-            }
-            else if (unknown.length > 1) {
-                fail("Unknown arguments: " + unknown.join(", "));
-            }
+            validation.unknownArguments(argv, aliases);
         }
 
-        checks.forEach(function (f) {
-            try {
-                var result = f(argv, aliases);
-                if (result === false) {
-                    fail('Argument check failed: ' + f.toString());
-                } else if (typeof result === 'string') {
-                    fail(result);
-                }
-            }
-            catch (err) {
-                fail(err)
-            }
-        });
-
-        var implyFail = [];
-        Object.keys(implied).forEach(function (key) {
-            var num, origKey = key, value = implied[key];
-
-            // convert string '1' to number 1
-            var num = Number(key);
-            key = isNaN(num) ? key : num;
-
-            if (typeof key === 'number') {
-                // check length of argv._
-                key = argv._.length >= key;
-            } else if (key.match(/^--no-.+/)) {
-                // check if key doesn't exist
-                key = key.match(/^--no-(.+)/)[1];
-                key = !argv[key];
-            } else {
-                // check if key exists
-                key = argv[key];
-            }
-
-            num = Number(value);
-            value = isNaN(num) ? value : num;
-
-            if (typeof value === 'number') {
-                value = argv._.length >= value;
-            } else if (value.match(/^--no-.+/)) {
-                value = value.match(/^--no-(.+)/)[1];
-                value = !argv[value];
-            } else {
-                value = argv[value];
-            }
-
-            if (key && !value) {
-                implyFail.push(origKey);
-            }
-        });
-
-        if (implyFail.length) {
-            var msg = 'Implications failed:\n';
-
-            implyFail.forEach(function (key) {
-                msg += ('  ' + key + ' -> ' + implied[key] + '\n');
-            });
-
-            fail(msg);
-        }
+        validation.customChecks(argv, aliases);
+        validation.implications(argv);
 
         return argv;
-    }
-
-    function longest (xs) {
-        return Math.max.apply(
-            null,
-            xs.map(function (x) { return x.length })
-        );
     }
 
     return self;

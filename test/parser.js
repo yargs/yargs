@@ -821,4 +821,30 @@ describe('parser tests', function () {
             parsed.verbose.should.equal(5);
         });
     });
+
+    describe('array', function() {
+        it('should default argument to empty array if no value given', function () {
+            var result = yargs().array('b').parse([ '-b' ]);
+            Array.isArray(result.b).should.equal(true);
+        });
+
+        it('should place value of argument in array, when one argument provided', function() {
+            var result = yargs().array('b').parse(['-b', '33']);
+            Array.isArray(result.b).should.equal(true);
+            result.b[0].should.equal(33);
+        });
+
+        it('should add multiple argument values to the array', function() {
+            var result = yargs().array('b').parse(['-b', '33', '-b', 'hello']);
+            Array.isArray(result.b).should.equal(true);
+            result.b.should.include(33);
+            result.b.should.include('hello');
+        });
+
+        it('should allow array: true, to be set inside an option block', function() {
+            var result = yargs().option('b', {array: true}).parse(['-b', '33']);
+            Array.isArray(result.b).should.equal(true);
+            result.b.should.include(33);
+        });
+    });
 });

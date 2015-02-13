@@ -475,6 +475,21 @@ present script similar to how `$0` works in bash or perl.
 
 `opts` is optional and acts like calling `.options(opts)`.
 
+.command(cmd, desc)
+-------------------
+
+Document the commands exposed by your application (stored in the `_` variable).
+
+As an example, here's how the npm cli might document some of its commands:
+
+```js
+var argv = require('yargs')
+  .usage('npm <command>')
+  .command('install', 'tis a mighty fine package to install')
+  .command('publish', 'shiver me timbers, should you be sharing all that')
+  .argv;
+```
+
 .example(cmd, desc)
 -------------------
 
@@ -483,6 +498,19 @@ Give some example invocations of your program. Inside `cmd`, the string
 present script similar to how `$0` works in bash or perl.
 Examples will be printed out as part of the help message.
 
+
+.epilogue(str)
+--------------
+.epilog(str)
+------------
+
+A message to print at the end of the usage instructions, e.g.,
+
+```js
+var argv = require('yargs')
+  .epilogue('for more information, find our manual at http://example.com');
+```
+
 .check(fn)
 ----------
 
@@ -490,7 +518,7 @@ Check that certain conditions are met in the provided arguments.
 
 `fn` is called with two arguments, the parsed `argv` hash and an array of options and their aliases.
 
-If `fn` throws or returns `false`, show the thrown error, usage information, and
+If `fn` throws or returns a non-truthy value, show the thrown error, usage information, and
 exit.
 
 .fail(fn)
@@ -522,6 +550,12 @@ If `key` is an Array, interpret all the elements as strings.
 `.string('_')` will result in non-hyphenated arguments being interpreted as strings,
 regardless of whether they resemble numbers.
 
+.array(key)
+----------
+
+Tell the parser to interpret `key` as an array. If `.array('foo')` is set,
+`--foo bar` will be parsed as `['bar']` rather than as `'bar'`.
+
 .config(key)
 ------------
 
@@ -532,6 +566,9 @@ is loaded and parsed, and its properties are set as arguments.
 --------------
 
 Format usage output to wrap at `columns` many columns.
+
+By default wrap will be set to `Math.min(80, windowWidth)`. Use `.wrap(null)` to
+specify no column limit.
 
 .strict()
 ---------
