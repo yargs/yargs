@@ -378,6 +378,27 @@ describe('parser tests', function () {
             argv.foo.bar.should.eql('99');
             argv.bar.foo.should.eql(99);
         });
+
+        it('should populate aliases when dot notation is used', function () {
+            var argv = yargs(['--foo.bar', '99'])
+              .alias('foo', 'f')
+              .argv;
+            argv.f.bar.should.eql(99);
+        });
+
+        it('should populate aliases when nested dot notation is used', function () {
+            var argv = yargs(['--foo.bar.snuh', '99', '--foo.apple', '33', '--foo.bar.cool', '11'])
+              .alias('foo', 'f')
+              .argv;
+            argv.f.bar.snuh.should.eql(99);
+            argv.foo.bar.snuh.should.eql(99);
+
+            argv.f.apple.should.eql(33);
+            argv.foo.apple.should.eql(33);
+
+            argv.f.bar.cool.should.eql(11);
+            argv.foo.bar.cool.should.eql(11);
+        });
     })
 
     it('should allow booleans and aliases to be defined with chainable api', function () {
