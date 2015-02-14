@@ -399,6 +399,26 @@ describe('parser tests', function () {
             argv.f.bar.cool.should.eql(11);
             argv.foo.bar.cool.should.eql(11);
         });
+
+        it("should allow flags to use dot notation, when seperated by '='", function () {
+          var argv = yargs(['-f.foo=99'])
+            .argv;
+          argv.f.foo.should.eql(99);
+        });
+
+        it("should allow flags to use dot notation, when seperated by ' '", function () {
+          var argv = yargs(['-f.foo', '99'])
+            .argv;
+          argv.f.foo.should.eql(99);
+        });
+
+        it("should allow flags to use dot notation when no right-hand-side is given", function () {
+          var argv = yargs(['-f.foo', '99', '-f.bar'])
+            .argv;
+
+          argv.f.foo.should.eql(99);
+          argv.f.bar.should.eql(true);
+        });
     })
 
     it('should allow booleans and aliases to be defined with chainable api', function () {
