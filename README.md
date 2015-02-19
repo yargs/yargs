@@ -595,7 +595,7 @@ console.log(yargs.help());
 
 Later on, ```argv``` can be retrived with ```yargs.argv```
 
-.version(version, option, [description])
+.version(version, [option], [description])
 ----------------------------------------
 
 Add an option (e.g., `--version`) that displays the version number (given by the
