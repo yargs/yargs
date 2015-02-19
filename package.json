@@ -26,7 +26,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "http://github.com/chevex/yargs.git"
+    "url": "http://github.com/bcoe/yargs.git"
   },
   "config": {
     "blanket": {
