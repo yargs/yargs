@@ -717,6 +717,30 @@ describe('usage tests', function () {
             r.should.have.property('exit').and.be.ok;
             r.logs[0].should.eql('1.0.1');
         });
+
+        it('should allow a function to be provided, rather than a number', function() {
+            var r = checkUsage(function () {
+                return yargs(['--version'])
+                    .version(function() {
+                      return require('./fixtures/config').version;
+                    }, 'version')
+                    .wrap(null)
+                    .argv;
+            });
+            r.logs[0].should.eql('1.0.2');
+        });
+
+        it("should default to 'version' as version option", function() {
+            var r = checkUsage(function () {
+                return yargs(['--version'])
+                    .version(function() {
+                      return require('./fixtures/config').version;
+                    })
+                    .wrap(null)
+                    .argv;
+            });
+            r.logs[0].should.eql('1.0.2');
+        });
     });
 
     describe('showHelpOnFail', function () {

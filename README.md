@@ -600,7 +600,18 @@ Later on, ```argv``` can be retrived with ```yargs.argv```
 
 Add an option (e.g., `--version`) that displays the version number (given by the
 `version` parameter) and exits the process. If present, the `description`
-parameter customises the description of the version option in the usage string.
+parameter customizes the description of the version option in the usage string.
+
+You can provide a `function` for version, rather than a string.
+This is useful if you want to use the version from your package.json:
+
+```js
+var argv = require('yargs')
+  .version(function() {
+    return require('../package').version;
+  })
+  .argv;
+```
 
 .showHelpOnFail(enable, [message])
 ----------------------------------
