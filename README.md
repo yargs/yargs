@@ -5,12 +5,12 @@ Yargs be a node.js library fer hearties tryin' ter parse optstrings.
 
 With yargs, ye be havin' a map that leads straight to yer treasure! Treasure of course, being a simple option hash.
 
-[![Build Status](https://travis-ci.org/chevex/yargs.png)](https://travis-ci.org/chevex/yargs)
-[![Dependency Status](https://gemnasium.com/chevex/yargs.png)](https://gemnasium.com/chevex/yargs)
+[![Build Status](https://travis-ci.org/bcoe/yargs.png)](https://travis-ci.org/bcoe/yargs)
+[![Dependency Status](https://gemnasium.com/bcoe/yargs.png)](https://gemnasium.com/bcoe/yargs)
 [![NPM version](https://badge.fury.io/js/yargs.png)](http://badge.fury.io/js/yargs)
-[![Coverage Status](https://coveralls.io/repos/chevex/yargs/badge.svg?branch=)](https://coveralls.io/r/chevex/yargs?branch=)
+[![Coverage Status](https://coveralls.io/repos/bcoe/yargs/badge.svg?branch=)](https://coveralls.io/r/bcoe/yargs?branch=)
 
-> Yargs is the official successor to optimist. Please feel free to submit issues and pull requests. If you'd like to contribute and don't know where to start, have a look at [the issue list](https://github.com/chevex/yargs/issues) :)
+> Yargs is the official successor to optimist. Please feel free to submit issues and pull requests. If you'd like to contribute and don't know where to start, have a look at [the issue list](https://github.com/bcoe/yargs/issues) :)
 
 examples
 ========
@@ -756,7 +756,7 @@ With [npm](http://github.com/isaacs/npm), just do:
 
 or clone this project on github:
 
-    git clone http://github.com/chevex/yargs.git
+    git clone http://github.com/bcoe/yargs.git
 
 To run the tests with [expresso](http://github.com/visionmedia/expresso),
 just do:
