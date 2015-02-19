@@ -265,9 +265,9 @@ function Argv (processArgs, cwd) {
 
     var versionOpt = null;
     self.version = function (ver, opt, msg) {
-        versionOpt = opt;
+        versionOpt = opt || 'version';
         usage.version(ver);
-        self.describe(opt, msg || 'Show version number');
+        self.describe(versionOpt, msg || 'Show version number');
         return self;
     };
 
