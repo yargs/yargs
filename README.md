@@ -371,6 +371,16 @@ Set `argv[key]` to `value` if no option was specified on `process.argv`.
 
 Optionally `.default()` can take an object that maps keys to default values.
 
+But wait, there's more! the default value can be a `function` which returns
+a value. The name of the function will be used in the usage string:
+
+```js
+var argv = require('yargs')
+  .default('random', function randomValue() {
+    return Math.random() * 256;
+  }).argv;
+```
+
 .demand(key, [msg | boolean])
 -----------------------------
 .require(key, [msg | boolean])

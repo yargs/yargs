@@ -160,16 +160,6 @@ describe('parser tests', function () {
         parse.should.have.property('_').and.deep.equal(['moo']);
     });
 
-    it('should set boolean options to false by default', function () {
-        var parse = yargs(['moo'])
-            .boolean(['t', 'verbose'])
-            .default('verbose', false)
-            .default('t', false).argv;
-        parse.should.have.property('verbose', false).and.be.a('boolean');
-        parse.should.have.property('t', false).and.be.a('boolean');
-        parse.should.have.property('_').and.deep.equal(['moo']);
-    });
-
     it('should allow defining options as boolean in groups', function () {
         var parse = yargs([ '-x', '-z', 'one', 'two', 'three' ])
             .boolean(['x','y','z']).argv;
@@ -324,26 +314,6 @@ describe('parser tests', function () {
         argv.should.have.property('z', 55);
         argv.should.have.property('zm', 55);
         argv.should.have.property('f', 11);
-    });
-
-    it('should define option as boolean and set default to true', function () {
-        var argv = yargs.options({
-            sometrue: {
-                boolean: true,
-                default: true
-            }
-        }).argv;
-        argv.should.have.property('sometrue', true);
-    });
-
-    it('should define option as boolean and set default to false', function () {
-        var argv = yargs.options({
-            somefalse: {
-                boolean: true,
-                default: false
-            }
-        }).argv;
-        argv.should.have.property('somefalse', false);
     });
 
     describe('dot notation', function() {
@@ -680,6 +650,46 @@ describe('parser tests', function () {
                     argv2.parse([ ]).flag.should.be.false;
                 });
             });
+        });
+
+        it('should define option as boolean and set default to true', function () {
+            var argv = yargs.options({
+                sometrue: {
+                    boolean: true,
+                    default: true
+                }
+            }).argv;
+            argv.should.have.property('sometrue', true);
+        });
+
+        it('should define option as boolean and set default to false', function () {
+            var argv = yargs.options({
+                somefalse: {
+                    boolean: true,
+                    default: false
+                }
+            }).argv;
+            argv.should.have.property('somefalse', false);
+        });
+
+        it('should set boolean options to false by default', function () {
+            var parse = yargs(['moo'])
+                .boolean(['t', 'verbose'])
+                .default('verbose', false)
+                .default('t', false).argv;
+            parse.should.have.property('verbose', false).and.be.a('boolean');
+            parse.should.have.property('t', false).and.be.a('boolean');
+            parse.should.have.property('_').and.deep.equal(['moo']);
+        });
+
+        it('should allow function to be provided as default value', function() {
+            var argv = yargs([])
+                .default('file', function() {
+                  return 'foo.txt';
+                })
+                .argv;
+
+            argv.file.should.equal('foo.txt');
         });
     });
 

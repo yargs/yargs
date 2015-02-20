@@ -915,4 +915,36 @@ describe('usage tests', function () {
           ]);
       });
     });
+
+    describe('default', function() {
+      it('should indicate that the default is a generated-value, if function is provided', function() {
+          var r = checkUsage(function() {
+              return yargs(['-h'])
+                  .help('h')
+                  .default('f', function() {
+                    return 99;
+                  })
+                  .wrap(null)
+                  .argv
+              ;
+          });
+
+          r.logs[0].should.include('default: (generated-value)');
+      });
+
+      it('if a named function is provided, should use name rather than (generated-value)', function() {
+          var r = checkUsage(function() {
+              return yargs(['-h'])
+                  .help('h')
+                  .default('f', function randomNumber() {
+                    return Math.random() * 256;
+                  })
+                  .wrap(null)
+                  .argv
+              ;
+          });
+
+          r.logs[0].should.include('default: (random-number)');
+      });
+    });
 });
