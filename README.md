@@ -7,8 +7,8 @@ With yargs, ye be havin' a map that leads straight to yer treasure! Treasure of 
 
 [![Build Status](https://travis-ci.org/bcoe/yargs.png)](https://travis-ci.org/bcoe/yargs)
 [![Dependency Status](https://gemnasium.com/bcoe/yargs.png)](https://gemnasium.com/bcoe/yargs)
-[![NPM version](https://badge.fury.io/js/yargs.png)](http://badge.fury.io/js/yargs)
 [![Coverage Status](https://coveralls.io/repos/bcoe/yargs/badge.svg?branch=)](https://coveralls.io/r/bcoe/yargs?branch=)
+[![NPM version](https://img.shields.io/npm/v/yargs.svg)](https://www.npmjs.com/package/yargs)
 
 > Yargs is the official successor to optimist. Please feel free to submit issues and pull requests. If you'd like to contribute and don't know where to start, have a look at [the issue list](https://github.com/bcoe/yargs/issues) :)
 
