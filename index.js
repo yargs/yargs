@@ -50,6 +50,7 @@ function Argv (processArgs, cwd) {
             string: [],
             alias: {},
             default: {},
+            defaultDescription: {},
             requiresArg: [],
             count: [],
             normalize: [],
@@ -94,13 +95,14 @@ function Argv (processArgs, cwd) {
         return self;
     };
 
-    self.default = function (key, value) {
+    self.default = function (key, value, defaultDescription) {
         if (typeof key === 'object') {
             Object.keys(key).forEach(function (k) {
                 self.default(k, key[k]);
             });
         }
         else {
+            options.defaultDescription[key] = defaultDescription;
             options.default[key] = value;
         }
         return self;

@@ -946,5 +946,20 @@ describe('usage tests', function () {
 
           r.logs[0].should.include('default: (random-number)');
       });
+
+      it('default-description take precedence if one is provided', function() {
+          var r = checkUsage(function() {
+              return yargs(['-h'])
+                  .help('h')
+                  .default('f', function randomNumber() {
+                    return Math.random() * 256;
+                  }, 'foo-description')
+                  .wrap(null)
+                  .argv
+              ;
+          });
+
+          r.logs[0].should.include('default: foo-description');
+      });
     });
 });
