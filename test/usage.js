@@ -861,6 +861,31 @@ describe('usage tests', function () {
               .help()
         });
 
+        it("should wrap the left-hand-column if it takes up more than 50% of the screen", function() {
+            var r = checkUsage(function () {
+                return yargs([])
+                  .example(
+                    'i am a fairly long example command and should wrap',
+                    'description'
+                  )
+                  .demand('foo')
+                  .wrap(40)
+                  .argv;
+            });
+
+            // should split example usage onto multiple lines.
+            r.errors[0].split('\n').length.should.equal(9);
+
+            // should wrap within appropriate boundaries.
+            r.errors[0].split('\n').forEach(function(line, i) {
+              // ignore headings an blank lines.
+              if (!line || line.match('Examples:') || line.match('Options:')) return;
+
+              line.length.should.gt(30);
+              line.length.should.lte(40);
+            });
+        });
+
         it('should wrap the usage string', function() {
             var r = checkUsage(function () {
                 return yargs([])
