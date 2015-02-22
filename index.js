@@ -107,13 +107,35 @@ function Argv (processArgs, cwd) {
     };
 
     self.alias = function (x, y) {
-        if (typeof x === 'object') {
+        if (Array.isArray(y)) {
+            y.forEach(function(value) {
+                self.alias(x, value);
+            });
+        }
+        else if (typeof x === 'object') {
             Object.keys(x).forEach(function (key) {
                 self.alias(key, x[key]);
             });
         }
         else {
-            options.alias[x] = (options.alias[x] || []).concat(y);
+            var arr = options.alias[x];
+
+            // this check ensures that an alias of
+            // an alias behaves as expected.
+            Object.keys(options.alias).forEach(function(key) {
+                var check = options.alias[key] || [];
+
+                if (~check.indexOf(x) || key === x) {
+                    x = key;
+                    arr = check;
+                } else if (~check.indexOf(y) || key === y) {
+                    y = [x, x = y][0];
+                    arr = check;
+                }
+            });
+
+            if (arr && arr.indexOf(y) === -1 && x !== y) arr.push(y);
+            else if (!arr) options.alias[x] = [].concat(y);
         }
         return self;
     };

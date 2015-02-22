@@ -326,6 +326,29 @@ describe('parser tests', function () {
         argv.should.have.property('f', 11);
     });
 
+    it('should allow a new alias to be assigned via an alias', function() {
+        var argv = yargs([ '--bar', '22' ])
+            .alias('f', 'foo')
+            .alias('foo', 'bar')
+            .alias('blarg', ['bar'])
+            .argv;
+
+        argv.should.have.property('f', 22);
+        argv.should.have.property('foo', 22);
+        argv.should.have.property('bar', 22);
+        argv.should.have.property('blarg', 22);
+    });
+
+    it('should not break if an attempt is made to create a cyclical alias', function() {
+        var argv = yargs([ '--foo', '22' ])
+            .alias('f', 'foo')
+            .alias('foo', 'f')
+            .argv;
+
+        argv.should.have.property('f', 22);
+        argv.should.have.property('foo', 22);
+    });
+
     it('should define option as boolean and set default to true', function () {
         var argv = yargs.options({
             sometrue: {
