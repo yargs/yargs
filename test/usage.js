@@ -878,7 +878,7 @@ describe('usage tests', function () {
 
             // should wrap within appropriate boundaries.
             r.errors[0].split('\n').forEach(function(line, i) {
-              // ignore headings an blank lines.
+              // ignore headings and blank lines.
               if (!line || line.match('Examples:') || line.match('Options:')) return;
 
               line.length.should.gt(30);
