@@ -364,12 +364,29 @@ Optionally `.alias()` can take an object that maps keys to aliases.
 Each key of this object should be the canonical version of the option, and each
 value should be a string or an array of strings.
 
-.default(key, value)
+.default(key, value, [description])
 --------------------
 
 Set `argv[key]` to `value` if no option was specified on `process.argv`.
 
 Optionally `.default()` can take an object that maps keys to default values.
+
+But wait, there's more! the default value can be a `function` which returns
+a value. The name of the function will be used in the usage string:
+
+```js
+var argv = require('yargs')
+  .default('random', function randomValue() {
+    return Math.random() * 256;
+  }).argv;
+```
+
+Optionally, `description` can also be provided and will take precedence over
+displaying the value in the usage instructions:
+
+```js
+.default('timeout', 60000, '(one-minute)');
+```
 
 .demand(key, [msg | boolean])
 -----------------------------
