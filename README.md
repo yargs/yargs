@@ -689,7 +689,7 @@ Parse `args` instead of `process.argv`. Returns the `argv` object.
 --------
 
 Reset the argument object built up so far. This is useful for
-created nested command line interaces.
+creating nested command line interfaces.
 
 ```js
 var yargs = require('./yargs')
