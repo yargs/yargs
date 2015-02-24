@@ -910,11 +910,13 @@ describe('parser tests', function () {
 
         it('should default alias to array type', function () {
             var result = yargs().option('ca-path', {
-              array: true
+              array: true,
+              alias: 'c'
             }).parse([ '--ca-path', 'http://www.example.com' ]);
 
             Array.isArray(result['ca-path']).should.equal(true);
             Array.isArray(result.caPath).should.equal(true);
+            Array.isArray(result.c).should.equal(true);
         });
     });
 });
