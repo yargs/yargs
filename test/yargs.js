@@ -158,6 +158,7 @@ describe('yargs dsl tests', function () {
             string: [],
             alias: {},
             default: {},
+            key: {},
             defaultDescription: {},
             requiresArg: [],
             count: [],

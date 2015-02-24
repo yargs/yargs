@@ -897,5 +897,26 @@ describe('parser tests', function () {
             Array.isArray(result.b).should.equal(true);
             result.b.should.include(33);
         });
+
+        // issue #103
+        it('should default camel-case alias to array type', function () {
+            var result = yargs().option('ca-path', {
+              array: true
+            }).parse([ '--ca-path', 'http://www.example.com' ]);
+
+            Array.isArray(result['ca-path']).should.equal(true);
+            Array.isArray(result.caPath).should.equal(true);
+        });
+
+        it('should default alias to array type', function () {
+            var result = yargs().option('ca-path', {
+              array: true,
+              alias: 'c'
+            }).parse([ '--ca-path', 'http://www.example.com' ]);
+
+            Array.isArray(result['ca-path']).should.equal(true);
+            Array.isArray(result.caPath).should.equal(true);
+            Array.isArray(result.c).should.equal(true);
+        });
     });
 });

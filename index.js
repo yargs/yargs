@@ -51,6 +51,7 @@ function Argv (processArgs, cwd) {
             array: [],
             boolean: [],
             string: [],
+            key: {},
             alias: {},
             default: {},
             defaultDescription: {},
@@ -221,9 +222,12 @@ function Argv (processArgs, cwd) {
             });
         }
         else {
+            options.key[key] = true; // track manually set keys.
+
             if (opt.alias) self.alias(key, opt.alias);
 
             var demand = opt.demand || opt.required || opt.require;
+
             if (demand) {
                 self.demand(key, demand);
             }
