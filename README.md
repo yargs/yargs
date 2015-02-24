@@ -685,6 +685,42 @@ By default, yargs exits the process when the user passes a help flag, uses the `
 
 Parse `args` instead of `process.argv`. Returns the `argv` object.
 
+.reset()
+--------
+
+Reset the argument object built up so far. This is useful for
+creating nested command line interfaces.
+
+```js
+var yargs = require('./yargs')
+  .usage('$0 command')
+  .command('hello', 'hello command')
+  .command('world', 'world command')
+  .demand(1, 'must provide a valid command'),
+  argv = yargs.argv,
+  command = argv._[0];
+
+if (command === 'hello') {
+  yargs.reset()
+    .usage('$0 hello')
+    .help('h')
+    .example('$0 hello', 'print the hello message!')
+    .argv
+
+  console.log('hello!');
+} else if (command === 'world'){
+  yargs.reset()
+    .usage('$0 world')
+    .help('h')
+    .example('$0 world', 'print the world message!')
+    .argv
+
+  console.log('world!');
+} else {
+  yargs.showHelp();
+}
+```
+
 .argv
 -----
 

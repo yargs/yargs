@@ -134,4 +134,42 @@ describe('yargs dsl tests', function () {
           r.exit.should.eql(true);
         });
     });
+
+    describe('reset', function() {
+        it('should put yargs back into its initial state', function() {
+          // create a command line with all the things.
+          // so that we can confirm they're reset.
+          var y = yargs(['--help'])
+            .help('help')
+            .command('foo', 'bar')
+            .default('foo', 'bar')
+            .describe('foo', 'foo variable')
+            .demand('foo')
+            .string('foo')
+            .alias('foo', 'bar')
+            .string('foo')
+            .implies('foo', 'snuh')
+            .exitProcess(false)  // defaults to true.
+            .reset();
+
+          var emptyOptions = {
+            array: [],
+            boolean: [],
+            string: [],
+            alias: {},
+            default: {},
+            defaultDescription: {},
+            requiresArg: [],
+            count: [],
+            normalize: [],
+            config: []
+          };
+
+          expect(y.getOptions()).to.deep.equal(emptyOptions);
+          expect(y.getUsageInstance().getDescriptions()).to.deep.equal({});
+          expect(y.getValidationInstance().getImplied()).to.deep.equal({});
+          expect(y.getExitProcess()).to.equal(true);
+          expect(y.getDemanded()).to.deep.equal({});
+        });
+    });
 });

@@ -21,8 +21,8 @@ Object.keys(inst).forEach(function (key) {
 var exports = module.exports = Argv;
 function Argv (processArgs, cwd) {
     var self = {};
-    var usage = Usage(self);
-    var validation = Validation(self, usage);
+    var usage = null;
+    var validation = null;
 
     if (!cwd) cwd = process.cwd();
 
@@ -43,7 +43,10 @@ function Argv (processArgs, cwd) {
     }
 
     var options;
-    self.resetOptions = function () {
+    self.resetOptions = self.reset = function () {
+        // put yargs back into its initial
+        // state, this is useful for creating a
+        // nested CLI.
         options = {
             array: [],
             boolean: [],
@@ -56,6 +59,16 @@ function Argv (processArgs, cwd) {
             normalize: [],
             config: []
         };
+
+        usage = Usage(self); // handle usage output.
+        validation = Validation(self, usage); // handle arg validation.
+
+        demanded = {};
+
+        exitProcess = true;
+        helpOpt = null;
+        versionOpt = null;
+
         return self;
     };
     self.resetOptions();
@@ -304,6 +317,14 @@ function Argv (processArgs, cwd) {
 
         return usage.help();
     };
+
+    self.getUsageInstance = function () {
+        return usage;
+    };
+
+    self.getValidationInstance = function () {
+        return validation;
+    }
 
     Object.defineProperty(self, 'argv', {
         get : function () {
