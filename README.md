@@ -573,6 +573,24 @@ regardless of whether they resemble numbers.
 Tell the parser to interpret `key` as an array. If `.array('foo')` is set,
 `--foo bar` will be parsed as `['bar']` rather than as `'bar'`.
 
+.nargs(key, count)
+-----------
+
+The number of arguments that should be consumed after a key. This can be a
+useful hint to prevent parsing ambiguity:
+
+```js
+var argv = require('yargs')
+  .nargs('token', 1)
+  .parse(['--token', '-my-token']);
+```
+
+parses as:
+
+`{ _: [], token: '-my-token', '$0': 'node test' }`
+
+Optionally `.nargs()` can take an object of `key`/`narg` pairs.
+
 .config(key)
 ------------
 
