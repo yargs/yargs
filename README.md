@@ -288,13 +288,18 @@ line_count.js
 ````javascript
 #!/usr/bin/env node
 var argv = require('yargs')
-    .usage('Count the lines in a file.\nUsage: $0')
-    .example('$0 -f', 'count the lines in the given file')
+    .usage('Usage: $0 <command> [options]')
+    .command('count', 'Count the lines in a file')
+    .demand(1)
+    .example('$0 count -f foo.js', 'count the lines in the given file')
     .demand('f')
     .alias('f', 'file')
+    .nargs('f', 1)
     .describe('f', 'Load a file')
-    .argv
-;
+    .help('h')
+    .alias('h', 'help')
+    .epilog('copyright 2015')
+    .argv;
 
 var fs = require('fs');
 var s = fs.createReadStream(argv.file);
@@ -823,15 +828,15 @@ installation
 
 With [npm](http://github.com/isaacs/npm), just do:
 
-    `npm install yargs`
+    npm install yargs
 
 or clone this project on github:
 
-    `git clone http://github.com/bcoe/yargs.git`
+    git clone http://github.com/bcoe/yargs.git
 
 To run the tests with npm, just do:
 
-    `npm test`
+    npm test
 
 inspired by
 ===========
