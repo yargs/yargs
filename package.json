@@ -9,7 +9,8 @@
     "LICENSE"
   ],
   "dependencies": {
-    "string": "^3.0.0",
+    "camelcase": "^1.0.2",
+    "decamelize": "^1.0.0",
     "window-size": "0.1.0",
     "wordwrap": "0.0.2"
   },
