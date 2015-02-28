@@ -328,6 +328,8 @@ s.on('end', function () {
     Examples:
       node test.js count -f foo.js    count the lines in the given file
 
+    copyright 2015
+
     Missing required arguments: f
 
     $ node line_count.js count --file line_count.js
