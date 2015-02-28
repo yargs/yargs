@@ -315,23 +315,25 @@ s.on('end', function () {
 ````
 
 ***
+    $ node line_count.js count
+    Usage: node test.js <command> [options]
 
-    $ node line_count.js
-    Count the lines in a file.
-    Usage: node ./line_count.js
-
-    Examples:
-      node ./line_count.js -f   count the lines in the given file
+    Commands:
+      count    Count the lines in a file
 
     Options:
-      -f, --file  Load a file  [required]
+      -f, --file  Load a file        [required]
+      -h, --help  Show help
+
+    Examples:
+      node test.js count -f foo.js    count the lines in the given file
 
     Missing required arguments: f
 
-    $ node line_count.js --file line_count.js
+    $ node line_count.js count --file line_count.js
     20
 
-    $ node line_count.js -f line_count.js
+    $ node line_count.js count -f line_count.js
     20
 
 methods
