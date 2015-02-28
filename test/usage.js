@@ -939,6 +939,23 @@ describe('usage tests', function () {
               'Missing required arguments: y'
           ]);
       });
+
+      it('replaces $0 in epilog string', function() {
+          var r = checkUsage(function () {
+              return yargs('')
+                  .epilog("Try '$0 --long-help' for more information")
+                  .demand('y')
+                  .wrap(null)
+                  .argv;
+          });
+
+          r.errors.join('\n').split(/\n+/).should.deep.equal([
+              'Options:',
+              '  -y  [required]',
+              'Try \'./usage --long-help\' for more information',
+              'Missing required arguments: y'
+          ]);
+      });
     });
 
     describe('default', function() {
