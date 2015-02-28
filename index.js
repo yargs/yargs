@@ -1,7 +1,7 @@
-var path = require('path');
-var Parser = require('./lib/parser');
-var Usage = require('./lib/usage');
-var Validation = require('./lib/validation');
+var path = require('path'),
+  Parser = require('./lib/parser'),
+  Usage = require('./lib/usage'),
+  Validation = require('./lib/validation');
 
 /*  Hack an instance of Argv with process.argv into Argv
     so people can do
