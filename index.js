@@ -51,6 +51,7 @@ function Argv (processArgs, cwd) {
             array: [],
             boolean: [],
             string: [],
+            narg: {},
             key: {},
             alias: {},
             default: {},
@@ -81,6 +82,17 @@ function Argv (processArgs, cwd) {
 
     self.array = function (arrays) {
         options.array.push.apply(options.array, [].concat(arrays));
+        return self;
+    }
+
+    self.nargs = function (key, n) {
+        if (typeof key === 'object') {
+            Object.keys(key).forEach(function(k) {
+                self.nargs(k, key[k]);
+            });
+        } else {
+            options.narg[key] = n;
+        }
         return self;
     }
 
@@ -233,6 +245,9 @@ function Argv (processArgs, cwd) {
             }
             if ('default' in opt) {
                 self.default(key, opt.default);
+            }
+            if ('nargs' in opt) {
+                self.nargs(key, opt.nargs);
             }
             if (opt.boolean || opt.type === 'boolean') {
                 self.boolean(key);

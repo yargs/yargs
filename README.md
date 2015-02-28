@@ -288,13 +288,18 @@ line_count.js
 ````javascript
 #!/usr/bin/env node
 var argv = require('yargs')
-    .usage('Count the lines in a file.\nUsage: $0')
-    .example('$0 -f', 'count the lines in the given file')
+    .usage('Usage: $0 <command> [options]')
+    .command('count', 'Count the lines in a file')
+    .demand(1)
+    .example('$0 count -f foo.js', 'count the lines in the given file')
     .demand('f')
     .alias('f', 'file')
+    .nargs('f', 1)
     .describe('f', 'Load a file')
-    .argv
-;
+    .help('h')
+    .alias('h', 'help')
+    .epilog('copyright 2015')
+    .argv;
 
 var fs = require('fs');
 var s = fs.createReadStream(argv.file);
@@ -310,23 +315,27 @@ s.on('end', function () {
 ````
 
 ***
+    $ node line_count.js count
+    Usage: node test.js <command> [options]
 
-    $ node line_count.js
-    Count the lines in a file.
-    Usage: node ./line_count.js
-
-    Examples:
-      node ./line_count.js -f   count the lines in the given file
+    Commands:
+      count    Count the lines in a file
 
     Options:
-      -f, --file  Load a file  [required]
+      -f, --file  Load a file        [required]
+      -h, --help  Show help
+
+    Examples:
+      node test.js count -f foo.js    count the lines in the given file
+
+    copyright 2015
 
     Missing required arguments: f
 
-    $ node line_count.js --file line_count.js
+    $ node line_count.js count --file line_count.js
     20
 
-    $ node line_count.js -f line_count.js
+    $ node line_count.js count -f line_count.js
     20
 
 methods
@@ -573,6 +582,24 @@ regardless of whether they resemble numbers.
 Tell the parser to interpret `key` as an array. If `.array('foo')` is set,
 `--foo bar` will be parsed as `['bar']` rather than as `'bar'`.
 
+.nargs(key, count)
+-----------
+
+The number of arguments that should be consumed after a key. This can be a
+useful hint to prevent parsing ambiguity:
+
+```js
+var argv = require('yargs')
+  .nargs('token', 1)
+  .parse(['--token', '-my-token']);
+```
+
+parses as:
+
+`{ _: [], token: '-my-token', '$0': 'node test' }`
+
+Optionally `.nargs()` can take an object of `key`/`narg` pairs.
+
 .config(key)
 ------------
 
@@ -811,10 +838,9 @@ or clone this project on github:
 
     git clone http://github.com/bcoe/yargs.git
 
-To run the tests with [expresso](http://github.com/visionmedia/expresso),
-just do:
+To run the tests with npm, just do:
 
-    expresso
+    npm test
 
 inspired by
 ===========

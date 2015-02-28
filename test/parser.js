@@ -919,4 +919,57 @@ describe('parser tests', function () {
             Array.isArray(result.c).should.equal(true);
         });
     });
+
+    describe('nargs', function() {
+        it('should allow the number of arguments following a key to be specified', function() {
+            var result = yargs().nargs('foo', 2)
+              .parse([ '--foo', 'apple', 'bar' ]);
+
+            Array.isArray(result.foo).should.equal(true);
+            result.foo[0].should.equal('apple');
+            result.foo[1].should.equal('bar');
+        });
+
+        it('should raise an exception if there are not enough arguments following key', function() {
+            expect(function() {
+              var result = yargs().nargs('foo', 2).
+                parse([ '--foo', 'apple']);
+            }).to.throw('not enough arguments following: foo');
+        });
+
+        it('nargs is applied to aliases', function() {
+            var result = yargs().nargs('foo', 2)
+              .alias('foo', 'bar')
+              .parse([ '--bar', 'apple', 'bar' ]);
+
+            Array.isArray(result.foo).should.equal(true);
+            result.foo[0].should.equal('apple');
+            result.foo[1].should.equal('bar');
+        });
+
+        it("should apply nargs to flag arguments", function() {
+            var result = yargs()
+              .option('f', {
+                nargs: 2
+              }).parse([ '-f', 'apple', 'bar', 'blerg' ]);
+
+            result.f[0].should.equal('apple');
+            result.f[1].should.equal('bar');
+            result._[0].should.equal('blerg');
+        });
+
+        it("allows multiple nargs to be set at the same time", function() {
+            var result = yargs().nargs({
+                'foo': 2,
+                'bar': 1
+              })
+              .parse([ '--foo', 'apple', 'bar', '--bar', 'banana', '-f' ]);
+
+            Array.isArray(result.foo).should.equal(true);
+            result.foo[0].should.equal('apple');
+            result.foo[1].should.equal('bar');
+            result.bar.should.equal('banana');
+            result.f.should.equal(true);
+        });
+    });
 });
