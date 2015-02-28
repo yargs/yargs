@@ -823,16 +823,15 @@ installation
 
 With [npm](http://github.com/isaacs/npm), just do:
 
-    npm install yargs
+    `npm install yargs`
 
 or clone this project on github:
 
-    git clone http://github.com/bcoe/yargs.git
+    `git clone http://github.com/bcoe/yargs.git`
 
-To run the tests with [expresso](http://github.com/visionmedia/expresso),
-just do:
+To run the tests with npm, just do:
 
-    expresso
+    `npm test`
 
 inspired by
 ===========
