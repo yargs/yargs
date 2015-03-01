@@ -871,6 +871,17 @@ describe('parser tests', function () {
             parsed = yargs(['--verbose', '--verbose', '-v', '-vv']).count('verbose').alias('v', 'verbose').argv;
             parsed.verbose.should.equal(5);
         });
+
+        it('should not consume the next argument', function () {
+            var parsed;
+            parsed = yargs([ '-v', 'moo' ]).count('v').argv;
+            parsed.v.should.equal(1);
+            parsed.should.have.property('_').and.deep.equal(['moo']);
+
+            parsed = yargs([ '--verbose', 'moomoo', '--verbose' ]).count('verbose').argv;
+            parsed.verbose.should.equal(2);
+            parsed.should.have.property('_').and.deep.equal(['moomoo']);
+        });
     });
 
     describe('array', function() {
