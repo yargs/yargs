@@ -819,6 +819,10 @@ describe('parser tests', function () {
     });
 
     describe('-', function () {
+        before(function() {
+          yargs.reset();
+        });
+
         it('should set - as value of n', function () {
             var argv = yargs.parse(['-n', '-']);
             argv.should.have.property('n', '-');

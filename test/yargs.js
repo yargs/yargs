@@ -5,6 +5,7 @@ var should = require('chai').should(),
     path = require('path');
 
 describe('yargs dsl tests', function () {
+
     it('should use bin name for $0, eliminating path', function () {
       process.argv[1] = '/usr/local/bin/ndm';
       process.env._ = '/usr/local/bin/ndm';
@@ -157,6 +158,7 @@ describe('yargs dsl tests', function () {
             .alias('foo', 'bar')
             .string('foo')
             .implies('foo', 'snuh')
+            .strict()
             .exitProcess(false)  // defaults to true.
             .reset();
 
@@ -179,6 +181,7 @@ describe('yargs dsl tests', function () {
           expect(y.getUsageInstance().getDescriptions()).to.deep.equal({});
           expect(y.getValidationInstance().getImplied()).to.deep.equal({});
           expect(y.getExitProcess()).to.equal(true);
+          expect(y.getStrict()).to.equal(false);
           expect(y.getDemanded()).to.deep.equal({});
         });
     });

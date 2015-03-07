@@ -160,30 +160,6 @@ describe('usage tests', function () {
         ]);
     });
 
-    exports.checkFailReturn = function () {
-        var r = checkUsage(function () {
-            return yargs('-x 10 -z 20'.split(' '))
-                .usage('Usage: $0 -x NUM -y NUM')
-                .wrap(null)
-                .check(function (argv) {
-                    if (!('x' in argv)) return 'You forgot about -x';
-                    if (!('y' in argv)) return 'You forgot about -y';
-                })
-                .argv;
-        });
-        r.should.have.property('result');
-        r.result.should.have.property('x', 10);
-        r.result.should.have.property('z', 20);
-        r.result.should.have.property('_').with.length(0);
-        r.should.have.property('logs').with.length(0);
-        r.should.have.property('exit').and.be.ok;
-        r.should.have.property('errors');
-        r.errors.join('\n').split(/\n+/).should.deep.equal([
-            'Usage: ./usage -x NUM -y NUM',
-            'You forgot about -y'
-        ]);
-    };
-
     it('should return a valid result when check condition passes', function () {
         function checker (argv) {
             return 'x' in argv && 'y' in argv;
