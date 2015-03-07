@@ -24,6 +24,14 @@ describe('yargs dsl tests', function () {
       argv.cat.should.eql(33);
     });
 
+    it('populates argv with placeholder keys for all options', function() {
+      var argv = yargs([])
+        .option('cool', {})
+        .argv;
+
+      Object.keys(argv).should.include('cool');
+    });
+
     it('accepts an object for implies', function() {
       var r = checkOutput(function () {
         return yargs(['--x=33'])
