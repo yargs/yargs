@@ -20,11 +20,14 @@ function Argv (processArgs, cwd) {
     self.$0 = process.argv
         .slice(0,2)
         .map(function (x) {
-            var b = rebase(cwd, x);
+            // ignore the node bin, specify this in your
+            // bin file with #!/usr/bin/env node
+            if (~x.indexOf('node')) return;
+            var b = path.basename(x);
             return x.match(/^\//) && b.length < x.length
                 ? b : x
         })
-        .join(' ')
+        .join(' ').trim();
     ;
 
     if (process.env._ != undefined && process.argv[1] == process.env._) {
