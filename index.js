@@ -1,5 +1,6 @@
 var assert = require('assert'),
   path = require('path'),
+  Completion = require('./lib/completion'),
   Parser = require('./lib/parser'),
   Usage = require('./lib/usage'),
   Validation = require('./lib/validation');
@@ -12,6 +13,7 @@ function Argv (processArgs, cwd) {
     processArgs = processArgs || []; // handle calling yargs().
 
     var self = {};
+    var completion = null;
     var usage = null;
     var validation = null;
 
@@ -23,7 +25,7 @@ function Argv (processArgs, cwd) {
             // ignore the node bin, specify this in your
             // bin file with #!/usr/bin/env node
             if (~x.indexOf('node')) return;
-            var b = path.basename(x);
+            var b = rebase(cwd, x);
             return x.match(/^\//) && b.length < x.length
                 ? b : x
         })
@@ -58,6 +60,7 @@ function Argv (processArgs, cwd) {
 
         usage = Usage(self); // handle usage output.
         validation = Validation(self, usage); // handle arg validation.
+        completion = Completion(self, usage);
 
         demanded = {};
 
@@ -65,6 +68,7 @@ function Argv (processArgs, cwd) {
         strict = false;
         helpOpt = null;
         versionOpt = null;
+        completionOpt = null;
 
         return self;
     };
@@ -297,6 +301,12 @@ function Argv (processArgs, cwd) {
         return self;
     };
 
+    self.showCompletionScript = function($0) {
+        $0 = $0 || self.$0;
+        console.log(completion.generateCompletionScript($0));
+        return self;
+    };
+
     var versionOpt = null;
     self.version = function (ver, opt, msg) {
         versionOpt = opt || 'version';
@@ -335,6 +345,15 @@ function Argv (processArgs, cwd) {
         if (!self.parsed) parseArgs(processArgs); // run parser, if it has not already been executed.
 
         return usage.help();
+    };
+
+    var completionOpt = null;
+    self.completion = function() {
+        completionOpt = completion.completionKey;
+
+        if (!self.parsed) parseArgs(processArgs); // run parser, if it has not already been executed.
+
+        return self;
     };
 
     self.getUsageInstance = function () {
@@ -381,6 +400,10 @@ function Argv (processArgs, cwd) {
                 if (exitProcess){
                     process.exit(0);
                 }
+            }
+            else if (key === completionOpt) {
+                completion.getCompletion();
+                process.exit(0);
             }
         });
 
