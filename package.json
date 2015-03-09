@@ -6,6 +6,7 @@
   "files": [
     "index.js",
     "lib",
+    "completion.sh.hbs",
     "LICENSE"
   ],
   "dependencies": {
@@ -58,6 +59,11 @@
     "url": "http://CodeTunnel.com"
   },
   "contributors": [
+    {
+      "name": "Benjamin Coe",
+      "email": "ben@npmjs.com",
+      "url": "https://github.com/bcoe"
+    },
     {
       "name": "Chris Needham",
       "email": "chris@chrisneedham.com",
