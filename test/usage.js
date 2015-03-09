@@ -3,6 +3,10 @@ var should = require('chai').should(),
     yargs = require('../');
 
 describe('usage tests', function () {
+  
+    beforeEach(function() {
+      yargs.reset();
+    });
 
     describe('demand options', function () {
         describe('using .demand()', function () {

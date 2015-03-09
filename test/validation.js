@@ -4,6 +4,11 @@ var should = require('chai').should(),
     yargs = require('../');
 
 describe('validation tests', function () {
+
+    beforeEach(function() {
+      yargs.reset();
+    });
+
     describe('implies', function() {
         it("fails if '_' populated, and implied argument not set", function(done) {
             var argv = yargs(['cat'])

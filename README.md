@@ -711,7 +711,7 @@ Enable bash-completion shortcuts for commands and options.
 being outputted. To enable bash completions, concat the generated script to your
 `.bashrc`, or `.bash_profile`.
 
-`descrption`: provide a description in your usage instructions for the command
+`description`: provide a description in your usage instructions for the command
 that generates bash completion scripts.
 
 `fn`, rather than relying on yargs' default completion functionlity, which

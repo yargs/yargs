@@ -1,19 +1,25 @@
 var should = require('chai').should(),
     checkUsage = require('./helpers/utils').checkOutput,
-    once = require('once'),
     yargs = require('../');
 
 describe('Completion', function () {
+  beforeEach(function() {
+    yargs.reset();
+  });
+
   describe('default completion behavior', function() {
     it('it returns a list of commands as completion suggestions', function() {
       var r = checkUsage(function() {
+        try {
           return yargs(['--get-yargs-completions'])
-              .help('h')
               .command('foo', 'bar')
               .command('apple', 'banana')
               .completion()
               .argv
           ;
+        } catch (e) {
+          console.log(e.message);
+        }
       }, ['./completion', '--get-yargs-completions', '']);
 
       r.logs.should.include('apple');
@@ -23,7 +29,6 @@ describe('Completion', function () {
     it("returns arguments as completion suggestion, if next contains '-'", function() {
       var r = checkUsage(function() {
           return yargs(['--get-yargs-completions'])
-              .help('h')
               .option('foo', {
                 describe: 'foo option'
               })
@@ -42,7 +47,6 @@ describe('Completion', function () {
     it('replaces application variable with $0 in script', function() {
       var r = checkUsage(function() {
           return yargs([])
-              .help('h')
               .showCompletionScript();
           ;
       }, ['ndm']);
@@ -53,7 +57,6 @@ describe('Completion', function () {
     it('if $0 has a .js extension, a ./ prefix is added', function() {
       var r = checkUsage(function() {
           return yargs([])
-              .help('h')
               .showCompletionScript();
           ;
       }, ['test.js']);
@@ -66,7 +69,6 @@ describe('Completion', function () {
     it('shows completion script if command registered with completion(cmd) is called', function() {
       var r = checkUsage(function() {
           return yargs(['completion'])
-              .help('h')
               .completion('completion')
               .argv;
       }, ['ndm']);
@@ -91,7 +93,6 @@ describe('Completion', function () {
     it('passes current arg for completion and the parsed arguments thus far to custom function', function() {
         var r = checkUsage(function() {
           return yargs(['--get-yargs-completions'])
-            .help('h')
             .completion('completion', function(current, argv) {
               if (current === 'ma' && argv.cool) return ['success!'];
             })
@@ -102,10 +103,7 @@ describe('Completion', function () {
     });
 
     it('if a callback parameter is provided, completions can be asynchronous', function(done) {
-        done = once(done); // fix for checkUsage preventing yargs from exiting.
-
         yargs(['--get-yargs-completions'])
-          .help('h')
           .completion('completion', function(current, argv, cb) {
             setTimeout(function() {
               var r = checkUsage(function() {
