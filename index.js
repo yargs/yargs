@@ -301,12 +301,6 @@ function Argv (processArgs, cwd) {
         return self;
     };
 
-    self.showCompletionScript = function($0) {
-        $0 = $0 || self.$0;
-        console.log(completion.generateCompletionScript($0));
-        return self;
-    };
-
     var versionOpt = null;
     self.version = function (ver, opt, msg) {
         versionOpt = opt || 'version';
@@ -347,12 +341,33 @@ function Argv (processArgs, cwd) {
         return usage.help();
     };
 
-    var completionOpt = null;
-    self.completion = function() {
+    var completionOpt = null,
+      completionCommand = null;
+    self.completion = function(cmd, desc, fn) {
+        // a function to execute when generating
+        // completions can be provided as the second
+        // or third argument to completion.
+        if (typeof desc === 'function') {
+            fn = desc;
+            desc = null;
+        }
+
+        // register the completion command.
+        completionCommand = cmd;
         completionOpt = completion.completionKey;
+        self.command(completionCommand, desc || 'generate bash completion script');
+
+        // a function can be provided
+        if (fn) completion.registerFunction(fn);
 
         if (!self.parsed) parseArgs(processArgs); // run parser, if it has not already been executed.
 
+        return self;
+    };
+
+    self.showCompletionScript = function($0) {
+        $0 = $0 || self.$0;
+        console.log(completion.generateCompletionScript($0));
         return self;
     };
 
@@ -388,6 +403,14 @@ function Argv (processArgs, cwd) {
 
         self.parsed = parsed;
 
+        // generate a completion script for adding to ~/.bashrc.
+        if (completionCommand && ~argv._.indexOf(completionCommand)) {
+            self.showCompletionScript();
+            if (exitProcess){
+                process.exit(0);
+            }
+        }
+
         Object.keys(argv).forEach(function(key) {
             if (key === helpOpt) {
                 self.showHelp('log');
@@ -402,8 +425,18 @@ function Argv (processArgs, cwd) {
                 }
             }
             else if (key === completionOpt) {
-                completion.getCompletion();
-                process.exit(0);
+                // we allow for asynchronous completions,
+                // e.g., loading in a list of commands from an API.
+                completion.getCompletion(function(completions) {
+                    (completions || []).forEach(function(completion) {
+                        console.log(completion);
+                    });
+
+                    if (exitProcess){
+                        process.exit(0);
+                    }
+                });
+                return;
             }
         });
 
