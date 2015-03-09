@@ -360,8 +360,6 @@ function Argv (processArgs, cwd) {
         // a function can be provided
         if (fn) completion.registerFunction(fn);
 
-        if (!self.parsed) parseArgs(processArgs); // run parser, if it has not already been executed.
-
         return self;
     };
 
@@ -481,8 +479,12 @@ function rebase (base, dir) {
 */
 function sigletonify(inst) {
     Object.keys(inst).forEach(function (key) {
-        Argv[key] = typeof inst[key] == 'function'
-            ? inst[key].bind(inst)
-            : inst[key];
+        if (key === 'argv') {
+          Argv.__defineGetter__(key, inst.__lookupGetter__(key));
+        } else {
+          Argv[key] = typeof inst[key] == 'function'
+              ? inst[key].bind(inst)
+              : inst[key];
+        }
     });
 }
