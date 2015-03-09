@@ -5,8 +5,7 @@ var assert = require('assert'),
   Usage = require('./lib/usage'),
   Validation = require('./lib/validation');
 
-var inst = Argv(process.argv.slice(2));
-sigletonify(inst);
+Argv(process.argv.slice(2));
 
 var exports = module.exports = Argv;
 function Argv (processArgs, cwd) {
