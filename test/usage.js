@@ -3,7 +3,7 @@ var should = require('chai').should(),
     yargs = require('../');
 
 describe('usage tests', function () {
-  
+
     beforeEach(function() {
       yargs.reset();
     });
@@ -789,6 +789,7 @@ describe('usage tests', function () {
 
         r.result.should.match(/foo/);
     });
+
 
     describe('wrap', function() {
         it('should wrap argument descriptions onto multiple lines', function() {
