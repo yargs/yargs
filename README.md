@@ -702,6 +702,58 @@ yargs.showHelp();
 
 Later on, ```argv``` can be retrived with ```yargs.argv```
 
+.completion(cmd, [description], [fn]);
+-------------
+
+Enable bash-completion shortcuts for commands and options.
+
+`cmd`: when present in `argv._`, will result in the `.bashrc` completion script
+being outputted. To enable bash completions, concat the generated script to your
+`.bashrc`, or `.bash_profile`.
+
+`description`: provide a description in your usage instructions for the command
+that generates bash completion scripts.
+
+`fn`, rather than relying on yargs' default completion functionlity, which
+shiver me timbers is pretty awesome, you can provide your own completion
+method.
+
+```js
+var argv = require('yargs')
+  .completion('completion', function(current, argv) {
+    // 'current' is the current command being completed.
+    // 'argv' is the parsed arguments so far.
+    // simply return an array of completions.
+    return [
+      'foo',
+      'bar'
+    ];
+  })
+  .argv;
+```
+
+But wait, there's more! you can provide asynchronous completions.
+
+```js
+var argv = require('yargs')
+  .completion('completion', function(current, argv, done) {
+    setTimeout(function() {
+      done([
+        'apple',
+        'banana'
+      ]);
+    }, 500);
+  })
+  .argv;
+```
+
+.showCompletionScript()
+----------------------
+
+Generate a bash completion script. Users of your application can install this
+script in their `.bashrc`, and yargs will provide completion shortcuts for
+commands and options.
+
 .exitProcess(enable)
 ----------------------------------
 

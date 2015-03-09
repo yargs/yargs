@@ -5,6 +5,9 @@ var should = require('chai').should(),
     path = require('path');
 
 describe('yargs dsl tests', function () {
+    beforeEach(function() {
+      yargs.reset();
+    });
 
     it('should use bin name for $0, eliminating path', function () {
       process.argv[1] = '/usr/local/bin/ndm';

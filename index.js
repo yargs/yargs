@@ -1,5 +1,6 @@
 var assert = require('assert'),
   path = require('path'),
+  Completion = require('./lib/completion'),
   Parser = require('./lib/parser'),
   Usage = require('./lib/usage'),
   Validation = require('./lib/validation');
@@ -12,6 +13,7 @@ function Argv (processArgs, cwd) {
     processArgs = processArgs || []; // handle calling yargs().
 
     var self = {};
+    var completion = null;
     var usage = null;
     var validation = null;
 
@@ -20,11 +22,14 @@ function Argv (processArgs, cwd) {
     self.$0 = process.argv
         .slice(0,2)
         .map(function (x) {
+            // ignore the node bin, specify this in your
+            // bin file with #!/usr/bin/env node
+            if (~x.indexOf('node')) return;
             var b = rebase(cwd, x);
             return x.match(/^\//) && b.length < x.length
                 ? b : x
         })
-        .join(' ')
+        .join(' ').trim();
     ;
 
     if (process.env._ != undefined && process.argv[1] == process.env._) {
@@ -55,6 +60,7 @@ function Argv (processArgs, cwd) {
 
         usage = Usage(self); // handle usage output.
         validation = Validation(self, usage); // handle arg validation.
+        completion = Completion(self, usage);
 
         demanded = {};
 
@@ -62,6 +68,7 @@ function Argv (processArgs, cwd) {
         strict = false;
         helpOpt = null;
         versionOpt = null;
+        completionOpt = null;
 
         return self;
     };
@@ -334,6 +341,36 @@ function Argv (processArgs, cwd) {
         return usage.help();
     };
 
+    var completionOpt = null,
+      completionCommand = null;
+    self.completion = function(cmd, desc, fn) {
+        // a function to execute when generating
+        // completions can be provided as the second
+        // or third argument to completion.
+        if (typeof desc === 'function') {
+            fn = desc;
+            desc = null;
+        }
+
+        // register the completion command.
+        completionCommand = cmd;
+        completionOpt = completion.completionKey;
+        self.command(completionCommand, desc || 'generate bash completion script');
+
+        // a function can be provided
+        if (fn) completion.registerFunction(fn);
+
+        if (!self.parsed) parseArgs(processArgs); // run parser, if it has not already been executed.
+
+        return self;
+    };
+
+    self.showCompletionScript = function($0) {
+        $0 = $0 || self.$0;
+        console.log(completion.generateCompletionScript($0));
+        return self;
+    };
+
     self.getUsageInstance = function () {
         return usage;
     };
@@ -366,6 +403,14 @@ function Argv (processArgs, cwd) {
 
         self.parsed = parsed;
 
+        // generate a completion script for adding to ~/.bashrc.
+        if (completionCommand && ~argv._.indexOf(completionCommand)) {
+            self.showCompletionScript();
+            if (exitProcess){
+                process.exit(0);
+            }
+        }
+
         Object.keys(argv).forEach(function(key) {
             if (key === helpOpt) {
                 self.showHelp('log');
@@ -378,6 +423,20 @@ function Argv (processArgs, cwd) {
                 if (exitProcess){
                     process.exit(0);
                 }
+            }
+            else if (key === completionOpt) {
+                // we allow for asynchronous completions,
+                // e.g., loading in a list of commands from an API.
+                completion.getCompletion(function(completions) {
+                    (completions || []).forEach(function(completion) {
+                        console.log(completion);
+                    });
+
+                    if (exitProcess){
+                        process.exit(0);
+                    }
+                });
+                return;
             }
         });
 

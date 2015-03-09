@@ -4,6 +4,9 @@ var should = require('chai').should(),
     path = require('path');
 
 describe('parser tests', function () {
+    beforeEach(function() {
+      yargs.reset();
+    });
 
     it('should pass when specifying a "short boolean"', function () {
         var parse = yargs.parse([ '-b' ]);
@@ -630,10 +633,16 @@ describe('parser tests', function () {
             });
 
             describe('with implied false default', function() {
-                var argv = yargs().options({
-                    flag: {type    : 'boolean'}
-                  }),
-                  argv2 = yargs().boolean(['flag']);
+                var argv = null,
+                  argv2 = null;
+
+                beforeEach(function() {
+                    argv = yargs().options({
+                      flag: {type    : 'boolean'}
+                    });
+
+                    argv2 = yargs().boolean(['flag']);
+                });
 
                 it('should set true if --flag in arg', function() {
                     argv.parse(['--flag']).flag.should.be.true;
@@ -819,10 +828,6 @@ describe('parser tests', function () {
     });
 
     describe('-', function () {
-        before(function() {
-          yargs.reset();
-        });
-
         it('should set - as value of n', function () {
             var argv = yargs.parse(['-n', '-']);
             argv.should.have.property('n', '-');
