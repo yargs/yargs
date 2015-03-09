@@ -1,4 +1,5 @@
-var path = require('path'),
+var assert = require('assert'),
+  path = require('path'),
   Parser = require('./lib/parser'),
   Usage = require('./lib/usage'),
   Validation = require('./lib/validation');
@@ -234,6 +235,8 @@ function Argv (processArgs, cwd) {
             });
         }
         else {
+            assert(typeof opt === 'object', 'second argument to option must be an object');
+
             options.key[key] = true; // track manually set keys.
 
             if (opt.alias) self.alias(key, opt.alias);
@@ -394,8 +397,15 @@ function Argv (processArgs, cwd) {
 
         validation.customChecks(argv, aliases);
         validation.implications(argv);
+        setPlaceholderKeys(argv);
 
         return argv;
+    }
+
+    function setPlaceholderKeys (argv) {
+        Object.keys(options.key).forEach(function(key) {
+            if (typeof argv[key] === 'undefined') argv[key] = undefined;
+        });
     }
 
     return self;
