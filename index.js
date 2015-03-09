@@ -4,23 +4,13 @@ var assert = require('assert'),
   Usage = require('./lib/usage'),
   Validation = require('./lib/validation');
 
-/*  Hack an instance of Argv with process.argv into Argv
-    so people can do
-        require('yargs')(['--beeble=1','-z','zizzle']).argv
-    to parse a list of args and
-        require('yargs').argv
-    to get a parsed version of process.argv.
-*/
-
 var inst = Argv(process.argv.slice(2));
-Object.keys(inst).forEach(function (key) {
-    Argv[key] = typeof inst[key] == 'function'
-        ? inst[key].bind(inst)
-        : inst[key];
-});
+sigletonify(inst);
 
 var exports = module.exports = Argv;
 function Argv (processArgs, cwd) {
+    processArgs = processArgs || []; // handle calling yargs().
+
     var self = {};
     var usage = null;
     var validation = null;
@@ -69,6 +59,7 @@ function Argv (processArgs, cwd) {
         demanded = {};
 
         exitProcess = true;
+        strict = false;
         helpOpt = null;
         versionOpt = null;
 
@@ -294,6 +285,9 @@ function Argv (processArgs, cwd) {
         strict = true;
         return self;
     };
+    self.getStrict = function () {
+        return strict;
+    }
 
     self.showHelp = function (fn) {
         usage.showHelp(fn);
@@ -408,6 +402,7 @@ function Argv (processArgs, cwd) {
         });
     }
 
+    sigletonify(self);
     return self;
 };
 
@@ -417,3 +412,18 @@ exports.rebase = rebase;
 function rebase (base, dir) {
   return path.relative(base, dir);
 };
+
+/*  Hack an instance of Argv with process.argv into Argv
+    so people can do
+        require('yargs')(['--beeble=1','-z','zizzle']).argv
+    to parse a list of args and
+        require('yargs').argv
+    to get a parsed version of process.argv.
+*/
+function sigletonify(inst) {
+    Object.keys(inst).forEach(function (key) {
+        Argv[key] = typeof inst[key] == 'function'
+            ? inst[key].bind(inst)
+            : inst[key];
+    });
+}
