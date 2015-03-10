@@ -59,4 +59,16 @@ describe('validation tests', function () {
               .argv;
         });
     });
+
+    describe('demand', function() {
+        it('fails without a message if msg is null', function(done) {
+            var argv = yargs([])
+                .demand(1, null)
+                .fail(function(msg) {
+                    (typeof msg).should.equal('undefined');
+                    return done();
+                })
+                .argv;
+        });
+    });
 });
