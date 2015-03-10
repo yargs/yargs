@@ -61,6 +61,16 @@ describe('validation tests', function () {
     });
 
     describe('demand', function() {
+        it('fails with standard error message if msg is not defined', function(done) {
+            var argv = yargs([])
+                .demand(1)
+                .fail(function(msg) {
+                    msg.should.equal('Not enough non-option arguments: got 0, need at least 1');
+                    return done();
+                })
+                .argv;
+        });
+
         it('fails without a message if msg is null', function(done) {
             var argv = yargs([])
                 .demand(1, null)
