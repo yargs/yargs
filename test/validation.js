@@ -1,4 +1,5 @@
 var should = require('chai').should(),
+    expect = require('chai').expect,
     checkValidation = require('./helpers/utils').checkOutput,
     Hash = require('hashish'),
     yargs = require('../');
@@ -75,7 +76,7 @@ describe('validation tests', function () {
             var argv = yargs([])
                 .demand(1, null)
                 .fail(function(msg) {
-                    (typeof msg).should.equal('undefined');
+                    expect(msg).to.equal(null);
                     return done();
                 })
                 .argv;
