@@ -95,6 +95,22 @@ describe('usage tests', function () {
             r.should.have.property('logs').with.length(0);
             r.should.have.property('exit', false);
         });
+
+
+        it('should not show a custom message if msg is null', function() {
+            var r = checkUsage(function() {
+                return yargs('')
+                    .usage('Usage: foo')
+                    .demand(1, null)
+                    .argv
+                ;
+            });
+
+            r.errors.join('\n').split(/\n+/).should.deep.equal([
+                'Usage: foo',
+                ''
+            ]);
+        });
     });
 
     it('should return valid values when check passes', function () {
