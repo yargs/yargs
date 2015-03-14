@@ -297,6 +297,17 @@ describe('parser tests', function () {
             argv.should.have.property('foo').and.deep.equal('bar');
         });
 
+        it('should load options and values from a JS file when config has .js extention', function () {
+            var jsPath = path.resolve(__dirname, './fixtures/settings.js');
+            var argv = yargs([ '--settings', jsPath, '--foo', 'bar' ])
+                .config('settings')
+                .argv;
+
+            argv.should.have.property('herp', 'derp');
+            argv.should.have.property('foo', 'bar');
+            argv.should.have.property('calculate').and.be.a('function');
+        });
+
         it('should raise an appropriate error if JSON file is not found', function(done) {
           var argv = yargs([ '--settings', 'fake.json', '--foo', 'bar' ])
             .alias('z', 'zoom')
