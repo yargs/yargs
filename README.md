@@ -687,10 +687,10 @@ var argv = require('yargs')
 
     Specify --help for available options
 
-.showHelp(fn=console.error)
+.showHelp(consoleLevel='error')
 ---------------------------
 
-Print the usage data using `fn` for printing.
+Print the usage data using the [`console`](https://nodejs.org/api/console.html) function `consoleLevel` for printing.
 
 Example:
 
@@ -698,6 +698,12 @@ Example:
 var yargs = require("yargs")
        .usage("$0 -operand1 number -operand2 number -operation [add|subtract]");
 yargs.showHelp();
+```
+
+Or, to print the usage data to `stdout` instead, you can specify the use of `console.log`:
+
+```
+yargs.showHelp("log");
 ```
 
 Later on, ```argv``` can be retrived with ```yargs.argv```
