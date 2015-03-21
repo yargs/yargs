@@ -1,5 +1,8 @@
 ## Change Log
 
+### v3.6.0 (2015/03/21 01:00 +00:00)
+- [4e24e22](https://github.com/bcoe/yargs/commit/4e24e22e6a195e55ab943ede704a0231ac33b99c) support for .js configuration files. (@pirxpilot)
+
 ### v3.5.4 (2015/03/12 05:56 +00:00)
 - [c16cc08](https://github.com/bcoe/yargs/commit/c16cc085501155cf7fd853ccdf8584b05ab92b78) message for non-option arguments is now optional, thanks to (@raine)
 
