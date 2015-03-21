@@ -126,6 +126,10 @@ function Argv (processArgs, cwd) {
             });
         }
         else {
+            if (typeof value === 'function') {
+                defaultDescription = usage.functionDescription(value, defaultDescription);
+                value = value.call();
+            }
             options.defaultDescription[key] = defaultDescription;
             options.default[key] = value;
         }
