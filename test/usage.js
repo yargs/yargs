@@ -424,6 +424,20 @@ describe('usage tests', function () {
                 ]);
             });
         });
+
+        it("still requires argument if 'type' hints are given", function() {
+          var r = checkUsage(function () {
+              return yargs('--foo --bar'.split(' '))
+                  .requiresArg("foo")
+                  .string("foo")
+                  .requiresArg("bar")
+                  .array("bar")
+                  .wrap(null)
+                  .argv;
+          });
+
+          r.errors[1].should.equal('Missing argument values: foo, bar');
+        });
     });
 
     context("with strict() option set", function () {
