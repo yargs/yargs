@@ -1000,6 +1000,23 @@ describe('usage tests', function () {
 
           r.logs[0].should.include('default: foo-description');
       });
+
+      it('serializes object and array defaults', function() {
+          var r = checkUsage(function() {
+              return yargs(['-h'])
+                  .help('h')
+                  .default('a', [])
+                  .default('a2', [3])
+                  .default('o', {a: '33'})
+                  .wrap(null)
+                  .argv
+              ;
+          });
+
+          r.logs[0].should.include('default: []');
+          r.logs[0].should.include('default: {"a":"33"}');
+          r.logs[0].should.include('default: [3]');
+      });
     });
 
     describe('normalizeAliases', function() {
