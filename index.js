@@ -74,6 +74,9 @@ function Argv (processArgs, cwd) {
     self.resetOptions();
 
     self.boolean = function (bools) {
+        ([].concat(bools)).forEach(function(key) {
+            options.key[key] = true;
+        });
         options.boolean.push.apply(options.boolean, [].concat(bools));
         return self;
     };
@@ -170,7 +173,7 @@ function Argv (processArgs, cwd) {
                 demanded[keys] = { msg: msg };
             }
             else if (msg === true || typeof msg === 'undefined') {
-                demanded[keys] = { msg: null };
+                demanded[keys] = { msg: undefined };
             }
         }
 
@@ -221,6 +224,7 @@ function Argv (processArgs, cwd) {
     self.defaults = self.default;
 
     self.describe = function (key, desc) {
+        options.key[key] = true;
         usage.describe(key, desc);
         return self;
     };
