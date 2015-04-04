@@ -74,9 +74,6 @@ function Argv (processArgs, cwd) {
     self.resetOptions();
 
     self.boolean = function (bools) {
-        ([].concat(bools)).forEach(function(key) {
-            options.key[key] = true;
-        });
         options.boolean.push.apply(options.boolean, [].concat(bools));
         return self;
     };
