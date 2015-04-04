@@ -1001,4 +1001,65 @@ describe('usage tests', function () {
           r.logs[0].should.include('default: foo-description');
       });
     });
+
+    describe('normalizeAliases', function() {
+      // see #128
+      it("should display 'description' string in help message if set for alias", function() {
+          var r = checkUsage(function() {
+              return yargs(['-h'])
+                  .describe('foo', 'foo option')
+                  .alias('f', 'foo')
+                  .help('h')
+                  .wrap(null)
+                  .argv
+              ;
+          });
+
+          r.logs.join('\n').split(/\n+/).should.deep.equal([
+              'Options:',
+              '  -h         Show help ',
+              '  -f, --foo  foo option',
+              ''
+          ]);
+      });
+
+      it("should display 'required' string in help message if set for alias", function() {
+          var r = checkUsage(function() {
+              return yargs(['-h'])
+                  .demand('foo')
+                  .alias('f', 'foo')
+                  .help('h')
+                  .wrap(null)
+                  .argv
+              ;
+          });
+
+          r.logs.join('\n').split(/\n+/).should.deep.equal([
+              'Options:',
+              '  -h         Show help',
+              '  -f, --foo             [required]',
+              ''
+          ]);
+      });
+
+      it("should display 'type' string in help message if set for alias", function() {
+          var r = checkUsage(function() {
+              return yargs(['-h'])
+                  .string('foo')
+                  .describe('foo', 'bar')
+                  .alias('f', 'foo')
+                  .help('h')
+                  .wrap(null)
+                  .argv
+              ;
+          });
+
+          r.logs.join('\n').split(/\n+/).should.deep.equal([
+              'Options:',
+              '  -h         Show help',
+              '  -f, --foo  bar        [string]',
+              ''
+          ]);
+      });
+    })
 });

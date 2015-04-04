@@ -804,7 +804,6 @@ describe('parser tests', function () {
                 result.should.have.property('some-option').that.is.a('string').and.equals('val');
                 result.should.have.property('someOption' ).that.is.a('string').and.equals('val');
             });
-
         }
 
         describe('dashes and camelCase', function () {

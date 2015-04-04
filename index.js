@@ -170,7 +170,7 @@ function Argv (processArgs, cwd) {
                 demanded[keys] = { msg: msg };
             }
             else if (msg === true || typeof msg === 'undefined') {
-                demanded[keys] = { msg: null };
+                demanded[keys] = { msg: undefined };
             }
         }
 
@@ -221,6 +221,7 @@ function Argv (processArgs, cwd) {
     self.defaults = self.default;
 
     self.describe = function (key, desc) {
+        options.key[key] = true;
         usage.describe(key, desc);
         return self;
     };
