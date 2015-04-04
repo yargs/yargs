@@ -1,9 +1,11 @@
 ## Change Log
 
 ### v3.7.0 (2015/04/04 02:29 -07:00)
-
+-
 [56cbe2d](https://github.com/bcoe/yargs/commit/56cbe2ddd33dc176dcbf97ba40559864a9f114e4) make .requiresArg() work with type hints. (@bcoe).
+-
 [2f5d562](https://github.com/bcoe/yargs/commit/2f5d5624f736741deeedf6a664d57bc4d857bdd0) serialize arrays and objects in usage strings. (@bcoe).
+-
 [5126304](https://github.com/bcoe/yargs/commit/5126304dd18351fc28f10530616fdd9361e0af98) be more lenient about alias/primary key ordering in chaining API. (@bcoe)
 
 ### v3.6.0 (2015/03/21 01:00 +00:00)
