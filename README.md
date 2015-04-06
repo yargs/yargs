@@ -18,27 +18,27 @@ examples
 With yargs, the options be just a hash!
 -------------------------------------------------------------------
 
-xup.js:
+plunder.js:
 
 ````javascript
 #!/usr/bin/env node
 var argv = require('yargs').argv;
 
-if (argv.rif - 5 * argv.xup > 7.138) {
+if (argv.ships > 3 && argv.distance < 53.5) {
     console.log('Plunder more riffiwobbles!');
 }
 else {
-    console.log('Drop the xupptumblers!');
+    console.log('Retreat from the xupptumblers!');
 }
 ````
 
 ***
 
-    $ ./xup.js --rif=55 --xup=9.52
+    $ ./plunder.js --ships=4 --distance=22
     Plunder more riffiwobbles!
 
-    $ ./xup.js --rif 12 --xup 8.1
-    Drop the xupptumblers!
+    $ ./plunder.js --ships 12 --distance 98.7
+    Retreat from the xupptumblers!
 
 ![Joe was one optimistic pirate.](http://i.imgur.com/4WFGVJ9.png)
 
@@ -153,31 +153,31 @@ DEBUG("Extra chatty mode");
 Tell users how to use yer options and make demands.
 -------------------------------------------------
 
-divide.js:
+area.js:
 
 ````javascript
 #!/usr/bin/env node
 var argv = require('yargs')
-    .usage('Usage: $0 -x [num] -y [num]')
-    .demand(['x','y'])
+    .usage('Usage: $0 -w [num] -yh[num]')
+    .demand(['w','h'])
     .argv;
 
-console.log(argv.x / argv.y);
+console.log("The area is:", argv.w * argv.h);
 ````
 
 ***
 
-    $ ./divide.js -x 55 -y 11
-    5
+    $ ./area.js -w 55 -w 11
+    605
 
-    $ node ./divide.js -x 4.91 -z 2.51
-    Usage: node ./divide.js -x [num] -y [num]
+    $ node ./area.js -w 4.91 -w 2.51
+    Usage: node ./area.js -w [num] -h [num]
 
     Options:
-      -x  [required]
-      -y  [required]
+      -w  [required]
+      -h  [required]
 
-    Missing required arguments: y
+    Missing required arguments: h
 
 After yer demands have been met, demand more! Ask for non-hypenated arguments!
 -----------------------------------------
