@@ -1092,5 +1092,27 @@ describe('usage tests', function () {
               ''
           ]);
       });
-    })
+    });
+
+    describe('showHelp', function(done) {
+        // see #143.
+        it('should show help regardless of whether argv has been called', function() {
+            var r = checkUsage(function () {
+                var y = yargs(['--foo'])
+                    .options('foo', {
+                      alias: 'f',
+                      describe: 'foo option'
+                    })
+                    .wrap(null);
+
+                y.showHelp();
+            });
+
+            r.errors.join('\n').split(/\n+/).should.deep.equal([
+                'Options:',
+                '  --foo, -f  foo option',
+                ''
+            ]);
+        });
+    });
 });

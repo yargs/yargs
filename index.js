@@ -301,6 +301,7 @@ function Argv (processArgs, cwd) {
     }
 
     self.showHelp = function (fn) {
+        if (!self.parsed) parseArgs(processArgs); // run parser, if it has not already been executed.
         usage.showHelp(fn);
         return self;
     };
