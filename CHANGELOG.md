@@ -2,12 +2,9 @@
 
 ### v3.7.1 (2015/04/10 11:06 -07:00)
 
-*
-[89e1992](https://github.com/bcoe/yargs/commit/89e1992a004ba73609b5f9ee6890c4060857aba4) detect iojs bin along with node bin. (@bcoe)
-*
-[755509e](https://github.com/bcoe/yargs/commit/755509ea90041e5f7833bba3b8c5deffe56f0aab) improvements to example documentation in README.md (@rstacruz)
-*
-[0d2dfc8](https://github.com/bcoe/yargs/commit/0d2dfc822a43418242908ad97ddd5291a1b35dc6) showHelp() no longer requires that .argv has been called (@bcoe)
+* [89e1992](https://github.com/bcoe/yargs/commit/89e1992a004ba73609b5f9ee6890c4060857aba4) detect iojs bin along with node bin. (@bcoe)
+* [755509e](https://github.com/bcoe/yargs/commit/755509ea90041e5f7833bba3b8c5deffe56f0aab) improvements to example documentation in README.md (@rstacruz)
+* [0d2dfc8](https://github.com/bcoe/yargs/commit/0d2dfc822a43418242908ad97ddd5291a1b35dc6) showHelp() no longer requires that .argv has been called (@bcoe)
 
 ### v3.7.0 (2015/04/04 02:29 -07:00)
 
