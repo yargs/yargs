@@ -1108,7 +1108,7 @@ describe('usage tests', function () {
     })
   })
 
-  describe('$0', function() {
+  describe('$0', function () {
     function mockProcessArgv (argv, cb) {
       var argvOld = process.argv
       process.argv = argv
