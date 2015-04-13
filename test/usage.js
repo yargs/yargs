@@ -1142,6 +1142,12 @@ describe('usage tests', function () {
             });
         });
 
+        it('is detected correctly when argv contains "/usr/bin/node"', function() {
+            mockProcessArgv(['/usr/bin/node', 'script.js'], function() {
+                yargs([]).$0.should.equal('script.js');
+            });
+        });
+
         it('is detected correctly when dirname contains "node"', function() {
             mockProcessArgv(['/code/node/script.js'], function() {
                 yargs([]).$0.should.equal('/code/node/script.js');
@@ -1156,6 +1162,12 @@ describe('usage tests', function () {
 
         it('is detected correctly when argv contains "iojs"', function() {
             mockProcessArgv(['iojs', 'script.js'], function() {
+                yargs([]).$0.should.equal('script.js');
+            });
+        });
+
+        it('is detected correctly when argv contains "/usr/bin/iojs"', function() {
+            mockProcessArgv(['/usr/bin/iojs', 'script.js'], function() {
                 yargs([]).$0.should.equal('script.js');
             });
         });
