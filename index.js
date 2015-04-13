@@ -29,7 +29,6 @@ function Argv (processArgs, cwd) {
                 ? b : x
         })
         .join(' ').trim();
-    ;
 
     if (process.env._ != undefined && process.argv[1] == process.env._) {
         self.$0 = process.env._.replace(
