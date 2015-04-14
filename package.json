@@ -22,10 +22,11 @@
     "mocha": "^2.2.1",
     "mocha-lcov-reporter": "0.0.2",
     "mocoverage": "^1.0.0",
-    "patched-blanket": "^1.0.1"
+    "patched-blanket": "^1.0.1",
+    "standard": "^3.6.0"
   },
   "scripts": {
-    "test": "mocha --check-leaks --ui exports --require patched-blanket -R mocoverage"
+    "test": "standard && mocha --check-leaks --ui exports --require patched-blanket -R mocoverage"
   },
   "repository": {
     "type": "git",
@@ -43,6 +44,14 @@
       ],
       "output-reporter": "spec"
     }
+  },
+  "standard": {
+    "ignore": [
+      "**/example/**"
+    ],
+    "globals": [
+      "it"
+    ]
   },
   "keywords": [
     "argument",
