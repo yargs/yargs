@@ -5,7 +5,7 @@ var checkUsage = require('./helpers/utils').checkOutput,
 
 describe('Completion', function () {
   beforeEach(function () {
-    yargs.reset();
+    yargs.reset()
   })
 
   describe('default completion behavior', function () {
