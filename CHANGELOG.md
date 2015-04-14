@@ -3,7 +3,7 @@
 ### v3.7.2 (2015/04/13 11:52 -07:00)
 
 * [679fbbf](https://github.com/bcoe/yargs/commit/679fbbf55904030ccee8a2635e8e5f46551ab2f0) updated yargs to use the [standard](https://github.com/feross/standard) style guide (agokjr)
-* [22382ee]https://github.com/bcoe/yargs/commit/22382ee9f5b495bc2586c1758cd1091cec3647f9 various bug fixes for $0
+* [22382ee](https://github.com/bcoe/yargs/commit/22382ee9f5b495bc2586c1758cd1091cec3647f9 various bug fixes for $0 (@nylen)
 
 ### v3.7.1 (2015/04/10 11:06 -07:00)
 
