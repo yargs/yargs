@@ -547,9 +547,9 @@ describe('usage tests', function () {
         }
 
         return yargs('--foo 10 --bar 20'.split(' '))
-        .usage('Usage: $0 [options]', opts)
-        .strict()
-        .argv
+          .usage('Usage: $0 [options]', opts)
+          .strict()
+          .argv
       })
 
       r.should.have.property('result')
@@ -1105,6 +1105,63 @@ describe('usage tests', function () {
         '  --foo, -f  foo option',
         ''
       ])
+    })
+  })
+
+  describe('$0', function () {
+    function mockProcessArgv (argv, cb) {
+      var argvOld = process.argv
+      process.argv = argv
+      // cb must be sync for now
+      try {
+        cb()
+        process.argv = argvOld
+      } catch (err) {
+        process.argv = argvOld
+        throw err
+      }
+    }
+
+    it('is detected correctly for a basic script', function () {
+      mockProcessArgv(['script.js'], function () {
+        yargs([]).$0.should.equal('script.js')
+      })
+    })
+
+    it('is detected correctly when argv contains "node"', function () {
+      mockProcessArgv(['node', 'script.js'], function () {
+        yargs([]).$0.should.equal('script.js')
+      })
+    })
+
+    it('is detected correctly when dirname contains "node"', function () {
+      mockProcessArgv(['/code/node/script.js'], function () {
+        yargs([]).$0.should.equal('/code/node/script.js')
+      })
+    })
+
+    it('is detected correctly when dirname and argv contain "node"', function () {
+      mockProcessArgv(['node', '/code/node/script.js'], function () {
+        yargs([]).$0.should.equal('/code/node/script.js')
+      })
+    })
+
+    it('is detected correctly when argv contains "iojs"', function () {
+      mockProcessArgv(['iojs', 'script.js'], function () {
+        yargs([]).$0.should.equal('script.js')
+      })
+    })
+
+    it('is detected correctly when dirname contains "iojs"', function () {
+      mockProcessArgv(['/code/iojs/script.js'], function () {
+        yargs([]).$0.should.equal('/code/iojs/script.js')
+      })
+    })
+
+    it('is detected correctly when dirname and argv contain "iojs"', function () {
+      mockProcessArgv(['iojs', '/code/iojs/script.js'], function () {
+        yargs([]).$0.should.equal('/code/iojs/script.js')
+      })
     })
   })
 })
