@@ -167,7 +167,7 @@ console.log("The area is:", argv.w * argv.h);
 
 ***
 
-    $ ./area.js -w 55 -w 11
+    $ ./area.js -w 55 -h 11
     605
 
     $ node ./area.js -w 4.91 -w 2.51
