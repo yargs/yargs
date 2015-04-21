@@ -11,9 +11,9 @@
   ],
   "dependencies": {
     "camelcase": "^1.0.2",
+    "cliui": "^1.4.0",
     "decamelize": "^1.0.0",
-    "window-size": "0.1.0",
-    "wordwrap": "0.0.2"
+    "window-size": "0.1.0"
   },
   "devDependencies": {
     "chai": "^2.2.0",
