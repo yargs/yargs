@@ -24,10 +24,8 @@ describe('usage tests', function () {
         r.errors.join('\n').split(/\n+/).should.deep.equal([
           'Usage: ./usage -x NUM -y NUM',
           'Options:',
-          '  -x',
-          '      [required]',
-          '  -y',
-          '      [required]',
+          '  -x  [required]',
+          '  -y  [required]',
           'Missing required arguments: y'
         ])
         r.logs.should.have.length(0)
@@ -49,10 +47,8 @@ describe('usage tests', function () {
           r.errors.join('\n').split(/\n+/).should.deep.equal([
             'Usage: ./usage -x NUM -y NUM',
             'Options:',
-            '  -x',
-            '      [required]',
-            '  -y',
-            '      [required]',
+            '  -x  [required]',
+            '  -y  [required]',
             'Missing required arguments: y'
           ])
           r.logs.should.have.length(0)
@@ -74,10 +70,8 @@ describe('usage tests', function () {
       r.errors.join('\n').split(/\n+/).should.deep.equal([
         'Usage: ./usage -x NUM -y NUM',
         'Options:',
-        '  -x',
-        '      [required]',
-        '  -y',
-        '      [required]',
+        '  -x  [required]',
+        '  -y  [required]',
         'Missing required arguments: x, y',
         'x and y are both required to multiply all the things'
       ])
@@ -325,8 +319,7 @@ describe('usage tests', function () {
     })
     r.errors.join('\n').split(/\n+/).should.deep.equal([
       'Options:',
-      '  -f, --foo',
-      '             [default: 5]',
+      '  -f, --foo  [default: 5]',
       'Not enough non-option arguments: got 0, need at least 1'
     ])
   })
@@ -471,10 +464,8 @@ describe('usage tests', function () {
       r.errors.join('\n').split(/\n+/).should.deep.equal([
         'Usage: ./usage [options]',
         'Options:',
-        '  --foo, -f',
-        '             [required]',
-        '  --bar, -b',
-        '             [required]',
+        '  --foo, -f  [required]',
+        '  --bar, -b  [required]',
         'Unknown argument: baz'
       ])
       r.should.have.property('logs').with.length(0)
@@ -587,10 +578,9 @@ describe('usage tests', function () {
     r.should.have.property('exit').and.be.ok
     r.errors.join('\n').split(/\n+/).should.deep.equal([
       'Options:',
-      '  -y',
-      '      [required]',
+      '  -y  [required]',
       'Examples:',
-      '  ./usage something  description',
+      '  ./usage something       description',
       '  ./usage something else  other description',
       'Missing required arguments: y'
     ])
@@ -616,8 +606,7 @@ describe('usage tests', function () {
           'Usage: ./usage -x NUM [-y NUM]',
           '',
           'Options:',
-          '  -x  an option',
-          '      [required]',
+          '  -x  an option  [required]',
           '  -y  another option',
           '',
           'Missing required arguments: x'
@@ -646,8 +635,7 @@ describe('usage tests', function () {
           'Usage: ./usage -x NUM [-y NUM]',
           '',
           'Options:',
-          '  -x  an option',
-          '      [required]',
+          '  -x  an option  [required]',
           '  -y  another option',
           '',
           'Missing required arguments: x'
@@ -692,8 +680,7 @@ describe('usage tests', function () {
       r.logs.join('\n').split(/\n+/).should.deep.equal([
         'Options:',
         '  --help  Show help',
-        '  -y',
-        '          [required]',
+        '  -y  [required]',
         ''
       ])
     })
@@ -716,9 +703,8 @@ describe('usage tests', function () {
       r.logs.join('\n').split(/\n+/).should.deep.equal([
         'Usage: ./usage options',
         'Options:',
-        '  --help  Show help',
-        '  --some-opt  Some option',
-        '              [default: 2]',
+        '  --help      Show help',
+        '  --some-opt  Some option  [default: 2]',
         ''
       ])
     })
@@ -885,17 +871,17 @@ describe('usage tests', function () {
     it('should wrap the left-hand-column if it takes up more than 50% of the screen', function () {
       var r = checkUsage(function () {
         return yargs([])
-        .example(
-          'i am a fairly long example',
-          'description that is also fairly long'
-        )
-        .demand('foo')
-        .wrap(40)
-        .argv
+          .example(
+            'i am a fairly long example',
+            'description that is also fairly long'
+          )
+          .demand('foo')
+          .wrap(40)
+          .argv
       })
 
       // should split example usage onto multiple lines.
-      r.errors[0].split('\n').length.should.equal(8)
+      r.errors[0].split('\n').length.should.equal(10)
 
       // should wrap within appropriate boundaries.
       r.errors[0].split('\n').forEach(function (line, i) {
@@ -936,8 +922,7 @@ describe('usage tests', function () {
         '  upload    upload something',
         '  download  download something from somewhere',
         'Options:',
-        '  -y',
-        '      [required]',
+        '  -y  [required]',
         'Missing required arguments: y'
       ])
     })
@@ -947,16 +932,15 @@ describe('usage tests', function () {
     it('should display an epilog message at the end of the usage instructions', function () {
       var r = checkUsage(function () {
         return yargs('')
-        .epilog('for more info view the manual at http://example.com')
-        .demand('y')
-        .wrap(null)
-        .argv
+          .epilog('for more info view the manual at http://example.com')
+          .demand('y')
+          .wrap(null)
+          .argv
       })
 
       r.errors.join('\n').split(/\n+/).should.deep.equal([
         'Options:',
-        '  -y',
-        '      [required]',
+        '  -y  [required]',
         'for more info view the manual at http://example.com',
         'Missing required arguments: y'
       ])
@@ -965,16 +949,15 @@ describe('usage tests', function () {
     it('replaces $0 in epilog string', function () {
       var r = checkUsage(function () {
         return yargs('')
-        .epilog("Try '$0 --long-help' for more information")
-        .demand('y')
-        .wrap(null)
-        .argv
+          .epilog("Try '$0 --long-help' for more information")
+          .demand('y')
+          .wrap(null)
+          .argv
       })
 
       r.errors.join('\n').split(/\n+/).should.deep.equal([
         'Options:',
-        '  -y',
-        '      [required]',
+        '  -y  [required]',
         'Try \'./usage --long-help\' for more information',
         'Missing required arguments: y'
       ])
@@ -1047,16 +1030,16 @@ describe('usage tests', function () {
     it("should display 'description' string in help message if set for alias", function () {
       var r = checkUsage(function () {
         return yargs(['-h'])
-        .describe('foo', 'foo option')
-        .alias('f', 'foo')
-        .help('h')
-        .wrap(null)
-        .argv
+          .describe('foo', 'foo option')
+          .alias('f', 'foo')
+          .help('h')
+          .wrap(null)
+          .argv
       })
 
       r.logs.join('\n').split(/\n+/).should.deep.equal([
         'Options:',
-        '  -h  Show help',
+        '  -h         Show help',
         '  -f, --foo  foo option',
         ''
       ])
@@ -1074,9 +1057,8 @@ describe('usage tests', function () {
 
       r.logs.join('\n').split(/\n+/).should.deep.equal([
         'Options:',
-        '  -h  Show help',
-        '  -f, --foo',
-        '             [required]',
+        '  -h         Show help',
+        '  -f, --foo  [required]',
         ''
       ])
     })
@@ -1094,9 +1076,8 @@ describe('usage tests', function () {
 
       r.logs.join('\n').split(/\n+/).should.deep.equal([
         'Options:',
-        '  -h  Show help',
-        '  -f, --foo  bar',
-        '             [string]',
+        '  -h         Show help',
+        '  -f, --foo  bar  [string]',
         ''
       ])
     })
