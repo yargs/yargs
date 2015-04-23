@@ -881,7 +881,7 @@ describe('usage tests', function () {
       })
 
       // should split example usage onto multiple lines.
-      r.errors[0].split('\n').length.should.equal(10)
+      r.errors[0].split('\n').length.should.equal(8)
 
       // should wrap within appropriate boundaries.
       r.errors[0].split('\n').forEach(function (line, i) {
