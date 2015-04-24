@@ -287,9 +287,9 @@ function Argv (processArgs, cwd) {
     return strict
   }
 
-  self.showHelp = function (fn) {
+  self.showHelp = function (level) {
     if (!self.parsed) parseArgs(processArgs) // run parser, if it has not already been executed.
-    usage.showHelp(fn)
+    usage.showHelp(level)
     return self
   }
 
