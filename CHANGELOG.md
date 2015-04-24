@@ -1,5 +1,10 @@
 ## Change Log
 
+### v3.8.0 (2015/04/24 23:10 +00:00)
+- [#154](https://github.com/bcoe/yargs/pull/154) showHelp's method signature was misleading fixes #153 (@bcoe)
+- [#151](https://github.com/bcoe/yargs/pull/151) refactor yargs' table layout logic to use new helper library (@bcoe)
+- [#150](https://github.com/bcoe/yargs/pull/150) Fix README example in argument requirements (@annonymouse)
+
 ### v3.7.2 (2015/04/13 11:52 -07:00)
 
 * [679fbbf](https://github.com/bcoe/yargs/commit/679fbbf55904030ccee8a2635e8e5f46551ab2f0) updated yargs to use the [standard](https://github.com/feross/standard) style guide (agokjr)
