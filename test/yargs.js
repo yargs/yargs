@@ -153,7 +153,7 @@ describe('yargs dsl tests', function () {
       // so that we can confirm they're reset.
       var y = yargs(['--help'])
         .help('help')
-        .command('foo', 'bar')
+        .command('foo', 'bar', function () {})
         .default('foo', 'bar')
         .describe('foo', 'foo variable')
         .demand('foo')
@@ -186,6 +186,62 @@ describe('yargs dsl tests', function () {
       expect(y.getExitProcess()).to.equal(true)
       expect(y.getStrict()).to.equal(false)
       expect(y.getDemanded()).to.deep.equal({})
+      expect(y.getCommandHandlers()).to.deep.equal({})
+    })
+  })
+
+  describe('command', function () {
+    it('allows a function to be associated with a command', function (done) {
+      yargs(['blerg'])
+        .command('blerg', 'handle blerg things', function () {
+          return done()
+        })
+        .exitProcess(false) // defaults to true.
+        .argv
+    })
+
+    it('does not execute top-level help if a handled command is provided', function () {
+      var r = checkOutput(function () {
+        yargs(['blerg', '-h'])
+          .command('blerg', 'handle blerg things', function (yargs) {
+            yargs.command('snuh', 'snuh command')
+              .help('h')
+              .argv
+          })
+          .help('h')
+          .argv
+      })
+
+      r.logs[0].split('\n').should.deep.equal([
+        'Commands:',
+        '  snuh  snuh command',
+        '',
+        'Options:',
+        '  -h  Show help',
+        ''
+      ])
+    })
+
+    it('executes top-level help if no handled command is provided', function () {
+      var r = checkOutput(function () {
+        yargs(['snuh', '-h'])
+          .command('blerg', 'handle blerg things', function (yargs) {
+            yargs.command('snuh', 'snuh command')
+              .help('h')
+              .argv
+          })
+          .help('h')
+          .argv
+      })
+
+      r.logs[0].split('\n').should.deep.equal([
+        'Commands:',
+        '  blerg  handle blerg things',
+        '',
+        'Options:',
+        '  -h  Show help',
+        ''
+      ])
     })
   })
 })

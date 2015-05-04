@@ -67,6 +67,7 @@ function Argv (processArgs, cwd) {
     helpOpt = null
     versionOpt = null
     completionOpt = null
+    commandHandlers = {}
 
     return self
   }
@@ -108,9 +109,15 @@ function Argv (processArgs, cwd) {
     return self
   }
 
-  self.command = function (cmd, description) {
+  self.command = function (cmd, description, fn) {
     usage.command(cmd, description)
+    if (fn) commandHandlers[cmd] = fn
     return self
+  }
+
+  var commandHandlers = {}
+  self.getCommandHandlers = function () {
+    return commandHandlers
   }
 
   self.string = function (strings) {
@@ -398,6 +405,16 @@ function Argv (processArgs, cwd) {
       self.showCompletionScript()
       if (exitProcess) {
         process.exit(0)
+      }
+    }
+
+    // if there's a handler associated with a
+    // command differ processing to it.
+    var handlerKeys = Object.keys(self.getCommandHandlers())
+    for (var i = 0, command; (command = handlerKeys[i]) !== undefined; i++) {
+      if (~argv._.indexOf(command)) {
+        self.getCommandHandlers()[command](self.reset())
+        return
       }
     }
 
