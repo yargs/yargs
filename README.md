@@ -501,18 +501,33 @@ present script similar to how `$0` works in bash or perl.
 
 `opts` is optional and acts like calling `.options(opts)`.
 
-.command(cmd, desc)
+.command(cmd, desc, [fn])
 -------------------
 
-Document the commands exposed by your application (stored in the `_` variable).
+Document the commands exposed by your application.
 
-As an example, here's how the npm cli might document some of its commands:
+use `desc` to provide a description for each command your application accepts (the
+values stored in `argv._`).
+
+Optionally, you can provide a handler `fn` which will be executed when
+a given command is provided. The handler will be executed with an instance
+of `yargs`, which can be used to compose nested commands.
+
+Here's an example of top-level and nested commands in action:
 
 ```js
 var argv = require('yargs')
   .usage('npm <command>')
   .command('install', 'tis a mighty fine package to install')
-  .command('publish', 'shiver me timbers, should you be sharing all that')
+  .command('publish', 'shiver me timbers, should you be sharing all that', function (yargs) {
+    argv = yargs.option('f', {
+      alias: 'force',
+      description: 'yar, it usually be a bad idea'
+    })
+    .help('help')
+    .argv
+  })
+  .help('help')
   .argv;
 ```
 
