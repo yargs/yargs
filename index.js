@@ -409,7 +409,7 @@ function Argv (processArgs, cwd) {
     }
 
     // if there's a handler associated with a
-    // command differ processing to it.
+    // command defer processing to it.
     var handlerKeys = Object.keys(self.getCommandHandlers())
     for (var i = 0, command; (command = handlerKeys[i]) !== undefined; i++) {
       if (~argv._.indexOf(command)) {
