@@ -206,6 +206,7 @@ describe('yargs dsl tests', function () {
           .command('blerg', 'handle blerg things', function (yargs) {
             yargs.command('snuh', 'snuh command')
               .help('h')
+              .wrap(null)
               .argv
           })
           .help('h')
@@ -217,7 +218,7 @@ describe('yargs dsl tests', function () {
         '  snuh  snuh command',
         '',
         'Options:',
-        '  -h  Show help',
+        '  -h  Show help  [boolean]',
         ''
       ])
     })
@@ -231,6 +232,7 @@ describe('yargs dsl tests', function () {
               .argv
           })
           .help('h')
+          .wrap(null)
           .argv
       })
 
@@ -239,7 +241,7 @@ describe('yargs dsl tests', function () {
         '  blerg  handle blerg things',
         '',
         'Options:',
-        '  -h  Show help',
+        '  -h  Show help  [boolean]',
         ''
       ])
     })

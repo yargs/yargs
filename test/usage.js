@@ -679,7 +679,7 @@ describe('usage tests', function () {
       r.should.have.property('exit').and.be.ok
       r.logs.join('\n').split(/\n+/).should.deep.equal([
         'Options:',
-        '  --help  Show help',
+        '  --help  Show help  [boolean]',
         '  -y  [required]',
         ''
       ])
@@ -703,7 +703,7 @@ describe('usage tests', function () {
       r.logs.join('\n').split(/\n+/).should.deep.equal([
         'Usage: ./usage options',
         'Options:',
-        '  --help      Show help',
+        '  --help      Show help  [boolean]',
         '  --some-opt  Some option  [default: 2]',
         ''
       ])
@@ -1039,7 +1039,7 @@ describe('usage tests', function () {
 
       r.logs.join('\n').split(/\n+/).should.deep.equal([
         'Options:',
-        '  -h         Show help',
+        '  -h         Show help  [boolean]',
         '  -f, --foo  foo option',
         ''
       ])
@@ -1057,7 +1057,7 @@ describe('usage tests', function () {
 
       r.logs.join('\n').split(/\n+/).should.deep.equal([
         'Options:',
-        '  -h         Show help',
+        '  -h         Show help  [boolean]',
         '  -f, --foo  [required]',
         ''
       ])
@@ -1076,7 +1076,7 @@ describe('usage tests', function () {
 
       r.logs.join('\n').split(/\n+/).should.deep.equal([
         'Options:',
-        '  -h         Show help',
+        '  -h         Show help  [boolean]',
         '  -f, --foo  bar  [string]',
         ''
       ])
