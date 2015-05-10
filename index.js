@@ -67,6 +67,8 @@ function Argv (processArgs, cwd) {
     helpOpt = null
     versionOpt = null
     completionOpt = null
+    commandHandlers = {}
+    self.parsed = false
 
     return self
   }
@@ -108,9 +110,15 @@ function Argv (processArgs, cwd) {
     return self
   }
 
-  self.command = function (cmd, description) {
+  self.command = function (cmd, description, fn) {
     usage.command(cmd, description)
+    if (fn) commandHandlers[cmd] = fn
     return self
+  }
+
+  var commandHandlers = {}
+  self.getCommandHandlers = function () {
+    return commandHandlers
   }
 
   self.string = function (strings) {
@@ -297,6 +305,7 @@ function Argv (processArgs, cwd) {
   self.version = function (ver, opt, msg) {
     versionOpt = opt || 'version'
     usage.version(ver)
+    self.boolean(versionOpt)
     self.describe(versionOpt, msg || 'Show version number')
     return self
   }
@@ -304,6 +313,7 @@ function Argv (processArgs, cwd) {
   var helpOpt = null
   self.addHelpOpt = function (opt, msg) {
     helpOpt = opt
+    self.boolean(opt)
     self.describe(opt, msg || 'Show help')
     return self
   }
@@ -386,8 +396,8 @@ function Argv (processArgs, cwd) {
 
   function parseArgs (args) {
     var parsed = Parser(args, options),
-    argv = parsed.argv,
-    aliases = parsed.aliases
+      argv = parsed.argv,
+      aliases = parsed.aliases
 
     argv.$0 = self.$0
 
@@ -401,13 +411,23 @@ function Argv (processArgs, cwd) {
       }
     }
 
+    // if there's a handler associated with a
+    // command defer processing to it.
+    var handlerKeys = Object.keys(self.getCommandHandlers())
+    for (var i = 0, command; (command = handlerKeys[i]) !== undefined; i++) {
+      if (~argv._.indexOf(command)) {
+        self.getCommandHandlers()[command](self.reset())
+        return self.argv
+      }
+    }
+
     Object.keys(argv).forEach(function (key) {
-      if (key === helpOpt) {
+      if (key === helpOpt && argv[key]) {
         self.showHelp('log')
         if (exitProcess) {
           process.exit(0)
         }
-      } else if (key === versionOpt) {
+      } else if (key === versionOpt && argv[key]) {
         usage.showVersion()
         if (exitProcess) {
           process.exit(0)
