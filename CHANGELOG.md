@@ -1,5 +1,9 @@
 ## Change Log
 
+### v3.9.0 (2015/05/10 18:32 +00:00)
+- [#157](https://github.com/bcoe/yargs/pull/157) Merge pull request #157 from bcoe/command-yargs. allows handling of command specific arguments. Thanks for the suggestion @ohjames (@bcoe)
+- [#158](https://github.com/bcoe/yargs/pull/158) Merge pull request #158 from kemitchell/spdx-license. Update license format (@kemitchell)
+
 ### v3.8.0 (2015/04/24 23:10 +00:00)
 - [#154](https://github.com/bcoe/yargs/pull/154) showHelp's method signature was misleading fixes #153 (@bcoe)
 - [#151](https://github.com/bcoe/yargs/pull/151) refactor yargs' table layout logic to use new helper library (@bcoe)
