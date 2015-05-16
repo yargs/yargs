@@ -19,9 +19,7 @@
     "chai": "^2.2.0",
     "coveralls": "^2.11.2",
     "hashish": "0.0.4",
-    "mocha": "^2.2.1",
-    "mocoverage": "^1.0.0",
-    "standard": "^3.6.0"
+    "mocha": "^2.2.1"
   },
   "scripts": {
     "test": "standard && nyc mocha --check-leaks && nyc report",
