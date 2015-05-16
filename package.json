@@ -20,7 +20,8 @@
     "coveralls": "^2.11.2",
     "hashish": "0.0.4",
     "mocha": "^2.2.1",
-    "nyc": "^2.0.0"
+    "nyc": "^2.0.0",
+    "standard": "^3.9.0"
   },
   "scripts": {
     "test": "standard && nyc mocha --check-leaks && nyc report",
