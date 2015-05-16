@@ -20,30 +20,16 @@
     "coveralls": "^2.11.2",
     "hashish": "0.0.4",
     "mocha": "^2.2.1",
-    "mocha-lcov-reporter": "0.0.2",
     "mocoverage": "^1.0.0",
-    "patched-blanket": "^1.0.1",
     "standard": "^3.6.0"
   },
   "scripts": {
-    "test": "standard && mocha --check-leaks --ui exports --require patched-blanket -R mocoverage"
+    "test": "standard && nyc mocha --check-leaks && nyc report",
+    "coverage": "nyc report --reporter=text-lcov | coveralls"
   },
   "repository": {
     "type": "git",
     "url": "http://github.com/bcoe/yargs.git"
-  },
-  "config": {
-    "blanket": {
-      "pattern": [
-        "lib",
-        "index.js"
-      ],
-      "data-cover-never": [
-        "node_modules",
-        "test"
-      ],
-      "output-reporter": "spec"
-    }
   },
   "standard": {
     "ignore": [
@@ -86,6 +72,10 @@
     {
       "name": "Benjamin Horsleben",
       "url": "https://github.com/fizker"
+    },
+    {
+      "name": "Lin Clark",
+      "url": "https://github.com/linclark"
     }
   ],
   "license": "MIT",
