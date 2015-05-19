@@ -956,8 +956,8 @@ describe('parser tests', function () {
 
     it('should raise an exception if there are not enough arguments following key', function () {
       expect(function () {
-        yargs().nargs('foo', 2).
-          parse([ '--foo', 'apple'])
+        yargs().nargs('foo', 2)
+          .parse([ '--foo', 'apple'])
       }).to.throw('not enough arguments following: foo')
     })
 

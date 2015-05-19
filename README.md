@@ -618,8 +618,9 @@ Optionally `.nargs()` can take an object of `key`/`narg` pairs.
 .config(key)
 ------------
 
-Tells the parser to interpret `key` as a path to a JSON config file. The file
-is loaded and parsed, and its properties are set as arguments.
+Tells the parser that if the option specified by `key` is passed in, it 
+should be interpreted as a path to a JSON config file. The file is loaded
+and parsed, and its properties are set as arguments.
 
 .wrap(columns)
 --------------
