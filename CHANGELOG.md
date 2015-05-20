@@ -1,5 +1,9 @@
 ## Change Log
 
+### v3.9.1 (2015/05/20 05:14 +00:00)
+- [b6662b6](https://github.com/bcoe/yargs/commit/b6662b6774cfeab4876f41ec5e2f67b7698f4e2f) clarify .config() docs (@linclark)
+- [0291360](https://github.com/bcoe/yargs/commit/02913606285ce31ce81d7f12c48d8a3029776ec7) fixed tests, switched to nyc for coverage, fixed security issue, added Lin as collaborator (@bcoe)
+
 ### v3.9.0 (2015/05/10 18:32 +00:00)
 - [#157](https://github.com/bcoe/yargs/pull/157) Merge pull request #157 from bcoe/command-yargs. allows handling of command specific arguments. Thanks for the suggestion @ohjames (@bcoe)
 - [#158](https://github.com/bcoe/yargs/pull/158) Merge pull request #158 from kemitchell/spdx-license. Update license format (@kemitchell)
