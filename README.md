@@ -618,7 +618,7 @@ Optionally `.nargs()` can take an object of `key`/`narg` pairs.
 .config(key)
 ------------
 
-Tells the parser that if the option specified by `key` is passed in, it 
+Tells the parser that if the option specified by `key` is passed in, it
 should be interpreted as a path to a JSON config file. The file is loaded
 and parsed, and its properties are set as arguments.
 
@@ -629,6 +629,9 @@ Format usage output to wrap at `columns` many columns.
 
 By default wrap will be set to `Math.min(80, windowWidth)`. Use `.wrap(null)` to
 specify no column limit.
+
+`yargs.wrap(yargs.terminalWidth())` can be used to maximize the width
+of yargs' usage instructions.
 
 .strict()
 ---------

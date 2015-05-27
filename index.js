@@ -379,6 +379,10 @@ function Argv (processArgs, cwd) {
     return validation
   }
 
+  self.terminalWidth = function () {
+    return require('window-size').width
+  }
+
   Object.defineProperty(self, 'argv', {
     get: function () {
       var args = null
