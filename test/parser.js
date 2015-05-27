@@ -942,6 +942,34 @@ describe('parser tests', function () {
       Array.isArray(result.caPath).should.equal(true)
       Array.isArray(result.c).should.equal(true)
     })
+
+    // see: https://github.com/bcoe/yargs/issues/162
+    it('should eat non-hyphenated arguments until hyphenated option is hit', function () {
+      var result = yargs()
+        .option('a', {array: true})
+        .option('b', {array: true})
+        .option('foo', {array: true})
+        .option('bar', {array: true})
+        .parse(['-a=hello', 'world', '-b',
+          '33', '22', '--foo', 'red', 'green',
+          '--bar=cat', 'dog'])
+
+      Array.isArray(result.a).should.equal(true)
+      result.a.should.include('hello')
+      result.a.should.include('world')
+
+      Array.isArray(result.b).should.equal(true)
+      result.b.should.include(33)
+      result.b.should.include(22)
+
+      Array.isArray(result.foo).should.equal(true)
+      result.foo.should.include('red')
+      result.foo.should.include('green')
+
+      Array.isArray(result.bar).should.equal(true)
+      result.bar.should.include('cat')
+      result.bar.should.include('dog')
+    })
   })
 
   describe('nargs', function () {
@@ -980,6 +1008,25 @@ describe('parser tests', function () {
       result.f[0].should.equal('apple')
       result.f[1].should.equal('bar')
       result._[0].should.equal('blerg')
+    })
+
+    it('should support nargs for -f= and --bar= format arguments', function () {
+      var result = yargs()
+        .option('f', {
+          nargs: 2
+        })
+        .option('bar', {
+          nargs: 2
+        })
+        .parse([ '-f=apple', 'bar', 'blerg', '--bar=monkey', 'washing', 'cat'])
+
+      result.f[0].should.equal('apple')
+      result.f[1].should.equal('bar')
+      result._[0].should.equal('blerg')
+
+      result.bar[0].should.equal('monkey')
+      result.bar[1].should.equal('washing')
+      result._[1].should.equal('cat')
     })
 
     it('allows multiple nargs to be set at the same time', function () {
