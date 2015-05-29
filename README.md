@@ -595,7 +595,7 @@ regardless of whether they resemble numbers.
 ----------
 
 Tell the parser to interpret `key` as an array. If `.array('foo')` is set,
-`--foo bar` will be parsed as `['bar']` rather than as `'bar'`.
+`--foo foo bar` will be parsed as `['foo', 'bar']` rather than as `'bar'`.
 
 .nargs(key, count)
 -----------
@@ -618,7 +618,7 @@ Optionally `.nargs()` can take an object of `key`/`narg` pairs.
 .config(key)
 ------------
 
-Tells the parser that if the option specified by `key` is passed in, it 
+Tells the parser that if the option specified by `key` is passed in, it
 should be interpreted as a path to a JSON config file. The file is loaded
 and parsed, and its properties are set as arguments.
 
