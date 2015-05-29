@@ -246,4 +246,10 @@ describe('yargs dsl tests', function () {
       ])
     })
   })
+
+  describe('terminalWidth', function () {
+    it('returns the maximum width of the terminal', function () {
+      yargs.terminalWidth().should.be.gt(0)
+    })
+  })
 })
