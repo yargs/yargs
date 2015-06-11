@@ -100,8 +100,9 @@ function Argv (processArgs, cwd) {
     return self
   }
 
-  self.config = function (configs) {
-    options.config.push.apply(options.config, [].concat(configs))
+  self.config = function (key, msg) {
+    self.describe(key, msg || 'Path to json config file')
+    options.config.push.apply(options.config, [].concat(key))
     return self
   }
 
