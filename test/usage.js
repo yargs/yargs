@@ -217,8 +217,8 @@ describe('usage tests', function () {
     r.should.have.property('exit').and.be.ok
     r.should.have.property('errors')
     r.errors.join('\n').split(/\n+/).join('\n').should.equal(
-      'Usage: ./usage -x NUM -y NUM\n'
-      + 'Argument check failed: ' + checker.toString()
+      'Usage: ./usage -x NUM -y NUM\n' +
+      'Argument check failed: ' + checker.toString()
     )
   })
 
