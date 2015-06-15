@@ -333,7 +333,7 @@ describe('parser tests', function () {
       r.should.have.property('logs').with.length(1)
       r.logs.join('\n').split(/\n+/).should.deep.equal([
         'Options:',
-        '  --settings  Path to json config file',
+        '  --settings  Path to JSON config file',
         '  --help      Show help  [boolean]',
         ''
       ])
