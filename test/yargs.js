@@ -1,8 +1,8 @@
 /* global describe, it, beforeEach */
 
-var expect = require('chai').expect,
-  checkOutput = require('./helpers/utils').checkOutput,
-  yargs = require('../')
+var expect = require('chai').expect
+var checkOutput = require('./helpers/utils').checkOutput
+var yargs = require('../')
 
 describe('yargs dsl tests', function () {
   beforeEach(function () {

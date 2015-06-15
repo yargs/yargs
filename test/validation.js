@@ -1,7 +1,7 @@
 /* global describe, it, beforeEach */
 
-var expect = require('chai').expect,
-  yargs = require('../')
+var expect = require('chai').expect
+var yargs = require('../')
 
 describe('validation tests', function () {
   beforeEach(function () {

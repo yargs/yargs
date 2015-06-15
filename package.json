@@ -21,7 +21,7 @@
     "hashish": "0.0.4",
     "mocha": "^2.2.1",
     "nyc": "^2.2.1",
-    "standard": "^4.1.0"
+    "standard": "^4.2.1"
   },
   "scripts": {
     "test": "standard && nyc mocha --check-leaks && nyc report",

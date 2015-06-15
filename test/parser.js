@@ -1,9 +1,9 @@
 /* global describe, it, beforeEach */
 
-var should = require('chai').should(),
-  expect = require('chai').expect,
-  yargs = require('../'),
-  path = require('path')
+var should = require('chai').should()
+var expect = require('chai').expect
+var yargs = require('../')
+var path = require('path')
 
 describe('parser tests', function () {
   beforeEach(function () {
@@ -408,10 +408,10 @@ describe('parser tests', function () {
   })
 
   it('should allow booleans and aliases to be defined with chainable api', function () {
-    var aliased = [ '-h', 'derp' ],
-      regular = [ '--herp', 'derp' ],
-      aliasedArgv = yargs(aliased).boolean('herp').alias('h', 'herp').argv,
-      propertyArgv = yargs(regular).boolean('herp').alias('h', 'herp').argv
+    var aliased = [ '-h', 'derp' ]
+    var regular = [ '--herp', 'derp' ]
+    var aliasedArgv = yargs(aliased).boolean('herp').alias('h', 'herp').argv
+    var propertyArgv = yargs(regular).boolean('herp').alias('h', 'herp').argv
 
     aliasedArgv.should.have.property('herp', true)
     aliasedArgv.should.have.property('h', true)
@@ -422,13 +422,14 @@ describe('parser tests', function () {
   })
 
   it('should allow booleans and aliases to be defined with options hash', function () {
-    var aliased = [ '-h', 'derp' ],
-    regular = [ '--herp', 'derp' ],
-    opts = {
+    var aliased = [ '-h', 'derp' ]
+    var regular = [ '--herp', 'derp' ]
+    var opts = {
       herp: { alias: 'h', boolean: true }
-    },
-    aliasedArgv = yargs(aliased).options(opts).argv,
-    propertyArgv = yargs(regular).options(opts).argv
+    }
+    var aliasedArgv = yargs(aliased).options(opts).argv
+    var propertyArgv = yargs(regular).options(opts).argv
+
     aliasedArgv.should.have.property('herp', true)
     aliasedArgv.should.have.property('h', true)
     aliasedArgv.should.have.property('_').and.deep.equal(['derp'])
@@ -438,8 +439,8 @@ describe('parser tests', function () {
   })
 
   it('should set boolean and alias using explicit true', function () {
-    var aliased = [ '-h', 'true' ],
-      aliasedArgv = yargs(aliased).boolean('h').alias('h', 'herp').argv
+    var aliased = [ '-h', 'true' ]
+    var aliasedArgv = yargs(aliased).boolean('h').alias('h', 'herp').argv
 
     aliasedArgv.should.have.property('herp', true)
     aliasedArgv.should.have.property('h', true)
@@ -617,8 +618,8 @@ describe('parser tests', function () {
               type: 'boolean',
               default: def
             }
-          }),
-          argv2 = yargs()
+          })
+          var argv2 = yargs()
             .boolean(['flag'])
             .default('flag', def)
 
@@ -640,8 +641,8 @@ describe('parser tests', function () {
       })
 
       describe('with implied false default', function () {
-        var argv = null,
-        argv2 = null
+        var argv = null
+        var argv2 = null
 
         beforeEach(function () {
           argv = yargs().options({

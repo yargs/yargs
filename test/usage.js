@@ -1,7 +1,7 @@
 /* global describe, it, beforeEach */
 
-var checkUsage = require('./helpers/utils').checkOutput,
-  yargs = require('../')
+var checkUsage = require('./helpers/utils').checkOutput
+var yargs = require('../')
 
 describe('usage tests', function () {
   beforeEach(function () {
