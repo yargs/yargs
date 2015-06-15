@@ -3,12 +3,12 @@ var Hash = require('hashish')
 // capture terminal output, so that we might
 // assert against it.
 exports.checkOutput = function (f, argv) {
-  var exit = false,
-    _exit = process.exit,
-    _env = process.env,
-    _argv = process.argv,
-    _error = console.error,
-    _log = console.log
+  var exit = false
+  var _exit = process.exit
+  var _env = process.env
+  var _argv = process.argv
+  var _error = console.error
+  var _log = console.log
 
   process.exit = function () { exit = true }
   process.env = Hash.merge(process.env, { _: 'node' })

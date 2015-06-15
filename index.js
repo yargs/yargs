@@ -1,9 +1,9 @@
-var assert = require('assert'),
-  path = require('path'),
-  Completion = require('./lib/completion'),
-  Parser = require('./lib/parser'),
-  Usage = require('./lib/usage'),
-  Validation = require('./lib/validation')
+var assert = require('assert')
+var Completion = require('./lib/completion')
+var Parser = require('./lib/parser')
+var path = require('path')
+var Usage = require('./lib/usage')
+var Validation = require('./lib/validation')
 
 Argv(process.argv.slice(2))
 
@@ -344,8 +344,8 @@ function Argv (processArgs, cwd) {
     return usage.help()
   }
 
-  var completionOpt = null,
-  completionCommand = null
+  var completionOpt = null
+  var completionCommand = null
   self.completion = function (cmd, desc, fn) {
     // a function to execute when generating
     // completions can be provided as the second
@@ -400,9 +400,9 @@ function Argv (processArgs, cwd) {
   })
 
   function parseArgs (args) {
-    var parsed = Parser(args, options),
-      argv = parsed.argv,
-      aliases = parsed.aliases
+    var parsed = Parser(args, options)
+    var argv = parsed.argv
+    var aliases = parsed.aliases
 
     argv.$0 = self.$0
 
