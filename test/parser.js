@@ -320,6 +320,24 @@ describe('parser tests', function () {
         })
         .argv
     })
+
+    it('should be displayed in the help message', function () {
+      var checkUsage = require('./helpers/utils').checkOutput
+      var r = checkUsage(function () {
+        return yargs(['--help'])
+          .config('settings')
+          .help('help')
+          .wrap(null)
+          .argv
+      })
+      r.should.have.property('logs').with.length(1)
+      r.logs.join('\n').split(/\n+/).should.deep.equal([
+        'Options:',
+        '  --settings  Path to json config file',
+        '  --help      Show help  [boolean]',
+        ''
+      ])
+    })
   })
 
   it('should allow multiple aliases to be specified', function () {
