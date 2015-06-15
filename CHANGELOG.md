@@ -1,5 +1,11 @@
 ## Change Log
 
+### v3.11.0 (2015/06/15 05:15 +00:00)
+
+- [#173](https://github.com/bcoe/yargs/pull/173) update standard, window-size, chai (@bcoe)
+- [#171](https://github.com/bcoe/yargs/pull/171) a description can now be set
+  when providing a config option. (@5c077yP)
+
 ### v3.10.0 (2015/05/29 04:25 +00:00)
 
 - [#165](https://github.com/bcoe/yargs/pull/165) expose yargs.terminalWidth() thanks @ensonic (@bcoe)
