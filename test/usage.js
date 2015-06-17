@@ -3,6 +3,8 @@
 var checkUsage = require('./helpers/utils').checkOutput
 var yargs = require('../')
 
+require('chai').should()
+
 describe('usage tests', function () {
   beforeEach(function () {
     yargs.reset()
@@ -109,6 +111,66 @@ describe('usage tests', function () {
         'Usage: foo',
         ''
       ])
+    })
+
+    // see #169.
+    describe('min/max demanded count', function () {
+      it("does not output an error if '_' count is within the min/max range", function () {
+        var r = checkUsage(function () {
+          return yargs(['foo', 'bar', 'apple'])
+            .usage('Usage: foo')
+            .demand(2, 3)
+            .wrap(null)
+            .argv
+        })
+
+        r.errors.length.should.equal(0)
+      })
+
+      it("outputs an error if '_' count is above max", function () {
+        var r = checkUsage(function () {
+          return yargs(['foo', 'bar', 'apple', 'banana'])
+            .usage('Usage: foo')
+            .demand(2, 3)
+            .wrap(null)
+            .argv
+        })
+
+        r.errors.join('\n').split(/\n+/).should.deep.equal([
+          'Usage: foo',
+          'Too many non-option arguments: got 4, maximum of 3'
+        ])
+      })
+
+      it("outputs an error if '_' count is below min", function () {
+        var r = checkUsage(function () {
+          return yargs(['foo'])
+            .usage('Usage: foo')
+            .demand(2, 3)
+            .wrap(null)
+            .argv
+        })
+
+        r.errors.join('\n').split(/\n+/).should.deep.equal([
+          'Usage: foo',
+          'Not enough non-option arguments: got 1, need at least 2'
+        ])
+      })
+
+      it('allows a customer error message to be provided', function () {
+        var r = checkUsage(function () {
+          return yargs(['foo'])
+            .usage('Usage: foo')
+            .demand(2, 3, 'pork chop sandwiches')
+            .wrap(null)
+            .argv
+        })
+
+        r.errors.join('\n').split(/\n+/).should.deep.equal([
+          'Usage: foo',
+          'pork chop sandwiches'
+        ])
+      })
     })
   })
 
