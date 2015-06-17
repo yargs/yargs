@@ -229,8 +229,8 @@ function Argv (processArgs, cwd) {
     return self
   }
 
-  self.parse = function (args, skipValidation) {
-    return parseArgs(args, skipValidation)
+  self.parse = function (args, parseOnly) {
+    return parseArgs(args, parseOnly)
   }
 
   self.option = self.options = function (key, opt) {
@@ -399,7 +399,7 @@ function Argv (processArgs, cwd) {
     enumerable: true
   })
 
-  function parseArgs (args, skipValidation) {
+  function parseArgs (args, parseOnly) {
     var parsed = Parser(args, options)
     var argv = parsed.argv
     var aliases = parsed.aliases
@@ -426,35 +426,37 @@ function Argv (processArgs, cwd) {
       }
     }
 
-    Object.keys(argv).forEach(function (key) {
-      if (key === helpOpt && argv[key]) {
-        self.showHelp('log')
-        if (exitProcess) {
-          process.exit(0)
-        }
-      } else if (key === versionOpt && argv[key]) {
-        usage.showVersion()
-        if (exitProcess) {
-          process.exit(0)
-        }
-      } else if (key === completionOpt) {
-        // we allow for asynchronous completions,
-        // e.g., loading in a list of commands from an API.
-        completion.getCompletion(function (completions) {
-          ;(completions || []).forEach(function (completion) {
-            console.log(completion)
-          })
-
-          if (exitProcess) {
-            process.exit(0)
-          }
+    if (completionOpt in argv) {
+      // we allow for asynchronous completions,
+      // e.g., loading in a list of commands from an API.
+      completion.getCompletion(function (completions) {
+        ;(completions || []).forEach(function (completion) {
+          console.log(completion)
         })
-        return
-      }
-    })
 
-    if (skipValidation) {
+        if (exitProcess) {
+          process.exit(0)
+        }
+      })
       return argv
+    }
+
+    if (parseOnly) {
+      return argv
+    }
+
+    if (argv[helpOpt]) {
+      self.showHelp('log')
+      if (exitProcess) {
+        process.exit(0)
+      }
+    }
+
+    if (argv[versionOpt]) {
+      usage.showVersion()
+      if (exitProcess) {
+        process.exit(0)
+      }
     }
 
     validation.nonOptionCount(argv)
