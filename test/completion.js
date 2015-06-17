@@ -40,6 +40,22 @@ describe('Completion', function () {
       r.logs.should.include('--foo')
       r.logs.should.not.include('bar')
     })
+
+    it('works for strict parsing if next is not yet an option', function () {
+      var r = checkUsage(function () {
+        return yargs(['--get-yargs-completions'])
+        .option('foo', {
+          describe: 'foo option'
+        })
+        .command('bar', 'bar command')
+        .strict()
+        .completion('completion')
+        .argv
+      }, ['./usage', '--get-yargs-completions', '--f'])
+
+      r.errors.should.be.empty
+      r.logs.should.include('--foo')
+    })
   })
 
   describe('generateCompletionScript()', function () {

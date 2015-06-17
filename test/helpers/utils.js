@@ -17,8 +17,16 @@ exports.checkOutput = function (f, argv) {
   var errors = []
   var logs = []
 
-  console.error = function (msg) { errors.push(msg) }
-  console.log = function (msg) { logs.push(msg) }
+  console.error = function (msg) {
+    if (!exit) {
+      errors.push(msg)
+    }
+  }
+  console.log = function (msg) {
+    if (!exit) {
+      logs.push(msg)
+    }
+  }
 
   var result = f()
 

@@ -229,8 +229,8 @@ function Argv (processArgs, cwd) {
     return self
   }
 
-  self.parse = function (args) {
-    return parseArgs(args)
+  self.parse = function (args, skipValidation) {
+    return parseArgs(args, skipValidation)
   }
 
   self.option = self.options = function (key, opt) {
@@ -399,7 +399,7 @@ function Argv (processArgs, cwd) {
     enumerable: true
   })
 
-  function parseArgs (args) {
+  function parseArgs (args, skipValidation) {
     var parsed = Parser(args, options)
     var argv = parsed.argv
     var aliases = parsed.aliases
@@ -452,6 +452,10 @@ function Argv (processArgs, cwd) {
         return
       }
     })
+
+    if (skipValidation) {
+      return argv
+    }
 
     validation.nonOptionCount(argv)
     validation.missingArgumentValue(argv)
