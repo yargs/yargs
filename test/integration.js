@@ -40,6 +40,14 @@ describe('integration tests', function () {
 
   })
 
+  // see #177
+  it('allows --help to be completed without returning help message', function (done) {
+    testCmd('./bin.js', [ '--get-yargs-completions', '--help' ], function (buf) {
+      buf.should.not.match(/generate bash completion script/)
+      buf.should.match(/--help/)
+      return done()
+    })
+  })
 })
 
 function testCmd (cmd, args, done) {
@@ -54,6 +62,9 @@ function testCmd (cmd, args, done) {
   bin.stderr.on('data', done)
 
   bin.stdout.on('data', function (buf) {
+    // hack to allow us to assert against completion suggestions.
+    if (~args.indexOf('--get-yargs-completions')) return done(buf.toString())
+
     var _ = JSON.parse(buf.toString())
     _.map(String).should.deep.equal(args.map(String))
     done()

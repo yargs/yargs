@@ -356,7 +356,7 @@ function Argv (processArgs, cwd) {
     }
 
     // register the completion command.
-    completionCommand = cmd
+    completionCommand = cmd || 'completion'
     completionOpt = completion.completionKey
     self.command(completionCommand, desc || 'generate bash completion script')
 
@@ -408,8 +408,17 @@ function Argv (processArgs, cwd) {
 
     self.parsed = parsed
 
+    // while building up the argv object, there
+    // are two passes through the parser. If completion
+    // is being performed short-circuit on the first pass.
+    if (completionCommand &&
+      (process.argv.join(' ')).indexOf(completionOpt) !== -1 &&
+      !argv[completionOpt]) {
+      return argv
+    }
+
     // generate a completion script for adding to ~/.bashrc.
-    if (completionCommand && ~argv._.indexOf(completionCommand)) {
+    if (completionCommand && ~argv._.indexOf(completionCommand) && !argv[completionOpt]) {
       self.showCompletionScript()
       if (exitProcess) {
         process.exit(0)
@@ -426,18 +435,10 @@ function Argv (processArgs, cwd) {
       }
     }
 
+    // we must run completions first, a user might
+    // want to complete the --help or --version option.
     Object.keys(argv).forEach(function (key) {
-      if (key === helpOpt && argv[key]) {
-        self.showHelp('log')
-        if (exitProcess) {
-          process.exit(0)
-        }
-      } else if (key === versionOpt && argv[key]) {
-        usage.showVersion()
-        if (exitProcess) {
-          process.exit(0)
-        }
-      } else if (key === completionOpt) {
+      if (key === completionOpt) {
         // we allow for asynchronous completions,
         // e.g., loading in a list of commands from an API.
         completion.getCompletion(function (completions) {
@@ -453,16 +454,31 @@ function Argv (processArgs, cwd) {
       }
     })
 
-    validation.nonOptionCount(argv)
-    validation.missingArgumentValue(argv)
-    validation.requiredArguments(argv)
+    Object.keys(argv).forEach(function (key) {
+      if (key === helpOpt && argv[key]) {
+        self.showHelp('log')
+        if (exitProcess) {
+          process.exit(0)
+        }
+      } else if (key === versionOpt && argv[key]) {
+        usage.showVersion()
+        if (exitProcess) {
+          process.exit(0)
+        }
+      }
+    })
 
-    if (strict) {
-      validation.unknownArguments(argv, aliases)
+    // if we're executed via bash completion, don't
+    // bother with validation.
+    if (!argv[completionOpt]) {
+      validation.nonOptionCount(argv)
+      validation.missingArgumentValue(argv)
+      validation.requiredArguments(argv)
+      if (strict) validation.unknownArguments(argv, aliases)
+      validation.customChecks(argv, aliases)
+      validation.implications(argv)
     }
 
-    validation.customChecks(argv, aliases)
-    validation.implications(argv)
     setPlaceholderKeys(argv)
 
     return argv
