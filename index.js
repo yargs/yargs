@@ -437,22 +437,20 @@ function Argv (processArgs, cwd) {
 
     // we must run completions first, a user might
     // want to complete the --help or --version option.
-    Object.keys(argv).forEach(function (key) {
-      if (key === completionOpt) {
-        // we allow for asynchronous completions,
-        // e.g., loading in a list of commands from an API.
-        completion.getCompletion(function (completions) {
-          ;(completions || []).forEach(function (completion) {
-            console.log(completion)
-          })
-
-          if (exitProcess) {
-            process.exit(0)
-          }
+    if (completionOpt in argv) {
+      // we allow for asynchronous completions,
+      // e.g., loading in a list of commands from an API.
+      completion.getCompletion(function (completions) {
+        ;(completions || []).forEach(function (completion) {
+          console.log(completion)
         })
-        return
-      }
-    })
+
+        if (exitProcess) {
+          process.exit(0)
+        }
+      })
+      return
+    }
 
     Object.keys(argv).forEach(function (key) {
       if (key === helpOpt && argv[key]) {
