@@ -229,8 +229,8 @@ function Argv (processArgs, cwd) {
     return self
   }
 
-  self.parse = function (args) {
-    return parseArgs(args)
+  self.parse = function (args, parseOnly) {
+    return parseArgs(args, parseOnly)
   }
 
   self.option = self.options = function (key, opt) {
@@ -399,7 +399,7 @@ function Argv (processArgs, cwd) {
     enumerable: true
   })
 
-  function parseArgs (args) {
+  function parseArgs (args, parseOnly) {
     var parsed = Parser(args, options)
     var argv = parsed.argv
     var aliases = parsed.aliases
@@ -407,6 +407,26 @@ function Argv (processArgs, cwd) {
     argv.$0 = self.$0
 
     self.parsed = parsed
+
+    if (parseOnly) {
+      return argv
+    }
+
+    // process completion option before all others
+    if (completionOpt in argv) {
+      // we allow for asynchronous completions,
+      // e.g., loading in a list of commands from an API.
+      completion.getCompletion(function (completions) {
+        ;(completions || []).forEach(function (completion) {
+          console.log(completion)
+        })
+
+        if (exitProcess) {
+          process.exit(0)
+        }
+      })
+      return argv
+    }
 
     // generate a completion script for adding to ~/.bashrc.
     if (completionCommand && ~argv._.indexOf(completionCommand)) {
@@ -426,32 +446,19 @@ function Argv (processArgs, cwd) {
       }
     }
 
-    Object.keys(argv).forEach(function (key) {
-      if (key === helpOpt && argv[key]) {
-        self.showHelp('log')
-        if (exitProcess) {
-          process.exit(0)
-        }
-      } else if (key === versionOpt && argv[key]) {
-        usage.showVersion()
-        if (exitProcess) {
-          process.exit(0)
-        }
-      } else if (key === completionOpt) {
-        // we allow for asynchronous completions,
-        // e.g., loading in a list of commands from an API.
-        completion.getCompletion(function (completions) {
-          ;(completions || []).forEach(function (completion) {
-            console.log(completion)
-          })
-
-          if (exitProcess) {
-            process.exit(0)
-          }
-        })
-        return
+    if (argv[helpOpt]) {
+      self.showHelp('log')
+      if (exitProcess) {
+        process.exit(0)
       }
-    })
+    }
+
+    if (argv[versionOpt]) {
+      usage.showVersion()
+      if (exitProcess) {
+        process.exit(0)
+      }
+    }
 
     validation.nonOptionCount(argv)
     validation.missingArgumentValue(argv)
