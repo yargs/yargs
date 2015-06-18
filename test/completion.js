@@ -56,6 +56,18 @@ describe('Completion', function () {
       r.errors.should.be.empty
       r.logs.should.include('--foo')
     })
+
+    it('does not execute the completion command while processing the option', function () {
+      var r = checkUsage(function () {
+        return yargs(['--get-yargs-completions'])
+        .completion('completion')
+        .argv
+      }, ['./usage', '--get-yargs-completions', 'completion'])
+
+      // confirm that the completion script is not logged
+      r.logs.should.deep.equal(['completion'])
+    })
+
   })
 
   describe('generateCompletionScript()', function () {

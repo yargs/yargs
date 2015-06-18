@@ -408,6 +408,26 @@ function Argv (processArgs, cwd) {
 
     self.parsed = parsed
 
+    if (parseOnly) {
+      return argv
+    }
+
+    // process completion option before all others
+    if (completionOpt in argv) {
+      // we allow for asynchronous completions,
+      // e.g., loading in a list of commands from an API.
+      completion.getCompletion(function (completions) {
+        ;(completions || []).forEach(function (completion) {
+          console.log(completion)
+        })
+
+        if (exitProcess) {
+          process.exit(0)
+        }
+      })
+      return argv
+    }
+
     // generate a completion script for adding to ~/.bashrc.
     if (completionCommand && ~argv._.indexOf(completionCommand)) {
       self.showCompletionScript()
@@ -424,25 +444,6 @@ function Argv (processArgs, cwd) {
         self.getCommandHandlers()[command](self.reset())
         return self.argv
       }
-    }
-
-    if (completionOpt in argv) {
-      // we allow for asynchronous completions,
-      // e.g., loading in a list of commands from an API.
-      completion.getCompletion(function (completions) {
-        ;(completions || []).forEach(function (completion) {
-          console.log(completion)
-        })
-
-        if (exitProcess) {
-          process.exit(0)
-        }
-      })
-      return argv
-    }
-
-    if (parseOnly) {
-      return argv
     }
 
     if (argv[helpOpt]) {
