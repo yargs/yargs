@@ -160,10 +160,18 @@ function Argv (processArgs, cwd) {
   }
 
   var demanded = {}
-  self.demand = self.required = self.require = function (keys, msg) {
+  self.demand = self.required = self.require = function (keys, max, msg) {
+    // you can optionally provide a 'max' key,
+    // which will raise an exception if too many '_'
+    // options are provided.
+    if (typeof max !== 'number') {
+      msg = max
+      max = Infinity
+    }
+
     if (typeof keys === 'number') {
-      if (!demanded._) demanded._ = { count: 0, msg: null }
-      demanded._.count += keys
+      if (!demanded._) demanded._ = { count: 0, msg: null, max: max }
+      demanded._.count = keys
       demanded._.msg = msg
     } else if (Array.isArray(keys)) {
       keys.forEach(function (key) {

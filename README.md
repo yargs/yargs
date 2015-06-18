@@ -398,17 +398,20 @@ displaying the value in the usage instructions:
 ```
 
 .demand(key, [msg | boolean])
------------------------------
+------------------------------
 .require(key, [msg | boolean])
 ------------------------------
 .required(key, [msg | boolean])
--------------------------------
+------------------------------
+.demand(count, [max], [msg])
+------------------------------
 
 If `key` is a string, show the usage information and exit if `key` wasn't
 specified in `process.argv`.
 
 If `key` is a number, demand at least as many non-option arguments, which show
-up in `argv._`.
+up in `argv._`. A second number can also optionally be provided, which indicates
+the maximum number of non-option arguments.
 
 If `key` is an Array, demand each element.
 
