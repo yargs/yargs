@@ -26,6 +26,23 @@ describe('Completion', function () {
       r.logs.should.include('foo')
     })
 
+    it('avoids repeating already included commands', function () {
+      var r = checkUsage(function () {
+        try {
+          return yargs(['--get-yargs-completions'])
+          .command('foo', 'bar')
+          .command('apple', 'banana')
+          .completion()
+          .argv
+        } catch (e) {
+          console.log(e.message)
+        }
+      }, ['./completion', '--get-yargs-completions', 'apple'])
+
+      r.logs.should.include('foo')
+      r.logs.should.not.include('apple')
+    })
+
     it("returns arguments as completion suggestion, if next contains '-'", function () {
       var r = checkUsage(function () {
         return yargs(['--get-yargs-completions'])
