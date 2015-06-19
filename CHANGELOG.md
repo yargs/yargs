@@ -1,5 +1,10 @@
 ## Change Log
 
+### v3.12.0 (2015/06/19 03:23 +00:00)
+- [#183](https://github.com/bcoe/yargs/pull/183) don't complete commands if they've already been completed (@tschaub)
+- [#181](https://github.com/bcoe/yargs/pull/181) various fixes for completion. (@bcoe, @tschaub)
+- [#182](https://github.com/bcoe/yargs/pull/182) you can now set a maximum # of of required arguments (@bcoe)
+
 ### v3.11.0 (2015/06/15 05:15 +00:00)
 
 - [#173](https://github.com/bcoe/yargs/pull/173) update standard, window-size, chai (@bcoe)
