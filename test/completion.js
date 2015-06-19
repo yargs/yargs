@@ -115,4 +115,22 @@ describe('Completion', function () {
       .argv
     })
   })
+
+  // fixes for #177.
+  it('does not apply validation when --get-yargs-completions is passed in', function () {
+    var r = checkUsage(function () {
+      try {
+        return yargs(['--get-yargs-completions'])
+          .option('foo', {})
+          .completion()
+          .strict()
+          .argv
+      } catch (e) {
+        console.log(e.message)
+      }
+    }, ['./completion', '--get-yargs-completions', '--'])
+
+    r.errors.length.should.equal(0)
+    r.logs.should.include('--foo')
+  })
 })
