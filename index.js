@@ -433,16 +433,6 @@ function Argv (processArgs, cwd) {
       }
     }
 
-    // if there's a handler associated with a
-    // command defer processing to it.
-    var handlerKeys = Object.keys(self.getCommandHandlers())
-    for (var i = 0, command; (command = handlerKeys[i]) !== undefined; i++) {
-      if (~argv._.indexOf(command)) {
-        self.getCommandHandlers()[command](self.reset())
-        return self.argv
-      }
-    }
-
     // we must run completions first, a user might
     // want to complete the --help or --version option.
     if (completionOpt in argv) {
@@ -458,6 +448,16 @@ function Argv (processArgs, cwd) {
         }
       })
       return
+    }
+
+    // if there's a handler associated with a
+    // command defer processing to it.
+    var handlerKeys = Object.keys(self.getCommandHandlers())
+    for (var i = 0, command; (command = handlerKeys[i]) !== undefined; i++) {
+      if (~argv._.indexOf(command)) {
+        self.getCommandHandlers()[command](self.reset())
+        return self.argv
+      }
     }
 
     Object.keys(argv).forEach(function (key) {
