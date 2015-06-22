@@ -19,7 +19,7 @@ _yargs_completions()
 
     # if no match was found, fall back to filename completion
     if [ ${#COMPREPLY[@]} -eq 0 ]; then
-      COMPREPLY=( $(compgen -f "${cur_word}" ) )
+      COMPREPLY=( $(compgen -f -- "${cur_word}" ) )
     fi
 
     return 0
