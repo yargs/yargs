@@ -16,6 +16,12 @@ _yargs_completions()
     type_list=`{{app_path}} --get-yargs-completions $args`
 
     COMPREPLY=( $(compgen -W "${type_list}" -- ${cur_word}) )
+
+    # if no match was found, fall back to filename completion
+    if [ ${#COMPREPLY[@]} -eq 0 ]; then
+      COMPREPLY=( $(compgen -f -- "${cur_word}" ) )
+    fi
+
     return 0
 }
 complete -F _yargs_completions {{app_name}}
