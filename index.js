@@ -66,7 +66,6 @@ function Argv (processArgs, cwd) {
     strict = false
     helpOpt = null
     versionOpt = null
-    completionOpt = null
     commandHandlers = {}
     self.parsed = false
 
@@ -352,7 +351,6 @@ function Argv (processArgs, cwd) {
     return usage.help()
   }
 
-  var completionOpt = null
   var completionCommand = null
   self.completion = function (cmd, desc, fn) {
     // a function to execute when generating
@@ -365,7 +363,6 @@ function Argv (processArgs, cwd) {
 
     // register the completion command.
     completionCommand = cmd || 'completion'
-    completionOpt = completion.completionKey
     self.command(completionCommand, desc || 'generate bash completion script')
 
     // a function can be provided
@@ -420,13 +417,23 @@ function Argv (processArgs, cwd) {
     // are two passes through the parser. If completion
     // is being performed short-circuit on the first pass.
     if (completionCommand &&
-      (process.argv.join(' ')).indexOf(completionOpt) !== -1 &&
-      !argv[completionOpt]) {
+      (process.argv.join(' ')).indexOf(completion.completionKey) !== -1 &&
+      !argv[completion.completionKey]) {
       return argv
     }
 
+    // if there's a handler associated with a
+    // command defer processing to it.
+    var handlerKeys = Object.keys(self.getCommandHandlers())
+    for (var i = 0, command; (command = handlerKeys[i]) !== undefined; i++) {
+      if (~argv._.indexOf(command)) {
+        self.getCommandHandlers()[command](self.reset())
+        return self.argv
+      }
+    }
+
     // generate a completion script for adding to ~/.bashrc.
-    if (completionCommand && ~argv._.indexOf(completionCommand) && !argv[completionOpt]) {
+    if (completionCommand && ~argv._.indexOf(completionCommand) && !argv[completion.completionKey]) {
       self.showCompletionScript()
       if (exitProcess) {
         process.exit(0)
@@ -435,7 +442,7 @@ function Argv (processArgs, cwd) {
 
     // we must run completions first, a user might
     // want to complete the --help or --version option.
-    if (completionOpt in argv) {
+    if (completion.completionKey in argv) {
       // we allow for asynchronous completions,
       // e.g., loading in a list of commands from an API.
       completion.getCompletion(function (completions) {
@@ -448,16 +455,6 @@ function Argv (processArgs, cwd) {
         }
       })
       return
-    }
-
-    // if there's a handler associated with a
-    // command defer processing to it.
-    var handlerKeys = Object.keys(self.getCommandHandlers())
-    for (var i = 0, command; (command = handlerKeys[i]) !== undefined; i++) {
-      if (~argv._.indexOf(command)) {
-        self.getCommandHandlers()[command](self.reset())
-        return self.argv
-      }
     }
 
     Object.keys(argv).forEach(function (key) {
@@ -476,7 +473,7 @@ function Argv (processArgs, cwd) {
 
     // if we're executed via bash completion, don't
     // bother with validation.
-    if (!argv[completionOpt]) {
+    if (!argv[completion.completionKey]) {
       validation.nonOptionCount(argv)
       validation.missingArgumentValue(argv)
       validation.requiredArguments(argv)
