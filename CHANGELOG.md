@@ -3,7 +3,7 @@
 ### v3.13.0 (2015/06/24 04:12 +00:00)
 
 - [#187](https://github.com/bcoe/yargs/pull/187) completion now behaves differently
-  if it is being run in the context of a command (@bcoe)
+  if it is being run in the context of a command (@tschaub)
 - [#186](https://github.com/bcoe/yargs/pull/186) if no matches are found for a completion
   default to filename completion (@tschaub)
 
