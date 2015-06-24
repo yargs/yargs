@@ -1,7 +1,8 @@
 /* global describe, it, beforeEach */
-
 var checkUsage = require('./helpers/utils').checkOutput
 var yargs = require('../')
+
+require('chai').should()
 
 describe('Completion', function () {
   beforeEach(function () {
@@ -11,15 +12,11 @@ describe('Completion', function () {
   describe('default completion behavior', function () {
     it('it returns a list of commands as completion suggestions', function () {
       var r = checkUsage(function () {
-        try {
-          return yargs(['--get-yargs-completions'])
+        return yargs(['--get-yargs-completions'])
           .command('foo', 'bar')
           .command('apple', 'banana')
           .completion()
           .argv
-        } catch (e) {
-          console.log(e.message)
-        }
       }, ['./completion', '--get-yargs-completions', ''])
 
       r.logs.should.include('apple')
@@ -28,19 +25,75 @@ describe('Completion', function () {
 
     it('avoids repeating already included commands', function () {
       var r = checkUsage(function () {
-        try {
-          return yargs(['--get-yargs-completions'])
+        return yargs(['--get-yargs-completions'])
           .command('foo', 'bar')
           .command('apple', 'banana')
-          .completion()
           .argv
-        } catch (e) {
-          console.log(e.message)
-        }
       }, ['./completion', '--get-yargs-completions', 'apple'])
 
       r.logs.should.include('foo')
       r.logs.should.not.include('apple')
+    })
+
+    it('completes options for a command', function () {
+      var r = checkUsage(function () {
+        return yargs(['--get-yargs-completions'])
+          .command('foo', 'foo command', function (subYargs) {
+            subYargs.options({
+              bar: {
+                describe: 'bar option'
+              }
+            })
+            .help('help')
+            .argv
+          })
+          .completion()
+          .argv
+      }, ['./completion', '--get-yargs-completions', 'foo', '--b'])
+
+      r.logs.should.have.length(2)
+      r.logs.should.include('--bar')
+      r.logs.should.include('--help')
+    })
+
+    it('completes options for the correct command', function () {
+      var r = checkUsage(function () {
+        return yargs(['--get-yargs-completions'])
+          .command('cmd1', 'first command', function (subYargs) {
+            subYargs.options({
+              opt1: {
+                describe: 'first option'
+              }
+            })
+            .argv
+          })
+          .command('cmd2', 'second command', function (subYargs) {
+            subYargs.options({
+              opt2: {
+                describe: 'second option'
+              }
+            })
+            .argv
+          })
+          .completion()
+          .argv
+      }, ['./completion', '--get-yargs-completions', 'cmd2', '--o'])
+
+      r.logs.should.have.length(1)
+      r.logs.should.include('--opt2')
+    })
+
+    it('works if command has no options', function () {
+      var r = checkUsage(function () {
+        return yargs(['--get-yargs-completions'])
+          .command('foo', 'foo command', function (subYargs) {
+            subYargs.completion().argv
+          })
+          .completion()
+          .argv
+      }, ['./completion', '--get-yargs-completions', 'foo', '--b'])
+
+      r.logs.should.have.length(0)
     })
 
     it("returns arguments as completion suggestion, if next contains '-'", function () {
