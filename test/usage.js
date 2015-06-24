@@ -988,6 +988,44 @@ describe('usage tests', function () {
         'Missing required arguments: y'
       ])
     })
+
+    it('should not show hidden commands', function () {
+      var r = checkUsage(function () {
+        return yargs('')
+          .command('upload', 'upload something')
+          .command('secret', false)
+          .demand('y')
+          .wrap(null)
+          .argv
+      })
+
+      r.errors.join('\n').split(/\s+/).should.deep.equal([
+        'Commands:',
+        'upload', 'upload', 'something',
+        'Options:',
+        '-y', '[required]',
+        'Missing', 'required', 'arguments:', 'y'
+      ])
+    })
+
+    it('allows completion command to be hidden', function () {
+      var r = checkUsage(function () {
+        return yargs('')
+          .command('upload', 'upload something')
+          .completion('completion', false)
+          .demand('y')
+          .wrap(null)
+          .argv
+      })
+
+      r.errors.join('\n').split(/\s+/).should.deep.equal([
+        'Commands:',
+        'upload', 'upload', 'something',
+        'Options:',
+        '-y', '[required]',
+        'Missing', 'required', 'arguments:', 'y'
+      ])
+    })
   })
 
   describe('epilogue', function () {

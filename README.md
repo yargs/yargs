@@ -509,8 +509,10 @@ present script similar to how `$0` works in bash or perl.
 
 Document the commands exposed by your application.
 
-use `desc` to provide a description for each command your application accepts (the
-values stored in `argv._`).
+Use `desc` to provide a description for each command your application accepts (the
+values stored in `argv._`).  Set `desc` to `false` to create a hidden command.
+Hidden commands don't show up in the help output and aren't available for
+completion.
 
 Optionally, you can provide a handler `fn` which will be executed when
 a given command is provided. The handler will be executed with an instance

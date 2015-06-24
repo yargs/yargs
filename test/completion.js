@@ -83,6 +83,19 @@ describe('Completion', function () {
       r.logs.should.include('--opt2')
     })
 
+    it('does not complete hidden commands', function () {
+      var r = checkUsage(function () {
+        return yargs(['--get-yargs-completions'])
+          .command('cmd1', 'first command')
+          .command('cmd2', false)
+          .completion('completion', false)
+          .argv
+      }, ['./completion', '--get-yargs-completions', 'cmd'])
+
+      r.logs.should.have.length(1)
+      r.logs.should.include('cmd1')
+    })
+
     it('works if command has no options', function () {
       var r = checkUsage(function () {
         return yargs(['--get-yargs-completions'])
