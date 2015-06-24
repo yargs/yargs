@@ -1,5 +1,12 @@
 ## Change Log
 
+### v3.13.0 (2015/06/24 04:12 +00:00)
+
+- [#187](https://github.com/bcoe/yargs/pull/187) completion now behaves differently
+  if it is being run in the context of a command (@bcoe)
+- [#186](https://github.com/bcoe/yargs/pull/186) if no matches are found for a completion
+  default to filename completion (@tschaub)
+
 ### v3.12.0 (2015/06/19 03:23 +00:00)
 - [#183](https://github.com/bcoe/yargs/pull/183) don't complete commands if they've already been completed (@tschaub)
 - [#181](https://github.com/bcoe/yargs/pull/181) various fixes for completion. (@bcoe, @tschaub)
