@@ -1,5 +1,11 @@
 ## Change Log
 
+### v3.14.0 (2015/06/28 02:12 +00:00)
+
+- [#192](https://github.com/bcoe/yargs/pull/192) standard style nits (@bcoe)
+- [#190](https://github.com/bcoe/yargs/pull/190) allow for hidden commands, e.g.,
+  .completion('completion', false) (@tschaub)
+
 ### v3.13.0 (2015/06/24 04:12 +00:00)
 
 - [#187](https://github.com/bcoe/yargs/pull/187) completion now behaves differently
