@@ -476,6 +476,8 @@ function Argv (processArgs, cwd) {
       }
     })
 
+    if (parsed.error) throw parsed.error
+
     // if we're executed via bash completion, don't
     // bother with validation.
     if (!argv[completion.completionKey]) {

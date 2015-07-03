@@ -321,6 +321,22 @@ describe('parser tests', function () {
         .argv
     })
 
+    // see: https://github.com/bcoe/yargs/issues/172
+    it('should not raise an exception if config file is set as default argument value', function () {
+      var fail = false
+      yargs([])
+        .option('config', {
+          default: 'foo.json'
+        })
+        .config('config')
+        .fail(function () {
+          fail = true
+        })
+        .argv
+
+      fail.should.equal(false)
+    })
+
     it('should be displayed in the help message', function () {
       var checkUsage = require('./helpers/utils').checkOutput
       var r = checkUsage(function () {
