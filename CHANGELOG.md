@@ -1,5 +1,9 @@
 ## Change Log
 
+### v3.15.0 (2015/07/06 06:01 +00:00)
+- [#197](https://github.com/bcoe/yargs/pull/197) tweaks to how errors bubble up from parser.js (@bcoe)
+- [#193](https://github.com/bcoe/yargs/pull/193) upgraded nyc, reporting now happens by default (@bcoe)
+
 ### v3.14.0 (2015/06/28 02:12 +00:00)
 
 - [#192](https://github.com/bcoe/yargs/pull/192) standard style nits (@bcoe)
