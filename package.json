@@ -19,6 +19,7 @@
     "chai": "^3.0.0",
     "coveralls": "^2.11.2",
     "eslint": "^0.24.0",
+    "eslint-config-standard": "^3.4.1",
     "hashish": "0.0.4",
     "mocha": "^2.2.1",
     "nyc": "^3.0.0"
