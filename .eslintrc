@@ -7,7 +7,6 @@ rules:
   dot-notation: 2
   global-strict: 2 # deprecated will be replaced by "strict" in the future
   linebreak-style: [2, "unix"]
-  no-bitwise: 2
   no-comma-dangle: 2
   no-constant-condition: 2
   no-else-return: 2
