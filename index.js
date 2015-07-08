@@ -431,14 +431,14 @@ function Argv (processArgs, cwd) {
     // command defer processing to it.
     var handlerKeys = Object.keys(self.getCommandHandlers())
     for (var i = 0, command; typeof (command = handlerKeys[i]) !== 'undefined'; i++) {
-      if (!argv._.indexOf(command)) {
+      if (~argv._.indexOf(command)) {
         self.getCommandHandlers()[command](self.reset())
         return self.argv
       }
     }
 
     // generate a completion script for adding to ~/.bashrc.
-    if (completionCommand && !argv._.indexOf(completionCommand) && !argv[completion.completionKey]) {
+    if (completionCommand && ~argv._.indexOf(completionCommand) && !argv[completion.completionKey]) {
       self.showCompletionScript()
       if (exitProcess) {
         throw new Error('Exit Process')

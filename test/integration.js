@@ -66,7 +66,7 @@ function testCmd (cmd, args, done) {
 
   bin.stdout.on('data', function (buf) {
     // hack to allow us to assert against completion suggestions.
-    if (!args.indexOf('--get-yargs-completions')) return done(buf.toString())
+    if (~args.indexOf('--get-yargs-completions')) return done(buf.toString())
 
     var _ = JSON.parse(buf.toString())
     _.map(String).should.deep.equal(args.map(String))
