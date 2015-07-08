@@ -1,4 +1,6 @@
-var yargs = require('../index');
+'use strict'
+
+var yargs = require('../index')
 
 var argv = yargs
   .usage('This is my awesome program\n\nUsage: $0 [options]')
@@ -7,21 +9,21 @@ var argv = yargs
   .options({
     input: {
       alias: 'i',
-      description: "<filename> Input file name",
+      description: '<filename> Input file name',
       requiresArg: true,
       required: true
     },
     output: {
       alias: 'o',
-      description: "<filename> output file name",
+      description: '<filename> output file name',
       requiresArg: true,
       required: true
     }
   })
-  .argv;
+  .argv
 
-console.log('Inspecting options');
-console.dir(argv);
+console.log('Inspecting options')
+console.dir(argv)
 
-console.log("input:", argv.input);
-console.log("output:", argv.output);
+console.log('input:', argv.input)
+console.log('output:', argv.output)

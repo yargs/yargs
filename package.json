@@ -4,10 +4,10 @@
   "description": "Light-weight option parsing with an argv hash. No optstrings attached.",
   "main": "./index.js",
   "files": [
-    "index.js",
-    "lib",
+    "LICENSE",
     "completion.sh.hbs",
-    "LICENSE"
+    "index.js",
+    "lib"
   ],
   "dependencies": {
     "camelcase": "^1.0.2",
@@ -18,39 +18,40 @@
   "devDependencies": {
     "chai": "^3.0.0",
     "coveralls": "^2.11.2",
+    "eslint": "^0.24.0",
     "hashish": "0.0.4",
     "mocha": "^2.2.1",
-    "nyc": "^3.0.0",
-    "standard": "^4.4.0"
+    "nyc": "^3.0.0"
   },
   "scripts": {
-    "test": "standard && nyc mocha --check-leaks",
-    "coverage": "nyc report --reporter=text-lcov | coveralls"
+    "coverage": "nyc report --reporter=text-lcov | coveralls",
+    "pretest": "eslint .",
+    "test": "nyc mocha --check-leaks"
   },
   "repository": {
     "type": "git",
     "url": "http://github.com/bcoe/yargs.git"
   },
   "standard": {
-    "ignore": [
-      "**/example/**"
-    ],
     "globals": [
       "it"
+    ],
+    "ignore": [
+      "**/example/**"
     ]
   },
   "keywords": [
-    "argument",
     "args",
+    "argument",
+    "cli",
+    "command",
     "option",
     "parser",
-    "parsing",
-    "cli",
-    "command"
+    "parsing"
   ],
   "author": {
-    "name": "Alex Ford",
     "email": "Alex.Ford@CodeTunnel.com",
+    "name": "Alex Ford",
     "url": "http://CodeTunnel.com"
   },
   "contributors": [

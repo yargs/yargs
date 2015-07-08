@@ -1,3 +1,5 @@
+'use strict'
+
 var assert = require('assert')
 var Completion = require('./lib/completion')
 var Parser = require('./lib/parser')
@@ -23,20 +25,26 @@ function Argv (processArgs, cwd) {
     .map(function (x, i) {
       // ignore the node bin, specify this in your
       // bin file with #!/usr/bin/env node
-      if (i === 0 && /\b(node|iojs)$/.test(x)) return
+      if (i === 0 && /\b(node|iojs)$/.test(x)) return null
       var b = rebase(cwd, x)
       return x.match(/^\//) && b.length < x.length
       ? b : x
     })
     .join(' ').trim()
 
-  if (process.env._ !== undefined && process.argv[1] === process.env._) {
+  if (typeof process.env._ !== 'undefined' && process.argv[1] === process.env._) {
     self.$0 = process.env._.replace(
       path.dirname(process.execPath) + '/', ''
     )
   }
 
   var options
+  var demanded = {}
+  var exitProcess = true
+  var strict = false
+  var helpOpt = null
+  var versionOpt = null
+  var commandHandlers = {}
   self.resetOptions = self.reset = function () {
     // put yargs back into its initial
     // state, this is useful for creating a
@@ -118,7 +126,6 @@ function Argv (processArgs, cwd) {
     return self
   }
 
-  var commandHandlers = {}
   self.getCommandHandlers = function () {
     return commandHandlers
   }
@@ -160,7 +167,6 @@ function Argv (processArgs, cwd) {
     return self
   }
 
-  var demanded = {}
   self.demand = self.required = self.require = function (keys, max, msg) {
     // you can optionally provide a 'max' key,
     // which will raise an exception if too many '_'
@@ -178,12 +184,10 @@ function Argv (processArgs, cwd) {
       keys.forEach(function (key) {
         self.demand(key, msg)
       })
-    } else {
-      if (typeof msg === 'string') {
-        demanded[keys] = { msg: msg }
-      } else if (msg === true || typeof msg === 'undefined') {
-        demanded[keys] = { msg: undefined }
-      }
+    } else if (typeof msg === 'string') {
+      demanded[keys] = { msg: msg }
+    } else if (msg === true || typeof msg === 'undefined') {
+      demanded[keys] = { msg: null }
     }
 
     return self
@@ -296,7 +300,6 @@ function Argv (processArgs, cwd) {
     return self
   }
 
-  var strict = false
   self.strict = function () {
     strict = true
     return self
@@ -311,7 +314,6 @@ function Argv (processArgs, cwd) {
     return self
   }
 
-  var versionOpt = null
   self.version = function (ver, opt, msg) {
     versionOpt = opt || 'version'
     usage.version(ver)
@@ -320,7 +322,6 @@ function Argv (processArgs, cwd) {
     return self
   }
 
-  var helpOpt = null
   self.addHelpOpt = function (opt, msg) {
     helpOpt = opt
     self.boolean(opt)
@@ -333,7 +334,6 @@ function Argv (processArgs, cwd) {
     return self
   }
 
-  var exitProcess = true
   self.exitProcess = function (enabled) {
     if (typeof enabled !== 'boolean') {
       enabled = true
@@ -430,18 +430,18 @@ function Argv (processArgs, cwd) {
     // if there's a handler associated with a
     // command defer processing to it.
     var handlerKeys = Object.keys(self.getCommandHandlers())
-    for (var i = 0, command; (command = handlerKeys[i]) !== undefined; i++) {
-      if (~argv._.indexOf(command)) {
+    for (var i = 0, command; typeof (command = handlerKeys[i]) !== 'undefined'; i++) {
+      if (!argv._.indexOf(command)) {
         self.getCommandHandlers()[command](self.reset())
         return self.argv
       }
     }
 
     // generate a completion script for adding to ~/.bashrc.
-    if (completionCommand && ~argv._.indexOf(completionCommand) && !argv[completion.completionKey]) {
+    if (completionCommand && !argv._.indexOf(completionCommand) && !argv[completion.completionKey]) {
       self.showCompletionScript()
       if (exitProcess) {
-        process.exit(0)
+        throw new Error('Exit Process')
       }
     }
 
@@ -451,27 +451,27 @@ function Argv (processArgs, cwd) {
       // we allow for asynchronous completions,
       // e.g., loading in a list of commands from an API.
       completion.getCompletion(function (completions) {
-        ;(completions || []).forEach(function (completion) {
+        (completions || []).forEach(function (completion) {
           console.log(completion)
         })
 
         if (exitProcess) {
-          process.exit(0)
+          throw new Error('Exit Process')
         }
       })
-      return
+      return null
     }
 
     Object.keys(argv).forEach(function (key) {
       if (key === helpOpt && argv[key]) {
         self.showHelp('log')
         if (exitProcess) {
-          process.exit(0)
+          throw new Error('Exit Process')
         }
       } else if (key === versionOpt && argv[key]) {
         usage.showVersion()
         if (exitProcess) {
-          process.exit(0)
+          throw new Error('Exit Prcess')
         }
       }
     })
@@ -496,7 +496,7 @@ function Argv (processArgs, cwd) {
 
   function setPlaceholderKeys (argv) {
     Object.keys(options.key).forEach(function (key) {
-      if (typeof argv[key] === 'undefined') argv[key] = undefined
+      if (typeof argv[key] === 'undefined') argv[key] = null
     })
   }
 

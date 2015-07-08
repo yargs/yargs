@@ -1,4 +1,4 @@
-/* global describe, it, beforeEach */
+'use strict'
 
 var checkUsage = require('./helpers/utils').checkOutput
 var yargs = require('../')
@@ -179,8 +179,8 @@ describe('usage tests', function () {
       return yargs('-x 10 -y 20'.split(' '))
       .usage('Usage: $0 -x NUM -y NUM')
       .check(function (argv) {
-        if (!('x' in argv)) throw Error('You forgot about -x')
-        if (!('y' in argv)) throw Error('You forgot about -y')
+        if (!('x' in argv)) throw new Error('You forgot about -x')
+        if (!('y' in argv)) throw new Error('You forgot about -y')
         else return true
       })
       .argv
@@ -200,8 +200,8 @@ describe('usage tests', function () {
         .usage('Usage: $0 -x NUM -y NUM')
         .wrap(null)
         .check(function (argv) {
-          if (!('x' in argv)) throw Error('You forgot about -x')
-          if (!('y' in argv)) throw Error('You forgot about -y')
+          if (!('x' in argv)) throw new Error('You forgot about -x')
+          if (!('y' in argv)) throw new Error('You forgot about -y')
         })
         .argv
     })
@@ -655,8 +655,8 @@ describe('usage tests', function () {
           return yargs('-y 10 -z 20'.split(' '))
             .usage('Usage: $0 -x NUM [-y NUM]')
             .options({
-              'x': { description: 'an option', demand: true },
-              'y': { description: 'another option', demand: false }
+              x: { description: 'an option', demand: true },
+              y: { description: 'another option', demand: false }
             })
             .wrap(null)
             .argv
@@ -684,8 +684,8 @@ describe('usage tests', function () {
           return yargs('-y 10 -z 20'.split(' '))
             .usage('Usage: $0 -x NUM [-y NUM]')
             .options({
-              'x': { description: 'an option', required: true },
-              'y': { description: 'another option', required: false }
+              x: { description: 'an option', required: true },
+              y: { description: 'another option', required: false }
             })
             .wrap(null)
             .argv
@@ -712,8 +712,8 @@ describe('usage tests', function () {
         return yargs('-w 10'.split(' '))
         .usage('Usage: $0 --width NUM [--height NUM]')
         .options({
-          'width': { description: 'Width', alias: 'w', demand: true },
-          'height': { description: 'Height', alias: 'h', demand: false }
+          width: { description: 'Width', alias: 'w', demand: true },
+          height: { description: 'Height', alias: 'h', demand: false }
         })
         .wrap(null)
         .argv
@@ -946,7 +946,7 @@ describe('usage tests', function () {
       r.errors[0].split('\n').length.should.equal(8)
 
       // should wrap within appropriate boundaries.
-      r.errors[0].split('\n').forEach(function (line, i) {
+      r.errors[0].split('\n').forEach(function (line) {
         // ignore headings and blank lines.
         if (!line || line.match('Examples:') || line.match('Options:')) return
 
@@ -1183,7 +1183,7 @@ describe('usage tests', function () {
     })
   })
 
-  describe('showHelp', function (done) {
+  describe('showHelp', function () {
     // see #143.
     it('should show help regardless of whether argv has been called', function () {
       var r = checkUsage(function () {

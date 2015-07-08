@@ -1,3 +1,5 @@
+'use strict'
+
 module.exports = {
   calculate: function (a) {
     return a + 55

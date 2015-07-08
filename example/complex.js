@@ -1,4 +1,6 @@
 // a fairly complex CLI defined using the yargs 3.0 API:
+'use strict'
+
 var argv = require('yargs')
   .usage('Usage: $0 <cmd> [options]') // usage string of application.
   .command('install', 'install a package (name@version)') // describe commands available.
@@ -27,7 +29,7 @@ var argv = require('yargs')
   // disable showing help on failures, provide a final message
   // to display for errors.
   .showHelpOnFail(false, 'whoops, something went wrong! run with --help')
-  .argv;
+  .argv
 
 // the parsed data is stored in argv.
-console.log(argv);
+console.log(argv)
