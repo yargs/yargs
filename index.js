@@ -432,11 +432,11 @@ function Argv (processArgs, cwd) {
     // command defer processing to it.
     var commandName = argv._[self.commandIndex]
     var handler = self.getCommandHandlers()[commandName]
-    
+
     if (handler) {
-        self.commandIndex++;
-        handler(self.reset())
-        return self.argv;
+      self.commandIndex++
+      handler(self.reset())
+      return self.argv
     }
 
     // generate a completion script for adding to ~/.bashrc.
