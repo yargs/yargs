@@ -417,6 +417,7 @@ function Argv (processArgs, cwd) {
     argv.$0 = self.$0
 
     self.parsed = parsed
+    self.commandIndex = self.commandIndex || 0
 
     // while building up the argv object, there
     // are two passes through the parser. If completion
@@ -429,12 +430,13 @@ function Argv (processArgs, cwd) {
 
     // if there's a handler associated with a
     // command defer processing to it.
-    var handlerKeys = Object.keys(self.getCommandHandlers())
-    for (var i = 0, command; (command = handlerKeys[i]) !== undefined; i++) {
-      if (~argv._.indexOf(command)) {
-        self.getCommandHandlers()[command](self.reset())
-        return self.argv
-      }
+    var commandName = argv._[self.commandIndex]
+    var handler = self.getCommandHandlers()[commandName]
+
+    if (handler) {
+      self.commandIndex++
+      handler(self.reset())
+      return self.argv
     }
 
     // generate a completion script for adding to ~/.bashrc.
