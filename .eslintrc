@@ -1,0 +1,25 @@
+extends: "standard"
+
+rules:
+  complexity: [1, 10]
+  consistent-return: 2
+  consistent-this: 2
+  dot-notation: 2
+  global-strict: 2 # deprecated will be replaced by "strict" in the future
+  linebreak-style: [2, "unix"]
+  no-comma-dangle: 2
+  no-constant-condition: 2
+  no-else-return: 2
+  no-else-return: 2
+  no-eq-null: 2
+  no-extra-parens: 2
+  no-extra-semi: 2
+  no-lonely-if: 2
+  no-loop-func: 1
+  no-nested-ternary: 2
+  no-path-concat: 2
+  no-process-exit: 2
+  no-undefined: 2
+  no-use-before-define: [2, "nofunc"]
+  no-void: 2
+  quote-props: [2, "as-needed"]

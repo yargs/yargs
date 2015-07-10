@@ -1,7 +1,9 @@
 #!/usr/bin/env node
+'use strict'
+
 var argv = require('yargs')
     .boolean('v')
     .argv
-;
-console.dir(argv.v);
-console.dir(argv._);
+
+console.dir(argv.v)
+console.dir(argv._)

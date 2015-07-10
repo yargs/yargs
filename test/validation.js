@@ -1,4 +1,4 @@
-/* global describe, it, beforeEach */
+'use strict'
 
 var expect = require('chai').expect
 var yargs = require('../')
@@ -25,7 +25,7 @@ describe('validation tests', function () {
       yargs(['--foo'])
         .boolean('foo')
         .implies({
-          'foo': 1
+          foo: 1
         })
         .fail(function (msg) {
           msg.should.match(/Implications failed/)
@@ -49,7 +49,7 @@ describe('validation tests', function () {
     it('fails if a key is set, along with a key that it implies should not be set', function (done) {
       yargs(['--bar', '--foo'])
         .implies({
-          'bar': '--no-foo'
+          bar: '--no-foo'
         })
         .fail(function (msg) {
           msg.should.match(/Implications failed/)

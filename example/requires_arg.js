@@ -1,19 +1,21 @@
-var yargs = require('yargs');
+'use strict'
+
+var yargs = require('yargs')
 
 var argv = yargs.usage('This is my awesome program', {
-  'input': {
+  input: {
     description: 'Input file name',
     requiresArg: true,
-    short: 'i',
+    short: 'i'
   },
-  'output': {
+  output: {
     description: 'Output file name',
     requiresArg: true,
     short: 'o'
   }
-}).argv;
+}).argv
 
-yargs.showHelp();
+yargs.showHelp()
 
-console.log('\n\nInspecting options');
-console.dir(argv);
+console.log('\n\nInspecting options')
+console.dir(argv)

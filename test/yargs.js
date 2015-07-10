@@ -1,4 +1,4 @@
-/* global describe, it, beforeEach */
+'use strict'
 
 var expect = require('chai').expect
 var checkOutput = require('./helpers/utils').checkOutput
@@ -14,7 +14,7 @@ describe('yargs dsl tests', function () {
     process.env._ = '/usr/local/bin/ndm'
     process.execPath = '/usr/local/bin/ndm'
     var argv = yargs([]).argv
-    argv['$0'].should.eql('ndm')
+    argv.$0.should.eql('ndm')
   })
 
   it('accepts an object for aliases', function () {

@@ -1,6 +1,7 @@
-/* global describe, it, beforeEach */
+'use strict'
 
 var spawn = require('child_process').spawn
+var path = require('path')
 
 describe('integration tests', function () {
   it('should run as a shell script with no arguments', function (done) {
@@ -52,7 +53,9 @@ describe('integration tests', function () {
 
 function testCmd (cmd, args, done) {
   var oldDir = process.cwd()
-  process.chdir(__dirname + '/fixtures')
+  process.chdir(
+    path.join(__dirname, 'fixtures')
+  )
 
   var cmds = cmd.split(' ')
 

@@ -1,3 +1,5 @@
+'use strict'
+
 var Hash = require('hashish')
 
 // capture terminal output, so that we might

@@ -1,4 +1,5 @@
-/* global describe, it, beforeEach */
+'use strict'
+
 var checkUsage = require('./helpers/utils').checkOutput
 var yargs = require('../')
 
@@ -160,7 +161,7 @@ describe('Completion', function () {
       var r = checkUsage(function () {
         return yargs(['--get-yargs-completions'])
         .help('h')
-        .completion('completion', function (current, argv) {
+        .completion('completion', function () {
           return ['cat', 'bat']
         })
         .argv

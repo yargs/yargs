@@ -1,4 +1,4 @@
-/* global describe, it, beforeEach */
+'use strict'
 
 var should = require('chai').should()
 var expect = require('chai').expect
@@ -528,7 +528,7 @@ describe('parser tests', function () {
   // regression, see https://github.com/chevex/yargs/issues/66
   it('should set boolean options values if next value is "true" or "false" with = as separator', function () {
     var argv = require('../')(['--bool=false'])
-    .options({'b': {
+    .options({b: {
       alias: 'bool',
       boolean: true,
       default: true
@@ -645,7 +645,7 @@ describe('parser tests', function () {
     })
 
     describe('for boolean options', function () {
-      [true, false, undefined].forEach(function (def) {
+      [true, false, null].forEach(function (def) {
         describe('with explicit ' + def + ' default', function () {
           var argv = yargs().options({
             flag: {
@@ -1066,8 +1066,8 @@ describe('parser tests', function () {
 
     it('allows multiple nargs to be set at the same time', function () {
       var result = yargs().nargs({
-        'foo': 2,
-        'bar': 1
+        foo: 2,
+        bar: 1
       })
       .parse([ '--foo', 'apple', 'bar', '--bar', 'banana', '-f' ])
 
