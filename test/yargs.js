@@ -223,6 +223,53 @@ describe('yargs dsl tests', function () {
       ])
     })
 
+    it('runs command handler if node-bin is included in path', function () {
+      var r = checkOutput(function () {
+        yargs(['/Users/benjamincoe/.nvm/versions/io.js/v2.0.2/bin/iojs', 'blerg', '-h'])
+          .command('blerg', 'handle blerg things', function (yargs) {
+            yargs.command('snuh', 'snuh command')
+              .help('h')
+              .wrap(null)
+              .argv
+          })
+          .help('h')
+          .argv
+      })
+
+      r.logs[0].split('\n').should.deep.equal([
+        'Commands:',
+        '  snuh  snuh command',
+        '',
+        'Options:',
+        '  -h  Show help  [boolean]',
+        ''
+      ])
+    })
+
+    it('checks commands based on their order in argv._', function () {
+      var r = checkOutput(function () {
+        yargs(['blerg', 'noop', '-h'])
+          .command('noop', 'do nothing', function () {})
+          .command('blerg', 'handle blerg things', function (yargs) {
+            yargs.command('snuh', 'snuh command')
+              .help('h')
+              .wrap(null)
+              .argv
+          })
+          .help('h')
+          .argv
+      })
+
+      r.logs[0].split('\n').should.deep.equal([
+        'Commands:',
+        '  snuh  snuh command',
+        '',
+        'Options:',
+        '  -h  Show help  [boolean]',
+        ''
+      ])
+    })
+
     it('executes top-level help if no handled command is provided', function () {
       var r = checkOutput(function () {
         yargs(['snuh', '-h'])
