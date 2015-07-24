@@ -5,10 +5,10 @@ Yargs be a node.js library fer hearties tryin' ter parse optstrings.
 
 With yargs, ye be havin' a map that leads straight to yer treasure! Treasure of course, being a simple option hash.
 
-[![Build Status](https://travis-ci.org/bcoe/yargs.png)](https://travis-ci.org/bcoe/yargs)
-[![Dependency Status](https://gemnasium.com/bcoe/yargs.png)](https://gemnasium.com/bcoe/yargs)
-[![Coverage Status](https://coveralls.io/repos/bcoe/yargs/badge.svg?branch=)](https://coveralls.io/r/bcoe/yargs?branch=)
-[![NPM version](https://img.shields.io/npm/v/yargs.svg)](https://www.npmjs.com/package/yargs)
+[![Build Status][travis-image]][travis-url]
+[![Dependency Status][gemnasium-image]][gemnasium-url]
+[![Coverage Status][coveralls-image]][coveralls-url]
+[![NPM version][npm-image]][npm-url]
 
 > Yargs is the official successor to optimist. Please feel free to submit issues and pull requests. If you'd like to contribute and don't know where to start, have a look at [the issue list](https://github.com/bcoe/yargs/issues) :)
 
@@ -930,3 +930,14 @@ inspired by
 
 This module is loosely inspired by Perl's
 [Getopt::Casual](http://search.cpan.org/~photo/Getopt-Casual-0.13.1/Casual.pm).
+
+
+
+[travis-url]: https://travis-ci.org/bcoe/yargs
+[travis-image]: https://img.shields.io/travis/bcoe/yargs.svg
+[gemnasium-url]: https://gemnasium.com/bcoe/yargs
+[gemnasium-image]: https://img.shields.io/gemnasium/bcoe/yargs.svg
+[coveralls-url]: https://coveralls.io/github/bcoe/yargs
+[coveralls-image]: https://img.shields.io/coveralls/bcoe/yargs.svg
+[npm-url]: https://npmjs.org/package/yargs
+[npm-image]: https://img.shields.io/npm/v/yargs.svg
