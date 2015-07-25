@@ -160,6 +160,7 @@ describe('yargs dsl tests', function () {
         .string('foo')
         .alias('foo', 'bar')
         .string('foo')
+        .choices('foo', ['bar', 'baz'])
         .implies('foo', 'snuh')
         .strict()
         .exitProcess(false)  // defaults to true.
@@ -174,6 +175,7 @@ describe('yargs dsl tests', function () {
         key: {},
         narg: {},
         defaultDescription: {},
+        choices: {},
         requiresArg: [],
         count: [],
         normalize: [],
