@@ -501,6 +501,40 @@ var argv = require('yargs')
 ;
 ````
 
+.choices(key, choices)
+----------------------
+
+Limit valid values for `key` to a predefined set of `choices`, given as an array
+or as an individual value.
+
+```js
+var argv = require('yargs')
+  .alias('i', 'ingredient')
+  .describe('i', 'choose your sandwich ingredients')
+  .choices('i', ['peanut-butter', 'jelly', 'banana', 'pickles'])
+  .help('help')
+  .argv
+```
+
+If this method is called multiple times, all enumerated values will be merged
+together. Choices are generally strings or numbers, and value matching is
+case-sensitive.
+
+Optionally `.choices()` can take an object that maps multiple keys to their
+choices.
+
+Choices can also be specified as `choices` in the object given to `option()`.
+
+```js
+var argv = require('yargs')
+  .option('size', {
+    alias: 's',
+    describe: 'choose a size',
+    choices: ['xs', 's', 'm', 'l', 'xl']
+  })
+  .argv
+```
+
 .usage(message, [opts])
 ---------------------
 
