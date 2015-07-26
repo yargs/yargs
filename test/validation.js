@@ -86,7 +86,10 @@ describe('validation tests', function () {
       yargs(['--state', 'denial'])
         .choices('state', ['happy', 'sad', 'hungry'])
         .fail(function (msg) {
-          msg.should.match(/Invalid values/)
+          msg.split('\n').should.deep.equal([
+            'Invalid values:',
+            '  Argument: state, Given: "denial", Choices: "happy", "sad", "hungry"'
+          ])
           return done()
         })
         .argv
@@ -96,17 +99,23 @@ describe('validation tests', function () {
       yargs(['--characters', 'susie', '--characters', 'linus'])
         .choices('characters', ['calvin', 'hobbes', 'susie', 'moe'])
         .fail(function (msg) {
-          msg.should.match(/Invalid values/)
+          msg.split('\n').should.deep.equal([
+            'Invalid values:',
+            '  Argument: characters, Given: "linus", Choices: "calvin", "hobbes", "susie", "moe"'
+          ])
           return done()
         })
         .argv
     })
 
-    it('fails with multiple invalid values', function (done) {
+    it('fails with multiple invalid values for same argument', function (done) {
       yargs(['--category', 'comedy', '--category', 'drama'])
         .choices('category', ['animal', 'vegetable', 'mineral'])
         .fail(function (msg) {
-          msg.should.match(/Invalid values/)
+          msg.split('\n').should.deep.equal([
+            'Invalid values:',
+            '  Argument: category, Given: "comedy", "drama", Choices: "animal", "vegetable", "mineral"'
+          ])
           return done()
         })
         .argv
@@ -116,7 +125,25 @@ describe('validation tests', function () {
       yargs(['--env', 'DEV'])
         .choices('env', ['dev', 'prd'])
         .fail(function (msg) {
-          msg.should.match(/Invalid values/)
+          msg.split('\n').should.deep.equal([
+            'Invalid values:',
+            '  Argument: env, Given: "DEV", Choices: "dev", "prd"'
+          ])
+          return done()
+        })
+        .argv
+    })
+
+    it('fails with multiple invalid arguments', function (done) {
+      yargs(['--system', 'osx', '--arch', '64'])
+        .choices('system', ['linux', 'mac', 'windows'])
+        .choices('arch', ['x86', 'x64', 'arm'])
+        .fail(function (msg) {
+          msg.split('\n').should.deep.equal([
+            'Invalid values:',
+            '  Argument: system, Given: "osx", Choices: "linux", "mac", "windows"',
+            '  Argument: arch, Given: 64, Choices: "x86", "x64", "arm"'
+          ])
           return done()
         })
         .argv
