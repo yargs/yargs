@@ -80,4 +80,46 @@ describe('validation tests', function () {
         .argv
     })
   })
+
+  describe('choices', function () {
+    it('fails with one invalid value', function (done) {
+      yargs(['--state', 'denial'])
+        .choices('state', ['happy', 'sad', 'hungry'])
+        .fail(function (msg) {
+          msg.should.match(/Invalid values/)
+          return done()
+        })
+        .argv
+    })
+
+    it('fails with one valid and one invalid value', function (done) {
+      yargs(['--characters', 'susie', '--characters', 'linus'])
+        .choices('characters', ['calvin', 'hobbes', 'susie', 'moe'])
+        .fail(function (msg) {
+          msg.should.match(/Invalid values/)
+          return done()
+        })
+        .argv
+    })
+
+    it('fails with multiple invalid values', function (done) {
+      yargs(['--category', 'comedy', '--category', 'drama'])
+        .choices('category', ['animal', 'vegetable', 'mineral'])
+        .fail(function (msg) {
+          msg.should.match(/Invalid values/)
+          return done()
+        })
+        .argv
+    })
+
+    it('fails with case-insensitive value', function (done) {
+      yargs(['--env', 'DEV'])
+        .choices('env', ['dev', 'prd'])
+        .fail(function (msg) {
+          msg.should.match(/Invalid values/)
+          return done()
+        })
+        .argv
+    })
+  })
 })
