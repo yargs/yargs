@@ -98,6 +98,16 @@ describe('yargs dsl tests', function () {
     argv.c.should.eql('99')
   })
 
+  it('should allow a valid choice', function () {
+    var argv = yargs(['--looks=good'])
+      .option('looks', {
+        choices: ['good', 'bad']
+      })
+      .argv
+
+    argv.looks.should.eql('good')
+  })
+
   describe('showHelpOnFail', function () {
     it('should display custom failure message, if string is provided as first argument', function () {
       var r = checkOutput(function () {
@@ -160,6 +170,7 @@ describe('yargs dsl tests', function () {
         .string('foo')
         .alias('foo', 'bar')
         .string('foo')
+        .choices('foo', ['bar', 'baz'])
         .implies('foo', 'snuh')
         .strict()
         .exitProcess(false)  // defaults to true.
@@ -174,6 +185,7 @@ describe('yargs dsl tests', function () {
         key: {},
         narg: {},
         defaultDescription: {},
+        choices: {},
         requiresArg: [],
         count: [],
         normalize: [],
@@ -250,6 +262,49 @@ describe('yargs dsl tests', function () {
   describe('terminalWidth', function () {
     it('returns the maximum width of the terminal', function () {
       yargs.terminalWidth().should.be.gt(0)
+    })
+  })
+
+  describe('choices', function () {
+    it('accepts an object', function () {
+      var optChoices = yargs([])
+        .choices({
+          color: ['red', 'green', 'blue'],
+          stars: [1, 2, 3, 4, 5]
+        })
+        .choices({
+          size: ['xl', 'l', 'm', 's', 'xs']
+        })
+        .getOptions().choices
+
+      optChoices.should.deep.equal({
+        color: ['red', 'green', 'blue'],
+        stars: [1, 2, 3, 4, 5],
+        size: ['xl', 'l', 'm', 's', 'xs']
+      })
+    })
+
+    it('accepts a string and array', function () {
+      var optChoices = yargs([])
+        .choices('meat', ['beef', 'chicken', 'pork', 'bison'])
+        .choices('temp', ['rare', 'med-rare', 'med', 'med-well', 'well'])
+        .getOptions().choices
+
+      optChoices.should.deep.equal({
+        meat: ['beef', 'chicken', 'pork', 'bison'],
+        temp: ['rare', 'med-rare', 'med', 'med-well', 'well']
+      })
+    })
+
+    it('accepts a string and single value', function () {
+      var optChoices = yargs([])
+        .choices('gender', 'male')
+        .choices('gender', 'female')
+        .getOptions().choices
+
+      optChoices.should.deep.equal({
+        gender: ['male', 'female']
+      })
     })
   })
 })

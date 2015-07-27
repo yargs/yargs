@@ -1261,4 +1261,53 @@ describe('usage tests', function () {
       })
     })
   })
+
+  describe('choices', function () {
+    it('should output choices when defined for non-hidden options', function () {
+      var r = checkUsage(function () {
+        return yargs(['--help'])
+          .option('answer', {
+            describe: 'does this look good?',
+            choices: ['yes', 'no', 'maybe']
+          })
+          .option('confidence', {
+            describe: 'percentage of confidence',
+            choices: [0, 25, 50, 75, 100]
+          })
+          .help('help')
+          .wrap(null)
+          .argv
+      })
+
+      r.logs[0].split('\n').should.deep.equal([
+        'Options:',
+        '  --answer      does this look good?  [choices: "yes", "no", "maybe"]',
+        '  --confidence  percentage of confidence  [choices: 0, 25, 50, 75, 100]',
+        '  --help        Show help  [boolean]',
+        ''
+      ])
+    })
+
+    it('should not output choices when defined for hidden options', function () {
+      var r = checkUsage(function () {
+        return yargs(['--help'])
+          .option('answer', {
+            type: 'string',
+            choices: ['yes', 'no', 'maybe']
+          })
+          .option('confidence', {
+            choices: [0, 25, 50, 75, 100]
+          })
+          .help('help')
+          .wrap(null)
+          .argv
+      })
+
+      r.logs[0].split('\n').should.deep.equal([
+        'Options:',
+        '  --help  Show help  [boolean]',
+        ''
+      ])
+    })
+  })
 })

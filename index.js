@@ -50,6 +50,7 @@ function Argv (processArgs, cwd) {
       alias: {},
       default: {},
       defaultDescription: {},
+      choices: {},
       requiresArg: [],
       count: [],
       normalize: [],
@@ -90,6 +91,17 @@ function Argv (processArgs, cwd) {
       })
     } else {
       options.narg[key] = n
+    }
+    return self
+  }
+
+  self.choices = function (key, values) {
+    if (typeof key === 'object') {
+      Object.keys(key).forEach(function (k) {
+        self.choices(k, key[k])
+      })
+    } else {
+      options.choices[key] = (options.choices[key] || []).concat(values)
     }
     return self
   }
@@ -262,6 +274,8 @@ function Argv (processArgs, cwd) {
         self.default(key, opt.default)
       } if ('nargs' in opt) {
         self.nargs(key, opt.nargs)
+      } if ('choices' in opt) {
+        self.choices(key, opt.choices)
       } if (opt.boolean || opt.type === 'boolean') {
         self.boolean(key)
         if (opt.alias) self.boolean(opt.alias)
@@ -486,6 +500,7 @@ function Argv (processArgs, cwd) {
       validation.requiredArguments(argv)
       if (strict) validation.unknownArguments(argv, aliases)
       validation.customChecks(argv, aliases)
+      validation.limitedChoices(argv)
       validation.implications(argv)
     }
 
