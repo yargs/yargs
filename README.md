@@ -924,6 +924,7 @@ To submit a new translation for yargs:
 2. submit a pull request with the new locale file.
 
 .updateLocale(obj)
+------------------
 .updateStrings(obj)
 ------------------
 
