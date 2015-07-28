@@ -28,7 +28,7 @@ describe('usage tests', function () {
           'Options:',
           '  -x  [required]',
           '  -y  [required]',
-          'Missing required arguments: y'
+          'Missing required argument: y'
         ])
         r.logs.should.have.length(0)
         r.exit.should.be.ok
@@ -51,7 +51,7 @@ describe('usage tests', function () {
             'Options:',
             '  -x  [required]',
             '  -y  [required]',
-            'Missing required arguments: y'
+            'Missing required argument: y'
           ])
           r.logs.should.have.length(0)
           r.exit.should.be.ok
@@ -644,7 +644,7 @@ describe('usage tests', function () {
       'Examples:',
       '  ./usage something       description',
       '  ./usage something else  other description',
-      'Missing required arguments: y'
+      'Missing required argument: y'
     ])
   })
 
@@ -671,7 +671,7 @@ describe('usage tests', function () {
           '  -x  an option  [required]',
           '  -y  another option',
           '',
-          'Missing required arguments: x'
+          'Missing required argument: x'
         ])
         r.logs.should.have.length(0)
         r.exit.should.be.ok
@@ -700,7 +700,7 @@ describe('usage tests', function () {
           '  -x  an option  [required]',
           '  -y  another option',
           '',
-          'Missing required arguments: x'
+          'Missing required argument: x'
         ])
         r.logs.should.have.length(0)
         r.exit.should.be.ok
@@ -835,7 +835,7 @@ describe('usage tests', function () {
       r.should.have.property('logs').with.length(0)
       r.should.have.property('exit').and.be.ok
       r.errors.join('\n').split(/\n/).should.deep.equal([
-        'Missing required arguments: bar',
+        'Missing required argument: bar',
         '',
         'Specify --help for available options'
       ])
@@ -985,7 +985,7 @@ describe('usage tests', function () {
         '  download  download something from somewhere',
         'Options:',
         '  -y  [required]',
-        'Missing required arguments: y'
+        'Missing required argument: y'
       ])
     })
 
@@ -1004,7 +1004,7 @@ describe('usage tests', function () {
         'upload', 'upload', 'something',
         'Options:',
         '-y', '[required]',
-        'Missing', 'required', 'arguments:', 'y'
+        'Missing', 'required', 'argument:', 'y'
       ])
     })
 
@@ -1023,7 +1023,7 @@ describe('usage tests', function () {
         'upload', 'upload', 'something',
         'Options:',
         '-y', '[required]',
-        'Missing', 'required', 'arguments:', 'y'
+        'Missing', 'required', 'argument:', 'y'
       ])
     })
   })
@@ -1042,7 +1042,7 @@ describe('usage tests', function () {
         'Options:',
         '  -y  [required]',
         'for more info view the manual at http://example.com',
-        'Missing required arguments: y'
+        'Missing required argument: y'
       ])
     })
 
@@ -1059,7 +1059,7 @@ describe('usage tests', function () {
         'Options:',
         '  -y  [required]',
         'Try \'./usage --long-help\' for more information',
-        'Missing required arguments: y'
+        'Missing required argument: y'
       ])
     })
   })
@@ -1116,7 +1116,6 @@ describe('usage tests', function () {
         .default('o', {a: '33'})
         .wrap(null)
         .argv
-
       })
 
       r.logs[0].should.include('default: []')
@@ -1308,6 +1307,40 @@ describe('usage tests', function () {
         '  --help  Show help  [boolean]',
         ''
       ])
+    })
+  })
+
+  describe('count', function () {
+    it('should indicate when an option is a count', function () {
+      var r = checkUsage(function () {
+        return yargs(['--help'])
+          .option('verbose', {
+            describe: 'verbose level',
+            count: true
+          })
+          .help('help')
+          .wrap(null)
+          .argv
+      })
+
+      r.logs.join(' ').should.match(/\[count\]/)
+    })
+  })
+
+  describe('array', function () {
+    it('should indicate when an option is an array', function () {
+      var r = checkUsage(function () {
+        return yargs(['--help'])
+          .option('arr', {
+            describe: 'array option',
+            array: true
+          })
+          .help('help')
+          .wrap(null)
+          .argv
+      })
+
+      r.logs.join(' ').should.match(/\[array\]/)
     })
   })
 })

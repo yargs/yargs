@@ -139,6 +139,7 @@ describe('validation tests', function () {
         .choices('system', ['linux', 'mac', 'windows'])
         .choices('arch', ['x86', 'x64', 'arm'])
         .fail(function (msg) {
+          console.log(msg)
           msg.split('\n').should.deep.equal([
             'Invalid values:',
             '  Argument: system, Given: "osx", Choices: "linux", "mac", "windows"',

@@ -4,6 +4,7 @@ var Parser = require('./lib/parser')
 var path = require('path')
 var Usage = require('./lib/usage')
 var Validation = require('./lib/validation')
+var Y18n = require('y18n')
 
 Argv(process.argv.slice(2))
 
@@ -15,6 +16,10 @@ function Argv (processArgs, cwd) {
   var completion = null
   var usage = null
   var validation = null
+  var y18n = Y18n({
+    directory: path.resolve(__dirname, './locales'),
+    locale: 'en'
+  })
 
   if (!cwd) cwd = process.cwd()
 
@@ -57,8 +62,8 @@ function Argv (processArgs, cwd) {
       config: []
     }
 
-    usage = Usage(self) // handle usage output.
-    validation = Validation(self, usage) // handle arg validation.
+    usage = Usage(self, y18n) // handle usage output.
+    validation = Validation(self, usage, y18n) // handle arg validation.
     completion = Completion(self, usage)
 
     demanded = {}
@@ -424,7 +429,7 @@ function Argv (processArgs, cwd) {
   })
 
   function parseArgs (args) {
-    var parsed = Parser(args, options)
+    var parsed = Parser(args, options, y18n)
     var argv = parsed.argv
     var aliases = parsed.aliases
 

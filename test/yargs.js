@@ -128,7 +128,7 @@ describe('yargs dsl tests', function () {
           .argv
       })
 
-      r.errors[1].should.match(/required arguments/)
+      r.errors[1].should.match(/required argument/)
     })
   })
 
@@ -141,7 +141,7 @@ describe('yargs dsl tests', function () {
             .showHelpOnFail(false)
             .exitProcess(false)
             .argv
-        }).to.throw(/Missing required arguments/)
+        }).to.throw(/Missing required argument/)
       })
     })
 
