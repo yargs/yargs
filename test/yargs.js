@@ -4,6 +4,8 @@ var expect = require('chai').expect
 var checkOutput = require('./helpers/utils').checkOutput
 var yargs = require('../')
 
+require('chai').should()
+
 describe('yargs dsl tests', function () {
   beforeEach(function () {
     yargs.reset()
@@ -304,6 +306,53 @@ describe('yargs dsl tests', function () {
 
       optChoices.should.deep.equal({
         gender: ['male', 'female']
+      })
+    })
+  })
+
+  describe('locale', function () {
+    it("allows a locale other than the default 'en' to be specified", function () {
+      var r = checkOutput(function () {
+        yargs(['snuh', '-h'])
+          .command('blerg', 'blerg command')
+          .help('h')
+          .wrap(null)
+          .locale('pirate')
+          .argv
+      })
+
+      r.logs.join(' ').should.match(/Choose yer command:/)
+    })
+
+    describe('updateLocale', function () {
+      it('allows you to override the default locale strings', function () {
+        var r = checkOutput(function () {
+          yargs(['snuh', '-h'])
+            .command('blerg', 'blerg command')
+            .help('h')
+            .wrap(null)
+            .updateLocale({
+              'Commands:': 'COMMANDS!'
+            })
+            .argv
+        })
+
+        r.logs.join(' ').should.match(/COMMANDS!/)
+      })
+
+      it('allows you to use updateStrings() as an alias for updateLocale()', function () {
+        var r = checkOutput(function () {
+          yargs(['snuh', '-h'])
+            .command('blerg', 'blerg command')
+            .help('h')
+            .wrap(null)
+            .updateStrings({
+              'Commands:': '!SDNAMMOC'
+            })
+            .argv
+        })
+
+        r.logs.join(' ').should.match(/!SDNAMMOC/)
       })
     })
   })

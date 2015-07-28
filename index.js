@@ -18,7 +18,8 @@ function Argv (processArgs, cwd) {
   var validation = null
   var y18n = Y18n({
     directory: path.resolve(__dirname, './locales'),
-    locale: 'en'
+    locale: 'en',
+    updateFiles: false
   })
 
   if (!cwd) cwd = process.cwd()
@@ -398,6 +399,16 @@ function Argv (processArgs, cwd) {
   self.showCompletionScript = function ($0) {
     $0 = $0 || self.$0
     console.log(completion.generateCompletionScript($0))
+    return self
+  }
+
+  self.locale = function (locale) {
+    y18n.setLocale(locale)
+    return self
+  }
+
+  self.updateStrings = self.updateLocale = function (obj) {
+    y18n.updateLocale(obj)
     return self
   }
 
