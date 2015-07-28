@@ -875,6 +875,82 @@ if (command === 'hello') {
 }
 ```
 
+.locale(locale)
+---------------
+
+Set a locale other than the default `en` locale:
+
+```js
+var argv = require('./')
+  .usage('./$0 - follow ye instructions true')
+  .option('option', {
+    alias: 'o',
+    describe: "'tis a mighty fine option",
+    demand: true
+  })
+  .command('run', "Arrr, ya best be knowin' what yer doin'")
+  .example('$0 run foo', "shiver me timbers, here's an example for ye")
+  .help('help')
+  .locale('pirate')
+  .argv
+```
+
+***
+
+```shell
+./test.js - follow ye instructions true
+
+Choose yer command:
+  run  Arrr, ya best be knowin' what yer doin'
+
+Options for me hearties!
+  --option, -o  'tis a mighty fine option                         [requi-yar-ed]
+  --help        Show help                                              [boolean]
+
+Ex. marks the spot:
+  test.js run foo  shiver me timbers, here's an example for ye
+
+Ye be havin' to set the followin' argument land lubber: option
+```
+
+Locales currently supported:
+
+* **en:** American English.
+* **pirate:** American Pirate.
+
+To submit a new translation for yargs:
+
+1. use `./locales/en.json` as a starting point.
+2. submit a pull request with the new locale file.
+
+.updateLocale(obj)
+.updateStrings(obj)
+------------------
+
+Override the default strings used by yargs with the key/value
+pairs provided in `obj`:
+
+```js
+var argv = require('./')
+  .command('run', 'the run command')
+  .help('help')
+  .updateStrings({
+    'Commands:': 'My Commands -->\n'
+  })
+  .argv
+```
+
+***
+
+```shell
+My Commands -->
+
+  run  the run command
+
+Options:
+  --help  Show help                                                    [boolean]
+```
+
 .argv
 -----
 
