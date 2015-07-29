@@ -881,7 +881,7 @@ if (command === 'hello') {
 Set a locale other than the default `en` locale:
 
 ```js
-var argv = require('./')
+var argv = require('yargs')
   .usage('./$0 - follow ye instructions true')
   .option('option', {
     alias: 'o',
