@@ -932,7 +932,7 @@ Override the default strings used by yargs with the key/value
 pairs provided in `obj`:
 
 ```js
-var argv = require('./')
+var argv = require('yargs')
   .command('run', 'the run command')
   .help('help')
   .updateStrings({
