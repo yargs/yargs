@@ -376,6 +376,163 @@ Optionally `.alias()` can take an object that maps keys to aliases.
 Each key of this object should be the canonical version of the option, and each
 value should be a string or an array of strings.
 
+.argv
+-----
+
+Get the arguments as a plain old object.
+
+Arguments without a corresponding flag show up in the `argv._` array.
+
+The script name or node command is available at `argv.$0` similarly to how `$0`
+works in bash or perl.
+
+.array(key)
+----------
+
+Tell the parser to interpret `key` as an array. If `.array('foo')` is set,
+`--foo foo bar` will be parsed as `['foo', 'bar']` rather than as `'foo'`.
+
+.boolean(key)
+-------------
+
+Interpret `key` as a boolean. If a non-flag option follows `key` in
+`process.argv`, that string won't get set as the value of `key`.
+
+`key` will default to `false`, unless a `default(key, undefined)` is
+explicitly set.
+
+If `key` is an array, interpret all the elements as booleans.
+
+.check(fn)
+----------
+
+Check that certain conditions are met in the provided arguments.
+
+`fn` is called with two arguments, the parsed `argv` hash and an array of options and their aliases.
+
+If `fn` throws or returns a non-truthy value, show the thrown error, usage information, and
+exit.
+
+.choices(key, choices)
+----------------------
+
+Limit valid values for `key` to a predefined set of `choices`, given as an array
+or as an individual value.
+
+```js
+var argv = require('yargs')
+  .alias('i', 'ingredient')
+  .describe('i', 'choose your sandwich ingredients')
+  .choices('i', ['peanut-butter', 'jelly', 'banana', 'pickles'])
+  .help('help')
+  .argv
+```
+
+If this method is called multiple times, all enumerated values will be merged
+together. Choices are generally strings or numbers, and value matching is
+case-sensitive.
+
+Optionally `.choices()` can take an object that maps multiple keys to their
+choices.
+
+Choices can also be specified as `choices` in the object given to `option()`.
+
+```js
+var argv = require('yargs')
+  .option('size', {
+    alias: 's',
+    describe: 'choose a size',
+    choices: ['xs', 's', 'm', 'l', 'xl']
+  })
+  .argv
+```
+
+.command(cmd, desc, [fn])
+-------------------
+
+Document the commands exposed by your application.
+
+Use `desc` to provide a description for each command your application accepts (the
+values stored in `argv._`).  Set `desc` to `false` to create a hidden command.
+Hidden commands don't show up in the help output and aren't available for
+completion.
+
+Optionally, you can provide a handler `fn` which will be executed when
+a given command is provided. The handler will be executed with an instance
+of `yargs`, which can be used to compose nested commands.
+
+Here's an example of top-level and nested commands in action:
+
+```js
+var argv = require('yargs')
+  .usage('npm <command>')
+  .command('install', 'tis a mighty fine package to install')
+  .command('publish', 'shiver me timbers, should you be sharing all that', function (yargs) {
+    argv = yargs.option('f', {
+      alias: 'force',
+      description: 'yar, it usually be a bad idea'
+    })
+    .help('help')
+    .argv
+  })
+  .help('help')
+  .argv;
+```
+
+.completion(cmd, [description], [fn]);
+-------------
+
+Enable bash-completion shortcuts for commands and options.
+
+`cmd`: When present in `argv._`, will result in the `.bashrc` completion script
+being outputted. To enable bash completions, concat the generated script to your
+`.bashrc` or `.bash_profile`.
+
+`description`: Provide a description in your usage instructions for the command
+that generates bash completion scripts.
+
+`fn`: Rather than relying on yargs' default completion functionality, which
+shiver me timbers is pretty awesome, you can provide your own completion
+method.
+
+```js
+var argv = require('yargs')
+  .completion('completion', function(current, argv) {
+    // 'current' is the current command being completed.
+    // 'argv' is the parsed arguments so far.
+    // simply return an array of completions.
+    return [
+      'foo',
+      'bar'
+    ];
+  })
+  .argv;
+```
+
+But wait, there's more! You can provide asynchronous completions.
+
+```js
+var argv = require('yargs')
+  .completion('completion', function(current, argv, done) {
+    setTimeout(function() {
+      done([
+        'apple',
+        'banana'
+      ]);
+    }, 500);
+  })
+  .argv;
+```
+
+.config(key, [description])
+------------
+
+Tells the parser that if the option specified by `key` is passed in, it
+should be interpreted as a path to a JSON config file. The file is loaded
+and parsed, and its properties are set as arguments. If present, the
+`description` parameter customizes the description of the config (`key`) option
+in the usage string.
+
 .default(key, value, [description])
 --------------------
 
@@ -400,11 +557,7 @@ displaying the value in the usage instructions:
 .default('timeout', 60000, '(one-minute)')
 ```
 
-.demand(key, [msg | boolean])
-------------------------------
-.require(key, [msg | boolean])
-------------------------------
-.required(key, [msg | boolean])
+<a name="demand-key-msg-boolean"></a>.demand(key, [msg | boolean])
 ------------------------------
 .demand(count, [max], [msg])
 ------------------------------
@@ -424,15 +577,66 @@ instead of the standard error message. This is especially helpful for the non-op
 If a `boolean` value is given, it controls whether the option is demanded;
 this is useful when using `.options()` to specify command line parameters.
 
-.requiresArg(key)
------------------
+.describe(key, desc)
+--------------------
 
-Specifies either a single option key (string), or an array of options that
-must be followed by option values. If any option value is missing, show the
-usage information and exit.
+Describe a `key` for the generated usage information.
 
-The default behaviour is to set the value of any key not followed by an
-option value to `true`.
+Optionally `.describe()` can take an object that maps keys to descriptions.
+
+.epilog(str)
+------------
+.epilogue(str)
+--------------
+
+A message to print at the end of the usage instructions, e.g.
+
+```js
+var argv = require('yargs')
+  .epilogue('for more information, find our manual at http://example.com');
+```
+
+.example(cmd, desc)
+-------------------
+
+Give some example invocations of your program. Inside `cmd`, the string
+`$0` will get interpolated to the current script name or node command for the
+present script similar to how `$0` works in bash or perl.
+Examples will be printed out as part of the help message.
+
+.exitProcess(enable)
+----------------------------------
+
+By default, yargs exits the process when the user passes a help flag, uses the
+`.version` functionality, or when validation fails. Calling
+`.exitProcess(false)` disables this behavior, enabling further actions after
+yargs have been validated.
+
+.fail(fn)
+---------
+
+Method to execute when a failure occurs, rather than printing the failure message.
+
+`fn` is called with the failure message that would have been printed.
+
+.help([option, [description]])
+------------------------------
+
+Add an option (e.g. `--help`) that displays the usage string and exits the
+process. If present, the `description` parameter customizes the description of
+the help option in the usage string.
+
+If invoked without parameters, `.help()` returns the generated usage string.
+
+Example:
+
+```js
+var yargs = require("yargs")
+  .usage("$0 -operand1 number -operand2 number -operation [add|subtract]");
+console.log(yargs.help());
+```
+
+Later on, `argv` can be retrieved with `yargs.argv`.
 
 .implies(x, y)
 --------------
@@ -441,12 +645,72 @@ Given the key `x` is set, it is required that the key `y` is set.
 
 Optionally `.implies()` can accept an object specifying multiple implications.
 
-.describe(key, desc)
---------------------
+.locale(locale)
+---------------
 
-Describe a `key` for the generated usage information.
+Set a locale other than the default `en` locale:
 
-Optionally `.describe()` can take an object that maps keys to descriptions.
+```js
+var argv = require('yargs')
+  .usage('./$0 - follow ye instructions true')
+  .option('option', {
+    alias: 'o',
+    describe: "'tis a mighty fine option",
+    demand: true
+  })
+  .command('run', "Arrr, ya best be knowin' what yer doin'")
+  .example('$0 run foo', "shiver me timbers, here's an example for ye")
+  .help('help')
+  .wrap(70)
+  .locale('pirate')
+  .argv
+```
+
+***
+
+```shell
+./test.js - follow ye instructions true
+
+Choose yer command:
+  run  Arrr, ya best be knowin' what yer doin'
+
+Options for me hearties!
+  --option, -o  'tis a mighty fine option               [requi-yar-ed]
+  --help        Show help                                    [boolean]
+
+Ex. marks the spot:
+  test.js run foo  shiver me timbers, here's an example for ye
+
+Ye be havin' to set the followin' argument land lubber: option
+```
+
+Locales currently supported:
+
+* **en:** American English.
+* **pirate:** American Pirate.
+
+To submit a new translation for yargs:
+
+1. use `./locales/en.json` as a starting point.
+2. submit a pull request with the new locale file.
+
+.nargs(key, count)
+-----------
+
+The number of arguments that should be consumed after a key. This can be a
+useful hint to prevent parsing ambiguity. For example:
+
+```js
+var argv = require('yargs')
+  .nargs('token', 1)
+  .parse(['--token', '-my-token']);
+```
+
+parses as:
+
+`{ _: [], token: '-my-token', '$0': 'node test' }`
+
+Optionally `.nargs()` can take an object of `key`/`narg` pairs.
 
 .option(key, opt)
 -----------------
@@ -501,343 +765,27 @@ var argv = require('yargs')
 ;
 ````
 
-.choices(key, choices)
-----------------------
-
-Limit valid values for `key` to a predefined set of `choices`, given as an array
-or as an individual value.
-
-```js
-var argv = require('yargs')
-  .alias('i', 'ingredient')
-  .describe('i', 'choose your sandwich ingredients')
-  .choices('i', ['peanut-butter', 'jelly', 'banana', 'pickles'])
-  .help('help')
-  .argv
-```
-
-If this method is called multiple times, all enumerated values will be merged
-together. Choices are generally strings or numbers, and value matching is
-case-sensitive.
-
-Optionally `.choices()` can take an object that maps multiple keys to their
-choices.
-
-Choices can also be specified as `choices` in the object given to `option()`.
-
-```js
-var argv = require('yargs')
-  .option('size', {
-    alias: 's',
-    describe: 'choose a size',
-    choices: ['xs', 's', 'm', 'l', 'xl']
-  })
-  .argv
-```
-
-.usage(message, [opts])
----------------------
-
-Set a usage message to show which commands to use. Inside `message`, the string
-`$0` will get interpolated to the current script name or node command for the
-present script similar to how `$0` works in bash or perl.
-
-`opts` is optional and acts like calling `.options(opts)`.
-
-.command(cmd, desc, [fn])
--------------------
-
-Document the commands exposed by your application.
-
-Use `desc` to provide a description for each command your application accepts (the
-values stored in `argv._`).  Set `desc` to `false` to create a hidden command.
-Hidden commands don't show up in the help output and aren't available for
-completion.
-
-Optionally, you can provide a handler `fn` which will be executed when
-a given command is provided. The handler will be executed with an instance
-of `yargs`, which can be used to compose nested commands.
-
-Here's an example of top-level and nested commands in action:
-
-```js
-var argv = require('yargs')
-  .usage('npm <command>')
-  .command('install', 'tis a mighty fine package to install')
-  .command('publish', 'shiver me timbers, should you be sharing all that', function (yargs) {
-    argv = yargs.option('f', {
-      alias: 'force',
-      description: 'yar, it usually be a bad idea'
-    })
-    .help('help')
-    .argv
-  })
-  .help('help')
-  .argv;
-```
-
-.example(cmd, desc)
--------------------
-
-Give some example invocations of your program. Inside `cmd`, the string
-`$0` will get interpolated to the current script name or node command for the
-present script similar to how `$0` works in bash or perl.
-Examples will be printed out as part of the help message.
-
-
-.epilogue(str)
---------------
-.epilog(str)
-------------
-
-A message to print at the end of the usage instructions, e.g.
-
-```js
-var argv = require('yargs')
-  .epilogue('for more information, find our manual at http://example.com');
-```
-
-.check(fn)
-----------
-
-Check that certain conditions are met in the provided arguments.
-
-`fn` is called with two arguments, the parsed `argv` hash and an array of options and their aliases.
-
-If `fn` throws or returns a non-truthy value, show the thrown error, usage information, and
-exit.
-
-.fail(fn)
----------
-
-Method to execute when a failure occurs, rather than printing the failure message.
-
-`fn` is called with the failure message that would have been printed.
-
-.boolean(key)
--------------
-
-Interpret `key` as a boolean. If a non-flag option follows `key` in
-`process.argv`, that string won't get set as the value of `key`.
-
-`key` will default to `false`, unless a `default(key, undefined)` is
-explicitly set.
-
-If `key` is an array, interpret all the elements as booleans.
-
-.string(key)
-------------
-
-Tell the parser logic not to interpret `key` as a number or boolean.
-This can be useful if you need to preserve leading zeros in an input.
-
-If `key` is an array, interpret all the elements as strings.
-
-`.string('_')` will result in non-hyphenated arguments being interpreted as strings,
-regardless of whether they resemble numbers.
-
-.array(key)
-----------
-
-Tell the parser to interpret `key` as an array. If `.array('foo')` is set,
-`--foo foo bar` will be parsed as `['foo', 'bar']` rather than as `'foo'`.
-
-.nargs(key, count)
------------
-
-The number of arguments that should be consumed after a key. This can be a
-useful hint to prevent parsing ambiguity. For example:
-
-```js
-var argv = require('yargs')
-  .nargs('token', 1)
-  .parse(['--token', '-my-token']);
-```
-
-parses as:
-
-`{ _: [], token: '-my-token', '$0': 'node test' }`
-
-Optionally `.nargs()` can take an object of `key`/`narg` pairs.
-
-.config(key, [description])
-------------
-
-Tells the parser that if the option specified by `key` is passed in, it
-should be interpreted as a path to a JSON config file. The file is loaded
-and parsed, and its properties are set as arguments. If present, the
-`description` parameter customizes the description of the config (`key`) option
-in the usage string.
-
-.wrap(columns)
---------------
-
-Format usage output to wrap at `columns` many columns.
-
-By default wrap will be set to `Math.min(80, windowWidth)`. Use `.wrap(null)` to
-specify no column limit (no right-align). Use `.wrap(yargs.terminalWidth())` to
-maximize the width of yargs' usage instructions.
-
-.strict()
----------
-
-Any command-line argument given that is not demanded, or does not have a
-corresponding description, will be reported as an error.
-
-.help([option, [description]])
-------------------------------
-
-Add an option (e.g. `--help`) that displays the usage string and exits the
-process. If present, the `description` parameter customizes the description of
-the help option in the usage string.
-
-If invoked without parameters, `.help()` returns the generated usage string.
-
-Example:
-
-```js
-var yargs = require("yargs")
-  .usage("$0 -operand1 number -operand2 number -operation [add|subtract]");
-console.log(yargs.help());
-```
-
-Later on, `argv` can be retrieved with `yargs.argv`.
-
-.version(version, [option], [description])
-----------------------------------------
-
-Add an option (e.g. `--version`) that displays the version number (given by the
-`version` parameter) and exits the process. If present, the `description`
-parameter customizes the description of the version option in the usage string.
-
-You can provide a `function` for version, rather than a string.
-This is useful if you want to use the version from your package.json:
-
-```js
-var argv = require('yargs')
-  .version(function() {
-    return require('../package').version;
-  })
-  .argv;
-```
-
-.showHelpOnFail(enable, [message])
-----------------------------------
-
-By default, yargs outputs a usage string if any error is detected. Use the
-`.showHelpOnFail()` method to customize this behavior. If `enable` is `false`,
-the usage string is not output. If the `message` parameter is present, this
-message is output after the error message.
-
-line_count.js:
-
-````javascript
-#!/usr/bin/env node
-var argv = require('yargs')
-    .usage('Count the lines in a file.\nUsage: $0 -f <file>')
-    .demand('f')
-    .alias('f', 'file')
-    .describe('f', 'Load a file')
-    .string('f')
-    .showHelpOnFail(false, 'Specify --help for available options')
-    .help('help')
-    .argv;
-
-// etc.
-````
-
-***
-
-    $ node line_count.js
-    Missing argument value: f
-
-    Specify --help for available options
-
-.showHelp(consoleLevel='error')
----------------------------
-
-Print the usage data using the [`console`](https://nodejs.org/api/console.html) function `consoleLevel` for printing.
-
-Example:
-
-```js
-var yargs = require("yargs")
-  .usage("$0 -operand1 number -operand2 number -operation [add|subtract]");
-yargs.showHelp(); //prints to stderr using console.error()
-```
-
-Or, to print the usage data to `stdout` instead, you can specify the use of `console.log`:
-
-```js
-yargs.showHelp("log"); //prints to stdout using console.log()
-```
-
-Later on, `argv` can be retrieved with `yargs.argv`.
-
-.completion(cmd, [description], [fn]);
--------------
-
-Enable bash-completion shortcuts for commands and options.
-
-`cmd`: When present in `argv._`, will result in the `.bashrc` completion script
-being outputted. To enable bash completions, concat the generated script to your
-`.bashrc` or `.bash_profile`.
-
-`description`: Provide a description in your usage instructions for the command
-that generates bash completion scripts.
-
-`fn`: Rather than relying on yargs' default completion functionality, which
-shiver me timbers is pretty awesome, you can provide your own completion
-method.
-
-```js
-var argv = require('yargs')
-  .completion('completion', function(current, argv) {
-    // 'current' is the current command being completed.
-    // 'argv' is the parsed arguments so far.
-    // simply return an array of completions.
-    return [
-      'foo',
-      'bar'
-    ];
-  })
-  .argv;
-```
-
-But wait, there's more! You can provide asynchronous completions.
-
-```js
-var argv = require('yargs')
-  .completion('completion', function(current, argv, done) {
-    setTimeout(function() {
-      done([
-        'apple',
-        'banana'
-      ]);
-    }, 500);
-  })
-  .argv;
-```
-
-.showCompletionScript()
-----------------------
-
-Generate a bash completion script. Users of your application can install this
-script in their `.bashrc`, and yargs will provide completion shortcuts for
-commands and options.
-
-.exitProcess(enable)
-----------------------------------
-
-By default, yargs exits the process when the user passes a help flag, uses the
-`.version` functionality, or when validation fails. Calling
-`.exitProcess(false)` disables this behavior, enabling further actions after
-yargs have been validated.
-
 .parse(args)
 ------------
 
 Parse `args` instead of `process.argv`. Returns the `argv` object.
+
+.require(key, [msg | boolean])
+------------------------------
+.required(key, [msg | boolean])
+------------------------------
+
+An alias for [`demand()`](#demand-key-msg-boolean). See docs there.
+
+.requiresArg(key)
+-----------------
+
+Specifies either a single option key (string), or an array of options that
+must be followed by option values. If any option value is missing, show the
+usage information and exit.
+
+The default behavior is to set the value of any key not followed by an
+option value to `true`.
 
 .reset()
 --------
@@ -875,53 +823,84 @@ if (command === 'hello') {
 }
 ```
 
-.locale(locale)
----------------
+.showCompletionScript()
+----------------------
 
-Set a locale other than the default `en` locale:
+Generate a bash completion script. Users of your application can install this
+script in their `.bashrc`, and yargs will provide completion shortcuts for
+commands and options.
+
+.showHelp(consoleLevel='error')
+---------------------------
+
+Print the usage data using the [`console`](https://nodejs.org/api/console.html) function `consoleLevel` for printing.
+
+Example:
 
 ```js
-var argv = require('yargs')
-  .usage('./$0 - follow ye instructions true')
-  .option('option', {
-    alias: 'o',
-    describe: "'tis a mighty fine option",
-    demand: true
-  })
-  .command('run', "Arrr, ya best be knowin' what yer doin'")
-  .example('$0 run foo', "shiver me timbers, here's an example for ye")
-  .help('help')
-  .locale('pirate')
-  .argv
+var yargs = require("yargs")
+  .usage("$0 -operand1 number -operand2 number -operation [add|subtract]");
+yargs.showHelp(); //prints to stderr using console.error()
 ```
+
+Or, to print the usage data to `stdout` instead, you can specify the use of `console.log`:
+
+```js
+yargs.showHelp("log"); //prints to stdout using console.log()
+```
+
+Later on, `argv` can be retrieved with `yargs.argv`.
+
+.showHelpOnFail(enable, [message])
+----------------------------------
+
+By default, yargs outputs a usage string if any error is detected. Use the
+`.showHelpOnFail()` method to customize this behavior. If `enable` is `false`,
+the usage string is not output. If the `message` parameter is present, this
+message is output after the error message.
+
+line_count.js:
+
+````javascript
+#!/usr/bin/env node
+var argv = require('yargs')
+    .usage('Count the lines in a file.\nUsage: $0 -f <file>')
+    .demand('f')
+    .alias('f', 'file')
+    .describe('f', 'Load a file')
+    .string('f')
+    .showHelpOnFail(false, 'Specify --help for available options')
+    .help('help')
+    .argv;
+
+// etc.
+````
 
 ***
 
-```shell
-./test.js - follow ye instructions true
+```
+$ node line_count.js
+Missing argument value: f
 
-Choose yer command:
-  run  Arrr, ya best be knowin' what yer doin'
-
-Options for me hearties!
-  --option, -o  'tis a mighty fine option                         [requi-yar-ed]
-  --help        Show help                                              [boolean]
-
-Ex. marks the spot:
-  test.js run foo  shiver me timbers, here's an example for ye
-
-Ye be havin' to set the followin' argument land lubber: option
+Specify --help for available options
 ```
 
-Locales currently supported:
+.strict()
+---------
 
-* **en:** American English.
-* **pirate:** American Pirate.
+Any command-line argument given that is not demanded, or does not have a
+corresponding description, will be reported as an error.
 
-To submit a new translation for yargs:
+.string(key)
+------------
 
-1. use `./locales/en.json` as a starting point.
-2. submit a pull request with the new locale file.
+Tell the parser logic not to interpret `key` as a number or boolean.
+This can be useful if you need to preserve leading zeros in an input.
+
+If `key` is an array, interpret all the elements as strings.
+
+`.string('_')` will result in non-hyphenated arguments being interpreted as strings,
+regardless of whether they resemble numbers.
 
 .updateLocale(obj)
 ------------------
@@ -938,6 +917,7 @@ var argv = require('yargs')
   .updateStrings({
     'Commands:': 'My Commands -->\n'
   })
+  .wrap(null)
   .argv
 ```
 
@@ -949,18 +929,44 @@ My Commands -->
   run  the run command
 
 Options:
-  --help  Show help                                                    [boolean]
+  --help  Show help  [boolean]
 ```
 
-.argv
------
+.usage(message, [opts])
+---------------------
 
-Get the arguments as a plain old object.
+Set a usage message to show which commands to use. Inside `message`, the string
+`$0` will get interpolated to the current script name or node command for the
+present script similar to how `$0` works in bash or perl.
 
-Arguments without a corresponding flag show up in the `argv._` array.
+`opts` is optional and acts like calling `.options(opts)`.
 
-The script name or node command is available at `argv.$0` similarly to how `$0`
-works in bash or perl.
+.version(version, [option], [description])
+----------------------------------------
+
+Add an option (e.g. `--version`) that displays the version number (given by the
+`version` parameter) and exits the process. If present, the `description`
+parameter customizes the description of the version option in the usage string.
+
+You can provide a `function` for version, rather than a string.
+This is useful if you want to use the version from your package.json:
+
+```js
+var argv = require('yargs')
+  .version(function() {
+    return require('../package').version;
+  })
+  .argv;
+```
+
+.wrap(columns)
+--------------
+
+Format usage output to wrap at `columns` many columns.
+
+By default wrap will be set to `Math.min(80, windowWidth)`. Use `.wrap(null)` to
+specify no column limit (no right-align). Use `.wrap(yargs.terminalWidth())` to
+maximize the width of yargs' usage instructions.
 
 parsing tricks
 ==============
