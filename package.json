@@ -22,7 +22,7 @@
     "coveralls": "^2.11.2",
     "hashish": "0.0.4",
     "mocha": "^2.2.1",
-    "nyc": "^3.0.0",
+    "nyc": "^3.1.0",
     "standard": "^4.4.0"
   },
   "scripts": {
