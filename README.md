@@ -916,6 +916,7 @@ Ye be havin' to set the followin' argument land lubber: option
 Locales currently supported:
 
 * **en:** American English.
+* **fr:** French.
 * **pirate:** American Pirate.
 
 To submit a new translation for yargs:
