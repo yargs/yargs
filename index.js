@@ -118,7 +118,7 @@ function Argv (processArgs, cwd) {
   }
 
   self.config = function (key, msg) {
-    self.describe(key, msg || y18n.__('Path to JSON config file'))
+    self.describe(key, msg || usage.deferY18nLookup('Path to JSON config file'))
     options.config.push.apply(options.config, [].concat(key))
     return self
   }
@@ -336,7 +336,7 @@ function Argv (processArgs, cwd) {
     versionOpt = opt || 'version'
     usage.version(ver)
     self.boolean(versionOpt)
-    self.describe(versionOpt, msg || y18n.__('Show version number'))
+    self.describe(versionOpt, msg || usage.deferY18nLookup('Show version number'))
     return self
   }
 
@@ -344,7 +344,7 @@ function Argv (processArgs, cwd) {
   self.addHelpOpt = function (opt, msg) {
     helpOpt = opt
     self.boolean(opt)
-    self.describe(helpOpt, msg || y18n.__('Show help'))
+    self.describe(helpOpt, msg || usage.deferY18nLookup('Show help'))
     return self
   }
 
