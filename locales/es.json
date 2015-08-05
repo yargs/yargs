@@ -30,7 +30,7 @@
   "Implications failed:": "Implicaciones fracasadas:",
   "not enough arguments following: %s": "no hay suficientes argumentos después de: %s",
   "invalid json config file: %s": "archivo de configuración json inválido: %s",
-  "Path to JSON config file": "Ruta al archivo de configuración JSON: %s",
+  "Path to JSON config file": "Ruta al archivo de configuración JSON",
   "Show help": "Muestra ayuda",
   "Show version number": "Muestra número de versión"
 }
