@@ -6,5 +6,7 @@
   "Missing required argument: %s": {
     "one": "Ye be havin' to set the followin' argument land lubber: %s",
     "other": "Ye be havin' to set the followin' arguments land lubber: %s"
-  }
+  },
+  "Show help": "Parlay this here code of conduct",
+  "Show version number": "'Tis the version ye be askin' fer"
 }

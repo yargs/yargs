@@ -688,6 +688,7 @@ Locales currently supported:
 
 * **en:** American English.
 * **fr:** French.
+* **es:** Spanish.
 * **pirate:** American Pirate.
 
 To submit a new translation for yargs:

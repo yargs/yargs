@@ -324,6 +324,30 @@ describe('yargs dsl tests', function () {
       r.logs.join(' ').should.match(/Choose yer command:/)
     })
 
+    it('uses locale string for help option default desc on .locale().help()', function () {
+      var r = checkOutput(function () {
+        yargs(['-h'])
+          .locale('pirate')
+          .help('h')
+          .wrap(null)
+          .argv
+      })
+
+      r.logs.join(' ').should.match(/Parlay this here code of conduct/)
+    })
+
+    it('uses locale string for help option default desc on .help().locale()', function () {
+      var r = checkOutput(function () {
+        yargs(['-h'])
+          .help('h')
+          .locale('pirate')
+          .wrap(null)
+          .argv
+      })
+
+      r.logs.join(' ').should.match(/Parlay this here code of conduct/)
+    })
+
     describe('updateLocale', function () {
       it('allows you to override the default locale strings', function () {
         var r = checkOutput(function () {
