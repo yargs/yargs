@@ -344,7 +344,7 @@ function Argv (processArgs, cwd) {
   self.addHelpOpt = function (opt, msg) {
     helpOpt = opt
     self.boolean(opt)
-    self.describe(helpOpt, msg || usage.deferY18nLookup('Show help'))
+    self.describe(opt, msg || usage.deferY18nLookup('Show help'))
     return self
   }
 
