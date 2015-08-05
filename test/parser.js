@@ -315,7 +315,7 @@ describe('parser tests', function () {
         .alias('z', 'zoom')
         .config('settings')
         .fail(function (msg) {
-          msg.should.eql('invalid json config file: fake.json')
+          msg.should.eql('Invalid JSON config file: fake.json')
           return done()
         })
         .argv
@@ -1021,7 +1021,7 @@ describe('parser tests', function () {
       expect(function () {
         yargs().nargs('foo', 2)
           .parse([ '--foo', 'apple'])
-      }).to.throw('not enough arguments following: foo')
+      }).to.throw('Not enough arguments following: foo')
     })
 
     it('nargs is applied to aliases', function () {
