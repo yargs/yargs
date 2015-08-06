@@ -676,7 +676,7 @@ Choose yer command:
 
 Options for me hearties!
   --option, -o  'tis a mighty fine option               [requi-yar-ed]
-  --help        Show help                                    [boolean]
+  --help        Parlay this here code of conduct             [boolean]
 
 Ex. marks the spot:
   test.js run foo  shiver me timbers, here's an example for ye
@@ -687,8 +687,8 @@ Ye be havin' to set the followin' argument land lubber: option
 Locales currently supported:
 
 * **en:** American English.
-* **fr:** French.
 * **es:** Spanish.
+* **fr:** French.
 * **pirate:** American Pirate.
 
 To submit a new translation for yargs:
@@ -933,6 +933,9 @@ My Commands -->
 Options:
   --help  Show help  [boolean]
 ```
+
+If you explicitly specify a `locale()`, you should do so *before* calling
+`updateStrings()`.
 
 .usage(message, [opts])
 ---------------------
