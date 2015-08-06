@@ -275,6 +275,26 @@ describe('parser tests', function () {
       argv.should.have.property('foo').and.deep.equal('baz')
     })
 
+    it('should use value from config file, if argv key is a boolean', function () {
+      var argv = yargs([])
+      .config('settings')
+      .default('settings', jsonPath)
+      .boolean('truthy')
+      .argv
+
+      argv.should.have.property('truthy', true)
+    })
+
+    it('should use value from cli, if cli overrides boolean argv key', function () {
+      var argv = yargs(['--no-truthy'])
+      .config('settings')
+      .default('settings', jsonPath)
+      .boolean('truthy')
+      .argv
+
+      argv.should.have.property('truthy', false)
+    })
+
     it('should use cli value, if cli value is set and both cli and default value match', function () {
       var argv = yargs(['--foo', 'banana'])
       .alias('z', 'zoom')
