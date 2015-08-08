@@ -310,9 +310,22 @@ describe('parser tests', function () {
 
     it('should load options and values from a file when config is used', function () {
       var argv = yargs([ '--settings', jsonPath, '--foo', 'bar' ])
-      .alias('z', 'zoom')
-      .config('settings')
-      .argv
+        .alias('z', 'zoom')
+        .config('settings')
+        .argv
+
+      argv.should.have.property('herp', 'derp')
+      argv.should.have.property('zoom', 55)
+      argv.should.have.property('foo').and.deep.equal('bar')
+    })
+
+    it("should allow config to be set as flag in 'option'", function () {
+      var argv = yargs([ '--settings', jsonPath, '--foo', 'bar' ])
+        .alias('z', 'zoom')
+        .option('settings', {
+          config: true
+        })
+        .argv
 
       argv.should.have.property('herp', 'derp')
       argv.should.have.property('zoom', 55)
