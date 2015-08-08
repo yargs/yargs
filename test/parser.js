@@ -106,7 +106,7 @@ describe('parser tests', function () {
   })
 
   it('should group values into an array if the same option is specified multiple times', function () {
-    var parse = yargs.parse(['-v', 'a', '-v', 'b', '-v', 'c' ])
+    var parse = yargs.parse(['-v', 'a', '-v', 'b', '-v', 'c'])
     parse.should.have.property('v').and.deep.equal(['a', 'b', 'c'])
     parse.should.have.property('_').with.length(0)
   })
@@ -1053,7 +1053,7 @@ describe('parser tests', function () {
     it('should raise an exception if there are not enough arguments following key', function () {
       expect(function () {
         yargs().nargs('foo', 2)
-          .parse([ '--foo', 'apple'])
+          .parse(['--foo', 'apple'])
       }).to.throw('not enough arguments following: foo')
     })
 
@@ -1086,7 +1086,7 @@ describe('parser tests', function () {
         .option('bar', {
           nargs: 2
         })
-        .parse([ '-f=apple', 'bar', 'blerg', '--bar=monkey', 'washing', 'cat'])
+        .parse(['-f=apple', 'bar', 'blerg', '--bar=monkey', 'washing', 'cat'])
 
       result.f[0].should.equal('apple')
       result.f[1].should.equal('bar')
