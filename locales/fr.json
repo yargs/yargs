@@ -28,6 +28,9 @@
   "Argument: %s, Given: %s, Choices: %s": "Argument: %s, Donné: %s, Choix: %s",
   "Argument check failed: %s": "Echec de la vérification de l'argument: %s",
   "Implications failed:": "Implications échouées:",
-  "not enough arguments following: %s": "pas assez d'arguments suivant: %s",
-  "invalid json config file: %s": "fichier de configuration json invalide: %s"
+  "Not enough arguments following: %s": "Pas assez d'arguments suivant: %s",
+  "Invalid JSON config file: %s": "Fichier de configuration JSON invalide: %s",
+  "Path to JSON config file": "Chemin du fichier de configuration JSON",
+  "Show help": "Affiche de l'aide",
+  "Show version number": "Affiche le numéro de version"
 }

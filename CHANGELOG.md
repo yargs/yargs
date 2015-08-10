@@ -1,5 +1,17 @@
 ## Change Log
 
+### v3.18.0 (2015/08/06 20:05 +00:00)
+- [#222](https://github.com/bcoe/yargs/pull/222) updates fr locale (@nexdrew)
+- [#221](https://github.com/bcoe/yargs/pull/221) adds missing locale strings (@nexdrew)
+- [#220](https://github.com/bcoe/yargs/pull/220) adds es locale (@zkat)
+
+### v3.17.1 (2015/08/02 19:35 +00:00)
+- [#218](https://github.com/bcoe/yargs/pull/218) upgrades nyc (@bcoe)
+
+### v3.17.0 (2015/08/02 18:39 +00:00)
+- [#217](https://github.com/bcoe/yargs/pull/217) sort methods in README.md (@nexdrew)
+- [#215](https://github.com/bcoe/yargs/pull/215) adds fr locale (@LoicMahieu)
+
 ### v3.16.0 (2015/07/30 04:35 +00:00)
 - [#210](https://github.com/bcoe/yargs/pull/210) adds i18n support to yargs (@bcoe)
 - [#209](https://github.com/bcoe/yargs/pull/209) adds choices type to yargs (@nexdrew)
