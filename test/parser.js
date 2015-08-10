@@ -106,7 +106,7 @@ describe('parser tests', function () {
   })
 
   it('should group values into an array if the same option is specified multiple times', function () {
-    var parse = yargs.parse(['-v', 'a', '-v', 'b', '-v', 'c' ])
+    var parse = yargs.parse(['-v', 'a', '-v', 'b', '-v', 'c'])
     parse.should.have.property('v').and.deep.equal(['a', 'b', 'c'])
     parse.should.have.property('_').with.length(0)
   })
@@ -275,6 +275,26 @@ describe('parser tests', function () {
       argv.should.have.property('foo').and.deep.equal('baz')
     })
 
+    it('should use value from config file, if argv key is a boolean', function () {
+      var argv = yargs([])
+      .config('settings')
+      .default('settings', jsonPath)
+      .boolean('truthy')
+      .argv
+
+      argv.should.have.property('truthy', true)
+    })
+
+    it('should use value from cli, if cli overrides boolean argv key', function () {
+      var argv = yargs(['--no-truthy'])
+      .config('settings')
+      .default('settings', jsonPath)
+      .boolean('truthy')
+      .argv
+
+      argv.should.have.property('truthy', false)
+    })
+
     it('should use cli value, if cli value is set and both cli and default value match', function () {
       var argv = yargs(['--foo', 'banana'])
       .alias('z', 'zoom')
@@ -290,9 +310,22 @@ describe('parser tests', function () {
 
     it('should load options and values from a file when config is used', function () {
       var argv = yargs([ '--settings', jsonPath, '--foo', 'bar' ])
-      .alias('z', 'zoom')
-      .config('settings')
-      .argv
+        .alias('z', 'zoom')
+        .config('settings')
+        .argv
+
+      argv.should.have.property('herp', 'derp')
+      argv.should.have.property('zoom', 55)
+      argv.should.have.property('foo').and.deep.equal('bar')
+    })
+
+    it("should allow config to be set as flag in 'option'", function () {
+      var argv = yargs([ '--settings', jsonPath, '--foo', 'bar' ])
+        .alias('z', 'zoom')
+        .option('settings', {
+          config: true
+        })
+        .argv
 
       argv.should.have.property('herp', 'derp')
       argv.should.have.property('zoom', 55)
@@ -1020,7 +1053,7 @@ describe('parser tests', function () {
     it('should raise an exception if there are not enough arguments following key', function () {
       expect(function () {
         yargs().nargs('foo', 2)
-          .parse([ '--foo', 'apple'])
+          .parse(['--foo', 'apple'])
       }).to.throw('Not enough arguments following: foo')
     })
 
@@ -1053,7 +1086,7 @@ describe('parser tests', function () {
         .option('bar', {
           nargs: 2
         })
-        .parse([ '-f=apple', 'bar', 'blerg', '--bar=monkey', 'washing', 'cat'])
+        .parse(['-f=apple', 'bar', 'blerg', '--bar=monkey', 'washing', 'cat'])
 
       result.f[0].should.equal('apple')
       result.f[1].should.equal('bar')
