@@ -386,6 +386,11 @@ Arguments without a corresponding flag show up in the `argv._` array.
 The script name or node command is available at `argv.$0` similarly to how `$0`
 works in bash or perl.
 
+If `yargs` is executed in an environment that embeds node and there's no script name (e.g. [Electron]
+(http://electron.atom.io/) or [nw.js](http://nwjs.io/)), it will ignore the first parameter since it
+expects it to be the script name. In order to override this behavior, use `.parse(process.argv.slice(1))`
+instead of `.argv` and the first parameter won't be ignored.
+
 .array(key)
 ----------
 
