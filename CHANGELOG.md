@@ -1,5 +1,10 @@
 ## Change Log
 
+### v3.18.1 (2015/08/12 05:53 +00:00)
+
+- [#228](https://github.com/bcoe/yargs/pull/228) notes about embedding yargs in Electron (@etiktin)
+- [#223](https://github.com/bcoe/yargs/pull/223) make booleans work in config files (@sgentle)
+
 ### v3.18.0 (2015/08/06 20:05 +00:00)
 - [#222](https://github.com/bcoe/yargs/pull/222) updates fr locale (@nexdrew)
 - [#221](https://github.com/bcoe/yargs/pull/221) adds missing locale strings (@nexdrew)
