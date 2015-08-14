@@ -1,5 +1,8 @@
 ## Change Log
 
+### v3.19.0 (2015/08/14 05:12 +00:00)
+- [#224](https://github.com/bcoe/yargs/pull/224) added Portuguese translation (@codemonkey3045)
+
 ### v3.18.1 (2015/08/12 05:53 +00:00)
 
 - [#228](https://github.com/bcoe/yargs/pull/228) notes about embedding yargs in Electron (@etiktin)
