@@ -653,7 +653,8 @@ Optionally `.implies()` can accept an object specifying multiple implications.
 .locale(locale)
 ---------------
 
-Set a locale other than the default `en` locale:
+Set a locale other than the operating system's default locale, you can modify this
+value by exporting `LC_ALL`.
 
 ```js
 var argv = require('yargs')
@@ -670,6 +671,11 @@ var argv = require('yargs')
   .locale('pirate')
   .argv
 ```
+
+.locale()
+---------
+
+Return the locale that yargs has detected.
 
 ***
 
