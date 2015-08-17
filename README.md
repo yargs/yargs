@@ -697,6 +697,7 @@ Ye be havin' to set the followin' argument land lubber: option
 
 Locales currently supported:
 
+* **de:** German.
 * **en:** American English.
 * **es:** Spanish.
 * **fr:** French.
