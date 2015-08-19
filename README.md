@@ -650,11 +650,24 @@ Given the key `x` is set, it is required that the key `y` is set.
 
 Optionally `.implies()` can accept an object specifying multiple implications.
 
+.locale()
+---------
+
+Return the locale that yargs is currently using.
+
+By default, yargs will auto-detect the operating system's locale
+(via [os-locale](https://www.npmjs.com/package/os-locale)) so that
+yargs-generated help content will display in the user's language.
+
+To override this behavior with a static locale, pass the desired locale as a
+string to this method (see below).
+
 .locale(locale)
 ---------------
 
-Set a locale other than the operating system's default locale, you can modify this
-value by exporting `LC_ALL`.
+Override the auto-detected locale from the user's operating system with a static
+locale. Note that the OS locale can be modified by setting/exporting the `LC_ALL`
+environment variable.
 
 ```js
 var argv = require('yargs')
@@ -671,11 +684,6 @@ var argv = require('yargs')
   .locale('pirate')
   .argv
 ```
-
-.locale()
----------
-
-Return the locale that yargs has detected.
 
 ***
 
