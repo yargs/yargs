@@ -536,7 +536,7 @@ function Argv (processArgs, cwd) {
   }
 
   function guessLocale () {
-    return osLocale.sync().split('_')[0]
+    return osLocale.sync()
   }
 
   sigletonify(self)

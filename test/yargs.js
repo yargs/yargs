@@ -311,21 +311,17 @@ describe('yargs dsl tests', function () {
   })
 
   describe('locale', function () {
-    it('returns locale if locale is called with no arguments', function () {
-      yargs.locale().should.equal('en')
-    })
-
     it("detects the operating system's locale", function () {
       loadLocale('es_ES.UTF-8')
-      yargs.locale().should.equal('es')
-      loadLocale('en_EN.UTF-8')
+      yargs.locale().should.equal('es_ES')
+      loadLocale('en_US.UTF-8')
     })
 
     it("it allows the operating system's locale to be overridden", function () {
       loadLocale('es_ES.UTF-8')
       yargs.locale('en')
       yargs.locale().should.equal('en')
-      loadLocale('en_EN.UTF-8')
+      loadLocale('en_US.UTF-8')
     })
 
     function loadLocale (locale) {
@@ -359,8 +355,8 @@ describe('yargs dsl tests', function () {
           .argv
       })
 
-      yargs.locale().should.equal('zz')
-      loadLocale('en_EN.UTF-8')
+      yargs.locale().should.equal('zz_ZZ')
+      loadLocale('en_US.UTF-8')
       r.logs.join(' ').should.match(/Commands:/)
     })
 
