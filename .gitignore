@@ -1,0 +1,6 @@
+.idea/
+node_modules/
+*.swp
+test.js
+coverage
+.nyc_output
