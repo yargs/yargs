@@ -19,7 +19,7 @@ function Argv (processArgs, cwd) {
   var validation = null
   var y18n = Y18n({
     directory: path.resolve(__dirname, './locales'),
-    locale: guessLocale(),
+    locale: osLocale.sync(),
     updateFiles: false
   })
 
@@ -533,10 +533,6 @@ function Argv (processArgs, cwd) {
     Object.keys(options.key).forEach(function (key) {
       if (typeof argv[key] === 'undefined') argv[key] = undefined
     })
-  }
-
-  function guessLocale () {
-    return osLocale.sync()
   }
 
   sigletonify(self)
