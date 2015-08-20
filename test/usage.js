@@ -1124,6 +1124,111 @@ describe('usage tests', function () {
     })
   })
 
+  describe('defaultDescription', function () {
+    describe('using option() without default()', function () {
+      it('should output given desc with default value', function () {
+        var r = checkUsage(function () {
+          return yargs(['-h'])
+            .help('h')
+            .option('port', {
+              describe: 'The port value for URL',
+              defaultDescription: '80 for HTTP and 443 for HTTPS',
+              default: 80
+            })
+            .wrap(null)
+            .argv
+        })
+
+        r.logs[0].should.include('default: 80 for HTTP and 443 for HTTPS')
+      })
+
+      it('should output given desc without default value', function () {
+        var r = checkUsage(function () {
+          return yargs(['-h'])
+            .help('h')
+            .option('port', {
+              describe: 'The port value for URL',
+              defaultDescription: '80 for HTTP and 443 for HTTPS'
+            })
+            .wrap(null)
+            .argv
+        })
+
+        r.logs[0].should.include('default: 80 for HTTP and 443 for HTTPS')
+      })
+
+      it('should prefer given desc over function desc', function () {
+        var r = checkUsage(function () {
+          return yargs(['-h'])
+            .help('h')
+            .option('port', {
+              describe: 'The port value for URL',
+              defaultDescription: '80 for HTTP and 443 for HTTPS',
+              default: function determinePort () {
+                return 80
+              }
+            })
+            .wrap(null)
+            .argv
+        })
+
+        r.logs[0].should.include('default: 80 for HTTP and 443 for HTTPS')
+      })
+    })
+
+    describe('using option() with default()', function () {
+      it('should prefer default() desc when given last', function () {
+        var r = checkUsage(function () {
+          return yargs(['-h'])
+            .help('h')
+            .option('port', {
+              describe: 'The port value for URL',
+              defaultDescription: 'depends on protocol'
+            })
+            .default('port', null, '80 for HTTP and 443 for HTTPS')
+            .wrap(null)
+            .argv
+        })
+
+        r.logs[0].should.include('default: 80 for HTTP and 443 for HTTPS')
+      })
+
+      it('should prefer option() desc when given last', function () {
+        var r = checkUsage(function () {
+          return yargs(['-h'])
+            .help('h')
+            .default('port', null, '80 for HTTP and 443 for HTTPS')
+            .option('port', {
+              describe: 'The port value for URL',
+              defaultDescription: 'depends on protocol'
+            })
+            .wrap(null)
+            .argv
+        })
+
+        r.logs[0].should.include('default: depends on protocol')
+      })
+
+      it('should prefer option() desc over default() function', function () {
+        var r = checkUsage(function () {
+          return yargs(['-h'])
+            .help('h')
+            .option('port', {
+              describe: 'The port value for URL',
+              defaultDescription: '80 for HTTP and 443 for HTTPS'
+            })
+            .default('port', function determinePort () {
+              return 80
+            })
+            .wrap(null)
+            .argv
+        })
+
+        r.logs[0].should.include('default: 80 for HTTP and 443 for HTTPS')
+      })
+    })
+  })
+
   describe('normalizeAliases', function () {
     // see #128
     it("should display 'description' string in help message if set for alias", function () {
