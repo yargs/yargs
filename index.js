@@ -1,5 +1,6 @@
 var assert = require('assert')
 var Completion = require('./lib/completion')
+var osLocale = require('os-locale')
 var Parser = require('./lib/parser')
 var path = require('path')
 var Usage = require('./lib/usage')
@@ -18,7 +19,7 @@ function Argv (processArgs, cwd) {
   var validation = null
   var y18n = Y18n({
     directory: path.resolve(__dirname, './locales'),
-    locale: 'en',
+    locale: osLocale.sync(),
     updateFiles: false
   })
 
@@ -405,6 +406,7 @@ function Argv (processArgs, cwd) {
   }
 
   self.locale = function (locale) {
+    if (arguments.length === 0) return y18n.getLocale()
     y18n.setLocale(locale)
     return self
   }

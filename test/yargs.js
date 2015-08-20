@@ -311,6 +311,26 @@ describe('yargs dsl tests', function () {
   })
 
   describe('locale', function () {
+    it("detects the operating system's locale", function () {
+      loadLocale('es_ES.UTF-8')
+      yargs.locale().should.equal('es_ES')
+      loadLocale('en_US.UTF-8')
+    })
+
+    it("it allows the operating system's locale to be overridden", function () {
+      loadLocale('es_ES.UTF-8')
+      yargs.locale('en')
+      yargs.locale().should.equal('en')
+      loadLocale('en_US.UTF-8')
+    })
+
+    function loadLocale (locale) {
+      process.env.LC_ALL = locale
+      delete require.cache[require.resolve('../')]
+      delete require.cache[require.resolve('os-locale')]
+      yargs = require('../')
+    }
+
     it("allows a locale other than the default 'en' to be specified", function () {
       var r = checkOutput(function () {
         yargs(['snuh', '-h'])
@@ -322,6 +342,22 @@ describe('yargs dsl tests', function () {
       })
 
       r.logs.join(' ').should.match(/Choose yer command:/)
+    })
+
+    it('handles a missing locale', function () {
+      loadLocale('zz_ZZ.UTF-8')
+
+      var r = checkOutput(function () {
+        yargs(['snuh', '-h'])
+          .command('blerg', 'blerg command')
+          .help('h')
+          .wrap(null)
+          .argv
+      })
+
+      yargs.locale().should.equal('zz_ZZ')
+      loadLocale('en_US.UTF-8')
+      r.logs.join(' ').should.match(/Commands:/)
     })
 
     it('uses locale string for help option default desc on .locale().help()', function () {
