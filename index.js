@@ -153,11 +153,11 @@ function Argv (processArgs, cwd) {
         self.default(k, key[k])
       })
     } else {
+      if (defaultDescription) options.defaultDescription[key] = defaultDescription
       if (typeof value === 'function') {
-        defaultDescription = usage.functionDescription(value, defaultDescription)
+        if (!options.defaultDescription[key]) options.defaultDescription[key] = usage.functionDescription(value)
         value = value.call()
       }
-      options.defaultDescription[key] = defaultDescription
       options.default[key] = value
     }
     return self
@@ -296,6 +296,8 @@ function Argv (processArgs, cwd) {
         if (opt.alias) self.string(opt.alias)
       } if (opt.count || opt.type === 'count') {
         self.count(key)
+      } if (opt.defaultDescription) {
+        options.defaultDescription[key] = opt.defaultDescription
       }
 
       var desc = opt.describe || opt.description || opt.desc

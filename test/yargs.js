@@ -110,6 +110,18 @@ describe('yargs dsl tests', function () {
     argv.looks.should.eql('good')
   })
 
+  it('should allow defaultDescription to be set with .option()', function () {
+    var optDefaultDescriptions = yargs([])
+      .option('port', {
+        defaultDescription: '80 for HTTP and 443 for HTTPS'
+      })
+      .getOptions().defaultDescription
+
+    optDefaultDescriptions.should.deep.equal({
+      port: '80 for HTTP and 443 for HTTPS'
+    })
+  })
+
   describe('showHelpOnFail', function () {
     it('should display custom failure message, if string is provided as first argument', function () {
       var r = checkOutput(function () {
