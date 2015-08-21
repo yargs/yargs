@@ -1,5 +1,9 @@
 ## Change Log
 
+### v3.21.0 (2015/08/21 21:20 +00:00)
+- [#238](https://github.com/bcoe/yargs/pull/238) upgrade camelcase, window-size, chai, mocha (@nexdrew)
+- [#237](https://github.com/bcoe/yargs/pull/237) adds defaultDescription to option() (@nexdrew)
+
 ### v3.20.0 (2015/08/20 01:29 +00:00)
 - [#231](https://github.com/bcoe/yargs/pull/231) Merge pull request #231 from bcoe/detect-locale (@sindresorhus)
 - [#235](https://github.com/bcoe/yargs/pull/235) adds german translation to yargs (@maxrimue)
