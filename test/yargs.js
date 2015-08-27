@@ -38,6 +38,17 @@ describe('yargs dsl tests', function () {
     Object.keys(argv).should.include('cool')
   })
 
+  it('populates argv with placeholder keys when passed into command handler', function (done) {
+    yargs(['blerg'])
+      .option('cool', {})
+      .command('blerg', 'handle blerg things', function (yargs, argv) {
+        Object.keys(argv).should.include('cool')
+        return done()
+      })
+      .exitProcess(false) // defaults to true.
+      .argv
+  })
+
   it('accepts an object for implies', function () {
     var r = checkOutput(function () {
       return yargs(['--x=33'])
@@ -235,7 +246,12 @@ describe('yargs dsl tests', function () {
   describe('command', function () {
     it('allows a function to be associated with a command', function (done) {
       yargs(['blerg'])
-        .command('blerg', 'handle blerg things', function () {
+        .command('blerg', 'handle blerg things', function (yargs, argv) {
+          // a fresh yargs instance for perorming command-specific parsing,
+          // and an argv instance containing the parsing performed thus far
+          // should be passed to the command handler.
+          (typeof yargs.option).should.equal('function')
+          argv._[0].should.equal('blerg')
           return done()
         })
         .exitProcess(false) // defaults to true.
