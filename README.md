@@ -717,6 +717,11 @@ To submit a new translation for yargs:
 1. use `./locales/en.json` as a starting point.
 2. submit a pull request with the new locale file.
 
+.detectLocale(boolean)
+-----------
+
+Should yargs attempt to detect the os' locale? defaults to `true`.
+
 .nargs(key, count)
 -----------
 

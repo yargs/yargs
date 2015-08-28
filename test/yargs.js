@@ -329,6 +329,25 @@ describe('yargs dsl tests', function () {
       loadLocale('en_US.UTF-8')
     })
 
+    it("should not detect the OS locale if detectLocale is 'false'", function () {
+      loadLocale('es_ES.UTF-8')
+
+      var r = checkOutput(function () {
+        yargs(['snuh', '-h'])
+          .command('blerg', 'blerg command')
+          .help('h')
+          .wrap(null)
+          .detectLocale(false)
+          .argv
+      })
+
+      yargs.locale().should.equal('en')
+      yargs.getDetectLocale().should.equal(false)
+      r.logs.join(' ').should.match(/Commands:/)
+
+      loadLocale('en_US.UTF-8')
+    })
+
     it("it allows the operating system's locale to be overridden", function () {
       loadLocale('es_ES.UTF-8')
       yargs.locale('en')
