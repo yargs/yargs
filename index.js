@@ -407,9 +407,11 @@ function Argv (processArgs, cwd) {
   }
 
   self.locale = function (locale) {
-    guessLocale()
+    if (arguments.length === 0) {
+      guessLocale()
+      return y18n.getLocale()
+    }
     detectLocale = false
-    if (arguments.length === 0) return y18n.getLocale()
     y18n.setLocale(locale)
     return self
   }
