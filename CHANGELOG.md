@@ -1,5 +1,8 @@
 ## Change Log
 
+### v3.22.0 (2015/08/28 22:26 +00:00)
+- [#242](https://github.com/bcoe/yargs/pull/242) adds detectLocale config option (@bcoe)
+
 ### v3.21.1 (2015/08/28 20:58 +00:00)
 - [#240](https://github.com/bcoe/yargs/pull/240) hot-fix for Atom on Windows (@bcoe)
 
