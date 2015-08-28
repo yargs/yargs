@@ -1,6 +1,5 @@
 var assert = require('assert')
 var Completion = require('./lib/completion')
-var osLocale = require('os-locale')
 var Parser = require('./lib/parser')
 var path = require('path')
 var Usage = require('./lib/usage')
@@ -549,6 +548,7 @@ function Argv (processArgs, cwd) {
     if (!detectLocale) return
 
     try {
+      var osLocale = require('os-locale')
       self.locale(osLocale.sync())
     } catch (err) {
     // if we explode looking up locale just noop

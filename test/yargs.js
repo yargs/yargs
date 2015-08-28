@@ -394,6 +394,7 @@ describe('yargs dsl tests', function () {
     // see https://github.com/atom/atom/issues/8559#issuecomment-135876279
     it('handles os-locale throwing an exception', function () {
       // make os-locale throw.
+      require('os-locale')
       require.cache[require.resolve('os-locale')].exports.sync = function () {throw Error('an error!')}
 
       delete require.cache[require.resolve('../')]
