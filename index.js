@@ -19,7 +19,7 @@ function Argv (processArgs, cwd) {
   var validation = null
   var y18n = Y18n({
     directory: path.resolve(__dirname, './locales'),
-    locale: osLocale.sync(),
+    locale: guessLocale(),
     updateFiles: false
   })
 
@@ -529,6 +529,14 @@ function Argv (processArgs, cwd) {
     setPlaceholderKeys(argv)
 
     return argv
+  }
+
+  function guessLocale () {
+    try {
+      return osLocale.sync()
+    } catch (err) {
+      return 'en'
+    }
   }
 
   function setPlaceholderKeys (argv) {

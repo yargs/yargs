@@ -372,6 +372,17 @@ describe('yargs dsl tests', function () {
       r.logs.join(' ').should.match(/Commands:/)
     })
 
+    // see https://github.com/atom/atom/issues/8559#issuecomment-135876279
+    it('handles os-locale throwing an exception', function () {
+      // make os-locale throw.
+      require.cache[require.resolve('os-locale')].exports.sync = function () {throw Error('an error!')}
+
+      delete require.cache[require.resolve('../')]
+      yargs = require('../')
+
+      yargs.locale().should.equal('en')
+    })
+
     it('uses locale string for help option default desc on .locale().help()', function () {
       var r = checkOutput(function () {
         yargs(['-h'])
