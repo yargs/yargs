@@ -1,5 +1,8 @@
 ## Change Log
 
+### v3.21.1 (2015/08/28 20:58 +00:00)
+- [#240](https://github.com/bcoe/yargs/pull/240) hot-fix for Atom on Windows (@bcoe)
+
 ### v3.21.0 (2015/08/21 21:20 +00:00)
 - [#238](https://github.com/bcoe/yargs/pull/238) upgrade camelcase, window-size, chai, mocha (@nexdrew)
 - [#237](https://github.com/bcoe/yargs/pull/237) adds defaultDescription to option() (@nexdrew)
