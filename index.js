@@ -420,7 +420,7 @@ function Argv (processArgs, cwd) {
     return self
   }
 
-  var detectLocale = true
+  var detectLocale = false
   self.detectLocale = function (detect) {
     detectLocale = detect
     return self

@@ -720,7 +720,7 @@ To submit a new translation for yargs:
 .detectLocale(boolean)
 -----------
 
-Should yargs attempt to detect the os' locale? defaults to `true`.
+Should yargs attempt to detect the os' locale? defaults to `false`.
 
 .nargs(key, count)
 -----------

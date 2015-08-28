@@ -325,7 +325,7 @@ describe('yargs dsl tests', function () {
   describe('locale', function () {
     it("detects the operating system's locale", function () {
       loadLocale('es_ES.UTF-8')
-      yargs.locale().should.equal('es_ES')
+      yargs.detectLocale(true).locale().should.equal('es_ES')
       loadLocale('en_US.UTF-8')
     })
 
@@ -345,13 +345,6 @@ describe('yargs dsl tests', function () {
       yargs.getDetectLocale().should.equal(false)
       r.logs.join(' ').should.match(/Commands:/)
 
-      loadLocale('en_US.UTF-8')
-    })
-
-    it("it allows the operating system's locale to be overridden", function () {
-      loadLocale('es_ES.UTF-8')
-      yargs.locale('en')
-      yargs.locale().should.equal('en')
       loadLocale('en_US.UTF-8')
     })
 
@@ -382,6 +375,7 @@ describe('yargs dsl tests', function () {
         yargs(['snuh', '-h'])
           .command('blerg', 'blerg command')
           .help('h')
+          .detectLocale(true)
           .wrap(null)
           .argv
       })
@@ -400,7 +394,7 @@ describe('yargs dsl tests', function () {
       delete require.cache[require.resolve('../')]
       yargs = require('../')
 
-      yargs.locale().should.equal('en')
+      yargs.detectLocale(true).locale().should.equal('en')
     })
 
     it('uses locale string for help option default desc on .locale().help()', function () {
