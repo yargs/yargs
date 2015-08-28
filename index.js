@@ -19,7 +19,6 @@ function Argv (processArgs, cwd) {
   var validation = null
   var y18n = Y18n({
     directory: path.resolve(__dirname, './locales'),
-    locale: guessLocale(),
     updateFiles: false
   })
 
@@ -408,7 +407,11 @@ function Argv (processArgs, cwd) {
   }
 
   self.locale = function (locale) {
-    if (arguments.length === 0) return y18n.getLocale()
+    if (arguments.length === 0) {
+      guessLocale()
+      return y18n.getLocale()
+    }
+    detectLocale = false
     y18n.setLocale(locale)
     return self
   }
@@ -416,6 +419,15 @@ function Argv (processArgs, cwd) {
   self.updateStrings = self.updateLocale = function (obj) {
     y18n.updateLocale(obj)
     return self
+  }
+
+  var detectLocale = true
+  self.detectLocale = function (detect) {
+    detectLocale = detect
+    return self
+  }
+  self.getDetectLocale = function () {
+    return detectLocale
   }
 
   self.getUsageInstance = function () {
@@ -453,6 +465,8 @@ function Argv (processArgs, cwd) {
     argv.$0 = self.$0
 
     self.parsed = parsed
+
+    guessLocale() // guess locale lazily, so that it can be turned off in chain.
 
     // while building up the argv object, there
     // are two passes through the parser. If completion
@@ -532,10 +546,13 @@ function Argv (processArgs, cwd) {
   }
 
   function guessLocale () {
+    if (!detectLocale) return
+
     try {
-      return osLocale.sync()
+      self.locale(osLocale.sync())
     } catch (err) {
-      return 'en'
+    // if we explode looking up locale just noop
+    // we'll keep using the default language 'en'.
     }
   }
 
