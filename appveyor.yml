@@ -5,7 +5,7 @@ environment:
   matrix:
     - nodejs_version: "0.10"
     - nodejs_version: "0.12"
-    - nodejs_version: "iojs"
+    - nodejs_version: "3.0"
 
 # Install scripts. (runs after repo cloning)
 install:
