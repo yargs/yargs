@@ -27,7 +27,8 @@
     "standard": "^5.1.1"
   },
   "scripts": {
-    "test": "standard && nyc ./node_modules/.bin/mocha --timeout=4000 --check-leaks",
+    "test": "standard && nyc mocha --timeout=4000 --check-leaks",
+    "test-windows": "mocha --timeout=4000",
     "coverage": "nyc report --reporter=text-lcov | coveralls"
   },
   "repository": {
