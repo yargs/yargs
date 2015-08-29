@@ -9,6 +9,7 @@ With yargs, ye be havin' a map that leads straight to yer treasure! Treasure of 
 [![Dependency Status][gemnasium-image]][gemnasium-url]
 [![Coverage Status][coveralls-image]][coveralls-url]
 [![NPM version][npm-image]][npm-url]
+[![Windows Tests][windows-image]][windows-url]
 
 > Yargs is the official successor to optimist. Please feel free to submit issues and pull requests. If you'd like to contribute and don't know where to start, have a look at [the issue list](https://github.com/bcoe/yargs/issues) :)
 
@@ -1089,3 +1090,5 @@ This module is loosely inspired by Perl's
 [coveralls-image]: https://img.shields.io/coveralls/bcoe/yargs.svg
 [npm-url]: https://npmjs.org/package/yargs
 [npm-image]: https://img.shields.io/npm/v/yargs.svg
+[windows-url]: https://ci.appveyor.com/project/bcoe/yargs
+[windows-image]: https://img.shields.io/appveyor/ci/bcoe/yargs/master.svg?label=Windows%20Tests
