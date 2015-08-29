@@ -23,6 +23,10 @@ test_script:
   - ps: "npm test # PowerShell" # Pass comment to PS for easier debugging
   - cmd: npm test
 
+os:
+- Default Azure
+- Windows Server 2012 R2
+
 # Don't actually build using MSBuild
 build: off
 
