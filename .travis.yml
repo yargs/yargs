@@ -1,8 +1,5 @@
 language: node_js
 sudo: false
-os:
-  - osx
-  - linux
 node_js:
   - "0.10"
   - "0.11"
