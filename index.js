@@ -416,6 +416,7 @@ function Argv (processArgs, cwd) {
   }
 
   self.updateStrings = self.updateLocale = function (obj) {
+    detectLocale = false
     y18n.updateLocale(obj)
     return self
   }
