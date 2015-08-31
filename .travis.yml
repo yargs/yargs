@@ -1,10 +1,8 @@
 language:
   - c
-
 os:
   - linux
   - osx
-
 install:
   - rm -rf ~/.nvm
   - git clone https://github.com/creationix/nvm.git ~/.nvm
@@ -12,11 +10,10 @@ install:
   - nvm install $NODE_VERSION
   - node --version
   - npm install
-
+script: npm test
 after_success: npm run coverage
-
 env:
-  - NODE_VERSION="0.8"
   - NODE_VERSION="0.10"
+  - NODE_VERSION="0.11"
   - NODE_VERSION="0.12"
   - NODE_VERSION="iojs"
