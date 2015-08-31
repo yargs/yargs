@@ -908,7 +908,7 @@ describe('usage tests', function () {
           .option('fairly-long-option', {
             alias: 'f',
             // create a giant string that should wrap.
-            description: new Array(width * 5).join('s')
+            description: new Array((width + 1) * 5).join('s')
           })
           .demand('foo')
           .argv
