@@ -5,6 +5,9 @@ node_js:
   - "0.11"
   - "0.12"
   - "iojs"
+os:
+  - linux
+  - osx
 after_success: npm run coverage
 env:
   - secure: "U5owYv3F2kT6FdxOhWltfpJbHe3CFxNqDyToDOGyA6a9cyKZQe8LQhBJTFxT606nfWaRuxRrRQ1+/tl4rDMjX3PwzR0MTaE/6cIItqe8jra7M3y7u9fBhM5WRWHs7MOVAeXkacZZ3oha6VugoZaQZQNT5myI3BhsvZKmn8JlciY="
