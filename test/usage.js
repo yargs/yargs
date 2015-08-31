@@ -916,7 +916,7 @@ describe('usage tests', function () {
 
       // the long description should cause several line
       // breaks when wrapped.
-      r.errors[0].split('\n').length.should.gt(4)
+      r.errors[0].split('\n').length.should.gte(4)
     })
 
     it('should not raise an exception when long default and description are provided', function () {
