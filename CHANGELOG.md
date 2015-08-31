@@ -1,5 +1,11 @@
 ## Change Log
 
+### v3.23.0 (2015/08/30 23:00 +00:00)
+
+- [#246](https://github.com/bcoe/yargs/pull/246) detect locale based only on environment variables (@bcoe)
+- [#244](https://github.com/bcoe/yargs/pull/244) adds Windows CI testing (@bcoe)
+- [#245](https://github.com/bcoe/yargs/pull/245) adds OSX CI testing (@bcoe, @nexdrew)
+
 ### v3.22.0 (2015/08/28 22:26 +00:00)
 - [#242](https://github.com/bcoe/yargs/pull/242) adds detectLocale config option (@bcoe)
 
