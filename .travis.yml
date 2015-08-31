@@ -1,13 +1,22 @@
-language: node_js
-sudo: false
-node_js:
-  - "0.10"
-  - "0.11"
-  - "0.12"
-  - "iojs"
+language:
+  - c
+
 os:
   - linux
   - osx
+
+install:
+  - rm -rf ~/.nvm
+  - git clone https://github.com/creationix/nvm.git ~/.nvm
+  - source ~/.nvm/nvm.sh
+  - nvm install $NODE_VERSION
+  - node --version
+  - npm install
+
 after_success: npm run coverage
+
 env:
-  - secure: "U5owYv3F2kT6FdxOhWltfpJbHe3CFxNqDyToDOGyA6a9cyKZQe8LQhBJTFxT606nfWaRuxRrRQ1+/tl4rDMjX3PwzR0MTaE/6cIItqe8jra7M3y7u9fBhM5WRWHs7MOVAeXkacZZ3oha6VugoZaQZQNT5myI3BhsvZKmn8JlciY="
+  - NODE_VERSION="0.8"
+  - NODE_VERSION="0.10"
+  - NODE_VERSION="0.12"
+  - NODE_VERSION="iojs"
