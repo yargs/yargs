@@ -1,5 +1,6 @@
 var assert = require('assert')
 var Completion = require('./lib/completion')
+var locale = require('./lib/locale')
 var Parser = require('./lib/parser')
 var path = require('path')
 var Usage = require('./lib/usage')
@@ -421,7 +422,7 @@ function Argv (processArgs, cwd) {
     return self
   }
 
-  var detectLocale = false
+  var detectLocale = true
   self.detectLocale = function (detect) {
     detectLocale = detect
     return self
@@ -547,14 +548,7 @@ function Argv (processArgs, cwd) {
 
   function guessLocale () {
     if (!detectLocale) return
-
-    try {
-      var osLocale = require('os-locale')
-      self.locale(osLocale.sync())
-    } catch (err) {
-    // if we explode looking up locale just noop
-    // we'll keep using the default language 'en'.
-    }
+    self.locale(locale())
   }
 
   function setPlaceholderKeys (argv) {

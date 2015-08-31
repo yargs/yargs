@@ -323,9 +323,16 @@ describe('yargs dsl tests', function () {
   })
 
   describe('locale', function () {
+    it('uses english as a default locale', function () {
+      ['LANGUAGE', 'LC_ALL', 'LANG', 'LC_MESSAGES'].forEach(function (e) {
+        delete process.env[e]
+      })
+      yargs.locale().should.equal('en_US')
+    })
+
     it("detects the operating system's locale", function () {
       loadLocale('es_ES.UTF-8')
-      yargs.detectLocale(true).locale().should.equal('es_ES')
+      yargs.locale().should.equal('es_ES')
       loadLocale('en_US.UTF-8')
     })
 
@@ -349,10 +356,9 @@ describe('yargs dsl tests', function () {
     })
 
     function loadLocale (locale) {
-      process.env.LC_ALL = locale
       delete require.cache[require.resolve('../')]
-      delete require.cache[require.resolve('os-locale')]
       yargs = require('../')
+      process.env.LC_ALL = locale
     }
 
     it("allows a locale other than the default 'en' to be specified", function () {
@@ -375,7 +381,6 @@ describe('yargs dsl tests', function () {
         yargs(['snuh', '-h'])
           .command('blerg', 'blerg command')
           .help('h')
-          .detectLocale(true)
           .wrap(null)
           .argv
       })
@@ -383,18 +388,6 @@ describe('yargs dsl tests', function () {
       yargs.locale().should.equal('zz_ZZ')
       loadLocale('en_US.UTF-8')
       r.logs.join(' ').should.match(/Commands:/)
-    })
-
-    // see https://github.com/atom/atom/issues/8559#issuecomment-135876279
-    it('handles os-locale throwing an exception', function () {
-      // make os-locale throw.
-      require('os-locale')
-      require.cache[require.resolve('os-locale')].exports.sync = function () {throw Error('an error!')}
-
-      delete require.cache[require.resolve('../')]
-      yargs = require('../')
-
-      yargs.detectLocale(true).locale().should.equal('en')
     })
 
     it('uses locale string for help option default desc on .locale().help()', function () {

@@ -656,8 +656,7 @@ Optionally `.implies()` can accept an object specifying multiple implications.
 
 Return the locale that yargs is currently using.
 
-By default, yargs will auto-detect the operating system's locale
-(via [os-locale](https://www.npmjs.com/package/os-locale)) so that
+By default, yargs will auto-detect the operating system's locale so that
 yargs-generated help content will display in the user's language.
 
 To override this behavior with a static locale, pass the desired locale as a
@@ -721,7 +720,7 @@ To submit a new translation for yargs:
 .detectLocale(boolean)
 -----------
 
-Should yargs attempt to detect the os' locale? defaults to `false`.
+Should yargs attempt to detect the os' locale? defaults to `true`.
 
 .nargs(key, count)
 -----------
