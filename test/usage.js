@@ -346,7 +346,6 @@ describe('usage tests', function () {
       .default('bar', 6)
       .default('baz', 7)
       .argv
-
     })
     r.should.have.property('result')
     r.result.should.have.property('foo', 50)
@@ -362,7 +361,6 @@ describe('usage tests', function () {
       .alias('f', 'foo')
       .default('f', 5)
       .argv
-
     })
     r.should.have.property('result')
     r.result.should.have.property('f', 5)
@@ -391,7 +389,6 @@ describe('usage tests', function () {
       return yargs('--foo 50 --baz 70'.split(' '))
       .default({ foo: 10, bar: 20, quux: 30 })
       .argv
-
     })
     r.should.have.property('result')
     r.result.should.have.property('_').with.length(0)
