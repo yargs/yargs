@@ -30,8 +30,7 @@ function Argv (processArgs, cwd) {
       // bin file with #!/usr/bin/env node
       if (i === 0 && /\b(node|iojs)$/.test(x)) return
       var b = rebase(cwd, x)
-      return x.match(/^\//) && b.length < x.length
-      ? b : x
+      return x.match(/^\//) && b.length < x.length ? b : x
     })
     .join(' ').trim()
 
@@ -586,9 +585,7 @@ function sigletonify (inst) {
     if (key === 'argv') {
       Argv.__defineGetter__(key, inst.__lookupGetter__(key))
     } else {
-      Argv[key] = typeof inst[key] === 'function'
-      ? inst[key].bind(inst)
-      : inst[key]
+      Argv[key] = typeof inst[key] === 'function' ? inst[key].bind(inst) : inst[key]
     }
   })
 }
