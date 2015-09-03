@@ -3,6 +3,7 @@ language:
 os:
   - linux
   - osx
+sudo: false
 install:
   - rm -rf ~/.nvm
   - git clone https://github.com/creationix/nvm.git ~/.nvm
