@@ -37,7 +37,6 @@ describe('integration tests', function () {
       })
       this.which.stderr.on('data', done)
     })
-
   })
 
   // see #177

@@ -23,7 +23,7 @@
     "hashish": "0.0.4",
     "mocha": "^2.3.0",
     "nyc": "^3.1.0",
-    "standard": "^5.1.1"
+    "standard": "^5.2.1"
   },
   "scripts": {
     "test": "standard && nyc mocha --timeout=4000 --check-leaks",
