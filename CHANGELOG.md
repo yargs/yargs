@@ -1,5 +1,11 @@
 ## Change Log
 
+### v3.24.0 (2015/09/04 12:02 +00:00)
+
+- [#248](https://github.com/bcoe/yargs/pull/248) reinstate os-locale, no spawning (@nexdrew)
+- [#249](https://github.com/bcoe/yargs/pull/249) use travis container-based infrastructure (@nexdrew)
+- [#247](https://github.com/bcoe/yargs/pull/247) upgrade standard (@nexdrew)
+
 ### v3.23.0 (2015/08/30 23:00 +00:00)
 
 - [#246](https://github.com/bcoe/yargs/pull/246) detect locale based only on environment variables (@bcoe)
