@@ -25,6 +25,9 @@
     "mocha": "^2.3.0",
     "nyc": "^3.1.0",
     "standard": "^5.2.1"
+    "standard": "^5.1.1",
+    "which": "^1.1.1",
+    "win-spawn": "^2.0.0"
   },
   "scripts": {
     "test": "standard && nyc mocha --timeout=4000 --check-leaks",
