@@ -20,8 +20,8 @@ test_script:
   - node --version
   - npm --version
   # We test multiple Windows shells
-  - ps: "npm run test-windows # PowerShell" # Pass comment to PS for easier debugging
-  - cmd: npm run test-windows
+  - ps: "npm t # PowerShell" # Pass comment to PS for easier debugging
+  - cmd: npm t
 
 os:
   - Default Azure
