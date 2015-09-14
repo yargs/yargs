@@ -1,6 +1,7 @@
 /* global describe, it, beforeEach */
 
 var checkUsage = require('./helpers/utils').checkOutput
+var path = require('path')
 var yargs = require('../')
 
 require('chai').should()
@@ -863,9 +864,9 @@ describe('usage tests', function () {
   })
 
   it('should succeed when rebase', function () {
-    yargs.rebase('/home/chevex', '/home/chevex/foo/bar/baz').should.equal('foo/bar/baz')
-    yargs.rebase('/home/chevex/foo/bar/baz', '/home/chevex').should.equal('../../..')
-    yargs.rebase('/home/chevex/foo', '/home/chevex/pow/zoom.txt').should.equal('../pow/zoom.txt')
+    yargs.rebase(['home', 'chevex'].join(path.sep), ['home', 'chevex', 'foo', 'bar', 'baz'].join(path.sep)).should.equal(['foo', 'bar', 'baz'].join(path.sep))
+    yargs.rebase(['home', 'chevex', 'foo', 'bar', 'baz'].join(path.sep), ['home', 'chevex'].join(path.sep)).should.equal(['..', '..', '..'].join(path.sep))
+    yargs.rebase(['home', 'chevex', 'foo'].join(path.sep), ['home', 'chevex', 'pow', 'zoom.txt'].join(path.sep)).should.equal(['..', 'pow', 'zoom.txt'].join(path.sep))
   })
 
   // Fixes: https://github.com/chevex/yargs/issues/71

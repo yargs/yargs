@@ -214,16 +214,16 @@ describe('parser tests', function () {
   })
 
   it('should normalize redundant paths', function () {
-    var a = yargs([ '-s', '/tmp/../' ]).alias('s', 'save').normalize('s').argv
-    a.should.have.property('s', '/')
-    a.should.have.property('save', '/')
+    var a = yargs([ '-s', ['', 'tmp', '..', ''].join(path.sep) ]).alias('s', 'save').normalize('s').argv
+    a.should.have.property('s', path.sep)
+    a.should.have.property('save', path.sep)
   })
 
   it('should normalize redundant paths when a value is later assigned', function () {
     var a = yargs(['-s']).normalize('s').argv
     a.should.have.property('s', true)
-    a.s = '/path/to/new/dir/../../'
-    a.s.should.equal('/path/to/')
+    a.s = ['', 'path', 'to', 'new', 'dir', '..', '..', ''].join(path.sep)
+    a.s.should.equal(['', 'path', 'to', ''].join(path.sep))
   })
 
   it('should assign data after forward slash to the option before the slash', function () {

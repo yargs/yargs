@@ -1,6 +1,9 @@
-/* global describe, it, beforeEach */
+/* global describe, it */
 
-var spawn = require('child_process').spawn
+var spawn = require('win-spawn')
+var which = require('which')
+
+require('chai').should()
 
 describe('integration tests', function () {
   it('should run as a shell script with no arguments', function (done) {
@@ -20,22 +23,18 @@ describe('integration tests', function () {
   })
 
   describe('path returned by "which"', function () {
-    beforeEach(function () {
-      this.which = spawn('which', ['node'])
-    })
-
     it('should match the actual path to the script file', function (done) {
-      this.which.stdout.on('data', function (buf) {
-        testCmd(buf.toString().trim() + ' bin.js', [], done)
+      which('node', function (err, path) {
+        if (err) return done(err)
+        testCmd(path.replace('Program Files', 'Progra~1') + ' bin.js', [], done)
       })
-      this.which.stderr.on('data', done)
     })
 
     it('should match the actual path to the script file, with arguments', function (done) {
-      this.which.stdout.on('data', function (buf) {
-        testCmd(buf.toString().trim() + ' bin.js', [ 'q', 'r' ], done)
+      which('node', function (err, path) {
+        if (err) return done(err)
+        testCmd(path.replace('Program Files', 'Progra~1') + ' bin.js', [ 'q', 'r' ], done)
       })
-      this.which.stderr.on('data', done)
     })
   })
 
