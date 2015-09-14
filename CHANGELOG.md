@@ -1,5 +1,10 @@
 ## Change Log
 
+### v3.25.0 (2015/09/13 7:38 -07:00)
+
+- [#254](https://github.com/bcoe/yargs/pull/254) adds Japanese translation (@oti)
+- [#253](https://github.com/bcoe/yargs/pull/253) fixes for tests on Windows (@bcoe)
+
 ### v3.24.0 (2015/09/04 12:02 +00:00)
 
 - [#248](https://github.com/bcoe/yargs/pull/248) reinstate os-locale, no spawning (@nexdrew)
