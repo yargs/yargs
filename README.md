@@ -180,7 +180,7 @@ console.log("The area is:", argv.w * argv.h);
 
     Missing required arguments: h
 
-After yer demands have been met, demand more! Ask for non-hypenated arguments!
+After yer demands have been met, demand more! Ask for non-hyphenated arguments!
 -----------------------------------------
 
 demand_count.js:
@@ -1016,7 +1016,7 @@ Use `--` to stop parsing flags and stuff the remainder into `argv._`.
 negate fields
 -------------
 
-If you want to explicity set a field to false instead of just leaving it
+If you want to explicitly set a field to false instead of just leaving it
 undefined or to override a default you can do `--no-key`.
 
     $ node examples/reflect.js -a --no-b
