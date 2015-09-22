@@ -66,7 +66,6 @@ bool.js:
 
 ````javascript
 #!/usr/bin/env node
-var util = require('util');
 var argv = require('yargs').argv;
 
 if (argv.s) {
