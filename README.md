@@ -713,6 +713,7 @@ Locales currently supported:
 * **en:** American English.
 * **es:** Spanish.
 * **fr:** French.
+* **ja:** Japanese.
 * **pt:** Portuguese.
 * **pirate:** American Pirate.
 
