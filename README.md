@@ -366,7 +366,7 @@ require('yargs').parse([ '-x', '1', '-y', '2' ])
 
 The rest of these methods below come in just before the terminating `.argv`.
 
-.alias(key, alias)
+<a name="alias"></a>.alias(key, alias)
 ------------------
 
 Set key names as equivalent such that updates to a key will propagate to aliases
@@ -386,18 +386,18 @@ Arguments without a corresponding flag show up in the `argv._` array.
 The script name or node command is available at `argv.$0` similarly to how `$0`
 works in bash or perl.
 
-If `yargs` is executed in an environment that embeds node and there's no script name (e.g. [Electron]
-(http://electron.atom.io/) or [nw.js](http://nwjs.io/)), it will ignore the first parameter since it
+If `yargs` is executed in an environment that embeds node and there's no script name (e.g.
+[Electron](http://electron.atom.io/) or [nw.js](http://nwjs.io/)), it will ignore the first parameter since it
 expects it to be the script name. In order to override this behavior, use `.parse(process.argv.slice(1))`
 instead of `.argv` and the first parameter won't be ignored.
 
-.array(key)
+<a name="array"></a>.array(key)
 ----------
 
 Tell the parser to interpret `key` as an array. If `.array('foo')` is set,
 `--foo foo bar` will be parsed as `['foo', 'bar']` rather than as `'foo'`.
 
-.boolean(key)
+<a name="boolean"></a>.boolean(key)
 -------------
 
 Interpret `key` as a boolean. If a non-flag option follows `key` in
@@ -418,7 +418,7 @@ Check that certain conditions are met in the provided arguments.
 If `fn` throws or returns a non-truthy value, show the thrown error, usage information, and
 exit.
 
-.choices(key, choices)
+<a name="choices"></a>.choices(key, choices)
 ----------------------
 
 Limit valid values for `key` to a predefined set of `choices`, given as an array
@@ -529,7 +529,7 @@ var argv = require('yargs')
   .argv;
 ```
 
-.config(key, [description])
+<a name="config"></a>.config(key, [description])
 ------------
 
 Tells the parser that if the option specified by `key` is passed in, it
@@ -538,7 +538,13 @@ and parsed, and its properties are set as arguments. If present, the
 `description` parameter customizes the description of the config (`key`) option
 in the usage string.
 
-.default(key, value, [description])
+<a name="count"></a>.count(key)
+------------
+
+Interpret `key` as a boolean flag, but set its parsed value to the number of
+flag occurrences rather than `true` or `false`. Default value is thus `0`.
+
+<a name="default"></a>.default(key, value, [description])
 --------------------
 
 Set `argv[key]` to `value` if no option was specified in `process.argv`.
@@ -562,7 +568,7 @@ displaying the value in the usage instructions:
 .default('timeout', 60000, '(one-minute)')
 ```
 
-<a name="demand-key-msg-boolean"></a>.demand(key, [msg | boolean])
+<a name="demand"></a>.demand(key, [msg | boolean])
 ------------------------------
 .demand(count, [max], [msg])
 ------------------------------
@@ -582,12 +588,17 @@ instead of the standard error message. This is especially helpful for the non-op
 If a `boolean` value is given, it controls whether the option is demanded;
 this is useful when using `.options()` to specify command line parameters.
 
-.describe(key, desc)
+<a name="describe"></a>.describe(key, desc)
 --------------------
 
 Describe a `key` for the generated usage information.
 
 Optionally `.describe()` can take an object that maps keys to descriptions.
+
+.detectLocale(boolean)
+-----------
+
+Should yargs attempt to detect the os' locale? Defaults to `true`.
 
 .epilog(str)
 ------------
@@ -708,6 +719,7 @@ Locales currently supported:
 * **en:** American English.
 * **es:** Spanish.
 * **fr:** French.
+* **ja:** Japanese.
 * **pt:** Portuguese.
 * **pirate:** American Pirate.
 
@@ -716,12 +728,7 @@ To submit a new translation for yargs:
 1. use `./locales/en.json` as a starting point.
 2. submit a pull request with the new locale file.
 
-.detectLocale(boolean)
------------
-
-Should yargs attempt to detect the os' locale? defaults to `true`.
-
-.nargs(key, count)
+<a name="nargs"></a>.nargs(key, count)
 -----------
 
 The number of arguments that should be consumed after a key. This can be a
@@ -792,6 +799,27 @@ var argv = require('yargs')
 ;
 ````
 
+Valid `opt` keys include:
+
+- `alias`: string or array of strings, alias(es) for the canonical option key, see [`alias()`](#alias)
+- `array`: boolean, interpret option as an array, see [`array()`](#array)
+- `boolean`: boolean, interpret option as a boolean flag, see [`boolean()`](#boolean)
+- `choices`: value or array of values, limit valid option arguments to a predefined set, see [`choices()`](#choices)
+- `config`: boolean, interpret option as a path to a JSON config file, see [`config()`](#config)
+- `count`: boolean, interpret option as a count of boolean flags, see [`count()`](#count)
+- `default`: value, set a default value for the option, see [`default()`](#default)
+- `defaultDescription`: string, use this description for the default value in help content, see [`default()`](#default)
+- `demand`/`require`/`required`: boolean or string, demand the option be given, with optional error message, see [`demand()`](#demand)
+- `desc`/`describe`/`description`: string, the option description for help content, see [`describe()`](#describe)
+- `nargs`: number, specify how many arguments should be consumed for the option, see [`nargs()`](#nargs)
+- `requiresArg`: boolean, require the option be specified with a value, see [`requiresArg()`](#requiresArg)
+- `string`: boolean, interpret option as a string, see [`string()`](#string)
+- `type`: one of the following strings
+    - `'array'`: synonymous for `array: true`, see [`array()`](#array)
+    - `'boolean'`: synonymous for `boolean: true`, see [`boolean()`](#boolean)
+    - `'count'`: synonymous for `count: true`, see [`count()`](#count)
+    - `'string'`: synonymous for `string: true`, see [`string()`](#string)
+
 .parse(args)
 ------------
 
@@ -802,9 +830,9 @@ Parse `args` instead of `process.argv`. Returns the `argv` object.
 .required(key, [msg | boolean])
 ------------------------------
 
-An alias for [`demand()`](#demand-key-msg-boolean). See docs there.
+An alias for [`demand()`](#demand). See docs there.
 
-.requiresArg(key)
+<a name="requiresArg"></a>.requiresArg(key)
 -----------------
 
 Specifies either a single option key (string), or an array of options that
@@ -918,7 +946,7 @@ Specify --help for available options
 Any command-line argument given that is not demanded, or does not have a
 corresponding description, will be reported as an error.
 
-.string(key)
+<a name="string"></a>.string(key)
 ------------
 
 Tell the parser logic not to interpret `key` as a number or boolean.
