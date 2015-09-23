@@ -589,6 +589,11 @@ Describe a `key` for the generated usage information.
 
 Optionally `.describe()` can take an object that maps keys to descriptions.
 
+.detectLocale(boolean)
+-----------
+
+Should yargs attempt to detect the os' locale? Defaults to `true`.
+
 .epilog(str)
 ------------
 .epilogue(str)
@@ -715,11 +720,6 @@ To submit a new translation for yargs:
 
 1. use `./locales/en.json` as a starting point.
 2. submit a pull request with the new locale file.
-
-.detectLocale(boolean)
------------
-
-Should yargs attempt to detect the os' locale? defaults to `true`.
 
 .nargs(key, count)
 -----------
