@@ -538,6 +538,12 @@ and parsed, and its properties are set as arguments. If present, the
 `description` parameter customizes the description of the config (`key`) option
 in the usage string.
 
+<a name="count"></a>.count(key)
+------------
+
+Interpret `key` as a boolean flag, but set its parsed value to the number of
+flag occurrences rather than `true` or `false`. Default value is thus `0`.
+
 <a name="default"></a>.default(key, value, [description])
 --------------------
 
@@ -800,7 +806,7 @@ Valid `opt` keys include:
 - `boolean`: boolean, interpret option as a boolean flag, see [`boolean()`](#boolean)
 - `choices`: value or array of values, limit valid option arguments to a predefined set, see [`choices()`](#choices)
 - `config`: boolean, interpret option as a path to a JSON config file, see [`config()`](#config)
-- `count`: boolean, interpret option as a count of boolean flags
+- `count`: boolean, interpret option as a count of boolean flags, see [`count()`](#count)
 - `default`: value, set a default value for the option, see [`default()`](#default)
 - `defaultDescription`: string, use this description for the default value in help content, see [`default()`](#default)
 - `demand`/`require`/`required`: boolean or string, demand the option be given, with optional error message, see [`demand()`](#demand)
@@ -811,7 +817,7 @@ Valid `opt` keys include:
 - `type`: one of the following strings
     - `'array'`: synonymous for `array: true`, see [`array()`](#array)
     - `'boolean'`: synonymous for `boolean: true`, see [`boolean()`](#boolean)
-    - `'count'`: synonymous for `count: true`
+    - `'count'`: synonymous for `count: true`, see [`count()`](#count)
     - `'string'`: synonymous for `string: true`, see [`string()`](#string)
 
 .parse(args)
