@@ -1,5 +1,12 @@
 ## Change Log
 
+### v3.26.0 (2015/09/25 2:14 +00:00)
+
+- [#263](https://github.com/bcoe/yargs/pull/263) document count() and option() object keys (@nexdrew)
+- [#259](https://github.com/bcoe/yargs/pull/259) remove util in readme (@38elements)
+- [#258](https://github.com/bcoe/yargs/pull/258) node v4 builds, update deps (@nexdrew)
+- [#257](https://github.com/bcoe/yargs/pull/257) fix spelling errors (@dkoleary88)
+
 ### v3.25.0 (2015/09/13 7:38 -07:00)
 
 - [#254](https://github.com/bcoe/yargs/pull/254) adds Japanese translation (@oti)
