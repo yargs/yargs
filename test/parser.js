@@ -117,7 +117,7 @@ describe('parser tests', function () {
       '-h', 'awesome', '--multi=quux',
       '--key', 'value',
       '-b', '--bool', '--no-meep', '--multi=baz',
-      '--', '--not-a-flag', 'eek'
+      '--', '--not-a-flag', '-', '-h', '-multi', '--', 'eek'
     ])
     parse.should.have.property('c', true)
     parse.should.have.property('a', true)
@@ -130,7 +130,7 @@ describe('parser tests', function () {
     parse.should.have.property('multi').and.deep.equal(['quux', 'baz'])
     parse.should.have.property('meep', false)
     parse.should.have.property('name', 'meowmers')
-    parse.should.have.property('_').and.deep.equal(['bare', '--not-a-flag', 'eek'])
+    parse.should.have.property('_').and.deep.equal(['bare', '--not-a-flag', '-', '-h', '-multi', '--', 'eek'])
   })
 
   it('should parse numbers appropriately', function () {
