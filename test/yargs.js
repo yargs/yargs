@@ -147,18 +147,34 @@ describe('yargs dsl tests', function () {
   })
 
   describe('exitProcess', function () {
-    it('throws an execption when a failure occurs, if exitProcess is set to false', function () {
-      checkOutput(function () {
-        expect(function () {
-          yargs([])
-            .demand('cat')
-            .showHelpOnFail(false)
-            .exitProcess(false)
-            .argv
-        }).to.throw(/Missing required argument/)
+    describe('when exitProcess is set to false and a failure occurs', function () {
+      it('should throw an exception', function () {
+        checkOutput(function () {
+          expect(function () {
+            yargs([])
+              .demand('cat')
+              .showHelpOnFail(false)
+              .exitProcess(false)
+              .argv
+          }).to.throw(/Missing required argument/)
+        })
+      })
+      it('should output the errors to stderr once', function () {
+        var r = checkOutput(function () {
+          try {
+            yargs([])
+              .demand('cat')
+              .showHelpOnFail(false)
+              .exitProcess(false)
+              .argv
+          } catch (err) {
+            // ignore the error, we only test the output here
+          }
+        })
+        expect(r.logs).to.deep.equal([])
+        expect(r.errors).to.deep.equal(['Missing required argument: cat'])
       })
     })
-
     it('should set exit process to true, if no argument provided', function () {
       var r = checkOutput(function () {
         return yargs([])
