@@ -721,6 +721,7 @@ Locales currently supported:
 * **fr:** French.
 * **ja:** Japanese.
 * **pt:** Portuguese.
+* **zh:** Chinese.
 * **pirate:** American Pirate.
 
 To submit a new translation for yargs:
