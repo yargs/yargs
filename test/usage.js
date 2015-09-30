@@ -768,6 +768,67 @@ describe('usage tests', function () {
         ''
       ])
     })
+
+    describe('when exitProcess is false', function () {
+      it('should not validate arguments (required argument)', function () {
+        var r = checkUsage(function () {
+          return yargs(['--help'])
+            .usage('Usage: $0 options')
+            .help('help')
+            .alias('help', 'h')
+            .describe('some-opt', 'Some option')
+            .demand('some-opt')
+            .wrap(null)
+            .exitProcess(false)
+            .argv
+        })
+        r.should.have.property('result')
+        r.result.should.have.property('_').with.length(0)
+        r.result.should.have.property('help').and.be.true
+        r.result.should.have.property('h').and.be.true
+        r.should.have.property('exit').and.be.false
+        r.should.have.property('errors').with.length(0)
+        r.should.have.property('logs')
+        r.logs.join('\n').split(/\n+/).should.deep.equal([
+          'Usage: ./usage options',
+          'Options:',
+          '  --help, -h  Show help  [boolean]',
+          '  --some-opt  Some option  [required]',
+          ''
+        ])
+      })
+
+      // We need both this and the previous spec because an required error is validated
+      // in required error is a validation error and nargs is a parse error
+      it('should not validate arguments (nargs)', function () {
+        var r = checkUsage(function () {
+          return yargs(['--help', '--some-opt'])
+            .usage('Usage: $0 options')
+            .help('help')
+            .alias('help', 'h')
+            .describe('some-opt', 'Some option')
+            .demand('some-opt')
+            .nargs('some-opt', 3)
+            .wrap(null)
+            .exitProcess(false)
+            .argv
+        })
+        r.should.have.property('result')
+        r.result.should.have.property('_').with.length(0)
+        r.result.should.have.property('help').and.be.true
+        r.result.should.have.property('h').and.be.true
+        r.should.have.property('exit').and.be.false
+        r.should.have.property('errors').with.length(0)
+        r.should.have.property('logs')
+        r.logs.join('\n').split(/\n+/).should.deep.equal([
+          'Usage: ./usage options',
+          'Options:',
+          '  --help, -h  Show help  [boolean]',
+          '  --some-opt  Some option  [required]',
+          ''
+        ])
+      })
+    })
   })
 
   describe('version option', function () {
@@ -808,6 +869,46 @@ describe('usage tests', function () {
         .argv
       })
       r.logs[0].should.eql('1.0.2')
+    })
+
+    describe('when exitProcess is false', function () {
+      it('should not validate arguments (required argument)', function () {
+        var r = checkUsage(function () {
+          return yargs(['--version'])
+            .version('1.0.1', 'version', 'Show version number')
+            .demand('some-opt')
+            .wrap(null)
+            .exitProcess(false)
+            .argv
+        })
+        r.should.have.property('result')
+        r.result.should.have.property('_').with.length(0)
+        r.result.should.have.property('version').and.be.true
+        r.should.have.property('exit').and.be.false
+        r.should.have.property('errors').with.length(0)
+        r.should.have.property('logs')
+        r.logs[0].should.eql('1.0.1')
+      })
+
+      // We need both this and the previous spec because an required error is validated
+      // in required error is a validation error and nargs is a parse error
+      it('should not validate arguments (nargs)', function () {
+        var r = checkUsage(function () {
+          return yargs(['--version', '--some-opt'])
+            .nargs('some-opt', 3)
+            .version('1.0.1', 'version', 'Show version number')
+            .wrap(null)
+            .exitProcess(false)
+            .argv
+        })
+        r.should.have.property('result')
+        r.result.should.have.property('_').with.length(0)
+        r.result.should.have.property('version').and.be.true
+        r.should.have.property('exit').and.be.false
+        r.should.have.property('errors').with.length(0)
+        r.should.have.property('logs')
+        r.logs[0].should.eql('1.0.1')
+      })
     })
   })
 
