@@ -285,6 +285,32 @@ describe('usage tests', function () {
     )
   })
 
+  describe('when exitProcess is false and check fails with a thrown exception', function () {
+    it('should display missing arguments once', function () {
+      var r = checkUsage(function () {
+        try {
+          return yargs('-x 10 -z 20'.split(' '))
+            .usage('Usage: $0 -x NUM -y NUM')
+            .exitProcess(false)
+            .wrap(null)
+            .check(function (argv) {
+              if (!('x' in argv)) throw Error('You forgot about -x')
+              if (!('y' in argv)) throw Error('You forgot about -y')
+            })
+            .argv
+        } catch (err) {
+          // ignore the error, we only test the output here
+        }
+      })
+      r.errors.join('\n').split(/\n+/).should.deep.equal([
+        'Usage: ./usage -x NUM -y NUM',
+        'You forgot about -y'
+      ])
+      r.should.have.property('logs').with.length(0)
+      r.should.have.property('exit').and.be.false
+    })
+  })
+
   it('should return a valid result when demanding a count of non-hyphenated values', function () {
     var r = checkUsage(function () {
       return yargs('1 2 3 --moo'.split(' '))
