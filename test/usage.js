@@ -824,8 +824,8 @@ describe('usage tests', function () {
         ])
       })
 
-      // We need both this and the previous spec because an required error is validated
-      // in required error is a validation error and nargs is a parse error
+      // We need both this and the previous spec because a required argument
+      // is a validation error and nargs is a parse error
       it('should not validate arguments (nargs)', function () {
         var r = checkUsage(function () {
           return yargs(['--help', '--some-opt'])
@@ -916,8 +916,8 @@ describe('usage tests', function () {
         r.logs[0].should.eql('1.0.1')
       })
 
-      // We need both this and the previous spec because an required error is validated
-      // in required error is a validation error and nargs is a parse error
+      // We need both this and the previous spec because a required argument
+      // is a validation error and nargs is a parse error
       it('should not validate arguments (nargs)', function () {
         var r = checkUsage(function () {
           return yargs(['--version', '--some-opt'])
