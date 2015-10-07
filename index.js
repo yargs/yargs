@@ -511,32 +511,40 @@ function Argv (processArgs, cwd) {
       return
     }
 
+    var helpOrVersion = false
+
     Object.keys(argv).forEach(function (key) {
       if (key === helpOpt && argv[key]) {
         self.showHelp('log')
+        helpOrVersion = true
         if (exitProcess) {
           process.exit(0)
         }
       } else if (key === versionOpt && argv[key]) {
         usage.showVersion()
+        helpOrVersion = true
         if (exitProcess) {
           process.exit(0)
         }
       }
     })
 
-    if (parsed.error) throw parsed.error
+    // If the help or version options where used and exitProcess is false,
+    // we won't run validations
+    if (!helpOrVersion) {
+      if (parsed.error) throw parsed.error
 
-    // if we're executed via bash completion, don't
-    // bother with validation.
-    if (!argv[completion.completionKey]) {
-      validation.nonOptionCount(argv)
-      validation.missingArgumentValue(argv)
-      validation.requiredArguments(argv)
-      if (strict) validation.unknownArguments(argv, aliases)
-      validation.customChecks(argv, aliases)
-      validation.limitedChoices(argv)
-      validation.implications(argv)
+      // if we're executed via bash completion, don't
+      // bother with validation.
+      if (!argv[completion.completionKey]) {
+        validation.nonOptionCount(argv)
+        validation.missingArgumentValue(argv)
+        validation.requiredArguments(argv)
+        if (strict) validation.unknownArguments(argv, aliases)
+        validation.customChecks(argv, aliases)
+        validation.limitedChoices(argv)
+        validation.implications(argv)
+      }
     }
 
     setPlaceholderKeys(argv)
