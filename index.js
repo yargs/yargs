@@ -512,17 +512,16 @@ function Argv (processArgs, cwd) {
     }
 
     var helpOrVersion = false
-
     Object.keys(argv).forEach(function (key) {
       if (key === helpOpt && argv[key]) {
-        self.showHelp('log')
         helpOrVersion = true
+        self.showHelp('log')
         if (exitProcess) {
           process.exit(0)
         }
       } else if (key === versionOpt && argv[key]) {
-        usage.showVersion()
         helpOrVersion = true
+        usage.showVersion()
         if (exitProcess) {
           process.exit(0)
         }
