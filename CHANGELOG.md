@@ -1,5 +1,13 @@
 ## Change Log
 
+### v3.27.0 (2015/10/08 1:55 +00:00)
+
+- [#271](https://github.com/bcoe/yargs/pull/273) skips validation for help or version flags with exitProcess(false) (@tepez)
+- [#273](https://github.com/bcoe/yargs/pull/273) implements single output for errors with exitProcess(false) (@nexdrew)
+- [#269](https://github.com/bcoe/yargs/pull/269) verifies single output for errors with exitProcess(false) (@tepez)
+- [#268](https://github.com/bcoe/yargs/pull/268) adds Chinese translation (@qiu8310)
+- [#266](https://github.com/bcoe/yargs/pull/266) adds case for -- after -- in parser test (@geophree)
+
 ### v3.26.0 (2015/09/25 2:14 +00:00)
 
 - [#263](https://github.com/bcoe/yargs/pull/263) document count() and option() object keys (@nexdrew)
