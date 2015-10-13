@@ -3,6 +3,7 @@
 var checkUsage = require('./helpers/utils').checkOutput
 var path = require('path')
 var yargs = require('../')
+var chalk = require('chalk')
 
 require('chai').should()
 
@@ -1090,6 +1091,54 @@ describe('usage tests', function () {
 
       // the long usage string should cause line-breaks.
       r.errors[0].split('\n').length.should.gt(6)
+    })
+
+    it('should align span columns when ansi colors are not used in a description', function () {
+      var noColorAddedDescr = 'The file to add or remove'
+
+      var r = checkUsage(function () {
+        return yargs(['-h'])
+          .option('f', {
+            alias: 'file',
+            describe: noColorAddedDescr,
+            demand: true,
+            type: 'string'
+          })
+          .help('h').alias('h', 'help')
+          .wrap(80)
+          .argv
+      })
+
+      r.logs.join('\n').split(/\n+/).should.deep.equal([
+        'Options:',
+        '  -f, --file  ' + noColorAddedDescr + '                      [string] [required]',
+        '  -h, --help  Show help                                                [boolean]',
+        ''
+      ])
+    })
+
+    it('should align span columns when ansi colors are used in a description', function () {
+      var yellowDescription = chalk.yellow('The file to add or remove')
+
+      var r = checkUsage(function () {
+        return yargs(['-h'])
+          .option('f', {
+            alias: 'file',
+            describe: yellowDescription,
+            demand: true,
+            type: 'string'
+          })
+          .help('h').alias('h', 'help')
+          .wrap(80)
+          .argv
+      })
+
+      r.logs.join('\n').split(/\n+/).should.deep.equal([
+        'Options:',
+        '  -f, --file  ' + yellowDescription + '                      [string] [required]',
+        '  -h, --help  Show help                                                [boolean]',
+        ''
+      ])
     })
   })
 

@@ -20,6 +20,7 @@
   },
   "devDependencies": {
     "chai": "^3.3.0",
+    "chalk": "^1.1.1",
     "coveralls": "^2.11.4",
     "hashish": "0.0.4",
     "mocha": "^2.3.3",
