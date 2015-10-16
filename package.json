@@ -12,7 +12,7 @@
   ],
   "dependencies": {
     "camelcase": "^1.2.1",
-    "cliui": "^3.0.0",
+    "cliui": "^3.0.2",
     "decamelize": "^1.0.0",
     "os-locale": "^1.4.0",
     "window-size": "^0.1.2",
