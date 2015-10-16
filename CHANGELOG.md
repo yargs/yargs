@@ -1,5 +1,9 @@
 ## Change Log
 
+### v3.28.0 (2015/10/16 1:55 +07:00)
+
+- [#277](https://github.com/bcoe/yargs/pull/277) adds support for ansi escape codes (@bcoe)
+
 ### v3.27.0 (2015/10/08 1:55 +00:00)
 
 - [#271](https://github.com/bcoe/yargs/pull/273) skips validation for help or version flags with exitProcess(false) (@tepez)
