@@ -12,7 +12,7 @@
   ],
   "dependencies": {
     "camelcase": "^1.2.1",
-    "cliui": "^2.1.0",
+    "cliui": "^3.0.2",
     "decamelize": "^1.0.0",
     "os-locale": "^1.4.0",
     "window-size": "^0.1.2",
@@ -20,6 +20,7 @@
   },
   "devDependencies": {
     "chai": "^3.3.0",
+    "chalk": "^1.1.1",
     "coveralls": "^2.11.4",
     "hashish": "0.0.4",
     "mocha": "^2.3.3",
