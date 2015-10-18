@@ -457,7 +457,7 @@ function Argv (processArgs, cwd) {
   })
 
   function parseArgs (args) {
-    var parsed = Parser(args, options, y18n)
+    var parsed = Parser(args, options, y18n, cwd)
     var argv = parsed.argv
     var aliases = parsed.aliases
 
