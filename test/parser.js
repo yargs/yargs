@@ -370,6 +370,16 @@ describe('parser tests', function () {
       fail.should.equal(false)
     })
 
+    it('should look travel up parent directories until a config file is found', function () {
+      var childPath = path.resolve(__dirname, './fixtures/child')
+      var argv = yargs([], childPath)
+        .config('settings')
+        .default('settings', 'config.json')
+        .argv
+
+      argv.should.have.property('herp', 'derp')
+    })
+
     it('should be displayed in the help message', function () {
       var checkUsage = require('./helpers/utils').checkOutput
       var r = checkUsage(function () {
