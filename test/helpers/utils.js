@@ -2,9 +2,10 @@ var Hash = require('hashish')
 
 // capture terminal output, so that we might
 // assert against it.
-exports.checkOutput = function (f, argv) {
+exports.checkOutput = function (f, argv, cb) {
   var exit = false
   var _exit = process.exit
+  var _emit = process.emit
   var _env = process.env
   var _argv = process.argv
   var _error = console.error
@@ -20,19 +21,43 @@ exports.checkOutput = function (f, argv) {
   console.error = function (msg) { errors.push(msg) }
   console.log = function (msg) { logs.push(msg) }
 
-  var result = f()
+  var result
 
-  process.exit = _exit
-  process.env = _env
-  process.argv = _argv
+  if (typeof cb === 'function') {
+    process.exit = function () {
+      exit = true
+      cb(null, done())
+    }
+    process.emit = function (ev, value) {
+      if (ev === 'uncaughtException') {
+        done()
+        cb(value)
+        return true
+      }
 
-  console.error = _error
-  console.log = _log
+      return _emit.apply(this, arguments)
+    }
 
-  return {
-    errors: errors,
-    logs: logs,
-    exit: exit,
-    result: result
+    f()
+  } else {
+    result = f()
+    return done()
+  }
+
+  function done () {
+    process.exit = _exit
+    process.emit = _emit
+    process.env = _env
+    process.argv = _argv
+
+    console.error = _error
+    console.log = _log
+
+    return {
+      errors: errors,
+      logs: logs,
+      exit: exit,
+      result: result
+    }
   }
 }

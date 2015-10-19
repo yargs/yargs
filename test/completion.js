@@ -2,6 +2,9 @@
 var checkUsage = require('./helpers/utils').checkOutput
 var yargs = require('../')
 
+/* polyfill Promise for older Node.js */
+require('es6-promise').polyfill()
+
 require('chai').should()
 
 describe('Completion', function () {
@@ -182,20 +185,57 @@ describe('Completion', function () {
       r.logs.should.include('success!')
     })
 
-    it('if a callback parameter is provided, completions can be asynchronous', function (done) {
-      yargs(['--get-yargs-completions'])
-      .completion('completion', function (current, argv, cb) {
-        setTimeout(function () {
-          var r = checkUsage(function () {
-            cb(['apple', 'banana'])
+    it('if a promise is returned, completions can be asynchronous', function (done) {
+      checkUsage(function (cb) {
+        yargs(['--get-yargs-completions'])
+        .completion('completion', function (current, argv) {
+          return new Promise(function (resolve, reject) {
+            setTimeout(function () {
+              resolve(['apple', 'banana'])
+            }, 10)
           })
-
-          r.logs.should.include('apple')
-          r.logs.should.include('banana')
-          return done()
-        }, 100)
+        })
+        .argv
+      }, null, function (err, r) {
+        if (err) throw err
+        r.logs.should.include('apple')
+        r.logs.should.include('banana')
+        return done()
       })
-      .argv
+    })
+
+    it('if a promise is returned, errors are handled', function (done) {
+      checkUsage(function () {
+        yargs(['--get-yargs-completions'])
+        .completion('completion', function (current, argv) {
+          return new Promise(function (resolve, reject) {
+            setTimeout(function () {
+              reject(new Error('Test'))
+            }, 10)
+          })
+        })
+        .argv
+      }, null, function (err) {
+        err.message.should.equal('Test')
+        return done()
+      })
+    })
+
+    it('if a callback parameter is provided, completions can be asynchronous', function (done) {
+      checkUsage(function () {
+        yargs(['--get-yargs-completions'])
+        .completion('completion', function (current, argv, cb) {
+          setTimeout(function () {
+            cb(['apple', 'banana'])
+          }, 10)
+        })
+        .argv
+      }, null, function (err, r) {
+        if (err) throw err
+        r.logs.should.include('apple')
+        r.logs.should.include('banana')
+        return done()
+      })
     })
   })
 
