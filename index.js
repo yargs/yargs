@@ -565,6 +565,9 @@ function Argv (processArgs, cwd) {
 
   function setPlaceholderKeys (argv) {
     Object.keys(options.key).forEach(function (key) {
+      // don't set placeholder keys for dot
+      // notation options 'foo.bar'.
+      if (~key.indexOf('.')) return
       if (typeof argv[key] === 'undefined') argv[key] = undefined
     })
   }

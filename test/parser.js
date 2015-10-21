@@ -419,9 +419,45 @@ describe('parser tests', function () {
 
     it('should apply defaults to dot notation arguments', function () {
       var argv = yargs([])
-      .default('foo.bar', 99)
-      .argv
+        .default('foo.bar', 99)
+        .argv
       argv.foo.bar.should.eql(99)
+    })
+
+    // see #279
+    it('should allow default to be overridden when an alias is provided', function () {
+      var argv = yargs(['--foo.bar', '200'])
+        .option('foo.bar', {
+          default: 99,
+          alias: 'f'
+        })
+        .argv
+
+      argv.foo.bar.should.eql(200)
+    })
+
+    // see #279
+    it('should also override alias', function () {
+      var argv = yargs(['--foo.bar', '200'])
+        .option('foo.bar', {
+          default: 99,
+          alias: 'f'
+        })
+        .argv
+
+      argv.f.should.eql(200)
+    })
+
+    // see #279
+    it('should not set an undefined dot notation key', function () {
+      var argv = yargs(['--foo.bar', '200'])
+        .option('foo.bar', {
+          default: 99,
+          alias: 'f'
+        })
+        .argv
+
+      ;('foo.bar' in argv).should.equal(false)
     })
 
     it('should respect .string() for dot notation arguments', function () {
