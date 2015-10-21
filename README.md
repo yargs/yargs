@@ -514,7 +514,7 @@ var argv = require('yargs')
   .argv;
 ```
 
-But wait, there's more! You can provide asynchronous completions.
+You can also provide asynchronous completions.
 
 ```js
 var argv = require('yargs')
@@ -525,6 +525,20 @@ var argv = require('yargs')
         'banana'
       ]);
     }, 500);
+  })
+  .argv;
+```
+
+But wait, there's more! You can return an asynchronous promise.
+
+```js
+var argv = require('yargs')
+  .completion('completion', function(current, argv, done) {
+    return new Promise(function (resolve, reject) {
+      setTimeout(function () {
+        resolve(['apple', 'banana'])
+      }, 10)
+    })
   })
   .argv;
 ```

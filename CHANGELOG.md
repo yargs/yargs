@@ -1,5 +1,10 @@
 ## Change Log
 
+### v3.29.0 (2015/10/16 21:51 +07:00)
+
+- [#282](https://github.com/bcoe/yargs/pull/282) completions now accept promises (@LinusU)
+- [#281](https://github.com/bcoe/yargs/pull/281) fix parsing issues with dot notation (@bcoe)
+
 ### v3.28.0 (2015/10/16 1:55 +07:00)
 
 - [#277](https://github.com/bcoe/yargs/pull/277) adds support for ansi escape codes (@bcoe)
