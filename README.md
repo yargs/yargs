@@ -735,6 +735,7 @@ Locales currently supported:
 * **fr:** French.
 * **ja:** Japanese.
 * **pt:** Portuguese.
+* **pt-BR:** Portuguese Brazil.
 * **zh:** Chinese.
 * **pirate:** American Pirate.
 
