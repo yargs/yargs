@@ -399,6 +399,32 @@ describe('parser tests', function () {
     argv.should.have.property('f', 11)
   })
 
+  it('should allow transitive aliases to be specified', function () {
+    var argv = yargs([ '-f', '11', '--zoom', '55' ])
+      .alias('z', 'zm')
+      .alias('zm', 'zoom')
+      .argv
+
+    argv.should.have.property('zoom', 55)
+    argv.should.have.property('z', 55)
+    argv.should.have.property('zm', 55)
+    argv.should.have.property('f', 11)
+  })
+
+  it('should merge two lists of aliases if the collide', function () {
+    var argv = yargs([ '-f', '11', '--zoom', '55' ])
+      .alias('z', 'zm')
+      .alias('zoom', 'zoop')
+      .alias('zm', 'zoom')
+      .argv
+
+    argv.should.have.property('zoom', 55)
+    argv.should.have.property('zoop', 55)
+    argv.should.have.property('z', 55)
+    argv.should.have.property('zm', 55)
+    argv.should.have.property('f', 11)
+  })
+
   describe('dot notation', function () {
     it('should allow object graph traversal via dot notation', function () {
       var argv = yargs([
