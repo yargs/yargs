@@ -315,7 +315,7 @@ function Argv (processArgs, cwd) {
     return options
   }
 
-  var groups = {'Options:': []}
+  var groups = {}
   self.group = function (opts, groupName) {
     groups[groupName] = (groups[groupName] || []).concat(opts)
     return self
