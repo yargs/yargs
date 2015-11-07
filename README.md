@@ -649,6 +649,27 @@ Method to execute when a failure occurs, rather than printing the failure messag
 
 `fn` is called with the failure message that would have been printed.
 
+<a name="group"></a>.group(key(s), groupName)
+--------------------
+
+Given a key, or an array of keys, places options under an alternative heading
+when displaying usage instructions, e.g.,
+
+***
+    Options:
+      --help  Show help  [boolean]
+
+    Heroes:
+      --batman  world's greatest detective
+
+```js
+var yargs = require('./')(['--help'])
+  .help('help')
+  .group('batman', 'Heroes:')
+  .describe('batman', "world's greatest detective")
+  .argv
+```
+
 .help([option, [description]])
 ------------------------------
 
@@ -827,6 +848,7 @@ Valid `opt` keys include:
 - `defaultDescription`: string, use this description for the default value in help content, see [`default()`](#default)
 - `demand`/`require`/`required`: boolean or string, demand the option be given, with optional error message, see [`demand()`](#demand)
 - `desc`/`describe`/`description`: string, the option description for help content, see [`describe()`](#describe)
+- `group`: string, when displaying usage instructions place the option under an alternative group heading, see [`group()`](#group)
 - `nargs`: number, specify how many arguments should be consumed for the option, see [`nargs()`](#nargs)
 - `requiresArg`: boolean, require the option be specified with a value, see [`requiresArg()`](#requiresArg)
 - `string`: boolean, interpret option as a string, see [`string()`](#string)
