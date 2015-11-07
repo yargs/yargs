@@ -407,6 +407,21 @@ describe('yargs dsl tests', function () {
       r.logs.join(' ').should.match(/Commands:/)
     })
 
+    it('properly translates a region-specific locale file', function () {
+      loadLocale('pt_BR.UTF-8')
+
+      var r = checkOutput(function () {
+        yargs(['-h'])
+          .help('h')
+          .wrap(null)
+          .argv
+      })
+
+      yargs.locale().should.equal('pt_BR')
+      loadLocale('en_US.UTF-8')
+      r.logs.join(' ').should.match(/Exibe ajuda/)
+    })
+
     it('handles os-locale throwing an exception', function () {
       // make os-locale throw.
       require('os-locale')
