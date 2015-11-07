@@ -655,13 +655,6 @@ Method to execute when a failure occurs, rather than printing the failure messag
 Given a key, or an array of keys, places options under an alternative heading
 when displaying usage instructions, e.g.,
 
-***
-    Options:
-      --help  Show help  [boolean]
-
-    Heroes:
-      --batman  world's greatest detective
-
 ```js
 var yargs = require('./')(['--help'])
   .help('help')
@@ -669,6 +662,12 @@ var yargs = require('./')(['--help'])
   .describe('batman', "world's greatest detective")
   .argv
 ```
+***
+    Options:
+      --help  Show help  [boolean]
+
+    Heroes:
+      --batman  world's greatest detective
 
 .help([option, [description]])
 ------------------------------
