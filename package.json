@@ -13,13 +13,13 @@
   "dependencies": {
     "camelcase": "^1.2.1",
     "cliui": "^3.0.3",
-    "decamelize": "^1.0.0",
+    "decamelize": "^1.1.1",
     "os-locale": "^1.4.0",
     "window-size": "^0.1.2",
     "y18n": "^3.2.0"
   },
   "devDependencies": {
-    "chai": "^3.3.0",
+    "chai": "^3.4.1",
     "chalk": "^1.1.1",
     "coveralls": "^2.11.4",
     "es6-promise": "^3.0.2",
