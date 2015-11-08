@@ -181,7 +181,7 @@ function Argv (processArgs, cwd) {
 
       // wait! perhaps we've created two lists of aliases
       // that reference each other?
-      if ((options.alias[x] || aliases) && options.alias[y]) {
+      if (options.alias[y]) {
         Array.prototype.push.apply((options.alias[x] || aliases), options.alias[y])
         delete options.alias[y]
       }
