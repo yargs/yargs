@@ -317,9 +317,7 @@ function Argv (processArgs, cwd) {
 
   var groups = {'Options:': []}
   self.group = function (opts, groupName) {
-    if (!Array.isArray(opts)) opts = [opts]
-    if (!groups[groupName]) groups[groupName] = []
-    Array.prototype.push.apply(groups[groupName], opts)
+    groups[groupName] = (groups[groupName] || []).concat(opts)
     return self
   }
   self.getGroups = function () {
