@@ -656,18 +656,19 @@ Given a key, or an array of keys, places options under an alternative heading
 when displaying usage instructions, e.g.,
 
 ```js
-var yargs = require('./')(['--help'])
+var yargs = require('yargs')(['--help'])
   .help('help')
   .group('batman', 'Heroes:')
   .describe('batman', "world's greatest detective")
+  .wrap(null)
   .argv
 ```
 ***
-    Options:
-      --help  Show help  [boolean]
-
     Heroes:
       --batman  world's greatest detective
+
+    Options:
+      --help  Show help  [boolean]
 
 .help([option, [description]])
 ------------------------------
