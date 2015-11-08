@@ -411,7 +411,7 @@ describe('parser tests', function () {
     argv.should.have.property('f', 11)
   })
 
-  it('should merge two lists of aliases if the collide', function () {
+  it('should merge two lists of aliases if they collide', function () {
     var argv = yargs([ '-f', '11', '--zoom', '55' ])
       .alias('z', 'zm')
       .alias('zoom', 'zoop')
