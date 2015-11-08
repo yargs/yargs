@@ -1639,11 +1639,11 @@ describe('usage tests', function () {
       })
 
       r.logs[0].split('\n').should.deep.equal([
-        'Options:',
-        '  --help  Show help  [boolean]',
-        '',
         'Heroes:',
         "  --batman  not the world's happiest guy  [string] [default: \"Bruce Wayne\"]",
+        '',
+        'Options:',
+        '  --help  Show help  [boolean]',
         ''
       ])
     })
@@ -1696,11 +1696,11 @@ describe('usage tests', function () {
       })
 
       r.logs[0].split('\n').should.deep.equal([
-        'Options:',
-        '  -h  Show help  [boolean]',
-        '',
         'Heroes:',
         '  --batman',
+        '',
+        'Options:',
+        '  -h  Show help  [boolean]',
         ''
       ])
     })
@@ -1709,6 +1709,7 @@ describe('usage tests', function () {
       var r = checkUsage(function () {
         return yargs(['-h'])
           .help('h')
+          .group('h', 'Options:')
           .group(['batman', 'robin'], 'Heroes:')
           .wrap(null)
           .argv
@@ -1738,11 +1739,11 @@ describe('usage tests', function () {
       })
 
       r.logs[0].split('\n').should.deep.equal([
-        'Options:',
-        '  -h  Show help  [boolean]',
-        '',
         'Heroes:',
         '  --batman  [string]',
+        '',
+        'Options:',
+        '  -h  Show help  [boolean]',
         ''
       ])
     })
