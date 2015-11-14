@@ -282,6 +282,8 @@ function Argv (processArgs, cwd) {
         self.nargs(key, opt.nargs)
       } if ('choices' in opt) {
         self.choices(key, opt.choices)
+      } if ('group' in opt) {
+        self.group(key, opt.group)
       } if (opt.boolean || opt.type === 'boolean') {
         self.boolean(key)
         if (opt.alias) self.boolean(opt.alias)
@@ -311,6 +313,15 @@ function Argv (processArgs, cwd) {
   }
   self.getOptions = function () {
     return options
+  }
+
+  var groups = {}
+  self.group = function (opts, groupName) {
+    groups[groupName] = (groups[groupName] || []).concat(opts)
+    return self
+  }
+  self.getGroups = function () {
+    return groups
   }
 
   self.wrap = function (cols) {

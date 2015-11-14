@@ -1622,4 +1622,130 @@ describe('usage tests', function () {
       r.logs.join(' ').should.match(/\[array\]/)
     })
   })
+
+  describe('group', function () {
+    it('allows an an option to be placed in an alternative group', function () {
+      var r = checkUsage(function () {
+        return yargs(['--help'])
+          .option('batman', {
+            type: 'string',
+            describe: "not the world's happiest guy",
+            default: 'Bruce Wayne'
+          })
+          .group('batman', 'Heroes:')
+          .help('help')
+          .wrap(null)
+          .argv
+      })
+
+      r.logs[0].split('\n').should.deep.equal([
+        'Heroes:',
+        "  --batman  not the world's happiest guy  [string] [default: \"Bruce Wayne\"]",
+        '',
+        'Options:',
+        '  --help  Show help  [boolean]',
+        ''
+      ])
+    })
+
+    it("does not print the 'Options:' group if no keys are in it", function () {
+      var r = checkUsage(function () {
+        return yargs(['-h'])
+          .string('batman')
+          .describe('batman', "not the world's happiest guy")
+          .default('batman', 'Bruce Wayne')
+          .group('batman', 'Heroes:')
+          .group('h', 'Heroes:')
+          .help('h')
+          .wrap(null)
+          .argv
+      })
+
+      r.logs[0].split('\n').should.deep.equal([
+        'Heroes:',
+        "  --batman  not the world's happiest guy  [string] [default: \"Bruce Wayne\"]",
+        '  -h        Show help  [boolean]',
+        ''
+      ])
+    })
+
+    it('displays alias keys appropriately within a grouping', function () {
+      var r = checkUsage(function () {
+        return yargs(['-h'])
+          .help('help')
+          .alias('h', 'help')
+          .group('help', 'Magic Variable:')
+          .wrap(null)
+          .argv
+      })
+
+      r.logs[0].split('\n').should.deep.equal([
+        'Magic Variable:',
+        '  -h, --help  Show help  [boolean]',
+        ''
+      ])
+    })
+
+    it('allows a group to be provided as the only information about an option', function () {
+      var r = checkUsage(function () {
+        return yargs(['-h'])
+          .help('h')
+          .group('batman', 'Heroes:')
+          .wrap(null)
+          .argv
+      })
+
+      r.logs[0].split('\n').should.deep.equal([
+        'Heroes:',
+        '  --batman',
+        '',
+        'Options:',
+        '  -h  Show help  [boolean]',
+        ''
+      ])
+    })
+
+    it('allows multiple options to be grouped at the same time', function () {
+      var r = checkUsage(function () {
+        return yargs(['-h'])
+          .help('h')
+          .group('h', 'Options:')
+          .group(['batman', 'robin'], 'Heroes:')
+          .wrap(null)
+          .argv
+      })
+
+      r.logs[0].split('\n').should.deep.equal([
+        'Options:',
+        '  -h  Show help  [boolean]',
+        '',
+        'Heroes:',
+        '  --batman',
+        '  --robin',
+        ''
+      ])
+    })
+
+    it('allows group to be provided in the options object', function () {
+      var r = checkUsage(function () {
+        return yargs(['-h'])
+          .help('h')
+          .option('batman', {
+            group: 'Heroes:',
+            string: true
+          })
+          .wrap(null)
+          .argv
+      })
+
+      r.logs[0].split('\n').should.deep.equal([
+        'Heroes:',
+        '  --batman  [string]',
+        '',
+        'Options:',
+        '  -h  Show help  [boolean]',
+        ''
+      ])
+    })
+  })
 })
