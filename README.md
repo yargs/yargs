@@ -759,6 +759,7 @@ Locales currently supported:
 * **pt_BR:** Brazilian Portuguese.
 * **zh:** Chinese.
 * **pirate:** American Pirate.
+* **nb** Norwegian Bokmål.
 
 To submit a new translation for yargs:
 
