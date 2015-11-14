@@ -1,8 +1,12 @@
 ## Change Log
 
+### Upcoming
+
+- [#297](https://github.com/bcoe/yargs/pull/297) Fix for layout of cjk characters (@disjukr)
+
 ### v3.30.0 (2015/11/13 16:29 +07:00)
 
-- [#293](https://github.com/bcoe/yargs/pull/293) Polish language support (@kamilogorek).
+- [#293](https://github.com/bcoe/yargs/pull/293) Polish language support (@kamilogorek)
 - [#291](https://github.com/bcoe/yargs/pull/291) fix edge-cases with `.alias()` (@bcoe)
 - [#289](https://github.com/bcoe/yargs/pull/289) group options in custom groups (@bcoe)
 
