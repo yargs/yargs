@@ -1104,7 +1104,7 @@ Short numeric `-n5` style arguments work too:
 installation
 ============
 
-With [npm](http://github.com/isaacs/npm), just do:
+With [npm](https://github.com/npm/npm), just do:
 
     npm install yargs
 
@@ -1130,7 +1130,7 @@ This module is loosely inspired by Perl's
 [gemnasium-image]: https://img.shields.io/gemnasium/bcoe/yargs.svg
 [coveralls-url]: https://coveralls.io/github/bcoe/yargs
 [coveralls-image]: https://img.shields.io/coveralls/bcoe/yargs.svg
-[npm-url]: https://npmjs.org/package/yargs
+[npm-url]: https://www.npmjs.com/package/yargs
 [npm-image]: https://img.shields.io/npm/v/yargs.svg
 [windows-url]: https://ci.appveyor.com/project/bcoe/yargs
 [windows-image]: https://img.shields.io/appveyor/ci/bcoe/yargs/master.svg?label=Windows%20Tests
