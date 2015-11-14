@@ -755,6 +755,7 @@ Locales currently supported:
 * **es:** Spanish.
 * **fr:** French.
 * **ja:** Japanese.
+* **ko:** Korean.
 * **pt:** Portuguese.
 * **pt_BR:** Brazilian Portuguese.
 * **zh:** Chinese.
