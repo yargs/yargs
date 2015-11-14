@@ -1748,4 +1748,22 @@ describe('usage tests', function () {
       ])
     })
   })
+
+  describe('cjk', function () {
+    it('should calculate width of cjk text correctly', function () {
+      var r = checkUsage(function () {
+        var y = yargs()
+          .example('안녕하세요 선생님 안녕 친구야', '인사하는 어린이 착한 어린이')
+          .wrap(80)
+
+        y.showHelp()
+      })
+
+      r.errors.join('\n').split(/\n+/).should.deep.equal([
+        'Examples:',
+        '  안녕하세요 선생님 안녕 친구야  인사하는 어린이 착한 어린이',
+        ''
+      ])
+    })
+  })
 })
