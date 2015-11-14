@@ -1,5 +1,11 @@
 ## Change Log
 
+### v3.30.0 (2015/11/13 16:29 +07:00)
+
+- [#293](https://github.com/bcoe/yargs/pull/293) Polish language support (@kamilogorek).
+- [#291](https://github.com/bcoe/yargs/pull/291) fix edge-cases with `.alias()` (@bcoe)
+- [#289](https://github.com/bcoe/yargs/pull/289) group options in custom groups (@bcoe)
+
 ### v3.29.0 (2015/10/16 21:51 +07:00)
 
 - [#282](https://github.com/bcoe/yargs/pull/282) completions now accept promises (@LinusU)
