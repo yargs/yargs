@@ -166,7 +166,25 @@ function Argv (processArgs, cwd) {
         self.alias(key, x[key])
       })
     } else {
-      options.alias[x] = (options.alias[x] || []).concat(y)
+      // perhaps 'x' is already an alias in another list?
+      // if so we should append to x's list.
+      var aliases = null
+      Object.keys(options.alias).forEach(function (key) {
+        if (~options.alias[key].indexOf(x)) aliases = options.alias[key]
+      })
+
+      if (aliases) { // x was an alias itself.
+        aliases.push(y)
+      } else { // x is a new alias key.
+        options.alias[x] = (options.alias[x] || []).concat(y)
+      }
+
+      // wait! perhaps we've created two lists of aliases
+      // that reference each other?
+      if (options.alias[y]) {
+        Array.prototype.push.apply((options.alias[x] || aliases), options.alias[y])
+        delete options.alias[y]
+      }
     }
     return self
   }
