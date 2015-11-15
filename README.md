@@ -767,6 +767,8 @@ To submit a new translation for yargs:
 1. use `./locales/en.json` as a starting point.
 2. submit a pull request with the new locale file.
 
+*The [Microsoft Terminology Search](http://www.microsoft.com/Language/en-US/Search.aspx) can be useful for finding the correct terminology in your locale.*
+
 <a name="nargs"></a>.nargs(key, count)
 -----------
 
