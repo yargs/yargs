@@ -2,7 +2,9 @@
 
 ### Upcoming
 
+- [#298](https://github.com/bcoe/yargs/pull/298) Add Norwegian Bokmål translation (@sindresorhus)
 - [#297](https://github.com/bcoe/yargs/pull/297) Fix for layout of cjk characters (@disjukr)
+- [#296](https://github.com/bcoe/yargs/pull/296) Add Korean translation (@disjukr)
 
 ### v3.30.0 (2015/11/13 16:29 +07:00)
 
