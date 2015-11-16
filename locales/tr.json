@@ -3,7 +3,7 @@
   "Options:": "Seçenekler:",
   "Examples:": "Örnekler:",
   "boolean": "boolean",
-  "count": "count",
+  "count": "sayı",
   "string": "string",
   "array": "array",
   "required": "zorunlu",
