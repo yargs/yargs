@@ -3,7 +3,7 @@
   "Options:": "옵션:",
   "Examples:": "예시:",
   "boolean": "여부",
-  "count": "숫자",
+  "count": "개수",
   "string": "문자열",
   "array": "배열",
   "required": "필수",
