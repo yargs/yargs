@@ -754,6 +754,7 @@ Locales currently supported:
 * **en:** American English.
 * **es:** Spanish.
 * **fr:** French.
+* **id:** Indonesian.
 * **ja:** Japanese.
 * **ko:** Korean.
 * **pt:** Portuguese.
