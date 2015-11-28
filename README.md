@@ -757,11 +757,12 @@ Locales currently supported:
 * **id:** Indonesian.
 * **ja:** Japanese.
 * **ko:** Korean.
+* **nb:** Norwegian Bokmål.
+* **pirate:** American Pirate.
 * **pt:** Portuguese.
 * **pt_BR:** Brazilian Portuguese.
+* **tr:** Turkish.
 * **zh:** Chinese.
-* **pirate:** American Pirate.
-* **nb** Norwegian Bokmål.
 
 To submit a new translation for yargs:
 

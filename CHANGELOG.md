@@ -3,6 +3,7 @@
 ### Upcoming
 
 - [#302](https://github.com/bcoe/yargs/pull/302) Add Indonesian translation (@rilut)
+- [#300](https://github.com/bcoe/yargs/pull/300) Add Turkish translation (@feyzo)
 - [#298](https://github.com/bcoe/yargs/pull/298) Add Norwegian Bokmål translation (@sindresorhus)
 - [#297](https://github.com/bcoe/yargs/pull/297) Fix for layout of cjk characters (@disjukr)
 - [#296](https://github.com/bcoe/yargs/pull/296) Add Korean translation (@disjukr)
