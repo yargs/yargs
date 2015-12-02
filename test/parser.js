@@ -1235,6 +1235,16 @@ describe('parser tests', function () {
       expect(result.state).to.be.undefined
     })
 
+    it('should set option from aliased env var', function () {
+      process.env.SPACE_X = 'awesome'
+      var result = yargs()
+        .env('SPACE')
+        .alias('xactly', 'x')
+        .parse([])
+
+      result.xactly.should.equal('awesome')
+    })
+
     it('should prefer env var value over configured default', function () {
       process.env.FOO_BALL = 'wut'
       process.env.FOO_BOOL = 'true'
