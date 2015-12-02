@@ -58,7 +58,8 @@ function Argv (processArgs, cwd) {
       requiresArg: [],
       count: [],
       normalize: [],
-      config: []
+      config: [],
+      envPrefix: undefined
     }
 
     usage = Usage(self, y18n) // handle usage output.
@@ -340,6 +341,14 @@ function Argv (processArgs, cwd) {
   }
   self.getGroups = function () {
     return groups
+  }
+
+  // as long as options.envPrefix is not undefined,
+  // parser will apply env vars matching prefix to argv
+  self.env = function (prefix) {
+    if (prefix === false) options.envPrefix = undefined
+    else options.envPrefix = prefix || ''
+    return self
   }
 
   self.wrap = function (cols) {

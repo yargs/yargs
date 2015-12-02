@@ -204,6 +204,7 @@ describe('yargs dsl tests', function () {
         .implies('foo', 'snuh')
         .strict()
         .exitProcess(false)  // defaults to true.
+        .env('YARGS')
         .reset()
 
       var emptyOptions = {
@@ -219,7 +220,8 @@ describe('yargs dsl tests', function () {
         requiresArg: [],
         count: [],
         normalize: [],
-        config: []
+        config: [],
+        envPrefix: undefined
       }
 
       expect(y.getOptions()).to.deep.equal(emptyOptions)
@@ -487,6 +489,33 @@ describe('yargs dsl tests', function () {
 
         r.logs.join(' ').should.match(/!SDNAMMOC/)
       })
+    })
+  })
+
+  describe('env', function () {
+    it('translates no arg as empty prefix (parser applies all env vars)', function () {
+      var options = yargs.env().getOptions()
+      options.envPrefix.should.equal('')
+    })
+
+    it('accepts true as a valid prefix (parser applies all env vars)', function () {
+      var options = yargs.env(true).getOptions()
+      options.envPrefix.should.equal(true)
+    })
+
+    it('accepts empty string as a valid prefix (parser applies all env vars)', function () {
+      var options = yargs.env('').getOptions()
+      options.envPrefix.should.equal('')
+    })
+
+    it('accepts a string prefix', function () {
+      var options = yargs.env('COOL').getOptions()
+      options.envPrefix.should.equal('COOL')
+    })
+
+    it('translates false as undefined prefix (disables parsing of env vars)', function () {
+      var options = yargs.env(false).getOptions()
+      expect(options.envPrefix).to.be.undefined
     })
   })
 })

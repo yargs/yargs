@@ -614,6 +614,63 @@ Optionally `.describe()` can take an object that maps keys to descriptions.
 
 Should yargs attempt to detect the os' locale? Defaults to `true`.
 
+.env([prefix])
+--------------
+
+Tell yargs to parse environment variables matching the given prefix and apply
+them to argv as though they were command line arguments.
+
+If this method is called with no argument or with an empty string or with `true`,
+then all env vars will be applied to argv.
+
+Program arguments are defined in this order of precedence:
+
+1. Command line args
+2. Config file
+3. Env var
+4. Configured defaults
+
+```js
+var argv = require('yargs')
+  .env('MY_PROGRAM')
+  .option('f', {
+    alias: 'fruit-thing',
+    default: 'apple'
+  })
+  .argv
+console.log(argv)
+```
+
+```
+$ node fruity.js
+{ _: [],
+  f: 'apple',
+  'fruit-thing': 'apple',
+  fruitThing: 'apple',
+  '$0': 'fruity.js' }
+```
+
+```
+$ MY_PROGRAM_FRUIT_THING=banana node fruity.js
+{ _: [],
+  fruitThing: 'banana',
+  f: 'banana',
+  'fruit-thing': 'banana',
+  '$0': 'fruity.js' }
+```
+
+```
+$ MY_PROGRAM_FRUIT_THING=banana node fruity.js -f cat
+{ _: [],
+  f: 'cat',
+  'fruit-thing': 'cat',
+  fruitThing: 'cat',
+  '$0': 'fruity.js' }
+```
+
+Env var parsing is disabled by default, but you can also explicitly disable it
+by calling `.env(false)`, e.g. if you need to undo previous configuration.
+
 .epilog(str)
 ------------
 .epilogue(str)
