@@ -1,6 +1,6 @@
 ## Change Log
 
-### 3.31.0 (2015/12/03 10:15 +07:00)
+### v3.31.0 (2015/12/03 10:15 +07:00)
 
 - [#239](https://github.com/bcoe/yargs/pull/239) Pass argv to commands (@bcoe)
 - [#308](https://github.com/bcoe/yargs/pull/308) Yargs now handles environment variables (@nexdrew)
