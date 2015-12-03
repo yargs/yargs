@@ -251,7 +251,11 @@ describe('yargs dsl tests', function () {
           // and an argv instance containing the parsing performed thus far
           // should be passed to the command handler.
           (typeof yargs.option).should.equal('function')
+          // we should get the argv from the prior yargs.
           argv._[0].should.equal('blerg')
+
+          // the yargs instance has been reset.
+          yargs.getCommandHandlers().should.deep.equal({})
           return done()
         })
         .exitProcess(false) // defaults to true.
