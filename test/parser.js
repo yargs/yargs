@@ -1173,4 +1173,139 @@ describe('parser tests', function () {
       result.f.should.equal(true)
     })
   })
+
+  describe('env vars', function () {
+    it('should apply all env vars if prefix is empty', function () {
+      process.env.ONE_FISH = 'twofish'
+      process.env.RED_FISH = 'bluefish'
+      var result = yargs().env('').parse([])
+
+      result.oneFish.should.equal('twofish')
+      result.redFish.should.equal('bluefish')
+    })
+
+    it('should apply only env vars matching prefix if prefix is valid string', function () {
+      process.env.ONE_FISH = 'twofish'
+      process.env.RED_FISH = 'bluefish'
+      process.env.GREEN_EGGS = 'sam'
+      process.env.GREEN_HAM = 'iam'
+      var result = yargs().env('GREEN').parse([])
+
+      result.eggs.should.equal('sam')
+      result.ham.should.equal('iam')
+      expect(result.oneFish).to.be.undefined
+      expect(result.redFish).to.be.undefined
+    })
+
+    it('should set aliases for options defined by env var', function () {
+      process.env.AIRFORCE_ONE = 'two'
+      var result = yargs()
+        .env('AIRFORCE')
+        .option('1', {
+          alias: 'one'
+        })
+        .alias('1', 'uno')
+        .parse([])
+
+      result['1'].should.equal('two')
+      result.one.should.equal('two')
+      result.uno.should.equal('two')
+    })
+
+    it('should prefer command line value over env var', function () {
+      process.env.FOO_BAR = 'ignore'
+      var result = yargs().env().parse(['--foo-bar', 'baz'])
+
+      result.fooBar.should.equal('baz')
+    })
+
+    it('should respect type for args defined by env var', function () {
+      process.env.MY_TEST_STRING = '1'
+      process.env.MY_TEST_NUMBER = '2'
+      var result = yargs().string('string').env('MY_TEST_').parse([])
+
+      result.string.should.equal('1')
+      result.number.should.equal(2)
+    })
+
+    it('should ignore env vars if enabled and subsequently disabled', function () {
+      process.env.STATE = 'denial'
+      var result = yargs().env(true).env(false).parse([])
+
+      expect(result.state).to.be.undefined
+    })
+
+    it('should set option from aliased env var', function () {
+      process.env.SPACE_X = 'awesome'
+      var result = yargs()
+        .env('SPACE')
+        .alias('xactly', 'x')
+        .parse([])
+
+      result.xactly.should.equal('awesome')
+    })
+
+    it('should prefer env var value over configured default', function () {
+      process.env.FOO_BALL = 'wut'
+      process.env.FOO_BOOL = 'true'
+      var result = yargs()
+        .env('FOO')
+        .option('ball', {
+          type: 'string',
+          default: 'baz'
+        })
+        .option('bool', {
+          type: 'boolean',
+          default: false
+        })
+        .parse([])
+
+      result.ball.should.equal('wut')
+      result.bool.should.equal(true)
+    })
+
+    var jsonPath = path.resolve(__dirname, './fixtures/config.json')
+    it('should prefer config file value over env var', function () {
+      process.env.CFG_HERP = 'zerp'
+      var result = yargs()
+        .env('CFG')
+        .config('cfg')
+        .option('herp', {
+          type: 'string',
+          default: 'nerp'
+        })
+        .parse(['--cfg', jsonPath])
+
+      result.herp.should.equal('derp')
+    })
+
+    it('should support an env var value as config file option', function () {
+      process.env.TUX_CFG = jsonPath
+      var result = yargs()
+        .env('TUX')
+        .config('cfg')
+        .default('z', 44)
+        .parse([])
+
+      result.should.have.property('herp')
+      result.should.have.property('foo')
+      result.should.have.property('version')
+      result.should.have.property('truthy')
+      result.z.should.equal(55)
+    })
+
+    it('should prefer cli config file option over env var config file option', function () {
+      process.env.MUX_CFG = path.resolve(__dirname, '../package.json')
+      var result = yargs()
+        .env('MUX')
+        .config('cfg')
+        .parse(['--cfg', jsonPath])
+
+      result.should.have.property('herp')
+      result.should.have.property('foo')
+      result.should.have.property('version')
+      result.should.have.property('truthy')
+      result.z.should.equal(55)
+    })
+  })
 })
