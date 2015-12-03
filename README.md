@@ -463,8 +463,14 @@ Hidden commands don't show up in the help output and aren't available for
 completion.
 
 Optionally, you can provide a handler `fn` which will be executed when
-a given command is provided. The handler will be executed with an instance
-of `yargs`, which can be used to compose nested commands.
+a given command is provided. The handler will be called with `yargs` and
+`argv` as arguments.
+
+`yargs` is a blank instance of yargs, which can be used to compose a nested
+hierarchy of options handlers.
+
+`argv` represents the arguments parsed prior to the
+command being executed (those described in the outer yargs instance).
 
 Here's an example of top-level and nested commands in action:
 
@@ -472,7 +478,7 @@ Here's an example of top-level and nested commands in action:
 var argv = require('yargs')
   .usage('npm <command>')
   .command('install', 'tis a mighty fine package to install')
-  .command('publish', 'shiver me timbers, should you be sharing all that', function (yargs) {
+  .command('publish', 'shiver me timbers, should you be sharing all that', function (yargs, argv) {
     argv = yargs.option('f', {
       alias: 'force',
       description: 'yar, it usually be a bad idea'
