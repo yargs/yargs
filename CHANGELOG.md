@@ -1,7 +1,9 @@
 ## Change Log
 
-### Upcoming
+### 3.31.0 (2015/12/03 10:15 +07:00)
 
+- [#239](https://github.com/bcoe/yargs/pull/239) Pass argv to commands (@bcoe)
+- [#308](https://github.com/bcoe/yargs/pull/308) Yargs now handles environment variables (@nexdrew)
 - [#302](https://github.com/bcoe/yargs/pull/302) Add Indonesian translation (@rilut)
 - [#300](https://github.com/bcoe/yargs/pull/300) Add Turkish translation (@feyzo)
 - [#298](https://github.com/bcoe/yargs/pull/298) Add Norwegian Bokmål translation (@sindresorhus)
