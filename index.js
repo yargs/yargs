@@ -615,7 +615,7 @@ function Argv (processArgs, cwd) {
     })
   }
 
-  sigletonify(self)
+  singletonify(self)
   return self
 }
 
@@ -633,7 +633,7 @@ function rebase (base, dir) {
     require('yargs').argv
     to get a parsed version of process.argv.
 */
-function sigletonify (inst) {
+function singletonify (inst) {
   Object.keys(inst).forEach(function (key) {
     if (key === 'argv') {
       Argv.__defineGetter__(key, inst.__lookupGetter__(key))
