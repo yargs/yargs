@@ -96,6 +96,6 @@
   ],
   "license": "MIT",
   "engine": {
-    "node": ">=0.4"
+    "node": ">=0.10"
   }
 }
