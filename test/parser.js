@@ -2,6 +2,7 @@
 
 var should = require('chai').should()
 var expect = require('chai').expect
+var fs = require('fs')
 var yargs = require('../')
 var path = require('path')
 
@@ -348,7 +349,7 @@ describe('parser tests', function () {
         .alias('z', 'zoom')
         .config('settings')
         .fail(function (msg) {
-          msg.should.eql('Invalid JSON config file: fake.json')
+          msg.should.match(/Invalid config file (.*): fake\.json/)
           return done()
         })
         .argv
@@ -386,6 +387,60 @@ describe('parser tests', function () {
         '  --help      Show help  [boolean]',
         ''
       ])
+    })
+
+    it('should allow help message to be overridden', function () {
+      var checkUsage = require('./helpers/utils').checkOutput
+      var r = checkUsage(function () {
+        return yargs(['--help'])
+          .config('settings', 'pork chop sandwiches')
+          .help('help')
+          .wrap(null)
+          .argv
+      })
+      r.should.have.property('logs').with.length(1)
+      r.logs.join('\n').split(/\n+/).should.deep.equal([
+        'Options:',
+        '  --settings  pork chop sandwiches',
+        '  --help      Show help  [boolean]',
+        ''
+      ])
+    })
+
+    it('allows a custom parsing function to be provided', function () {
+      var jsPath = path.resolve(__dirname, './fixtures/config.txt')
+      var argv = yargs([ '--settings', jsPath, '--foo', 'bar' ])
+        .config('settings', function (configPath) {
+          // as an example, parse an environment
+          // variable style config:
+          // FOO=99
+          // BATMAN=grumpy
+          var config = {}
+          var txt = fs.readFileSync(configPath, 'utf-8')
+          txt.split('\n').forEach(function (l) {
+            var kv = l.split('=')
+            config[kv[0].toLowerCase()] = kv[1]
+          })
+          return config
+        })
+        .argv
+
+      argv.batman.should.equal('grumpy')
+      argv.awesome.should.equal('banana')
+      argv.foo.should.equal('bar')
+    })
+
+    it('allows a custom parsing function to be provided as an alias', function () {
+      var jsPath = path.resolve(__dirname, './fixtures/config.json')
+      var argv = yargs([ '--settings', jsPath, '--foo', 'bar' ])
+        .config('s', function (configPath) {
+          return JSON.parse(fs.readFileSync(configPath, 'utf-8'))
+        })
+        .alias('s', 'settings')
+        .argv
+
+      argv.should.have.property('herp', 'derp')
+      argv.should.have.property('foo', 'bar')
     })
   })
 

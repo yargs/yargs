@@ -32,7 +32,8 @@
     "win-spawn": "^2.0.0"
   },
   "scripts": {
-    "test": "standard && nyc ./node_modules/.bin/_mocha --timeout=4000 --check-leaks",
+    "pretest": "standard",
+    "test": "nyc ./node_modules/.bin/_mocha --timeout=4000 --check-leaks",
     "coverage": "nyc report --reporter=text-lcov | coveralls"
   },
   "repository": {

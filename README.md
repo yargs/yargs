@@ -549,7 +549,7 @@ var argv = require('yargs')
   .argv;
 ```
 
-<a name="config"></a>.config(key, [description])
+<a name="config"></a>.config(key, [parseFn], [description])
 ------------
 
 Tells the parser that if the option specified by `key` is passed in, it
@@ -557,6 +557,17 @@ should be interpreted as a path to a JSON config file. The file is loaded
 and parsed, and its properties are set as arguments. If present, the
 `description` parameter customizes the description of the config (`key`) option
 in the usage string.
+
+An optional `parseFn` argument can be passed to provide a custom config
+parser:
+
+```js
+var argv = require('yargs')
+  .config('settings', function (configPath) {
+    return JSON.parse(fs.readFileSync(configPath, 'utf-8'))
+  })
+  .argv
+```
 
 <a name="count"></a>.count(key)
 ------------
