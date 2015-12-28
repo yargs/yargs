@@ -556,7 +556,7 @@ Tells the parser that if the option specified by `key` is passed in, it
 should be interpreted as a path to a JSON config file. The file is loaded
 and parsed, and its properties are set as arguments.
 
-An optional `description` can be provided to customize of the config (`key`) option
+An optional `description` can be provided to customize the config (`key`) option
 in the usage string.
 
 An optional `parseFn` can be used to provide a custom parser. The parsing
