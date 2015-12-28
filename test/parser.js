@@ -349,7 +349,7 @@ describe('parser tests', function () {
         .alias('z', 'zoom')
         .config('settings')
         .fail(function (msg) {
-          msg.should.match(/Invalid config file (.*): fake\.json/)
+          msg.should.eql('Invalid JSON config file: fake.json')
           return done()
         })
         .argv
@@ -441,6 +441,26 @@ describe('parser tests', function () {
 
       argv.should.have.property('herp', 'derp')
       argv.should.have.property('foo', 'bar')
+    })
+
+    it('outputs an error returned by the parsing function', function () {
+      var checkUsage = require('./helpers/utils').checkOutput
+      var r = checkUsage(function () {
+        return yargs(['--settings=./package.json'])
+          .config('settings', 'path to config file', function (configPath) {
+            return Error('someone set us up the bomb')
+          })
+          .help('help')
+          .wrap(null)
+          .argv
+      })
+
+      r.errors.join('\n').split(/\n+/).should.deep.equal([
+        'Options:',
+        '  --settings  path to config file',
+        '  --help      Show help  [boolean]',
+        'someone set us up the bomb'
+      ])
     })
   })
 

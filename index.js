@@ -116,10 +116,10 @@ function Argv (processArgs, cwd) {
     return self
   }
 
-  self.config = function (key, parseFn, msg) {
-    if (typeof parseFn === 'string') {
-      msg = parseFn
-      parseFn = null
+  self.config = function (key, msg, parseFn) {
+    if (typeof msg === 'function') {
+      parseFn = msg
+      msg = null
     }
     self.describe(key, msg || usage.deferY18nLookup('Path to JSON config file'))
     ;(Array.isArray(key) ? key : [key]).forEach(function (k) {
