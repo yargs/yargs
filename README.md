@@ -549,14 +549,27 @@ var argv = require('yargs')
   .argv;
 ```
 
-<a name="config"></a>.config(key, [description])
+<a name="config"></a>.config(key, [description], [parseFn])
 ------------
 
 Tells the parser that if the option specified by `key` is passed in, it
 should be interpreted as a path to a JSON config file. The file is loaded
-and parsed, and its properties are set as arguments. If present, the
-`description` parameter customizes the description of the config (`key`) option
+and parsed, and its properties are set as arguments.
+
+An optional `description` can be provided to customize the config (`key`) option
 in the usage string.
+
+An optional `parseFn` can be used to provide a custom parser. The parsing
+function must be synchronous, and should return an object containing
+key value pairs or an error.
+
+```js
+var argv = require('yargs')
+  .config('settings', function (configPath) {
+    return JSON.parse(fs.readFileSync(configPath, 'utf-8'))
+  })
+  .argv
+```
 
 <a name="count"></a>.count(key)
 ------------
@@ -912,6 +925,7 @@ Valid `opt` keys include:
 - `boolean`: boolean, interpret option as a boolean flag, see [`boolean()`](#boolean)
 - `choices`: value or array of values, limit valid option arguments to a predefined set, see [`choices()`](#choices)
 - `config`: boolean, interpret option as a path to a JSON config file, see [`config()`](#config)
+- `configParser`: function, provide a custom config parsing function, see [`config()`](#config)
 - `count`: boolean, interpret option as a count of boolean flags, see [`count()`](#count)
 - `default`: value, set a default value for the option, see [`default()`](#default)
 - `defaultDescription`: string, use this description for the default value in help content, see [`default()`](#default)

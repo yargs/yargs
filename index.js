@@ -58,7 +58,7 @@ function Argv (processArgs, cwd) {
       requiresArg: [],
       count: [],
       normalize: [],
-      config: [],
+      config: {},
       envPrefix: undefined
     }
 
@@ -116,9 +116,15 @@ function Argv (processArgs, cwd) {
     return self
   }
 
-  self.config = function (key, msg) {
+  self.config = function (key, msg, parseFn) {
+    if (typeof msg === 'function') {
+      parseFn = msg
+      msg = null
+    }
     self.describe(key, msg || usage.deferY18nLookup('Path to JSON config file'))
-    options.config.push.apply(options.config, [].concat(key))
+    ;(Array.isArray(key) ? key : [key]).forEach(function (k) {
+      options.config[k] = parseFn || true
+    })
     return self
   }
 
@@ -294,7 +300,7 @@ function Argv (processArgs, cwd) {
       if (demand) {
         self.demand(key, demand)
       } if ('config' in opt) {
-        self.config(key)
+        self.config(key, opt.configParser)
       } if ('default' in opt) {
         self.default(key, opt.default)
       } if ('nargs' in opt) {
