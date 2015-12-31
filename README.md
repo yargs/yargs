@@ -925,6 +925,7 @@ Valid `opt` keys include:
 - `boolean`: boolean, interpret option as a boolean flag, see [`boolean()`](#boolean)
 - `choices`: value or array of values, limit valid option arguments to a predefined set, see [`choices()`](#choices)
 - `config`: boolean, interpret option as a path to a JSON config file, see [`config()`](#config)
+- `configParser`: function, provide a custom config parsing function, see [`config()`](#config)
 - `count`: boolean, interpret option as a count of boolean flags, see [`count()`](#count)
 - `default`: value, set a default value for the option, see [`default()`](#default)
 - `defaultDescription`: string, use this description for the default value in help content, see [`default()`](#default)

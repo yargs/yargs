@@ -443,12 +443,48 @@ describe('parser tests', function () {
       argv.should.have.property('foo', 'bar')
     })
 
+    it('allows a custom parsing function to be provided using option shorthand', function () {
+      var jsPath = path.resolve(__dirname, './fixtures/config.json')
+      var argv = yargs([ '--settings', jsPath, '--foo', 'bar' ])
+        .option('s', {
+          alias: 'settings',
+          config: true,
+          configParser: function (configPath) {
+            return JSON.parse(fs.readFileSync(configPath, 'utf-8'))
+          }
+        })
+        .argv
+
+      argv.should.have.property('herp', 'derp')
+      argv.should.have.property('foo', 'bar')
+    })
+
     it('outputs an error returned by the parsing function', function () {
       var checkUsage = require('./helpers/utils').checkOutput
       var r = checkUsage(function () {
         return yargs(['--settings=./package.json'])
           .config('settings', 'path to config file', function (configPath) {
             return Error('someone set us up the bomb')
+          })
+          .help('help')
+          .wrap(null)
+          .argv
+      })
+
+      r.errors.join('\n').split(/\n+/).should.deep.equal([
+        'Options:',
+        '  --settings  path to config file',
+        '  --help      Show help  [boolean]',
+        'someone set us up the bomb'
+      ])
+    })
+
+    it('outputs an error if thrown by the parsing function', function () {
+      var checkUsage = require('./helpers/utils').checkOutput
+      var r = checkUsage(function () {
+        return yargs(['--settings=./package.json'])
+          .config('settings', 'path to config file', function (configPath) {
+            throw Error('someone set us up the bomb')
           })
           .help('help')
           .wrap(null)

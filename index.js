@@ -300,7 +300,7 @@ function Argv (processArgs, cwd) {
       if (demand) {
         self.demand(key, demand)
       } if ('config' in opt) {
-        self.config(key)
+        self.config(key, opt.configParser)
       } if ('default' in opt) {
         self.default(key, opt.default)
       } if ('nargs' in opt) {
