@@ -417,7 +417,7 @@ describe('parser tests', function () {
           // BATMAN=grumpy
           var config = {}
           var txt = fs.readFileSync(configPath, 'utf-8')
-          txt.split('\n').forEach(function (l) {
+          txt.split(/\r?\n/).forEach(function (l) {
             var kv = l.split('=')
             config[kv[0].toLowerCase()] = kv[1]
           })
