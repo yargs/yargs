@@ -384,11 +384,22 @@ function Argv (processArgs, cwd) {
   }
 
   var versionOpt = null
-  self.version = function (ver, opt, msg) {
-    versionOpt = opt || 'version'
-    usage.version(ver)
+  self.version = function (opt, msg, ver) {
+    if (arguments.length === 1) {
+      ver = opt
+      versionOpt = 'version'
+      msg = usage.deferY18nLookup('Show version number')
+    } else if (arguments.length === 2) {
+      versionOpt = opt
+      ver = msg
+      msg = usage.deferY18nLookup('Show version number')
+    } else {
+      versionOpt = opt
+    }
+
+    usage.version(ver || undefined)
     self.boolean(versionOpt)
-    self.describe(versionOpt, msg || usage.deferY18nLookup('Show version number'))
+    self.describe(versionOpt, msg)
     return self
   }
 
