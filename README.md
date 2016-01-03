@@ -364,6 +364,12 @@ or use `.parse()` to do the same thing:
 require('yargs').parse([ '-x', '1', '-y', '2' ])
 ````
 
+If you have a random string of args you want to parse, you only have to split on the space as yargs handles the `=` for you:
+
+````javascript
+require('yargs').parse('-x 1 -y=2'.split(' '))
+````
+
 The rest of these methods below come in just before the terminating `.argv`.
 
 <a name="alias"></a>.alias(key, alias)
