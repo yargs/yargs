@@ -538,4 +538,27 @@ describe('yargs dsl tests', function () {
       expect(options.envPrefix).to.be.undefined
     })
   })
+
+  describe('parse', function () {
+    it('parses a simple string', function () {
+      var a1 = yargs.parse('-x=2 --foo=bar')
+      var a2 = yargs('-x=2 --foo=bar').argv
+      a1.x.should.equal(2)
+      a1.foo.should.equal('bar')
+
+      a2.x.should.equal(2)
+      a2.foo.should.equal('bar')
+    })
+
+    it('parses a quoted string', function () {
+      var a1 = yargs.parse('-x=\'marks "the" spot\' --foo "break \'dance\'"')
+      var a2 = yargs('-x=\'marks "the" spot\' --foo "break \'dance\'"').argv
+
+      a1.x.should.equal('marks "the" spot')
+      a2.x.should.equal('marks "the" spot')
+
+      a1.foo.should.equal("break 'dance'")
+      a2.foo.should.equal("break 'dance'")
+    })
+  })
 })
