@@ -2,6 +2,7 @@
 
 ### Upcoming
 
+- [#325](https://github.com/bcoe/yargs/pull/325) Tweaks to make tests pass again on Windows (@isaacs)
 - [#321](https://github.com/bcoe/yargs/pull/321) Custom config parsing function (@bcoe)
 
 ### v3.31.0 (2015/12/03 10:15 +07:00)
