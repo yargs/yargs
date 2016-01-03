@@ -946,6 +946,8 @@ Valid `opt` keys include:
 
 Parse `args` instead of `process.argv`. Returns the `argv` object.
 
+`args` may either be a pre-processed argv array, or a raw argument string.
+
 .require(key, [msg | boolean])
 ------------------------------
 .required(key, [msg | boolean])
