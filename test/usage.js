@@ -862,7 +862,7 @@ describe('usage tests', function () {
     it('should display version', function () {
       var r = checkUsage(function () {
         return yargs(['--version'])
-        .version('1.0.1', 'version', 'Show version number')
+        .version('version', 'Show version number', '1.0.1')
         .wrap(null)
         .argv
       })
@@ -874,12 +874,22 @@ describe('usage tests', function () {
       r.logs[0].should.eql('1.0.1')
     })
 
+    it('accepts version option as first argument, and version number as second argument', function () {
+      var r = checkUsage(function () {
+        return yargs(['--version'])
+        .version('version', '1.0.0')
+        .wrap(null)
+        .argv
+      })
+      r.logs[0].should.eql('1.0.0')
+    })
+
     it('should allow a function to be provided, rather than a number', function () {
       var r = checkUsage(function () {
         return yargs(['--version'])
-        .version(function () {
+        .version('version', function () {
           return require('./fixtures/config').version
-        }, 'version')
+        })
         .wrap(null)
         .argv
       })
@@ -902,7 +912,7 @@ describe('usage tests', function () {
       it('should not validate arguments (required argument)', function () {
         var r = checkUsage(function () {
           return yargs(['--version'])
-            .version('1.0.1', 'version', 'Show version number')
+            .version('version', 'Show version number', '1.0.1')
             .demand('some-opt')
             .wrap(null)
             .exitProcess(false)
@@ -923,7 +933,7 @@ describe('usage tests', function () {
         var r = checkUsage(function () {
           return yargs(['--version', '--some-opt'])
             .nargs('some-opt', 3)
-            .version('1.0.1', 'version', 'Show version number')
+            .version('version', 'Show version number', '1.0.1')
             .wrap(null)
             .exitProcess(false)
             .argv
