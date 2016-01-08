@@ -1122,13 +1122,14 @@ present script similar to how `$0` works in bash or perl.
 
 `opts` is optional and acts like calling `.options(opts)`.
 
-.version([option], [description], version)
+.version([option], [description], [version])
 ----------------------------------------
 
 Add an option (e.g. `--version`) that displays the version number (given by the
 `version` parameter) and exits the process. If no option is provided, it will default to `--version`.
 If present, the `description` parameter customizes the description of the version
-option in the usage string.
+option in the usage string. You can also pass no `version` parameter (`.version()`),
+in this case, yargs will parse the `package.json` of your module and use its `version` value.
 
 You can provide a `function` for version, rather than a string.
 This is useful if you want to use the version from your package.json:
