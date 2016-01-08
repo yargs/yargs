@@ -5,6 +5,7 @@ var path = require('path')
 var Usage = require('./lib/usage')
 var Validation = require('./lib/validation')
 var Y18n = require('y18n')
+var readPkgUp = require('read-pkg-up')
 
 Argv(process.argv.slice(2))
 
@@ -379,17 +380,18 @@ function Argv (processArgs, cwd) {
 
   var versionOpt = null
   self.version = function (opt, msg, ver) {
-    if (arguments.length === 1) {
+    if (arguments.length === 0) {
+      ver = readPkgUp.sync({cwd: path.join(__dirname + '/..')}).pkg.version
+      opt = 'version'
+    } else if (arguments.length === 1) {
       ver = opt
-      versionOpt = 'version'
-      msg = usage.deferY18nLookup('Show version number')
+      opt = 'version'
     } else if (arguments.length === 2) {
-      versionOpt = opt
       ver = msg
-      msg = usage.deferY18nLookup('Show version number')
-    } else {
-      versionOpt = opt
     }
+
+    versionOpt = opt
+    msg = msg || usage.deferY18nLookup('Show version number')
 
     usage.version(ver || undefined)
     self.boolean(versionOpt)
