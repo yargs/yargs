@@ -372,7 +372,18 @@ function Argv (processArgs, cwd) {
   var versionOpt = null
   self.version = function (opt, msg, ver) {
     if (arguments.length === 0) {
+<<<<<<< HEAD
       ver = guessVersion()
+=======
+      ver = parent(__dirname)
+
+      if (ver === false) {
+        ver = undefined
+      } else {
+        ver = ver.parse().version
+      }
+
+>>>>>>> Provide default value for version in .version()
       opt = 'version'
     } else if (arguments.length === 1) {
       ver = opt
