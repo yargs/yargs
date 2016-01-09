@@ -1,5 +1,9 @@
 ## Change Log
 
+### 4.x
+
+- [#330](https://github.com/bcoe/yargs/pull/330) **breaking change**, fix inconsistencies with `.version()` API.
+
 ### v3.32.0 (2016/1/14 10:13 +07:00)
 
 - [#344](https://github.com/bcoe/yargs/pull/344) yargs now has a code of conduct and contributor guidelines (@bcoe)
