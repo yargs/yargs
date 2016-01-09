@@ -1120,12 +1120,13 @@ present script similar to how `$0` works in bash or perl.
 
 `opts` is optional and acts like calling `.options(opts)`.
 
-.version(version, [option], [description])
+.version([option], [description], version)
 ----------------------------------------
 
 Add an option (e.g. `--version`) that displays the version number (given by the
-`version` parameter) and exits the process. If present, the `description`
-parameter customizes the description of the version option in the usage string.
+`version` parameter) and exits the process. If no option is provided, it will default to `--version`.
+If present, the `description` parameter customizes the description of the version
+option in the usage string.
 
 You can provide a `function` for version, rather than a string.
 This is useful if you want to use the version from your package.json:
