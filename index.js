@@ -67,6 +67,7 @@ function Argv (processArgs, cwd) {
     completion = Completion(self, usage)
 
     demanded = {}
+    groups = {}
 
     exitProcess = true
     strict = false
@@ -342,7 +343,11 @@ function Argv (processArgs, cwd) {
 
   var groups = {}
   self.group = function (opts, groupName) {
-    groups[groupName] = (groups[groupName] || []).concat(opts)
+    var seen = {}
+    groups[groupName] = (groups[groupName] || []).concat(opts).filter(function (key) {
+      if (seen[key]) return false
+      return (seen[key] = true)
+    })
     return self
   }
   self.getGroups = function () {
