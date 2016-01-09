@@ -1,5 +1,9 @@
 ## Change Log
 
+## 4.x
+
+- [#330](https://github.com/bcoe/yargs/pull/330) **breaking change**, fix inconsistencies with `.version()` API.
+
 ### Upcoming
 
 - [#325](https://github.com/bcoe/yargs/pull/325) Tweaks to make tests pass again on Windows (@isaacs)
