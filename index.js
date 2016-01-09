@@ -2,6 +2,7 @@ var assert = require('assert')
 var Completion = require('./lib/completion')
 var Parser = require('./lib/parser')
 var path = require('path')
+var tokenizeArgString = require('./lib/tokenize-arg-string')
 var Usage = require('./lib/usage')
 var Validation = require('./lib/validation')
 var Y18n = require('y18n')
@@ -501,6 +502,8 @@ function Argv (processArgs, cwd) {
   })
 
   function parseArgs (args) {
+    args = normalizeArgs(args)
+
     var parsed = Parser(args, options, y18n)
     var argv = parsed.argv
     var aliases = parsed.aliases
@@ -619,6 +622,13 @@ function Argv (processArgs, cwd) {
       if (~key.indexOf('.')) return
       if (typeof argv[key] === 'undefined') argv[key] = undefined
     })
+  }
+
+  function normalizeArgs (args) {
+    if (typeof args === 'string') {
+      return tokenizeArgString(args)
+    }
+    return args
   }
 
   singletonify(self)
