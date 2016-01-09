@@ -16,7 +16,7 @@ describe('usage tests', function () {
     describe('using .demand()', function () {
       it('should show an error along with the missing arguments on demand fail', function () {
         var r = checkUsage(function () {
-          return yargs('-x 10 -z 20'.split(' '))
+          return yargs('-x 10 -z 20')
             .usage('Usage: $0 -x NUM -y NUM')
             .demand(['x', 'y'])
             .wrap(null)
@@ -39,7 +39,7 @@ describe('usage tests', function () {
       describe('using .require()', function () {
         it('should show an error along with the missing arguments on demand fail', function () {
           var r = checkUsage(function () {
-            return yargs('-x 10 -z 20'.split(' '))
+            return yargs('-x 10 -z 20')
               .usage('Usage: $0 -x NUM -y NUM')
               .require(['x', 'y'])
               .wrap(null)
@@ -63,7 +63,7 @@ describe('usage tests', function () {
 
     it('should show an error along with a custom message on demand fail', function () {
       var r = checkUsage(function () {
-        return yargs('-z 20'.split(' '))
+        return yargs('-z 20')
         .usage('Usage: $0 -x NUM -y NUM')
         .demand(['x', 'y'], 'x and y are both required to multiply all the things')
         .wrap(null)
@@ -85,7 +85,7 @@ describe('usage tests', function () {
 
     it('should return valid values when demand passes', function () {
       var r = checkUsage(function () {
-        return yargs('-x 10 -y 20'.split(' '))
+        return yargs('-x 10 -y 20')
         .usage('Usage: $0 -x NUM -y NUM')
         .demand(['x', 'y'])
         .wrap(null)
@@ -178,7 +178,7 @@ describe('usage tests', function () {
 
   it('should return valid values when check passes', function () {
     var r = checkUsage(function () {
-      return yargs('-x 10 -y 20'.split(' '))
+      return yargs('-x 10 -y 20')
       .usage('Usage: $0 -x NUM -y NUM')
       .check(function (argv) {
         if (!('x' in argv)) throw Error('You forgot about -x')
@@ -198,7 +198,7 @@ describe('usage tests', function () {
 
   it('should display missing arguments when check fails with a thrown exception', function () {
     var r = checkUsage(function () {
-      return yargs('-x 10 -z 20'.split(' '))
+      return yargs('-x 10 -z 20')
         .usage('Usage: $0 -x NUM -y NUM')
         .wrap(null)
         .check(function (argv) {
@@ -221,7 +221,7 @@ describe('usage tests', function () {
 
   it('should display missing arguments when check fails with a return value', function () {
     var r = checkUsage(function () {
-      return yargs('-x 10 -z 20'.split(' '))
+      return yargs('-x 10 -z 20')
       .usage('Usage: $0 -x NUM -y NUM')
       .wrap(null)
       .check(function (argv) {
@@ -248,7 +248,7 @@ describe('usage tests', function () {
       return 'x' in argv && 'y' in argv
     }
     var r = checkUsage(function () {
-      return yargs('-x 10 -y 20'.split(' '))
+      return yargs('-x 10 -y 20')
       .usage('Usage: $0 -x NUM -y NUM')
       .check(checker)
       .argv
@@ -267,7 +267,7 @@ describe('usage tests', function () {
       return 'x' in argv && 'y' in argv
     }
     var r = checkUsage(function () {
-      return yargs('-x 10 -z 20'.split(' '))
+      return yargs('-x 10 -z 20')
       .usage('Usage: $0 -x NUM -y NUM')
       .check(checker)
       .wrap(null)
@@ -290,7 +290,7 @@ describe('usage tests', function () {
     it('should display missing arguments once', function () {
       var r = checkUsage(function () {
         try {
-          return yargs('-x 10 -z 20'.split(' '))
+          return yargs('-x 10 -z 20')
             .usage('Usage: $0 -x NUM -y NUM')
             .exitProcess(false)
             .wrap(null)
@@ -314,7 +314,7 @@ describe('usage tests', function () {
 
   it('should return a valid result when demanding a count of non-hyphenated values', function () {
     var r = checkUsage(function () {
-      return yargs('1 2 3 --moo'.split(' '))
+      return yargs('1 2 3 --moo')
       .usage('Usage: $0 [x] [y] [z] {OPTIONS}')
       .demand(3)
       .argv
@@ -329,7 +329,7 @@ describe('usage tests', function () {
 
   it('should return a failure message when not enough non-hyphenated arguments are found after a demand count', function () {
     var r = checkUsage(function () {
-      return yargs('1 2 --moo'.split(' '))
+      return yargs('1 2 --moo')
       .usage('Usage: $0 [x] [y] [z] {OPTIONS}')
       .demand(3)
       .wrap(null)
@@ -349,7 +349,7 @@ describe('usage tests', function () {
 
   it('should return a custom failure message when not enough non-hyphenated arguments are found after a demand count', function () {
     var r = checkUsage(function () {
-      return yargs('src --moo'.split(' '))
+      return yargs('src --moo')
       .usage('Usage: $0 [x] [y] [z] {OPTIONS} <src> <dest> [extra_files...]')
       .demand(2, 'src and dest files are both required')
       .wrap(null)
@@ -369,7 +369,7 @@ describe('usage tests', function () {
 
   it('should return a valid result when setting defaults for singles', function () {
     var r = checkUsage(function () {
-      return yargs('--foo 50 --baz 70 --powsy'.split(' '))
+      return yargs('--foo 50 --baz 70 --powsy')
       .default('foo', 5)
       .default('bar', 6)
       .default('baz', 7)
@@ -414,7 +414,7 @@ describe('usage tests', function () {
 
   it('should allow you to set default values for a hash of options', function () {
     var r = checkUsage(function () {
-      return yargs('--foo 50 --baz 70'.split(' '))
+      return yargs('--foo 50 --baz 70')
       .default({ foo: 10, bar: 20, quux: 30 })
       .argv
     })
@@ -435,7 +435,7 @@ describe('usage tests', function () {
             bar: { description: 'bar option', alias: 'b', requiresArg: true }
           }
 
-          return yargs('-f --bar 20'.split(' '))
+          return yargs('-f --bar 20')
           .usage('Usage: $0 [options]', opts)
           .wrap(null)
           .argv
@@ -461,7 +461,7 @@ describe('usage tests', function () {
             bar: { description: 'bar option', alias: 'b', requiresArg: true }
           }
 
-          return yargs('-f --bar'.split(' '))
+          return yargs('-f --bar')
           .usage('Usage: $0 [options]', opts)
           .wrap(null)
           .argv
@@ -489,7 +489,7 @@ describe('usage tests', function () {
             bar: { description: 'bar option', alias: 'b' }
           }
 
-          return yargs('-f --bar 20'.split(' '))
+          return yargs('-f --bar 20')
           .usage('Usage: $0 [options]', opts)
           .requiresArg(['foo', 'bar'])
           .wrap(null)
@@ -512,7 +512,7 @@ describe('usage tests', function () {
 
     it("still requires argument if 'type' hints are given", function () {
       var r = checkUsage(function () {
-        return yargs('--foo --bar'.split(' '))
+        return yargs('--foo --bar')
           .requiresArg('foo')
           .string('foo')
           .requiresArg('bar')
@@ -533,7 +533,7 @@ describe('usage tests', function () {
           bar: { demand: 'bar option', alias: 'b' }
         }
 
-        return yargs('-f 10 --bar 20 --baz 30'.split(' '))
+        return yargs('-f 10 --bar 20 --baz 30')
         .usage('Usage: $0 [options]', opts)
         .strict()
         .wrap(null)
@@ -566,7 +566,7 @@ describe('usage tests', function () {
           bar: { description: 'bar option', alias: 'b' }
         }
 
-        return yargs('-f 10 --bar 20 --baz 30'.split(' '))
+        return yargs('-f 10 --bar 20 --baz 30')
         .usage('Usage: $0 [options]', opts)
         .strict()
         .wrap(null)
@@ -599,7 +599,7 @@ describe('usage tests', function () {
           bar: { description: 'bar option', alias: 'b' }
         }
 
-        return yargs('-f 10 --bar 20 --baz 30 -q 40'.split(' '))
+        return yargs('-f 10 --bar 20 --baz 30 -q 40')
           .usage('Usage: $0 [options]', opts)
           .strict()
           .wrap(null)
@@ -633,7 +633,7 @@ describe('usage tests', function () {
           bar: { description: 'bar option' }
         }
 
-        return yargs('--foo 10 --bar 20'.split(' '))
+        return yargs('--foo 10 --bar 20')
           .usage('Usage: $0 [options]', opts)
           .strict()
           .argv
@@ -677,7 +677,7 @@ describe('usage tests', function () {
     describe('with demand option', function () {
       it('should report missing required arguments', function () {
         var r = checkUsage(function () {
-          return yargs('-y 10 -z 20'.split(' '))
+          return yargs('-y 10 -z 20')
             .usage('Usage: $0 -x NUM [-y NUM]')
             .options({
               'x': { description: 'an option', demand: true },
@@ -706,7 +706,7 @@ describe('usage tests', function () {
     describe('with required option', function () {
       it('should report missing required arguments', function () {
         var r = checkUsage(function () {
-          return yargs('-y 10 -z 20'.split(' '))
+          return yargs('-y 10 -z 20')
             .usage('Usage: $0 -x NUM [-y NUM]')
             .options({
               'x': { description: 'an option', required: true },
@@ -734,7 +734,7 @@ describe('usage tests', function () {
 
     it('should not report missing required arguments when given an alias', function () {
       var r = checkUsage(function () {
-        return yargs('-w 10'.split(' '))
+        return yargs('-w 10')
         .usage('Usage: $0 --width NUM [--height NUM]')
         .options({
           'width': { description: 'Width', alias: 'w', demand: true },
