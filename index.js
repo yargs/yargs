@@ -41,7 +41,8 @@ function Argv (processArgs, cwd) {
     )
   }
 
-  var options
+  self.level = 1;
+
   self.resetOptions = self.reset = function () {
     // put yargs back into its initial
     // state, this is useful for creating a
@@ -527,8 +528,10 @@ function Argv (processArgs, cwd) {
     // command defer processing to it.
     var handlerKeys = Object.keys(self.getCommandHandlers())
     for (var i = 0, command; (command = handlerKeys[i]) !== undefined; i++) {
-      if (~argv._.indexOf(command)) {
+      if (argv._.indexOf(command) === self.level - 1) {
+        self.level += 1;
         runCommand(command, self, argv)
+        self.level -= 1;
         return self.argv
       }
     }
