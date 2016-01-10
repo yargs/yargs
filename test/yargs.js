@@ -213,6 +213,7 @@ describe('yargs dsl tests', function () {
         .string('foo')
         .choices('foo', ['bar', 'baz'])
         .implies('foo', 'snuh')
+        .group('foo', 'Group:')
         .strict()
         .exitProcess(false)  // defaults to true.
         .env('YARGS')
@@ -242,6 +243,7 @@ describe('yargs dsl tests', function () {
       expect(y.getStrict()).to.equal(false)
       expect(y.getDemanded()).to.deep.equal({})
       expect(y.getCommandHandlers()).to.deep.equal({})
+      expect(y.getGroups()).to.deep.equal({})
     })
   })
 

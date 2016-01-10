@@ -1200,6 +1200,34 @@ describe('usage tests', function () {
         'Missing', 'required', 'argument:', 'y'
       ])
     })
+
+    it('resets groups for a command handler, respecting order', function () {
+      var r = checkUsage(function () {
+        return yargs(['upload', '-h'])
+          .command('upload', 'upload something', function (yargs, argv) {
+            argv = yargs
+              .option('q', {
+                type: 'boolean',
+                group: 'Flags:'
+              })
+              .help('h').group('h', 'Global Flags:')
+              .wrap(null)
+              .argv
+          })
+          .help('h').group('h', 'Global Flags:')
+          .wrap(null)
+          .argv
+      })
+
+      r.logs[0].split('\n').should.deep.equal([
+        'Flags:',
+        '  -q  [boolean]',
+        '',
+        'Global Flags:',
+        '  -h  Show help  [boolean]',
+        ''
+      ])
+    })
   })
 
   describe('epilogue', function () {
@@ -1741,6 +1769,30 @@ describe('usage tests', function () {
       r.logs[0].split('\n').should.deep.equal([
         'Heroes:',
         '  --batman  [string]',
+        '',
+        'Options:',
+        '  -h  Show help  [boolean]',
+        ''
+      ])
+    })
+
+    it('only displays a duplicated option once per group', function () {
+      var r = checkUsage(function () {
+        return yargs(['-h'])
+          .help('h')
+          .group(['batman', 'batman'], 'Heroes:')
+          .group('robin', 'Heroes:')
+          .option('robin', {
+            group: 'Heroes:'
+          })
+          .wrap(null)
+          .argv
+      })
+
+      r.logs[0].split('\n').should.deep.equal([
+        'Heroes:',
+        '  --batman',
+        '  --robin',
         '',
         'Options:',
         '  -h  Show help  [boolean]',
