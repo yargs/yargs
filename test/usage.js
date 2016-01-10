@@ -874,6 +874,16 @@ describe('usage tests', function () {
       r.logs[0].should.eql('1.0.1')
     })
 
+    /*it('defaults to the version # in the package.json', function () {
+      var r = checkUsage(function () {
+        return yargs(['--version'])
+        .version()
+        .wrap(null)
+        .argv
+      })
+      r.logs[0].should.eql(require('./package.json').version)
+    })*/
+
     it('accepts version option as first argument, and version number as second argument', function () {
       var r = checkUsage(function () {
         return yargs(['--version'])

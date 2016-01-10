@@ -14,6 +14,7 @@
     "camelcase": "^2.0.1",
     "cliui": "^3.0.3",
     "decamelize": "^1.1.1",
+    "read-pkg-up": "^1.0.1",
     "os-locale": "^1.4.0",
     "string-width": "^1.0.1",
     "window-size": "^0.1.4",
