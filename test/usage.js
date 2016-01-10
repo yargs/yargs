@@ -1,9 +1,12 @@
 /* global describe, it, beforeEach */
 
 var checkUsage = require('./helpers/utils').checkOutput
-var path = require('path')
-var yargs = require('../')
 var chalk = require('chalk')
+var cpr = require('cpr')
+var fs = require('fs')
+var path = require('path')
+var rimraf = require('rimraf')
+var yargs = require('../')
 
 require('chai').should()
 
@@ -874,14 +877,37 @@ describe('usage tests', function () {
       r.logs[0].should.eql('1.0.1')
     })
 
-    it('defaults to the version # in the package.json', function () {
-      var r = checkUsage(function () {
-        return yargs(['--version'])
-        .version()
-        .wrap(null)
-        .argv
+    describe('default version #', function () {
+      before(function (done) {
+        this.timeout(10000)
+
+        cpr('./', './test/fixtures/yargs', {
+          filter: /node_modules|example|test|package\.json/
+        }, function () {
+          return done()
+        })
       })
-      r.logs[0].should.eql(require('./package.json').version)
+
+      it('defaults to appropriate version # when yargs is installed normally', function () {
+        var y = require('./fixtures/yargs/index.js')
+
+        var r = checkUsage(function () {
+          return y(['--version'])
+            .version()
+            .wrap(null)
+            .argv
+        })
+
+        r.logs[0].should.eql(require('../package.json').version)
+      })
+
+      it('defaults to appropriate version # when yargs is symlinked', function () {
+        fs.symlinkSync(process.cwd(), './test/fixtures/yargs-symlink')
+      })
+
+      after(function () {
+        rimraf.sync('./test/fixtures/yargs')
+      })
     })
 
     it('accepts version option as first argument, and version number as second argument', function () {

@@ -5,7 +5,7 @@ var path = require('path')
 var Usage = require('./lib/usage')
 var Validation = require('./lib/validation')
 var Y18n = require('y18n')
-var parent = require('parent-package-json')
+var readPkgUp = require('read-pkg-up')
 
 Argv(process.argv.slice(2))
 
@@ -381,14 +381,7 @@ function Argv (processArgs, cwd) {
   var versionOpt = null
   self.version = function (opt, msg, ver) {
     if (arguments.length === 0) {
-      ver = parent(__dirname)
-
-      if (ver === false) {
-        ver = undefined
-      } else {
-        ver = ver.parse().version
-      }
-
+      ver = guessVersion()
       opt = 'version'
     } else if (arguments.length === 1) {
       ver = opt
@@ -404,6 +397,18 @@ function Argv (processArgs, cwd) {
     self.boolean(versionOpt)
     self.describe(versionOpt, msg)
     return self
+  }
+
+  function guessVersion () {
+    var obj = readPkgUp.sync({
+      cwd: path.resolve(__dirname, '../')
+    })
+
+    if (!obj) {
+      return obj
+    } else {
+      return obj.pkg.version
+    }
   }
 
   var helpOpt = null
