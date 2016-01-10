@@ -5,7 +5,6 @@ var path = require('path')
 var Usage = require('./lib/usage')
 var Validation = require('./lib/validation')
 var Y18n = require('y18n')
-var readPkgUp = require('read-pkg-up')
 var pkgConf = require('pkg-conf')
 var requireMainFilename = require('require-main-filename')
 
@@ -373,6 +372,7 @@ function Argv (processArgs, cwd) {
   self.version = function (opt, msg, ver) {
     if (arguments.length === 0) {
 <<<<<<< HEAD
+<<<<<<< HEAD
       ver = guessVersion()
 =======
       ver = parent(__dirname)
@@ -384,6 +384,9 @@ function Argv (processArgs, cwd) {
       }
 
 >>>>>>> Provide default value for version in .version()
+=======
+      ver = guessVersion()
+>>>>>>> add tests around guessing version # based on parent package.json
       opt = 'version'
     } else if (arguments.length === 1) {
       ver = opt
@@ -407,6 +410,14 @@ function Argv (processArgs, cwd) {
     })
 
     return obj.pkg ? obj.pkg.version : 'unknown'
+      cwd: path.resolve(__dirname, '../')
+    })
+
+    if (!obj) {
+      return obj
+    } else {
+      return obj.pkg.version
+    }
   }
 
   var helpOpt = null
