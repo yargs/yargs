@@ -1,4 +1,4 @@
-/* global describe, it, beforeEach */
+/* global describe, it, beforeEach, before, after */
 
 var checkUsage = require('./helpers/utils').checkOutput
 var chalk = require('chalk')
@@ -880,10 +880,13 @@ describe('usage tests', function () {
     describe('default version #', function () {
       before(function (done) {
         this.timeout(10000)
-
+        // create a symlinked, and a physical copy of yargs in
+        // our fixtures directory, so that we can test that the
+        // nearest package.json is appropriately loaded.
         cpr('./', './test/fixtures/yargs', {
           filter: /node_modules|example|test|package\.json/
         }, function () {
+          fs.symlinkSync(process.cwd(), './test/fixtures/yargs-symlink')
           return done()
         })
       })
@@ -902,11 +905,21 @@ describe('usage tests', function () {
       })
 
       it('defaults to appropriate version # when yargs is symlinked', function () {
-        fs.symlinkSync(process.cwd(), './test/fixtures/yargs-symlink')
+        var y = require('./fixtures/yargs-symlink/index.js')
+
+        var r = checkUsage(function () {
+          return y(['--version'])
+            .version()
+            .wrap(null)
+            .argv
+        })
+
+        r.logs[0].should.eql(require('../package.json').version)
       })
 
       after(function () {
         rimraf.sync('./test/fixtures/yargs')
+        fs.unlinkSync('./test/fixtures/yargs-symlink')
       })
     })
 

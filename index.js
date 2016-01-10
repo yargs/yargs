@@ -404,11 +404,13 @@ function Argv (processArgs, cwd) {
       cwd: path.resolve(__dirname, '../')
     })
 
-    if (!obj) {
-      return obj
-    } else {
-      return obj.pkg.version
+    // fallback to process.cwd() this
+    // solves the case of symlinked modules.
+    if (!obj.pkg) {
+      obj = readPkgUp.sync()
     }
+
+    return obj.pkg ? obj.pkg.version : 'unknown'
   }
 
   var helpOpt = null
