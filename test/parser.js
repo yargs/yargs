@@ -907,6 +907,15 @@ describe('parser tests', function () {
           argv2.parse([ ]).flag.should.be.false
         })
       })
+
+      // Fixes: https://github.com/bcoe/yargs/issues/341
+      it('should apply defaults to camel-case form of argument', function () {
+        var argv = yargs([])
+          .default('foo-bar', 99)
+          .argv
+
+        argv.fooBar.should.equal(99)
+      })
     })
 
     it('should define option as boolean and set default to true', function () {
