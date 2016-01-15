@@ -1,7 +1,8 @@
 ## Change Log
 
-### Upcoming
+### v3.32.0 (2016/1/14 10:13 +07:00)
 
+- [#344](https://github.com/bcoe/yargs/pull/344) yargs now has a code of conduct and contributor guidelines (@bcoe)
 - [#341](https://github.com/bcoe/yargs/issues/341) Fix edge-case with camel-case arguments (@davibe)
 - [#331](https://github.com/bcoe/yargs/pull/331) Handle parsing a raw argument string (@kellyselden)
 - [#325](https://github.com/bcoe/yargs/pull/325) Tweaks to make tests pass again on Windows (@isaacs)
