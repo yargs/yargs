@@ -1124,18 +1124,18 @@ present script similar to how `$0` works in bash or perl.
 ----------------------------------------
 
 Add an option (e.g. `--version`) that displays the version number (given by the
-`version` parameter) and exits the process. If no option is provided, it will default to `--version`.
-If present, the `description` parameter customizes the description of the version
-option in the usage string. You can also pass no `version` parameter (`.version()`),
-in this case, yargs will parse the `package.json` of your module and use its `version` value.
+`version` parameter) and exits the process.
+
+If no arguments are passed to `version` (`.version()`), yargs will parse the `package.json`
+of your module and use its `version` value. The default value of `option` is `--version`.
 
 You can provide a `function` for version, rather than a string.
-This is useful if you want to use the version from your package.json:
+This is useful if you want to use a version stored in a location other than package.json:
 
 ```js
 var argv = require('yargs')
   .version(function() {
-    return require('../package').version;
+    return require('../lib/version').version;
   })
   .argv;
 ```

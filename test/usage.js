@@ -886,6 +886,9 @@ describe('usage tests', function () {
         cpr('./', './test/fixtures/yargs', {
           filter: /node_modules|example|test|package\.json/
         }, function () {
+          fs.writeFileSync('./test/fixtures/yargs/package.json', JSON.stringify({
+            version: 99
+          }), 'utf-8')
           fs.symlinkSync(process.cwd(), './test/fixtures/yargs-symlink')
           return done()
         })
