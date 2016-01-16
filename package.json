@@ -33,7 +33,7 @@
   },
   "scripts": {
     "pretest": "standard",
-    "test": "nyc --cache mocha --timeout=4000 --check-leaks",
+    "test": "nyc --cache mocha --require ./test/before.js --timeout=4000 --check-leaks",
     "coverage": "nyc report --reporter=text-lcov | coveralls"
   },
   "repository": {
