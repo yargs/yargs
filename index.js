@@ -1,8 +1,7 @@
 var assert = require('assert')
 var Completion = require('./lib/completion')
-var Parser = require('./lib/parser')
+var Parser = require('yargs-parser')
 var path = require('path')
-var tokenizeArgString = require('./lib/tokenize-arg-string')
 var Usage = require('./lib/usage')
 var Validation = require('./lib/validation')
 var Y18n = require('y18n')
@@ -176,25 +175,7 @@ function Argv (processArgs, cwd) {
         self.alias(key, x[key])
       })
     } else {
-      // perhaps 'x' is already an alias in another list?
-      // if so we should append to x's list.
-      var aliases = null
-      Object.keys(options.alias).forEach(function (key) {
-        if (~options.alias[key].indexOf(x)) aliases = options.alias[key]
-      })
-
-      if (aliases) { // x was an alias itself.
-        aliases.push(y)
-      } else { // x is a new alias key.
-        options.alias[x] = (options.alias[x] || []).concat(y)
-      }
-
-      // wait! perhaps we've created two lists of aliases
-      // that reference each other?
-      if (options.alias[y]) {
-        Array.prototype.push.apply((options.alias[x] || aliases), options.alias[y])
-        delete options.alias[y]
-      }
+      options.alias[x] = (options.alias[x] || []).concat(y)
     }
     return self
   }
@@ -534,14 +515,14 @@ function Argv (processArgs, cwd) {
   })
 
   function parseArgs (args) {
-    args = normalizeArgs(args)
+    options.__ = y18n.__
+    options.cwd = path.resolve(path.dirname(__filename), '../')
 
-    var parsed = Parser(args, options, y18n)
+    var parsed = Parser.detailed(args, options)
     var argv = parsed.argv
     var aliases = parsed.aliases
 
     argv.$0 = self.$0
-
     self.parsed = parsed
 
     guessLocale() // guess locale lazily, so that it can be turned off in chain.
@@ -654,13 +635,6 @@ function Argv (processArgs, cwd) {
       if (~key.indexOf('.')) return
       if (typeof argv[key] === 'undefined') argv[key] = undefined
     })
-  }
-
-  function normalizeArgs (args) {
-    if (typeof args === 'string') {
-      return tokenizeArgString(args)
-    }
-    return args
   }
 
   singletonify(self)
