@@ -103,8 +103,5 @@
   "license": "MIT",
   "engine": {
     "node": ">=0.10"
-  },
-  "yargs": {
-    "camel-case-expansion": true
   }
 }
