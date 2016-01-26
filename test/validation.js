@@ -72,7 +72,12 @@ describe('validation tests', function () {
 
     it('fails with invalid command', function (done) {
       yargs(['koala'])
-        .command('wombat', 'wombat handlers', function () {})
+        .command('wombat', 'wombat burrows', function (yargs, argv) {
+          return argv
+        })
+        .command('kangaroo', 'kangaroo handlers', function (yargs, argv) {
+          return argv
+        })
         .demand(1)
         .strict()
         .fail(function (msg) {
