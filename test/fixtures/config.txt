@@ -1,2 +1,0 @@
-AWESOME=banana
-BATMAN=grumpy

@@ -865,6 +865,11 @@ parses as:
 
 Optionally `.nargs()` can take an object of `key`/`narg` pairs.
 
+<a name="normalize"></a>.normalize(key)
+---------------
+
+The key provided represents a path and should have `path.normalize()` applied.
+
 .option(key, opt)
 -----------------
 .options(key, opt)
@@ -933,6 +938,7 @@ Valid `opt` keys include:
 - `desc`/`describe`/`description`: string, the option description for help content, see [`describe()`](#describe)
 - `group`: string, when displaying usage instructions place the option under an alternative group heading, see [`group()`](#group)
 - `nargs`: number, specify how many arguments should be consumed for the option, see [`nargs()`](#nargs)
+- `normalize`: The option should be normalized, see [`normalize()`](#normalize)
 - `requiresArg`: boolean, require the option be specified with a value, see [`requiresArg()`](#requiresArg)
 - `string`: boolean, interpret option as a string, see [`string()`](#string)
 - `type`: one of the following strings

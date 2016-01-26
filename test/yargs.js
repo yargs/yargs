@@ -1,6 +1,7 @@
 /* global describe, it, beforeEach */
 
 var expect = require('chai').expect
+var fs = require('fs')
 var checkOutput = require('./helpers/utils').checkOutput
 var yargs = require('../')
 
@@ -572,6 +573,91 @@ describe('yargs dsl tests', function () {
 
       a1.why.should.equal('hello world')
       a2.why.should.equal('hello world')
+    })
+  })
+
+  describe('config', function () {
+    it('allows a parsing function to be provided as a second argument', function () {
+      var argv = yargs('--config ./test/fixtures/config.json')
+        .config('config', function (path) {
+          return JSON.parse(fs.readFileSync(path))
+        })
+        .argv
+
+      argv.foo.should.equal('baz')
+    })
+
+    it('allows key to be specified with option shorthand', function () {
+      var argv = yargs('--config ./test/fixtures/config.json')
+        .option('config', {
+          config: true
+        })
+        .argv
+
+      argv.foo.should.equal('baz')
+    })
+  })
+
+  describe('normalize', function () {
+    it('normalizes paths passed as arguments', function () {
+      var argv = yargs('--path /foo/bar//baz/asdf/quux/..')
+        .normalize(['path'])
+        .argv
+
+      argv.path.should.equal('/foo/bar/baz/asdf')
+    })
+
+    it('normalizes path when when it is updated', function () {
+      var argv = yargs('--path /batman')
+        .normalize(['path'])
+        .argv
+
+      argv.path = '/foo/bar//baz/asdf/quux/..'
+      argv.path.should.equal('/foo/bar/baz/asdf')
+    })
+
+    it('allows key to be specified with option shorthand', function () {
+      var argv = yargs('--path /batman')
+        .option('path', {
+          normalize: true
+        })
+        .argv
+
+      argv.path = '/foo/bar//baz/asdf/quux/..'
+      argv.path.should.equal('/foo/bar/baz/asdf')
+    })
+  })
+
+  describe('narg', function () {
+    it('accepts a key as the first argument and a count as the second', function () {
+      var argv = yargs('--foo a b c')
+        .nargs('foo', 2)
+        .argv
+
+      argv.foo.should.deep.equal(['a', 'b'])
+      argv._.should.deep.equal(['c'])
+    })
+
+    it('accepts a hash of keys and counts', function () {
+      var argv = yargs('--foo a b c')
+        .nargs({
+          foo: 2
+        })
+        .argv
+
+      argv.foo.should.deep.equal(['a', 'b'])
+      argv._.should.deep.equal(['c'])
+    })
+
+    it('allows key to be specified with option shorthand', function () {
+      var argv = yargs('--foo a b c')
+        .option('foo', {
+          nargs: 2
+        })
+        .argv
+
+      argv.foo.should.deep.equal(['a', 'b'])
+      argv._.should.deep.equal(['c'])
     })
   })
 })
