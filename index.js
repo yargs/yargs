@@ -289,6 +289,8 @@ function Argv (processArgs, cwd) {
         self.default(key, opt.default)
       } if ('nargs' in opt) {
         self.nargs(key, opt.nargs)
+      } if ('normalize' in opt) {
+        self.normalize(key)
       } if ('choices' in opt) {
         self.choices(key, opt.choices)
       } if ('group' in opt) {
