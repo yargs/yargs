@@ -70,6 +70,18 @@ describe('validation tests', function () {
         .argv
     })
 
+    it('fails with invalid command', function (done) {
+      yargs(['koala'])
+        .command('wombat', 'wombat handlers', function () {})
+        .demand(1)
+        .strict()
+        .fail(function (msg) {
+          msg.should.equal('Unknown argument: koala')
+          return done()
+        })
+        .argv
+    })
+
     it('fails without a message if msg is null', function (done) {
       yargs([])
         .demand(1, null)
