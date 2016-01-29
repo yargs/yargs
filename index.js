@@ -518,8 +518,6 @@ function Argv (processArgs, cwd) {
 
   function parseArgs (args) {
     options.__ = y18n.__
-    options.cwd = path.resolve(path.dirname(__filename), '../')
-
     var parsed = Parser.detailed(args, options)
     var argv = parsed.argv
     var aliases = parsed.aliases

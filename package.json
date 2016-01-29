@@ -19,7 +19,7 @@
     "string-width": "^1.0.1",
     "window-size": "^0.2.0",
     "y18n": "^3.2.0",
-    "yargs-parser": "^1.1.0"
+    "yargs-parser": "^1.1.1-alpha"
   },
   "devDependencies": {
     "chai": "^3.4.1",
