@@ -390,14 +390,8 @@ function Argv (processArgs, cwd) {
 
   function guessVersion () {
     var obj = readPkgUp.sync({
-      cwd: path.resolve(__dirname, '../')
+      cwd: require.main.filename
     })
-
-    // fallback to process.cwd() this
-    // solves the case of symlinked modules.
-    if (!obj.pkg) {
-      obj = readPkgUp.sync()
-    }
 
     return obj.pkg ? obj.pkg.version : 'unknown'
   }
