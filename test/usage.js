@@ -1,11 +1,8 @@
-/* global describe, it, beforeEach, before, after */
+/* global describe, it, beforeEach */
 
 var checkUsage = require('./helpers/utils').checkOutput
 var chalk = require('chalk')
-var cpr = require('cpr')
-var fs = require('fs')
 var path = require('path')
-var rimraf = require('rimraf')
 var yargs = require('../')
 
 require('chai').should()
@@ -875,55 +872,6 @@ describe('usage tests', function () {
       r.should.have.property('logs').with.length(1)
       r.should.have.property('exit').and.be.ok
       r.logs[0].should.eql('1.0.1')
-    })
-
-    describe('default version #', function () {
-      before(function (done) {
-        this.timeout(10000)
-        // create a symlinked, and a physical copy of yargs in
-        // our fixtures directory, so that we can test that the
-        // nearest package.json is appropriately loaded.
-        cpr('./', './test/fixtures/yargs', {
-          filter: /node_modules|example|test|package\.json/
-        }, function () {
-          fs.writeFileSync('./test/fixtures/yargs/package.json', JSON.stringify({
-            version: 99
-          }), 'utf-8')
-          fs.symlinkSync(process.cwd(), './test/fixtures/yargs-symlink')
-          return done()
-        })
-      })
-
-      it('defaults to appropriate version # when yargs is installed normally', function () {
-        var y = require('./fixtures/yargs/index.js')
-
-        var r = checkUsage(function () {
-          return y(['--version'])
-            .version()
-            .wrap(null)
-            .argv
-        })
-
-        r.logs[0].should.eql(require('../package.json').version)
-      })
-
-      it('defaults to appropriate version # when yargs is symlinked', function () {
-        var y = require('./fixtures/yargs-symlink/index.js')
-
-        var r = checkUsage(function () {
-          return y(['--version'])
-            .version()
-            .wrap(null)
-            .argv
-        })
-
-        r.logs[0].should.eql(require('../package.json').version)
-      })
-
-      after(function () {
-        rimraf.sync('./test/fixtures/yargs')
-        fs.unlinkSync('./test/fixtures/yargs-symlink')
-      })
     })
 
     it('accepts version option as first argument, and version number as second argument', function () {
