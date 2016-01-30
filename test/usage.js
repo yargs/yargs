@@ -2,10 +2,7 @@
 
 var checkUsage = require('./helpers/utils').checkOutput
 var chalk = require('chalk')
-var cpr = require('cpr')
-var fs = require('fs')
 var path = require('path')
-var rimraf = require('rimraf')
 var yargs = require('../')
 
 require('chai').should()
