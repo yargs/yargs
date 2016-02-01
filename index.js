@@ -6,6 +6,7 @@ var Usage = require('./lib/usage')
 var Validation = require('./lib/validation')
 var Y18n = require('y18n')
 var readPkgUp = require('read-pkg-up')
+var requireMainFilename = require('require-main-filename')
 
 Argv(process.argv.slice(2))
 
@@ -390,7 +391,7 @@ function Argv (processArgs, cwd) {
 
   function guessVersion () {
     var obj = readPkgUp.sync({
-      cwd: require.main.filename
+      cwd: requireMainFilename()
     })
 
     return obj.pkg ? obj.pkg.version : 'unknown'
