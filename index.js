@@ -669,3 +669,4 @@ function singletonify (inst) {
     }
   })
 
+}
