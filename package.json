@@ -40,6 +40,7 @@
     "type": "git",
     "url": "http://github.com/bcoe/yargs.git"
   },
+  "homepage": "http://yargs.js.org/",
   "standard": {
     "ignore": [
       "**/example/**"
