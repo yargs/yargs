@@ -87,20 +87,6 @@ describe('validation tests', function () {
         .argv
     })
 
-    it('fails with one command and an argument not on the list are provided', function (done) {
-      yargs(['wombat --mob'])
-        .command('wombat', 'wombat handlers', function (yargs, argv) {
-          return argv
-        })
-        .demand(1, ['wisdom', 'marsupial'])
-        .strict()
-        .fail(function (msg) {
-          msg.should.equal('Uknown argument: mob')
-          return done()
-        })
-        .argv
-    })
-
     it('fails without a message if msg is null', function (done) {
       yargs([])
         .demand(1, null)

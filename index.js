@@ -668,5 +668,4 @@ function singletonify (inst) {
       Argv[key] = typeof inst[key] === 'function' ? inst[key].bind(inst) : inst[key]
     }
   })
-
 }

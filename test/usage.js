@@ -36,6 +36,29 @@ describe('usage tests', function () {
         r.exit.should.be.ok
       })
 
+      it('fails if one command and an argument not on the list are provided', function () {
+        var r = checkUsage(function () {
+          return yargs('wombat -w 10 -y 10')
+            .usage('Usage: $0 -w NUM -m NUM')
+            .demand(1, ['w', 'm'])
+            .strict()
+            .wrap(null)
+            .argv
+        })
+        r.result.should.have.property('w', 10)
+        r.result.should.have.property('y', 10)
+        r.result.should.have.property('_').with.length(1)
+        r.errors.join('\n').split(/\n+/).should.deep.equal([
+          'Usage: ./usage -w NUM -m NUM',
+          'Options:',
+          '  -w  [required]',
+          '  -m  [required]',
+          'Missing required argument: m'
+        ])
+        r.logs.should.have.length(0)
+        r.exit.should.be.ok
+      })
+
       describe('using .require()', function () {
         it('should show an error along with the missing arguments on demand fail', function () {
           var r = checkUsage(function () {
@@ -54,6 +77,28 @@ describe('usage tests', function () {
             '  -x  [required]',
             '  -y  [required]',
             'Missing required argument: y'
+          ])
+          r.logs.should.have.length(0)
+          r.exit.should.be.ok
+        })
+        it('fails if one command and an argument not on the list are provided', function () {
+          var r = checkUsage(function () {
+            return yargs('wombat -w 10 -y 10')
+              .usage('Usage: $0 -w NUM -m NUM')
+              .required(1, ['w', 'm'])
+              .strict()
+              .wrap(null)
+              .argv
+          })
+          r.result.should.have.property('w', 10)
+          r.result.should.have.property('y', 10)
+          r.result.should.have.property('_').with.length(1)
+          r.errors.join('\n').split(/\n+/).should.deep.equal([
+            'Usage: ./usage -w NUM -m NUM',
+            'Options:',
+            '  -w  [required]',
+            '  -m  [required]',
+            'Missing required argument: m'
           ])
           r.logs.should.have.length(0)
           r.exit.should.be.ok
