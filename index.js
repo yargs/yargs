@@ -6,6 +6,7 @@ var Usage = require('./lib/usage')
 var Validation = require('./lib/validation')
 var Y18n = require('y18n')
 var readPkgUp = require('read-pkg-up')
+var pkgConf = require('pkg-conf')
 var requireMainFilename = require('require-main-filename')
 
 Argv(process.argv.slice(2))
@@ -513,6 +514,10 @@ function Argv (processArgs, cwd) {
 
   function parseArgs (args) {
     options.__ = y18n.__
+    options.configuration = pkgConf.sync('yargs', {
+      defaults: {},
+      cwd: requireMainFilename()
+    })
     var parsed = Parser.detailed(args, options)
     var argv = parsed.argv
     var aliases = parsed.aliases

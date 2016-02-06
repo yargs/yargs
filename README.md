@@ -1231,13 +1231,32 @@ To run the tests with npm, just do:
 
     npm test
 
+configuration
+=============
+
+Using the `yargs` stanza in your `package.json` you can turn on and off
+some of yargs' parsing features:
+
+```json
+{
+  "yargs": {
+    "short-option-groups": true,
+    "camel-case-expansion": true,
+    "dot-notation": true,
+    "parse-numbers": true,
+    "boolean-negation": true
+  }
+}
+```
+
+See the [yargs-parser](https://github.com/yargs/yargs-parser#configuration) module
+for detailed documentation of this feature.
+
 inspired by
 ===========
 
 This module is loosely inspired by Perl's
 [Getopt::Casual](http://search.cpan.org/~photo/Getopt-Casual-0.13.1/Casual.pm).
-
-
 
 [travis-url]: https://travis-ci.org/bcoe/yargs
 [travis-image]: https://img.shields.io/travis/bcoe/yargs.svg

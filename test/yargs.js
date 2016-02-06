@@ -2,6 +2,7 @@
 
 var expect = require('chai').expect
 var fs = require('fs')
+var path = require('path')
 var checkOutput = require('./helpers/utils').checkOutput
 var yargs = require('../')
 
@@ -604,7 +605,7 @@ describe('yargs dsl tests', function () {
         .normalize(['path'])
         .argv
 
-      argv.path.should.equal('/foo/bar/baz/asdf')
+      argv.path.should.equal(['', 'foo', 'bar', 'baz', 'asdf'].join(path.sep))
     })
 
     it('normalizes path when when it is updated', function () {
@@ -613,7 +614,7 @@ describe('yargs dsl tests', function () {
         .argv
 
       argv.path = '/foo/bar//baz/asdf/quux/..'
-      argv.path.should.equal('/foo/bar/baz/asdf')
+      argv.path.should.equal(['', 'foo', 'bar', 'baz', 'asdf'].join(path.sep))
     })
 
     it('allows key to be specified with option shorthand', function () {
@@ -624,7 +625,7 @@ describe('yargs dsl tests', function () {
         .argv
 
       argv.path = '/foo/bar//baz/asdf/quux/..'
-      argv.path.should.equal('/foo/bar/baz/asdf')
+      argv.path.should.equal(['', 'foo', 'bar', 'baz', 'asdf'].join(path.sep))
     })
   })
 
