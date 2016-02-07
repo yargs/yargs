@@ -235,7 +235,9 @@ describe('yargs dsl tests', function () {
         count: [],
         normalize: [],
         config: {},
-        envPrefix: undefined
+        envPrefix: undefined,
+        global: [],
+        demanded: {}
       }
 
       expect(y.getOptions()).to.deep.equal(emptyOptions)
@@ -665,6 +667,23 @@ describe('yargs dsl tests', function () {
 
       argv.foo.should.deep.equal(['a', 'b'])
       argv._.should.deep.equal(['c'])
+    })
+  })
+
+  describe("global", function () {
+    it('does not reset a global options when reset is called', function () {
+      var y = yargs('--foo a b c')
+        .option('foo', {
+          nargs: 2
+        })
+        .option('bar', {
+          nargs: 2
+        })
+        .global('foo')
+        .reset()
+      var options = y.getOptions()
+      options.key.foo.should.equal(true)
+      expect(options.key.bar).to.equal(undefined)
     })
   })
 })
