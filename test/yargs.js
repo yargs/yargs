@@ -728,13 +728,6 @@ describe('yargs dsl tests', function () {
       options.global.should.include('version')
     })
 
-    it('should set completion to global option by default', function () {
-      var y = yargs('--foo')
-        .completion()
-      var options = y.getOptions()
-      options.global.should.include('completion')
-    })
-
     it('should not reset usage descriptions of global options', function () {
       var y = yargs('--foo')
         .describe('bar', 'my awesome bar option')

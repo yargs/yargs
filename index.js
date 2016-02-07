@@ -102,6 +102,7 @@ function Argv (processArgs, cwd) {
     strict = false
     groups = {}
     commandHandlers = {}
+    completionCommand = null
     self.parsed = false
 
     return self
@@ -491,7 +492,6 @@ function Argv (processArgs, cwd) {
       desc = 'generate bash completion script'
     }
     self.command(completionCommand, desc)
-    self.global(completionCommand)
 
     // a function can be provided
     if (fn) completion.registerFunction(fn)
