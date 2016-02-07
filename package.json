@@ -27,7 +27,7 @@
     "hashish": "0.0.4",
     "mocha": "^2.4.5",
     "nyc": "^5.2.0",
-    "standard": "^5.4.1",
+    "standard": "^6.0.4",
     "which": "^1.1.2",
     "win-spawn": "^2.0.0"
   },
