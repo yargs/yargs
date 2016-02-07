@@ -452,7 +452,7 @@ var argv = require('yargs')
   .argv
 ```
 
-.command(cmd, desc, [fn])
+.command(cmd, desc, [builder], [handler])
 -------------------
 
 Document the commands exposed by your application.
@@ -462,32 +462,40 @@ values stored in `argv._`).  Set `desc` to `false` to create a hidden command.
 Hidden commands don't show up in the help output and aren't available for
 completion.
 
-Optionally, you can provide a handler `fn` which will be executed when
-a given command is provided. The handler will be called with `yargs` and
-`argv` as arguments.
-
-`yargs` is a blank instance of yargs, which can be used to compose a nested
-hierarchy of options handlers.
-
-`argv` represents the arguments parsed prior to the
-command being executed (those described in the outer yargs instance).
-
-Here's an example of top-level and nested commands in action:
+Optionally, you can provide a `builder` function. This function is executed
+with a `yargs` instance, and can be used to provide command specific help:
 
 ```js
-var argv = require('yargs')
-  .usage('npm <command>')
-  .command('install', 'tis a mighty fine package to install')
-  .command('publish', 'shiver me timbers, should you be sharing all that', function (yargs, argv) {
-    argv = yargs.option('f', {
-      alias: 'force',
-      description: 'yar, it usually be a bad idea'
+yargs.command('get', 'make a get HTTP request', function (yargs) {
+    return yargs.option('u', {
+      alias: 'url',
+      describe: 'the URL to make an HTTP request to'
     })
-    .help('help')
-    .argv
   })
-  .help('help')
-  .argv;
+  .help()
+  .argv
+```
+
+You can also provide a handler function, which will be executed with the
+parsed `argv` object:
+
+```js
+yargs
+  .command(
+    'get',
+    'make a get HTTP request',
+    function (yargs) {
+      return yargs.option('u', {
+        alias: 'url',
+        describe: 'the URL to make an HTTP request to'
+      })
+    },
+    function (argv) {
+      console.log(argv.url)
+    }
+  )
+  .help()
+  .argv
 ```
 
 .completion(cmd, [description], [fn]);

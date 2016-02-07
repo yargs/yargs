@@ -43,7 +43,7 @@ describe('yargs dsl tests', function () {
   it('populates argv with placeholder keys when passed into command handler', function (done) {
     yargs(['blerg'])
       .option('cool', {})
-      .command('blerg', 'handle blerg things', function (yargs, argv) {
+      .command('blerg', 'handle blerg things', function () {}, function (argv) {
         Object.keys(argv).should.include('cool')
         return done()
       })
@@ -250,33 +250,38 @@ describe('yargs dsl tests', function () {
   })
 
   describe('command', function () {
-    it('allows a function to be associated with a command', function (done) {
+    it('executes command handler with parsed argv', function (done) {
       yargs(['blerg'])
-        .command('blerg', 'handle blerg things', function (yargs, argv) {
-          // a fresh yargs instance for performing command-specific parsing,
-          // and an argv instance containing the parsing performed thus far
-          // should be passed to the command handler.
-          (typeof yargs.option).should.equal('function')
-          // we should get the argv from the prior yargs.
-          argv._[0].should.equal('blerg')
-
-          // the yargs instance has been reset.
-          yargs.getCommandHandlers().should.deep.equal({})
-          return done()
-        })
+        .command(
+          'blerg',
+          'handle blerg things',
+          function () {},
+          function (argv) {
+            // we should get the argv from the prior yargs.
+            argv._[0].should.equal('blerg')
+            return done()
+          }
+        )
         .exitProcess(false) // defaults to true.
         .argv
     })
 
-    it('does not execute top-level help if a handled command is provided', function () {
+    it("skips executing top-level command if builder's help is executed", function () {
       var r = checkOutput(function () {
         yargs(['blerg', '-h'])
-          .command('blerg', 'handle blerg things', function (yargs) {
-            yargs.command('snuh', 'snuh command')
-              .help('h')
-              .wrap(null)
-              .argv
-          })
+          .command(
+            'blerg',
+            'handle blerg things',
+            function (yargs) {
+              return yargs
+                .command('snuh', 'snuh command')
+                .help('h')
+                .wrap(null)
+            },
+            function () {
+              throw Error('should not happen')
+            }
+          )
           .help('h')
           .argv
       })
@@ -295,7 +300,8 @@ describe('yargs dsl tests', function () {
       var r = checkOutput(function () {
         yargs(['snuh', '-h'])
           .command('blerg', 'handle blerg things', function (yargs) {
-            yargs.command('snuh', 'snuh command')
+            return yargs
+              .command('snuh', 'snuh command')
               .help('h')
               .argv
           })

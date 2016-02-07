@@ -5,6 +5,7 @@ var which = require('which')
 var rimraf = require('rimraf')
 var cpr = require('cpr')
 var fs = require('fs')
+var isWindows = require('is-windows')
 
 require('chai').should()
 
@@ -50,6 +51,7 @@ describe('integration tests', function () {
     })
   })
 
+  if (!isWindows())
   describe('load root package.json', function () {
     before(function (done) {
       this.timeout(10000)

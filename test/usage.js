@@ -1247,15 +1247,14 @@ describe('usage tests', function () {
     it('resets groups for a command handler, respecting order', function () {
       var r = checkUsage(function () {
         return yargs(['upload', '-h'])
-          .command('upload', 'upload something', function (yargs, argv) {
-            argv = yargs
+          .command('upload', 'upload something', function (yargs) {
+            return yargs
               .option('q', {
                 type: 'boolean',
                 group: 'Flags:'
               })
               .help('h').group('h', 'Global Flags:')
               .wrap(null)
-              .argv
           })
           .help('h').group('h', 'Global Flags:')
           .wrap(null)
