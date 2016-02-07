@@ -975,6 +975,7 @@ Valid `opt` keys include:
 - `defaultDescription`: string, use this description for the default value in help content, see [`default()`](#default)
 - `demand`/`require`/`required`: boolean or string, demand the option be given, with optional error message, see [`demand()`](#demand)
 - `desc`/`describe`/`description`: string, the option description for help content, see [`describe()`](#describe)
+- `global`: boolean, indicate that this key should not be [reset](#reset) when a command is invoked, see [`global()`](#global)
 - `group`: string, when displaying usage instructions place the option under an alternative group heading, see [`group()`](#group)
 - `nargs`: number, specify how many arguments should be consumed for the option, see [`nargs()`](#nargs)
 - `normalize`: The option should be normalized, see [`normalize()`](#normalize)
@@ -1010,7 +1011,7 @@ usage information and exit.
 The default behavior is to set the value of any key not followed by an
 option value to `true`.
 
-.reset()
+<a name="reset"></a>.reset()
 --------
 
 Reset the argument object built up so far. This is useful for
