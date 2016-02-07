@@ -92,23 +92,16 @@ function Argv (processArgs, cwd) {
     tmpOptions.envPrefix = undefined
     options = tmpOptions
 
-    usage = Usage(self, y18n) // handle usage output.
-    validation = validation ? validation.reset(globalLookup) : Validation(self, usage, y18n) // handle arg validation.
-    completion = Completion(self, usage)
+    // if this is the first time being executed, create
+    // instances of all our helpers -- otherwise just reset.
+    usage = usage ? usage.reset(globalLookup) : Usage(self, y18n)
+    validation = validation ? validation.reset(globalLookup) : Validation(self, usage, y18n)
+    if (!completion) completion = Completion(self, usage)
 
-    // these options shoudl not be reset
-    // help and/or version are globals.
-    helpOpt = null
-    versionOpt = null
-
-    // these parsing settings are not
-    // dependent on keys and should always
-    // be reset.
     exitProcess = true
     strict = false
     groups = {}
     commandHandlers = {}
-
     self.parsed = false
 
     return self
@@ -344,6 +337,8 @@ function Argv (processArgs, cwd) {
         self.choices(key, opt.choices)
       } if ('group' in opt) {
         self.group(key, opt.group)
+      } if (opt.global) {
+        self.global(key)
       } if (opt.boolean || opt.type === 'boolean') {
         self.boolean(key)
         if (opt.alias) self.boolean(opt.alias)
@@ -433,6 +428,7 @@ function Argv (processArgs, cwd) {
 
     usage.version(ver || undefined)
     self.boolean(versionOpt)
+    self.global(versionOpt)
     self.describe(versionOpt, msg)
     return self
   }
@@ -449,6 +445,7 @@ function Argv (processArgs, cwd) {
   self.addHelpOpt = function (opt, msg) {
     helpOpt = opt
     self.boolean(opt)
+    self.global(opt)
     self.describe(opt, msg || usage.deferY18nLookup('Show help'))
     return self
   }
@@ -494,6 +491,7 @@ function Argv (processArgs, cwd) {
       desc = 'generate bash completion script'
     }
     self.command(completionCommand, desc)
+    self.global(completionCommand)
 
     // a function can be provided
     if (fn) completion.registerFunction(fn)

@@ -733,6 +733,37 @@ Method to execute when a failure occurs, rather than printing the failure messag
 
 `fn` is called with the failure message that would have been printed.
 
+<a name="global"></a>.global(globals)
+------------
+
+Indicate that an option (or group of options) should not be reset when a command
+is executed, as an example:
+
+```js
+var argv = require('yargs')
+  .option('a', {
+    alias: 'all',
+    default: true
+  })
+  .option('n', {
+    alias: 'none',
+    default: true
+  })
+  .command('foo', 'foo command', function (yargs) {
+    return yargs.option('b', {
+      alias: 'bar'
+    })
+  })
+  .help('help')
+  .global('a')
+  .argv
+```
+
+If the `foo` command is executed the `all` option will remain, but the `none`
+option will have been eliminated.
+
+`help`, `version`, and `completion` options default to being global.
+
 <a name="group"></a>.group(key(s), groupName)
 --------------------
 
@@ -983,7 +1014,8 @@ option value to `true`.
 --------
 
 Reset the argument object built up so far. This is useful for
-creating nested command line interfaces.
+creating nested command line interfaces. Use [global](#global)
+to specify keys that should not be reset.
 
 ```js
 var yargs = require('yargs')

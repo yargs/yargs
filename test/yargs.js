@@ -223,11 +223,11 @@ describe('yargs dsl tests', function () {
 
       var emptyOptions = {
         array: [],
-        boolean: [],
+        boolean: ['help'],
         string: [],
         alias: {},
         default: {},
-        key: {},
+        key: {help: true},
         narg: {},
         defaultDescription: {},
         choices: {},
@@ -236,12 +236,12 @@ describe('yargs dsl tests', function () {
         normalize: [],
         config: {},
         envPrefix: undefined,
-        global: [],
+        global: ['help'],
         demanded: {}
       }
 
       expect(y.getOptions()).to.deep.equal(emptyOptions)
-      expect(y.getUsageInstance().getDescriptions()).to.deep.equal({})
+      expect(y.getUsageInstance().getDescriptions()).to.deep.equal({help: '__yargsString__:Show help'})
       expect(y.getValidationInstance().getImplied()).to.deep.equal({})
       expect(y.getExitProcess()).to.equal(true)
       expect(y.getStrict()).to.equal(false)
@@ -680,6 +680,96 @@ describe('yargs dsl tests', function () {
           nargs: 2
         })
         .global('foo')
+        .reset()
+      var options = y.getOptions()
+      options.key.foo.should.equal(true)
+      expect(options.key.bar).to.equal(undefined)
+    })
+
+    it('does not reset alias of global option', function () {
+      var y = yargs('--foo a b c')
+        .option('foo', {
+          nargs: 2,
+          alias: 'awesome-sauce'
+        })
+        .string('awesome-sauce')
+        .demand('awesomeSauce')
+        .option('bar', {
+          nargs: 2,
+          string: true,
+          demand: true
+        })
+        .global('foo')
+        .reset({
+          foo: ['awesome-sauce', 'awesomeSauce']
+        })
+      var options = y.getOptions()
+
+      options.key.foo.should.equal(true)
+      options.string.should.include('awesome-sauce')
+      Object.keys(options.demanded).should.include('awesomeSauce')
+
+      expect(options.key.bar).to.equal(undefined)
+      options.string.should.not.include('bar')
+      Object.keys(options.demanded).should.not.include('bar')
+    })
+
+    it('should set help to global option by default', function () {
+      var y = yargs('--foo')
+        .help('help')
+      var options = y.getOptions()
+      options.global.should.include('help')
+    })
+
+    it('should set version to global option by default', function () {
+      var y = yargs('--foo')
+        .version()
+      var options = y.getOptions()
+      options.global.should.include('version')
+    })
+
+    it('should set completion to global option by default', function () {
+      var y = yargs('--foo')
+        .completion()
+      var options = y.getOptions()
+      options.global.should.include('completion')
+    })
+
+    it('should not reset usage descriptions of global options', function () {
+      var y = yargs('--foo')
+        .describe('bar', 'my awesome bar option')
+        .describe('foo', 'my awesome foo option')
+        .global('foo')
+        .reset()
+      var descriptions = y.getUsageInstance().getDescriptions()
+      Object.keys(descriptions).should.include('foo')
+      Object.keys(descriptions).should.not.include('bar')
+    })
+
+    it('should not reset implications of global options', function () {
+      var y = yargs(['--x=33'])
+        .implies({
+          x: 'y'
+        })
+        .implies({
+          z: 'w'
+        })
+        .global(['x'])
+        .reset()
+      var implied = y.getValidationInstance().getImplied()
+      Object.keys(implied).should.include('x')
+      Object.keys(implied).should.not.include('z')
+    })
+
+    it('should expose an options short-hand for declaring global options', function () {
+      var y = yargs('--foo a b c')
+        .option('foo', {
+          nargs: 2,
+          global: true
+        })
+        .option('bar', {
+          nargs: 2
+        })
         .reset()
       var options = y.getOptions()
       options.key.foo.should.equal(true)
