@@ -670,7 +670,7 @@ describe('yargs dsl tests', function () {
     })
   })
 
-  describe("global", function () {
+  describe('global', function () {
     it('does not reset a global options when reset is called', function () {
       var y = yargs('--foo a b c')
         .option('foo', {

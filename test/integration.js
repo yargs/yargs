@@ -51,58 +51,59 @@ describe('integration tests', function () {
     })
   })
 
-  if (!isWindows())
-  describe('load root package.json', function () {
-    before(function (done) {
-      this.timeout(10000)
-      // create a symlinked, and a physical copy of yargs in
-      // our fixtures directory, so that we can test that the
-      // nearest package.json is appropriately loaded.
-      cpr('./', './test/fixtures/yargs', {
-        filter: /node_modules|example|test|package\.json/
-      }, function () {
-        fs.symlinkSync(process.cwd(), './test/fixtures/yargs-symlink')
-        return done()
-      })
-    })
-
-    describe('version #', function () {
-      it('defaults to appropriate version # when yargs is installed normally', function (done) {
-        testCmd('./normal-bin.js', [ '--version' ], function (buf) {
-          buf.should.match(/9\.9\.9/)
+  if (!isWindows()) {
+    describe('load root package.json', function () {
+      before(function (done) {
+        this.timeout(10000)
+        // create a symlinked, and a physical copy of yargs in
+        // our fixtures directory, so that we can test that the
+        // nearest package.json is appropriately loaded.
+        cpr('./', './test/fixtures/yargs', {
+          filter: /node_modules|example|test|package\.json/
+        }, function () {
+          fs.symlinkSync(process.cwd(), './test/fixtures/yargs-symlink')
           return done()
         })
       })
 
-      it('defaults to appropriate version # when yargs is symlinked', function (done) {
-        testCmd('./symlink-bin.js', [ '--version' ], function (buf) {
-          buf.should.match(/9\.9\.9/)
-          return done()
+      describe('version #', function () {
+        it('defaults to appropriate version # when yargs is installed normally', function (done) {
+          testCmd('./normal-bin.js', [ '--version' ], function (buf) {
+            buf.should.match(/9\.9\.9/)
+            return done()
+          })
+        })
+
+        it('defaults to appropriate version # when yargs is symlinked', function (done) {
+          testCmd('./symlink-bin.js', [ '--version' ], function (buf) {
+            buf.should.match(/9\.9\.9/)
+            return done()
+          })
         })
       })
-    })
 
-    describe('parser settings', function (done) {
-      it('reads parser config settings when yargs is installed normally', function (done) {
-        testCmd('./normal-bin.js', [ '--foo.bar' ], function (buf) {
-          buf.should.match(/foo\.bar/)
-          return done()
+      describe('parser settings', function (done) {
+        it('reads parser config settings when yargs is installed normally', function (done) {
+          testCmd('./normal-bin.js', [ '--foo.bar' ], function (buf) {
+            buf.should.match(/foo\.bar/)
+            return done()
+          })
+        })
+
+        it('reads parser config settings when yargs is installed as a symlink', function (done) {
+          testCmd('./symlink-bin.js', [ '--foo.bar' ], function (buf) {
+            buf.should.match(/foo\.bar/)
+            return done()
+          })
         })
       })
 
-      it('reads parser config settings when yargs is installed as a symlink', function (done) {
-        testCmd('./symlink-bin.js', [ '--foo.bar' ], function (buf) {
-          buf.should.match(/foo\.bar/)
-          return done()
-        })
+      after(function () {
+        rimraf.sync('./test/fixtures/yargs')
+        fs.unlinkSync('./test/fixtures/yargs-symlink')
       })
     })
-
-    after(function () {
-      rimraf.sync('./test/fixtures/yargs')
-      fs.unlinkSync('./test/fixtures/yargs-symlink')
-    })
-  })
+  }
 })
 
 function testCmd (cmd, args, done) {
