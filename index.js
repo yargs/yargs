@@ -1,4 +1,5 @@
 var assert = require('assert')
+var Command = require('./lib/command')
 var Completion = require('./lib/completion')
 var Parser = require('yargs-parser')
 var path = require('path')
@@ -17,6 +18,7 @@ function Argv (processArgs, cwd) {
   processArgs = processArgs || [] // handle calling yargs().
 
   var self = {}
+  var command = null
   var completion = null
   var usage = null
   var validation = null
@@ -96,12 +98,12 @@ function Argv (processArgs, cwd) {
     // instances of all our helpers -- otherwise just reset.
     usage = usage ? usage.reset(globalLookup) : Usage(self, y18n)
     validation = validation ? validation.reset(globalLookup) : Validation(self, usage, y18n)
-    if (!completion) completion = Completion(self, usage)
+    command = command ? command.reset() : Command(self, usage)
+    if (!completion) completion = Completion(self, usage, command)
 
     exitProcess = true
     strict = false
     groups = {}
-    commandHandlers = {}
     completionCommand = null
     self.parsed = false
 
@@ -164,27 +166,8 @@ function Argv (processArgs, cwd) {
   }
 
   self.command = function (cmd, description, builder, handler) {
-    if (description !== false) {
-      usage.command(cmd, description)
-    }
-
-    if (arguments.length === 3) {
-      commandHandlers[cmd] = {
-        builder: builder
-      }
-    } else if (arguments.length === 4) {
-      commandHandlers[cmd] = {
-        handler: handler,
-        builder: builder
-      }
-    }
-
+    command.addHandler(cmd, description, builder, handler)
     return self
-  }
-
-  var commandHandlers = {}
-  self.getCommandHandlers = function () {
-    return commandHandlers
   }
 
   self.string = function (strings) {
@@ -538,6 +521,10 @@ function Argv (processArgs, cwd) {
     return validation
   }
 
+  self.getCommandInstance = function () {
+    return command
+  }
+
   self.terminalWidth = function () {
     return require('window-size').width
   }
@@ -583,10 +570,11 @@ function Argv (processArgs, cwd) {
 
     // if there's a handler associated with a
     // command defer processing to it.
-    var handlerKeys = Object.keys(self.getCommandHandlers())
-    for (var i = 0, command; (command = handlerKeys[i]) !== undefined; i++) {
-      if (~argv._.indexOf(command)) {
-        return runCommand(command, self, parsed)
+    var handlerKeys = command.getCommands()
+    for (var i = 0, cmd; (cmd = handlerKeys[i]) !== undefined; i++) {
+      if (~argv._.indexOf(cmd)) {
+        setPlaceholderKeys(argv)
+        return command.runCommand(cmd, self, parsed)
       }
     }
 
@@ -665,21 +653,6 @@ function Argv (processArgs, cwd) {
       // if we explode looking up locale just noop
       // we'll keep using the default language 'en'.
     }
-  }
-
-  function runCommand (command, yargs, parsed) {
-    var argv = parsed.argv
-    setPlaceholderKeys(argv)
-    var commandHandler = yargs.getCommandHandlers()[command]
-    var innerArgv = argv
-    if (commandHandler.builder) {
-      innerArgv = commandHandler.builder(yargs.reset(parsed.aliases))
-      innerArgv = innerArgv ? innerArgv.argv : argv
-    }
-    if (commandHandler.handler) {
-      commandHandler.handler(innerArgv)
-    }
-    return innerArgv
   }
 
   function setPlaceholderKeys (argv) {
