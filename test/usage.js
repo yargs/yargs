@@ -417,29 +417,103 @@ describe('usage tests', function () {
     )
   })
 
-  describe('when exitProcess is false and check fails with a thrown exception', function () {
-    it('should display missing arguments once', function () {
-      var r = checkUsage(function () {
-        try {
-          return yargs('-x 10 -z 20')
-            .usage('Usage: $0 -x NUM -y NUM')
-            .exitProcess(false)
-            .wrap(null)
-            .check(function (argv) {
-              if (!('x' in argv)) throw Error('You forgot about -x')
-              if (!('y' in argv)) throw Error('You forgot about -y')
-            })
-            .argv
-        } catch (err) {
-          // ignore the error, we only test the output here
-        }
+  describe('when exitProcess is false', function () {
+    describe('when check fails with a thrown exception', function () {
+      it('should display missing arguments once', function () {
+        var r = checkUsage(function () {
+          try {
+            return yargs('-x 10 -z 20')
+              .usage('Usage: $0 -x NUM -y NUM')
+              .exitProcess(false)
+              .wrap(null)
+              .check(function (argv) {
+                if (!('x' in argv)) throw Error('You forgot about -x')
+                if (!('y' in argv)) throw Error('You forgot about -y')
+              })
+              .argv
+          } catch (err) {
+            // ignore the error, we only test the output here
+          }
+        })
+        r.errors.join('\n').split(/\n+/).should.deep.equal([
+          'Usage: ./usage -x NUM -y NUM',
+          'You forgot about -y'
+        ])
+        r.should.have.property('logs').with.length(0)
+        r.should.have.property('exit').and.be.false
       })
-      r.errors.join('\n').split(/\n+/).should.deep.equal([
-        'Usage: ./usage -x NUM -y NUM',
-        'You forgot about -y'
-      ])
-      r.should.have.property('logs').with.length(0)
-      r.should.have.property('exit').and.be.false
+    })
+    describe('fail()', function () {
+      it('is called with the original error message as the first parameter', function () {
+        var r = checkUsage(function () {
+          try {
+            return yargs()
+              .fail(function (message) {
+                console.log(message)
+              })
+              .exitProcess(false)
+              .wrap(null)
+              .check(function (argv) {
+                throw new Error('foo')
+              })
+              .argv
+          } catch (error) {
+
+          }
+        })
+        r.logs.should.deep.equal(['foo'])
+        r.should.have.property('exit').and.be.false
+      })
+      describe('when check() throws error', function () {
+        it('fail() is called with the original error object as the second parameter', function () {
+          var r = checkUsage(function () {
+            try {
+              return yargs()
+                .fail(function (message, error) {
+                  console.log(error.message)
+                })
+                .exitProcess(false)
+                .wrap(null)
+                .check(function () {
+                  throw new Error('foo')
+                })
+                .argv
+            } catch (error) {
+
+            }
+          })
+          r.logs.should.deep.equal(['foo'])
+          r.should.have.property('exit').and.be.false
+        })
+      })
+      describe('when command() throws error', function () {
+        it('fail() is called with the original error object as the second parameter', function () {
+          var r = checkUsage(function () {
+            try {
+              return yargs('test')
+                .fail(function () {
+                  console.log('is not triggered')
+                })
+                .exitProcess(false)
+                .wrap(null)
+                .command('test', 'test', function (subYargs) {
+                  subYargs
+                    .fail(function (message, error) {
+                      console.log([error.name, error.message])
+                    })
+                    .exitProcess(false)
+
+                  throw new Error('foo')
+                })
+                .argv
+            } catch (error) {
+
+            }
+          })
+          r.logs.should.deep.equal([['Error', 'foo']])
+          r.should.have.property('exit').and.be.false
+        })
+      })
     })
   })
 
