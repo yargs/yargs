@@ -321,6 +321,28 @@ describe('yargs dsl tests', function () {
         ''
       ])
     })
+
+    it("accepts an object for describing a command's options", function () {
+      var r = checkOutput(function () {
+        yargs(['blerg', '-h'])
+          .command('blerg <foo>', 'handle blerg things', {
+            foo: {
+              default: 99
+            },
+            bar: {
+              default: 'hello world'
+            }
+          })
+          .help('h')
+          .wrap(null)
+          .argv
+      })
+
+      var usageString = r.logs[0]
+      usageString.should.match(/usage blerg <foo>/)
+      usageString.should.match(/--foo.*default: 99/)
+      usageString.should.match(/--bar.*default: "hello world"/)
+    })
   })
 
   describe('terminalWidth', function () {
