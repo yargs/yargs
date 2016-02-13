@@ -1,4 +1,4 @@
-yargs
+qyargs
 ========
 
 Yargs be a node.js library fer hearties tryin' ter parse optstrings.
@@ -453,6 +453,7 @@ var argv = require('yargs')
 ```
 
 .command(cmd, desc, [builder], [handler])
+.command(cmd, desc, [module])
 -------------------
 
 Document the commands exposed by your application.
@@ -462,8 +463,21 @@ values stored in `argv._`).  Set `desc` to `false` to create a hidden command.
 Hidden commands don't show up in the help output and aren't available for
 completion.
 
-Optionally, you can provide a `builder` function. This function is executed
-with a `yargs` instance, and can be used to provide command specific help:
+Optionally, you can provide a `builder` object to provide hints about the
+options that your command accepts:
+
+```js
+yargs.command('get', 'make a get HTTP request', {
+    url: {
+      default: 'http://yargs.js.org/'
+    }
+  })
+  .help()
+  .argv
+```
+
+`builder` can also be a function. This function is executed
+with a `yargs` instance, and can be used to provide _advanced_ command specific help:
 
 ```js
 yargs.command('get', 'make a get HTTP request', function (yargs) {
@@ -496,6 +510,42 @@ yargs
   )
   .help()
   .argv
+```
+
+### Positional Arguments
+
+Commands can accept _optional_ and _required_ positional arguments. Required
+positional arguments take the form `<foo>`, and optional arguments
+take the form `[bar]`. The parsed positional arguments will be populated in
+`argv`:
+
+```js
+yargs.command('get <source> [proxy]', 'make a get HTTP request')
+  .help()
+  .argv
+```
+
+### Providing a Command Module
+
+For complicated commands you can pull the logic into a module. A module
+simply needs to export:
+
+* `exports.builder`: which describes the options that a command accepts.
+* `exports.handler`: a function which will be passed the parsed argv.
+
+```js
+exports.builder = {
+  banana: {
+    default: 'cool'
+  },
+  batman: {
+    default: 'sad'
+  }
+}
+
+exports.handler = function (argv) {
+  // do something with argv.
+}
 ```
 
 .completion(cmd, [description], [fn]);
