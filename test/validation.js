@@ -87,6 +87,26 @@ describe('validation tests', function () {
         .argv
     })
 
+    it('fails when a required argument is missing', function (done) {
+      yargs('-w 10 marsupial')
+        .demand(1, ['w', 'b'])
+        .fail(function (msg) {
+          msg.should.equal('Missing required argument: b')
+          return done()
+        })
+        .argv
+    })
+
+    it('fails when required arguments are present, but a command is missing', function (done) {
+      yargs('-w 10 -m wombat')
+        .demand(1, ['w', 'm'])
+        .fail(function (msg) {
+          msg.should.equal('Not enough non-option arguments: got 0, need at least 1')
+          return done()
+        })
+        .argv
+    })
+
     it('fails without a message if msg is null', function (done) {
       yargs([])
         .demand(1, null)
