@@ -470,6 +470,7 @@ options that your command accepts:
 ```js
 yargs.command('get', 'make a get HTTP request', {
     url: {
+      alias: 'u',
       default: 'http://yargs.js.org/'
     }
   })
@@ -482,9 +483,9 @@ with a `yargs` instance, and can be used to provide _advanced_ command specific 
 
 ```js
 yargs.command('get', 'make a get HTTP request', function (yargs) {
-    return yargs.option('u', {
-      alias: 'url',
-      describe: 'the URL to make an HTTP request to'
+    return yargs.option('url', {
+      alias: 'u',
+      default: 'http://yargs.js.org/'
     })
   })
   .help()
@@ -535,6 +536,7 @@ simply needs to export:
 * `exports.handler`: a function which will be passed the parsed argv.
 
 ```js
+// my-module.js
 exports.builder = {
   banana: {
     default: 'cool'
@@ -547,6 +549,14 @@ exports.builder = {
 exports.handler = function (argv) {
   // do something with argv.
 }
+```
+
+You then register the module like so:
+
+```js
+yargs.command('get <source> [proxy]', 'make a get HTTP request', require('my-module'))
+  .help()
+  .argv
 ```
 
 .completion(cmd, [description], [fn]);
