@@ -453,6 +453,7 @@ var argv = require('yargs')
 ```
 
 .command(cmd, desc, [builder], [handler])
+-------------------
 .command(cmd, desc, [module])
 -------------------
 
@@ -463,7 +464,7 @@ values stored in `argv._`).  Set `desc` to `false` to create a hidden command.
 Hidden commands don't show up in the help output and aren't available for
 completion.
 
-Optionally, you can provide a `builder` object to provide hints about the
+Optionally, you can provide a `builder` object to give hints about the
 options that your command accepts:
 
 ```js
