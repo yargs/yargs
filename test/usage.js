@@ -999,20 +999,18 @@ describe('usage tests', function () {
 
   it('should not print usage string if help() is called without arguments', function () {
     var r = checkUsage(function () {
-      return yargs([]).usage('foo').help()
+      return yargs([]).usage('foo').help().argv
     })
 
-    console.log(r)
-    r.result.should.equal(undefined)
+    r.logs.length.should.equal(0)
   })
 
   it('should add --help as an option for printing usage text if help() is called without arguments', function () {
     var r = checkUsage(function () {
-      return yargs(['--help']).usage('foo').help()
+      return yargs(['--help']).usage('foo').help().argv
     })
 
-    console.log(r)
-    r.result.should.equal(/foo/)
+    r.logs.length.should.not.equal(0)
   })
 
   describe('wrap', function () {
