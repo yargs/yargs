@@ -997,13 +997,22 @@ describe('usage tests', function () {
     yargs.rebase(['home', 'chevex', 'foo'].join(path.sep), ['home', 'chevex', 'pow', 'zoom.txt'].join(path.sep)).should.equal(['..', 'pow', 'zoom.txt'].join(path.sep))
   })
 
-  // Fixes: https://github.com/chevex/yargs/issues/71
-  it('should not raise an exception if help called on empty arguments', function () {
+  it('should not print usage string if help() is called without arguments', function () {
     var r = checkUsage(function () {
       return yargs([]).usage('foo').help()
     })
 
-    r.result.should.match(/foo/)
+    console.log(r)
+    r.result.should.equal(undefined)
+  })
+
+  it('should add --help as an option for printing usage text if help() is called without arguments', function () {
+    var r = checkUsage(function () {
+      return yargs(['--help']).usage('foo').help()
+    })
+
+    console.log(r)
+    r.result.should.equal(/foo/)
   })
 
   describe('wrap', function () {

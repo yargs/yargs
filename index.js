@@ -422,7 +422,7 @@ function Argv (processArgs, cwd) {
 
     if (!self.parsed) parseArgs(processArgs) // run parser, if it has not already been executed.
 
-    return usage.help()
+    return self.addHelpOpt.apply(self, 'help')
   }
 
   var completionCommand = null
