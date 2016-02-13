@@ -621,6 +621,26 @@ instead of the standard error message. This is especially helpful for the non-op
 If a `boolean` value is given, it controls whether the option is demanded;
 this is useful when using `.options()` to specify command line parameters.
 
+A combination of `.demand(1)` and `.strict()` will allow you to require a user to pass at least one command:
+
+```js
+var argv = require('yargs')
+  .command('install', 'tis a mighty fine package to install')
+  .demand(1)
+  .strict()
+  .argv
+```
+
+Similarly, you can require a command and arguments at the same time:
+
+```js
+var argv = require('yargs')
+  .command('install', 'tis a mighty fine package to install')
+  .demand(1, ['w', 'm'])
+  .strict()
+  .argv
+```
+
 <a name="describe"></a>.describe(key, desc)
 --------------------
 
