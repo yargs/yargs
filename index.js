@@ -98,7 +98,7 @@ function Argv (processArgs, cwd) {
     // instances of all our helpers -- otherwise just reset.
     usage = usage ? usage.reset(globalLookup) : Usage(self, y18n)
     validation = validation ? validation.reset(globalLookup) : Validation(self, usage, y18n)
-    command = command ? command.reset() : Command(self, usage)
+    command = command ? command.reset() : Command(self, usage, validation)
     if (!completion) completion = Completion(self, usage, command)
 
     exitProcess = true
@@ -572,7 +572,7 @@ function Argv (processArgs, cwd) {
     // command defer processing to it.
     var handlerKeys = command.getCommands()
     for (var i = 0, cmd; (cmd = handlerKeys[i]) !== undefined; i++) {
-      if (~argv._.indexOf(cmd)) {
+      if (~argv._.indexOf(cmd) && cmd !== completionCommand) {
         setPlaceholderKeys(argv)
         return command.runCommand(cmd, self, parsed)
       }
