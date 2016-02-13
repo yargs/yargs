@@ -1,4 +1,4 @@
-qyargs
+yargs
 ========
 
 Yargs be a node.js library fer hearties tryin' ter parse optstrings.
