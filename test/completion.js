@@ -42,13 +42,12 @@ describe('Completion', function () {
       var r = checkUsage(function () {
         return yargs(['--get-yargs-completions'])
           .command('foo', 'foo command', function (subYargs) {
-            subYargs.options({
+            return subYargs.options({
               bar: {
                 describe: 'bar option'
               }
             })
             .help('help')
-            .argv
           })
           .completion()
           .argv

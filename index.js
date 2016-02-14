@@ -1,4 +1,5 @@
 var assert = require('assert')
+var Command = require('./lib/command')
 var Completion = require('./lib/completion')
 var Parser = require('yargs-parser')
 var path = require('path')
@@ -8,6 +9,7 @@ var Y18n = require('y18n')
 var readPkgUp = require('read-pkg-up')
 var pkgConf = require('pkg-conf')
 var requireMainFilename = require('require-main-filename')
+var objFilter = require('./lib/obj-filter')
 
 Argv(process.argv.slice(2))
 
@@ -16,6 +18,7 @@ function Argv (processArgs, cwd) {
   processArgs = processArgs || [] // handle calling yargs().
 
   var self = {}
+  var command = null
   var completion = null
   var usage = null
   var validation = null
@@ -43,40 +46,65 @@ function Argv (processArgs, cwd) {
     )
   }
 
+  // puts yargs back into an initial state. any keys
+  // that have been set to "global" will not be reset
+  // by this action.
   var options
-  self.resetOptions = self.reset = function () {
-    // put yargs back into its initial
-    // state, this is useful for creating a
-    // nested CLI.
-    options = {
-      array: [],
-      boolean: [],
-      string: [],
-      narg: {},
-      key: {},
-      alias: {},
-      default: {},
-      defaultDescription: {},
-      choices: {},
-      requiresArg: [],
-      count: [],
-      normalize: [],
-      config: {},
-      envPrefix: undefined
-    }
+  self.resetOptions = self.reset = function (aliases) {
+    aliases = aliases || {}
+    options = options || {}
+    // put yargs back into an initial state, this
+    // logic is used to build a nested command
+    // hierarchy.
+    var tmpOptions = {}
+    tmpOptions.global = options.global ? options.global : []
 
-    usage = Usage(self, y18n) // handle usage output.
-    validation = Validation(self, usage, y18n) // handle arg validation.
-    completion = Completion(self, usage)
+    // if a key has been set as a global, we
+    // do not want to reset it or its aliases.
+    var globalLookup = {}
+    tmpOptions.global.forEach(function (g) {
+      globalLookup[g] = true
+      ;(aliases[g] || []).forEach(function (a) {
+        globalLookup[a] = true
+      })
+    })
 
-    demanded = {}
-    groups = {}
+    var arrayOptions = [
+      'array', 'boolean', 'string', 'requiresArg',
+      'count', 'requiresArg', 'count', 'normalize'
+    ]
+
+    var objectOptions = [
+      'narg', 'key', 'alias', 'default', 'defaultDescription',
+      'config', 'choices', 'demanded'
+    ]
+
+    arrayOptions.forEach(function (k) {
+      tmpOptions[k] = (options[k] || []).filter(function (k) {
+        return globalLookup[k]
+      })
+    })
+
+    objectOptions.forEach(function (k) {
+      tmpOptions[k] = objFilter(options[k], function (k, v) {
+        return globalLookup[k]
+      })
+    })
+
+    tmpOptions.envPrefix = undefined
+    options = tmpOptions
+
+    // if this is the first time being executed, create
+    // instances of all our helpers -- otherwise just reset.
+    usage = usage ? usage.reset(globalLookup) : Usage(self, y18n)
+    validation = validation ? validation.reset(globalLookup) : Validation(self, usage, y18n)
+    command = command ? command.reset() : Command(self, usage, validation)
+    if (!completion) completion = Completion(self, usage, command)
 
     exitProcess = true
     strict = false
-    helpOpt = null
-    versionOpt = null
-    commandHandlers = {}
+    groups = {}
+    completionCommand = null
     self.parsed = false
 
     return self
@@ -137,17 +165,9 @@ function Argv (processArgs, cwd) {
     return self
   }
 
-  self.command = function (cmd, description, fn) {
-    if (description !== false) {
-      usage.command(cmd, description)
-    }
-    if (fn) commandHandlers[cmd] = fn
+  self.command = function (cmd, description, builder, handler) {
+    command.addHandler(cmd, description, builder, handler)
     return self
-  }
-
-  var commandHandlers = {}
-  self.getCommandHandlers = function () {
-    return commandHandlers
   }
 
   self.string = function (strings) {
@@ -187,7 +207,6 @@ function Argv (processArgs, cwd) {
     return self
   }
 
-  var demanded = {}
   self.demand = self.required = self.require = function (keys, max, msg) {
     // you can optionally provide a 'max' key,
     // which will raise an exception if too many '_'
@@ -203,18 +222,18 @@ function Argv (processArgs, cwd) {
     }
 
     if (typeof keys === 'number') {
-      if (!demanded._) demanded._ = { count: 0, msg: null, max: max }
-      demanded._.count = keys
-      demanded._.msg = msg
+      if (!options.demanded._) options.demanded._ = { count: 0, msg: null, max: max }
+      options.demanded._.count = keys
+      options.demanded._.msg = msg
     } else if (Array.isArray(keys)) {
       keys.forEach(function (key) {
         self.demand(key, msg)
       })
     } else {
       if (typeof msg === 'string') {
-        demanded[keys] = { msg: msg }
+        options.demanded[keys] = { msg: msg }
       } else if (msg === true || typeof msg === 'undefined') {
-        demanded[keys] = { msg: undefined }
+        options.demanded[keys] = { msg: undefined }
       }
     }
 
@@ -222,7 +241,7 @@ function Argv (processArgs, cwd) {
   }
 
   self.getDemanded = function () {
-    return demanded
+    return options.demanded
   }
 
   self.requiresArg = function (requiresArgs) {
@@ -271,6 +290,11 @@ function Argv (processArgs, cwd) {
     return self
   }
 
+  self.global = function (globals) {
+    options.global.push.apply(options.global, [].concat(globals))
+    return self
+  }
+
   self.parse = function (args) {
     return parseArgs(args)
   }
@@ -303,6 +327,8 @@ function Argv (processArgs, cwd) {
         self.choices(key, opt.choices)
       } if ('group' in opt) {
         self.group(key, opt.group)
+      } if (opt.global) {
+        self.global(key)
       } if (opt.boolean || opt.type === 'boolean') {
         self.boolean(key)
         if (opt.alias) self.boolean(opt.alias)
@@ -392,6 +418,7 @@ function Argv (processArgs, cwd) {
 
     usage.version(ver || undefined)
     self.boolean(versionOpt)
+    self.global(versionOpt)
     self.describe(versionOpt, msg)
     return self
   }
@@ -409,6 +436,7 @@ function Argv (processArgs, cwd) {
     opt = opt || 'help'
     helpOpt = opt
     self.boolean(opt)
+    self.global(opt)
     self.describe(opt, msg || usage.deferY18nLookup('Show help'))
     return self
   }
@@ -492,6 +520,10 @@ function Argv (processArgs, cwd) {
     return validation
   }
 
+  self.getCommandInstance = function () {
+    return command
+  }
+
   self.terminalWidth = function () {
     return require('window-size').width
   }
@@ -537,11 +569,11 @@ function Argv (processArgs, cwd) {
 
     // if there's a handler associated with a
     // command defer processing to it.
-    var handlerKeys = Object.keys(self.getCommandHandlers())
-    for (var i = 0, command; (command = handlerKeys[i]) !== undefined; i++) {
-      if (~argv._.indexOf(command)) {
-        runCommand(command, self, argv)
-        return self.argv
+    var handlerKeys = command.getCommands()
+    for (var i = 0, cmd; (cmd = handlerKeys[i]) !== undefined; i++) {
+      if (~argv._.indexOf(cmd) && cmd !== completionCommand) {
+        setPlaceholderKeys(argv)
+        return command.runCommand(cmd, self, parsed)
       }
     }
 
@@ -620,11 +652,6 @@ function Argv (processArgs, cwd) {
       // if we explode looking up locale just noop
       // we'll keep using the default language 'en'.
     }
-  }
-
-  function runCommand (command, yargs, argv) {
-    setPlaceholderKeys(argv)
-    yargs.getCommandHandlers()[command](yargs.reset(), argv)
   }
 
   function setPlaceholderKeys (argv) {
