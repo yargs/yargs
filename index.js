@@ -295,6 +295,23 @@ function Argv (processArgs, cwd) {
     return self
   }
 
+  self.pkgConf = function (key, path) {
+    var conf = null
+
+    var obj = readPkgUp.sync({
+      cwd: path || requireMainFilename()
+    })
+
+    if (obj.pkg && obj.pkg[key] && typeof obj.pkg[key] === 'object') {
+      conf = obj.pkg[key]
+      Object.keys(conf).forEach(function (k) {
+        self.default(k, conf[k])
+      })
+    }
+
+    return self
+  }
+
   self.parse = function (args) {
     return parseArgs(args)
   }

@@ -2,6 +2,8 @@
 
 ### 4.x
 
+- [#378](https://github.com/bcoe/yargs/pull/378) introduces the pkgConf feature, which tells
+  yargs to load default argument values from a key on a project's package.json (@bcoe)
 - [#376](https://github.com/bcoe/yargs/pull/376) **breaking change**, make help() method signature
    more consistent with other commands (@maxrimue)
 - [#368](https://github.com/bcoe/yargs/pull/368) **breaking change**, overhaul to command handling API:
