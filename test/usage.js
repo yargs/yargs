@@ -36,6 +36,72 @@ describe('usage tests', function () {
         r.exit.should.be.ok
       })
 
+      it('missing argument message given if one command, but an argument not on the list is provided', function () {
+        var r = checkUsage(function () {
+          return yargs('wombat -w 10 -y 10')
+            .usage('Usage: $0 -w NUM -m NUM')
+            .demand(1, ['w', 'm'])
+            .strict()
+            .wrap(null)
+            .argv
+        })
+        r.result.should.have.property('w', 10)
+        r.result.should.have.property('y', 10)
+        r.result.should.have.property('_').with.length(1)
+        r.errors.join('\n').split(/\n+/).should.deep.equal([
+          'Usage: ./usage -w NUM -m NUM',
+          'Options:',
+          '  -w  [required]',
+          '  -m  [required]',
+          'Missing required argument: m'
+        ])
+        r.logs.should.have.length(0)
+        r.exit.should.be.ok
+      })
+
+      it('missing command message if all the required arguments exist, but not enough commands are provided', function () {
+        var r = checkUsage(function () {
+          return yargs('-w 10 -y 10')
+            .usage('Usage: $0 -w NUM -m NUM')
+            .demand(1, ['w', 'm'])
+            .strict()
+            .wrap(null)
+            .argv
+        })
+        r.result.should.have.property('w', 10)
+        r.result.should.have.property('y', 10)
+        r.result.should.have.property('_').with.length(0)
+        r.errors.join('\n').split(/\n+/).should.deep.equal([
+          'Usage: ./usage -w NUM -m NUM',
+          'Options:',
+          '  -w  [required]',
+          '  -m  [required]',
+          'Not enough non-option arguments: got 0, need at least 1'
+        ])
+        r.logs.should.have.length(0)
+        r.exit.should.be.ok
+      })
+
+      it('no failure occurs if the required arguments and the required number of commands are provided.', function () {
+        var r = checkUsage(function () {
+          return yargs('wombat -w 10 -m 10')
+            .usage('Usage: $0 -w NUM -m NUM')
+            .command('wombat', 'wombat handlers', function (yargs, argv) {
+              return argv
+            })
+            .demand(1, ['w', 'm'])
+            .strict()
+            .wrap(null)
+            .argv
+        })
+        r.result.should.have.property('w', 10)
+        r.result.should.have.property('m', 10)
+        r.result.should.have.property('_').with.length(1)
+        r.should.have.property('errors').with.length(0)
+        r.should.have.property('logs').with.length(0)
+        r.should.have.property('exit', false)
+      })
+
       describe('using .require()', function () {
         it('should show an error along with the missing arguments on demand fail', function () {
           var r = checkUsage(function () {
@@ -58,6 +124,71 @@ describe('usage tests', function () {
           r.logs.should.have.length(0)
           r.exit.should.be.ok
         })
+        it('missing argument message given if one command and an argument not on the list are provided', function () {
+          var r = checkUsage(function () {
+            return yargs('wombat -w 10 -y 10')
+              .usage('Usage: $0 -w NUM -m NUM')
+              .required(1, ['w', 'm'])
+              .strict()
+              .wrap(null)
+              .argv
+          })
+          r.result.should.have.property('w', 10)
+          r.result.should.have.property('y', 10)
+          r.result.should.have.property('_').with.length(1)
+          r.errors.join('\n').split(/\n+/).should.deep.equal([
+            'Usage: ./usage -w NUM -m NUM',
+            'Options:',
+            '  -w  [required]',
+            '  -m  [required]',
+            'Missing required argument: m'
+          ])
+          r.logs.should.have.length(0)
+          r.exit.should.be.ok
+        })
+      })
+
+      it('missing command message if all the required arguments exist, but not enough commands are provided', function () {
+        var r = checkUsage(function () {
+          return yargs('-w 10 -y 10')
+            .usage('Usage: $0 -w NUM -m NUM')
+            .require(1, ['w', 'm'])
+            .strict()
+            .wrap(null)
+            .argv
+        })
+        r.result.should.have.property('w', 10)
+        r.result.should.have.property('y', 10)
+        r.result.should.have.property('_').with.length(0)
+        r.errors.join('\n').split(/\n+/).should.deep.equal([
+          'Usage: ./usage -w NUM -m NUM',
+          'Options:',
+          '  -w  [required]',
+          '  -m  [required]',
+          'Not enough non-option arguments: got 0, need at least 1'
+        ])
+        r.logs.should.have.length(0)
+        r.exit.should.be.ok
+      })
+
+      it('no failure occurs if the required arguments and the required number of commands are provided.', function () {
+        var r = checkUsage(function () {
+          return yargs('wombat -w 10 -m 10')
+            .usage('Usage: $0 -w NUM -m NUM')
+            .command('wombat', 'wombat handlers', function (yargs, argv) {
+              return argv
+            })
+            .require(1, ['w', 'm'])
+            .strict()
+            .wrap(null)
+            .argv
+        })
+        r.result.should.have.property('w', 10)
+        r.result.should.have.property('m', 10)
+        r.result.should.have.property('_').with.length(1)
+        r.should.have.property('errors').with.length(0)
+        r.should.have.property('logs').with.length(0)
+        r.should.have.property('exit', false)
       })
     })
 

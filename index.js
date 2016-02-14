@@ -192,7 +192,12 @@ function Argv (processArgs, cwd) {
     // you can optionally provide a 'max' key,
     // which will raise an exception if too many '_'
     // options are provided.
-    if (typeof max !== 'number') {
+
+    if (Array.isArray(max)) {
+      max.forEach(function (key) {
+        self.demand(key, msg)
+      })
+    } else if (typeof max !== 'number') {
       msg = max
       max = Infinity
     }
@@ -215,6 +220,7 @@ function Argv (processArgs, cwd) {
 
     return self
   }
+
   self.getDemanded = function () {
     return demanded
   }
