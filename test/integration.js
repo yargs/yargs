@@ -1,6 +1,7 @@
 /* global describe, it, before, after */
 
 var spawn = require('win-spawn')
+var path = require('path')
 var which = require('which')
 var rimraf = require('rimraf')
 var cpr = require('cpr')
@@ -107,7 +108,7 @@ describe('integration tests', function () {
 
 function testCmd (cmd, args, done) {
   var oldDir = process.cwd()
-  process.chdir(__dirname + '/fixtures')
+  process.chdir(path.join(__dirname, '/fixtures'))
 
   var cmds = cmd.split(' ')
 
