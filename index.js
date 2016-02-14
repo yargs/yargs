@@ -295,11 +295,11 @@ function Argv (processArgs, cwd) {
     return self
   }
 
-  self.pkgConf = function (key) {
+  self.pkgConf = function (key, path) {
     var conf = null
 
     var obj = readPkgUp.sync({
-      cwd: requireMainFilename()
+      cwd: path || requireMainFilename()
     })
 
     if (obj.pkg && obj.pkg[key] && typeof obj.pkg[key] === 'object') {

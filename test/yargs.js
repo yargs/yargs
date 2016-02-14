@@ -836,5 +836,14 @@ describe('yargs dsl tests', function () {
       argv.foo.should.equal('a')
       expect(argv.git).to.equal(undefined)
     })
+
+    it('allows an alternative cwd to be specified', function () {
+      var argv = yargs('--foo a')
+        .pkgConf('yargs', './test/fixtures')
+        .argv
+
+      argv.foo.should.equal('a')
+      argv.dotNotation.should.equal(false)
+    })
   })
 })
