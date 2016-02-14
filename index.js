@@ -71,7 +71,7 @@ function Argv (processArgs, cwd) {
 
     var arrayOptions = [
       'array', 'boolean', 'string', 'requiresArg',
-      'count', 'requiresArg', 'count', 'normalize'
+      'count', 'requiresArg', 'count', 'normalize', 'number'
     ]
 
     var objectOptions = [
@@ -129,6 +129,11 @@ function Argv (processArgs, cwd) {
     } else {
       options.narg[key] = n
     }
+    return self
+  }
+
+  self.number = function (numbers) {
+    options.numbers.push.apply(options.number, [].concat(numbers))
     return self
   }
 
