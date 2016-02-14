@@ -806,4 +806,35 @@ describe('yargs dsl tests', function () {
       expect(options.key.bar).to.equal(undefined)
     })
   })
+
+  describe('pkgConf', function () {
+    it('uses values from package.json as defaults', function () {
+      var argv = yargs('--foo a').pkgConf('repository').argv
+
+      argv.foo.should.equal('a')
+      argv.type.should.equal('git')
+    })
+
+    it('combines yargs defaults with package.json defaults', function () {
+      var argv = yargs('--foo a')
+        .default('b', 99)
+        .pkgConf('repository')
+        .argv
+
+      argv.b.should.equal(99)
+      argv.foo.should.equal('a')
+      argv.type.should.equal('git')
+    })
+
+    it('is cool with a key not existing', function () {
+      var argv = yargs('--foo a')
+        .default('b', 99)
+        .pkgConf('banana')
+        .argv
+
+      argv.b.should.equal(99)
+      argv.foo.should.equal('a')
+      expect(argv.git).to.equal(undefined)
+    })
+  })
 })

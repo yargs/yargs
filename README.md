@@ -1077,6 +1077,12 @@ Parse `args` instead of `process.argv`. Returns the `argv` object.
 
 `args` may either be a pre-processed argv array, or a raw argument string.
 
+.pkgConf(key)
+------------
+
+Similar to [`config()`](#config), indicates that yargs should read
+default argument values from the specified key in package.json.
+
 .require(key, [msg | boolean])
 ------------------------------
 .required(key, [msg | boolean])
