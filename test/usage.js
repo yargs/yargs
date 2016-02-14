@@ -1326,6 +1326,26 @@ describe('usage tests', function () {
     })
   })
 
+  describe('number', function () {
+    it("should display 'type' number in help message", function () {
+      var r = checkUsage(function () {
+        return yargs(['-h'])
+          .number(['n'])
+          .describe('n', 'number of cherries')
+          .help('h')
+          .wrap(null)
+          .argv
+      })
+
+      r.logs.join('\n').split(/\n+/).should.deep.equal([
+        'Options:',
+        '  -h         Show help  [boolean]',
+        '  -n number of cherries [number]',
+        ''
+      ])
+    })
+  })
+
   describe('defaultDescription', function () {
     describe('using option() without default()', function () {
       it('should output given desc with default value', function () {
@@ -1484,6 +1504,26 @@ describe('usage tests', function () {
         'Options:',
         '  -h         Show help  [boolean]',
         '  -f, --foo  bar  [string]',
+        ''
+      ])
+    })
+
+    it("should display 'type' number in help message if set for alias", function () {
+      var r = checkUsage(function () {
+        return yargs(['-h'])
+          .string('foo')
+          .describe('foo', 'bar')
+          .alias('f', 'foo')
+          .number(['n'])
+          .help('h')
+          .wrap(null)
+          .argv
+      })
+
+      r.logs.join('\n').split(/\n+/).should.deep.equal([
+        'Options:',
+        '  -h         Show help  [boolean]',
+        '  -f, --foo  bar  [number]',
         ''
       ])
     })
