@@ -1708,6 +1708,26 @@ describe('usage tests', function () {
         ''
       ])
     })
+
+    it("should display 'type' number in help message if set for alias", function () {
+      var r = checkUsage(function () {
+        return yargs(['-h'])
+          .string('foo')
+          .describe('foo', 'bar')
+          .alias('f', 'foo')
+          .number(['foo'])
+          .help('h')
+          .wrap(null)
+          .argv
+      })
+
+      r.logs.join('\n').split(/\n+/).should.deep.equal([
+        'Options:',
+        '  -h         Show help  [boolean]',
+        '  -f, --foo  bar  [number]',
+        ''
+      ])
+    })
   })
 
   describe('showHelp', function (done) {

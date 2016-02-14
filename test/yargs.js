@@ -234,6 +234,7 @@ describe('yargs dsl tests', function () {
         requiresArg: [],
         count: [],
         normalize: [],
+        number: [],
         config: {},
         envPrefix: undefined,
         global: ['help'],
@@ -363,6 +364,15 @@ describe('yargs dsl tests', function () {
   describe('terminalWidth', function () {
     it('returns the maximum width of the terminal', function () {
       yargs.terminalWidth().should.be.gte(0)
+    })
+  })
+
+  describe('number', function () {
+    it('accepts number arguments when a number type is specified', function () {
+      var argv = yargs('-w 10')
+        .number('w')
+        .argv
+      argv.w.should.equal(10)
     })
   })
 

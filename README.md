@@ -1064,6 +1064,7 @@ Valid `opt` keys include:
 - `normalize`: The option should be normalized, see [`normalize()`](#normalize)
 - `requiresArg`: boolean, require the option be specified with a value, see [`requiresArg()`](#requiresArg)
 - `string`: boolean, interpret option as a string, see [`string()`](#string)
+- `number`: number, keys are treated as numbers, [`number()`](#number)
 - `type`: one of the following strings
     - `'array'`: synonymous for `array: true`, see [`array()`](#array)
     - `'boolean'`: synonymous for `boolean: true`, see [`boolean()`](#boolean)
@@ -1218,6 +1219,20 @@ If `key` is an array, interpret all the elements as strings.
 
 `.string('_')` will result in non-hyphenated arguments being interpreted as strings,
 regardless of whether they resemble numbers.
+
+<a name="number"></a>.number([key])
+------------
+Specify options with a numeric argument.
+
+If an argument is not provided with the option, will return `undefined`.
+
+If a non-numeric argument is provided, will return a `NaN`.
+
+```js
+var argv = require('yargs')
+  .number(['n'])
+  .argv
+```
 
 .updateLocale(obj)
 ------------------
