@@ -59,6 +59,7 @@ function Argv (processArgs, cwd) {
       requiresArg: [],
       count: [],
       normalize: [],
+      number: [],
       config: {},
       envPrefix: undefined
     }
@@ -99,6 +100,11 @@ function Argv (processArgs, cwd) {
     } else {
       options.narg[key] = n
     }
+    return self
+  }
+
+  self.number = function (numbers) {
+    options.numbers.push.apply(options.number, [].concat(numbers))
     return self
   }
 

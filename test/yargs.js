@@ -232,6 +232,7 @@ describe('yargs dsl tests', function () {
         requiresArg: [],
         count: [],
         normalize: [],
+        number: [],
         config: {},
         envPrefix: undefined
       }
