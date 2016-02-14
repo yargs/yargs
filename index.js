@@ -535,7 +535,7 @@ function Argv (processArgs, cwd) {
       try {
         args = parseArgs(processArgs)
       } catch (err) {
-        usage.fail(err.message)
+        usage.fail(err.message, err)
       }
 
       return args
