@@ -367,6 +367,15 @@ describe('yargs dsl tests', function () {
     })
   })
 
+  describe('number', function () {
+    it('accepts number arguments when a number type is specified', function () {
+      var argv = yargs('-w 10')
+        .number('w')
+        .argv
+      argv.w.should.equal(10)
+    })
+  })
+
   describe('choices', function () {
     it('accepts an object', function () {
       var optChoices = yargs([])

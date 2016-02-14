@@ -133,7 +133,7 @@ function Argv (processArgs, cwd) {
   }
 
   self.number = function (numbers) {
-    options.numbers.push.apply(options.number, [].concat(numbers))
+    options.number.push.apply(options.number, [].concat(numbers))
     return self
   }
 
