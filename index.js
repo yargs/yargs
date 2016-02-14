@@ -399,7 +399,8 @@ function Argv (processArgs, cwd) {
   }
 
   var helpOpt = null
-  self.addHelpOpt = function (opt, msg) {
+  self.addHelpOpt = self.help = function (opt, msg) {
+    opt = opt || 'help'
     helpOpt = opt
     self.boolean(opt)
     self.describe(opt, msg || usage.deferY18nLookup('Show help'))
@@ -421,14 +422,6 @@ function Argv (processArgs, cwd) {
   }
   self.getExitProcess = function () {
     return exitProcess
-  }
-
-  self.help = function () {
-    if (arguments.length > 0) return self.addHelpOpt.apply(self, arguments)
-
-    if (!self.parsed) parseArgs(processArgs) // run parser, if it has not already been executed.
-
-    return usage.help()
   }
 
   var completionCommand = null

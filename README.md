@@ -733,7 +733,7 @@ when displaying usage instructions, e.g.,
 
 ```js
 var yargs = require('yargs')(['--help'])
-  .help('help')
+  .help()
   .group('batman', 'Heroes:')
   .describe('batman', "world's greatest detective")
   .wrap(null)
@@ -753,14 +753,15 @@ Add an option (e.g. `--help`) that displays the usage string and exits the
 process. If present, the `description` parameter customizes the description of
 the help option in the usage string.
 
-If invoked without parameters, `.help()` returns the generated usage string.
+If invoked without parameters, `.help()` will make `--help` the option to trigger
+help output.
 
 Example:
 
 ```js
-var yargs = require("yargs")
+var yargs = require("yargs")['--help']
   .usage("$0 -operand1 number -operand2 number -operation [add|subtract]");
-console.log(yargs.help());
+  .help()
 ```
 
 Later on, `argv` can be retrieved with `yargs.argv`.
