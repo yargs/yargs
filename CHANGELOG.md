@@ -1,7 +1,9 @@
 ## Change Log
 
-### 4.x
+### v4.0.0 (2016/2/14 1:27 +07:00)
 
+- [#384](https://github.com/bcoe/yargs/pull/384) add new number type to yargs (@lrlna, @maxrimue)
+- [#382](https://github.com/bcoe/yargs/pull/382) pass error as extra parameter to fail (@gajus)
 - [#378](https://github.com/bcoe/yargs/pull/378) introduces the pkgConf feature, which tells
   yargs to load default argument values from a key on a project's package.json (@bcoe)
 - [#376](https://github.com/bcoe/yargs/pull/376) **breaking change**, make help() method signature
