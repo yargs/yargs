@@ -2,9 +2,12 @@
 
 ### 4.x
 
+- [#376](https://github.com/bcoe/yargs/pull/376) **breaking change**, make help() method signature
+   more consistent with other commands (@maxrimue)
 - [#368](https://github.com/bcoe/yargs/pull/368) **breaking change**, overhaul to command handling API:
   introducing named positional arguments, commands as modules, introduces the concept of global options (options that don't reset). (@nexdrew, @bcoe).
 - [#364](https://github.com/bcoe/yargs/pull/364) add the slick new yargs website to the package.json (@iarna).
+- [#357](https://github.com/bcoe/yargs/pull/357) .strict() now requires that a valid command is provided (@lrlna)
 - [#356](https://github.com/bcoe/yargs/pull/356) pull the parsing bits of yargs into the separate module yargs-parser. Various parsing options can now be turned on and off using configuration (@bcoe).
 - [#330](https://github.com/bcoe/yargs/pull/330) **breaking change**, fix inconsistencies with `.version()` API. (@maxrimue).
 
