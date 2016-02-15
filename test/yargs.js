@@ -376,7 +376,6 @@ describe('yargs dsl tests', function () {
       expect(typeof argv.w).to.equal('number')
     })
 
-
     it('should expose an options short-hand for numbers', function () {
       var argv = yargs('-w banana')
         .option('w', {
