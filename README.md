@@ -1070,6 +1070,7 @@ Valid `opt` keys include:
     - `'boolean'`: synonymous for `boolean: true`, see [`boolean()`](#boolean)
     - `'count'`: synonymous for `count: true`, see [`count()`](#count)
     - `'string'`: synonymous for `string: true`, see [`string()`](#string)
+    - `'number'`: synonymous for `number: true`, see [`number()`](#number)
 
 .parse(args)
 ------------

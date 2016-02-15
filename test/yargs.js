@@ -369,10 +369,24 @@ describe('yargs dsl tests', function () {
 
   describe('number', function () {
     it('accepts number arguments when a number type is specified', function () {
-      var argv = yargs('-w 10')
+      var argv = yargs('-w banana')
         .number('w')
         .argv
-      argv.w.should.equal(10)
+
+      expect(typeof argv.w).to.equal('number')
+    })
+
+
+    it('should expose an options short-hand for numbers', function () {
+      var argv = yargs('-w banana')
+        .option('w', {
+          number: true
+        })
+        .alias('w', 'x')
+        .argv
+
+      expect(typeof argv.w).to.equal('number')
+      expect(typeof argv.x).to.equal('number')
     })
   })
 

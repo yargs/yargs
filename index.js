@@ -357,6 +357,9 @@ function Argv (processArgs, cwd) {
       } if (opt.array || opt.type === 'array') {
         self.array(key)
         if (opt.alias) self.array(opt.alias)
+      } if (opt.number || opt.type === 'number') {
+        self.number(key)
+        if (opt.alias) self.number(opt.alias)
       } if (opt.string || opt.type === 'string') {
         self.string(key)
         if (opt.alias) self.string(opt.alias)
