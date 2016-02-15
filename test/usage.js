@@ -1,9 +1,9 @@
 /* global describe, it, beforeEach */
 
 var checkUsage = require('./helpers/utils').checkOutput
+var chalk = require('chalk')
 var path = require('path')
 var yargs = require('../')
-var chalk = require('chalk')
 
 require('chai').should()
 
@@ -36,6 +36,72 @@ describe('usage tests', function () {
         r.exit.should.be.ok
       })
 
+      it('missing argument message given if one command, but an argument not on the list is provided', function () {
+        var r = checkUsage(function () {
+          return yargs('wombat -w 10 -y 10')
+            .usage('Usage: $0 -w NUM -m NUM')
+            .demand(1, ['w', 'm'])
+            .strict()
+            .wrap(null)
+            .argv
+        })
+        r.result.should.have.property('w', 10)
+        r.result.should.have.property('y', 10)
+        r.result.should.have.property('_').with.length(1)
+        r.errors.join('\n').split(/\n+/).should.deep.equal([
+          'Usage: ./usage -w NUM -m NUM',
+          'Options:',
+          '  -w  [required]',
+          '  -m  [required]',
+          'Missing required argument: m'
+        ])
+        r.logs.should.have.length(0)
+        r.exit.should.be.ok
+      })
+
+      it('missing command message if all the required arguments exist, but not enough commands are provided', function () {
+        var r = checkUsage(function () {
+          return yargs('-w 10 -y 10')
+            .usage('Usage: $0 -w NUM -m NUM')
+            .demand(1, ['w', 'm'])
+            .strict()
+            .wrap(null)
+            .argv
+        })
+        r.result.should.have.property('w', 10)
+        r.result.should.have.property('y', 10)
+        r.result.should.have.property('_').with.length(0)
+        r.errors.join('\n').split(/\n+/).should.deep.equal([
+          'Usage: ./usage -w NUM -m NUM',
+          'Options:',
+          '  -w  [required]',
+          '  -m  [required]',
+          'Not enough non-option arguments: got 0, need at least 1'
+        ])
+        r.logs.should.have.length(0)
+        r.exit.should.be.ok
+      })
+
+      it('no failure occurs if the required arguments and the required number of commands are provided.', function () {
+        var r = checkUsage(function () {
+          return yargs('wombat -w 10 -m 10')
+            .usage('Usage: $0 -w NUM -m NUM')
+            .command('wombat', 'wombat handlers', function (yargs, argv) {
+              return argv
+            })
+            .demand(1, ['w', 'm'])
+            .strict()
+            .wrap(null)
+            .argv
+        })
+        r.result.should.have.property('w', 10)
+        r.result.should.have.property('m', 10)
+        r.result.should.have.property('_').with.length(1)
+        r.should.have.property('errors').with.length(0)
+        r.should.have.property('logs').with.length(0)
+        r.should.have.property('exit', false)
+      })
+
       describe('using .require()', function () {
         it('should show an error along with the missing arguments on demand fail', function () {
           var r = checkUsage(function () {
@@ -58,6 +124,71 @@ describe('usage tests', function () {
           r.logs.should.have.length(0)
           r.exit.should.be.ok
         })
+        it('missing argument message given if one command and an argument not on the list are provided', function () {
+          var r = checkUsage(function () {
+            return yargs('wombat -w 10 -y 10')
+              .usage('Usage: $0 -w NUM -m NUM')
+              .required(1, ['w', 'm'])
+              .strict()
+              .wrap(null)
+              .argv
+          })
+          r.result.should.have.property('w', 10)
+          r.result.should.have.property('y', 10)
+          r.result.should.have.property('_').with.length(1)
+          r.errors.join('\n').split(/\n+/).should.deep.equal([
+            'Usage: ./usage -w NUM -m NUM',
+            'Options:',
+            '  -w  [required]',
+            '  -m  [required]',
+            'Missing required argument: m'
+          ])
+          r.logs.should.have.length(0)
+          r.exit.should.be.ok
+        })
+      })
+
+      it('missing command message if all the required arguments exist, but not enough commands are provided', function () {
+        var r = checkUsage(function () {
+          return yargs('-w 10 -y 10')
+            .usage('Usage: $0 -w NUM -m NUM')
+            .require(1, ['w', 'm'])
+            .strict()
+            .wrap(null)
+            .argv
+        })
+        r.result.should.have.property('w', 10)
+        r.result.should.have.property('y', 10)
+        r.result.should.have.property('_').with.length(0)
+        r.errors.join('\n').split(/\n+/).should.deep.equal([
+          'Usage: ./usage -w NUM -m NUM',
+          'Options:',
+          '  -w  [required]',
+          '  -m  [required]',
+          'Not enough non-option arguments: got 0, need at least 1'
+        ])
+        r.logs.should.have.length(0)
+        r.exit.should.be.ok
+      })
+
+      it('no failure occurs if the required arguments and the required number of commands are provided.', function () {
+        var r = checkUsage(function () {
+          return yargs('wombat -w 10 -m 10')
+            .usage('Usage: $0 -w NUM -m NUM')
+            .command('wombat', 'wombat handlers', function (yargs, argv) {
+              return argv
+            })
+            .require(1, ['w', 'm'])
+            .strict()
+            .wrap(null)
+            .argv
+        })
+        r.result.should.have.property('w', 10)
+        r.result.should.have.property('m', 10)
+        r.result.should.have.property('_').with.length(1)
+        r.should.have.property('errors').with.length(0)
+        r.should.have.property('logs').with.length(0)
+        r.should.have.property('exit', false)
       })
     })
 
@@ -286,29 +417,103 @@ describe('usage tests', function () {
     )
   })
 
-  describe('when exitProcess is false and check fails with a thrown exception', function () {
-    it('should display missing arguments once', function () {
-      var r = checkUsage(function () {
-        try {
-          return yargs('-x 10 -z 20')
-            .usage('Usage: $0 -x NUM -y NUM')
-            .exitProcess(false)
-            .wrap(null)
-            .check(function (argv) {
-              if (!('x' in argv)) throw Error('You forgot about -x')
-              if (!('y' in argv)) throw Error('You forgot about -y')
-            })
-            .argv
-        } catch (err) {
-          // ignore the error, we only test the output here
-        }
+  describe('when exitProcess is false', function () {
+    describe('when check fails with a thrown exception', function () {
+      it('should display missing arguments once', function () {
+        var r = checkUsage(function () {
+          try {
+            return yargs('-x 10 -z 20')
+              .usage('Usage: $0 -x NUM -y NUM')
+              .exitProcess(false)
+              .wrap(null)
+              .check(function (argv) {
+                if (!('x' in argv)) throw Error('You forgot about -x')
+                if (!('y' in argv)) throw Error('You forgot about -y')
+              })
+              .argv
+          } catch (err) {
+            // ignore the error, we only test the output here
+          }
+        })
+        r.errors.join('\n').split(/\n+/).should.deep.equal([
+          'Usage: ./usage -x NUM -y NUM',
+          'You forgot about -y'
+        ])
+        r.should.have.property('logs').with.length(0)
+        r.should.have.property('exit').and.be.false
       })
-      r.errors.join('\n').split(/\n+/).should.deep.equal([
-        'Usage: ./usage -x NUM -y NUM',
-        'You forgot about -y'
-      ])
-      r.should.have.property('logs').with.length(0)
-      r.should.have.property('exit').and.be.false
+    })
+    describe('fail()', function () {
+      it('is called with the original error message as the first parameter', function () {
+        var r = checkUsage(function () {
+          try {
+            return yargs()
+              .fail(function (message) {
+                console.log(message)
+              })
+              .exitProcess(false)
+              .wrap(null)
+              .check(function (argv) {
+                throw new Error('foo')
+              })
+              .argv
+          } catch (error) {
+
+          }
+        })
+        r.logs.should.deep.equal(['foo'])
+        r.should.have.property('exit').and.be.false
+      })
+      describe('when check() throws error', function () {
+        it('fail() is called with the original error object as the second parameter', function () {
+          var r = checkUsage(function () {
+            try {
+              return yargs()
+                .fail(function (message, error) {
+                  console.log(error.message)
+                })
+                .exitProcess(false)
+                .wrap(null)
+                .check(function () {
+                  throw new Error('foo')
+                })
+                .argv
+            } catch (error) {
+
+            }
+          })
+          r.logs.should.deep.equal(['foo'])
+          r.should.have.property('exit').and.be.false
+        })
+      })
+      describe('when command() throws error', function () {
+        it('fail() is called with the original error object as the second parameter', function () {
+          var r = checkUsage(function () {
+            try {
+              return yargs('test')
+                .fail(function () {
+                  console.log('is not triggered')
+                })
+                .exitProcess(false)
+                .wrap(null)
+                .command('test', 'test', function (subYargs) {
+                  subYargs
+                    .fail(function (message, error) {
+                      console.log([error.name, error.message])
+                    })
+                    .exitProcess(false)
+
+                  throw new Error('foo')
+                })
+                .argv
+            } catch (error) {
+
+            }
+          })
+          r.logs.should.deep.equal([['Error', 'foo']])
+          r.should.have.property('exit').and.be.false
+        })
+      })
     })
   })
 
@@ -862,7 +1067,7 @@ describe('usage tests', function () {
     it('should display version', function () {
       var r = checkUsage(function () {
         return yargs(['--version'])
-        .version('1.0.1', 'version', 'Show version number')
+        .version('version', 'Show version number', '1.0.1')
         .wrap(null)
         .argv
       })
@@ -874,12 +1079,22 @@ describe('usage tests', function () {
       r.logs[0].should.eql('1.0.1')
     })
 
+    it('accepts version option as first argument, and version number as second argument', function () {
+      var r = checkUsage(function () {
+        return yargs(['--version'])
+        .version('version', '1.0.0')
+        .wrap(null)
+        .argv
+      })
+      r.logs[0].should.eql('1.0.0')
+    })
+
     it('should allow a function to be provided, rather than a number', function () {
       var r = checkUsage(function () {
         return yargs(['--version'])
-        .version(function () {
+        .version('version', function () {
           return require('./fixtures/config').version
-        }, 'version')
+        })
         .wrap(null)
         .argv
       })
@@ -902,7 +1117,7 @@ describe('usage tests', function () {
       it('should not validate arguments (required argument)', function () {
         var r = checkUsage(function () {
           return yargs(['--version'])
-            .version('1.0.1', 'version', 'Show version number')
+            .version('version', 'Show version number', '1.0.1')
             .demand('some-opt')
             .wrap(null)
             .exitProcess(false)
@@ -923,7 +1138,7 @@ describe('usage tests', function () {
         var r = checkUsage(function () {
           return yargs(['--version', '--some-opt'])
             .nargs('some-opt', 3)
-            .version('1.0.1', 'version', 'Show version number')
+            .version('version', 'Show version number', '1.0.1')
             .wrap(null)
             .exitProcess(false)
             .argv
@@ -997,13 +1212,20 @@ describe('usage tests', function () {
     yargs.rebase(['home', 'chevex', 'foo'].join(path.sep), ['home', 'chevex', 'pow', 'zoom.txt'].join(path.sep)).should.equal(['..', 'pow', 'zoom.txt'].join(path.sep))
   })
 
-  // Fixes: https://github.com/chevex/yargs/issues/71
-  it('should not raise an exception if help called on empty arguments', function () {
+  it('should not print usage string if help() is called without arguments', function () {
     var r = checkUsage(function () {
-      return yargs([]).usage('foo').help()
+      return yargs([]).usage('foo').help().argv
     })
 
-    r.result.should.match(/foo/)
+    r.logs.length.should.equal(0)
+  })
+
+  it('should add --help as an option for printing usage text if help() is called without arguments', function () {
+    var r = checkUsage(function () {
+      return yargs(['--help']).usage('foo').help().argv
+    })
+
+    r.logs.length.should.not.equal(0)
   })
 
   describe('wrap', function () {
@@ -1204,15 +1426,14 @@ describe('usage tests', function () {
     it('resets groups for a command handler, respecting order', function () {
       var r = checkUsage(function () {
         return yargs(['upload', '-h'])
-          .command('upload', 'upload something', function (yargs, argv) {
-            argv = yargs
+          .command('upload', 'upload something', function (yargs) {
+            return yargs
               .option('q', {
                 type: 'boolean',
                 group: 'Flags:'
               })
               .help('h').group('h', 'Global Flags:')
               .wrap(null)
-              .argv
           })
           .help('h').group('h', 'Global Flags:')
           .wrap(null)
@@ -1484,6 +1705,26 @@ describe('usage tests', function () {
         'Options:',
         '  -h         Show help  [boolean]',
         '  -f, --foo  bar  [string]',
+        ''
+      ])
+    })
+
+    it("should display 'type' number in help message if set for alias", function () {
+      var r = checkUsage(function () {
+        return yargs(['-h'])
+          .string('foo')
+          .describe('foo', 'bar')
+          .alias('f', 'foo')
+          .number(['foo'])
+          .help('h')
+          .wrap(null)
+          .argv
+      })
+
+      r.logs.join('\n').split(/\n+/).should.deep.equal([
+        'Options:',
+        '  -h         Show help  [boolean]',
+        '  -f, --foo  bar  [number]',
         ''
       ])
     })

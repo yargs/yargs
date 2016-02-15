@@ -1,6 +1,8 @@
 /* global describe, it, beforeEach */
 
 var expect = require('chai').expect
+var fs = require('fs')
+var path = require('path')
 var checkOutput = require('./helpers/utils').checkOutput
 var yargs = require('../')
 
@@ -41,7 +43,7 @@ describe('yargs dsl tests', function () {
   it('populates argv with placeholder keys when passed into command handler', function (done) {
     yargs(['blerg'])
       .option('cool', {})
-      .command('blerg', 'handle blerg things', function (yargs, argv) {
+      .command('blerg', 'handle blerg things', function () {}, function (argv) {
         Object.keys(argv).should.include('cool')
         return done()
       })
@@ -221,60 +223,68 @@ describe('yargs dsl tests', function () {
 
       var emptyOptions = {
         array: [],
-        boolean: [],
+        boolean: ['help'],
         string: [],
         alias: {},
         default: {},
-        key: {},
+        key: {help: true},
         narg: {},
         defaultDescription: {},
         choices: {},
         requiresArg: [],
         count: [],
         normalize: [],
+        number: [],
         config: {},
-        envPrefix: undefined
+        envPrefix: undefined,
+        global: ['help'],
+        demanded: {}
       }
 
       expect(y.getOptions()).to.deep.equal(emptyOptions)
-      expect(y.getUsageInstance().getDescriptions()).to.deep.equal({})
+      expect(y.getUsageInstance().getDescriptions()).to.deep.equal({help: '__yargsString__:Show help'})
       expect(y.getValidationInstance().getImplied()).to.deep.equal({})
+      expect(y.getCommandInstance().getCommandHandlers()).to.deep.equal({})
       expect(y.getExitProcess()).to.equal(true)
       expect(y.getStrict()).to.equal(false)
       expect(y.getDemanded()).to.deep.equal({})
-      expect(y.getCommandHandlers()).to.deep.equal({})
       expect(y.getGroups()).to.deep.equal({})
     })
   })
 
   describe('command', function () {
-    it('allows a function to be associated with a command', function (done) {
+    it('executes command handler with parsed argv', function (done) {
       yargs(['blerg'])
-        .command('blerg', 'handle blerg things', function (yargs, argv) {
-          // a fresh yargs instance for performing command-specific parsing,
-          // and an argv instance containing the parsing performed thus far
-          // should be passed to the command handler.
-          (typeof yargs.option).should.equal('function')
-          // we should get the argv from the prior yargs.
-          argv._[0].should.equal('blerg')
-
-          // the yargs instance has been reset.
-          yargs.getCommandHandlers().should.deep.equal({})
-          return done()
-        })
+        .command(
+          'blerg',
+          'handle blerg things',
+          function () {},
+          function (argv) {
+            // we should get the argv from the prior yargs.
+            argv._[0].should.equal('blerg')
+            return done()
+          }
+        )
         .exitProcess(false) // defaults to true.
         .argv
     })
 
-    it('does not execute top-level help if a handled command is provided', function () {
+    it("skips executing top-level command if builder's help is executed", function () {
       var r = checkOutput(function () {
         yargs(['blerg', '-h'])
-          .command('blerg', 'handle blerg things', function (yargs) {
-            yargs.command('snuh', 'snuh command')
-              .help('h')
-              .wrap(null)
-              .argv
-          })
+          .command(
+            'blerg',
+            'handle blerg things',
+            function (yargs) {
+              return yargs
+                .command('snuh', 'snuh command')
+                .help('h')
+                .wrap(null)
+            },
+            function () {
+              throw Error('should not happen')
+            }
+          )
           .help('h')
           .argv
       })
@@ -293,7 +303,8 @@ describe('yargs dsl tests', function () {
       var r = checkOutput(function () {
         yargs(['snuh', '-h'])
           .command('blerg', 'handle blerg things', function (yargs) {
-            yargs.command('snuh', 'snuh command')
+            return yargs
+              .command('snuh', 'snuh command')
               .help('h')
               .argv
           })
@@ -311,11 +322,70 @@ describe('yargs dsl tests', function () {
         ''
       ])
     })
+
+    it("accepts an object for describing a command's options", function () {
+      var r = checkOutput(function () {
+        yargs(['blerg', '-h'])
+          .command('blerg <foo>', 'handle blerg things', {
+            foo: {
+              default: 99
+            },
+            bar: {
+              default: 'hello world'
+            }
+          })
+          .help('h')
+          .wrap(null)
+          .argv
+      })
+
+      var usageString = r.logs[0]
+      usageString.should.match(/usage blerg <foo>/)
+      usageString.should.match(/--foo.*default: 99/)
+      usageString.should.match(/--bar.*default: "hello world"/)
+    })
+
+    it("accepts a module with a 'builder' and 'handler' key", function () {
+      var argv = yargs(['blerg', 'bar'])
+        .command('blerg <foo>', 'handle blerg things', require('./fixtures/command'))
+        .argv
+
+      argv.banana.should.equal('cool')
+      argv.batman.should.equal('sad')
+      argv.foo.should.equal('bar')
+
+      global.commandHandlerCalledWith.banana.should.equal('cool')
+      global.commandHandlerCalledWith.batman.should.equal('sad')
+      global.commandHandlerCalledWith.foo.should.equal('bar')
+      delete global.commandHandlerCalledWith
+    })
   })
 
   describe('terminalWidth', function () {
     it('returns the maximum width of the terminal', function () {
       yargs.terminalWidth().should.be.gte(0)
+    })
+  })
+
+  describe('number', function () {
+    it('accepts number arguments when a number type is specified', function () {
+      var argv = yargs('-w banana')
+        .number('w')
+        .argv
+
+      expect(typeof argv.w).to.equal('number')
+    })
+
+    it('should expose an options short-hand for numbers', function () {
+      var argv = yargs('-w banana')
+        .option('w', {
+          number: true
+        })
+        .alias('w', 'x')
+        .argv
+
+      expect(typeof argv.w).to.equal('number')
+      expect(typeof argv.x).to.equal('number')
     })
   })
 
@@ -572,6 +642,231 @@ describe('yargs dsl tests', function () {
 
       a1.why.should.equal('hello world')
       a2.why.should.equal('hello world')
+    })
+  })
+
+  describe('config', function () {
+    it('allows a parsing function to be provided as a second argument', function () {
+      var argv = yargs('--config ./test/fixtures/config.json')
+        .config('config', function (path) {
+          return JSON.parse(fs.readFileSync(path))
+        })
+        .argv
+
+      argv.foo.should.equal('baz')
+    })
+
+    it('allows key to be specified with option shorthand', function () {
+      var argv = yargs('--config ./test/fixtures/config.json')
+        .option('config', {
+          config: true
+        })
+        .argv
+
+      argv.foo.should.equal('baz')
+    })
+  })
+
+  describe('normalize', function () {
+    it('normalizes paths passed as arguments', function () {
+      var argv = yargs('--path /foo/bar//baz/asdf/quux/..')
+        .normalize(['path'])
+        .argv
+
+      argv.path.should.equal(['', 'foo', 'bar', 'baz', 'asdf'].join(path.sep))
+    })
+
+    it('normalizes path when when it is updated', function () {
+      var argv = yargs('--path /batman')
+        .normalize(['path'])
+        .argv
+
+      argv.path = '/foo/bar//baz/asdf/quux/..'
+      argv.path.should.equal(['', 'foo', 'bar', 'baz', 'asdf'].join(path.sep))
+    })
+
+    it('allows key to be specified with option shorthand', function () {
+      var argv = yargs('--path /batman')
+        .option('path', {
+          normalize: true
+        })
+        .argv
+
+      argv.path = '/foo/bar//baz/asdf/quux/..'
+      argv.path.should.equal(['', 'foo', 'bar', 'baz', 'asdf'].join(path.sep))
+    })
+  })
+
+  describe('narg', function () {
+    it('accepts a key as the first argument and a count as the second', function () {
+      var argv = yargs('--foo a b c')
+        .nargs('foo', 2)
+        .argv
+
+      argv.foo.should.deep.equal(['a', 'b'])
+      argv._.should.deep.equal(['c'])
+    })
+
+    it('accepts a hash of keys and counts', function () {
+      var argv = yargs('--foo a b c')
+        .nargs({
+          foo: 2
+        })
+        .argv
+
+      argv.foo.should.deep.equal(['a', 'b'])
+      argv._.should.deep.equal(['c'])
+    })
+
+    it('allows key to be specified with option shorthand', function () {
+      var argv = yargs('--foo a b c')
+        .option('foo', {
+          nargs: 2
+        })
+        .argv
+
+      argv.foo.should.deep.equal(['a', 'b'])
+      argv._.should.deep.equal(['c'])
+    })
+  })
+
+  describe('global', function () {
+    it('does not reset a global options when reset is called', function () {
+      var y = yargs('--foo a b c')
+        .option('foo', {
+          nargs: 2
+        })
+        .option('bar', {
+          nargs: 2
+        })
+        .global('foo')
+        .reset()
+      var options = y.getOptions()
+      options.key.foo.should.equal(true)
+      expect(options.key.bar).to.equal(undefined)
+    })
+
+    it('does not reset alias of global option', function () {
+      var y = yargs('--foo a b c')
+        .option('foo', {
+          nargs: 2,
+          alias: 'awesome-sauce'
+        })
+        .string('awesome-sauce')
+        .demand('awesomeSauce')
+        .option('bar', {
+          nargs: 2,
+          string: true,
+          demand: true
+        })
+        .global('foo')
+        .reset({
+          foo: ['awesome-sauce', 'awesomeSauce']
+        })
+      var options = y.getOptions()
+
+      options.key.foo.should.equal(true)
+      options.string.should.include('awesome-sauce')
+      Object.keys(options.demanded).should.include('awesomeSauce')
+
+      expect(options.key.bar).to.equal(undefined)
+      options.string.should.not.include('bar')
+      Object.keys(options.demanded).should.not.include('bar')
+    })
+
+    it('should set help to global option by default', function () {
+      var y = yargs('--foo')
+        .help('help')
+      var options = y.getOptions()
+      options.global.should.include('help')
+    })
+
+    it('should set version to global option by default', function () {
+      var y = yargs('--foo')
+        .version()
+      var options = y.getOptions()
+      options.global.should.include('version')
+    })
+
+    it('should not reset usage descriptions of global options', function () {
+      var y = yargs('--foo')
+        .describe('bar', 'my awesome bar option')
+        .describe('foo', 'my awesome foo option')
+        .global('foo')
+        .reset()
+      var descriptions = y.getUsageInstance().getDescriptions()
+      Object.keys(descriptions).should.include('foo')
+      Object.keys(descriptions).should.not.include('bar')
+    })
+
+    it('should not reset implications of global options', function () {
+      var y = yargs(['--x=33'])
+        .implies({
+          x: 'y'
+        })
+        .implies({
+          z: 'w'
+        })
+        .global(['x'])
+        .reset()
+      var implied = y.getValidationInstance().getImplied()
+      Object.keys(implied).should.include('x')
+      Object.keys(implied).should.not.include('z')
+    })
+
+    it('should expose an options short-hand for declaring global options', function () {
+      var y = yargs('--foo a b c')
+        .option('foo', {
+          nargs: 2,
+          global: true
+        })
+        .option('bar', {
+          nargs: 2
+        })
+        .reset()
+      var options = y.getOptions()
+      options.key.foo.should.equal(true)
+      expect(options.key.bar).to.equal(undefined)
+    })
+  })
+
+  describe('pkgConf', function () {
+    it('uses values from package.json as defaults', function () {
+      var argv = yargs('--foo a').pkgConf('repository').argv
+
+      argv.foo.should.equal('a')
+      argv.type.should.equal('git')
+    })
+
+    it('combines yargs defaults with package.json defaults', function () {
+      var argv = yargs('--foo a')
+        .default('b', 99)
+        .pkgConf('repository')
+        .argv
+
+      argv.b.should.equal(99)
+      argv.foo.should.equal('a')
+      argv.type.should.equal('git')
+    })
+
+    it('is cool with a key not existing', function () {
+      var argv = yargs('--foo a')
+        .default('b', 99)
+        .pkgConf('banana')
+        .argv
+
+      argv.b.should.equal(99)
+      argv.foo.should.equal('a')
+      expect(argv.git).to.equal(undefined)
+    })
+
+    it('allows an alternative cwd to be specified', function () {
+      var argv = yargs('--foo a')
+        .pkgConf('yargs', './test/fixtures')
+        .argv
+
+      argv.foo.should.equal('a')
+      argv.dotNotation.should.equal(false)
     })
   })
 })

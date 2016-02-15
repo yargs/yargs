@@ -1,11 +1,15 @@
 var assert = require('assert')
+var Command = require('./lib/command')
 var Completion = require('./lib/completion')
-var Parser = require('./lib/parser')
+var Parser = require('yargs-parser')
 var path = require('path')
-var tokenizeArgString = require('./lib/tokenize-arg-string')
 var Usage = require('./lib/usage')
 var Validation = require('./lib/validation')
 var Y18n = require('y18n')
+var readPkgUp = require('read-pkg-up')
+var pkgConf = require('pkg-conf')
+var requireMainFilename = require('require-main-filename')
+var objFilter = require('./lib/obj-filter')
 
 Argv(process.argv.slice(2))
 
@@ -14,6 +18,7 @@ function Argv (processArgs, cwd) {
   processArgs = processArgs || [] // handle calling yargs().
 
   var self = {}
+  var command = null
   var completion = null
   var usage = null
   var validation = null
@@ -41,40 +46,65 @@ function Argv (processArgs, cwd) {
     )
   }
 
+  // puts yargs back into an initial state. any keys
+  // that have been set to "global" will not be reset
+  // by this action.
   var options
-  self.resetOptions = self.reset = function () {
-    // put yargs back into its initial
-    // state, this is useful for creating a
-    // nested CLI.
-    options = {
-      array: [],
-      boolean: [],
-      string: [],
-      narg: {},
-      key: {},
-      alias: {},
-      default: {},
-      defaultDescription: {},
-      choices: {},
-      requiresArg: [],
-      count: [],
-      normalize: [],
-      config: {},
-      envPrefix: undefined
-    }
+  self.resetOptions = self.reset = function (aliases) {
+    aliases = aliases || {}
+    options = options || {}
+    // put yargs back into an initial state, this
+    // logic is used to build a nested command
+    // hierarchy.
+    var tmpOptions = {}
+    tmpOptions.global = options.global ? options.global : []
 
-    usage = Usage(self, y18n) // handle usage output.
-    validation = Validation(self, usage, y18n) // handle arg validation.
-    completion = Completion(self, usage)
+    // if a key has been set as a global, we
+    // do not want to reset it or its aliases.
+    var globalLookup = {}
+    tmpOptions.global.forEach(function (g) {
+      globalLookup[g] = true
+      ;(aliases[g] || []).forEach(function (a) {
+        globalLookup[a] = true
+      })
+    })
 
-    demanded = {}
-    groups = {}
+    var arrayOptions = [
+      'array', 'boolean', 'string', 'requiresArg',
+      'count', 'requiresArg', 'count', 'normalize', 'number'
+    ]
+
+    var objectOptions = [
+      'narg', 'key', 'alias', 'default', 'defaultDescription',
+      'config', 'choices', 'demanded'
+    ]
+
+    arrayOptions.forEach(function (k) {
+      tmpOptions[k] = (options[k] || []).filter(function (k) {
+        return globalLookup[k]
+      })
+    })
+
+    objectOptions.forEach(function (k) {
+      tmpOptions[k] = objFilter(options[k], function (k, v) {
+        return globalLookup[k]
+      })
+    })
+
+    tmpOptions.envPrefix = undefined
+    options = tmpOptions
+
+    // if this is the first time being executed, create
+    // instances of all our helpers -- otherwise just reset.
+    usage = usage ? usage.reset(globalLookup) : Usage(self, y18n)
+    validation = validation ? validation.reset(globalLookup) : Validation(self, usage, y18n)
+    command = command ? command.reset() : Command(self, usage, validation)
+    if (!completion) completion = Completion(self, usage, command)
 
     exitProcess = true
     strict = false
-    helpOpt = null
-    versionOpt = null
-    commandHandlers = {}
+    groups = {}
+    completionCommand = null
     self.parsed = false
 
     return self
@@ -99,6 +129,11 @@ function Argv (processArgs, cwd) {
     } else {
       options.narg[key] = n
     }
+    return self
+  }
+
+  self.number = function (numbers) {
+    options.number.push.apply(options.number, [].concat(numbers))
     return self
   }
 
@@ -135,17 +170,9 @@ function Argv (processArgs, cwd) {
     return self
   }
 
-  self.command = function (cmd, description, fn) {
-    if (description !== false) {
-      usage.command(cmd, description)
-    }
-    if (fn) commandHandlers[cmd] = fn
+  self.command = function (cmd, description, builder, handler) {
+    command.addHandler(cmd, description, builder, handler)
     return self
-  }
-
-  var commandHandlers = {}
-  self.getCommandHandlers = function () {
-    return commandHandlers
   }
 
   self.string = function (strings) {
@@ -175,25 +202,7 @@ function Argv (processArgs, cwd) {
         self.alias(key, x[key])
       })
     } else {
-      // perhaps 'x' is already an alias in another list?
-      // if so we should append to x's list.
-      var aliases = null
-      Object.keys(options.alias).forEach(function (key) {
-        if (~options.alias[key].indexOf(x)) aliases = options.alias[key]
-      })
-
-      if (aliases) { // x was an alias itself.
-        aliases.push(y)
-      } else { // x is a new alias key.
-        options.alias[x] = (options.alias[x] || []).concat(y)
-      }
-
-      // wait! perhaps we've created two lists of aliases
-      // that reference each other?
-      if (options.alias[y]) {
-        Array.prototype.push.apply((options.alias[x] || aliases), options.alias[y])
-        delete options.alias[y]
-      }
+      options.alias[x] = (options.alias[x] || []).concat(y)
     }
     return self
   }
@@ -203,36 +212,41 @@ function Argv (processArgs, cwd) {
     return self
   }
 
-  var demanded = {}
   self.demand = self.required = self.require = function (keys, max, msg) {
     // you can optionally provide a 'max' key,
     // which will raise an exception if too many '_'
     // options are provided.
-    if (typeof max !== 'number') {
+
+    if (Array.isArray(max)) {
+      max.forEach(function (key) {
+        self.demand(key, msg)
+      })
+    } else if (typeof max !== 'number') {
       msg = max
       max = Infinity
     }
 
     if (typeof keys === 'number') {
-      if (!demanded._) demanded._ = { count: 0, msg: null, max: max }
-      demanded._.count = keys
-      demanded._.msg = msg
+      if (!options.demanded._) options.demanded._ = { count: 0, msg: null, max: max }
+      options.demanded._.count = keys
+      options.demanded._.msg = msg
     } else if (Array.isArray(keys)) {
       keys.forEach(function (key) {
         self.demand(key, msg)
       })
     } else {
       if (typeof msg === 'string') {
-        demanded[keys] = { msg: msg }
+        options.demanded[keys] = { msg: msg }
       } else if (msg === true || typeof msg === 'undefined') {
-        demanded[keys] = { msg: undefined }
+        options.demanded[keys] = { msg: undefined }
       }
     }
 
     return self
   }
+
   self.getDemanded = function () {
-    return demanded
+    return options.demanded
   }
 
   self.requiresArg = function (requiresArgs) {
@@ -281,6 +295,28 @@ function Argv (processArgs, cwd) {
     return self
   }
 
+  self.global = function (globals) {
+    options.global.push.apply(options.global, [].concat(globals))
+    return self
+  }
+
+  self.pkgConf = function (key, path) {
+    var conf = null
+
+    var obj = readPkgUp.sync({
+      cwd: path || requireMainFilename()
+    })
+
+    if (obj.pkg && obj.pkg[key] && typeof obj.pkg[key] === 'object') {
+      conf = obj.pkg[key]
+      Object.keys(conf).forEach(function (k) {
+        self.default(k, conf[k])
+      })
+    }
+
+    return self
+  }
+
   self.parse = function (args) {
     return parseArgs(args)
   }
@@ -307,16 +343,23 @@ function Argv (processArgs, cwd) {
         self.default(key, opt.default)
       } if ('nargs' in opt) {
         self.nargs(key, opt.nargs)
+      } if ('normalize' in opt) {
+        self.normalize(key)
       } if ('choices' in opt) {
         self.choices(key, opt.choices)
       } if ('group' in opt) {
         self.group(key, opt.group)
+      } if (opt.global) {
+        self.global(key)
       } if (opt.boolean || opt.type === 'boolean') {
         self.boolean(key)
         if (opt.alias) self.boolean(opt.alias)
       } if (opt.array || opt.type === 'array') {
         self.array(key)
         if (opt.alias) self.array(opt.alias)
+      } if (opt.number || opt.type === 'number') {
+        self.number(key)
+        if (opt.alias) self.number(opt.alias)
       } if (opt.string || opt.type === 'string') {
         self.string(key)
         if (opt.alias) self.string(opt.alias)
@@ -384,18 +427,41 @@ function Argv (processArgs, cwd) {
   }
 
   var versionOpt = null
-  self.version = function (ver, opt, msg) {
-    versionOpt = opt || 'version'
-    usage.version(ver)
+  self.version = function (opt, msg, ver) {
+    if (arguments.length === 0) {
+      ver = guessVersion()
+      opt = 'version'
+    } else if (arguments.length === 1) {
+      ver = opt
+      opt = 'version'
+    } else if (arguments.length === 2) {
+      ver = msg
+    }
+
+    versionOpt = opt
+    msg = msg || usage.deferY18nLookup('Show version number')
+
+    usage.version(ver || undefined)
     self.boolean(versionOpt)
-    self.describe(versionOpt, msg || usage.deferY18nLookup('Show version number'))
+    self.global(versionOpt)
+    self.describe(versionOpt, msg)
     return self
   }
 
+  function guessVersion () {
+    var obj = readPkgUp.sync({
+      cwd: requireMainFilename()
+    })
+
+    return obj.pkg ? obj.pkg.version : 'unknown'
+  }
+
   var helpOpt = null
-  self.addHelpOpt = function (opt, msg) {
+  self.addHelpOpt = self.help = function (opt, msg) {
+    opt = opt || 'help'
     helpOpt = opt
     self.boolean(opt)
+    self.global(opt)
     self.describe(opt, msg || usage.deferY18nLookup('Show help'))
     return self
   }
@@ -415,14 +481,6 @@ function Argv (processArgs, cwd) {
   }
   self.getExitProcess = function () {
     return exitProcess
-  }
-
-  self.help = function () {
-    if (arguments.length > 0) return self.addHelpOpt.apply(self, arguments)
-
-    if (!self.parsed) parseArgs(processArgs) // run parser, if it has not already been executed.
-
-    return usage.help()
   }
 
   var completionCommand = null
@@ -487,6 +545,10 @@ function Argv (processArgs, cwd) {
     return validation
   }
 
+  self.getCommandInstance = function () {
+    return command
+  }
+
   self.terminalWidth = function () {
     return require('window-size').width
   }
@@ -498,7 +560,7 @@ function Argv (processArgs, cwd) {
       try {
         args = parseArgs(processArgs)
       } catch (err) {
-        usage.fail(err.message)
+        usage.fail(err.message, err)
       }
 
       return args
@@ -507,14 +569,16 @@ function Argv (processArgs, cwd) {
   })
 
   function parseArgs (args) {
-    args = normalizeArgs(args)
-
-    var parsed = Parser(args, options, y18n)
+    options.__ = y18n.__
+    options.configuration = pkgConf.sync('yargs', {
+      defaults: {},
+      cwd: requireMainFilename()
+    })
+    var parsed = Parser.detailed(args, options)
     var argv = parsed.argv
     var aliases = parsed.aliases
 
     argv.$0 = self.$0
-
     self.parsed = parsed
 
     guessLocale() // guess locale lazily, so that it can be turned off in chain.
@@ -530,11 +594,11 @@ function Argv (processArgs, cwd) {
 
     // if there's a handler associated with a
     // command defer processing to it.
-    var handlerKeys = Object.keys(self.getCommandHandlers())
-    for (var i = 0, command; (command = handlerKeys[i]) !== undefined; i++) {
-      if (~argv._.indexOf(command)) {
-        runCommand(command, self, argv)
-        return self.argv
+    var handlerKeys = command.getCommands()
+    for (var i = 0, cmd; (cmd = handlerKeys[i]) !== undefined; i++) {
+      if (~argv._.indexOf(cmd) && cmd !== completionCommand) {
+        setPlaceholderKeys(argv)
+        return command.runCommand(cmd, self, parsed)
       }
     }
 
@@ -615,11 +679,6 @@ function Argv (processArgs, cwd) {
     }
   }
 
-  function runCommand (command, yargs, argv) {
-    setPlaceholderKeys(argv)
-    yargs.getCommandHandlers()[command](yargs.reset(), argv)
-  }
-
   function setPlaceholderKeys (argv) {
     Object.keys(options.key).forEach(function (key) {
       // don't set placeholder keys for dot
@@ -627,13 +686,6 @@ function Argv (processArgs, cwd) {
       if (~key.indexOf('.')) return
       if (typeof argv[key] === 'undefined') argv[key] = undefined
     })
-  }
-
-  function normalizeArgs (args) {
-    if (typeof args === 'string') {
-      return tokenizeArgString(args)
-    }
-    return args
   }
 
   singletonify(self)

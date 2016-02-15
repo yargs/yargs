@@ -1,7 +1,11 @@
-/* global describe, it */
+/* global describe, it, before, after */
 
 var spawn = require('win-spawn')
+var path = require('path')
 var which = require('which')
+var rimraf = require('rimraf')
+var cpr = require('cpr')
+var fs = require('fs')
 
 require('chai').should()
 
@@ -46,11 +50,65 @@ describe('integration tests', function () {
       return done()
     })
   })
+
+  if (process.platform !== 'win32') {
+    describe('load root package.json', function () {
+      before(function (done) {
+        this.timeout(10000)
+        // create a symlinked, and a physical copy of yargs in
+        // our fixtures directory, so that we can test that the
+        // nearest package.json is appropriately loaded.
+        cpr('./', './test/fixtures/yargs', {
+          filter: /node_modules|example|test|package\.json/
+        }, function () {
+          fs.symlinkSync(process.cwd(), './test/fixtures/yargs-symlink')
+          return done()
+        })
+      })
+
+      describe('version #', function () {
+        it('defaults to appropriate version # when yargs is installed normally', function (done) {
+          testCmd('./normal-bin.js', [ '--version' ], function (buf) {
+            buf.should.match(/9\.9\.9/)
+            return done()
+          })
+        })
+
+        it('defaults to appropriate version # when yargs is symlinked', function (done) {
+          testCmd('./symlink-bin.js', [ '--version' ], function (buf) {
+            buf.should.match(/9\.9\.9/)
+            return done()
+          })
+        })
+      })
+
+      describe('parser settings', function (done) {
+        it('reads parser config settings when yargs is installed normally', function (done) {
+          testCmd('./normal-bin.js', [ '--foo.bar' ], function (buf) {
+            buf.should.match(/foo\.bar/)
+            return done()
+          })
+        })
+
+        it('reads parser config settings when yargs is installed as a symlink', function (done) {
+          testCmd('./symlink-bin.js', [ '--foo.bar' ], function (buf) {
+            buf.should.match(/foo\.bar/)
+            return done()
+          })
+        })
+      })
+
+      after(function () {
+        rimraf.sync('./test/fixtures/yargs')
+        fs.unlinkSync('./test/fixtures/yargs-symlink')
+      })
+    })
+  }
 })
 
 function testCmd (cmd, args, done) {
   var oldDir = process.cwd()
-  process.chdir(__dirname + '/fixtures')
+  process.chdir(path.join(__dirname, '/fixtures'))
 
   var cmds = cmd.split(' ')
 
@@ -61,7 +119,9 @@ function testCmd (cmd, args, done) {
 
   bin.stdout.on('data', function (buf) {
     // hack to allow us to assert against completion suggestions.
-    if (~args.indexOf('--get-yargs-completions')) return done(buf.toString())
+    if (~args.indexOf('--get-yargs-completions') ||
+      ~args.indexOf('--version') ||
+      ~args.indexOf('--foo.bar')) return done(buf.toString())
 
     var _ = JSON.parse(buf.toString())
     _.map(String).should.deep.equal(args.map(String))

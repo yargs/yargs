@@ -70,6 +70,43 @@ describe('validation tests', function () {
         .argv
     })
 
+    it('fails with invalid command', function (done) {
+      yargs(['koala'])
+        .command('wombat', 'wombat burrows', function (yargs, argv) {
+          return argv
+        })
+        .command('kangaroo', 'kangaroo handlers', function (yargs, argv) {
+          return argv
+        })
+        .demand(1)
+        .strict()
+        .fail(function (msg) {
+          msg.should.equal('Unknown argument: koala')
+          return done()
+        })
+        .argv
+    })
+
+    it('fails when a required argument is missing', function (done) {
+      yargs('-w 10 marsupial')
+        .demand(1, ['w', 'b'])
+        .fail(function (msg) {
+          msg.should.equal('Missing required argument: b')
+          return done()
+        })
+        .argv
+    })
+
+    it('fails when required arguments are present, but a command is missing', function (done) {
+      yargs('-w 10 -m wombat')
+        .demand(1, ['w', 'm'])
+        .fail(function (msg) {
+          msg.should.equal('Not enough non-option arguments: got 0, need at least 1')
+          return done()
+        })
+        .argv
+    })
+
     it('fails without a message if msg is null', function (done) {
       yargs([])
         .demand(1, null)
@@ -147,6 +184,128 @@ describe('validation tests', function () {
           return done()
         })
         .argv
+    })
+  })
+
+  describe('config', function () {
+    it('should raise an appropriate error if JSON file is not found', function (done) {
+      yargs(['--settings', 'fake.json', '--foo', 'bar'])
+        .alias('z', 'zoom')
+        .config('settings')
+        .fail(function (msg) {
+          msg.should.eql('Invalid JSON config file: fake.json')
+          return done()
+        })
+        .argv
+    })
+
+    // see: https://github.com/bcoe/yargs/issues/172
+    it('should not raise an exception if config file is set as default argument value', function () {
+      var fail = false
+      yargs([])
+        .option('config', {
+          default: 'foo.json'
+        })
+        .config('config')
+        .fail(function () {
+          fail = true
+        })
+        .argv
+
+      fail.should.equal(false)
+    })
+
+    it('should be displayed in the help message', function () {
+      var checkUsage = require('./helpers/utils').checkOutput
+      var r = checkUsage(function () {
+        return yargs(['--help'])
+          .config('settings')
+          .help('help')
+          .wrap(null)
+          .argv
+      })
+      r.should.have.property('logs').with.length(1)
+      r.logs.join('\n').split(/\n+/).should.deep.equal([
+        'Options:',
+        '  --settings  Path to JSON config file',
+        '  --help      Show help  [boolean]',
+        ''
+      ])
+    })
+
+    it('should allow help message to be overridden', function () {
+      var checkUsage = require('./helpers/utils').checkOutput
+      var r = checkUsage(function () {
+        return yargs(['--help'])
+          .config('settings', 'pork chop sandwiches')
+          .help('help')
+          .wrap(null)
+          .argv
+      })
+      r.should.have.property('logs').with.length(1)
+      r.logs.join('\n').split(/\n+/).should.deep.equal([
+        'Options:',
+        '  --settings  pork chop sandwiches',
+        '  --help      Show help  [boolean]',
+        ''
+      ])
+    })
+
+    it('outputs an error returned by the parsing function', function () {
+      var checkUsage = require('./helpers/utils').checkOutput
+      var r = checkUsage(function () {
+        return yargs(['--settings=./package.json'])
+          .config('settings', 'path to config file', function (configPath) {
+            return Error('someone set us up the bomb')
+          })
+          .help('help')
+          .wrap(null)
+          .argv
+      })
+
+      r.errors.join('\n').split(/\n+/).should.deep.equal([
+        'Options:',
+        '  --settings  path to config file',
+        '  --help      Show help  [boolean]',
+        'someone set us up the bomb'
+      ])
+    })
+
+    it('outputs an error if thrown by the parsing function', function () {
+      var checkUsage = require('./helpers/utils').checkOutput
+      var r = checkUsage(function () {
+        return yargs(['--settings=./package.json'])
+          .config('settings', 'path to config file', function (configPath) {
+            throw Error('someone set us up the bomb')
+          })
+          .help('help')
+          .wrap(null)
+          .argv
+      })
+
+      r.errors.join('\n').split(/\n+/).should.deep.equal([
+        'Options:',
+        '  --settings  path to config file',
+        '  --help      Show help  [boolean]',
+        'someone set us up the bomb'
+      ])
+    })
+  })
+
+  describe('defaults', function () {
+    // See https://github.com/chevex/yargs/issues/31
+    it('should not fail when demanded options with defaults are missing', function () {
+      yargs()
+        .fail(function (msg) {
+          throw new Error(msg)
+        })
+        .option('some-option', {
+          describe: 'some option',
+          demand: true,
+          default: 88
+        })
+        .strict()
+        .parse([])
     })
   })
 })

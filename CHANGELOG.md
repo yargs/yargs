@@ -1,5 +1,20 @@
 ## Change Log
 
+### v4.0.0 (2016/2/14 1:27 +07:00)
+
+- [#384](https://github.com/bcoe/yargs/pull/384) add new number type to yargs (@lrlna, @maxrimue)
+- [#382](https://github.com/bcoe/yargs/pull/382) pass error as extra parameter to fail (@gajus)
+- [#378](https://github.com/bcoe/yargs/pull/378) introduces the pkgConf feature, which tells
+  yargs to load default argument values from a key on a project's package.json (@bcoe)
+- [#376](https://github.com/bcoe/yargs/pull/376) **breaking change**, make help() method signature
+   more consistent with other commands (@maxrimue)
+- [#368](https://github.com/bcoe/yargs/pull/368) **breaking change**, overhaul to command handling API:
+  introducing named positional arguments, commands as modules, introduces the concept of global options (options that don't reset). (@nexdrew, @bcoe).
+- [#364](https://github.com/bcoe/yargs/pull/364) add the slick new yargs website to the package.json (@iarna).
+- [#357](https://github.com/bcoe/yargs/pull/357) .strict() now requires that a valid command is provided (@lrlna)
+- [#356](https://github.com/bcoe/yargs/pull/356) pull the parsing bits of yargs into the separate module yargs-parser. Various parsing options can now be turned on and off using configuration (@bcoe).
+- [#330](https://github.com/bcoe/yargs/pull/330) **breaking change**, fix inconsistencies with `.version()` API. (@maxrimue).
+
 ### v3.32.0 (2016/1/14 10:13 +07:00)
 
 - [#344](https://github.com/bcoe/yargs/pull/344) yargs now has a code of conduct and contributor guidelines (@bcoe)

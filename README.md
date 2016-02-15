@@ -10,6 +10,7 @@ With yargs, ye be havin' a map that leads straight to yer treasure! Treasure of 
 [![Coverage Status][coveralls-image]][coveralls-url]
 [![NPM version][npm-image]][npm-url]
 [![Windows Tests][windows-image]][windows-url]
+[![js-standard-style][standard-image]](standard-url)
 
 > Yargs is the official successor to optimist. Please feel free to submit issues and pull requests. If you'd like to contribute and don't know where to start, have a look at [the issue list](https://github.com/bcoe/yargs/issues) :)
 
@@ -452,7 +453,9 @@ var argv = require('yargs')
   .argv
 ```
 
-.command(cmd, desc, [fn])
+.command(cmd, desc, [builder], [handler])
+-------------------
+.command(cmd, desc, [module])
 -------------------
 
 Document the commands exposed by your application.
@@ -462,32 +465,99 @@ values stored in `argv._`).  Set `desc` to `false` to create a hidden command.
 Hidden commands don't show up in the help output and aren't available for
 completion.
 
-Optionally, you can provide a handler `fn` which will be executed when
-a given command is provided. The handler will be called with `yargs` and
-`argv` as arguments.
-
-`yargs` is a blank instance of yargs, which can be used to compose a nested
-hierarchy of options handlers.
-
-`argv` represents the arguments parsed prior to the
-command being executed (those described in the outer yargs instance).
-
-Here's an example of top-level and nested commands in action:
+Optionally, you can provide a `builder` object to give hints about the
+options that your command accepts:
 
 ```js
-var argv = require('yargs')
-  .usage('npm <command>')
-  .command('install', 'tis a mighty fine package to install')
-  .command('publish', 'shiver me timbers, should you be sharing all that', function (yargs, argv) {
-    argv = yargs.option('f', {
-      alias: 'force',
-      description: 'yar, it usually be a bad idea'
-    })
-    .help('help')
-    .argv
+yargs.command('get', 'make a get HTTP request', {
+    url: {
+      alias: 'u',
+      default: 'http://yargs.js.org/'
+    }
   })
-  .help('help')
-  .argv;
+  .help()
+  .argv
+```
+
+`builder` can also be a function. This function is executed
+with a `yargs` instance, and can be used to provide _advanced_ command specific help:
+
+```js
+yargs.command('get', 'make a get HTTP request', function (yargs) {
+    return yargs.option('url', {
+      alias: 'u',
+      default: 'http://yargs.js.org/'
+    })
+  })
+  .help()
+  .argv
+```
+
+You can also provide a handler function, which will be executed with the
+parsed `argv` object:
+
+```js
+yargs
+  .command(
+    'get',
+    'make a get HTTP request',
+    function (yargs) {
+      return yargs.option('u', {
+        alias: 'url',
+        describe: 'the URL to make an HTTP request to'
+      })
+    },
+    function (argv) {
+      console.log(argv.url)
+    }
+  )
+  .help()
+  .argv
+```
+
+### Positional Arguments
+
+Commands can accept _optional_ and _required_ positional arguments. Required
+positional arguments take the form `<foo>`, and optional arguments
+take the form `[bar]`. The parsed positional arguments will be populated in
+`argv`:
+
+```js
+yargs.command('get <source> [proxy]', 'make a get HTTP request')
+  .help()
+  .argv
+```
+
+### Providing a Command Module
+
+For complicated commands you can pull the logic into a module. A module
+simply needs to export:
+
+* `exports.builder`: which describes the options that a command accepts.
+* `exports.handler`: a function which will be passed the parsed argv.
+
+```js
+// my-module.js
+exports.builder = {
+  banana: {
+    default: 'cool'
+  },
+  batman: {
+    default: 'sad'
+  }
+}
+
+exports.handler = function (argv) {
+  // do something with argv.
+}
+```
+
+You then register the module like so:
+
+```js
+yargs.command('get <source> [proxy]', 'make a get HTTP request', require('my-module'))
+  .help()
+  .argv
 ```
 
 .completion(cmd, [description], [fn]);
@@ -621,6 +691,26 @@ instead of the standard error message. This is especially helpful for the non-op
 If a `boolean` value is given, it controls whether the option is demanded;
 this is useful when using `.options()` to specify command line parameters.
 
+A combination of `.demand(1)` and `.strict()` will allow you to require a user to pass at least one command:
+
+```js
+var argv = require('yargs')
+  .command('install', 'tis a mighty fine package to install')
+  .demand(1)
+  .strict()
+  .argv
+```
+
+Similarly, you can require a command and arguments at the same time:
+
+```js
+var argv = require('yargs')
+  .command('install', 'tis a mighty fine package to install')
+  .demand(1, ['w', 'm'])
+  .strict()
+  .argv
+```
+
 <a name="describe"></a>.describe(key, desc)
 --------------------
 
@@ -725,6 +815,37 @@ Method to execute when a failure occurs, rather than printing the failure messag
 
 `fn` is called with the failure message that would have been printed.
 
+<a name="global"></a>.global(globals)
+------------
+
+Indicate that an option (or group of options) should not be reset when a command
+is executed, as an example:
+
+```js
+var argv = require('yargs')
+  .option('a', {
+    alias: 'all',
+    default: true
+  })
+  .option('n', {
+    alias: 'none',
+    default: true
+  })
+  .command('foo', 'foo command', function (yargs) {
+    return yargs.option('b', {
+      alias: 'bar'
+    })
+  })
+  .help('help')
+  .global('a')
+  .argv
+```
+
+If the `foo` command is executed the `all` option will remain, but the `none`
+option will have been eliminated.
+
+`help`, `version`, and `completion` options default to being global.
+
 <a name="group"></a>.group(key(s), groupName)
 --------------------
 
@@ -733,7 +854,7 @@ when displaying usage instructions, e.g.,
 
 ```js
 var yargs = require('yargs')(['--help'])
-  .help('help')
+  .help()
   .group('batman', 'Heroes:')
   .describe('batman', "world's greatest detective")
   .wrap(null)
@@ -753,14 +874,15 @@ Add an option (e.g. `--help`) that displays the usage string and exits the
 process. If present, the `description` parameter customizes the description of
 the help option in the usage string.
 
-If invoked without parameters, `.help()` returns the generated usage string.
+If invoked without parameters, `.help()` will make `--help` the option to trigger
+help output.
 
 Example:
 
 ```js
-var yargs = require("yargs")
+var yargs = require("yargs")['--help']
   .usage("$0 -operand1 number -operand2 number -operation [add|subtract]");
-console.log(yargs.help());
+  .help()
 ```
 
 Later on, `argv` can be retrieved with `yargs.argv`.
@@ -865,6 +987,11 @@ parses as:
 
 Optionally `.nargs()` can take an object of `key`/`narg` pairs.
 
+<a name="normalize"></a>.normalize(key)
+---------------
+
+The key provided represents a path and should have `path.normalize()` applied.
+
 .option(key, opt)
 -----------------
 .options(key, opt)
@@ -931,15 +1058,19 @@ Valid `opt` keys include:
 - `defaultDescription`: string, use this description for the default value in help content, see [`default()`](#default)
 - `demand`/`require`/`required`: boolean or string, demand the option be given, with optional error message, see [`demand()`](#demand)
 - `desc`/`describe`/`description`: string, the option description for help content, see [`describe()`](#describe)
+- `global`: boolean, indicate that this key should not be [reset](#reset) when a command is invoked, see [`global()`](#global)
 - `group`: string, when displaying usage instructions place the option under an alternative group heading, see [`group()`](#group)
 - `nargs`: number, specify how many arguments should be consumed for the option, see [`nargs()`](#nargs)
+- `normalize`: The option should be normalized, see [`normalize()`](#normalize)
 - `requiresArg`: boolean, require the option be specified with a value, see [`requiresArg()`](#requiresArg)
 - `string`: boolean, interpret option as a string, see [`string()`](#string)
+- `number`: number, keys are treated as numbers, [`number()`](#number)
 - `type`: one of the following strings
     - `'array'`: synonymous for `array: true`, see [`array()`](#array)
     - `'boolean'`: synonymous for `boolean: true`, see [`boolean()`](#boolean)
     - `'count'`: synonymous for `count: true`, see [`count()`](#count)
     - `'string'`: synonymous for `string: true`, see [`string()`](#string)
+    - `'number'`: synonymous for `number: true`, see [`number()`](#number)
 
 .parse(args)
 ------------
@@ -947,6 +1078,15 @@ Valid `opt` keys include:
 Parse `args` instead of `process.argv`. Returns the `argv` object.
 
 `args` may either be a pre-processed argv array, or a raw argument string.
+
+.pkgConf(key, [cwd])
+------------
+
+Similar to [`config()`](#config), indicates that yargs should read
+default argument values from the specified key in package.json.
+
+`cwd` can optionally be provided, the package.json will be read
+from this location.
 
 .require(key, [msg | boolean])
 ------------------------------
@@ -965,11 +1105,12 @@ usage information and exit.
 The default behavior is to set the value of any key not followed by an
 option value to `true`.
 
-.reset()
+<a name="reset"></a>.reset()
 --------
 
 Reset the argument object built up so far. This is useful for
-creating nested command line interfaces.
+creating nested command line interfaces. Use [global](#global)
+to specify keys that should not be reset.
 
 ```js
 var yargs = require('yargs')
@@ -1080,6 +1221,20 @@ If `key` is an array, interpret all the elements as strings.
 `.string('_')` will result in non-hyphenated arguments being interpreted as strings,
 regardless of whether they resemble numbers.
 
+<a name="number"></a>.number([key])
+------------
+Specify options with a numeric argument.
+
+If an argument is not provided with the option, will return `undefined`.
+
+If a non-numeric argument is provided, will return a `NaN`.
+
+```js
+var argv = require('yargs')
+  .number(['n'])
+  .argv
+```
+
 .updateLocale(obj)
 ------------------
 .updateStrings(obj)
@@ -1122,20 +1277,22 @@ present script similar to how `$0` works in bash or perl.
 
 `opts` is optional and acts like calling `.options(opts)`.
 
-.version(version, [option], [description])
+.version([option], [description], [version])
 ----------------------------------------
 
 Add an option (e.g. `--version`) that displays the version number (given by the
-`version` parameter) and exits the process. If present, the `description`
-parameter customizes the description of the version option in the usage string.
+`version` parameter) and exits the process.
+
+If no arguments are passed to `version` (`.version()`), yargs will parse the `package.json`
+of your module and use its `version` value. The default value of `option` is `--version`.
 
 You can provide a `function` for version, rather than a string.
-This is useful if you want to use the version from your package.json:
+This is useful if you want to use a version stored in a location other than package.json:
 
 ```js
 var argv = require('yargs')
   .version(function() {
-    return require('../package').version;
+    return require('../lib/version').version;
   })
   .argv;
 ```
@@ -1223,13 +1380,32 @@ To run the tests with npm, just do:
 
     npm test
 
+configuration
+=============
+
+Using the `yargs` stanza in your `package.json` you can turn on and off
+some of yargs' parsing features:
+
+```json
+{
+  "yargs": {
+    "short-option-groups": true,
+    "camel-case-expansion": true,
+    "dot-notation": true,
+    "parse-numbers": true,
+    "boolean-negation": true
+  }
+}
+```
+
+See the [yargs-parser](https://github.com/yargs/yargs-parser#configuration) module
+for detailed documentation of this feature.
+
 inspired by
 ===========
 
 This module is loosely inspired by Perl's
 [Getopt::Casual](http://search.cpan.org/~photo/Getopt-Casual-0.13.1/Casual.pm).
-
-
 
 [travis-url]: https://travis-ci.org/bcoe/yargs
 [travis-image]: https://img.shields.io/travis/bcoe/yargs.svg
@@ -1241,3 +1417,5 @@ This module is loosely inspired by Perl's
 [npm-image]: https://img.shields.io/npm/v/yargs.svg
 [windows-url]: https://ci.appveyor.com/project/bcoe/yargs
 [windows-image]: https://img.shields.io/appveyor/ci/bcoe/yargs/master.svg?label=Windows%20Tests
+[standard-image]: https://img.shields.io/badge/code%20style-standard-brightgreen.svg
+[standard-url]: http://standardjs.com/
