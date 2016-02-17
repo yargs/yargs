@@ -1423,6 +1423,98 @@ describe('usage tests', function () {
       ])
     })
 
+    it('preserves global wrap() for commands that do not override it', function () {
+      var uploadCommand = 'upload <dest>'
+      var uploadDesc = 'Upload cwd to remote destination'
+      var uploadOpts = {
+        force: {
+          describe: 'Force overwrite of remote directory contents',
+          type: 'boolean'
+        }
+      }
+      var uploadHandler = function (argv) {}
+
+      var generalHelp = checkUsage(function () {
+        return yargs('--help')
+          .command(uploadCommand, uploadDesc, uploadOpts, uploadHandler)
+          .help()
+          .wrap(null)
+          .argv
+      })
+      var commandHelp = checkUsage(function () {
+        return yargs('upload --help')
+          .command(uploadCommand, uploadDesc, uploadOpts, uploadHandler)
+          .help()
+          .wrap(null)
+          .argv
+      })
+
+      generalHelp.logs[0].split('\n').should.deep.equal([
+        'Commands:',
+        '  upload <dest>  Upload cwd to remote destination',
+        '',
+        'Options:',
+        '  --help  Show help  [boolean]',
+        ''
+      ])
+      commandHelp.logs[0].split('\n').should.deep.equal([
+        './usage upload <dest>',
+        '',
+        'Options:',
+        '  --help   Show help  [boolean]',
+        '  --force  Force overwrite of remote directory contents  [boolean]',
+        ''
+      ])
+    })
+
+    it('allows a command to override global wrap()', function () {
+      var uploadCommand = 'upload <dest>'
+      var uploadDesc = 'Upload cwd to remote destination'
+      var uploadBuilder = function (yargs) {
+        return yargs
+          .usage('$0 ' + uploadCommand)
+          .option('force', {
+            describe: 'Force overwrite of remote directory contents',
+            type: 'boolean'
+          })
+          .wrap(46)
+      }
+      var uploadHandler = function (argv) {}
+
+      var generalHelp = checkUsage(function () {
+        return yargs('--help')
+          .command(uploadCommand, uploadDesc, uploadBuilder, uploadHandler)
+          .help()
+          .wrap(null)
+          .argv
+      })
+      var commandHelp = checkUsage(function () {
+        return yargs('upload --help')
+          .command(uploadCommand, uploadDesc, uploadBuilder, uploadHandler)
+          .help()
+          .wrap(null)
+          .argv
+      })
+
+      generalHelp.logs[0].split('\n').should.deep.equal([
+        'Commands:',
+        '  upload <dest>  Upload cwd to remote destination',
+        '',
+        'Options:',
+        '  --help  Show help  [boolean]',
+        ''
+      ])
+      commandHelp.logs[0].split('\n').should.deep.equal([
+        './usage upload <dest>',
+        '',
+        'Options:',
+        '  --help   Show help                 [boolean]',
+        '  --force  Force overwrite of remote directory',
+        '           contents                  [boolean]',
+        ''
+      ])
+    })
+
     it('resets groups for a command handler, respecting order', function () {
       var r = checkUsage(function () {
         return yargs(['upload', '-h'])
