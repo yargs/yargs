@@ -290,6 +290,8 @@ describe('yargs dsl tests', function () {
       })
 
       r.logs[0].split('\n').should.deep.equal([
+        './usage blerg',
+        '',
         'Commands:',
         '  snuh  snuh command',
         '',
