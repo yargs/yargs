@@ -1449,6 +1449,29 @@ describe('usage tests', function () {
         ''
       ])
     })
+
+    it('should list a module command only once', function () {
+      var r = checkUsage(function () {
+        return yargs('--help')
+          .command('upload', 'upload something', {
+            builder: function (yargs) {
+              return yargs
+            },
+            handler: function (argv) {}
+          })
+          .help().wrap(null)
+          .argv
+      })
+
+      r.logs[0].split('\n').should.deep.equal([
+        'Commands:',
+        '  upload  upload something',
+        '',
+        'Options:',
+        '  --help  Show help  [boolean]',
+        ''
+      ])
+    })
   })
 
   describe('epilogue', function () {
