@@ -1542,6 +1542,117 @@ describe('usage tests', function () {
       ])
     })
 
+    it('preserves groups with global keys', function () {
+      var r = checkUsage(function () {
+        return yargs(['upload', '-h'])
+          .command('upload', 'upload something', function (yargs) {
+            return yargs
+              .option('q', {
+                type: 'boolean',
+                group: 'Flags:'
+              })
+              .wrap(null)
+          })
+          .option('i', {
+            type: 'boolean',
+            global: true,
+            group: 'Awesome Flags:'
+          })
+          .option('j', {
+            type: 'boolean',
+            global: false, // not global so not preserved, even though the group is
+            group: 'Awesome Flags:'
+          })
+          .help('h')
+          .wrap(null)
+          .argv
+      })
+
+      r.logs[0].split('\n').should.deep.equal([
+        'Flags:',
+        '  -q  [boolean]',
+        '',
+        'Awesome Flags:',
+        '  -i  [boolean]',
+        '',
+        'Options:',
+        '  -h  Show help  [boolean]',
+        ''
+      ])
+    })
+
+    it('can add to preserved groups', function () {
+      var r = checkUsage(function () {
+        return yargs(['upload', '-h'])
+          .command('upload', 'upload something', function (yargs) {
+            return yargs
+              .option('q', {
+                type: 'boolean',
+                group: 'Awesome Flags:'
+              })
+              .wrap(null)
+          })
+          .option('i', {
+            type: 'boolean',
+            global: true,
+            group: 'Awesome Flags:'
+          })
+          .help('h')
+          .wrap(null)
+          .argv
+      })
+
+      r.logs[0].split('\n').should.deep.equal([
+        'Awesome Flags:',
+        '  -i  [boolean]',
+        '  -q  [boolean]',
+        '',
+        'Options:',
+        '  -h  Show help  [boolean]',
+        ''
+      ])
+    })
+
+    it('can bump up preserved groups', function () {
+      var r = checkUsage(function () {
+        return yargs(['upload', '-h'])
+          .command('upload', 'upload something', function (yargs) {
+            return yargs
+              .group([], 'Awesome Flags:')
+              .option('q', {
+                type: 'boolean',
+                group: 'Flags:'
+              })
+              .wrap(null)
+          })
+          .option('i', {
+            type: 'boolean',
+            global: true,
+            group: 'Awesome Flags:'
+          })
+          .option('j', {
+            type: 'boolean',
+            global: false, // not global so not preserved, even though the group is
+            group: 'Awesome Flags:'
+          })
+          .help('h')
+          .wrap(null)
+          .argv
+      })
+
+      r.logs[0].split('\n').should.deep.equal([
+        'Awesome Flags:',
+        '  -i  [boolean]',
+        '',
+        'Flags:',
+        '  -q  [boolean]',
+        '',
+        'Options:',
+        '  -h  Show help  [boolean]',
+        ''
+      ])
+    })
+
     it('should list a module command only once', function () {
       var r = checkUsage(function () {
         return yargs('--help')
