@@ -12,7 +12,7 @@ With yargs, ye be havin' a map that leads straight to yer treasure! Treasure of 
 [![Windows Tests][windows-image]][windows-url]
 [![js-standard-style][standard-image]](standard-url)
 
-> Yargs is the official successor to optimist. Please feel free to submit issues and pull requests. If you'd like to contribute and don't know where to start, have a look at [the issue list](https://github.com/bcoe/yargs/issues) :)
+> Yargs is the official successor to optimist. Please feel free to submit issues and pull requests. If you'd like to contribute and don't know where to start, have a look at [the issue list](https://github.com/yargs/yargs/issues) :)
 
 examples
 ========
@@ -1374,7 +1374,7 @@ With [npm](https://github.com/npm/npm), just do:
 
 or clone this project on github:
 
-    git clone http://github.com/bcoe/yargs.git
+    git clone http://github.com/yargs/yargs.git
 
 To run the tests with npm, just do:
 
@@ -1407,15 +1407,15 @@ inspired by
 This module is loosely inspired by Perl's
 [Getopt::Casual](http://search.cpan.org/~photo/Getopt-Casual-0.13.1/Casual.pm).
 
-[travis-url]: https://travis-ci.org/bcoe/yargs
-[travis-image]: https://img.shields.io/travis/bcoe/yargs.svg
-[gemnasium-url]: https://gemnasium.com/bcoe/yargs
-[gemnasium-image]: https://img.shields.io/gemnasium/bcoe/yargs.svg
-[coveralls-url]: https://coveralls.io/github/bcoe/yargs
-[coveralls-image]: https://img.shields.io/coveralls/bcoe/yargs.svg
+[travis-url]: https://travis-ci.org/yargs/yargs
+[travis-image]: https://img.shields.io/travis/yargs/yargs.svg
+[gemnasium-url]: https://gemnasium.com/yargs/yargs
+[gemnasium-image]: https://img.shields.io/gemnasium/yargs/yargs.svg
+[coveralls-url]: https://coveralls.io/github/yargs/yargs
+[coveralls-image]: https://img.shields.io/coveralls/yargs/yargs.svg
 [npm-url]: https://www.npmjs.com/package/yargs
 [npm-image]: https://img.shields.io/npm/v/yargs.svg
-[windows-url]: https://ci.appveyor.com/project/bcoe/yargs
-[windows-image]: https://img.shields.io/appveyor/ci/bcoe/yargs/master.svg?label=Windows%20Tests
+[windows-url]: https://ci.appveyor.com/project/yargs/yargs
+[windows-image]: https://img.shields.io/appveyor/ci/yargs/yargs/master.svg?label=Windows%20Tests
 [standard-image]: https://img.shields.io/badge/code%20style-standard-brightgreen.svg
 [standard-url]: http://standardjs.com/

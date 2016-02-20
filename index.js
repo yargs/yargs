@@ -1,4 +1,5 @@
 var assert = require('assert')
+var assign = require('lodash.assign')
 var Command = require('./lib/command')
 var Completion = require('./lib/completion')
 var Parser = require('yargs-parser')
@@ -416,7 +417,7 @@ function Argv (processArgs, cwd) {
   }
   self.getGroups = function () {
     // combine explicit and preserved groups. explicit groups should be first
-    return Object.assign({}, groups, preservedGroups)
+    return assign({}, groups, preservedGroups)
   }
 
   // as long as options.envPrefix is not undefined,
