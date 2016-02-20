@@ -20,6 +20,8 @@ function Argv (processArgs, cwd) {
   var self = {}
   var command = null
   var completion = null
+  var groups = {}
+  var preservedGroups = {}
   var usage = null
   var validation = null
   var y18n = Y18n({
@@ -69,6 +71,19 @@ function Argv (processArgs, cwd) {
       })
     })
 
+    // preserve groups containing global keys
+    preservedGroups = Object.keys(groups).reduce(function (acc, groupName) {
+      var keys = groups[groupName].filter(function (key) {
+        return key in globalLookup
+      })
+      if (keys.length > 0) {
+        acc[groupName] = keys
+      }
+      return acc
+    }, {})
+    // groups can now be reset
+    groups = {}
+
     var arrayOptions = [
       'array', 'boolean', 'string', 'requiresArg',
       'count', 'requiresArg', 'count', 'normalize', 'number'
@@ -103,7 +118,6 @@ function Argv (processArgs, cwd) {
 
     exitProcess = true
     strict = false
-    groups = {}
     completionCommand = null
     self.parsed = false
 
@@ -385,17 +399,24 @@ function Argv (processArgs, cwd) {
     return options
   }
 
-  var groups = {}
   self.group = function (opts, groupName) {
+    var existing = preservedGroups[groupName] || groups[groupName]
+    if (preservedGroups[groupName]) {
+      // the preserved group will be moved to the set of explicitly declared
+      // groups
+      delete preservedGroups[groupName]
+    }
+
     var seen = {}
-    groups[groupName] = (groups[groupName] || []).concat(opts).filter(function (key) {
+    groups[groupName] = (existing || []).concat(opts).filter(function (key) {
       if (seen[key]) return false
       return (seen[key] = true)
     })
     return self
   }
   self.getGroups = function () {
-    return groups
+    // combine explicit and preserved groups. explicit groups should be first
+    return Object.assign({}, groups, preservedGroups)
   }
 
   // as long as options.envPrefix is not undefined,
