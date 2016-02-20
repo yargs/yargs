@@ -1472,7 +1472,6 @@ describe('usage tests', function () {
       var uploadDesc = 'Upload cwd to remote destination'
       var uploadBuilder = function (yargs) {
         return yargs
-          .usage('$0 ' + uploadCommand)
           .option('force', {
             describe: 'Force overwrite of remote directory contents',
             type: 'boolean'
@@ -1533,6 +1532,8 @@ describe('usage tests', function () {
       })
 
       r.logs[0].split('\n').should.deep.equal([
+        './usage upload',
+        '',
         'Flags:',
         '  -q  [boolean]',
         '',
@@ -1670,6 +1671,45 @@ describe('usage tests', function () {
         'Commands:',
         '  upload  upload something',
         '',
+        'Options:',
+        '  --help  Show help  [boolean]',
+        ''
+      ])
+    })
+
+    it('allows a builder function to override default usage() string', function () {
+      var r = checkUsage(function () {
+        return yargs('upload --help')
+          .command('upload', 'upload something', {
+            builder: function (yargs) {
+              return yargs.usage('Usage: program upload <something> [opts]').demand(1)
+            },
+            handler: function (argv) {}
+          })
+          .help().wrap(null)
+          .argv
+      })
+
+      r.logs[0].split('\n').should.deep.equal([
+        'Usage: program upload <something> [opts]',
+        '',
+        'Options:',
+        '  --help  Show help  [boolean]',
+        ''
+      ])
+    })
+
+    it('allows a builder function to disable default usage() with null', function () {
+      var r = checkUsage(function () {
+        return yargs('upload --help')
+          .command('upload', 'upload something', function (yargs) {
+            return yargs.usage(null)
+          }, function (argv) {})
+          .help().wrap(null)
+          .argv
+      })
+
+      r.logs[0].split('\n').should.deep.equal([
         'Options:',
         '  --help  Show help  [boolean]',
         ''
