@@ -319,7 +319,7 @@ function Argv (processArgs, cwd) {
     var conf = null
 
     var obj = readPkgUp.sync({
-      cwd: path || requireMainFilename()
+      cwd: path || requireMainFilename(require)
     })
 
     if (obj.pkg && obj.pkg[key] && typeof obj.pkg[key] === 'object') {
@@ -472,7 +472,7 @@ function Argv (processArgs, cwd) {
 
   function guessVersion () {
     var obj = readPkgUp.sync({
-      cwd: requireMainFilename()
+      cwd: requireMainFilename(require)
     })
 
     return obj.pkg ? obj.pkg.version : 'unknown'
@@ -594,7 +594,7 @@ function Argv (processArgs, cwd) {
     options.__ = y18n.__
     options.configuration = pkgConf.sync('yargs', {
       defaults: {},
-      cwd: requireMainFilename()
+      cwd: requireMainFilename(require)
     })
     var parsed = Parser.detailed(args, options)
     var argv = parsed.argv
