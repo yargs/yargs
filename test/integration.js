@@ -56,6 +56,36 @@ describe('integration tests', function () {
     })
   })
 
+  it('correctly fills positional command args with preceding option', function (done) {
+    testCmd('./opt-assignment-and-positional-command-arg.js', ['--foo', 'fOo', 'bar', 'bAz'], function (code, stdout) {
+      if (code) {
+        done(new Error('cmd exited with code ' + code))
+        return
+      }
+
+      var argv = JSON.parse(stdout)
+      argv._.should.deep.equal(['bar'])
+      argv.foo.should.equal('fOo')
+      argv.baz.should.equal('bAz')
+      return done()
+    })
+  })
+
+  it('correctly fills positional command args with = assignment in preceding option', function (done) {
+    testCmd('./opt-assignment-and-positional-command-arg.js', ['--foo=fOo', 'bar', 'bAz'], function (code, stdout) {
+      if (code) {
+        done(new Error('cmd exited with code ' + code))
+        return
+      }
+
+      var argv = JSON.parse(stdout)
+      argv._.should.deep.equal(['bar'])
+      argv.foo.should.equal('fOo')
+      argv.baz.should.equal('bAz')
+      return done()
+    })
+  })
+
   if (process.platform !== 'win32') {
     describe('load root package.json', function () {
       before(function (done) {
