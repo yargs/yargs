@@ -1,6 +1,6 @@
 ## Change Log
 
-### v4.1.0 (2016/2/20 12:04 +07:00)
+### v4.2.0 (2016/2/22 11:02 +07:00)
 
 - [#395](https://github.com/yargs/yargs/pull/395) do not reset groups if they contain
   global keys (@novemberborn)

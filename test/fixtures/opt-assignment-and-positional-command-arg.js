@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 require('../../index')
   .option('foo', {
-    nargs: 1,
+    nargs: 1
   })
   .command(
     'bar <baz>',
