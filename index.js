@@ -1,4 +1,5 @@
 var assert = require('assert')
+var assign = require('lodash.assign')
 var Command = require('./lib/command')
 var Completion = require('./lib/completion')
 var Parser = require('yargs-parser')
@@ -318,7 +319,7 @@ function Argv (processArgs, cwd) {
     var conf = null
 
     var obj = readPkgUp.sync({
-      cwd: path || requireMainFilename()
+      cwd: path || requireMainFilename(require)
     })
 
     if (obj.pkg && obj.pkg[key] && typeof obj.pkg[key] === 'object') {
@@ -416,7 +417,7 @@ function Argv (processArgs, cwd) {
   }
   self.getGroups = function () {
     // combine explicit and preserved groups. explicit groups should be first
-    return Object.assign({}, groups, preservedGroups)
+    return assign({}, groups, preservedGroups)
   }
 
   // as long as options.envPrefix is not undefined,
@@ -471,7 +472,7 @@ function Argv (processArgs, cwd) {
 
   function guessVersion () {
     var obj = readPkgUp.sync({
-      cwd: requireMainFilename()
+      cwd: requireMainFilename(require)
     })
 
     return obj.pkg ? obj.pkg.version : 'unknown'
@@ -593,7 +594,7 @@ function Argv (processArgs, cwd) {
     options.__ = y18n.__
     options.configuration = pkgConf.sync('yargs', {
       defaults: {},
-      cwd: requireMainFilename()
+      cwd: requireMainFilename(require)
     })
     var parsed = Parser.detailed(args, options)
     var argv = parsed.argv

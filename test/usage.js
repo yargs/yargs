@@ -1570,6 +1570,8 @@ describe('usage tests', function () {
       })
 
       r.logs[0].split('\n').should.deep.equal([
+        './usage upload',
+        '',
         'Flags:',
         '  -q  [boolean]',
         '',
@@ -1604,6 +1606,8 @@ describe('usage tests', function () {
       })
 
       r.logs[0].split('\n').should.deep.equal([
+        './usage upload',
+        '',
         'Awesome Flags:',
         '  -i  [boolean]',
         '  -q  [boolean]',
@@ -1642,6 +1646,8 @@ describe('usage tests', function () {
       })
 
       r.logs[0].split('\n').should.deep.equal([
+        './usage upload',
+        '',
         'Awesome Flags:',
         '  -i  [boolean]',
         '',

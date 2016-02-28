@@ -199,7 +199,7 @@ describe('validation tests', function () {
         .argv
     })
 
-    // see: https://github.com/bcoe/yargs/issues/172
+    // see: https://github.com/yargs/yargs/issues/172
     it('should not raise an exception if config file is set as default argument value', function () {
       var fail = false
       yargs([])

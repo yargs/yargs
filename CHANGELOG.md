@@ -1,5 +1,14 @@
 ## Change Log
 
+### v4.2.0 (2016/2/22 11:02 +07:00)
+
+- [#395](https://github.com/yargs/yargs/pull/395) do not reset groups if they contain
+  global keys (@novemberborn)
+- [#393](https://github.com/yargs/yargs/pull/393) use sane default for usage strings (@nexdrew)
+- [#392](https://github.com/yargs/yargs/pull/392) resetting wrap() was causing layout issues
+  with commands (@nexdrew)
+- [#391](https://github.com/yargs/yargs/pull/391) commands were being added multiple times (@nexdrew)
+
 ### v4.0.0 (2016/2/14 1:27 +07:00)
 
 - [#384](https://github.com/bcoe/yargs/pull/384) add new number type to yargs (@lrlna, @maxrimue)
