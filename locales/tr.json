@@ -5,6 +5,7 @@
   "boolean": "boolean",
   "count": "sayı",
   "string": "string",
+  "number": "numara",
   "array": "array",
   "required": "zorunlu",
   "default:": "varsayılan:",
