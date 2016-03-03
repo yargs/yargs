@@ -5,6 +5,7 @@
   "boolean": "boolean",
   "count": "Zähler",
   "string": "string",
+  "number": "Zahl",
   "array": "array",
   "required": "erforderlich",
   "default:": "Standard:",
