@@ -5,6 +5,7 @@
   "boolean": "boolean",
   "count": "ilość",
   "string": "ciąg znaków",
+  "number": "liczba",
   "array": "tablica",
   "required": "wymagany",
   "default:": "domyślny:",
