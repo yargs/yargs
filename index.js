@@ -616,7 +616,7 @@ function Argv (processArgs, cwd) {
 
     // if there's a handler associated with a
     // command defer processing to it.
-    var handlerKeys = command.getCommands()
+    var handlerKeys = command.getCommandsWithHandlers()
     for (var i = 0, cmd; (cmd = handlerKeys[i]) !== undefined; i++) {
       if (~argv._.indexOf(cmd) && cmd !== completionCommand) {
         setPlaceholderKeys(argv)
