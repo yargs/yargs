@@ -361,6 +361,21 @@ describe('yargs dsl tests', function () {
       global.commandHandlerCalledWith.foo.should.equal('bar')
       delete global.commandHandlerCalledWith
     })
+
+    it("accepts a module with a keys 'command', 'describe', 'builder', and 'handler'", function () {
+      var argv = yargs(['blerg', 'bar'])
+        .command(require('./fixtures/command-module'))
+        .argv
+
+      argv.banana.should.equal('cool')
+      argv.batman.should.equal('sad')
+      argv.foo.should.equal('bar')
+
+      global.commandHandlerCalledWith.banana.should.equal('cool')
+      global.commandHandlerCalledWith.batman.should.equal('sad')
+      global.commandHandlerCalledWith.foo.should.equal('bar')
+      delete global.commandHandlerCalledWith
+    })
   })
 
   describe('terminalWidth', function () {
