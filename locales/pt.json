@@ -5,6 +5,7 @@
   "boolean": "boolean",
   "count": "contagem",
   "string": "cadeia de caracteres",
+  "number": "número",
   "array": "arranjo",
   "required": "requerido",
   "default:": "padrão:",
