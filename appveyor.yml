@@ -13,6 +13,7 @@ install:
   # Get the latest stable version of Node 0.STABLE.latest
   - ps: Install-Product node $env:nodejs_version
   # Typical npm stuff.
+  - npm -g install npm@latest
   - npm install
 
 # Post-install test scripts.
@@ -33,3 +34,6 @@ build: off
 
 # Set build version format here instead of in the admin panel.
 version: "{build}"
+
+matrix:
+  fast_finish: true
