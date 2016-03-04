@@ -5,6 +5,7 @@
   "boolean": "여부",
   "count": "개수",
   "string": "문자열",
+  "number": "숫자",
   "array": "배열",
   "required": "필수",
   "default:": "기본:",
