@@ -992,6 +992,28 @@ Optionally `.nargs()` can take an object of `key`/`narg` pairs.
 
 The key provided represents a path and should have `path.normalize()` applied.
 
+<a name="number"></a>.number(key)
+------------
+
+Tell the parser to always interpret `key` as a number.
+
+If `key` is an array, all elements will be parsed as numbers.
+
+If the option is given on the command line without a value, `argv` will be
+populated with `undefined`.
+
+If the value given on the command line cannot be parsed as a number, `argv` will
+be populated with `NaN`.
+
+Note that decimals, hexadecimals, and scientific notation are all accepted.
+
+```js
+var argv = require('yargs')
+  .number('n')
+  .number(['width', 'height'])
+  .argv
+```
+
 .option(key, opt)
 -----------------
 .options(key, opt)
@@ -1061,16 +1083,16 @@ Valid `opt` keys include:
 - `global`: boolean, indicate that this key should not be [reset](#reset) when a command is invoked, see [`global()`](#global)
 - `group`: string, when displaying usage instructions place the option under an alternative group heading, see [`group()`](#group)
 - `nargs`: number, specify how many arguments should be consumed for the option, see [`nargs()`](#nargs)
-- `normalize`: The option should be normalized, see [`normalize()`](#normalize)
+- `normalize`: boolean, apply `path.normalize()` to the option, see [`normalize()`](#normalize)
+- `number`: boolean, interpret option as a number, [`number()`](#number)
 - `requiresArg`: boolean, require the option be specified with a value, see [`requiresArg()`](#requiresArg)
 - `string`: boolean, interpret option as a string, see [`string()`](#string)
-- `number`: number, keys are treated as numbers, [`number()`](#number)
 - `type`: one of the following strings
     - `'array'`: synonymous for `array: true`, see [`array()`](#array)
     - `'boolean'`: synonymous for `boolean: true`, see [`boolean()`](#boolean)
     - `'count'`: synonymous for `count: true`, see [`count()`](#count)
-    - `'string'`: synonymous for `string: true`, see [`string()`](#string)
     - `'number'`: synonymous for `number: true`, see [`number()`](#number)
+    - `'string'`: synonymous for `string: true`, see [`string()`](#string)
 
 .parse(args)
 ------------
@@ -1220,20 +1242,6 @@ If `key` is an array, interpret all the elements as strings.
 
 `.string('_')` will result in non-hyphenated arguments being interpreted as strings,
 regardless of whether they resemble numbers.
-
-<a name="number"></a>.number([key])
-------------
-Specify options with a numeric argument.
-
-If an argument is not provided with the option, will return `undefined`.
-
-If a non-numeric argument is provided, will return a `NaN`.
-
-```js
-var argv = require('yargs')
-  .number(['n'])
-  .argv
-```
 
 .updateLocale(obj)
 ------------------
