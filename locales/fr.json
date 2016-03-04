@@ -5,6 +5,7 @@
   "boolean": "booléen",
   "count": "comptage",
   "string": "chaine de caractère",
+  "number": "nombre",
   "array": "tableau",
   "required": "requis",
   "default:": "défaut:",
