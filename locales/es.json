@@ -5,6 +5,7 @@
   "boolean": "boolean",
   "count": "cuenta",
   "string": "cadena de caracteres",
+  "number": "número",
   "array": "tabla",
   "required": "requisito",
   "default:": "defecto:",
