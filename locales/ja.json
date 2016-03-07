@@ -5,6 +5,7 @@
   "boolean": "真偽",
   "count": "カウント",
   "string": "文字列",
+  "number": "数値",
   "array": "配列",
   "required": "必須",
   "default:": "デフォルト:",
