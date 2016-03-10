@@ -1717,6 +1717,44 @@ describe('usage tests', function () {
         ''
       ])
     })
+
+    it('displays given command chain with positional args in default usage for subcommand with builder object', function () {
+      var r = checkUsage(function () {
+        return yargs('one two --help')
+          .command('one <sub>', 'level one, requires subcommand', function (yargs) {
+            return yargs.command('two [next]', 'level two', {}, function (argv) {})
+          }, function (argv) {})
+          .help().wrap(null)
+          .argv
+      })
+
+      r.logs[0].split('\n').should.deep.equal([
+        './usage one two [next]',
+        '',
+        'Options:',
+        '  --help  Show help  [boolean]',
+        ''
+      ])
+    })
+
+    it('displays given command chain with positional args in default usage for subcommand with builder function', function () {
+      var r = checkUsage(function () {
+        return yargs('one two --help')
+          .command('one <sub>', 'level one, requires subcommand', function (yargs) {
+            return yargs.command('two [next]', 'level two', function (yargs) { return yargs }, function (argv) {})
+          }, function (argv) {})
+          .help().wrap(null)
+          .argv
+      })
+
+      r.logs[0].split('\n').should.deep.equal([
+        './usage one two [next]',
+        '',
+        'Options:',
+        '  --help  Show help  [boolean]',
+        ''
+      ])
+    })
   })
 
   describe('epilogue', function () {

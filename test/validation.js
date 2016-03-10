@@ -315,4 +315,22 @@ describe('validation tests', function () {
         .parse([])
     })
   })
+
+  describe('strict mode', function () {
+    it('does not fail when command with subcommands called', function () {
+      yargs('one')
+        .command('one', 'level one', function (yargs) {
+          return yargs
+            .command('twoA', 'level two A')
+            .command('twoB', 'level two B')
+            .strict()
+            .fail(function (msg) {
+              expect.fail()
+            })
+        }, function (argv) {
+          argv._[0].should.equal('one')
+        })
+        .argv
+    })
+  })
 })

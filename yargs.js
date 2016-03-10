@@ -47,11 +47,19 @@ function Yargs (processArgs, cwd, parentRequire) {
     )
   }
 
+  // use context object to keep track of resets, subcommand execution, etc
+  // submodules should modify and check the state of context as necessary
+  var context = { resets: -1, commands: [] }
+  self.getContext = function () {
+    return context
+  }
+
   // puts yargs back into an initial state. any keys
   // that have been set to "global" will not be reset
   // by this action.
   var options
   self.resetOptions = self.reset = function (aliases) {
+    context.resets++
     aliases = aliases || {}
     options = options || {}
     // put yargs back into an initial state, this
