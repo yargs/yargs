@@ -5,6 +5,7 @@
   "boolean": "boolsk",
   "count": "antall",
   "string": "streng",
+  "number": "nummer",
   "array": "matrise",
   "required": "obligatorisk",
   "default:": "standard:",
