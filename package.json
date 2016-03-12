@@ -5,6 +5,7 @@
   "main": "./index.js",
   "files": [
     "index.js",
+    "yargs.js",
     "lib",
     "locales",
     "completion.sh.hbs",
