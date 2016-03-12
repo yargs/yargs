@@ -1,5 +1,9 @@
 ## Change Log
 
+### v4.3.0 (2016/3/12 11:04 +07:00)
+
+- [#414](https://github.com/yargs/yargs/pull/414) all command options can be defined in module now (@nexdrew)
+
 ### v4.2.0 (2016/2/22 11:02 +07:00)
 
 - [#395](https://github.com/yargs/yargs/pull/395) do not reset groups if they contain
