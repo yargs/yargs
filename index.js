@@ -620,7 +620,8 @@ function Argv (processArgs, cwd) {
     for (var i = 0, cmd; (cmd = handlerKeys[i]) !== undefined; i++) {
       if (~argv._.indexOf(cmd) && cmd !== completionCommand) {
         setPlaceholderKeys(argv)
-        return command.runCommand(cmd, self, parsed)
+        command.runCommand(cmd, self, parsed)
+        if (command.hasHandlerFunction(cmd)) return
       }
     }
 

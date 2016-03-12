@@ -269,6 +269,22 @@ describe('yargs dsl tests', function () {
         .argv
     })
 
+    it('only runs commands if handler is defined', function () {
+      var r = checkOutput(function () {
+        yargs(['get', '--browser', 'Internet Explorer'])
+          .command('get')
+          .string('browser')
+          .check(function (argv) {
+            // This check is only run if the command handler is not run
+            return argv.browser !== 'Internet Explorer'
+          })
+          .exitProcess()
+          .argv
+      })
+
+      expect(r.exit).to.equal(true)
+    })
+
     it("skips executing top-level command if builder's help is executed", function () {
       var r = checkOutput(function () {
         yargs(['blerg', '-h'])
