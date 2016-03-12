@@ -1423,7 +1423,7 @@ This module is loosely inspired by Perl's
 [coveralls-image]: https://img.shields.io/coveralls/yargs/yargs.svg
 [npm-url]: https://www.npmjs.com/package/yargs
 [npm-image]: https://img.shields.io/npm/v/yargs.svg
-[windows-url]: https://ci.appveyor.com/project/yargs/yargs
-[windows-image]: https://img.shields.io/appveyor/ci/yargs/yargs/master.svg?label=Windows%20Tests
+[windows-url]: https://ci.appveyor.com/project/bcoe/yargs
+[windows-image]: https://img.shields.io/appveyor/ci/bcoe/yargs/master.svg?label=Windows%20Tests
 [standard-image]: https://img.shields.io/badge/code%20style-standard-brightgreen.svg
 [standard-url]: http://standardjs.com/
