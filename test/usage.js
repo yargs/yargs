@@ -86,9 +86,7 @@ describe('usage tests', function () {
         var r = checkUsage(function () {
           return yargs('wombat -w 10 -m 10')
             .usage('Usage: $0 -w NUM -m NUM')
-            .command('wombat', 'wombat handlers', function (yargs, argv) {
-              return argv
-            })
+            .command('wombat', 'wombat handlers')
             .demand(1, ['w', 'm'])
             .strict()
             .wrap(null)
@@ -175,9 +173,7 @@ describe('usage tests', function () {
         var r = checkUsage(function () {
           return yargs('wombat -w 10 -m 10')
             .usage('Usage: $0 -w NUM -m NUM')
-            .command('wombat', 'wombat handlers', function (yargs, argv) {
-              return argv
-            })
+            .command('wombat', 'wombat handlers')
             .require(1, ['w', 'm'])
             .strict()
             .wrap(null)
