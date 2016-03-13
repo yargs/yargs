@@ -5,15 +5,13 @@ var yargs = require('./yargs')
 
 Argv(process.argv.slice(2))
 
-var exports = module.exports = Argv
+module.exports = Argv
 
 function Argv (processArgs, cwd) {
   var argv = yargs(processArgs, cwd, require)
   singletonify(argv)
   return argv
 }
-
-exports.rebase = yargs.rebase
 
 /*  Hack an instance of Argv with process.argv into Argv
     so people can do
