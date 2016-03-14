@@ -70,6 +70,16 @@ describe('validation tests', function () {
         .argv
     })
 
+    it('fails with substituted counts if msg is defined', function (done) {
+      yargs([])
+        .demand(1, 'got $0, expected $1 ($0 / $1)')
+        .fail(function (msg) {
+          msg.should.equal('got 0, expected 1 (0 / 1)')
+          return done()
+        })
+        .argv
+    })
+
     it('fails in strict mode with invalid command', function (done) {
       yargs(['koala'])
         .command('wombat', 'wombat burrows')
