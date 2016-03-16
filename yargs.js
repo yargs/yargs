@@ -85,7 +85,7 @@ function Yargs (processArgs, cwd, parentRequire) {
 
     var arrayOptions = [
       'array', 'boolean', 'string', 'requiresArg',
-      'count', 'requiresArg', 'count', 'normalize', 'number'
+      'count', 'normalize', 'number'
     ]
 
     var objectOptions = [
