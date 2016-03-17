@@ -9,7 +9,6 @@ var exports = module.exports = Argv
 
 function Argv (processArgs, cwd) {
   var argv = yargs(processArgs, cwd, require)
-  processArgs = processArgs || [] // handle calling yargs().
   singletonify(argv)
   return argv
 }
