@@ -4,6 +4,7 @@ var checkUsage = require('./helpers/utils').checkOutput
 var chalk = require('chalk')
 var path = require('path')
 var yargs = require('../')
+var rebase = require('../yargs').rebase
 
 require('chai').should()
 
@@ -1207,9 +1208,9 @@ describe('usage tests', function () {
   })
 
   it('should succeed when rebase', function () {
-    yargs.rebase(['home', 'chevex'].join(path.sep), ['home', 'chevex', 'foo', 'bar', 'baz'].join(path.sep)).should.equal(['foo', 'bar', 'baz'].join(path.sep))
-    yargs.rebase(['home', 'chevex', 'foo', 'bar', 'baz'].join(path.sep), ['home', 'chevex'].join(path.sep)).should.equal(['..', '..', '..'].join(path.sep))
-    yargs.rebase(['home', 'chevex', 'foo'].join(path.sep), ['home', 'chevex', 'pow', 'zoom.txt'].join(path.sep)).should.equal(['..', 'pow', 'zoom.txt'].join(path.sep))
+    rebase(['home', 'chevex'].join(path.sep), ['home', 'chevex', 'foo', 'bar', 'baz'].join(path.sep)).should.equal(['foo', 'bar', 'baz'].join(path.sep))
+    rebase(['home', 'chevex', 'foo', 'bar', 'baz'].join(path.sep), ['home', 'chevex'].join(path.sep)).should.equal(['..', '..', '..'].join(path.sep))
+    rebase(['home', 'chevex', 'foo'].join(path.sep), ['home', 'chevex', 'pow', 'zoom.txt'].join(path.sep)).should.equal(['..', 'pow', 'zoom.txt'].join(path.sep))
   })
 
   it('should not print usage string if help() is called without arguments', function () {
