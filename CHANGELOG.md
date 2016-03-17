@@ -1,5 +1,10 @@
 ## Change Log
 
+### v4.4.0 (2016/3/16 21:07 +07:00)
+
+- [#443](https://github.com/yargs/yargs/pull/443) adds Itallian translation \o/ (@madrisan)
+- [#443](https://github.com/yargs/yargs/pull/441) remove duplicate keys from array options configuration (@elas7)
+
 ### v4.3.0 (2016/3/12 14:19 +07:00)
 
 - [#432](https://github.com/yargs/yargs/pull/432) non-singleton version of yargs (@bcoe)
