@@ -90,6 +90,16 @@ describe('validation tests', function () {
         .argv
     })
 
+    it('fails with substituted counts if "too many" message is defined', function (done) {
+      yargs(['a', 'b', 'c'])
+        .demand(1, 2, undefined, 'got $0, expected $1 ($0 / $1)')
+        .fail(function (msg) {
+          msg.should.equal('got 3, expected 1 (3 / 1)')
+          return done()
+        })
+        .argv
+    })
+
     it('fails in strict mode with invalid command', function (done) {
       yargs(['koala'])
         .command('wombat', 'wombat burrows')
