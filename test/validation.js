@@ -70,7 +70,7 @@ describe('validation tests', function () {
         .argv
     })
 
-    it('fails with invalid command', function (done) {
+    it('fails in strict mode with invalid command', function (done) {
       yargs(['koala'])
         .command('wombat', 'wombat burrows')
         .command('kangaroo', 'kangaroo handlers')
@@ -81,6 +81,17 @@ describe('validation tests', function () {
           return done()
         })
         .argv
+    })
+
+    it('does not fail in strict mode when no commands configured', function () {
+      var argv = yargs('koala')
+        .demand(1)
+        .strict()
+        .fail(function (msg) {
+          expect.fail()
+        })
+        .argv
+      argv._[0].should.equal('koala')
     })
 
     it('fails when a required argument is missing', function (done) {
