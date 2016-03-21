@@ -4,8 +4,8 @@
 
 - [446](https://github.com/yargs/yargs/pull/446) update yargs-parser, y18n, nyc, cliui (@bcoe)
 - [#445](https://github.com/yargs/yargs/pull/445) strict mode was failing if no commands were registered (@nexdrew)
-- [#443](https://github.com/yargs/yargs/pull/443) adds Itallian translation \o/ (@madrisan)
-- [#443](https://github.com/yargs/yargs/pull/441) remove duplicate keys from array options configuration (@elas7)
+- [#443](https://github.com/yargs/yargs/pull/443) adds Italian translation \o/ (@madrisan)
+- [#441](https://github.com/yargs/yargs/pull/441) remove duplicate keys from array options configuration (@elas7)
 - [#437](https://github.com/yargs/yargs/pull/437) standardize tests for .command() (@lrlna)
 - [#436](https://github.com/yargs/yargs/pull/436) the rebase method is only used by tests, do not export it in two places (@elas7)
 
