@@ -1,8 +1,11 @@
 ## Change Log
 
-### v4.4.0 (2016/3/20 15:07 +07:00)
+### v4.3.3 (2016/4/20 22:00 +07:00)
 
 - [446](https://github.com/yargs/yargs/pull/446) update yargs-parser, y18n, nyc, cliui (@bcoe)
+
+### v4.3.2 (2016/3/20 15:07 +07:00)
+
 - [#445](https://github.com/yargs/yargs/pull/445) strict mode was failing if no commands were registered (@nexdrew)
 - [#443](https://github.com/yargs/yargs/pull/443) adds Italian translation \o/ (@madrisan)
 - [#441](https://github.com/yargs/yargs/pull/441) remove duplicate keys from array options configuration (@elas7)
