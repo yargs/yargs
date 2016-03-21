@@ -1,5 +1,17 @@
 ## Change Log
 
+### v4.3.3 (2016/4/20 22:00 +07:00)
+
+- [446](https://github.com/yargs/yargs/pull/446) update yargs-parser, y18n, nyc, cliui (@bcoe)
+
+### v4.3.2 (2016/3/20 15:07 +07:00)
+
+- [#445](https://github.com/yargs/yargs/pull/445) strict mode was failing if no commands were registered (@nexdrew)
+- [#443](https://github.com/yargs/yargs/pull/443) adds Italian translation \o/ (@madrisan)
+- [#441](https://github.com/yargs/yargs/pull/441) remove duplicate keys from array options configuration (@elas7)
+- [#437](https://github.com/yargs/yargs/pull/437) standardize tests for .command() (@lrlna)
+- [#436](https://github.com/yargs/yargs/pull/436) the rebase method is only used by tests, do not export it in two places (@elas7)
+
 ### v4.3.0 (2016/3/12 14:19 +07:00)
 
 - [#432](https://github.com/yargs/yargs/pull/432) non-singleton version of yargs (@bcoe)
