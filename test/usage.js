@@ -1958,7 +1958,7 @@ describe('usage tests', function () {
       ])
     })
 
-    it('should display 'type' string in help message if set for alias', function () {
+    it("should display 'type' string in help message if set for alias", function () {
       var r = checkUsage(function () {
         return yargs(['-h'])
           .string('foo')
