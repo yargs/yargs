@@ -880,9 +880,10 @@ help output.
 Example:
 
 ```js
-var yargs = require("yargs")['--help']
-  .usage("$0 -operand1 number -operand2 number -operation [add|subtract]");
+var yargs = require("yargs")(['--help'])
+  .usage("$0 -operand1 number -operand2 number -operation [add|subtract]")
   .help()
+  .argv
 ```
 
 Later on, `argv` can be retrieved with `yargs.argv`.
