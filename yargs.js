@@ -234,6 +234,7 @@ function Yargs (processArgs, cwd, parentRequire) {
       max.forEach(function (key) {
         self.demand(key, msg)
       })
+      max = Infinity
     } else if (typeof max !== 'number') {
       msg = max
       max = Infinity
