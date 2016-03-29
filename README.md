@@ -560,8 +560,8 @@ yargs.command('get <source> [proxy]', 'make a get HTTP request', require('my-mod
   .argv
 ```
 
-.completion(cmd, [description], [fn]);
--------------
+.completion([cmd, [description], [fn]]);
+----------------------------------------
 
 Enable bash-completion shortcuts for commands and options.
 
@@ -575,6 +575,9 @@ that generates bash completion scripts.
 `fn`: Rather than relying on yargs' default completion functionality, which
 shiver me timbers is pretty awesome, you can provide your own completion
 method.
+
+If invoked without parameters, `.completion()` will make `completion` the command to output 
+the completion script.
 
 ```js
 var argv = require('yargs')
