@@ -2112,7 +2112,7 @@ describe('usage tests', function () {
 
       it('is not resolved to the relative path if it is larger, using Windows paths', function () {
         mockProcessArgv(['node', 'C:\\script.js'], function () {
-          yargs([], 'C:\\very\\long\\current\\directory\\').$0.should.equal('\\script.js')
+          yargs([], 'C:\\very\\long\\current\\directory\\').$0.should.equal('C:\\script.js')
         })
       })
     }
