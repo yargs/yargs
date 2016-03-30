@@ -982,10 +982,12 @@ Locales currently supported:
 * **es:** Spanish.
 * **fr:** French.
 * **id:** Indonesian.
+* **it:** Italian.
 * **ja:** Japanese.
 * **ko:** Korean.
 * **nb:** Norwegian Bokmål.
 * **pirate:** American Pirate.
+* **pl:** Polish.
 * **pt:** Portuguese.
 * **pt_BR:** Brazilian Portuguese.
 * **tr:** Turkish.
