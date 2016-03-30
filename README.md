@@ -560,7 +560,7 @@ yargs.command('get <source> [proxy]', 'make a get HTTP request', require('my-mod
   .argv
 ```
 
-.completion([cmd, [description], [fn]]);
+.completion([cmd], [description], [fn]);
 ----------------------------------------
 
 Enable bash-completion shortcuts for commands and options.
