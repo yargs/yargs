@@ -887,3 +887,43 @@ describe('yargs dsl tests', function () {
     })
   })
 })
+
+describe('yargs context', function () {
+  beforeEach(function () {
+    delete require.cache[require.resolve('../')]
+    yargs = require('../')
+  })
+
+  it('should begin with initial state', function () {
+    var context = yargs.getContext()
+    context.resets.should.equal(0)
+    context.commands.should.deep.equal([])
+  })
+
+  it('should track number of resets', function () {
+    var context = yargs.getContext()
+    yargs.reset()
+    context.resets.should.equal(1)
+    yargs.reset()
+    yargs.reset()
+    context.resets.should.equal(3)
+  })
+
+  it('should track commands being executed', function () {
+    var context
+    yargs('one two')
+      .command('one', 'level one', function (yargs) {
+        context = yargs.getContext()
+        context.commands.should.deep.equal(['one'])
+        return yargs.command('two', 'level two', function (yargs) {
+          context.commands.should.deep.equal(['one', 'two'])
+        }, function (argv) {
+          context.commands.should.deep.equal(['one', 'two'])
+        })
+      }, function (argv) {
+        context.commands.should.deep.equal(['one'])
+      })
+      .argv
+    context.commands.should.deep.equal([])
+  })
+})

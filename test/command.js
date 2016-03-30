@@ -41,6 +41,23 @@ describe('Command', function () {
       argv.bar.should.equal('hello')
       argv.awesome.should.equal('world')
     })
+
+    it('populates subcommand\'s inner argv with positional arguments', function () {
+      yargs('foo bar hello world')
+        .command('foo', 'my awesome command', function (yargs) {
+          return yargs.command(
+            'bar <greeting> [recipient]',
+            'subcommands are cool',
+            function () {},
+            function (argv) {
+              argv._.should.deep.equal(['foo', 'bar'])
+              argv.greeting.should.equal('hello')
+              argv.recipient.should.equal('world')
+            }
+          )
+        })
+        .argv
+    })
   })
 
   describe('missing positional arguments', function () {
