@@ -1,8 +1,12 @@
 ## Change Log
 
-### v4.3.3 (2016/4/20 22:00 +07:00)
+### v4.4.0 (upcoming)
 
-- [446](https://github.com/yargs/yargs/pull/446) update yargs-parser, y18n, nyc, cliui (@bcoe)
+- [#454](https://github.com/yargs/yargs/pull/454) fix demand() when second argument is an array (@elas7)
+- [#450](https://github.com/yargs/yargs/pull/450) fix for bash completion trailing space edge-case (@elas7)
+- [#448](https://github.com/yargs/yargs/pull/448) allow a method to be passed to `showHelp`, rather than a log-level (@osher)
+- [#446](https://github.com/yargs/yargs/pull/446) update yargs-parser, y18n, nyc, cliui, pkg-conf (@bcoe)
+- [#436](https://github.com/yargs/yargs/pull/436) the rebase method is only used by tests, do not export it in two places (@elas7)
 
 ### v4.3.2 (2016/3/20 15:07 +07:00)
 
