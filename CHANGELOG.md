@@ -3,10 +3,12 @@
 ### v4.4.0 (upcoming)
 
 - [#454](https://github.com/yargs/yargs/pull/454) fix demand() when second argument is an array (@elas7)
+- [#452](https://github.com/yargs/yargs/pull/452) fix code example for `.help()` docs (@maxrimue)
 - [#450](https://github.com/yargs/yargs/pull/450) fix for bash completion trailing space edge-case (@elas7)
 - [#448](https://github.com/yargs/yargs/pull/448) allow a method to be passed to `showHelp`, rather than a log-level (@osher)
 - [#446](https://github.com/yargs/yargs/pull/446) update yargs-parser, y18n, nyc, cliui, pkg-conf (@bcoe)
 - [#436](https://github.com/yargs/yargs/pull/436) the rebase method is only used by tests, do not export it in two places (@elas7)
+- [#428](https://github.com/yargs/yargs/pull/428) initial support for subcommands (@nexdrew)
 
 ### v4.3.2 (2016/3/20 15:07 +07:00)
 
@@ -14,7 +16,6 @@
 - [#443](https://github.com/yargs/yargs/pull/443) adds Italian translation \o/ (@madrisan)
 - [#441](https://github.com/yargs/yargs/pull/441) remove duplicate keys from array options configuration (@elas7)
 - [#437](https://github.com/yargs/yargs/pull/437) standardize tests for .command() (@lrlna)
-- [#436](https://github.com/yargs/yargs/pull/436) the rebase method is only used by tests, do not export it in two places (@elas7)
 
 ### v4.3.0 (2016/3/12 14:19 +07:00)
 
