@@ -454,9 +454,11 @@ var argv = require('yargs')
 ```
 
 .command(cmd, desc, [builder], [handler])
--------------------
+-----------------------------------------
 .command(cmd, desc, [module])
--------------------
+-----------------------------
+.command(module)
+----------------
 
 Document the commands exposed by your application.
 
@@ -533,11 +535,17 @@ yargs.command('get <source> [proxy]', 'make a get HTTP request')
 For complicated commands you can pull the logic into a module. A module
 simply needs to export:
 
-* `exports.builder`: which describes the options that a command accepts.
+* `exports.command`: string that executes this command when given on the command line, may contain positional args
+* `exports.describe`: string used as the description for the command in help text, use `false` for a hidden command
+* `exports.builder`: object declaring the options the command accepts, or a function accepting and returning a yargs instance
 * `exports.handler`: a function which will be passed the parsed argv.
 
 ```js
 // my-module.js
+exports.command = 'get <source> [proxy]'
+
+exports.describe = 'make a get HTTP request'
+
 exports.builder = {
   banana: {
     default: 'cool'
@@ -553,6 +561,14 @@ exports.handler = function (argv) {
 ```
 
 You then register the module like so:
+
+```js
+yargs.command(require('my-module'))
+  .help()
+  .argv
+```
+
+Or if the module does not export `command` and `describe` (or if you just want to override them):
 
 ```js
 yargs.command('get <source> [proxy]', 'make a get HTTP request', require('my-module'))
