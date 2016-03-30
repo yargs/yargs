@@ -2019,6 +2019,52 @@ describe('usage tests', function () {
         ''
       ])
     })
+
+    it('when passed a string - should call the correct console.log method', function () {
+      var r = checkUsage(function () {
+        var y = yargs(['--foo'])
+          .options('foo', {
+            alias: 'f',
+            describe: 'foo option'
+          })
+          .wrap(null)
+
+        y.showHelp('log')
+      })
+
+      r.errors.length.should.eql(0)
+      r.logs.join('\n').split(/\n+/).should.deep.equal([
+        'Options:',
+        '  --foo, -f  foo option',
+        ''
+      ])
+    })
+    it('when passed a handler - should provide the help string to the handler', function () {
+      var testlogs = []
+      var r = checkUsage(function () {
+        var y = yargs(['--foo'])
+          .options('foo', {
+            alias: 'f',
+            describe: 'foo option'
+          })
+          .wrap(null)
+
+        y.showHelp(testHandler)
+      })
+
+      r.errors.length.should.eql(0)
+      r.logs.length.should.eql(0)
+
+      testlogs.join('\n').split(/\n+/).should.deep.equal([
+        'Options:',
+        '  --foo, -f  foo option',
+        ''
+      ])
+
+      function testHandler (msg) {
+        testlogs.push(msg)
+      }
+    })
   })
 
   describe('$0', function () {
