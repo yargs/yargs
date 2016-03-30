@@ -301,6 +301,18 @@ describe('usage tests', function () {
           'pork chop sandwiches'
         ])
       })
+
+      it("shouldn't interpret the second argument as a max when it is an array", function () {
+        var r = checkUsage(function () {
+          return yargs(['koala', 'wombat', '--1'])
+              .usage('Usage: foo')
+              .demand(1, ['1'])
+              .wrap(null)
+              .argv
+        })
+
+        r.errors.length.should.equal(0)
+      })
     })
   })
 
