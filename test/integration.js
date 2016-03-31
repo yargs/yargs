@@ -44,7 +44,7 @@ describe('integration tests', function () {
 
   // see #177
   it('allows --help to be completed without returning help message', function (done) {
-    testCmd('./bin.js', [ '--get-yargs-completions', '--help' ], function (code, stdout) {
+    testCmd('./bin.js', [ '--get-yargs-completions', '--h' ], function (code, stdout) {
       if (code) {
         done(new Error('cmd exited with code ' + code))
         return

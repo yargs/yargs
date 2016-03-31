@@ -38,6 +38,36 @@ describe('Completion', function () {
       r.logs.should.not.include('apple')
     })
 
+    it('avoids repeating already included options', function () {
+      var r = checkUsage(function () {
+        return yargs(['--get-yargs-completions'])
+          .options({
+            foo: {describe: 'foo option'},
+            bar: {describe: 'bar option'}
+          })
+          .completion()
+          .argv
+      }, ['./completion', '--get-yargs-completions', './completion', '--foo', '--'])
+
+      r.logs.should.include('--bar')
+      r.logs.should.not.include('--foo')
+    })
+
+    it('avoids repeating options whose aliases are already included', function () {
+      var r = checkUsage(function () {
+        return yargs(['--get-yargs-completions'])
+            .options({
+              foo: {describe: 'foo option', alias: 'f'},
+              bar: {describe: 'bar option'}
+            })
+            .completion()
+            .argv
+      }, ['./completion', '--get-yargs-completions', './completion', '--f', '--'])
+
+      r.logs.should.include('--bar')
+      r.logs.should.not.include('--foo')
+    })
+
     it('completes options for a command', function () {
       var r = checkUsage(function () {
         return yargs(['--get-yargs-completions'])
