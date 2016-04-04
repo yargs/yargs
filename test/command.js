@@ -17,8 +17,14 @@ describe('Command', function () {
         })
       var command = y.getCommandInstance()
       var handlers = command.getCommandHandlers()
-      handlers.foo.demanded.should.include('bar')
-      handlers.foo.optional.should.include('awesome')
+      handlers.foo.demanded.should.include({
+        cmd: 'bar',
+        variadic: false
+      })
+      handlers.foo.optional.should.include({
+        cmd: 'awesome',
+        variadic: false
+      })
     })
 
     it('populates inner argv with positional arguments', function (done) {
@@ -57,6 +63,55 @@ describe('Command', function () {
           )
         })
         .argv
+    })
+  })
+
+  describe('variadic', function () {
+    it('allows required arguments to be variadic', function () {
+      var argv = yargs('foo /root file1 file2 file3')
+        .command('foo <root> <files..>')
+        .argv
+
+      argv.root.should.equal('/root')
+      argv.files.should.deep.equal(['file1', 'file2', 'file3'])
+    })
+
+    it('allows optional arguments to be variadic', function () {
+      var argv = yargs('foo /root file1 file2 file3')
+        .command('foo <root> [files..]')
+        .argv
+
+      argv.root.should.equal('/root')
+      argv.files.should.deep.equal(['file1', 'file2', 'file3'])
+    })
+
+    it('fails if required arguments are missing', function (done) {
+      yargs('foo /root')
+        .command('foo <root> <files..>')
+        .fail(function (err) {
+          err.should.match(/Not enough non-option arguments/)
+          return done()
+        })
+        .argv
+    })
+
+    it('does not fail if zero optional arguments are provided', function () {
+      var argv = yargs('foo /root')
+        .command('foo <root> [files...]')
+        .argv
+
+      argv.root.should.equal('/root')
+      argv.files.should.deep.equal([])
+    })
+
+    it('only allows the last argument to be variadic', function () {
+      var argv = yargs('foo /root file1 file2')
+        .command('foo <root..> <file>')
+        .argv
+
+      argv.root.should.equal('/root')
+      argv.file.should.equal('file1')
+      argv._.should.include('file2')
     })
   })
 

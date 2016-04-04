@@ -530,6 +530,17 @@ yargs.command('get <source> [proxy]', 'make a get HTTP request')
   .argv
 ```
 
+#### Variadic Positional Arguments
+
+The last positional argument can optionally accept an array of
+values, by using the `..` operator:
+
+```js
+yargs.command('download <url> [files..]', 'download several files')
+  .help()
+  .argv
+```
+
 ### Providing a Command Module
 
 For complicated commands you can pull the logic into a module. A module
