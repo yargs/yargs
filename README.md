@@ -622,12 +622,14 @@ var argv = require('yargs')
   .argv;
 ```
 
-<a name="config"></a>.config(key, [description], [parseFn])
+<a name="config"></a>.config([key], [description], [parseFn])
 ------------
 
 Tells the parser that if the option specified by `key` is passed in, it
 should be interpreted as a path to a JSON config file. The file is loaded
 and parsed, and its properties are set as arguments.
+
+If invoked without parameters, `.config()` will make `--config` the option to pass the JSON config file.
 
 An optional `description` can be provided to customize the config (`key`) option
 in the usage string.

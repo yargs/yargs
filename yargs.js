@@ -179,6 +179,8 @@ function Yargs (processArgs, cwd, parentRequire) {
       parseFn = msg
       msg = null
     }
+
+    key = key || 'config'
     self.describe(key, msg || usage.deferY18nLookup('Path to JSON config file'))
     ;(Array.isArray(key) ? key : [key]).forEach(function (k) {
       options.config[k] = parseFn || true

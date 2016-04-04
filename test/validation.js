@@ -240,6 +240,24 @@ describe('validation tests', function () {
       ])
     })
 
+    it('should be displayed in the help message with its default name', function () {
+      var checkUsage = require('./helpers/utils').checkOutput
+      var r = checkUsage(function () {
+        return yargs(['--help'])
+            .config()
+            .help('help')
+            .wrap(null)
+            .argv
+      })
+      r.should.have.property('logs').with.length(1)
+      r.logs.join('\n').split(/\n+/).should.deep.equal([
+        'Options:',
+        '  --config  Path to JSON config file',
+        '  --help    Show help  [boolean]',
+        ''
+      ])
+    })
+
     it('should allow help message to be overridden', function () {
       var checkUsage = require('./helpers/utils').checkOutput
       var r = checkUsage(function () {
