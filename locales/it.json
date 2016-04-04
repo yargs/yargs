@@ -5,6 +5,7 @@
   "boolean": "booleano",
   "count": "contatore",
   "string": "stringa",
+  "number": "numero",
   "array": "vettore",
   "required": "richiesto",
   "default:": "predefinito:",
