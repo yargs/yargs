@@ -1,3 +1,20 @@
+<a name="4.5.0"></a>
+# [4.5.0](https://github.com/yargs/yargs/compare/v4.4.0...v4.5.0) (2016-04-05)
+
+
+### Bug Fixes
+
+* **windows:** handle $0 better on Windows platforms ([eb6e03f](https://github.com/yargs/yargs/commit/eb6e03f))
+
+### Features
+
+* **commands:** implemented variadic positional arguments ([51d926e](https://github.com/yargs/yargs/commit/51d926e))
+* **completion:** completion now better handles aliases, and avoids duplicating keys. ([86416c8](https://github.com/yargs/yargs/commit/86416c8))
+* **config:** If invoking .config() without parameters, set a default option ([0413dd1](https://github.com/yargs/yargs/commit/0413dd1))
+* **conventional-changelog:** switching to using conventional-changelog for generating the changelog ([a2b5a2a](https://github.com/yargs/yargs/commit/a2b5a2a))
+
+
+
 ### v4.4.0 (2016/04/03 21:10 +07:00)
 
 - [#454](https://github.com/yargs/yargs/pull/454) fix demand() when second argument is an array (@elas7)
