@@ -35,9 +35,9 @@ function Yargs (processArgs, cwd, parentRequire) {
     .map(function (x, i) {
       // ignore the node bin, specify this in your
       // bin file with #!/usr/bin/env node
-      if (i === 0 && /\b(node|iojs)$/.test(x)) return
+      if (i === 0 && /\b(node|iojs)(\.exe)?$/.test(x)) return
       var b = rebase(cwd, x)
-      return x.match(/^\//) && b.length < x.length ? b : x
+      return x.match(/^(\/|([a-zA-Z]:)?\\)/) && b.length < x.length ? b : x
     })
     .join(' ').trim()
 

@@ -2165,6 +2165,46 @@ describe('usage tests', function () {
         yargs([]).$0.should.equal('/code/iojs/script.js')
       })
     })
+
+    it('is detected correctly when argv contains "node.exe"', function () {
+      mockProcessArgv(['node.exe', 'script.js'], function () {
+        yargs([]).$0.should.equal('script.js')
+      })
+    })
+
+    it('is detected correctly when argv contains "iojs.exe"', function () {
+      mockProcessArgv(['iojs.exe', 'script.js'], function () {
+        yargs([]).$0.should.equal('script.js')
+      })
+    })
+
+    if (process.platform !== 'win32') {
+      it('is resolved to the relative path if it is shorter', function () {
+        mockProcessArgv(['node', '/code/node/script.js'], function () {
+          yargs([], '/code/python/').$0.should.equal('../node/script.js')
+        })
+      })
+
+      it('is not resolved to the relative path if it is larger', function () {
+        mockProcessArgv(['node', '/script.js'], function () {
+          yargs([], '/very/long/current/directory/').$0.should.equal('/script.js')
+        })
+      })
+    }
+
+    if (process.platform === 'win32') {
+      it('is resolved to the relative path if it is shorter, using Windows paths', function () {
+        mockProcessArgv(['node.exe', 'C:\\code\\node\\script.js'], function () {
+          yargs([], 'C:\\code\\python\\').$0.should.equal('..\\node\\script.js')
+        })
+      })
+
+      it('is not resolved to the relative path if it is larger, using Windows paths', function () {
+        mockProcessArgv(['node', 'C:\\script.js'], function () {
+          yargs([], 'C:\\very\\long\\current\\directory\\').$0.should.equal('C:\\script.js')
+        })
+      })
+    }
   })
 
   describe('choices', function () {
