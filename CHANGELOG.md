@@ -1,5 +1,3 @@
-## Change Log
-
 ### v4.4.0 (2016/04/03 21:10 +07:00)
 
 - [#454](https://github.com/yargs/yargs/pull/454) fix demand() when second argument is an array (@elas7)
