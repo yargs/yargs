@@ -311,8 +311,6 @@ function Yargs (processArgs, cwd, parentRequire) {
     return self
   }
 
-  self.defaults = self.default
-
   self.describe = function (key, desc) {
     options.key[key] = true
     usage.describe(key, desc)
