@@ -31,19 +31,19 @@ function Yargs (processArgs, cwd, parentRequire) {
   if (!cwd) cwd = process.cwd()
 
   self.$0 = process.argv
-      .slice(0, 2)
-      .map(function (x, i) {
-        // ignore the node bin, specify this in your
-        // bin file with #!/usr/bin/env node
-        if (i === 0 && /\b(node|iojs)(\.exe)?$/.test(x)) return
-        var b = rebase(cwd, x)
-        return x.match(/^(\/|([a-zA-Z]:)?\\)/) && b.length < x.length ? b : x
-      })
-      .join(' ').trim()
+    .slice(0, 2)
+    .map(function (x, i) {
+      // ignore the node bin, specify this in your
+      // bin file with #!/usr/bin/env node
+      if (i === 0 && /\b(node|iojs)(\.exe)?$/.test(x)) return
+      var b = rebase(cwd, x)
+      return x.match(/^(\/|([a-zA-Z]:)?\\)/) && b.length < x.length ? b : x
+    })
+    .join(' ').trim()
 
   if (process.env._ !== undefined && process.argv[1] === process.env._) {
     self.$0 = process.env._.replace(
-        path.dirname(process.execPath) + '/', ''
+      path.dirname(process.execPath) + '/', ''
     )
   }
 
