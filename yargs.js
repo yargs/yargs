@@ -31,19 +31,19 @@ function Yargs (processArgs, cwd, parentRequire) {
   if (!cwd) cwd = process.cwd()
 
   self.$0 = process.argv
-    .slice(0, 2)
-    .map(function (x, i) {
-      // ignore the node bin, specify this in your
-      // bin file with #!/usr/bin/env node
-      if (i === 0 && /\b(node|iojs)(\.exe)?$/.test(x)) return
-      var b = rebase(cwd, x)
-      return x.match(/^(\/|([a-zA-Z]:)?\\)/) && b.length < x.length ? b : x
-    })
-    .join(' ').trim()
+      .slice(0, 2)
+      .map(function (x, i) {
+        // ignore the node bin, specify this in your
+        // bin file with #!/usr/bin/env node
+        if (i === 0 && /\b(node|iojs)(\.exe)?$/.test(x)) return
+        var b = rebase(cwd, x)
+        return x.match(/^(\/|([a-zA-Z]:)?\\)/) && b.length < x.length ? b : x
+      })
+      .join(' ').trim()
 
   if (process.env._ !== undefined && process.argv[1] === process.env._) {
     self.$0 = process.env._.replace(
-      path.dirname(process.execPath) + '/', ''
+        path.dirname(process.execPath) + '/', ''
     )
   }
 
@@ -341,8 +341,8 @@ function Yargs (processArgs, cwd, parentRequire) {
     return self
   }
 
-  self.parse = function (args) {
-    return parseArgs(args)
+  self.parse = function (args, shortCircuit) {
+    return parseArgs(args, shortCircuit)
   }
 
   self.option = self.options = function (key, opt) {
@@ -543,6 +543,10 @@ function Yargs (processArgs, cwd, parentRequire) {
     return self
   }
 
+  self.getCompletion = function (args, done) {
+    completion.getCompletion(args, done)
+  }
+
   self.locale = function (locale) {
     if (arguments.length === 0) {
       guessLocale()
@@ -599,7 +603,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     enumerable: true
   })
 
-  function parseArgs (args) {
+  function parseArgs (args, shortCircuit) {
     options.__ = y18n.__
     options.configuration = pkgConf.sync('yargs', {
       defaults: {},
@@ -617,9 +621,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     // while building up the argv object, there
     // are two passes through the parser. If completion
     // is being performed short-circuit on the first pass.
-    if (completionCommand &&
-      (process.argv.join(' ')).indexOf(completion.completionKey) !== -1 &&
-      !argv[completion.completionKey]) {
+    if (shortCircuit) {
       return argv
     }
 
@@ -646,7 +648,8 @@ function Yargs (processArgs, cwd, parentRequire) {
     if (completion.completionKey in argv) {
       // we allow for asynchronous completions,
       // e.g., loading in a list of commands from an API.
-      completion.getCompletion(function (completions) {
+      var completionArgs = args.slice(args.indexOf('--' + completion.completionKey) + 1)
+      completion.getCompletion(completionArgs, function (completions) {
         ;(completions || []).forEach(function (completion) {
           console.log(completion)
         })
