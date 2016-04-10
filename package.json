@@ -1,7 +1,7 @@
 {
   "name": "yargs",
   "version": "4.5.0",
-  "description": "Light-weight option parsing with an argv hash. No optstrings attached.",
+  "description": "yargs the modern, pirate-themed, successor to optimist.",
   "main": "./index.js",
   "files": [
     "index.js",
