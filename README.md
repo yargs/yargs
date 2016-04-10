@@ -10,7 +10,8 @@ With yargs, ye be havin' a map that leads straight to yer treasure! Treasure of 
 [![Coverage Status][coveralls-image]][coveralls-url]
 [![NPM version][npm-image]][npm-url]
 [![Windows Tests][windows-image]][windows-url]
-[![js-standard-style][standard-image]](standard-url)
+[![js-standard-style][standard-image]][standard-url]
+[![standard-version][standard-version-image]][standard-version-url]
 
 > Yargs is the official successor to optimist. Please feel free to submit issues and pull requests. If you'd like to contribute and don't know where to start, have a look at [the issue list](https://github.com/yargs/yargs/issues) :)
 
@@ -603,7 +604,7 @@ that generates bash completion scripts.
 shiver me timbers is pretty awesome, you can provide your own completion
 method.
 
-If invoked without parameters, `.completion()` will make `completion` the command to output 
+If invoked without parameters, `.completion()` will make `completion` the command to output
 the completion script.
 
 ```js
@@ -1474,3 +1475,5 @@ This module is loosely inspired by Perl's
 [windows-image]: https://img.shields.io/appveyor/ci/bcoe/yargs/master.svg?label=Windows%20Tests
 [standard-image]: https://img.shields.io/badge/code%20style-standard-brightgreen.svg
 [standard-url]: http://standardjs.com/
+[standard-version-image]: https://img.shields.io/badge/standard-version-brightgreen.svg
+[standard-version-url]: https://github.com/conventional-changelog/standard-version
