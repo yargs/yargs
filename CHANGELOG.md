@@ -1,3 +1,22 @@
+# Change Log
+
+All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+<a name="4.6.0"></a>
+# [4.6.0](https://github.com/yargs/yargs/compare/v4.5.0...v4.6.0) (2016-04-11)
+
+
+### Bug Fixes
+
+* **my brand!:** I agree with [@osher](https://github.com/osher) lightweight isn't a huge selling point of ours any longer, see [#468](https://github.com/yargs/yargs/issues/468) ([c46d7e1](https://github.com/yargs/yargs/commit/c46d7e1))
+
+### Features
+
+* switch to standard-version for release management ([f70f801](https://github.com/yargs/yargs/commit/f70f801))
+* upgrade to version of yargs-parser that introduces some slick new features, great work [@elas7](https://github.com/elas7). update cliui, replace win-spawn, replace badge. ([#475](https://github.com/yargs/yargs/issues/475)) ([f915dd4](https://github.com/yargs/yargs/commit/f915dd4))
+
+
+
 <a name="4.5.0"></a>
 # [4.5.0](https://github.com/yargs/yargs/compare/v4.4.0...v4.5.0) (2016-04-05)
 
