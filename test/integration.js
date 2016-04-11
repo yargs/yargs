@@ -1,6 +1,6 @@
 /* global describe, it, before, after */
 
-var spawn = require('win-spawn')
+var spawn = require('cross-spawn-async')
 var path = require('path')
 var which = require('which')
 var rimraf = require('rimraf')

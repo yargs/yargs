@@ -1475,5 +1475,5 @@ This module is loosely inspired by Perl's
 [windows-image]: https://img.shields.io/appveyor/ci/bcoe/yargs/master.svg?label=Windows%20Tests
 [standard-image]: https://img.shields.io/badge/code%20style-standard-brightgreen.svg
 [standard-url]: http://standardjs.com/
-[standard-version-image]: https://img.shields.io/badge/standard-version-brightgreen.svg
+[standard-version-image]: https://img.shields.io/badge/release-standard%20version-brightgreen.svg
 [standard-version-url]: https://github.com/conventional-changelog/standard-version
