@@ -188,6 +188,14 @@ function Yargs (processArgs, cwd, parentRequire) {
     return self
   }
 
+  // Add 'obj' to options.configObjects
+  self.configObject = function (obj) {
+    if (typeof obj === 'object') {
+      options.configObjects = (options.configObjects || []).concat(obj)
+    }
+    return self
+  }
+
   self.example = function (cmd, description) {
     usage.example(cmd, description)
     return self

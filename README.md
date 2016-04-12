@@ -674,6 +674,28 @@ var argv = require('yargs')
   .argv
 ```
 
+.configObject(obj)
+------------------
+
+Similar to [`config()`](#config), it receives an explicit configuration object.
+
+`obj` will be parsed and its properties will be set as arguments.
+
+```js
+var argv = require('yargs')
+  .configObject({foo: 1, bar: 2})
+  .argv
+console.log(argv)  
+```
+
+```
+$ node test.js
+{ _: [],
+  foo: 1,
+  bar: 2,
+  '$0': 'test.js' }
+```
+
 <a name="count"></a>.count(key)
 ------------
 
