@@ -1155,8 +1155,8 @@ Parse `args` instead of `process.argv`. Returns the `argv` object.
 .pkgConf(key, [cwd])
 ------------
 
-Similar to [`config()`](#config), indicates that yargs should read
-default argument values from the specified key in package.json.
+Similar to [`config()`](#config), indicates that yargs should interpret the object from the specified key in package.json
+as a configuration object.
 
 `cwd` can optionally be provided, the package.json will be read
 from this location.

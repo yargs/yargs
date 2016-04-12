@@ -331,11 +331,10 @@ function Yargs (processArgs, cwd, parentRequire) {
       cwd: path || requireMainFilename(parentRequire || require)
     })
 
+    // If an object exists in the key, add it to options.configObjects
     if (obj.pkg && obj.pkg[key] && typeof obj.pkg[key] === 'object') {
       conf = obj.pkg[key]
-      Object.keys(conf).forEach(function (k) {
-        self.default(k, conf[k])
-      })
+      options.configObjects = (options.configObjects || []).concat(conf)
     }
 
     return self
