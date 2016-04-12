@@ -684,6 +684,17 @@ describe('yargs dsl tests', function () {
     })
   })
 
+  describe('configObject', function () {
+    it('allows a configuration object', function () {
+      var argv = yargs
+          .configObject({foo: 1, bar: 2})
+          .argv
+
+      argv.foo.should.equal(1)
+      argv.bar.should.equal(2)
+    })
+  })
+
   describe('normalize', function () {
     it('normalizes paths passed as arguments', function () {
       var argv = yargs('--path /foo/bar//baz/asdf/quux/..')
