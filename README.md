@@ -859,6 +859,29 @@ var argv = require('yargs')
   .argv
 ```
 
+.getCompletion(args, done);
+---------------------------
+
+Allows to programmatically get completion choices for any line.
+
+`args`: An array of the words in the command line to complete.
+
+`done`: The callback to be called with the resulting completions.
+
+For example:
+
+```js
+require('yargs')
+  .option('foobar', {})
+  .option('foobaz', {})
+  .completion()
+  .getCompletion(['./test.js', '--foo'], function (completions) {
+    console.log(completions)
+  })
+```
+
+Outputs the same completion choices as `./test.js --foo`<kbd>TAB</kbd>: `--foobar` and `--foobaz`
+
 <a name="global"></a>.global(globals)
 ------------
 
