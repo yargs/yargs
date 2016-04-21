@@ -206,6 +206,12 @@ function Yargs (processArgs, cwd, parentRequire) {
     return self
   }
 
+  self.commandDir = function (dir, opts) {
+    var req = parentRequire || require
+    command.addDirectory(dir, req, requireMainFilename(req), opts)
+    return self
+  }
+
   self.string = function (strings) {
     options.string.push.apply(options.string, [].concat(strings))
     return self
