@@ -1142,6 +1142,7 @@ Valid `opt` keys include:
 - `normalize`: boolean, apply `path.normalize()` to the option, see [`normalize()`](#normalize)
 - `number`: boolean, interpret option as a number, [`number()`](#number)
 - `requiresArg`: boolean, require the option be specified with a value, see [`requiresArg()`](#requiresArg)
+- `skipValidation`: boolean, skips validation if the option is present, see [`skipValidation()`](#skipValidation)
 - `string`: boolean, interpret option as a string, see [`string()`](#string)
 - `type`: one of the following strings
     - `'array'`: synonymous for `array: true`, see [`array()`](#array)
@@ -1281,6 +1282,12 @@ Missing argument value: f
 
 Specify --help for available options
 ```
+
+<a name="skipValidation"></a>.skipValidation(key)
+-----------------
+
+Specifies either a single option key (string), or an array of options.
+If any of the options is present, yargs validation is skipped.
 
 .strict()
 ---------

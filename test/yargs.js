@@ -232,6 +232,7 @@ describe('yargs dsl tests', function () {
         defaultDescription: {},
         choices: {},
         requiresArg: [],
+        skipValidation: [],
         count: [],
         normalize: [],
         number: [],
@@ -884,6 +885,43 @@ describe('yargs dsl tests', function () {
 
       argv.foo.should.equal('a')
       argv.dotNotation.should.equal(false)
+    })
+  })
+
+  describe('skipValidation', function () {
+    it('skips validation if an option with skipValidation is present', function () {
+      var argv = yargs(['--koala', '--skip'])
+          .demand(1)
+          .fail(function (msg) {
+            expect.fail()
+          })
+          .skipValidation(['skip', 'reallySkip'])
+          .argv
+      argv.koala.should.equal(true)
+    })
+
+    it('does not skip validation if no option with skipValidation is present', function (done) {
+      var argv = yargs(['--koala'])
+          .demand(1)
+          .fail(function (msg) {
+            return done()
+          })
+          .skipValidation(['skip', 'reallySkip'])
+          .argv
+      argv.koala.should.equal(true)
+    })
+
+    it('allows key to be specified with option shorthand', function () {
+      var argv = yargs(['--koala', '--skip'])
+          .demand(1)
+          .fail(function (msg) {
+            expect.fail()
+          })
+          .option('skip', {
+            skipValidation: true
+          })
+          .argv
+      argv.koala.should.equal(true)
     })
   })
 })

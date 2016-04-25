@@ -92,7 +92,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     groups = {}
 
     var arrayOptions = [
-      'array', 'boolean', 'string', 'requiresArg',
+      'array', 'boolean', 'string', 'requiresArg', 'skipValidation',
       'count', 'normalize', 'number'
     ]
 
@@ -279,6 +279,11 @@ function Yargs (processArgs, cwd, parentRequire) {
     return self
   }
 
+  self.skipValidation = function (skipValidations) {
+    options.skipValidation.push.apply(options.skipValidation, [].concat(skipValidations))
+    return self
+  }
+
   self.implies = function (key, value) {
     validation.implies(key, value)
     return self
@@ -390,6 +395,8 @@ function Yargs (processArgs, cwd, parentRequire) {
         self.count(key)
       } if (opt.defaultDescription) {
         options.defaultDescription[key] = opt.defaultDescription
+      } if (opt.skipValidation) {
+        self.skipValidation(key)
       }
 
       var desc = opt.describe || opt.description || opt.desc
@@ -657,16 +664,18 @@ function Yargs (processArgs, cwd, parentRequire) {
       return
     }
 
-    var helpOrVersion = false
+    var skipValidation = false
+
+    // Handle 'help' and 'version' options
     Object.keys(argv).forEach(function (key) {
       if (key === helpOpt && argv[key]) {
-        helpOrVersion = true
+        skipValidation = true
         self.showHelp('log')
         if (exitProcess) {
           process.exit(0)
         }
       } else if (key === versionOpt && argv[key]) {
-        helpOrVersion = true
+        skipValidation = true
         usage.showVersion()
         if (exitProcess) {
           process.exit(0)
@@ -674,9 +683,16 @@ function Yargs (processArgs, cwd, parentRequire) {
       }
     })
 
+    // Check if any of the options to skip validation were provided
+    if (!skipValidation && options.skipValidation.length > 0) {
+      skipValidation = Object.keys(argv).some(function (key) {
+        return options.skipValidation.indexOf(key) >= 0
+      })
+    }
+
     // If the help or version options where used and exitProcess is false,
-    // we won't run validations
-    if (!helpOrVersion) {
+    // or if explicitly skipped, we won't run validations
+    if (!skipValidation) {
       if (parsed.error) throw parsed.error
 
       // if we're executed via bash completion, don't
