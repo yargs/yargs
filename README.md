@@ -681,7 +681,12 @@ Interpret `key` as a boolean flag, but set its parsed value to the number of
 flag occurrences rather than `true` or `false`. Default value is thus `0`.
 
 <a name="default"></a>.default(key, value, [description])
---------------------
+---------------------------------------------------------
+.defaults(key, value, [description])
+------------------------------------
+
+**Note:** The `.defaults()` alias is deprecated. It will be 
+removed in the next major version.
 
 Set `argv[key]` to `value` if no option was specified in `process.argv`.
 

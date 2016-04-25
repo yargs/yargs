@@ -203,7 +203,8 @@ function Yargs (processArgs, cwd, parentRequire) {
     return self
   }
 
-  self.default = function (key, value, defaultDescription) {
+  // The 'defaults' alias is deprecated. It will be removed in the next major version.
+  self.default = self.defaults = function (key, value, defaultDescription) {
     if (typeof key === 'object') {
       Object.keys(key).forEach(function (k) {
         self.default(k, key[k])
@@ -310,8 +311,6 @@ function Yargs (processArgs, cwd, parentRequire) {
     validation.check(f)
     return self
   }
-
-  self.defaults = self.default
 
   self.describe = function (key, desc) {
     options.key[key] = true
