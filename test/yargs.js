@@ -858,14 +858,14 @@ describe('yargs dsl tests', function () {
   })
 
   describe('pkgConf', function () {
-    it('uses values from package.json as defaults', function () {
+    it('uses values from package.json', function () {
       var argv = yargs('--foo a').pkgConf('repository').argv
 
       argv.foo.should.equal('a')
       argv.type.should.equal('git')
     })
 
-    it('combines yargs defaults with package.json defaults', function () {
+    it('combines yargs defaults with package.json values', function () {
       var argv = yargs('--foo a')
         .default('b', 99)
         .pkgConf('repository')
@@ -874,6 +874,31 @@ describe('yargs dsl tests', function () {
       argv.b.should.equal(99)
       argv.foo.should.equal('a')
       argv.type.should.equal('git')
+    })
+
+    it('should use value from package.json, if argv value is using default value', function () {
+      var argv = yargs('--foo a')
+        .default('b', 99)
+        .pkgConf('repository')
+        .default('type', 'default')
+        .argv
+
+      argv.b.should.equal(99)
+      argv.foo.should.equal('a')
+      argv.type.should.equal('git')
+    })
+
+    it('should apply value from config object to all aliases', function () {
+      var argv = yargs('--foo a')
+        .pkgConf('repository')
+        .alias('type', 't')
+        .alias('t', 'u')
+        .argv
+
+      argv.foo.should.equal('a')
+      argv.type.should.equal('git')
+      argv.t.should.equal('git')
+      argv.u.should.equal('git')
     })
 
     it('is cool with a key not existing', function () {
