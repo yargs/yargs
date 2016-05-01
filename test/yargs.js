@@ -683,6 +683,15 @@ describe('yargs dsl tests', function () {
 
       argv.foo.should.equal('baz')
     })
+
+    it('allows to pass a configuration object', function () {
+      var argv = yargs
+          .config({foo: 1, bar: 2})
+          .argv
+
+      argv.foo.should.equal(1)
+      argv.bar.should.equal(2)
+    })
   })
 
   describe('normalize', function () {

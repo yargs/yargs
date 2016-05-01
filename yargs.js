@@ -175,6 +175,13 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   self.config = function (key, msg, parseFn) {
+    // allow to pass a configuration object
+    if (typeof key === 'object') {
+      options.configObjects = (options.configObjects || []).concat(key)
+      return self
+    }
+
+    // allow to provide a parsing function
     if (typeof msg === 'function') {
       parseFn = msg
       msg = null

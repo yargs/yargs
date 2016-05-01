@@ -650,7 +650,9 @@ var argv = require('yargs')
 ```
 
 <a name="config"></a>.config([key], [description], [parseFn])
-------------
+-------------------------------------------------------------
+.config(object)
+---------------
 
 Tells the parser that if the option specified by `key` is passed in, it
 should be interpreted as a path to a JSON config file. The file is loaded
@@ -671,6 +673,24 @@ var argv = require('yargs')
     return JSON.parse(fs.readFileSync(configPath, 'utf-8'))
   })
   .argv
+```
+
+You can also pass an explicit configuration `object`, it will be parsed 
+and its properties will be set as arguments.
+             
+```js
+var argv = require('yargs')
+  .config({foo: 1, bar: 2})
+  .argv
+console.log(argv)
+```
+ 
+```
+$ node test.js
+{ _: [],
+  foo: 1,
+  bar: 2,
+  '$0': 'test.js' }
 ```
 
 <a name="count"></a>.count(key)
