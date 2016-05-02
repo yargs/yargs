@@ -36,7 +36,7 @@
     "mocha": "^2.4.5",
     "nyc": "^6.4.2",
     "rimraf": "^2.5.0",
-    "standard": "^6.0.5",
+    "standard": "^7.0.0",
     "standard-version": "^2.2.1",
     "which": "^1.1.2"
   },
