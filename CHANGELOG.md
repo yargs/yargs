@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.7.0"></a>
+# [4.7.0](https://github.com/yargs/yargs/compare/v4.6.0...v4.7.0) (2016-05-02)
+
+
+### Bug Fixes
+
+* **pkgConf:** fix aliases issues in .pkgConf() ([#478](https://github.com/yargs/yargs/issues/478))([b900502](https://github.com/yargs/yargs/commit/b900502)), closes [(#478](https://github.com/(/issues/478)
+
+
+### Features
+
+* **completion:** allow to get completions for any string, not just process.argv ([#470](https://github.com/yargs/yargs/issues/470))([74fcfbc](https://github.com/yargs/yargs/commit/74fcfbc))
+* **configuration:** Allow to directly pass a configuration object to .config() ([#480](https://github.com/yargs/yargs/issues/480))([e0a7e05](https://github.com/yargs/yargs/commit/e0a7e05))
+* **validation:** Add .skipValidation() method ([#471](https://github.com/yargs/yargs/issues/471))([d72badb](https://github.com/yargs/yargs/commit/d72badb))
+
+
+
 <a name="4.6.0"></a>
 # [4.6.0](https://github.com/yargs/yargs/compare/v4.5.0...v4.6.0) (2016-04-11)
 
