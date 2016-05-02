@@ -8,7 +8,7 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### Bug Fixes
 
-* **pkgConf:** fix aliases issues in .pkgConf() ([#478](https://github.com/yargs/yargs/issues/478))([b900502](https://github.com/yargs/yargs/commit/b900502)), closes [(#478](https://github.com/(/issues/478)
+* **pkgConf:** fix aliases issues in .pkgConf() ([#478](https://github.com/yargs/yargs/issues/478))([b900502](https://github.com/yargs/yargs/commit/b900502))
 
 
 ### Features
