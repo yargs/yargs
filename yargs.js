@@ -205,6 +205,12 @@ function Yargs (processArgs, cwd, parentRequire) {
     return self
   }
 
+  self.commands = function (glob, opts) {
+    var req = parentRequire || require
+    command.findModules(glob, req, path.dirname(requireMainFilename(req)), opts)
+    return self
+  }
+
   self.string = function (strings) {
     options.string.push.apply(options.string, [].concat(strings))
     return self

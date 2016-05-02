@@ -15,6 +15,7 @@
     "camelcase": "^2.0.1",
     "cliui": "^3.2.0",
     "decamelize": "^1.1.1",
+    "glob": "^7.0.3",
     "lodash.assign": "^4.0.3",
     "os-locale": "^1.4.0",
     "pkg-conf": "^1.1.2",
