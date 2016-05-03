@@ -50,7 +50,7 @@ function Yargs (processArgs, cwd, parentRequire) {
 
   // use context object to keep track of resets, subcommand execution, etc
   // submodules should modify and check the state of context as necessary
-  const context = { resets: -1, commands: [] }
+  const context = { resets: -1, commands: [], dirs: {}, files: [] }
   self.getContext = function () {
     return context
   }
@@ -208,7 +208,7 @@ function Yargs (processArgs, cwd, parentRequire) {
 
   self.commandDir = function (dir, opts) {
     var req = parentRequire || require
-    command.addDirectory(dir, req, requireMainFilename(req), opts)
+    command.addDirectory(dir, self.getContext(), req, requireMainFilename(req), opts)
     return self
   }
 
