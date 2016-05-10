@@ -11,6 +11,12 @@ var readPkgUp = require('read-pkg-up')
 var pkgConf = require('pkg-conf')
 var requireMainFilename = require('require-main-filename')
 var objFilter = require('./lib/obj-filter')
+var EventEmitter = require('events')
+var ee = new EventEmitter()
+
+ee.on('custom_exit', function (res) {
+  // no-op
+})
 
 var exports = module.exports = Yargs
 function Yargs (processArgs, cwd, parentRequire) {
@@ -651,7 +657,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     if (completionCommand && ~argv._.indexOf(completionCommand) && !argv[completion.completionKey]) {
       self.showCompletionScript()
       if (exitProcess) {
-        process.exit(0)
+        return ee.emit('custom_exit', 0)
       }
     }
 
@@ -667,7 +673,7 @@ function Yargs (processArgs, cwd, parentRequire) {
         })
 
         if (exitProcess) {
-          process.exit(0)
+          return ee.emit('custom_exit', 0)
         }
       })
       return
@@ -681,13 +687,13 @@ function Yargs (processArgs, cwd, parentRequire) {
         skipValidation = true
         self.showHelp('log')
         if (exitProcess) {
-          process.exit(0)
+          return ee.emit('custom_exit', 0)
         }
       } else if (key === versionOpt && argv[key]) {
         skipValidation = true
         usage.showVersion()
         if (exitProcess) {
-          process.exit(0)
+          return ee.emit('custom_exit', 0)
         }
       }
     })
