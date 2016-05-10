@@ -1,29 +1,29 @@
-var assert = require('assert')
-var assign = require('lodash.assign')
-var Command = require('./lib/command')
-var Completion = require('./lib/completion')
-var Parser = require('yargs-parser')
-var path = require('path')
-var Usage = require('./lib/usage')
-var Validation = require('./lib/validation')
-var Y18n = require('y18n')
-var readPkgUp = require('read-pkg-up')
-var pkgConf = require('pkg-conf')
-var requireMainFilename = require('require-main-filename')
-var objFilter = require('./lib/obj-filter')
+const assert = require('assert')
+const assign = require('lodash.assign')
+const Command = require('./lib/command')
+const Completion = require('./lib/completion')
+const Parser = require('yargs-parser')
+const path = require('path')
+const Usage = require('./lib/usage')
+const Validation = require('./lib/validation')
+const Y18n = require('y18n')
+const readPkgUp = require('read-pkg-up')
+const pkgConf = require('pkg-conf')
+const requireMainFilename = require('require-main-filename')
+const objFilter = require('./lib/obj-filter')
 
 var exports = module.exports = Yargs
 function Yargs (processArgs, cwd, parentRequire) {
   processArgs = processArgs || [] // handle calling yargs().
 
-  var self = {}
+  const self = {}
   var command = null
   var completion = null
   var groups = {}
   var preservedGroups = {}
   var usage = null
   var validation = null
-  var y18n = Y18n({
+  const y18n = Y18n({
     directory: path.resolve(__dirname, './locales'),
     updateFiles: false
   })
@@ -49,7 +49,7 @@ function Yargs (processArgs, cwd, parentRequire) {
 
   // use context object to keep track of resets, subcommand execution, etc
   // submodules should modify and check the state of context as necessary
-  var context = { resets: -1, commands: [] }
+  const context = { resets: -1, commands: [] }
   self.getContext = function () {
     return context
   }
@@ -621,8 +621,8 @@ function Yargs (processArgs, cwd, parentRequire) {
       defaults: {},
       cwd: requireMainFilename(require)
     })
-    var parsed = Parser.detailed(args, options)
-    var argv = parsed.argv
+    const parsed = Parser.detailed(args, options)
+    const argv = parsed.argv
     var aliases = parsed.aliases
 
     argv.$0 = self.$0
@@ -726,7 +726,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     if (!detectLocale) return
 
     try {
-      var osLocale = require('os-locale')
+      const osLocale = require('os-locale')
       self.locale(osLocale.sync({ spawn: false }))
     } catch (err) {
       // if we explode looking up locale just noop
