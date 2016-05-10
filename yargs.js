@@ -11,7 +11,7 @@ var readPkgUp = require('read-pkg-up')
 var pkgConf = require('pkg-conf')
 var requireMainFilename = require('require-main-filename')
 var objFilter = require('./lib/obj-filter')
-var EventEmitter = require('events')
+var EventEmitter = require('events').EventEmitter
 var ee = new EventEmitter()
 
 ee.on('custom_exit', function (res) {
