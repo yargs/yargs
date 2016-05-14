@@ -65,6 +65,7 @@ describe('integration tests', function () {
       }
 
       stdout.should.match(/--o999/)
+      stdout.should.not.match(/never get here/)
       return done()
     })
   })
