@@ -8,7 +8,7 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### Bug Fixes
 
-* **package:** update camelcase to version 3.0.0 ([#495](https://github.com/yargs/yargs/issues/495)) ([796285d](https://github.com/yargs/yargs/commit/796285d))
+* switch to using `const` rather than `var` ([#499](https://github.com/yargs/yargs/pull/499))
 * make stdout flush on newer versions of Node.js ([#501](https://github.com/yargs/yargs/issues/501)) ([9f8c6f4](https://github.com/yargs/yargs/commit/9f8c6f4))
 
 
