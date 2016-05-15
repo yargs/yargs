@@ -4,8 +4,8 @@ var y = yargs.command('download <url> <files..>', 'make a get HTTP request')
   .help()
 var longDescription = ''
 
-for (var i = 0; i < 5000; i++) {
-  longDescription += 'a very long description ' + i
+for (var i = 0; i < 10000; i++) {
+  longDescription += ' a very long description ' + i
 }
 
 yargs.option('o', {
