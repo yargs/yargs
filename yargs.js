@@ -650,7 +650,7 @@ function Yargs (processArgs, cwd, parentRequire) {
 
     // generate a completion script for adding to ~/.bashrc.
     if (completionCommand && ~argv._.indexOf(completionCommand) && !argv[completion.completionKey]) {
-      if (exitProcess) setBlocking(false)
+      if (exitProcess) setBlocking(true)
       self.showCompletionScript()
       if (exitProcess) {
         process.exit(0)

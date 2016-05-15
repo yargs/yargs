@@ -64,7 +64,7 @@ describe('integration tests', function () {
         return
       }
 
-      stdout.should.match(/--o999/)
+      stdout.should.match(/a very long description 4999/)
       stdout.should.not.match(/never get here/)
       return done()
     })
