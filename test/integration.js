@@ -56,6 +56,20 @@ describe('integration tests', function () {
     })
   })
 
+  // see #497
+  it('flushes all output when --help is executed', function (done) {
+    testCmd('./issue-497.js', [ '--help' ], function (code, stdout) {
+      if (code) {
+        done(new Error('cmd exited with code ' + code))
+        return
+      }
+
+      stdout.should.match(/--o999/)
+      stdout.should.not.match(/never get here/)
+      return done()
+    })
+  })
+
   it('correctly fills positional command args with preceding option', function (done) {
     testCmd('./opt-assignment-and-positional-command-arg.js', ['--foo', 'fOo', 'bar', 'bAz'], function (code, stdout) {
       if (code) {

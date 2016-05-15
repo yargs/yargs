@@ -20,6 +20,7 @@
     "pkg-conf": "^1.1.2",
     "read-pkg-up": "^1.0.1",
     "require-main-filename": "^1.0.1",
+    "set-blocking": "^1.0.0",
     "string-width": "^1.0.1",
     "window-size": "^0.2.0",
     "y18n": "^3.2.1",
@@ -42,7 +43,7 @@
   },
   "scripts": {
     "pretest": "standard",
-    "test": "nyc --cache mocha --require ./test/before.js --timeout=4000 --check-leaks",
+    "test": "nyc --cache mocha --require ./test/before.js --timeout=8000 --check-leaks",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
     "version": "standard-version"
   },

@@ -11,6 +11,7 @@ var readPkgUp = require('read-pkg-up')
 var pkgConf = require('pkg-conf')
 var requireMainFilename = require('require-main-filename')
 var objFilter = require('./lib/obj-filter')
+var setBlocking = require('set-blocking')
 
 var exports = module.exports = Yargs
 function Yargs (processArgs, cwd, parentRequire) {
@@ -649,6 +650,7 @@ function Yargs (processArgs, cwd, parentRequire) {
 
     // generate a completion script for adding to ~/.bashrc.
     if (completionCommand && ~argv._.indexOf(completionCommand) && !argv[completion.completionKey]) {
+      if (exitProcess) setBlocking(true)
       self.showCompletionScript()
       if (exitProcess) {
         process.exit(0)
@@ -658,6 +660,8 @@ function Yargs (processArgs, cwd, parentRequire) {
     // we must run completions first, a user might
     // want to complete the --help or --version option.
     if (completion.completionKey in argv) {
+      if (exitProcess) setBlocking(true)
+
       // we allow for asynchronous completions,
       // e.g., loading in a list of commands from an API.
       var completionArgs = args.slice(args.indexOf('--' + completion.completionKey) + 1)
@@ -678,12 +682,16 @@ function Yargs (processArgs, cwd, parentRequire) {
     // Handle 'help' and 'version' options
     Object.keys(argv).forEach(function (key) {
       if (key === helpOpt && argv[key]) {
+        if (exitProcess) setBlocking(true)
+
         skipValidation = true
         self.showHelp('log')
         if (exitProcess) {
           process.exit(0)
         }
       } else if (key === versionOpt && argv[key]) {
+        if (exitProcess) setBlocking(true)
+
         skipValidation = true
         usage.showVersion()
         if (exitProcess) {
