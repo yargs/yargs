@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.7.1"></a>
+## [4.7.1](https://github.com/yargs/yargs/compare/v4.7.0...v4.7.1) (2016-05-15)
+
+
+### Bug Fixes
+
+* **package:** update camelcase to version 3.0.0 ([#495](https://github.com/yargs/yargs/issues/495)) ([796285d](https://github.com/yargs/yargs/commit/796285d))
+* make stdout flush on newer versions of Node.js ([#501](https://github.com/yargs/yargs/issues/501)) ([9f8c6f4](https://github.com/yargs/yargs/commit/9f8c6f4))
+
+
+
 <a name="4.7.0"></a>
 # [4.7.0](https://github.com/yargs/yargs/compare/v4.6.0...v4.7.0) (2016-05-02)
 
