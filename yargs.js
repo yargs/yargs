@@ -650,7 +650,7 @@ function Yargs (processArgs, cwd, parentRequire) {
 
     // generate a completion script for adding to ~/.bashrc.
     if (completionCommand && ~argv._.indexOf(completionCommand) && !argv[completion.completionKey]) {
-      if (exitProcess) setBlocking(true)
+      if (exitProcess) setBlocking(false)
       self.showCompletionScript()
       if (exitProcess) {
         process.exit(0)
@@ -660,7 +660,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     // we must run completions first, a user might
     // want to complete the --help or --version option.
     if (completion.completionKey in argv) {
-      if (exitProcess) setBlocking(true)
+      if (exitProcess) setBlocking(false)
 
       // we allow for asynchronous completions,
       // e.g., loading in a list of commands from an API.
@@ -682,7 +682,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     // Handle 'help' and 'version' options
     Object.keys(argv).forEach(function (key) {
       if (key === helpOpt && argv[key]) {
-        if (exitProcess) setBlocking(true)
+        if (exitProcess) setBlocking(false)
 
         skipValidation = true
         self.showHelp('log')
@@ -690,7 +690,7 @@ function Yargs (processArgs, cwd, parentRequire) {
           process.exit(0)
         }
       } else if (key === versionOpt && argv[key]) {
-        if (exitProcess) setBlocking(true)
+        if (exitProcess) setBlocking(false)
 
         skipValidation = true
         usage.showVersion()
