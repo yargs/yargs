@@ -1521,7 +1521,7 @@ This module is loosely inspired by Perl's
 [Getopt::Casual](http://search.cpan.org/~photo/Getopt-Casual-0.13.1/Casual.pm).
 
 [travis-url]: https://travis-ci.org/yargs/yargs
-[travis-image]: https://img.shields.io/travis/yargs/yargs.svg
+[travis-image]: https://img.shields.io/travis/yargs/yargs/master.svg
 [gemnasium-url]: https://gemnasium.com/yargs/yargs
 [gemnasium-image]: https://img.shields.io/gemnasium/yargs/yargs.svg
 [coveralls-url]: https://coveralls.io/github/yargs/yargs
