@@ -39,7 +39,7 @@
     "rimraf": "^2.5.0",
     "standard": "^7.0.0",
     "standard-version": "^2.2.1",
-    "which": "^1.1.2"
+    "which": "^1.2.9"
   },
   "scripts": {
     "pretest": "standard",
