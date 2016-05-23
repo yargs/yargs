@@ -34,7 +34,7 @@
     "cross-spawn-async": "^2.2.1",
     "es6-promise": "^3.0.2",
     "hashish": "0.0.4",
-    "mocha": "^2.4.5",
+    "mocha": "^2.5.0",
     "nyc": "^6.4.2",
     "rimraf": "^2.5.0",
     "standard": "^7.0.0",
