@@ -207,7 +207,7 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   self.commandDir = function (dir, opts) {
-    var req = parentRequire || require
+    const req = parentRequire || require
     command.addDirectory(dir, self.getContext(), req, requireMainFilename(req), opts)
     return self
   }
