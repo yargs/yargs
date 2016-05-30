@@ -1,6 +1,7 @@
 /* global describe, it, beforeEach */
 var yargs = require('../')
 var expect = require('chai').expect
+var checkOutput = require('./helpers/utils').checkOutput
 
 require('chai').should()
 
@@ -316,6 +317,123 @@ describe('Command', function () {
       handlers.foo.handler.should.equal(module.handler)
       var commands = y.getUsageInstance().getCommands()
       commands[0].should.deep.equal([module.command, module.describe])
+    })
+  })
+
+  describe('commandDir', function () {
+    it('supports relative dirs', function () {
+      var r = checkOutput(function () {
+        return yargs('--help').help().wrap(null)
+          // assumes cwd is node_modules/mocha/bin
+          .commandDir('../../../test/fixtures/cmddir')
+          .argv
+      })
+      r.should.have.property('exit').and.be.true
+      r.should.have.property('errors').with.length(0)
+      r.should.have.property('logs')
+      r.logs.join('\n').split(/\n+/).should.deep.equal([
+        'Commands:',
+        '  dream [command] [opts]  Go to sleep and dream',
+        'Options:',
+        '  --help  Show help  [boolean]',
+        ''
+      ])
+    })
+
+    it('supports nested subcommands', function () {
+      var r = checkOutput(function () {
+        return yargs('dream --help').help().wrap(null)
+          // assumes cwd is node_modules/mocha/bin
+          .commandDir('../../../test/fixtures/cmddir')
+          .argv
+      }, [ './command' ])
+      r.should.have.property('exit').and.be.true
+      r.should.have.property('errors').with.length(0)
+      r.should.have.property('logs')
+      r.logs[0].split(/\n+/).should.deep.equal([
+        './command dream [command] [opts]',
+        'Commands:',
+        '  of-memory <memory>               Dream about a specific memory',
+        '  within-a-dream [command] [opts]  Dream within a dream',
+        'Options:',
+        '  --help     Show help  [boolean]',
+        '  --shared   Is the dream shared with others?  [boolean]',
+        '  --extract  Attempt extraction?  [boolean]',
+        ''
+      ])
+    })
+
+    it('supports a "recurse" boolean option', function () {
+      var r = checkOutput(function () {
+        return yargs('--help').help().wrap(null)
+          // assumes cwd is node_modules/mocha/bin
+          .commandDir('../../../test/fixtures/cmddir', { recurse: true })
+          .argv
+      })
+      r.should.have.property('exit').and.be.true
+      r.should.have.property('errors').with.length(0)
+      r.should.have.property('logs')
+      r.logs.join('\n').split(/\n+/).should.deep.equal([
+        'Commands:',
+        '  limbo [opts]                     Get lost in pure subconscious',
+        '  inception [command] [opts]       Enter another dream, where inception is possible',
+        '  within-a-dream [command] [opts]  Dream within a dream',
+        '  dream [command] [opts]           Go to sleep and dream',
+        'Options:',
+        '  --help  Show help  [boolean]',
+        ''
+      ])
+    })
+
+    it('supports a "visit" function option', function () {
+      var commandObject
+      var pathToFile
+      var filename
+      var r = checkOutput(function () {
+        return yargs('--help').help().wrap(null)
+          // assumes cwd is node_modules/mocha/bin
+          .commandDir('../../../test/fixtures/cmddir', {
+            visit: function (_commandObject, _pathToFile, _filename) {
+              commandObject = _commandObject
+              pathToFile = _pathToFile
+              filename = _filename
+              return false // exclude command
+            }
+          })
+          .argv
+      })
+      commandObject.should.have.property('command').and.equal('dream [command] [opts]')
+      commandObject.should.have.property('desc').and.equal('Go to sleep and dream')
+      commandObject.should.have.property('builder')
+      commandObject.should.have.property('handler')
+      pathToFile.should.contain(require('path').join('test', 'fixtures', 'cmddir', 'dream.js'))
+      filename.should.equal('dream.js')
+      r.should.have.property('exit').and.be.true
+      r.should.have.property('errors').with.length(0)
+      r.should.have.property('logs')
+      r.logs.join('\n').split(/\n+/).should.deep.equal([
+        'Options:',
+        '  --help  Show help  [boolean]',
+        ''
+      ])
+    })
+
+    it('detects and ignores cyclic dir references', function () {
+      var r = checkOutput(function () {
+        return yargs('cyclic --help').help().wrap(null)
+          // assumes cwd is node_modules/mocha/bin
+          .commandDir('../../../test/fixtures/cmddir_cyclic')
+          .argv
+      }, [ './command' ])
+      r.should.have.property('exit').and.be.true
+      r.should.have.property('errors').with.length(0)
+      r.should.have.property('logs')
+      r.logs.join('\n').split(/\n+/).should.deep.equal([
+        './command cyclic',
+        'Options:',
+        '  --help  Show help  [boolean]',
+        ''
+      ])
     })
   })
 })

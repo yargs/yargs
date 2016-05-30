@@ -587,8 +587,138 @@ yargs.command('get <source> [proxy]', 'make a get HTTP request', require('my-mod
   .argv
 ```
 
-.completion([cmd], [description], [fn]);
-----------------------------------------
+.commandDir(directory, [opts])
+------------------------------
+
+Apply command modules from a directory relative to the module calling this method.
+
+This allows you to organize multiple commands into their own modules under a
+single directory and apply all of them at once instead of calling
+`.command(require('./dir/module'))` multiple times.
+
+By default, it ignores subdirectories. This is so you can use a directory
+structure to represent your command hierarchy, where each command applies its
+subcommands using this method in its builder function. See the example below.
+
+Note that yargs assumes all modules in the given directory are command modules
+and will error if non-command modules are encountered. In this scenario, you
+can either move your module to a different directory or use the `exclude` or
+`visit` option to manually filter it out. More on that below.
+
+`directory` is a relative directory path as a string (required).
+
+`opts` is an options object (optional). The following options are valid:
+
+- `recurse`: boolean, default `false`
+
+    Look for command modules in all subdirectories and apply them as a flattened
+    (non-hierarchical) list.
+
+- `extensions`: array of strings, default `['js']`
+
+    The types of files to look for when requiring command modules.
+
+- `visit`: function
+
+    A synchronous function called for each command module encountered. Accepts
+    `commandObject`, `pathToFile`, and `filename` as arguments. Returns
+    `commandObject` to include the command; any falsy value to exclude/skip it.
+
+- `include`: RegExp or function
+
+    Whitelist certain modules. See [`require-directory` whitelisting](https://www.npmjs.com/package/require-directory#whitelisting) for details.
+
+- `exclude`: RegExp or function
+
+    Blacklist certain modules. See [`require-directory` blacklisting](https://www.npmjs.com/package/require-directory#blacklisting) for details.
+
+### Example command hierarchy using `.commandDir()`
+
+Desired CLI:
+
+```sh
+$ myapp --help
+$ myapp init
+$ myapp remote --help
+$ myapp remote add base http://yargs.js.org
+$ myapp remote prune base
+$ myapp remote prune base fork whatever
+```
+
+Directory structure:
+
+```
+myapp/
+├─ cli.js
+└─ cmds/
+   ├─ init.js
+   ├─ remote.js
+   └─ remote_cmds/
+      ├─ add.js
+      └─ prune.js
+```
+
+cli.js:
+
+```js
+#!/usr/bin/env node
+require('yargs')
+  .commandDir('cmds')
+  .demand(1)
+  .help()
+  .argv
+```
+
+cmds/init.js:
+
+```js
+exports.command = 'init [dir]'
+exports.desc = 'Create an empty repo'
+exports.builder = {
+  dir: {
+    default: '.'
+  }
+}
+exports.handler = function (argv) {
+  console.log('init called for dir', argv.dir)
+}
+```
+
+cmds/remote.js:
+
+```js
+exports.command = 'remote <command>'
+exports.desc = 'Manage set of tracked repos'
+exports.builder = function (yargs) {
+  return yargs.commandDir('remote_cmds')
+}
+exports.handler = function (argv) {}
+```
+
+cmds/remote_cmds/add.js:
+
+```js
+exports.command = 'add <name> <url>'
+exports.desc = 'Add remote named <name> for repo at url <url>'
+exports.builder = {}
+exports.handler = function (argv) {
+  console.log('adding remote %s at url %s', argv.name, argv.url)
+}
+```
+
+cmds/remote_cmds/prune.js:
+
+```js
+exports.command = 'prune <name> [names..]'
+exports.desc = 'Delete tracked branches gone stale for remotes'
+exports.builder = {}
+exports.handler = function (argv) {
+  console.log('pruning remotes %s', [].concat(argv.name).concat(argv.names).join(', '))
+}
+```
+
+.completion([cmd], [description], [fn])
+---------------------------------------
 
 Enable bash-completion shortcuts for commands and options.
 
