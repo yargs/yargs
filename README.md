@@ -467,6 +467,9 @@ values stored in `argv._`).  Set `desc` to `false` to create a hidden command.
 Hidden commands don't show up in the help output and aren't available for
 completion.
 
+Note that commands will **not** automatically inherit the configuration of their
+parent context (eg. a parent command or global context). 
+
 Optionally, you can provide a `builder` object to give hints about the
 options that your command accepts:
 
