@@ -435,5 +435,24 @@ describe('Command', function () {
         ''
       ])
     })
+
+    it('derives \'command\' string from filename when not exported', function () {
+      var r = checkOutput(function () {
+        return yargs('--help').help().wrap(null)
+          // assumes cwd is node_modules/mocha/bin
+          .commandDir('../../../test/fixtures/cmddir_noname')
+          .argv
+      })
+      r.should.have.property('exit').and.be.true
+      r.should.have.property('errors').with.length(0)
+      r.should.have.property('logs')
+      r.logs.join('\n').split(/\n+/).should.deep.equal([
+        'Commands:',
+        '  nameless  Command name derived from module filename',
+        'Options:',
+        '  --help  Show help  [boolean]',
+        ''
+      ])
+    })
   })
 })

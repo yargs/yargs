@@ -377,6 +377,31 @@ describe('yargs dsl tests', function () {
       global.commandHandlerCalledWith.foo.should.equal('bar')
       delete global.commandHandlerCalledWith
     })
+
+    it('derives \'command\' string from filename when missing', function () {
+      var argv = yargs('nameless --foo bar')
+        .command(require('./fixtures/cmddir_noname/nameless'))
+        .argv
+
+      argv.banana.should.equal('cool')
+      argv.batman.should.equal('sad')
+      argv.foo.should.equal('bar')
+
+      global.commandHandlerCalledWith.banana.should.equal('cool')
+      global.commandHandlerCalledWith.batman.should.equal('sad')
+      global.commandHandlerCalledWith.foo.should.equal('bar')
+      delete global.commandHandlerCalledWith
+    })
+
+    it('throws error for non-module command object missing \'command\' string', function () {
+      expect(function () {
+        yargs.command({
+          desc: 'A command with no name',
+          builder: function (yargs) { return yargs },
+          handler: function (argv) {}
+        })
+      }).to.throw(/No command name given for module: { desc: 'A command with no name',\n {2}builder: \[Function\],\n {2}handler: \[Function\] }/)
+    })
   })
 
   describe('terminalWidth', function () {
