@@ -467,9 +467,6 @@ values stored in `argv._`).  Set `desc` to `false` to create a hidden command.
 Hidden commands don't show up in the help output and aren't available for
 completion.
 
-Note that commands will **not** automatically inherit the configuration of their
-parent context (eg. a parent command or global context). 
-
 Optionally, you can provide a `builder` object to give hints about the
 options that your command accepts:
 
@@ -483,6 +480,14 @@ yargs.command('get', 'make a get HTTP request', {
   .help()
   .argv
 ```
+
+Note that commands will not automatically inherit configuration _or_ options
+of their parent context. This means you'll have to re-apply configuration
+if necessary, and make options global manually using the [global](#global) method.
+
+Additionally, the [`help`](#helpoption) and [`version`](#versionoption)
+options (if used) **always** apply globally, just like the
+[`.wrap()`](#wrapcolumns) configuration.
 
 `builder` can also be a function. This function is executed
 with a `yargs` instance, and can be used to provide _advanced_ command specific help:
@@ -808,16 +813,16 @@ var argv = require('yargs')
   .argv
 ```
 
-You can also pass an explicit configuration `object`, it will be parsed 
+You can also pass an explicit configuration `object`, it will be parsed
 and its properties will be set as arguments.
-             
+
 ```js
 var argv = require('yargs')
   .config({foo: 1, bar: 2})
   .argv
 console.log(argv)
 ```
- 
+
 ```
 $ node test.js
 { _: [],
@@ -837,7 +842,7 @@ flag occurrences rather than `true` or `false`. Default value is thus `0`.
 .defaults(key, value, [description])
 ------------------------------------
 
-**Note:** The `.defaults()` alias is deprecated. It will be 
+**Note:** The `.defaults()` alias is deprecated. It will be
 removed in the next major version.
 
 Set `argv[key]` to `value` if no option was specified in `process.argv`.
