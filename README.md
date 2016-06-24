@@ -485,9 +485,9 @@ Note that commands will not automatically inherit configuration _or_ options
 of their parent context. This means you'll have to re-apply configuration
 if necessary, and make options global manually using the [global](#global) method.
 
-Additionally, the [`help`](#helpoption) and [`version`](#versionoption)
+Additionally, the [`help`](#help) and [`version`](#version)
 options (if used) **always** apply globally, just like the
-[`.wrap()`](#wrapcolumns) configuration.
+[`.wrap()`](#wrap) configuration.
 
 `builder` can also be a function. This function is executed
 with a `yargs` instance, and can be used to provide _advanced_ command specific help:
@@ -1100,7 +1100,7 @@ var yargs = require('yargs')(['--help'])
     Options:
       --help  Show help  [boolean]
 
-.help([option, [description]])
+<a name="help"></a>.help([option, [description]])
 ------------------------------
 
 Add an option (e.g. `--help`) that displays the usage string and exits the
@@ -1528,7 +1528,7 @@ present script similar to how `$0` works in bash or perl.
 
 `opts` is optional and acts like calling `.options(opts)`.
 
-.version([option], [description], [version])
+<a name="version"></a>.version([option], [description], [version])
 ----------------------------------------
 
 Add an option (e.g. `--version`) that displays the version number (given by the
@@ -1548,7 +1548,7 @@ var argv = require('yargs')
   .argv;
 ```
 
-.wrap(columns)
+<a name="wrap"></a>.wrap(columns)
 --------------
 
 Format usage output to wrap at `columns` many columns.
