@@ -481,6 +481,14 @@ yargs.command('get', 'make a get HTTP request', {
   .argv
 ```
 
+Note that commands will not automatically inherit configuration _or_ options
+of their parent context. This means you'll have to re-apply configuration
+if necessary, and make options global manually using the [global](#global) method.
+
+Additionally, the [`help`](#help) and [`version`](#version)
+options (if used) **always** apply globally, just like the
+[`.wrap()`](#wrap) configuration.
+
 `builder` can also be a function. This function is executed
 with a `yargs` instance, and can be used to provide _advanced_ command specific help:
 
@@ -805,16 +813,16 @@ var argv = require('yargs')
   .argv
 ```
 
-You can also pass an explicit configuration `object`, it will be parsed 
+You can also pass an explicit configuration `object`, it will be parsed
 and its properties will be set as arguments.
-             
+
 ```js
 var argv = require('yargs')
   .config({foo: 1, bar: 2})
   .argv
 console.log(argv)
 ```
- 
+
 ```
 $ node test.js
 { _: [],
@@ -834,7 +842,7 @@ flag occurrences rather than `true` or `false`. Default value is thus `0`.
 .defaults(key, value, [description])
 ------------------------------------
 
-**Note:** The `.defaults()` alias is deprecated. It will be 
+**Note:** The `.defaults()` alias is deprecated. It will be
 removed in the next major version.
 
 Set `argv[key]` to `value` if no option was specified in `process.argv`.
@@ -1092,7 +1100,7 @@ var yargs = require('yargs')(['--help'])
     Options:
       --help  Show help  [boolean]
 
-.help([option, [description]])
+<a name="help"></a>.help([option, [description]])
 ------------------------------
 
 Add an option (e.g. `--help`) that displays the usage string and exits the
@@ -1520,7 +1528,7 @@ present script similar to how `$0` works in bash or perl.
 
 `opts` is optional and acts like calling `.options(opts)`.
 
-.version([option], [description], [version])
+<a name="version"></a>.version([option], [description], [version])
 ----------------------------------------
 
 Add an option (e.g. `--version`) that displays the version number (given by the
@@ -1540,7 +1548,7 @@ var argv = require('yargs')
   .argv;
 ```
 
-.wrap(columns)
+<a name="wrap"></a>.wrap(columns)
 --------------
 
 Format usage output to wrap at `columns` many columns.
