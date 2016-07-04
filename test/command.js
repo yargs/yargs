@@ -455,4 +455,20 @@ describe('Command', function () {
       ])
     })
   })
+
+  // addresses https://github.com/yargs/yargs/issues/514.
+  it('respects order of positional arguments when matching commands', function () {
+    var output = []
+    yargs('bar foo')
+      .command('foo', 'foo command', function (yargs) {
+        output.push('foo')
+      })
+      .command('bar', 'bar command', function (yargs) {
+        output.push('bar')
+      })
+      .argv
+
+    output.should.include('bar')
+    output.should.not.include('foo')
+  })
 })

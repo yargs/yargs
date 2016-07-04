@@ -647,8 +647,8 @@ function Yargs (processArgs, cwd, parentRequire) {
     // if there's a handler associated with a
     // command defer processing to it.
     var handlerKeys = command.getCommands()
-    for (var i = 0, cmd; (cmd = handlerKeys[i]) !== undefined; i++) {
-      if (~argv._.indexOf(cmd) && cmd !== completionCommand) {
+    for (var i = 0, cmd; (cmd = argv._[i]) !== undefined; i++) {
+      if (~handlerKeys.indexOf(cmd) && cmd !== completionCommand) {
         setPlaceholderKeys(argv)
         return command.runCommand(cmd, self, parsed)
       }
