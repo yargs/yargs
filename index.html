@@ -22,9 +22,13 @@
 
   <!-- Initializer -->
   <script>
-    Flatdoc.run({
-      fetcher: Flatdoc.github('bcoe/yargs')
-    });
+    // use https://jsonp.afeld.me/ to wrap registry json in jsonp
+    $.get('https://jsonp.afeld.me/?url=https://registry.npmjs.org/yargs', function (data) {
+      var version = data['dist-tags'] && data['dist-tags'].latest
+      Flatdoc.run({
+        fetcher: Flatdoc.file('https://raw.githubusercontent.com/yargs/yargs/v' + version + '/README.md')
+      })
+    }, 'jsonp')
   </script>
 </head>
 <body role='flatdoc' class='no-literate'>
