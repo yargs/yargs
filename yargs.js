@@ -7,8 +7,6 @@ const path = require('path')
 const Usage = require('./lib/usage')
 const Validation = require('./lib/validation')
 const Y18n = require('y18n')
-const readPkgUp = require('read-pkg-up')
-const pkgConf = require('pkg-conf')
 const requireMainFilename = require('require-main-filename')
 const objFilter = require('./lib/obj-filter')
 const setBlocking = require('set-blocking')
@@ -24,6 +22,7 @@ function Yargs (processArgs, cwd, parentRequire) {
   var preservedGroups = {}
   var usage = null
   var validation = null
+
   const y18n = Y18n({
     directory: path.resolve(__dirname, './locales'),
     updateFiles: false
@@ -345,17 +344,28 @@ function Yargs (processArgs, cwd, parentRequire) {
   self.pkgConf = function (key, path) {
     var conf = null
 
-    var obj = readPkgUp.sync({
-      cwd: path || requireMainFilename(parentRequire || require)
-    })
+    var obj = pkgUp(path)
 
     // If an object exists in the key, add it to options.configObjects
-    if (obj.pkg && obj.pkg[key] && typeof obj.pkg[key] === 'object') {
-      conf = obj.pkg[key]
+    if (obj[key] && typeof obj[key] === 'object') {
+      conf = obj[key]
       options.configObjects = (options.configObjects || []).concat(conf)
     }
 
     return self
+  }
+
+  var pkg = null
+  function pkgUp (path) {
+    if (pkg && !path) return pkg
+    const readPkgUp = require('read-pkg-up')
+
+    var obj = readPkgUp.sync({
+      cwd: path || requireMainFilename(parentRequire || require)
+    })
+
+    if (obj.pkg) pkg = obj.pkg
+    return pkg || {}
   }
 
   self.parse = function (args, shortCircuit) {
@@ -499,11 +509,9 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   function guessVersion () {
-    var obj = readPkgUp.sync({
-      cwd: requireMainFilename(parentRequire || require)
-    })
+    var obj = pkgUp()
 
-    return obj.pkg ? obj.pkg.version : 'unknown'
+    return obj.version || 'unknown'
   }
 
   var helpOpt = null
@@ -624,10 +632,7 @@ function Yargs (processArgs, cwd, parentRequire) {
 
   function parseArgs (args, shortCircuit) {
     options.__ = y18n.__
-    options.configuration = pkgConf.sync('yargs', {
-      defaults: {},
-      cwd: requireMainFilename(require)
-    })
+    options.configuration = pkgUp()['yargs'] || {}
     const parsed = Parser.detailed(args, options)
     const argv = parsed.argv
     var aliases = parsed.aliases
