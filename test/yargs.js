@@ -945,6 +945,15 @@ describe('yargs dsl tests', function () {
       argv.foo.should.equal('a')
       argv.dotNotation.should.equal(false)
     })
+
+    // see https://github.com/yargs/yargs/issues/485
+    it('handles an invalid package.json', function () {
+      var argv = yargs('--foo a')
+        .pkgConf('yargs', './test/fixtures/broken-json')
+        .argv
+
+      argv.foo.should.equal('a')
+    })
   })
 
   describe('skipValidation', function () {

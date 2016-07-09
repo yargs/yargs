@@ -360,9 +360,12 @@ function Yargs (processArgs, cwd, parentRequire) {
     if (pkg && !path) return pkg
     const readPkgUp = require('read-pkg-up')
 
-    var obj = readPkgUp.sync({
-      cwd: path || requireMainFilename(parentRequire || require)
-    })
+    var obj = {}
+    try {
+      obj = readPkgUp.sync({
+        cwd: path || requireMainFilename(parentRequire || require)
+      })
+    } catch (noop) {}
 
     if (obj.pkg) pkg = obj.pkg
     return pkg || {}
