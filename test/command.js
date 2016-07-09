@@ -318,6 +318,26 @@ describe('Command', function () {
       var commands = y.getUsageInstance().getCommands()
       commands[0].should.deep.equal([module.command, module.describe])
     })
+
+    it('accepts module (missing handler function) as 1st argument', function () {
+      var module = {
+        command: 'foo',
+        describe: 'i\'m not feeling very creative at the moment',
+        builder: {
+          hello: {
+            default: 'world'
+          }
+        }
+      }
+
+      var y = yargs([]).command(module)
+      var handlers = y.getCommandInstance().getCommandHandlers()
+      handlers.foo.original.should.equal(module.command)
+      handlers.foo.builder.should.equal(module.builder)
+      expect(handlers.foo.handler).to.equal(undefined)
+      var commands = y.getUsageInstance().getCommands()
+      commands[0].should.deep.equal([module.command, module.describe])
+    })
   })
 
   describe('commandDir', function () {
