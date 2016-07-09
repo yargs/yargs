@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.8.0"></a>
+# [4.8.0](https://github.com/yargs/yargs/compare/v4.7.1...v4.8.0) (2016-07-09)
+
+
+### Bug Fixes
+
+* drop unused camelcase dependency fixes [#516](https://github.com/yargs/yargs/issues/516) ([#525](https://github.com/yargs/yargs/issues/525)) ([365fb9a](https://github.com/yargs/yargs/commit/365fb9a)), closes [#516](https://github.com/yargs/yargs/issues/516) [#525](https://github.com/yargs/yargs/issues/525)
+* fake a tty in tests, so that we can use the new set-blocking ([#512](https://github.com/yargs/yargs/issues/512)) ([a54c742](https://github.com/yargs/yargs/commit/a54c742))
+* ignore invalid package.json during read-pkg-up ([#546](https://github.com/yargs/yargs/issues/546)) ([e058c87](https://github.com/yargs/yargs/commit/e058c87))
+* keep both zh and zh_CN until yargs[@5](https://github.com/5).x ([0f8faa7](https://github.com/yargs/yargs/commit/0f8faa7))
+* lazy-load package.json and cache. get rid of pkg-conf dependency. ([#544](https://github.com/yargs/yargs/issues/544)) ([2609b2e](https://github.com/yargs/yargs/commit/2609b2e))
+* we now respect the order of _ when applying commands ([#537](https://github.com/yargs/yargs/issues/537)) ([ed86b78](https://github.com/yargs/yargs/commit/ed86b78))
+
+
+### Features
+
+* add .commandDir(dir) to API to apply all command modules from a relative directory ([#494](https://github.com/yargs/yargs/issues/494)) ([b299dff](https://github.com/yargs/yargs/commit/b299dff))
+* **command:** derive missing command string from module filename ([#527](https://github.com/yargs/yargs/issues/527)) ([20d4b8a](https://github.com/yargs/yargs/commit/20d4b8a))
+* builder is now optional for a command module ([#545](https://github.com/yargs/yargs/issues/545)) ([8d6ad6e](https://github.com/yargs/yargs/commit/8d6ad6e))
+
+
+
 <a name="4.7.1"></a>
 ## [4.7.1](https://github.com/yargs/yargs/compare/v4.7.0...v4.7.1) (2016-05-15)
 
