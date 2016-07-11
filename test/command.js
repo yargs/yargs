@@ -493,4 +493,14 @@ describe('Command', function () {
     var argv = y.parse(['foo', 'bar'])
     argv.second.should.equal('bar')
   })
+
+  // addresses https://github.com/yargs/yargs/issues/522
+  it('does not require builder function to return', function () {
+    var argv = yargs('yo')
+      .command('yo [someone]', 'Send someone a yo', function (yargs) {
+        yargs.default('someone', 'Pat')
+      })
+      .argv
+    argv.should.have.property('someone').and.equal('Pat')
+  })
 })

@@ -40,7 +40,7 @@ describe('yargs dsl tests', function () {
     Object.keys(argv).should.include('cool')
   })
 
-  it('populates argv with placeholder keys when passed into command handler', function (done) {
+  it.skip('populates argv with placeholder keys when passed into command handler', function (done) {
     yargs(['blerg'])
       .option('cool', {})
       .command('blerg', 'handle blerg things', function () {}, function (argv) {
