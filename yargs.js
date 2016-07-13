@@ -113,7 +113,7 @@ function Yargs (processArgs, cwd, parentRequire) {
       })
     })
 
-    tmpOptions.envPrefix = undefined
+    tmpOptions.envPrefix = options.envPrefix
     options = tmpOptions
 
     // if this is the first time being executed, create

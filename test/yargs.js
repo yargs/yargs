@@ -237,7 +237,7 @@ describe('yargs dsl tests', function () {
         normalize: [],
         number: [],
         config: {},
-        envPrefix: undefined,
+        envPrefix: 'YARGS', // preserved as global
         global: ['help'],
         demanded: {}
       }
