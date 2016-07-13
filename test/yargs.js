@@ -934,7 +934,7 @@ describe('yargs dsl tests', function () {
 
       argv.b.should.equal(99)
       argv.foo.should.equal('a')
-      expect(argv.git).to.equal(undefined)
+      expect(argv.type).to.equal(undefined)
     })
 
     it('allows an alternative cwd to be specified', function () {
@@ -944,6 +944,22 @@ describe('yargs dsl tests', function () {
 
       argv.foo.should.equal('a')
       argv.dotNotation.should.equal(false)
+    })
+
+    it('doesn\'t mess up other pkg lookups when cwd is specified', function () {
+      var r = checkOutput(function () {
+        return yargs('--version')
+          .pkgConf('repository', './test/fixtures')
+          .version()
+          .argv
+      })
+      const options = yargs.getOptions()
+
+      // assert pkgConf lookup (test/fixtures/package.json)
+      options.configObjects.should.deep.equal([{ type: 'svn' }])
+      // assert parseArgs and guessVersion lookup (package.json)
+      expect(options.configuration['dot-notation']).to.be.undefined
+      r.logs[0].should.not.equal('9.9.9') // breaks when yargs gets to this version
     })
 
     // see https://github.com/yargs/yargs/issues/485
