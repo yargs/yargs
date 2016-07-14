@@ -355,9 +355,10 @@ function Yargs (processArgs, cwd, parentRequire) {
     return self
   }
 
-  var pkg = null
+  var pkgs = {}
   function pkgUp (path) {
-    if (pkg && !path) return pkg
+    var npath = path || '*'
+    if (pkgs[npath]) return pkgs[npath]
     const readPkgUp = require('read-pkg-up')
 
     var obj = {}
@@ -367,8 +368,8 @@ function Yargs (processArgs, cwd, parentRequire) {
       })
     } catch (noop) {}
 
-    if (obj.pkg) pkg = obj.pkg
-    return pkg || {}
+    pkgs[npath] = obj.pkg || {}
+    return pkgs[npath]
   }
 
   self.parse = function (args, shortCircuit) {
