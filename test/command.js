@@ -344,8 +344,7 @@ describe('Command', function () {
     it('supports relative dirs', function () {
       var r = checkOutput(function () {
         return yargs('--help').help().wrap(null)
-          // assumes cwd is node_modules/mocha/bin
-          .commandDir('../../../test/fixtures/cmddir')
+          .commandDir('fixtures/cmddir')
           .argv
       })
       r.should.have.property('exit').and.be.true
@@ -363,8 +362,7 @@ describe('Command', function () {
     it('supports nested subcommands', function () {
       var r = checkOutput(function () {
         return yargs('dream --help').help().wrap(null)
-          // assumes cwd is node_modules/mocha/bin
-          .commandDir('../../../test/fixtures/cmddir')
+          .commandDir('fixtures/cmddir')
           .argv
       }, [ './command' ])
       r.should.have.property('exit').and.be.true
@@ -386,8 +384,7 @@ describe('Command', function () {
     it('supports a "recurse" boolean option', function () {
       var r = checkOutput(function () {
         return yargs('--help').help().wrap(null)
-          // assumes cwd is node_modules/mocha/bin
-          .commandDir('../../../test/fixtures/cmddir', { recurse: true })
+          .commandDir('fixtures/cmddir', { recurse: true })
           .argv
       })
       r.should.have.property('exit').and.be.true
@@ -411,8 +408,7 @@ describe('Command', function () {
       var filename
       var r = checkOutput(function () {
         return yargs('--help').help().wrap(null)
-          // assumes cwd is node_modules/mocha/bin
-          .commandDir('../../../test/fixtures/cmddir', {
+          .commandDir('fixtures/cmddir', {
             visit: function (_commandObject, _pathToFile, _filename) {
               commandObject = _commandObject
               pathToFile = _pathToFile
@@ -441,8 +437,7 @@ describe('Command', function () {
     it('detects and ignores cyclic dir references', function () {
       var r = checkOutput(function () {
         return yargs('cyclic --help').help().wrap(null)
-          // assumes cwd is node_modules/mocha/bin
-          .commandDir('../../../test/fixtures/cmddir_cyclic')
+          .commandDir('fixtures/cmddir_cyclic')
           .argv
       }, [ './command' ])
       r.should.have.property('exit').and.be.true
@@ -459,8 +454,7 @@ describe('Command', function () {
     it('derives \'command\' string from filename when not exported', function () {
       var r = checkOutput(function () {
         return yargs('--help').help().wrap(null)
-          // assumes cwd is node_modules/mocha/bin
-          .commandDir('../../../test/fixtures/cmddir_noname')
+          .commandDir('fixtures/cmddir_noname')
           .argv
       })
       r.should.have.property('exit').and.be.true
