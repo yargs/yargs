@@ -57,6 +57,23 @@ describe('validation tests', function () {
         })
         .argv
     })
+
+    it('should ignore the --no- part if boolean negation is disabled', function (done) {
+      var fail = false
+
+      yargs(['--foo', 'false'])
+        .pkgConf('boolean-negation', './fixtures/')
+        .implies({
+          '--no-foo': '--bar'
+        })
+        .fail(function () {
+          fail = true
+        })
+        .argv
+
+      fail.should.equal(false)
+      return done()
+    })
   })
 
   describe('demand', function () {

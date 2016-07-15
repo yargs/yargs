@@ -4,6 +4,7 @@
     "type": "svn"
   },
   "yargs": {
-    "dot-notation": false
+    "dot-notation": false,
+    "boolean-negation": false
   }
 }
