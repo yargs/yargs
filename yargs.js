@@ -736,7 +736,7 @@ function Yargs (processArgs, cwd, parentRequire) {
         if (strict) validation.unknownArguments(argv, aliases)
         validation.customChecks(argv, aliases)
         validation.limitedChoices(argv)
-        validation.implications(argv)
+        validation.implications(argv, options.configuration)
       }
     }
 

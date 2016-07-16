@@ -58,21 +58,20 @@ describe('validation tests', function () {
         .argv
     })
 
-    it('should ignore the --no- part if boolean negation is disabled', function (done) {
+    it('does not treat --no- as a special case if boolean negation is disabled', function () {
       var fail = false
-
-      yargs(['--foo', 'false'])
-        .pkgConf('boolean-negation', './fixtures/')
+      yargs(['--foo', '--bar', 'false'])
+        .config({'boolean-negation': false})
         .implies({
-          '--no-foo': '--bar'
+          '--foo': '--no-bar'
         })
-        .fail(function () {
+        .fail(function (msg) {
+          msg.should.equal(/Implications failed/)
           fail = true
         })
         .argv
 
-      fail.should.equal(false)
-      return done()
+      fail.should.equal(true)
     })
   })
 
