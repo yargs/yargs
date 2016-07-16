@@ -25,14 +25,14 @@
     "which-module": "^1.0.0",
     "window-size": "^0.2.0",
     "y18n": "^3.2.1",
-    "yargs-parser": "^2.4.0"
+    "yargs-parser": "^2.4.1"
   },
   "devDependencies": {
     "chai": "^3.4.1",
     "chalk": "^1.1.3",
     "coveralls": "^2.11.11",
     "cpr": "^1.0.0",
-    "cross-spawn-async": "^2.2.1",
+    "cross-spawn": "^4.0.0",
     "es6-promise": "^3.0.2",
     "hashish": "0.0.4",
     "mocha": "^2.5.2",
