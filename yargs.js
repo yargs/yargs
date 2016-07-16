@@ -373,6 +373,7 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   self.parse = function (args, shortCircuit) {
+    if (!shortCircuit) processArgs = args
     return parseArgs(args, shortCircuit)
   }
 
