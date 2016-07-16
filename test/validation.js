@@ -61,7 +61,7 @@ describe('validation tests', function () {
     it('does not treat --no- as a special case if boolean negation is disabled', function () {
       var fail = false
       yargs(['--foo', '--bar', 'false'])
-        .config({'boolean-negation': false})
+        .pkgConf('boolean-negation', './fixtures/')
         .implies({
           '--foo': '--no-bar'
         })
