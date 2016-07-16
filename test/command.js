@@ -491,4 +491,12 @@ describe('Command', function () {
     output.should.include('bar')
     output.should.not.include('foo')
   })
+
+  // addresses https://github.com/yargs/yargs/issues/558
+  it('handles positional arguments if command is invoked using .parse()', function () {
+    var y = yargs([])
+      .command('foo <second>', 'the foo command', {})
+    var argv = y.parse(['foo', 'bar'])
+    argv.second.should.equal('bar')
+  })
 })
