@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.8.1"></a>
+## [4.8.1](https://github.com/yargs/yargs/compare/v4.8.0...v4.8.1) (2016-07-16)
+
+
+### Bug Fixes
+
+* **commandDir:** make dir relative to caller instead of require.main.filename ([#548](https://github.com/yargs/yargs/issues/548)) ([3c2e479](https://github.com/yargs/yargs/commit/3c2e479))
+* add config lookup for .implies() ([#556](https://github.com/yargs/yargs/issues/556)) ([8d7585c](https://github.com/yargs/yargs/commit/8d7585c))
+* cache pkg lookups by path to avoid returning the wrong one ([#552](https://github.com/yargs/yargs/issues/552)) ([fea7e0b](https://github.com/yargs/yargs/commit/fea7e0b))
+* positional arguments were not being handled appropriately by parse() ([#559](https://github.com/yargs/yargs/issues/559)) ([063a866](https://github.com/yargs/yargs/commit/063a866))
+* pull in [@nexdrew](https://github.com/nexdrew)'s fixes to yargs-parser ([#560](https://github.com/yargs/yargs/issues/560)) ([c77c080](https://github.com/yargs/yargs/commit/c77c080)), closes [#560](https://github.com/yargs/yargs/issues/560)
+
+
+
 <a name="4.8.0"></a>
 # [4.8.0](https://github.com/yargs/yargs/compare/v4.7.1...v4.8.0) (2016-07-09)
 
