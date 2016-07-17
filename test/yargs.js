@@ -270,6 +270,17 @@ describe('yargs dsl tests', function () {
         .argv
     })
 
+    it('recommends a similiar command if no command handler is found', function () {
+      var r = checkOutput(function () {
+        yargs(['boat'])
+          .command('goat')
+          .recommendCommands(true)
+          .argv
+      })
+
+      r.logs[0].should.match(/Did you mean 'goat'/)
+    })
+
     it("skips executing top-level command if builder's help is executed", function () {
       var r = checkOutput(function () {
         yargs(['blerg', '-h'])

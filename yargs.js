@@ -10,6 +10,7 @@ const Y18n = require('y18n')
 const requireMainFilename = require('require-main-filename')
 const objFilter = require('./lib/obj-filter')
 const setBlocking = require('set-blocking')
+const didYouMean = require('didyoumean')
 
 var exports = module.exports = Yargs
 function Yargs (processArgs, cwd, parentRequire) {
@@ -125,6 +126,7 @@ function Yargs (processArgs, cwd, parentRequire) {
 
     exitProcess = true
     strict = false
+    recommendCommands = false
     completionCommand = null
     self.parsed = false
 
@@ -285,6 +287,12 @@ function Yargs (processArgs, cwd, parentRequire) {
 
   self.getDemanded = function () {
     return options.demanded
+  }
+
+  var recommendCommands
+  self.recommendCommands = function (value) {
+    recommendCommands = !!value
+    return self
   }
 
   self.requiresArg = function (requiresArgs) {
@@ -661,6 +669,11 @@ function Yargs (processArgs, cwd, parentRequire) {
       if (~handlerKeys.indexOf(cmd) && cmd !== completionCommand) {
         setPlaceholderKeys(argv)
         return command.runCommand(cmd, self, parsed)
+      } else {
+        if (recommendCommands) {
+          const similiarCommand = didYouMean(cmd, handlerKeys)
+          console.log('Did you mean \'' + similiarCommand + '\'?')
+        }
       }
     }
 
