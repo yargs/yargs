@@ -29,6 +29,8 @@ function Yargs (processArgs, cwd, parentRequire) {
     updateFiles: false
   })
 
+  const __ = y18n.__
+
   if (!cwd) cwd = process.cwd()
 
   self.$0 = process.argv
@@ -672,7 +674,7 @@ function Yargs (processArgs, cwd, parentRequire) {
       } else {
         if (recommendCommands) {
           const similiarCommand = didYouMean(cmd, handlerKeys)
-          console.log('Did you mean \'' + similiarCommand + '\'?')
+          console.log(__('Did you mean %s?', similiarCommand))
         }
       }
     }
