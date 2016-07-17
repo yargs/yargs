@@ -267,7 +267,7 @@ describe('yargs dsl tests', function () {
           .argv
       })
 
-      r.logs[0].should.match(/Did you mean 'goat'/)
+      r.logs[0].should.match(/Did you mean goat/)
     })
 
     it("skips executing top-level command if builder's help is executed", function () {
