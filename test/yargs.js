@@ -274,7 +274,7 @@ describe('yargs dsl tests', function () {
       var r = checkOutput(function () {
         yargs(['boat'])
           .command('goat')
-          .recommendCommands(true)
+          .recommendCommands()
           .argv
       })
 
