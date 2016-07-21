@@ -499,8 +499,32 @@ describe('Command', function () {
     var argv = yargs('yo')
       .command('yo [someone]', 'Send someone a yo', function (yargs) {
         yargs.default('someone', 'Pat')
+      }, function (argv) {
+        argv.should.have.property('someone').and.equal('Pat')
       })
       .argv
     argv.should.have.property('someone').and.equal('Pat')
+  })
+
+  it('allows builder function to parse argv without returning', function () {
+    var argv = yargs('yo Jude')
+      .command('yo <someone>', 'Send someone a yo', function (yargs) {
+        yargs.argv
+      }, function (argv) {
+        argv.should.have.property('someone').and.equal('Jude')
+      })
+      .argv
+    argv.should.have.property('someone').and.equal('Jude')
+  })
+
+  it('allows builder function to return parsed argv', function () {
+    var argv = yargs('yo Leslie')
+      .command('yo <someone>', 'Send someone a yo', function (yargs) {
+        return yargs.argv
+      }, function (argv) {
+        argv.should.have.property('someone').and.equal('Leslie')
+      })
+      .argv
+    argv.should.have.property('someone').and.equal('Leslie')
   })
 })
