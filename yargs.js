@@ -520,12 +520,31 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   var helpOpt = null
-  self.addHelpOpt = self.help = function (opt, msg) {
-    opt = opt || 'help'
-    helpOpt = opt
-    self.boolean(opt)
-    self.global(opt)
-    self.describe(opt, msg || usage.deferY18nLookup('Show help'))
+  var useHelpOptAsCommand = false // a call to .help() will enable this
+  self.addHelpOpt = self.help = function (opt, msg, addImplicitCmd) {
+    // argument shuffle
+    if (arguments.length === 0) {
+      useHelpOptAsCommand = true
+    } else if (arguments.length === 1) {
+      if (typeof opt === 'boolean') {
+        useHelpOptAsCommand = opt
+        opt = null
+      } else {
+        useHelpOptAsCommand = true
+      }
+    } else if (arguments.length === 2) {
+      if (typeof msg === 'boolean') {
+        useHelpOptAsCommand = msg
+        msg = null
+      } else {
+        useHelpOptAsCommand = true
+      }
+    }
+    // use arguments, fallback to defaults for opt and msg
+    helpOpt = opt || 'help'
+    self.boolean(helpOpt)
+    self.global(helpOpt)
+    self.describe(helpOpt, msg || usage.deferY18nLookup('Show help'))
     return self
   }
 
@@ -654,22 +673,45 @@ function Yargs (processArgs, cwd, parentRequire) {
       return argv
     }
 
-    // if there's a handler associated with a
-    // command defer processing to it.
-    var handlerKeys = command.getCommands()
-    for (var i = 0, cmd; (cmd = argv._[i]) !== undefined; i++) {
-      if (~handlerKeys.indexOf(cmd) && cmd !== completionCommand) {
-        setPlaceholderKeys(argv)
-        return command.runCommand(cmd, self, parsed)
+    if (argv._.length) {
+      // check for helpOpt in argv._ before running commands
+      // assumes helpOpt must be valid if useHelpOptAsCommand is true
+      if (useHelpOptAsCommand) {
+        // consider any multi-char helpOpt alias as a valid help command
+        // unless all helpOpt aliases are single-char
+        // note that parsed.aliases is a normalized bidirectional map :)
+        var helpCmds = [helpOpt].concat(aliases[helpOpt])
+        var multiCharHelpCmds = helpCmds.filter(function (k) {
+          return k.length > 1
+        })
+        if (multiCharHelpCmds.length) helpCmds = multiCharHelpCmds
+        // look for and strip any helpCmds from argv._
+        argv._.filter(function (cmd) {
+          if (~helpCmds.indexOf(cmd)) {
+            argv[helpOpt] = true
+            return false
+          }
+          return true
+        })
       }
-    }
 
-    // generate a completion script for adding to ~/.bashrc.
-    if (completionCommand && ~argv._.indexOf(completionCommand) && !argv[completion.completionKey]) {
-      if (exitProcess) setBlocking(true)
-      self.showCompletionScript()
-      if (exitProcess) {
-        process.exit(0)
+      // if there's a handler associated with a
+      // command defer processing to it.
+      var handlerKeys = command.getCommands()
+      for (var i = 0, cmd; (cmd = argv._[i]) !== undefined; i++) {
+        if (~handlerKeys.indexOf(cmd) && cmd !== completionCommand) {
+          setPlaceholderKeys(argv)
+          return command.runCommand(cmd, self, parsed)
+        }
+      }
+
+      // generate a completion script for adding to ~/.bashrc.
+      if (completionCommand && ~argv._.indexOf(completionCommand) && !argv[completion.completionKey]) {
+        if (exitProcess) setBlocking(true)
+        self.showCompletionScript()
+        if (exitProcess) {
+          process.exit(0)
+        }
       }
     }
 
