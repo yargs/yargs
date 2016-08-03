@@ -539,6 +539,8 @@ function Yargs (processArgs, cwd, parentRequire) {
       } else {
         useHelpOptAsCommand = true
       }
+    } else {
+      useHelpOptAsCommand = Boolean(addImplicitCmd)
     }
     // use arguments, fallback to defaults for opt and msg
     helpOpt = opt || 'help'
@@ -686,7 +688,7 @@ function Yargs (processArgs, cwd, parentRequire) {
         })
         if (multiCharHelpCmds.length) helpCmds = multiCharHelpCmds
         // look for and strip any helpCmds from argv._
-        argv._.filter(function (cmd) {
+        argv._ = argv._.filter(function (cmd) {
           if (~helpCmds.indexOf(cmd)) {
             argv[helpOpt] = true
             return false

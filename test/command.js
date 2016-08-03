@@ -470,6 +470,83 @@ describe('Command', function () {
     })
   })
 
+  describe('help command', function () {
+    it('displays command help appropriately', function () {
+      var sub = {
+        command: 'sub',
+        desc: 'Run the subcommand',
+        builder: {},
+        handler: function (argv) {}
+      }
+
+      var cmd = {
+        command: 'cmd <sub>',
+        desc: 'Try a command',
+        builder: function (yargs) {
+          return yargs.command(sub)
+        },
+        handler: function (argv) {}
+      }
+
+      var helpCmd = checkOutput(function () {
+        return yargs('help cmd')
+          .help().wrap(null)
+          .command(cmd)
+          .argv
+      }, [ './command' ])
+
+      var cmdHelp = checkOutput(function () {
+        return yargs('cmd help')
+          .help().wrap(null)
+          .command(cmd)
+          .argv
+      }, [ './command' ])
+
+      var helpCmdSub = checkOutput(function () {
+        return yargs('help cmd sub')
+          .help().wrap(null)
+          .command(cmd)
+          .argv
+      }, [ './command' ])
+
+      var cmdHelpSub = checkOutput(function () {
+        return yargs('cmd help sub')
+          .help().wrap(null)
+          .command(cmd)
+          .argv
+      }, [ './command' ])
+
+      var cmdSubHelp = checkOutput(function () {
+        return yargs('cmd sub help')
+          .help().wrap(null)
+          .command(cmd)
+          .argv
+      }, [ './command' ])
+
+      var expectedCmd = [
+        './command cmd <sub>',
+        'Commands:',
+        '  sub  Run the subcommand',
+        'Options:',
+        '  --help  Show help  [boolean]',
+        ''
+      ]
+
+      var expectedSub = [
+        './command cmd sub',
+        'Options:',
+        '  --help  Show help  [boolean]',
+        ''
+      ]
+
+      helpCmd.logs.join('\n').split(/\n+/).should.deep.equal(expectedCmd)
+      cmdHelp.logs.join('\n').split(/\n+/).should.deep.equal(expectedCmd)
+      helpCmdSub.logs.join('\n').split(/\n+/).should.deep.equal(expectedSub)
+      cmdHelpSub.logs.join('\n').split(/\n+/).should.deep.equal(expectedSub)
+      cmdSubHelp.logs.join('\n').split(/\n+/).should.deep.equal(expectedSub)
+    })
+  })
+
   // addresses https://github.com/yargs/yargs/issues/514.
   it('respects order of positional arguments when matching commands', function () {
     var output = []
