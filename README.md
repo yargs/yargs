@@ -1099,15 +1099,31 @@ var yargs = require('yargs')(['--help'])
     Options:
       --help  Show help  [boolean]
 
-<a name="help"></a>.help([option, [description]])
-------------------------------
+<a name="help"></a>.help()
+-----------------------------------------
+.help([option | boolean])
+-----------------------------------------
+.help([option, [description | boolean]])
+-----------------------------------------
+.help([option, [description, [boolean]]])
+-----------------------------------------
 
-Add an option (e.g. `--help`) that displays the usage string and exits the
-process. If present, the `description` parameter customizes the description of
+Add an option (e.g. `--help`) and implicit command that displays the usage
+string and exits the process.
+
+If present, the `description` parameter customizes the description of
 the help option in the usage string.
 
-If invoked without parameters, `.help()` will make `--help` the option to trigger
-help output.
+If a boolean argument is provided, it will enable or disable the use of an
+implicit command. The implicit command is enabled by default, but it can be
+disabled by passing `false`.
+
+Note that any multi-char aliases (e.g. `help`) used for the help option will
+also be used for the implicit command. If there are no multi-char aliases (e.g.
+`h`), then all single-char aliases will be used for the command.
+
+If invoked without parameters, `.help()` will use `--help` as the option and
+`help` as the implicit command to trigger help output.
 
 Example:
 
