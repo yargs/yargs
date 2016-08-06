@@ -125,7 +125,6 @@ function Yargs (processArgs, cwd, parentRequire) {
     command = command ? command.reset() : Command(self, usage, validation)
     if (!completion) completion = Completion(self, usage, command)
 
-    exitProcess = true
     strict = false
     recommendCommands = false
     completionCommand = null
@@ -302,7 +301,9 @@ function Yargs (processArgs, cwd, parentRequire) {
 
   self.recommendCommand = function (cmd, handlerKeys) {
     if (recommendCommands) {
-      const similarCommand = require('didyoumean')(cmd, handlerKeys)
+      const didyoumean = require('didyoumean')
+      didyoumean.threshold = 0.7
+      const similarCommand = didyoumean(cmd, handlerKeys)
       if (similarCommand) {
         console.log(__('Did you mean %s?', similarCommand))
       }
