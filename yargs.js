@@ -28,6 +28,8 @@ function Yargs (processArgs, cwd, parentRequire) {
     updateFiles: false
   })
 
+  const __ = y18n.__
+
   if (!cwd) cwd = process.cwd()
 
   self.$0 = process.argv
@@ -285,6 +287,27 @@ function Yargs (processArgs, cwd, parentRequire) {
 
   self.getDemanded = function () {
     return options.demanded
+  }
+
+  var recommendCommands
+  self.recommendCommands = function (value) {
+    if (value === undefined || !!value === true) {
+      recommendCommands = true
+    } else {
+      recommendCommands = false
+    }
+    return self
+  }
+
+  self.recommendCommand = function (cmd, handlerKeys) {
+    if (recommendCommands) {
+      const didyoumean = require('didyoumean')
+      didyoumean.threshold = 0.7
+      const similarCommand = didyoumean(cmd, handlerKeys)
+      if (similarCommand) {
+        console.log(__('Did you mean %s?', similarCommand))
+      }
+    }
   }
 
   self.requiresArg = function (requiresArgs) {
@@ -661,6 +684,8 @@ function Yargs (processArgs, cwd, parentRequire) {
       if (~handlerKeys.indexOf(cmd) && cmd !== completionCommand) {
         setPlaceholderKeys(argv)
         return command.runCommand(cmd, self, parsed)
+      } else {
+        self.recommendCommand(cmd, handlerKeys)
       }
     }
 
