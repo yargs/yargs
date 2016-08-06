@@ -125,8 +125,8 @@ function Yargs (processArgs, cwd, parentRequire) {
     command = command ? command.reset() : Command(self, usage, validation)
     if (!completion) completion = Completion(self, usage, command)
 
+    exitProcess = true
     strict = false
-    recommendCommands = false
     completionCommand = null
     self.parsed = false
 
