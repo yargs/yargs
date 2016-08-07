@@ -686,6 +686,11 @@ describe('yargs dsl tests', function () {
       a1.why.should.equal('hello world')
       a2.why.should.equal('hello world')
     })
+
+    it('ignores implicit help command (with short-circuit)', function () {
+      var parsed = yargs.help().parse('help', true)
+      parsed._.should.deep.equal(['help'])
+    })
   })
 
   describe('config', function () {
@@ -1006,6 +1011,262 @@ describe('yargs dsl tests', function () {
           })
           .argv
       argv.koala.should.equal(true)
+    })
+  })
+
+  describe('.help()', function () {
+    it('enables `--help` option and `help` command without arguments', function () {
+      var option = checkOutput(function () {
+        return yargs('--help')
+          .help()
+          .wrap(null)
+          .argv
+      })
+      var command = checkOutput(function () {
+        return yargs('help')
+          .help()
+          .wrap(null)
+          .argv
+      })
+      var expected = [
+        'Options:',
+        '  --help  Show help  [boolean]',
+        ''
+      ]
+      option.logs[0].split('\n').should.deep.equal(expected)
+      command.logs[0].split('\n').should.deep.equal(expected)
+    })
+
+    it('enables `--help` option and `help` command with `true` argument', function () {
+      var option = checkOutput(function () {
+        return yargs('--help')
+          .help(true)
+          .wrap(null)
+          .argv
+      })
+      var command = checkOutput(function () {
+        return yargs('help')
+          .help(true)
+          .wrap(null)
+          .argv
+      })
+      var expected = [
+        'Options:',
+        '  --help  Show help  [boolean]',
+        ''
+      ]
+      option.logs[0].split('\n').should.deep.equal(expected)
+      command.logs[0].split('\n').should.deep.equal(expected)
+    })
+
+    it('enables only `--help` option with `false` argument', function () {
+      var option = checkOutput(function () {
+        return yargs('--help')
+          .help(false)
+          .wrap(null)
+          .argv
+      })
+      var command = checkOutput(function () {
+        return yargs('help')
+          .help(false)
+          .wrap(null)
+          .argv
+      })
+      option.logs[0].split('\n').should.deep.equal([
+        'Options:',
+        '  --help  Show help  [boolean]',
+        ''
+      ])
+      command.result.should.have.property('_').and.deep.equal(['help'])
+    })
+
+    it('enables given string as help option and command with string argument', function () {
+      var option = checkOutput(function () {
+        return yargs('--info')
+          .help('info')
+          .wrap(null)
+          .argv
+      })
+      var command = checkOutput(function () {
+        return yargs('info')
+          .help('info')
+          .wrap(null)
+          .argv
+      })
+      var helpOption = checkOutput(function () {
+        return yargs('--help')
+          .help('info')
+          .wrap(null)
+          .argv
+      })
+      var expected = [
+        'Options:',
+        '  --info  Show help  [boolean]',
+        ''
+      ]
+      option.logs[0].split('\n').should.deep.equal(expected)
+      command.logs[0].split('\n').should.deep.equal(expected)
+      helpOption.result.should.have.property('help').and.be.true
+    })
+
+    it('enables given string as help option and command with string argument and `true` argument', function () {
+      var option = checkOutput(function () {
+        return yargs('--info')
+          .help('info', true)
+          .wrap(null)
+          .argv
+      })
+      var command = checkOutput(function () {
+        return yargs('info')
+          .help('info', true)
+          .wrap(null)
+          .argv
+      })
+      var helpOption = checkOutput(function () {
+        return yargs('--help')
+          .help('info', true)
+          .wrap(null)
+          .argv
+      })
+      var expected = [
+        'Options:',
+        '  --info  Show help  [boolean]',
+        ''
+      ]
+      option.logs[0].split('\n').should.deep.equal(expected)
+      command.logs[0].split('\n').should.deep.equal(expected)
+      helpOption.result.should.have.property('help').and.be.true
+    })
+
+    it('enables given string as help option only with string argument and `false` argument', function () {
+      var option = checkOutput(function () {
+        return yargs('--info')
+          .help('info', false)
+          .wrap(null)
+          .argv
+      })
+      var command = checkOutput(function () {
+        return yargs('info')
+          .help('info', false)
+          .wrap(null)
+          .argv
+      })
+      option.logs[0].split('\n').should.deep.equal([
+        'Options:',
+        '  --info  Show help  [boolean]',
+        ''
+      ])
+      command.result.should.have.property('_').and.deep.equal(['info'])
+    })
+
+    it('enables given string as help option and command with custom description with two string arguments', function () {
+      var option = checkOutput(function () {
+        return yargs('--info')
+          .help('info', 'Display info')
+          .wrap(null)
+          .argv
+      })
+      var command = checkOutput(function () {
+        return yargs('info')
+          .help('info', 'Display info')
+          .wrap(null)
+          .argv
+      })
+      var expected = [
+        'Options:',
+        '  --info  Display info  [boolean]',
+        ''
+      ]
+      option.logs[0].split('\n').should.deep.equal(expected)
+      command.logs[0].split('\n').should.deep.equal(expected)
+    })
+
+    it('enables given string as help option and command with custom description with two string arguments and `true` argument', function () {
+      var option = checkOutput(function () {
+        return yargs('--info')
+          .help('info', 'Display info', true)
+          .wrap(null)
+          .argv
+      })
+      var command = checkOutput(function () {
+        return yargs('info')
+          .help('info', 'Display info', true)
+          .wrap(null)
+          .argv
+      })
+      var expected = [
+        'Options:',
+        '  --info  Display info  [boolean]',
+        ''
+      ]
+      option.logs[0].split('\n').should.deep.equal(expected)
+      command.logs[0].split('\n').should.deep.equal(expected)
+    })
+
+    it('enables given string as help option only and custom description with two string arguments and `false` argument', function () {
+      var option = checkOutput(function () {
+        return yargs('--info')
+          .help('info', 'Display info', false)
+          .wrap(null)
+          .argv
+      })
+      var command = checkOutput(function () {
+        return yargs('info')
+          .help('info', 'Display info', false)
+          .wrap(null)
+          .argv
+      })
+      option.logs[0].split('\n').should.deep.equal([
+        'Options:',
+        '  --info  Display info  [boolean]',
+        ''
+      ])
+      command.result.should.have.property('_').and.deep.equal(['info'])
+    })
+  })
+
+  describe('.help() with .alias()', function () {
+    it('uses multi-char (but not single-char) help alias as command', function () {
+      var info = checkOutput(function () {
+        return yargs('info')
+          .help().alias('h', 'help').alias('h', 'info')
+          .wrap(null)
+          .argv
+      })
+      var h = checkOutput(function () {
+        return yargs('h')
+          .help().alias('h', 'help').alias('h', 'info')
+          .wrap(null)
+          .argv
+      })
+      info.logs[0].split('\n').should.deep.equal([
+        'Options:',
+        '  -h, --help, --info  Show help  [boolean]',
+        ''
+      ])
+      h.result.should.have.property('_').and.deep.equal(['h'])
+    })
+
+    it('uses single-char help alias as command if there are no multi-char aliases', function () {
+      var h = checkOutput(function () {
+        return yargs('h')
+          .help('h').alias('h', '?')
+          .wrap(null)
+          .argv
+      })
+      var q = checkOutput(function () {
+        return yargs('?')
+          .help('h').alias('h', '?')
+          .wrap(null)
+          .argv
+      })
+      var expected = [
+        'Options:',
+        '  -h, -?  Show help  [boolean]',
+        ''
+      ]
+      h.logs[0].split('\n').should.deep.equal(expected)
+      q.logs[0].split('\n').should.deep.equal(expected)
     })
   })
 })
