@@ -547,6 +547,23 @@ describe('Command', function () {
     })
   })
 
+  // see: https://github.com/yargs/yargs/pull/553
+  it('preserves top-level envPrefix', function () {
+    process.env.FUN_DIP_STICK = 'yummy'
+    process.env.FUN_DIP_POWDER = 'true'
+    yargs('eat')
+      .env('FUN_DIP')
+      .global('stick') // this does not actually need to be global
+      .command('eat', 'Adult supervision recommended', function (yargs) {
+        return yargs.boolean('powder').exitProcess(false)
+      }, function (argv) {
+        argv.should.have.property('powder').and.be.true
+        argv.should.have.property('stick').and.equal('yummy')
+      })
+      .exitProcess(false)
+      .argv
+  })
+
   // addresses https://github.com/yargs/yargs/issues/514.
   it('respects order of positional arguments when matching commands', function () {
     var output = []
