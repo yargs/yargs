@@ -287,27 +287,6 @@ function Yargs (processArgs, cwd, parentRequire) {
     return options.demanded
   }
 
-  var recommendCommands
-  self.recommendCommands = function (value) {
-    if (value === undefined || !!value === true) {
-      recommendCommands = true
-    } else {
-      recommendCommands = false
-    }
-    return self
-  }
-
-  self.recommendCommand = function (cmd, handlerKeys) {
-    if (recommendCommands) {
-      const didyoumean = require('didyoumean')
-      didyoumean.threshold = 0.7
-      const similarCommand = didyoumean(cmd, handlerKeys)
-      if (similarCommand) {
-        console.log(__('Did you mean %s?', similarCommand))
-      }
-    }
-  }
-
   self.requiresArg = function (requiresArgs) {
     options.requiresArg.push.apply(options.requiresArg, [].concat(requiresArgs))
     return self
@@ -646,6 +625,12 @@ function Yargs (processArgs, cwd, parentRequire) {
     return detectLocale
   }
 
+  var recommendCommands
+  self.recommendCommands = function () {
+    recommendCommands = true
+    return self
+  }
+
   self.getUsageInstance = function () {
     return usage
   }
@@ -696,7 +681,6 @@ function Yargs (processArgs, cwd, parentRequire) {
       return argv
     }
 
-<<<<<<< HEAD
     if (argv._.length) {
       // check for helpOpt in argv._ before running commands
       // assumes helpOpt must be valid if useHelpOptAsCommand is true
@@ -727,18 +711,11 @@ function Yargs (processArgs, cwd, parentRequire) {
           setPlaceholderKeys(argv)
           return command.runCommand(cmd, self, parsed)
         }
-=======
-    // if there's a handler associated with a
-    // command defer processing to it.
-    var handlerKeys = command.getCommands()
-    for (var i = 0, cmd; (cmd = argv._[i]) !== undefined; i++) {
-      if (~handlerKeys.indexOf(cmd) && cmd !== completionCommand) {
-        setPlaceholderKeys(argv)
-        return command.runCommand(cmd, self, parsed)
-      } else {
-        self.recommendCommand(cmd, handlerKeys)
->>>>>>> update .recommendCommands() following @nexdrew's review
       }
+
+      // recommend a command if recommendCommands() has
+      // been enabled, and no commands were found to execute
+      if (recommendCommands && argv._.length) validation.recommendCommands(argv._[argv._.length - 1], handlerKeys)
 
       // generate a completion script for adding to ~/.bashrc.
       if (completionCommand && ~argv._.indexOf(completionCommand) && !argv[completion.completionKey]) {

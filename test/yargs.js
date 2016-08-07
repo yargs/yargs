@@ -267,18 +267,7 @@ describe('yargs dsl tests', function () {
           .argv
       })
 
-      r.logs[0].should.match(/Did you mean goat/)
-    })
-
-    it('does not recommend a similar command if a "false" is passed as a parameter', function () {
-      var r = checkOutput(function () {
-        yargs(['boat'])
-          .command('goat')
-          .recommendCommands(false)
-          .argv
-      })
-
-      r.logs.should.be.empty
+      r.errors[1].should.match(/Did you mean goat/)
     })
 
     it('does not recommend a similiar command if no similar command exists', function () {

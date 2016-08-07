@@ -14,7 +14,6 @@
   "dependencies": {
     "cliui": "^3.2.0",
     "decamelize": "^1.1.1",
-    "didyoumean": "^1.2.1",
     "get-caller-file": "^1.0.1",
     "lodash.assign": "^4.0.3",
     "os-locale": "^1.4.0",

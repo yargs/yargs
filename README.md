@@ -1362,12 +1362,11 @@ as a configuration object.
 `cwd` can optionally be provided, the package.json will be read
 from this location.
 
-.recommendCommands(boolean)
+.recommendCommands()
 ---------------------------
 
-If this feature is turned on, yargs will provide suggestions for similiar commands if a command is called
-that wasn't defined in your configuration. By default, this feature is disabled.
-Alternatively, you can also pass no argument to enable this feature.
+Should yargs provide suggestions regarding similar commands if no matching
+command is found?
 
 .require(key, [msg | boolean])
 ------------------------------
