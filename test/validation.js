@@ -135,6 +135,30 @@ describe('validation tests', function () {
         })
         .argv
     })
+
+    it('interprets min relative to command', function () {
+      var failureMsg
+      yargs('lint')
+        .command('lint', 'Lint a file', function (yargs) {
+          yargs.demand(1).fail(function (msg) {
+            failureMsg = msg
+          })
+        })
+        .argv
+      expect(failureMsg).to.equal('Not enough non-option arguments: got 0, need at least 1')
+    })
+
+    it('interprets max relative to command', function () {
+      var failureMsg
+      yargs('lint one.js two.js')
+        .command('lint', 'Lint a file', function (yargs) {
+          yargs.demand(0, 1).fail(function (msg) {
+            failureMsg = msg
+          })
+        })
+        .argv
+      expect(failureMsg).to.equal('Too many non-option arguments: got 2, maximum of 1')
+    })
   })
 
   describe('choices', function () {
