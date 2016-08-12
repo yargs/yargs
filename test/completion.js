@@ -34,7 +34,7 @@ describe('Completion', function () {
           .argv
       })
 
-      r.logs.should.include('foo')
+      // should not suggest foo for completion unless foo is subcommand of apple
       r.logs.should.not.include('apple')
     })
 

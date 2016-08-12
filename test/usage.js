@@ -501,7 +501,7 @@ describe('usage tests', function () {
             try {
               return yargs('test')
                 .fail(function () {
-                  console.log('is not triggered')
+                  console.log('is triggered last')
                 })
                 .exitProcess(false)
                 .wrap(null)
@@ -511,7 +511,7 @@ describe('usage tests', function () {
                       console.log([error.name, error.message])
                     })
                     .exitProcess(false)
-
+                }, function (argv) {
                   throw new Error('foo')
                 })
                 .argv
@@ -519,7 +519,7 @@ describe('usage tests', function () {
 
             }
           })
-          r.logs.should.deep.equal([['Error', 'foo']])
+          r.logs.should.deep.equal([['Error', 'foo'], 'is triggered last'])
           r.should.have.property('exit').and.be.false
         })
       })
