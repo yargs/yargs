@@ -706,16 +706,23 @@ function Yargs (processArgs, cwd, parentRequire) {
       // if there's a handler associated with a
       // command defer processing to it.
       var handlerKeys = command.getCommands()
-      for (var i = 0, cmd; (cmd = argv._[i]) !== undefined; i++) {
-        if (~handlerKeys.indexOf(cmd) && cmd !== completionCommand) {
-          setPlaceholderKeys(argv)
-          return command.runCommand(cmd, self, parsed)
+      if (handlerKeys.length) {
+        var firstUnknownCommand
+        for (var i = 0, cmd; (cmd = argv._[i]) !== undefined; i++) {
+          if (~handlerKeys.indexOf(cmd) && cmd !== completionCommand) {
+            setPlaceholderKeys(argv)
+            return command.runCommand(cmd, self, parsed)
+          } else if (!firstUnknownCommand && cmd !== completionCommand) {
+            firstUnknownCommand = cmd
+          }
+        }
+
+        // recommend a command if recommendCommands() has
+        // been enabled, and no commands were found to execute
+        if (recommendCommands && firstUnknownCommand) {
+          validation.recommendCommands(firstUnknownCommand, handlerKeys)
         }
       }
-
-      // recommend a command if recommendCommands() has
-      // been enabled, and no commands were found to execute
-      if (recommendCommands && argv._.length) validation.recommendCommands(argv._[argv._.length - 1], handlerKeys)
 
       // generate a completion script for adding to ~/.bashrc.
       if (completionCommand && ~argv._.indexOf(completionCommand) && !argv[completion.completionKey]) {
