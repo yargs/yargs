@@ -1,4 +1,4 @@
-yargs
+  yargs
 ========
 
 Yargs be a node.js library fer hearties tryin' ter parse optstrings.
@@ -449,6 +449,49 @@ var argv = require('yargs')
     describe: 'choose a size',
     choices: ['xs', 's', 'm', 'l', 'xl']
   })
+  .argv
+```
+
+<a name="coerce"></a>.coerce(key, fn)
+----------------
+
+Provide a synchronous function to coerce or transform the value(s) given on the
+command line for `key`.
+
+The coercion function should accept one argument, representing the parsed value
+from the command line, and should return a new value or throw an error. The
+returned value will be used as the value for `key` (or one of its aliases) in
+`argv`. If the function throws, the error will be treated as a validation
+failure, delegating to either a custom [`.fail()`](#fail) handler or printing
+the error message in the console.
+
+```js
+var argv = require('yargs')
+  .coerce('file', function (arg) {
+    return require('fs').readFileSync(arg, 'utf8')
+  })
+  .argv
+```
+
+Optionally `.coerce()` can take an object that maps several keys to their
+respective coercion function.
+
+```js
+var argv = require('yargs')
+  .coerce({
+    date: Date.parse,
+    json: JSON.parse
+  })
+  .argv
+```
+
+You can also map the same function to several keys at one time. Just pass an
+array of keys as the first argument to `.coerce()`:
+
+```js
+var path = require('path')
+var argv = require('yargs')
+  .coerce(['src', 'dest'], path.resolve)
   .argv
 ```
 
@@ -1005,7 +1048,7 @@ By default, yargs exits the process when the user passes a help flag, uses the
 `.exitProcess(false)` disables this behavior, enabling further actions after
 yargs have been validated.
 
-.fail(fn)
+<a name="fail"></a>.fail(fn)
 ---------
 
 Method to execute when a failure occurs, rather than printing the failure message.
@@ -1324,6 +1367,7 @@ Valid `opt` keys include:
 - `array`: boolean, interpret option as an array, see [`array()`](#array)
 - `boolean`: boolean, interpret option as a boolean flag, see [`boolean()`](#boolean)
 - `choices`: value or array of values, limit valid option arguments to a predefined set, see [`choices()`](#choices)
+- `coerce`: function, coerce or transform parsed command line values into another value, see [`coerce()`](#coerce)
 - `config`: boolean, interpret option as a path to a JSON config file, see [`config()`](#config)
 - `configParser`: function, provide a custom config parsing function, see [`config()`](#config)
 - `count`: boolean, interpret option as a count of boolean flags, see [`count()`](#count)
