@@ -98,7 +98,7 @@ function Yargs (processArgs, cwd, parentRequire) {
 
     var objectOptions = [
       'narg', 'key', 'alias', 'default', 'defaultDescription',
-      'config', 'choices', 'demanded'
+      'config', 'choices', 'demanded', 'coerce'
     ]
 
     arrayOptions.forEach(function (k) {
@@ -240,6 +240,19 @@ function Yargs (processArgs, cwd, parentRequire) {
       })
     } else {
       options.alias[x] = (options.alias[x] || []).concat(y)
+    }
+    return self
+  }
+
+  self.coerce = function (key, fn) {
+    if (typeof key === 'object' && !Array.isArray(key)) {
+      Object.keys(key).forEach(function (k) {
+        self.coerce(k, key[k])
+      })
+    } else {
+      [].concat(key).forEach(function (k) {
+        options.coerce[k] = fn
+      })
     }
     return self
   }
@@ -403,6 +416,8 @@ function Yargs (processArgs, cwd, parentRequire) {
         self.normalize(key)
       } if ('choices' in opt) {
         self.choices(key, opt.choices)
+      } if ('coerce' in opt) {
+        self.coerce(key, opt.coerce)
       } if ('group' in opt) {
         self.group(key, opt.group)
       } if (opt.global) {

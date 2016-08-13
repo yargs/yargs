@@ -203,6 +203,7 @@ describe('yargs dsl tests', function () {
         .alias('foo', 'bar')
         .string('foo')
         .choices('foo', ['bar', 'baz'])
+        .coerce('foo', function (foo) { return foo + 'bar' })
         .implies('foo', 'snuh')
         .group('foo', 'Group:')
         .strict()
@@ -220,6 +221,7 @@ describe('yargs dsl tests', function () {
         narg: {},
         defaultDescription: {},
         choices: {},
+        coerce: {},
         requiresArg: [],
         skipValidation: [],
         count: [],
@@ -1256,6 +1258,94 @@ describe('yargs dsl tests', function () {
       ]
       h.logs[0].split('\n').should.deep.equal(expected)
       q.logs[0].split('\n').should.deep.equal(expected)
+    })
+  })
+
+  describe('.coerce()', function () {
+    it('supports string and function args (as option key and coerce function)', function () {
+      var argv = yargs(['--file', path.join(__dirname, 'fixtures', 'package.json')])
+        .coerce('file', function (arg) {
+          return JSON.parse(fs.readFileSync(arg, 'utf8'))
+        })
+        .argv
+      expect(argv.file).to.have.property('version').and.equal('9.9.9')
+    })
+
+    it('supports object arg (as map of multiple options)', function () {
+      var argv = yargs('--expand abc --range 1..3')
+        .coerce({
+          expand: function (arg) {
+            return arg.split('')
+          },
+          range: function (arg) {
+            var arr = arg.split('..').map(Number)
+            return { begin: arr[0], end: arr[1] }
+          }
+        })
+        .argv
+      expect(argv.expand).to.deep.equal(['a', 'b', 'c'])
+      expect(argv.range).to.have.property('begin').and.equal(1)
+      expect(argv.range).to.have.property('end').and.equal(3)
+    })
+
+    it('supports array and function args (as option keys and coerce function)', function () {
+      var argv = yargs(['--src', 'in', '--dest', 'out'])
+        .coerce(['src', 'dest'], function (arg) {
+          return path.resolve(arg)
+        })
+        .argv
+      argv.src.should.match(/in/).and.have.length.above(2)
+      argv.dest.should.match(/out/).and.have.length.above(3)
+    })
+
+    it('allows an error to be handled by fail() handler', function () {
+      var msg
+      var err
+      yargs('--json invalid')
+        .coerce('json', function (arg) {
+          return JSON.parse(arg)
+        })
+        .fail(function (m, e) {
+          msg = m
+          err = e
+        })
+        .argv
+      expect(msg).to.match(/Unexpected token i/)
+      expect(err).to.exist
+    })
+
+    it('supports an option alias', function () {
+      var argv = yargs('-d 2016-08-12')
+        .coerce('date', Date.parse)
+        .alias('date', 'd')
+        .argv
+      argv.date.should.equal(1470960000000)
+    })
+
+    it('supports a global option within command', function () {
+      var regex
+      yargs('check --regex x')
+        .global('regex')
+        .coerce('regex', RegExp)
+        .command('check', 'Check something', {}, function (argv) {
+          regex = argv.regex
+        })
+        .argv
+      expect(regex).to.be.an.instanceof(RegExp)
+      regex.toString().should.equal('/x/')
+    })
+
+    it('is supported by .option()', function () {
+      var argv = yargs('--env SHELL=/bin/bash')
+        .option('env', {
+          coerce: function (arg) {
+            var arr = arg.split('=')
+            return { name: arr[0], value: arr[1] || '' }
+          }
+        })
+        .argv
+      expect(argv.env).to.have.property('name').and.equal('SHELL')
+      expect(argv.env).to.have.property('value').and.equal('/bin/bash')
     })
   })
 })
