@@ -1347,6 +1347,50 @@ describe('yargs dsl tests', function () {
       expect(argv.env).to.have.property('name').and.equal('SHELL')
       expect(argv.env).to.have.property('value').and.equal('/bin/bash')
     })
+
+    it('supports positional and variadic args for a command', function () {
+      var age
+      var dates
+      yargs('add 30days 2016-06-13 2016-07-18')
+        .command('add <age> [dates..]', 'Testing', function (yargs) {
+          return yargs
+            .coerce('age', function (arg) {
+              return parseInt(arg, 10) * 86400000
+            })
+            .coerce('dates', function (arg) {
+              return arg.map(function (str) {
+                return new Date(str)
+              })
+            })
+        }, function (argv) {
+          age = argv.age
+          dates = argv.dates
+        })
+        .argv
+      expect(age).to.equal(2592000000)
+      expect(dates).to.have.lengthOf(2)
+      dates[0].toString().should.equal(new Date('2016-06-13').toString())
+      dates[1].toString().should.equal(new Date('2016-07-18').toString())
+    })
+
+    it('allows an error from positional arg to be handled by fail() handler', function () {
+      var msg
+      var err
+      yargs('throw ball')
+        .command('throw <msg>', false, function (yargs) {
+          return yargs
+            .coerce('msg', function (arg) {
+              throw new Error(arg)
+            })
+            .fail(function (m, e) {
+              msg = m
+              err = e
+            })
+        })
+        .argv
+      expect(msg).to.equal('ball')
+      expect(err).to.exist
+    })
   })
 })
 
