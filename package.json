@@ -36,7 +36,7 @@
     "es6-promise": "^3.0.2",
     "hashish": "0.0.4",
     "mocha": "^3.0.1",
-    "nyc": "^7.0.0",
+    "nyc": "^8.0.0",
     "rimraf": "^2.5.0",
     "standard": "^7.0.0",
     "standard-version": "^2.2.1",
