@@ -6,12 +6,12 @@ Yargs be a node.js library fer hearties tryin' ter parse optstrings.
 With yargs, ye be havin' a map that leads straight to yer treasure! Treasure of course, being a simple option hash.
 
 [![Build Status][travis-image]][travis-url]
-[![Dependency Status][gemnasium-image]][gemnasium-url]
 [![Coverage Status][coveralls-image]][coveralls-url]
 [![NPM version][npm-image]][npm-url]
 [![Windows Tests][windows-image]][windows-url]
 [![js-standard-style][standard-image]][standard-url]
 [![standard-version][standard-version-image]][standard-version-url]
+[![Gitter][gitter-image]][gitter-url]
 
 > Yargs is the official successor to optimist. Please feel free to submit issues and pull requests. If you'd like to contribute and don't know where to start, have a look at [the issue list](https://github.com/yargs/yargs/issues) :)
 
@@ -1725,8 +1725,6 @@ This module is loosely inspired by Perl's
 
 [travis-url]: https://travis-ci.org/yargs/yargs
 [travis-image]: https://img.shields.io/travis/yargs/yargs/master.svg
-[gemnasium-url]: https://gemnasium.com/yargs/yargs
-[gemnasium-image]: https://img.shields.io/gemnasium/yargs/yargs.svg
 [coveralls-url]: https://coveralls.io/github/yargs/yargs
 [coveralls-image]: https://img.shields.io/coveralls/yargs/yargs.svg
 [npm-url]: https://www.npmjs.com/package/yargs
@@ -1737,3 +1735,5 @@ This module is loosely inspired by Perl's
 [standard-url]: http://standardjs.com/
 [standard-version-image]: https://img.shields.io/badge/release-standard%20version-brightgreen.svg
 [standard-version-url]: https://github.com/conventional-changelog/standard-version
+[gitter-image]: https://img.shields.io/gitter/room/nwjs/nw.js.svg?maxAge=2592000
+[gitter-url]: https://gitter.im/yargs/Lobby?utm_source=share-link&utm_medium=link&utm_campaign=share-link
