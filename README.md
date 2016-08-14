@@ -1406,6 +1406,12 @@ as a configuration object.
 `cwd` can optionally be provided, the package.json will be read
 from this location.
 
+.recommendCommands()
+---------------------------
+
+Should yargs provide suggestions regarding similar commands if no matching
+command is found?
+
 .require(key, [msg | boolean])
 ------------------------------
 .required(key, [msg | boolean])

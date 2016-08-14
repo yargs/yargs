@@ -640,6 +640,12 @@ function Yargs (processArgs, cwd, parentRequire) {
     return detectLocale
   }
 
+  var recommendCommands
+  self.recommendCommands = function () {
+    recommendCommands = true
+    return self
+  }
+
   self.getUsageInstance = function () {
     return usage
   }
@@ -715,10 +721,21 @@ function Yargs (processArgs, cwd, parentRequire) {
       // if there's a handler associated with a
       // command defer processing to it.
       var handlerKeys = command.getCommands()
-      for (var i = 0, cmd; (cmd = argv._[i]) !== undefined; i++) {
-        if (~handlerKeys.indexOf(cmd) && cmd !== completionCommand) {
-          setPlaceholderKeys(argv)
-          return command.runCommand(cmd, self, parsed)
+      if (handlerKeys.length) {
+        var firstUnknownCommand
+        for (var i = 0, cmd; (cmd = argv._[i]) !== undefined; i++) {
+          if (~handlerKeys.indexOf(cmd) && cmd !== completionCommand) {
+            setPlaceholderKeys(argv)
+            return command.runCommand(cmd, self, parsed)
+          } else if (!firstUnknownCommand && cmd !== completionCommand) {
+            firstUnknownCommand = cmd
+          }
+        }
+
+        // recommend a command if recommendCommands() has
+        // been enabled, and no commands were found to execute
+        if (recommendCommands && firstUnknownCommand) {
+          validation.recommendCommands(firstUnknownCommand, handlerKeys)
         }
       }
 

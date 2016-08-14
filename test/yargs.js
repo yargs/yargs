@@ -261,6 +261,40 @@ describe('yargs dsl tests', function () {
         .argv
     })
 
+    it('recommends a similar command if no command handler is found', function () {
+      var r = checkOutput(function () {
+        yargs(['boat'])
+          .command('goat')
+          .recommendCommands()
+          .argv
+      })
+
+      r.errors[1].should.match(/Did you mean goat/)
+    })
+
+    it('does not recommend a similiar command if no similar command exists', function () {
+      var r = checkOutput(function () {
+        yargs(['foo'])
+          .command('nothingSimilar')
+          .recommendCommands()
+          .argv
+      })
+
+      r.logs.should.be.empty
+    })
+
+    it('recommends the longest match first', function () {
+      var r = checkOutput(function () {
+        yargs(['boat'])
+          .command('bot')
+          .command('goat')
+          .recommendCommands()
+          .argv
+      })
+
+      r.errors[1].should.match(/Did you mean goat/)
+    })
+
     it("skips executing top-level command if builder's help is executed", function () {
       var r = checkOutput(function () {
         yargs(['blerg', '-h'])
