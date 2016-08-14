@@ -1,5 +1,4 @@
 const assert = require('assert')
-const assign = require('lodash.assign')
 const Command = require('./lib/command')
 const Completion = require('./lib/completion')
 const Parser = require('yargs-parser')
@@ -7,7 +6,6 @@ const path = require('path')
 const Usage = require('./lib/usage')
 const Validation = require('./lib/validation')
 const Y18n = require('y18n')
-const requireMainFilename = require('require-main-filename')
 const objFilter = require('./lib/obj-filter')
 const setBlocking = require('set-blocking')
 
@@ -377,7 +375,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     var obj = {}
     try {
       obj = readPkgUp.sync({
-        cwd: path || requireMainFilename(parentRequire || require)
+        cwd: path || require('require-main-filename')(parentRequire || require)
       })
     } catch (noop) {}
 
@@ -475,7 +473,7 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
   self.getGroups = function () {
     // combine explicit and preserved groups. explicit groups should be first
-    return assign({}, groups, preservedGroups)
+    return require('lodash.assign')({}, groups, preservedGroups)
   }
 
   // as long as options.envPrefix is not undefined,
