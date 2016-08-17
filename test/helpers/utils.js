@@ -40,11 +40,16 @@ exports.checkOutput = function (f, argv, cb) {
 
     f()
   } else {
-    result = f()
+    try {
+      result = f()
+    } finally {
+      reset()
+    }
+
     return done()
   }
 
-  function done () {
+  function reset () {
     process.exit = _exit
     process.emit = _emit
     process.env = _env
@@ -52,6 +57,10 @@ exports.checkOutput = function (f, argv, cb) {
 
     console.error = _error
     console.log = _log
+  }
+
+  function done () {
+    reset()
 
     return {
       errors: errors,
