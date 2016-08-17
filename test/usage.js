@@ -1258,6 +1258,10 @@ describe('usage tests', function () {
     })
 
     it('should wrap based on window-size if no wrap is provided', function () {
+      if (!process.stdout.isTTY) {
+        return this.skip()
+      }
+
       var width = require('window-size').width
 
       var r = checkUsage(function () {

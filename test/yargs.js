@@ -431,6 +431,10 @@ describe('yargs dsl tests', function () {
 
   describe('terminalWidth', function () {
     it('returns the maximum width of the terminal', function () {
+      if (!process.stdout.isTTY) {
+        return this.skip()
+      }
+
       yargs.terminalWidth().should.be.gte(0)
     })
   })
