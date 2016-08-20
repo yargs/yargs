@@ -621,4 +621,19 @@ describe('Command', function () {
       .argv
     argv.should.have.property('someone').and.equal('Leslie')
   })
+
+  // addresses https://github.com/yargs/yargs/issues/540
+  it('ignores extra spaces in command string', function () {
+    var y = yargs([])
+      .command('foo  [awesome]', 'my awesome command', function (yargs) {
+        return yargs
+      })
+    var command = y.getCommandInstance()
+    var handlers = command.getCommandHandlers()
+    handlers.foo.demanded.should.not.include({
+      cmd: '',
+      variadic: false
+    })
+    handlers.foo.demanded.should.have.lengthOf(0)
+  })
 })
