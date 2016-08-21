@@ -836,7 +836,9 @@ var argv = require('yargs')
 
 Tells the parser that if the option specified by `key` is passed in, it
 should be interpreted as a path to a JSON config file. The file is loaded
-and parsed, and its properties are set as arguments.
+and parsed, and its properties are set as arguments. Because the file is
+loaded using Node's require(), the filename MUST end in `.json` to be
+interpreted correctly.
 
 If invoked without parameters, `.config()` will make `--config` the option to pass the JSON config file.
 
