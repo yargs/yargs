@@ -1041,6 +1041,20 @@ describe('yargs dsl tests', function () {
           .argv
       argv.koala.should.equal(true)
     })
+
+    it('allows having an option that skips validation but not skipping validation if that option is not used', function () {
+      var skippedValidation = true
+      yargs(['--no-skip'])
+          .demand(5)
+          .option('skip', {
+            skipValidation: true
+          })
+          .fail(function (msg) {
+            skippedValidation = false
+          })
+          .argv
+      expect(skippedValidation).to.equal(false)
+    })
   })
 
   describe('.help()', function () {
