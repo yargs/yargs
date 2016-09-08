@@ -404,39 +404,69 @@ function Yargs (processArgs, cwd, parentRequire) {
 
       if (demand) {
         self.demand(key, demand)
-      } if ('config' in opt) {
+      }
+
+      if ('config' in opt) {
         self.config(key, opt.configParser)
-      } if ('default' in opt) {
+      }
+
+      if ('default' in opt) {
         self.default(key, opt.default)
-      } if ('nargs' in opt) {
+      }
+
+      if ('nargs' in opt) {
         self.nargs(key, opt.nargs)
-      } if ('normalize' in opt) {
+      }
+
+      if ('normalize' in opt) {
         self.normalize(key)
-      } if ('choices' in opt) {
+      }
+
+      if ('choices' in opt) {
         self.choices(key, opt.choices)
-      } if ('coerce' in opt) {
+      }
+
+      if ('coerce' in opt) {
         self.coerce(key, opt.coerce)
-      } if ('group' in opt) {
+      }
+
+      if ('group' in opt) {
         self.group(key, opt.group)
-      } if (opt.global) {
+      }
+
+      if (opt.global) {
         self.global(key)
-      } if (opt.boolean || opt.type === 'boolean') {
+      }
+
+      if (opt.boolean || opt.type === 'boolean') {
         self.boolean(key)
         if (opt.alias) self.boolean(opt.alias)
-      } if (opt.array || opt.type === 'array') {
+      }
+
+      if (opt.array || opt.type === 'array') {
         self.array(key)
         if (opt.alias) self.array(opt.alias)
-      } if (opt.number || opt.type === 'number') {
+      }
+
+      if (opt.number || opt.type === 'number') {
         self.number(key)
         if (opt.alias) self.number(opt.alias)
-      } if (opt.string || opt.type === 'string') {
+      }
+
+      if (opt.string || opt.type === 'string') {
         self.string(key)
         if (opt.alias) self.string(opt.alias)
-      } if (opt.count || opt.type === 'count') {
+      }
+
+      if (opt.count || opt.type === 'count') {
         self.count(key)
-      } if (opt.defaultDescription) {
+      }
+
+      if (opt.defaultDescription) {
         options.defaultDescription[key] = opt.defaultDescription
-      } if (opt.skipValidation) {
+      }
+
+      if (opt.skipValidation) {
         self.skipValidation(key)
       }
 
