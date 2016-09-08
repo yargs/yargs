@@ -20,13 +20,10 @@ test_script:
   # Output useful info for debugging.
   - node --version
   - npm --version
-  # We test multiple Windows shells
-  - ps: "npm t # PowerShell" # Pass comment to PS for easier debugging
   - cmd: npm t
 
 os:
   - Default Azure
-  - Windows Server 2012 R2
 
 # Don't actually build using MSBuild
 build: off
