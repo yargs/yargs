@@ -25,7 +25,6 @@ test_script:
 
 os:
   - Default Azure
-  - Windows Server 2012 R2
 
 # Don't actually build using MSBuild
 build: off
