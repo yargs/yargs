@@ -1082,8 +1082,8 @@ For example:
 
 ```js
 require('yargs')
-  .option('foobar', {})
-  .option('foobaz', {})
+  .option('foobar')
+  .option('foobaz')
   .completion()
   .getCompletion(['./test.js', '--foo'], function (completions) {
     console.log(completions)
@@ -1310,13 +1310,14 @@ var argv = require('yargs')
   .argv
 ```
 
-.option(key, opt)
+.option(key, [opt])
 -----------------
-.options(key, opt)
+.options(key, [opt])
 ------------------
 
-Instead of chaining together `.alias().demand().default().describe().string()`, you can specify
-keys in `opt` for each of the chainable methods.
+This method can be used to make yargs aware of options that _could_
+exist. You can also pass an `opt` object which can hold further
+customization, like `.alias()`, `.demand()` etc. for that option.
 
 For example:
 

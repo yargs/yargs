@@ -124,6 +124,16 @@ describe('yargs dsl tests', function () {
     })
   })
 
+  it('should not require config object for an option', function () {
+    var r = checkOutput(function () {
+      return yargs([])
+        .option('x')
+        .argv
+    })
+
+    expect(r.errors).to.deep.equal([])
+  })
+
   describe('showHelpOnFail', function () {
     it('should display custom failure message, if string is provided as first argument', function () {
       var r = checkOutput(function () {

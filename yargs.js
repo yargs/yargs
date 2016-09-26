@@ -1,4 +1,3 @@
-const assert = require('assert')
 const Command = require('./lib/command')
 const Completion = require('./lib/completion')
 const Parser = require('yargs-parser')
@@ -394,7 +393,9 @@ function Yargs (processArgs, cwd, parentRequire) {
         self.options(k, key[k])
       })
     } else {
-      assert(typeof opt === 'object', 'second argument to option must be an object')
+      if (typeof opt !== 'object') {
+        opt = {}
+      }
 
       options.key[key] = true // track manually set keys.
 
