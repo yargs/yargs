@@ -463,7 +463,8 @@ from the command line, and should return a new value or throw an error. The
 returned value will be used as the value for `key` (or one of its aliases) in
 `argv`. If the function throws, the error will be treated as a validation
 failure, delegating to either a custom [`.fail()`](#fail) handler or printing
-the error message in the console.
+the error message in the console. Coercion will be applied to a value after
+all other modifications, such as [`.normalize()`](#normalize).
 
 ```js
 var argv = require('yargs')
@@ -492,6 +493,22 @@ array of keys as the first argument to `.coerce()`:
 var path = require('path')
 var argv = require('yargs')
   .coerce(['src', 'dest'], path.resolve)
+  .argv
+```
+
+If you have a `dot-option`, so an option with children (eg: `user.email`
+and `user.password` etc...), coercion will happen once for the main object,
+where you can also apply changes to children:
+
+```js
+// --user.name Batman --user.password 123
+var argv = require('yargs')
+  .option('user')
+
+  .coerce('user', opt => {
+    opt.name = opt.name.toUpperCase()
+    return opt
+  })
   .argv
 ```
 
