@@ -25,7 +25,7 @@
     "which-module": "^1.0.0",
     "window-size": "^0.2.0",
     "y18n": "^3.2.1",
-    "yargs-parser": "^3.2.0"
+    "yargs-parser": "^4.0.0"
   },
   "devDependencies": {
     "chai": "^3.4.1",
