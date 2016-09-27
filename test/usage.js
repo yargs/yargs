@@ -473,6 +473,31 @@ describe('usage tests', function () {
         r.logs.should.deep.equal(['foo'])
         r.should.have.property('exit').and.be.false
       })
+
+      it('gives the ability to log a per-command error message if failure occurs in a command', function () {
+        var r = checkUsage(function () {
+          try {
+            return yargs
+              .command('foo', 'desc', {
+                bar: {
+                  describe: 'bar command'
+                }
+              }, function (argv) {
+                throw new Error('blah')
+              })
+              .fail(function (message, error, yargs) {
+                console.log(yargs.help())
+              })
+              .exitProcess(false)
+              .wrap(null)
+              .argv
+          } catch (e) {
+          }
+        }, 'foo')
+
+        r.logs[0].should.contain('bar command')
+      })
+
       describe('when check() throws error', function () {
         it('fail() is called with the original error object as the second parameter', function () {
           var r = checkUsage(function () {
