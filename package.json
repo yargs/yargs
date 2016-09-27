@@ -33,7 +33,7 @@
     "coveralls": "^2.11.11",
     "cpr": "^2.0.0",
     "cross-spawn": "^4.0.0",
-    "es6-promise": "^3.0.2",
+    "es6-promise": "^4.0.1",
     "hashish": "0.0.4",
     "mocha": "^3.0.1",
     "nyc": "^8.1.0",
