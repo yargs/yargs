@@ -1439,6 +1439,29 @@ describe('yargs dsl tests', function () {
       expect(msg).to.equal('ball')
       expect(err).to.exist
     })
+
+    it('should save & reuse raw options', function () {
+      var opts = {
+        looks: {
+          choices: ['good', 'bad']
+        },
+        foo: {},
+        bar: {
+          number: true
+        }
+      }
+      var gotOptions = yargs('component')
+        .option('looks', opts.looks)
+        .option('foo')
+        .option({
+          bar: {
+            number: true
+          }
+        })
+        .getRawOptions()
+      expect(gotOptions).to.deep.equal(opts)
+      expect(yargs('reuse').options(gotOptions).getRawOptions()).to.deep.equal(opts)
+    })
   })
 })
 
