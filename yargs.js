@@ -504,7 +504,7 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
   self.getGroups = function () {
     // combine explicit and preserved groups. explicit groups should be first
-    return require('lodash.assign')({}, groups, preservedGroups)
+    return require('./lib/assign')(groups, preservedGroups)
   }
 
   // as long as options.envPrefix is not undefined,
