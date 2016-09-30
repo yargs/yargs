@@ -2,6 +2,45 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="6.0.0"></a>
+# [6.0.0](https://github.com/yargs/yargs/compare/v5.0.0...v6.0.0) (2016-09-30)
+
+
+### Bug Fixes
+
+* changed parsing of the command string to ignore extra spaces ([#600](https://github.com/yargs/yargs/issues/600)) ([e8e5a72](https://github.com/yargs/yargs/commit/e8e5a72))
+* drop lodash.assign ([#641](https://github.com/yargs/yargs/issues/641)) ([ad3146f](https://github.com/yargs/yargs/commit/ad3146f))
+* for args that have skipValidation set to `true`, check if the parsed arg is `true` ([#619](https://github.com/yargs/yargs/issues/619)) ([658a34c](https://github.com/yargs/yargs/commit/658a34c))
+* upgrade standard, and fix appveyor config so that it works with newest standard ([#607](https://github.com/yargs/yargs/issues/607)) ([c301f42](https://github.com/yargs/yargs/commit/c301f42))
+
+
+### Chores
+
+* upgrade yargs-parser ([#633](https://github.com/yargs/yargs/issues/633)) ([cc1224e](https://github.com/yargs/yargs/commit/cc1224e))
+
+
+### Features
+
+* make opts object optional for .option() ([#624](https://github.com/yargs/yargs/issues/624)) ([4f29de6](https://github.com/yargs/yargs/commit/4f29de6))
+
+
+### Performance Improvements
+
+* defer windowWidth() to improve perf for non-help usage ([#610](https://github.com/yargs/yargs/issues/610)) ([cbc3636](https://github.com/yargs/yargs/commit/cbc3636))
+
+
+### BREAKING CHANGES
+
+* coerce is now applied as a final step after other parsing is complete
+
+* add documentation for breaking changes in yargs-parser@4
+
+* fix: a few small editing nits
+
+* fix: bump yargs-parser again
+
+
+
 <a name="5.0.0"></a>
 # [5.0.0](https://github.com/yargs/yargs/compare/v4.8.1...v5.0.0) (2016-08-14)
 
