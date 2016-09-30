@@ -461,9 +461,16 @@ command line for `key`.
 The coercion function should accept one argument, representing the parsed value
 from the command line, and should return a new value or throw an error. The
 returned value will be used as the value for `key` (or one of its aliases) in
-`argv`. If the function throws, the error will be treated as a validation
+`argv`.
+
+If the function throws, the error will be treated as a validation
 failure, delegating to either a custom [`.fail()`](#fail) handler or printing
 the error message in the console.
+
+Coercion will be applied to a value after
+all other modifications, such as [`.normalize()`](#normalize).
+
+_Examples:_
 
 ```js
 var argv = require('yargs')
@@ -492,6 +499,22 @@ array of keys as the first argument to `.coerce()`:
 var path = require('path')
 var argv = require('yargs')
   .coerce(['src', 'dest'], path.resolve)
+  .argv
+```
+
+If you are using dot-notion or arrays, .e.g., `user.email` and `user.password`,
+coercion will be applied to the final object that has been parsed:
+
+```js
+// --user.name Batman --user.password 123
+// gives us: {name: 'batman', password: '[SECRET]'}
+var argv = require('yargs')
+  .option('user')
+  .coerce('user', opt => {
+    opt.name = opt.name.toLowerCase()
+    opt.password = '[SECRET]'
+    return opt
+  })
   .argv
 ```
 
