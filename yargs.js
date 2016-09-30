@@ -824,7 +824,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     // Check if any of the options to skip validation were provided
     if (!skipValidation && options.skipValidation.length > 0) {
       skipValidation = Object.keys(argv).some(function (key) {
-        return options.skipValidation.indexOf(key) >= 0
+        return options.skipValidation.indexOf(key) >= 0 && argv[key] === true
       })
     }
 
