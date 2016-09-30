@@ -70,5 +70,10 @@
   "license": "MIT",
   "engine": {
     "node": ">=0.10"
+  },
+  "greenkeeper": {
+    "ignore": [
+      "string-width"
+    ]
   }
 }
