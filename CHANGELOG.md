@@ -33,12 +33,6 @@ All notable changes to this project will be documented in this file. See [standa
 
 * coerce is now applied as a final step after other parsing is complete
 
-* add documentation for breaking changes in yargs-parser@4
-
-* fix: a few small editing nits
-
-* fix: bump yargs-parser again
-
 
 
 <a name="5.0.0"></a>
@@ -72,7 +66,7 @@ All notable changes to this project will be documented in this file. See [standa
 
 * fail is now applied globally.
 * we now default to an empty builder function when command is executed with no builder.
-* yargs-parser now better handles negative integer values, at the cost of handling numeric option names, e.g., -1 hello 
+* yargs-parser now better handles negative integer values, at the cost of handling numeric option names, e.g., -1 hello
 * default: removed undocumented `defaults` alias for `default`.
 * introduces a default `help` command which outputs help, as an alternative to a help flag.
 
