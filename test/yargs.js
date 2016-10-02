@@ -1494,4 +1494,49 @@ describe('yargs context', function () {
       .argv
     context.commands.should.deep.equal([])
   })
+
+  describe('exit', function () {
+    it('delegates to custom exit when printing completion script', function () {
+      var completionScript = null
+      var argv = yargs('completion')
+        .completion()
+        .logger({
+          log: function (_completionScript) {
+            completionScript = _completionScript
+          }
+        })
+        .exit(function (code, argv) {
+          code.should.equal(0)
+          completionScript.should.match(/yargs command completion script/)
+        })
+        .argv
+
+      argv._.should.include('completion')
+    })
+
+    it('delegates to custom exit when making completion suggestions', function (done) {
+      var completions = ''
+      var argv = yargs(['--get-yargs-completions'])
+        .completion('completion', function (current, argv) {
+          return new Promise(function (resolve, reject) {
+            setTimeout(function () {
+              resolve(['apple', 'banana'])
+            }, 10)
+          })
+        })
+        .logger({
+          log: function (completion) {
+            completions += completion
+          }
+        })
+        .exit(function (code) {
+          completions.should.match(/apple/)
+          completions.should.match(/banana/)
+          code.should.equal(0)
+          return done()
+        })
+        .argv
+      argv.getYargsCompletions.should.equal(true)
+    })
+  })
 })
