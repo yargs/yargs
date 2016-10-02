@@ -1,4 +1,4 @@
-/* global describe, it, beforeEach */
+/* global context, describe, it, beforeEach */
 
 var expect = require('chai').expect
 var fs = require('fs')
@@ -1495,7 +1495,7 @@ describe('yargs context', function () {
     context.commands.should.deep.equal([])
   })
 
-  describe('exit', function () {
+  context('override exit', function () {
     it('delegates to custom exit when printing completion script', function (done) {
       var completionScript = null
       var argv = yargs('completion')
@@ -1557,6 +1557,58 @@ describe('yargs context', function () {
         .argv
 
       argv.help.should.equal(true)
+    })
+
+    describe('commands', function () {
+      it('handles top-level command appropriately', function (done) {
+        var helpMsg = null
+        var argv = yargs('help')
+          .command('cool', 'my cool command', function (yargs) {
+            yargs.option('opt', {
+              describe: 'my cool option'
+            }).help()
+          }, function () {})
+          .logger({
+            log: function (_helpMsg) {
+              helpMsg = _helpMsg
+            }
+          })
+          .help()
+          .exit(function (code) {
+            code.should.equal(0)
+            helpMsg.should.not.match(/my cool option/)
+            process.nextTick(done)
+          })
+          .argv
+
+        argv.help.should.equal(true)
+        argv._.length.should.equal(0)
+      })
+
+      it('handles sub-command appropriately', function (done) {
+        var helpMsg = null
+        var argv = yargs('cool help')
+          .command('cool', 'my cool command', function (yargs) {
+            yargs.option('opt', {
+              describe: 'my cool option'
+            }).help()
+          }, function () {})
+          .logger({
+            log: function (_helpMsg) {
+              helpMsg = _helpMsg
+            }
+          })
+          .help()
+          .exit(function (code) {
+            code.should.equal(0)
+            helpMsg.should.match(/my cool option/)
+            process.nextTick(done)
+          })
+          .argv
+
+        argv.help.should.equal(true)
+        argv._.should.include('cool')
+      })
     })
   })
 })
