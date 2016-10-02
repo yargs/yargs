@@ -675,10 +675,24 @@ function Yargs (processArgs, cwd, parentRequire) {
     return self
   }
 
+  self.getExitInstance = function () {
+    return exitFn
+  }
+
+  const ExitEarly = Error('exited early')
+  function exitEarly (code) {
+    ExitEarly.code = code
+    throw ExitEarly
+  }
+
   var logger = console
   self.logger = function (_logger) {
     logger = _logger
     return self
+  }
+
+  self.getLoggerInstance = function () {
+    return logger
   }
 
   var recommendCommands
@@ -866,12 +880,6 @@ function Yargs (processArgs, cwd, parentRequire) {
     }
 
     return setPlaceholderKeys(argv)
-  }
-
-  const ExitEarly = Error('exited early')
-  function exitEarly (code) {
-    ExitEarly.code = code
-    throw ExitEarly
   }
 
   function guessLocale () {

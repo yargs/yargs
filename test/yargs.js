@@ -1496,7 +1496,7 @@ describe('yargs context', function () {
   })
 
   describe('exit', function () {
-    it('delegates to custom exit when printing completion script', function () {
+    it('delegates to custom exit when printing completion script', function (done) {
       var completionScript = null
       var argv = yargs('completion')
         .completion()
@@ -1505,9 +1505,10 @@ describe('yargs context', function () {
             completionScript = _completionScript
           }
         })
-        .exit(function (code, argv) {
+        .exit(function (code) {
           code.should.equal(0)
           completionScript.should.match(/yargs command completion script/)
+          process.nextTick(done)
         })
         .argv
 
@@ -1537,6 +1538,25 @@ describe('yargs context', function () {
         })
         .argv
       argv.getYargsCompletions.should.equal(true)
+    })
+
+    it('delegates to custom exit when help is shown', function (done) {
+      var helpMsg = null
+      var argv = yargs('help')
+        .logger({
+          log: function (_helpMsg) {
+            helpMsg = _helpMsg
+          }
+        })
+        .exit(function (code) {
+          code.should.equal(0)
+          helpMsg.should.match(/Show help/)
+          process.nextTick(done)
+        })
+        .help()
+        .argv
+
+      argv.help.should.equal(true)
     })
   })
 })
