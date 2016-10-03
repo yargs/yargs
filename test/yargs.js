@@ -1610,5 +1610,62 @@ describe('yargs context', function () {
         argv._.should.include('cool')
       })
     })
+
+    describe('validation', function () {
+      it('calls exit handler when validation triggers', function (done) {
+        var out = ''
+        yargs('')
+          .demand(3)
+          .logger({
+            error: function (msg) {
+              out += msg
+            }
+          })
+          .exit(function (code) {
+            code.should.equal(1)
+            out.should.match(/Not enough non-option argument/)
+            process.nextTick(done)
+          })
+          .argv
+      })
+
+      it('calls exit handler when a custom check throws an exception', function (done) {
+        var out = ''
+        yargs('--batman true')
+          .check(function (argv, opts) {
+            throw Error('why u no')
+          })
+          .logger({
+            error: function (msg) {
+              out += msg
+            }
+          })
+          .exit(function (code) {
+            code.should.equal(1)
+            out.should.equal('why u no')
+            process.nextTick(done)
+          })
+          .argv
+      })
+
+      it('calls exit handler when a custom check returns en error', function (done) {
+        var out = ''
+        yargs('--batman true')
+          .check(function (argv, opts) {
+            return Error('why u no')
+          })
+          .logger({
+            error: function (msg) {
+              out += msg
+            }
+          })
+          .exit(function (code) {
+            code.should.equal(1)
+            out.should.match(/why u no/)
+            process.nextTick(done)
+          })
+          .argv
+      })
+    })
   })
 })
