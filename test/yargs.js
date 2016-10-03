@@ -1495,7 +1495,7 @@ describe('yargs context', function () {
     context.commands.should.deep.equal([])
   })
 
-  context('override exit', function () {
+  context('custom exit handler', function () {
     it('delegates to custom exit when printing completion script', function (done) {
       var completionScript = null
       var argv = yargs('completion')
@@ -1559,6 +1559,34 @@ describe('yargs context', function () {
       argv.help.should.equal(true)
     })
 
+    it('invokes custom exit handler after argv is parsed', function (done) {
+      var out = ''
+      var argv = yargs('--batman')
+        .exit(function (code) {
+          code.should.equal(1)
+          out.should.match(/Not enough non-option arguments/)
+          argv.batman.should.equal(true)
+          return done()
+        })
+        .logger({
+          error: function (_out) {
+            out += _out
+          }
+        })
+        .demand(2)
+        .argv
+    })
+
+    it('invokes custom exit handler if yargs exits normally', function (done) {
+      var argv = yargs('--batman')
+        .exit(function (code) {
+          code.should.equal(0)
+          argv.batman.should.equal(true)
+          return done()
+        })
+        .argv
+    })
+
     describe('commands', function () {
       it('handles top-level command appropriately', function (done) {
         var helpMsg = null
@@ -1612,7 +1640,7 @@ describe('yargs context', function () {
     })
 
     describe('validation', function () {
-      it('calls exit handler when validation triggers', function (done) {
+      it('calls custom exit when validation triggers', function (done) {
         var out = ''
         yargs('')
           .demand(3)
@@ -1629,7 +1657,7 @@ describe('yargs context', function () {
           .argv
       })
 
-      it('calls exit handler when a custom check throws an exception', function (done) {
+      it('calls custom exit when a custom check throws an exception', function (done) {
         var out = ''
         yargs('--batman true')
           .check(function (argv, opts) {
@@ -1648,7 +1676,7 @@ describe('yargs context', function () {
           .argv
       })
 
-      it('calls exit handler when a custom check returns en error', function (done) {
+      it('calls custom exit when a custom check returns en error', function (done) {
         var out = ''
         yargs('--batman true')
           .check(function (argv, opts) {

@@ -123,6 +123,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     exitProcess = true
     strict = false
     completionCommand = null
+    exiting = false
     self.parsed = false
 
     return self
@@ -669,9 +670,19 @@ function Yargs (processArgs, cwd, parentRequire) {
     return detectLocale
   }
 
-  var exitFn = process.exit.bind(process)
+  var exitFn = process.exit
+  var exiting = false
   self.exit = function (fn) {
-    exitFn = fn
+    // if a custom exit handler is provided we emit
+    // the event on the next tick of the event loop, giving
+    // the handler access to the parsed argv.
+    exitFn = function (code) {
+      if (exiting) return
+      exiting = true
+      process.nextTick(function () {
+        fn(code)
+      })
+    }
     return self
   }
 
@@ -879,6 +890,9 @@ function Yargs (processArgs, cwd, parentRequire) {
       else throw e
     }
 
+    // if a custom exit handler has been provided,
+    // for API consistency always trigger it.
+    if (exitFn !== process.exit) exitFn(0)
     return setPlaceholderKeys(argv)
   }
 
