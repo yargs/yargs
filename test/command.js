@@ -143,10 +143,11 @@ describe('Command', function () {
     it('accepts string, string as first 2 arguments', function () {
       var cmd = 'foo'
       var desc = 'i\'m not feeling very creative at the moment'
+      var aliases = []
 
       var y = yargs([]).command(cmd, desc)
       var commands = y.getUsageInstance().getCommands()
-      commands[0].should.deep.equal([cmd, desc])
+      commands[0].should.deep.equal([cmd, desc, aliases])
     })
 
     it('accepts string, boolean as first 2 arguments', function () {
@@ -221,6 +222,7 @@ describe('Command', function () {
         builder: function (yargs) { return yargs },
         handler: function (argv) {}
       }
+      var aliases = []
 
       var y = yargs([]).command(module)
       var handlers = y.getCommandInstance().getCommandHandlers()
@@ -228,7 +230,7 @@ describe('Command', function () {
       handlers.foo.builder.should.equal(module.builder)
       handlers.foo.handler.should.equal(module.handler)
       var commands = y.getUsageInstance().getCommands()
-      commands[0].should.deep.equal([module.command, module.describe])
+      commands[0].should.deep.equal([module.command, module.describe, aliases])
     })
 
     it('accepts module (description key, builder function) as 1st argument', function () {
@@ -238,6 +240,7 @@ describe('Command', function () {
         builder: function (yargs) { return yargs },
         handler: function (argv) {}
       }
+      var aliases = []
 
       var y = yargs([]).command(module)
       var handlers = y.getCommandInstance().getCommandHandlers()
@@ -245,7 +248,7 @@ describe('Command', function () {
       handlers.foo.builder.should.equal(module.builder)
       handlers.foo.handler.should.equal(module.handler)
       var commands = y.getUsageInstance().getCommands()
-      commands[0].should.deep.equal([module.command, module.description])
+      commands[0].should.deep.equal([module.command, module.description, aliases])
     })
 
     it('accepts module (desc key, builder function) as 1st argument', function () {
@@ -255,6 +258,7 @@ describe('Command', function () {
         builder: function (yargs) { return yargs },
         handler: function (argv) {}
       }
+      var aliases = []
 
       var y = yargs([]).command(module)
       var handlers = y.getCommandInstance().getCommandHandlers()
@@ -262,7 +266,7 @@ describe('Command', function () {
       handlers.foo.builder.should.equal(module.builder)
       handlers.foo.handler.should.equal(module.handler)
       var commands = y.getUsageInstance().getCommands()
-      commands[0].should.deep.equal([module.command, module.desc])
+      commands[0].should.deep.equal([module.command, module.desc, aliases])
     })
 
     it('accepts module (false describe, builder function) as 1st argument', function () {
@@ -309,6 +313,7 @@ describe('Command', function () {
         },
         handler: function (argv) {}
       }
+      var aliases = []
 
       var y = yargs([]).command(module)
       var handlers = y.getCommandInstance().getCommandHandlers()
@@ -316,7 +321,7 @@ describe('Command', function () {
       handlers.foo.builder.should.equal(module.builder)
       handlers.foo.handler.should.equal(module.handler)
       var commands = y.getUsageInstance().getCommands()
-      commands[0].should.deep.equal([module.command, module.describe])
+      commands[0].should.deep.equal([module.command, module.describe, aliases])
     })
 
     it('accepts module (missing handler function) as 1st argument', function () {
@@ -329,6 +334,7 @@ describe('Command', function () {
           }
         }
       }
+      var aliases = []
 
       var y = yargs([]).command(module)
       var handlers = y.getCommandInstance().getCommandHandlers()
@@ -336,7 +342,7 @@ describe('Command', function () {
       handlers.foo.builder.should.equal(module.builder)
       expect(handlers.foo.handler).to.equal(undefined)
       var commands = y.getUsageInstance().getCommands()
-      commands[0].should.deep.equal([module.command, module.describe])
+      commands[0].should.deep.equal([module.command, module.describe, aliases])
     })
   })
 
