@@ -1791,11 +1791,11 @@ describe('usage tests', function () {
       ])
     })
 
-    it('displays aliases for commands that have them (default wrap)', function () {
+    it('displays aliases for commands that have them (with wrap)', function () {
       var r = checkUsage(function () {
         return yargs('help')
           .command(['copy <src> [dest]', 'cp', 'dupe'], 'Copy something')
-          .help()
+          .help().wrap(80)
           .argv
       })
 
