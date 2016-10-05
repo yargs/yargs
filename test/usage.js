@@ -1772,6 +1772,42 @@ describe('usage tests', function () {
         ''
       ])
     })
+
+    it('displays aliases for commands that have them (no wrap)', function () {
+      var r = checkUsage(function () {
+        return yargs('help')
+          .command(['copy <src> [dest]', 'cp', 'dupe'], 'Copy something')
+          .help().wrap(null)
+          .argv
+      })
+
+      r.logs[0].split('\n').should.deep.equal([
+        'Commands:',
+        '  copy <src> [dest]  Copy something  [aliases: cp, dupe]',
+        '',
+        'Options:',
+        '  --help  Show help  [boolean]',
+        ''
+      ])
+    })
+
+    it('displays aliases for commands that have them (default wrap)', function () {
+      var r = checkUsage(function () {
+        return yargs('help')
+          .command(['copy <src> [dest]', 'cp', 'dupe'], 'Copy something')
+          .help()
+          .argv
+      })
+
+      r.logs[0].split('\n').should.deep.equal([
+        'Commands:',
+        '  copy <src> [dest]  Copy something                          [aliases: cp, dupe]',
+        '',
+        'Options:',
+        '  --help  Show help                                                    [boolean]',
+        ''
+      ])
+    })
   })
 
   describe('epilogue', function () {

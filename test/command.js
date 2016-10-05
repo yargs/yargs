@@ -65,6 +65,20 @@ describe('Command', function () {
         })
         .argv
     })
+
+    it('ignores positional args for aliases', function () {
+      var y = yargs([])
+        .command(['foo [awesome]', 'wat <yo>'], 'my awesome command')
+      var command = y.getCommandInstance()
+      var handlers = command.getCommandHandlers()
+      handlers.foo.optional.should.include({
+        cmd: 'awesome',
+        variadic: false
+      })
+      handlers.foo.demanded.should.deep.equal([])
+      expect(handlers.wat).to.not.exist
+      command.getCommands().should.deep.equal(['foo', 'wat'])
+    })
   })
 
   describe('variadic', function () {
@@ -150,6 +164,18 @@ describe('Command', function () {
       commands[0].should.deep.equal([cmd, desc, aliases])
     })
 
+    it('accepts array, string as first 2 arguments', function () {
+      var aliases = ['bar', 'baz']
+      var cmd = 'foo <qux>'
+      var desc = 'i\'m not feeling very creative at the moment'
+
+      var y = yargs([]).command([cmd].concat(aliases), desc)
+      var usageCommands = y.getUsageInstance().getCommands()
+      usageCommands[0].should.deep.equal([cmd, desc, aliases])
+      var cmdCommands = y.getCommandInstance().getCommands()
+      cmdCommands.should.deep.equal(['foo', 'bar', 'baz'])
+    })
+
     it('accepts string, boolean as first 2 arguments', function () {
       var cmd = 'foo'
       var desc = false
@@ -157,6 +183,18 @@ describe('Command', function () {
       var y = yargs([]).command(cmd, desc)
       var commands = y.getUsageInstance().getCommands()
       commands.should.deep.equal([])
+    })
+
+    it('accepts array, boolean as first 2 arguments', function () {
+      var aliases = ['bar', 'baz']
+      var cmd = 'foo <qux>'
+      var desc = false
+
+      var y = yargs([]).command([cmd].concat(aliases), desc)
+      var usageCommands = y.getUsageInstance().getCommands()
+      usageCommands.should.deep.equal([])
+      var cmdCommands = y.getCommandInstance().getCommands()
+      cmdCommands.should.deep.equal(['foo', 'bar', 'baz'])
     })
 
     it('accepts function as 3rd argument', function () {
@@ -343,6 +381,25 @@ describe('Command', function () {
       expect(handlers.foo.handler).to.equal(undefined)
       var commands = y.getUsageInstance().getCommands()
       commands[0].should.deep.equal([module.command, module.describe, aliases])
+    })
+
+    it('accepts module (with command array) as 1st argument', function () {
+      var module = {
+        command: ['foo <qux>', 'bar', 'baz'],
+        describe: 'i\'m not feeling very creative at the moment',
+        builder: function (yargs) { return yargs },
+        handler: function (argv) {}
+      }
+
+      var y = yargs([]).command(module)
+      var handlers = y.getCommandInstance().getCommandHandlers()
+      handlers.foo.original.should.equal(module.command[0])
+      handlers.foo.builder.should.equal(module.builder)
+      handlers.foo.handler.should.equal(module.handler)
+      var usageCommands = y.getUsageInstance().getCommands()
+      usageCommands[0].should.deep.equal([module.command[0], module.describe, ['bar', 'baz']])
+      var cmdCommands = y.getCommandInstance().getCommands()
+      cmdCommands.should.deep.equal(['foo', 'bar', 'baz'])
     })
   })
 
@@ -641,5 +698,17 @@ describe('Command', function () {
       variadic: false
     })
     handlers.foo.demanded.should.have.lengthOf(0)
+  })
+
+  it('executes a command via alias', function () {
+    var commandCalled = false
+    var argv = yargs('hi world')
+      .command(['hello <someone>', 'hi'], 'Say hello', {}, function (argv) {
+        commandCalled = true
+        argv.should.have.property('someone').and.equal('world')
+      })
+      .argv
+    argv.should.have.property('someone').and.equal('world')
+    commandCalled.should.be.true
   })
 })
