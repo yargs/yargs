@@ -401,6 +401,66 @@ describe('Command', function () {
       var cmdCommands = y.getCommandInstance().getCommands()
       cmdCommands.should.deep.equal(['foo', 'bar', 'baz'])
     })
+
+    it('accepts module (with command string and aliases array) as 1st argument', function () {
+      var module = {
+        command: 'foo <qux>',
+        aliases: ['bar', 'baz'],
+        describe: 'i\'m not feeling very creative at the moment',
+        builder: function (yargs) { return yargs },
+        handler: function (argv) {}
+      }
+
+      var y = yargs([]).command(module)
+      var handlers = y.getCommandInstance().getCommandHandlers()
+      handlers.foo.original.should.equal(module.command)
+      handlers.foo.builder.should.equal(module.builder)
+      handlers.foo.handler.should.equal(module.handler)
+      var usageCommands = y.getUsageInstance().getCommands()
+      usageCommands[0].should.deep.equal([module.command, module.describe, module.aliases])
+      var cmdCommands = y.getCommandInstance().getCommands()
+      cmdCommands.should.deep.equal(['foo', 'bar', 'baz'])
+    })
+
+    it('accepts module (with command array and aliases array) as 1st argument', function () {
+      var module = {
+        command: ['foo <qux>', 'bar'],
+        aliases: ['baz', 'nat'],
+        describe: 'i\'m not feeling very creative at the moment',
+        builder: function (yargs) { return yargs },
+        handler: function (argv) {}
+      }
+
+      var y = yargs([]).command(module)
+      var handlers = y.getCommandInstance().getCommandHandlers()
+      handlers.foo.original.should.equal(module.command[0])
+      handlers.foo.builder.should.equal(module.builder)
+      handlers.foo.handler.should.equal(module.handler)
+      var usageCommands = y.getUsageInstance().getCommands()
+      usageCommands[0].should.deep.equal([module.command[0], module.describe, ['bar', 'baz', 'nat']])
+      var cmdCommands = y.getCommandInstance().getCommands()
+      cmdCommands.should.deep.equal(['foo', 'bar', 'baz', 'nat'])
+    })
+
+    it('accepts module (with command string and aliases string) as 1st argument', function () {
+      var module = {
+        command: 'foo <qux>',
+        aliases: 'bar',
+        describe: 'i\'m not feeling very creative at the moment',
+        builder: function (yargs) { return yargs },
+        handler: function (argv) {}
+      }
+
+      var y = yargs([]).command(module)
+      var handlers = y.getCommandInstance().getCommandHandlers()
+      handlers.foo.original.should.equal(module.command)
+      handlers.foo.builder.should.equal(module.builder)
+      handlers.foo.handler.should.equal(module.handler)
+      var usageCommands = y.getUsageInstance().getCommands()
+      usageCommands[0].should.deep.equal([module.command, module.describe, ['bar']])
+      var cmdCommands = y.getCommandInstance().getCommands()
+      cmdCommands.should.deep.equal(['foo', 'bar'])
+    })
   })
 
   describe('commandDir', function () {
