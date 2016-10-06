@@ -525,7 +525,11 @@ var argv = require('yargs')
 .command(module)
 ----------------
 
-Document the commands exposed by your application.
+Define the commands exposed by your application.
+
+`cmd` should be a string representing the command or an array of strings
+representing the command and its aliases. Read more about command aliases in the
+subsection below.
 
 Use `desc` to provide a description for each command your application accepts (the
 values stored in `argv._`).  Set `desc` to `false` to create a hidden command.
@@ -536,7 +540,8 @@ Optionally, you can provide a `builder` object to give hints about the
 options that your command accepts:
 
 ```js
-yargs.command('get', 'make a get HTTP request', {
+yargs
+  .command('get', 'make a get HTTP request', {
     url: {
       alias: 'u',
       default: 'http://yargs.js.org/'
@@ -558,7 +563,8 @@ options (if used) **always** apply globally, just like the
 with a `yargs` instance, and can be used to provide _advanced_ command specific help:
 
 ```js
-yargs.command('get', 'make a get HTTP request', function (yargs) {
+yargs
+  .command('get', 'make a get HTTP request', function (yargs) {
     return yargs.option('url', {
       alias: 'u',
       default: 'http://yargs.js.org/'
@@ -614,12 +620,78 @@ yargs.command('download <url> [files..]', 'download several files')
   .argv
 ```
 
+### Command Execution
+
+When a command is given on the command line, yargs will execute the following:
+
+1. push the command into the current context
+2. reset non-global configuration
+3. apply command configuration via the `builder`, if given
+4. parse and validate args from the command line, including positional args
+5. if validation succeeds, run the `handler` function, if given
+6. pop the command from the current context
+
+### Command Aliases
+
+You can define aliases for a command by putting the command and all of its
+aliases into an array.
+
+Alternatively, a command module may specify an `aliases` property, which may be
+a string or an array of strings. All aliases defined via the `command` property
+and the `aliases` property will be concatenated together.
+
+The first element in the array is considered the canonical command, which may
+define positional arguments, and the remaining elements in the array are
+considered aliases. Aliases inherit positional args from the canonical command,
+and thus any positional args defined in the aliases themselves are ignored.
+
+If either the canonical command or any of its aliases are given on the command
+line, the command will be executed.
+
+```js
+#!/usr/bin/env node
+require('yargs')
+  .command(['start [app]', 'run', 'up'], 'Start up an app', {}, (argv) => {
+    console.log('starting up the', argv.app || 'default', 'app')
+  })
+  .command({
+    command: 'configure <key> [value]',
+    aliases: ['config', 'cfg'],
+    desc: 'Set a config variable',
+    builder: (yargs) => yargs.default('value', 'true'),
+    handler: (argv) => {
+      console.log(`setting ${argv.key} to ${argv.value}`)
+    }
+  })
+  .demand(1)
+  .help()
+  .wrap(72)
+  .argv
+```
+
+```
+$ ./svc.js help
+Commands:
+  start [app]              Start up an app            [aliases: run, up]
+  configure <key> [value]  Set a config variable  [aliases: config, cfg]
+
+Options:
+  --help  Show help                                            [boolean]
+
+$ ./svc.js cfg concurrency 4
+setting concurrency to 4
+
+$ ./svc.js run web
+starting up the web app
+```
+
 ### Providing a Command Module
 
 For complicated commands you can pull the logic into a module. A module
 simply needs to export:
 
-* `exports.command`: string that executes this command when given on the command line, may contain positional args
+* `exports.command`: string (or array of strings) that executes this command when given on the command line, first string may contain positional args
+* `exports.aliases`: array of strings (or a single string) representing aliases of `exports.command`, positional args defined in an alias are ignored
 * `exports.describe`: string used as the description for the command in help text, use `false` for a hidden command
 * `exports.builder`: object declaring the options the command accepts, or a function accepting and returning a yargs instance
 * `exports.handler`: a function which will be passed the parsed argv.
