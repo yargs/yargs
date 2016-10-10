@@ -10,6 +10,7 @@
   "required": "zorunlu",
   "default:": "varsayılan:",
   "choices:": "seçimler:",
+  "aliases:": "takma adlar:",
   "generated-value": "oluşturulan-değer",
   "Not enough non-option arguments: got %s, need at least %s": "Seçenek dışı argümanlar yetersiz: %s bulundu, %s gerekli",
   "Too many non-option arguments: got %s, maximum of %s": "Seçenek dışı argümanlar gereğinden fazla: %s bulundu, azami %s",
@@ -33,5 +34,6 @@
   "Invalid JSON config file: %s": "Geçersiz JSON yapılandırma dosyası: %s",
   "Path to JSON config file": "JSON yapılandırma dosya konumu",
   "Show help": "Yardım detaylarını göster",
-  "Show version number": "Versiyon detaylarını göster"
+  "Show version number": "Versiyon detaylarını göster",
+  "Did you mean %s?": "Bunu mu demek istediniz: %s?"
 }
