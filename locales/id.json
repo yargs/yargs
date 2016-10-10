@@ -10,6 +10,7 @@
   "array": "larik",
   "required": "diperlukan",
   "default:": "bawaan:",
+  "aliases:": "istilah lain:",
   "choices:": "pilihan:",
   "generated-value": "nilai-yang-dihasilkan",
   "Not enough non-option arguments: got %s, need at least %s": "Argumen wajib kurang: hanya %s, minimal %s",
@@ -34,5 +35,6 @@
   "Invalid JSON config file: %s": "Berkas konfigurasi JSON tidak valid: %s",
   "Path to JSON config file": "Alamat berkas konfigurasi JSON",
   "Show help": "Lihat bantuan",
+  "Did you mean %s?": "Maksud Anda: %s?",
   "Show version number": "Lihat nomor versi"
 }
