@@ -10,6 +10,7 @@
   "required": "wymagany",
   "default:": "domyślny:",
   "choices:": "dostępne:",
+  "aliases:": "aliasy:",
   "generated-value": "wygenerowana-wartość",
   "Not enough non-option arguments: got %s, need at least %s": "Niewystarczająca ilość argumentów: otrzymano %s, wymagane co najmniej %s",
   "Too many non-option arguments: got %s, maximum of %s": "Zbyt duża ilość argumentów: otrzymano %s, wymagane co najwyżej %s",
@@ -33,5 +34,6 @@
   "Invalid JSON config file: %s": "Nieprawidłowy plik konfiguracyjny JSON: %s",
   "Path to JSON config file": "Ścieżka do pliku konfiguracyjnego JSON",
   "Show help": "Pokaż pomoc",
-  "Show version number": "Pokaż numer wersji"
+  "Show version number": "Pokaż numer wersji",
+  "Did you mean %s?": "Czy chodziło Ci o %s?"
 }
