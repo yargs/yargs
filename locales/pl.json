@@ -35,5 +35,5 @@
   "Path to JSON config file": "Ścieżka do pliku konfiguracyjnego JSON",
   "Show help": "Pokaż pomoc",
   "Show version number": "Pokaż numer wersji",
-  "Czy chodziło Ci o %s?": "Did you mean %s?"
+  "Did you mean %s?": "Czy chodziło Ci o %s?"
 }
