@@ -10,6 +10,7 @@
   "required": "必須",
   "default:": "デフォルト:",
   "choices:": "選択してください:",
+  "aliases:": "エイリアス:",
   "generated-value": "生成された値",
   "Not enough non-option arguments: got %s, need at least %s": "オプションではない引数が %s 個では不足しています。少なくとも %s 個の引数が必要です:",
   "Too many non-option arguments: got %s, maximum of %s": "オプションではない引数が %s 個では多すぎます。最大で %s 個までです:",
@@ -33,5 +34,6 @@
   "Invalid JSON config file: %s": "JSONの設定ファイルが不正です: %s",
   "Path to JSON config file": "JSONの設定ファイルまでのpath",
   "Show help": "ヘルプを表示",
-  "Show version number": "バージョンを表示"
+  "Show version number": "バージョンを表示",
+  "Did you mean %s?": "もしかして %s?"
 }
