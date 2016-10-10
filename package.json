@@ -38,7 +38,7 @@
     "nyc": "^8.1.0",
     "rimraf": "^2.5.0",
     "standard": "^8.2.0",
-    "standard-version": "^2.2.1",
+    "standard-version": "^3.0.0",
     "which": "^1.2.9"
   },
   "scripts": {
