@@ -10,6 +10,7 @@
   "required": "필수",
   "default:": "기본:",
   "choices:": "선택:",
+  "aliases:": "별칭:",
   "generated-value": "생성된 값",
   "Not enough non-option arguments: got %s, need at least %s": "옵션이 아닌 인자가 충분치 않습니다: %s개를 받았지만, 적어도 %s개는 필요합니다",
   "Too many non-option arguments: got %s, maximum of %s": "옵션이 아닌 인자가 너무 많습니다: %s개를 받았지만, %s개 이하여야 합니다",
@@ -33,5 +34,6 @@
   "Invalid JSON config file: %s": "유효하지 않은 JSON 설정파일입니다: %s",
   "Path to JSON config file": "JSON 설정파일 경로",
   "Show help": "도움말을 보여줍니다",
-  "Show version number": "버전 넘버를 보여줍니다"
+  "Show version number": "버전 넘버를 보여줍니다",
+  "Did you mean %s?": "찾고계신게 %s입니까?"
 }
