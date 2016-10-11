@@ -247,10 +247,24 @@ describe('yargs dsl tests', function () {
       expect(y.getUsageInstance().getDescriptions()).to.deep.equal({help: '__yargsString__:Show help'})
       expect(y.getValidationInstance().getImplied()).to.deep.equal({})
       expect(y.getCommandInstance().getCommandHandlers()).to.deep.equal({})
-      expect(y.getExitProcess()).to.equal(true)
+      expect(y.getExitProcess()).to.equal(false)
       expect(y.getStrict()).to.equal(false)
       expect(y.getDemanded()).to.deep.equal({})
       expect(y.getGroups()).to.deep.equal({})
+    })
+
+    it('does not invoke parse with an error if reset has been called', function (done) {
+      var y = yargs()
+        .demand('cake')
+
+      y.parse('hello', function (err) {
+        err.message.should.match(/Missing required argumen/)
+      })
+      y.reset()
+      y.parse('cake', function (err) {
+        expect(err).to.equal(null)
+        return done()
+      })
     })
   })
 
@@ -729,6 +743,102 @@ describe('yargs dsl tests', function () {
     it('ignores implicit help command (with short-circuit)', function () {
       var parsed = yargs.help().parse('help', true)
       parsed._.should.deep.equal(['help'])
+    })
+  })
+
+  // yargs.parse(['foo', '--bar'], function (err, argv, output) {}
+  context('function passed as second argument to parse', function () {
+    it('does not print to stdout', function () {
+      var r = checkOutput(function () {
+        yargs()
+          .help('h')
+          .parse('-h', function (_err, argv, output) {})
+      })
+
+      r.logs.length.should.equal(0)
+      r.errors.length.should.equal(0)
+    })
+
+    it('gets passed error as first argument', function () {
+      var err = null
+      var r = checkOutput(function () {
+        yargs()
+          .demand('robin')
+          .parse('batman', function (_err, argv, output) {
+            err = _err
+          })
+      })
+      r.logs.length.should.equal(0)
+      r.errors.length.should.equal(0)
+      err.should.match(/Missing required argument/)
+    })
+
+    it('gets passed argv as second argument', function () {
+      var argv = null
+      var r = checkOutput(function () {
+        yargs()
+          .demand('robin')
+          .parse('batman --foo', function (_err, _argv, output) {
+            argv = _argv
+          })
+      })
+      r.logs.length.should.equal(0)
+      r.errors.length.should.equal(0)
+      argv.foo.should.equal(true)
+    })
+
+    it('gets passed output as third argument', function () {
+      var output = null
+      var r = checkOutput(function () {
+        yargs()
+          .demand('robin')
+          .help()
+          .parse('--help', function (_err, argv, _output) {
+            output = _output
+          })
+      })
+      r.logs.length.should.equal(0)
+      r.errors.length.should.equal(0)
+      output.should.match(/--robin.*\[required\]/)
+    })
+
+    describe('commands', function () {
+      it('does not invoke command handler if output is populated', function () {
+        var err = null
+        var handlerCalled = false
+        var r = checkOutput(function () {
+          yargs()
+            .command('batman <api-token>', 'batman command', function () {}, function () {
+              handlerCalled = true
+            })
+            .parse('batman --what', function (_err, argv, output) {
+              err = _err
+            })
+        })
+        r.logs.length.should.equal(0)
+        r.errors.length.should.equal(0)
+        err.message.should.match(/Not enough non-option arguments/)
+        handlerCalled.should.equal(false)
+      })
+
+      it('invokes command handler normally if no output is populated', function () {
+        var argv = null
+        var output = null
+        var r = checkOutput(function () {
+          yargs()
+            .command('batman <api-token>', 'batman command', function () {}, function (_argv) {
+              argv = _argv
+            })
+            .parse('batman robin --what', function (_err, argv, _output) {
+              output = _output
+            })
+        })
+        r.logs.length.should.equal(0)
+        r.errors.length.should.equal(0)
+        output.should.equal('')
+        argv['api-token'].should.equal('robin')
+        argv.what.should.equal(true)
+      })
     })
   })
 
@@ -1493,207 +1603,5 @@ describe('yargs context', function () {
       })
       .argv
     context.commands.should.deep.equal([])
-  })
-
-  context('custom exit handler', function () {
-    it('delegates to custom exit when printing completion script', function (done) {
-      var completionScript = null
-      var argv = yargs('completion')
-        .completion()
-        .logger({
-          log: function (_completionScript) {
-            completionScript = _completionScript
-          }
-        })
-        .exit(function (code) {
-          code.should.equal(0)
-          completionScript.should.match(/yargs command completion script/)
-          process.nextTick(done)
-        })
-        .argv
-
-      argv._.should.include('completion')
-    })
-
-    it('delegates to custom exit when making completion suggestions', function (done) {
-      var completions = ''
-      var argv = yargs(['--get-yargs-completions'])
-        .completion('completion', function (current, argv) {
-          return new Promise(function (resolve, reject) {
-            setTimeout(function () {
-              resolve(['apple', 'banana'])
-            }, 10)
-          })
-        })
-        .logger({
-          log: function (completion) {
-            completions += completion
-          }
-        })
-        .exit(function (code) {
-          completions.should.match(/apple/)
-          completions.should.match(/banana/)
-          code.should.equal(0)
-          return done()
-        })
-        .argv
-      argv.getYargsCompletions.should.equal(true)
-    })
-
-    it('delegates to custom exit when help is shown', function (done) {
-      var helpMsg = null
-      var argv = yargs('help')
-        .logger({
-          log: function (_helpMsg) {
-            helpMsg = _helpMsg
-          }
-        })
-        .exit(function (code) {
-          code.should.equal(0)
-          helpMsg.should.match(/Show help/)
-          process.nextTick(done)
-        })
-        .help()
-        .argv
-
-      argv.help.should.equal(true)
-    })
-
-    it('invokes custom exit handler after argv is parsed', function (done) {
-      var out = ''
-      var argv = yargs('--batman')
-        .exit(function (code) {
-          code.should.equal(1)
-          out.should.match(/Not enough non-option arguments/)
-          argv.batman.should.equal(true)
-          return done()
-        })
-        .logger({
-          error: function (_out) {
-            out += _out
-          }
-        })
-        .demand(2)
-        .argv
-    })
-
-    it('invokes custom exit handler if yargs exits normally', function (done) {
-      var argv = yargs('--batman')
-        .exit(function (code) {
-          code.should.equal(0)
-          argv.batman.should.equal(true)
-          return done()
-        })
-        .argv
-    })
-
-    describe('commands', function () {
-      it('handles top-level command appropriately', function (done) {
-        var helpMsg = null
-        var argv = yargs('help')
-          .command('cool', 'my cool command', function (yargs) {
-            yargs.option('opt', {
-              describe: 'my cool option'
-            }).help()
-          }, function () {})
-          .logger({
-            log: function (_helpMsg) {
-              helpMsg = _helpMsg
-            }
-          })
-          .help()
-          .exit(function (code) {
-            code.should.equal(0)
-            helpMsg.should.not.match(/my cool option/)
-            process.nextTick(done)
-          })
-          .argv
-
-        argv.help.should.equal(true)
-        argv._.length.should.equal(0)
-      })
-
-      it('handles sub-command appropriately', function (done) {
-        var helpMsg = null
-        var argv = yargs('cool help')
-          .command('cool', 'my cool command', function (yargs) {
-            yargs.option('opt', {
-              describe: 'my cool option'
-            }).help()
-          }, function () {})
-          .logger({
-            log: function (_helpMsg) {
-              helpMsg = _helpMsg
-            }
-          })
-          .help()
-          .exit(function (code) {
-            code.should.equal(0)
-            helpMsg.should.match(/my cool option/)
-            process.nextTick(done)
-          })
-          .argv
-
-        argv.help.should.equal(true)
-        argv._.should.include('cool')
-      })
-    })
-
-    describe('validation', function () {
-      it('calls custom exit when validation triggers', function (done) {
-        var out = ''
-        yargs('')
-          .demand(3)
-          .logger({
-            error: function (msg) {
-              out += msg
-            }
-          })
-          .exit(function (code) {
-            code.should.equal(1)
-            out.should.match(/Not enough non-option argument/)
-            process.nextTick(done)
-          })
-          .argv
-      })
-
-      it('calls custom exit when a custom check throws an exception', function (done) {
-        var out = ''
-        yargs('--batman true')
-          .check(function (argv, opts) {
-            throw Error('why u no')
-          })
-          .logger({
-            error: function (msg) {
-              out += msg
-            }
-          })
-          .exit(function (code) {
-            code.should.equal(1)
-            out.should.equal('why u no')
-            process.nextTick(done)
-          })
-          .argv
-      })
-
-      it('calls custom exit when a custom check returns en error', function (done) {
-        var out = ''
-        yargs('--batman true')
-          .check(function (argv, opts) {
-            return Error('why u no')
-          })
-          .logger({
-            error: function (msg) {
-              out += msg
-            }
-          })
-          .exit(function (code) {
-            code.should.equal(1)
-            out.should.match(/why u no/)
-            process.nextTick(done)
-          })
-          .argv
-      })
-    })
   })
 })
