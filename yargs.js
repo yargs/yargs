@@ -406,8 +406,8 @@ function Yargs (processArgs, cwd, parentRequire) {
     return parsed
   }
 
-  self._getParseFunction = function () {
-    return parseFn
+  self._hasParseCallback = function () {
+    return !!parseFn
   }
 
   self.option = self.options = function (key, opt) {
@@ -725,7 +725,7 @@ function Yargs (processArgs, cwd, parentRequire) {
   // has yargs output an error our help
   // message in the current execution context.
   self._hasOutput = function () {
-    return hasOutput
+    return !!hasOutput
   }
 
   var recommendCommands
