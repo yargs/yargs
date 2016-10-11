@@ -1488,12 +1488,33 @@ Valid `opt` keys include:
     - `'number'`: synonymous for `number: true`, see [`number()`](#number)
     - `'string'`: synonymous for `string: true`, see [`string()`](#string)
 
-.parse(args)
+.parse(args, [fn])
 ------------
 
 Parse `args` instead of `process.argv`. Returns the `argv` object.
-
 `args` may either be a pre-processed argv array, or a raw argument string.
+
+A callback `fn` can optionally be provided as the second argument to `.parse()`.
+If a callback is given, it will be invoked with three arguments:
+
+1. `err`: populated if any validation errors raised while parsing.
+2. `argv`: the parsed argv object.
+3. `output`: any text that would have been output to the terminal, had a
+  callback not been provided.
+
+ > pro tip: providing the `fn` argument to `parse()` runs yargs in headless mode, this
+   makes it easy to use yargs in contexts other than the CLI, e.g., writing
+   a chat-bot.
+
+```js
+yargs()
+  .command('lunch-train <restaurant> <time>', function () {}, function (argv) {
+    api.scheduleLunch(argv.restaurant, moment(argv.time))
+  })
+  .parse(bot.userText, function (err, argv, output) {
+    if (output) bot.respond(output)
+  })
+```
 
 .pkgConf(key, [cwd])
 ------------

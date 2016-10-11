@@ -702,6 +702,8 @@ function Yargs (processArgs, cwd, parentRequire) {
     if (exitProcess) process.exit(code)
   }
 
+  // we use a custom logger that buffers output,
+  // so that we can print to non-CLIs, e.g., chat-bots.
   var silent = false
   var _logger = {
     log: function () {
@@ -717,8 +719,6 @@ function Yargs (processArgs, cwd, parentRequire) {
       output += args.join(' ')
     }
   }
-  // we use a custom logger that buffers output,
-  // so that we can print to non-CLIs, e.g., Slack.
   self._getLoggerInstance = function () {
     return _logger
   }
