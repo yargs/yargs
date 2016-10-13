@@ -61,6 +61,18 @@ describe('Command', function () {
       argv['baz-qux'].should.equal('world')
     })
 
+    it('populates argv with camel-case variants of variadic args when possible', function () {
+      var argv = yargs('foo hello world !')
+        .command('foo <foo-bar> [baz-qux..]')
+        .argv
+
+      argv._.should.include('foo')
+      argv['foo-bar'].should.equal('hello')
+      argv.fooBar.should.equal('hello')
+      argv.bazQux.should.deep.equal(['world', '!'])
+      argv['baz-qux'].should.deep.equal(['world', '!'])
+    })
+
     it('populates subcommand\'s inner argv with positional arguments', function () {
       yargs('foo bar hello world')
         .command('foo', 'my awesome command', function (yargs) {
