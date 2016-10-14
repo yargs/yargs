@@ -1137,7 +1137,7 @@ Give some example invocations of your program. Inside `cmd`, the string
 present script similar to how `$0` works in bash or perl.
 Examples will be printed out as part of the help message.
 
-.exitProcess(enable)
+<a name="exitProcess"></a>.exitProcess(enable)
 ----------------------------------
 
 By default, yargs exits the process when the user passes a help flag, uses the
@@ -1516,6 +1516,8 @@ parser.parse(bot.userText, function (err, argv, output) {
   if (output) bot.respond(output)
 })
 ```
+
+***Note:*** Providing a callback disables the [`exitProcess` setting](#exitProcess) until after the callback is invoked.
 
 .pkgConf(key, [cwd])
 ------------
