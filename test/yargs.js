@@ -802,6 +802,48 @@ describe('yargs dsl tests', function () {
       output.should.match(/--robin.*\[required\]/)
     })
 
+    it('reinstates original exitProcess setting after invocation', function () {
+      var callbackCalled = false
+      var r = checkOutput(function () {
+        yargs
+          .exitProcess(true)
+          .help()
+          .parse('--help', function () {
+            callbackCalled = true
+            yargs.getExitProcess().should.be.false
+          })
+      })
+      r.logs.length.should.equal(0)
+      r.errors.length.should.equal(0)
+      r.exit.should.be.false
+      callbackCalled.should.be.true
+      yargs.getExitProcess().should.be.true
+    })
+
+    it('does not call callback if subsequently called without callback', function () {
+      var callbackCalled = 0
+      var callback = function () {
+        callbackCalled++
+      }
+      var r1 = checkOutput(function () {
+        yargs
+          .help()
+          .parse('--help', callback)
+      })
+      var r2 = checkOutput(function () {
+        yargs
+          .help()
+          .parse('--help')
+      })
+      callbackCalled.should.equal(1)
+      r1.logs.length.should.equal(0)
+      r1.errors.length.should.equal(0)
+      r1.exit.should.be.false
+      r2.exit.should.be.true
+      r2.errors.length.should.equal(0)
+      r2.logs[0].should.match(/--help.*Show help.*\[boolean\]/)
+    })
+
     describe('commands', function () {
       it('does not invoke command handler if output is populated', function () {
         var err = null
