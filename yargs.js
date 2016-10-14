@@ -137,6 +137,31 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
   self.resetOptions()
 
+  // temporary hack: allow "freezing" of reset-able state for parse(msg, cb)
+  var frozen
+  function freeze () {
+    frozen = {}
+    frozen.options = options
+    frozen.exitProcess = exitProcess
+    frozen.groups = groups
+    usage.freeze()
+    validation.freeze()
+    command.freeze()
+    frozen.strict = strict
+    frozen.completionCommand = completionCommand
+  }
+  function unfreeze () {
+    options = frozen.options
+    exitProcess = frozen.exitProcess
+    groups = frozen.groups
+    usage.unfreeze()
+    validation.unfreeze()
+    command.unfreeze()
+    strict = frozen.strict
+    completionCommand = frozen.completionCommand
+    frozen = undefined
+  }
+
   self.boolean = function (bools) {
     options.boolean.push.apply(options.boolean, [].concat(bools))
     return self
@@ -395,25 +420,24 @@ function Yargs (processArgs, cwd, parentRequire) {
     // by providing a function as a second argument to
     // parse you can capture output that would otherwise
     // default to printing to stdout/stderr.
-    var exitProcessBeforeParse
     if (typeof shortCircuit === 'function') {
       parseFn = shortCircuit
       shortCircuit = null
-      exitProcessBeforeParse = exitProcess
-      exitProcess = false
     }
     // completion short-circuits the parsing process,
     // skipping validation, etc.
     if (!shortCircuit) processArgs = args
 
-    if (parseFn) command.freeze()
+    if (parseFn) {
+      freeze()
+      exitProcess = false
+    }
     var parsed = parseArgs(args, shortCircuit)
     if (parseFn) {
       parseFn(exitError, parsed, output)
-      command.unfreeze()
+      unfreeze()
       resetForNextParse()
       parseFn = null
-      exitProcess = exitProcessBeforeParse
     }
 
     return parsed

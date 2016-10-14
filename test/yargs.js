@@ -825,15 +825,12 @@ describe('yargs dsl tests', function () {
       var callback = function () {
         callbackCalled++
       }
+      yargs.help()
       var r1 = checkOutput(function () {
-        yargs
-          .help()
-          .parse('--help', callback)
+        yargs.parse('--help', callback)
       })
       var r2 = checkOutput(function () {
-        yargs
-          .help()
-          .parse('--help')
+        yargs.parse('--help')
       })
       callbackCalled.should.equal(1)
       r1.logs.length.should.equal(0)
@@ -972,6 +969,34 @@ describe('yargs dsl tests', function () {
           'Options:',
           '  --help  Show help  [boolean]',
           ''
+        ])
+      })
+
+      it('preserves top-level config when parse is called multiple times', function () {
+        var x = 'wrong'
+        var err
+        var output
+        // set some top-level, reset-able config
+        var parser = yargs()
+          .demand(1, 'Must call a command')
+          .strict()
+          .command('one <x>', 'The one and only command')
+        // first call parse with command, which calls reset
+        parser.parse('one two', function (_, argv) {
+          x = argv.x
+        })
+        // then call parse without command, which should enforce top-level config
+        parser.parse('', function (_err, argv, _output) {
+          err = _err || {}
+          output = _output || ''
+        })
+        x.should.equal('two')
+        err.should.have.property('message').and.equal('Must call a command')
+        output.split('\n').should.deep.equal([
+          'Commands:',
+          '  one <x>  The one and only command',
+          '',
+          'Must call a command'
         ])
       })
     })
