@@ -839,6 +839,99 @@ describe('yargs dsl tests', function () {
         argv['api-token'].should.equal('robin')
         argv.what.should.equal(true)
       })
+
+      it('populates argv appropriately when parse is called multiple times', function () {
+        var parser = yargs()
+          .command('batman <api-token>', 'batman command', function () {}, function (_argv) {})
+          .command('robin <egg>', 'robin command', function () {}, function (_argv) {})
+
+        var argv1 = null
+        parser.parse('batman abc123', function (_err, argv, _output) {
+          argv1 = argv
+        })
+        var argv2 = null
+        parser.parse('robin blue', function (_err, argv, _output) {
+          argv2 = argv
+        })
+        expect(argv1.egg).to.equal(undefined)
+        argv1['api-token'].should.equal('abc123')
+
+        expect(argv2['api-token']).to.equal(undefined)
+        argv2.egg.should.equal('blue')
+      })
+
+      it('populates output appropriately when parse is called multiple times', function () {
+        var parser = yargs()
+          .command('batman <api-token>', 'batman command', function () {}, function (_argv) {})
+          .command('robin <egg>', 'robin command', function () {}, function (_argv) {})
+          .wrap(null)
+          .help()
+
+        var output1 = null
+        parser.parse('batman help', function (_err, _argv, output) {
+          output1 = output
+        })
+        var output2 = null
+        parser.parse('robin help', function (_err, _argv, output) {
+          output2 = output
+        })
+
+        output1.split('\n').should.deep.equal([
+          'ndm batman <api-token>',
+          '',
+          'Options:',
+          '  --help  Show help  [boolean]',
+          ''
+        ])
+
+        output2.split('\n').should.deep.equal([
+          'ndm robin <egg>',
+          '',
+          'Options:',
+          '  --help  Show help  [boolean]',
+          ''
+        ])
+      })
+
+      it('resets errors when parse is called multiple times', function () {
+        var parser = yargs()
+          .command('batman <api-token>', 'batman command', function () {}, function (_argv) {})
+          .command('robin <egg>', 'robin command', function () {}, function (_argv) {})
+          .wrap(null)
+          .help()
+
+        var error1 = null
+        var output1 = null
+        parser.parse('batman', function (err, _argv, output) {
+          error1 = err
+          output1 = output
+        })
+        var error2 = null
+        var output2 = null
+        parser.parse('robin help', function (err, _argv, output) {
+          error2 = err
+          output2 = output
+        })
+
+        error1.message.should.match(/Not enough non-option arguments/)
+        output1.split('\n').should.deep.equal([
+          'ndm batman <api-token>',
+          '',
+          'Options:',
+          '  --help  Show help  [boolean]',
+          '',
+          'Not enough non-option arguments: got 0, need at least 1'
+        ])
+
+        expect(error2).to.equal(undefined)
+        output2.split('\n').should.deep.equal([
+          'ndm robin <egg>',
+          '',
+          'Options:',
+          '  --help  Show help  [boolean]',
+          ''
+        ])
+      })
     })
   })
 

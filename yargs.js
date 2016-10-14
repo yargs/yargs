@@ -47,10 +47,16 @@ function Yargs (processArgs, cwd, parentRequire) {
 
   // use context object to keep track of resets, subcommand execution, etc
   // submodules should modify and check the state of context as necessary
-  const context = { resets: -1, commands: [], files: [] }
+  var context = null
   self.getContext = function () {
     return context
   }
+  // reset the context object used to track the depth
+  // of commands being invoked.
+  function resetContext () {
+    context = { resets: -1, commands: [], files: [] }
+  }
+  resetContext()
 
   // puts yargs back into an initial state. any keys
   // that have been set to "global" will not be reset
@@ -123,12 +129,17 @@ function Yargs (processArgs, cwd, parentRequire) {
 
     strict = false
     completionCommand = null
+    resetForNextParse()
+
+    return self
+  }
+  // partially reset yargs, such that
+  // yargs.parse() can be invoked multiple times.
+  function resetForNextParse () {
     output = ''
     exitError = null
     hasOutput = false
     self.parsed = false
-
-    return self
   }
   self.resetOptions()
 
@@ -399,8 +410,14 @@ function Yargs (processArgs, cwd, parentRequire) {
     // skipping validation, etc.
     if (!shortCircuit) processArgs = args
 
+    if (parseFn) command.freeze()
     var parsed = parseArgs(args, shortCircuit)
-    if (parseFn) parseFn(exitError, parsed, output)
+    if (parseFn) {
+      parseFn(exitError, parsed, output)
+      command.unfreeze()
+      resetContext()
+      resetForNextParse()
+    }
 
     return parsed
   }
