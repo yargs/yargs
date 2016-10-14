@@ -395,10 +395,12 @@ function Yargs (processArgs, cwd, parentRequire) {
     // by providing a function as a second argument to
     // parse you can capture output that would otherwise
     // default to printing to stdout/stderr.
+    var exitProcessBeforeParse
     if (typeof shortCircuit === 'function') {
       parseFn = shortCircuit
       shortCircuit = null
-      self.exitProcess(false)
+      exitProcessBeforeParse = exitProcess
+      exitProcess = false
     }
     // completion short-circuits the parsing process,
     // skipping validation, etc.
@@ -410,6 +412,8 @@ function Yargs (processArgs, cwd, parentRequire) {
       parseFn(exitError, parsed, output)
       command.unfreeze()
       resetForNextParse()
+      parseFn = null
+      exitProcess = exitProcessBeforeParse
     }
 
     return parsed
