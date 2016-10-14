@@ -1435,6 +1435,34 @@ describe('yargs dsl tests', function () {
       dates[1].toString().should.equal(new Date('2016-07-18').toString())
     })
 
+    it('returns camelcase args for a command', function () {
+      var age1
+      var age2
+      var dates
+      yargs('add 30days 2016-06-13 2016-07-18')
+        .command('add <age-in-days> [dates..]', 'Testing', function (yargs) {
+          return yargs
+            .coerce('age-in-days', function (arg) {
+              return parseInt(arg, 10) * 86400000
+            })
+            .coerce('dates', function (arg) {
+              return arg.map(function (str) {
+                return new Date(str)
+              })
+            })
+        }, function (argv) {
+          age1 = argv.ageInDays
+          age2 = argv['age-in-days']
+          dates = argv.dates
+        })
+        .argv
+      expect(age1).to.equal(2592000000)
+      expect(age2).to.equal(2592000000)
+      expect(dates).to.have.lengthOf(2)
+      dates[0].toString().should.equal(new Date('2016-06-13').toString())
+      dates[1].toString().should.equal(new Date('2016-07-18').toString())
+    })
+
     it('allows an error from positional arg to be handled by fail() handler', function () {
       var msg
       var err
