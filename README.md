@@ -1515,6 +1515,29 @@ yargs()
   })
 ```
 
+If you are running yargs in a long-lived process, e.g., parsing incoming messages
+to a web-server, it's important that you do not execute yargs as a singleton:
+
+
+_so, don't do this!_
+
+```js
+yargs
+  .option('a')
+  .parse('--a b')
+```
+
+_instead, instantiate an instance of yargs to handle each request:_
+
+```js
+var yargs = require('yargs/yargs')
+yargs()
+  .option('a')
+  .parse('--a b', function (err, argv, output) {
+  // handle the incoming chat message.
+  })
+```
+
 .pkgConf(key, [cwd])
 ------------
 

@@ -393,7 +393,6 @@ function Yargs (processArgs, cwd, parentRequire) {
     if (typeof shortCircuit === 'function') {
       parseFn = shortCircuit
       shortCircuit = null
-      silent = true
       self.exitProcess(false)
     }
     // completion short-circuits the parsing process,
@@ -704,18 +703,19 @@ function Yargs (processArgs, cwd, parentRequire) {
 
   // we use a custom logger that buffers output,
   // so that we can print to non-CLIs, e.g., chat-bots.
-  var silent = false
   var _logger = {
     log: function () {
       var args = Array.prototype.slice.call(arguments)
-      if (!silent) console.log.apply(console, args)
+      if (!self._hasParseCallback()) console.log.apply(console, args)
       hasOutput = true
+      if (output.length) output += '\n'
       output += args.join(' ')
     },
     error: function () {
       var args = Array.prototype.slice.call(arguments)
-      if (!silent) console.error.apply(console, args)
+      if (!self._hasParseCallback()) console.error.apply(console, args)
       hasOutput = true
+      if (output.length) output += '\n'
       output += args.join(' ')
     }
   }
@@ -725,7 +725,7 @@ function Yargs (processArgs, cwd, parentRequire) {
   // has yargs output an error our help
   // message in the current execution context.
   self._hasOutput = function () {
-    return !!hasOutput
+    return hasOutput
   }
 
   var recommendCommands
