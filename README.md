@@ -1517,7 +1517,7 @@ parser.parse(bot.userText, function (err, argv, output) {
 })
 ```
 
-***Note:*** Providing a callback disables the [`exitProcess` setting](#exitProcess) until after the callback is invoked.
+***Note:*** Providing a callback to `parse()` disables the [`exitProcess` setting](#exitProcess) until after the callback is invoked.
 
 .pkgConf(key, [cwd])
 ------------
