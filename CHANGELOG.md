@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="6.1.1"></a>
+## [6.1.1](https://github.com/yargs/yargs/compare/v6.1.0...v6.1.1) (2016-10-15)
+
+
+### Bug Fixes
+
+* freeze was not resetting configObjects to initial state; addressed performance issue raised by [@nexdrew](https://github.com/nexdrew). ([#670](https://github.com/yargs/yargs/issues/670)) ([ae4bcd4](https://github.com/yargs/yargs/commit/ae4bcd4))
+
+
+
 <a name="6.1.0"></a>
 # [6.1.0](https://github.com/yargs/yargs/compare/v6.0.0...v6.1.0) (2016-10-15)
 
