@@ -124,17 +124,12 @@ function Yargs (processArgs, cwd, parentRequire) {
 
     strict = false
     completionCommand = null
-    resetForNextParse()
-
-    return self
-  }
-  // partially reset yargs, such that
-  // yargs.parse() can be invoked multiple times.
-  function resetForNextParse () {
     output = ''
     exitError = null
     hasOutput = false
     self.parsed = false
+
+    return self
   }
   self.resetOptions()
 
@@ -443,8 +438,8 @@ function Yargs (processArgs, cwd, parentRequire) {
     var parsed = parseArgs(args, shortCircuit)
     if (parseFn) {
       parseFn(exitError, parsed, output)
+      self.reset()
       unfreeze()
-      resetForNextParse()
       parseFn = null
     }
 
