@@ -851,6 +851,40 @@ describe('yargs dsl tests', function () {
       r2.logs[0].should.match(/--help.*Show help.*\[boolean\]/)
     })
 
+    it('resets error state between calls to parse', function () {
+      var y = yargs()
+        .demand(2)
+
+      var err1 = null
+      var out1 = null
+      var argv1 = null
+      y.parse('foo', function (err, argv, output) {
+        err1 = err
+        argv1 = argv
+        out1 = output
+      })
+
+      err1.message.should.match(/Not enough non-option arguments/)
+      argv1._.should.include('foo')
+      out1.should.match(/Not enough non-option arguments/)
+
+      var err2 = null
+      var argv2 = null
+      var out2 = null
+      y.parse('foo bar', function (err, argv, output) {
+        err2 = err
+        argv2 = argv
+        out2 = output
+      })
+
+      expect(err2).to.equal(null)
+      argv2._.should.deep.equal([
+        'foo',
+        'bar'
+      ])
+      expect(out2).to.equal('')
+    })
+
     describe('commands', function () {
       it('does not invoke command handler if output is populated', function () {
         var err = null
@@ -902,6 +936,24 @@ describe('yargs dsl tests', function () {
         argv.state.should.equal('grumpy but rich')
         argv['api-token'].should.equal('robin')
         argv.what.should.equal(true)
+      })
+
+      it('overwrites the prior context object, when parse is called multiple times', function () {
+        var argv = null
+        var parser = yargs()
+          .command('batman <api-token>', 'batman command', function () {}, function (_argv) {})
+
+        parser.parse('batman robin --what', {
+          state: 'grumpy but rich'
+        }, function (_err, _argv, _output) {})
+
+        parser.parse('batman robin --what', {
+          state: 'the hero we need'
+        }, function (_err, _argv, _output) {
+          argv = _argv
+        })
+
+        argv.state.should.equal('the hero we need')
       })
 
       it('populates argv appropriately when parse is called multiple times', function () {
