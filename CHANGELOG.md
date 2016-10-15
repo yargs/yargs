@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="6.1.0"></a>
+# [6.1.0](https://github.com/yargs/yargs/compare/v6.0.0...v6.1.0) (2016-10-15)
+
+
+### Bug Fixes
+
+* **locales:** change some translations ([#667](https://github.com/yargs/yargs/issues/667)) ([aa966c5](https://github.com/yargs/yargs/commit/aa966c5))
+* **locales:** conform hi locale to y18n.__n expectations ([#666](https://github.com/yargs/yargs/issues/666)) ([22adb18](https://github.com/yargs/yargs/commit/22adb18))
+
+
+### Features
+
+* initial support for command aliases ([#647](https://github.com/yargs/yargs/issues/647)) ([127a040](https://github.com/yargs/yargs/commit/127a040))
+* **command:** add camelcase commands to argv ([#658](https://github.com/yargs/yargs/issues/658)) ([b1cabae](https://github.com/yargs/yargs/commit/b1cabae))
+* **locales:** add Hindi translations ([9290912](https://github.com/yargs/yargs/commit/9290912))
+* **locales:** add Hungarian translations  ([be92327](https://github.com/yargs/yargs/commit/be92327))
+* **locales:** Japanese translations for 'did you mean' and 'aliases'  ([#651](https://github.com/yargs/yargs/issues/651)) ([5eb78fc](https://github.com/yargs/yargs/commit/5eb78fc))
+* **locales:** Polish translations for 'did you mean' and 'aliases' ([#650](https://github.com/yargs/yargs/issues/650)) ([c951c0e](https://github.com/yargs/yargs/commit/c951c0e))
+* reworking yargs API to make it easier to run in headless environments, e.g., Slack ([#646](https://github.com/yargs/yargs/issues/646)) ([f284c29](https://github.com/yargs/yargs/commit/f284c29))
+* Turkish translations for 'did you mean' and 'aliases' ([#660](https://github.com/yargs/yargs/issues/660)) ([072fd45](https://github.com/yargs/yargs/commit/072fd45))
+
+
+
 <a name="6.0.0"></a>
 # [6.0.0](https://github.com/yargs/yargs/compare/v5.0.0...v6.0.0) (2016-09-30)
 
