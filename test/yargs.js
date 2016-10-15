@@ -869,6 +869,8 @@ describe('yargs dsl tests', function () {
       out1.should.match(/Not enough non-option arguments/)
 
       var err2 = null
+      var argv2 = null
+      var out2 = null
       y.parse('foo bar', function (err, argv, output) {
         err2 = err
         argv2 = argv
