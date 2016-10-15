@@ -938,6 +938,24 @@ describe('yargs dsl tests', function () {
         argv.what.should.equal(true)
       })
 
+      it('overwrites the prior context object, when parse is called multiple times', function () {
+        var argv = null
+        var parser = yargs()
+          .command('batman <api-token>', 'batman command', function () {}, function (_argv) {})
+
+        parser.parse('batman robin --what', {
+          state: 'grumpy but rich'
+        }, function (_err, _argv, _output) {})
+
+        parser.parse('batman robin --what', {
+          state: 'the hero we need'
+        }, function (_err, _argv, _output) {
+          argv = _argv
+        })
+
+        argv.state.should.equal('the hero we need')
+      })
+
       it('populates argv appropriately when parse is called multiple times', function () {
         var parser = yargs()
           .command('batman <api-token>', 'batman command', function () {}, function (_argv) {})

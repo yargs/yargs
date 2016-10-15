@@ -138,6 +138,7 @@ function Yargs (processArgs, cwd, parentRequire) {
   function freeze () {
     frozen = {}
     frozen.options = options
+    frozen.configObjects = options.configObjects.slice(0)
     frozen.exitProcess = exitProcess
     frozen.groups = groups
     usage.freeze()
@@ -152,6 +153,7 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
   function unfreeze () {
     options = frozen.options
+    options.configObjects = frozen.configObjects
     exitProcess = frozen.exitProcess
     groups = frozen.groups
     output = frozen.output
@@ -421,10 +423,12 @@ function Yargs (processArgs, cwd, parentRequire) {
 
   var parseFn = null
   self.parse = function (args, shortCircuit, _parseFn) {
+    var config = null
+
     // a context object can optionally be provided, this allows
     // additional information to be passed to a command handler.
     if (typeof shortCircuit === 'object') {
-      self.config(shortCircuit)
+      config = shortCircuit
       shortCircuit = _parseFn
     }
 
@@ -443,6 +447,8 @@ function Yargs (processArgs, cwd, parentRequire) {
       freeze()
       exitProcess = false
     }
+    if (config) self.config(config)
+
     var parsed = parseArgs(args, shortCircuit)
     if (parseFn) {
       parseFn(exitError, parsed, output)
