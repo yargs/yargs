@@ -1494,7 +1494,7 @@ Valid `opt` keys include:
 Parse `args` instead of `process.argv`. Returns the `argv` object.
 `args` may either be a pre-processed argv array, or a raw argument string.
 
-A `context` object can optionally as the second argument to `parse()`, providing a
+A `context` object can optionally be given as the second argument to `parse()`, providing a
 useful mechanism for passing state information to commands:
 
 ```js
