@@ -1,4 +1,4 @@
-/* global describe, it, beforeEach */
+/* global context, describe, it, beforeEach */
 
 var expect = require('chai').expect
 var fs = require('fs')
@@ -238,6 +238,7 @@ describe('yargs dsl tests', function () {
         normalize: [],
         number: [],
         config: {},
+        configObjects: [],
         envPrefix: 'YARGS', // preserved as global
         global: ['help'],
         demanded: {}
@@ -247,10 +248,24 @@ describe('yargs dsl tests', function () {
       expect(y.getUsageInstance().getDescriptions()).to.deep.equal({help: '__yargsString__:Show help'})
       expect(y.getValidationInstance().getImplied()).to.deep.equal({})
       expect(y.getCommandInstance().getCommandHandlers()).to.deep.equal({})
-      expect(y.getExitProcess()).to.equal(true)
+      expect(y.getExitProcess()).to.equal(false)
       expect(y.getStrict()).to.equal(false)
       expect(y.getDemanded()).to.deep.equal({})
       expect(y.getGroups()).to.deep.equal({})
+    })
+
+    it('does not invoke parse with an error if reset has been called', function (done) {
+      var y = yargs()
+        .demand('cake')
+
+      y.parse('hello', function (err) {
+        err.message.should.match(/Missing required argumen/)
+      })
+      y.reset()
+      y.parse('cake', function (err) {
+        expect(err).to.equal(null)
+        return done()
+      })
     })
   })
 
@@ -729,6 +744,286 @@ describe('yargs dsl tests', function () {
     it('ignores implicit help command (with short-circuit)', function () {
       var parsed = yargs.help().parse('help', true)
       parsed._.should.deep.equal(['help'])
+    })
+
+    it('allows an optional context object to be provided', function () {
+      var a1 = yargs.parse('-x=2 --foo=bar', {
+        context: 'look at me go!'
+      })
+      a1.x.should.equal(2)
+      a1.foo.should.equal('bar')
+      a1.context.should.equal('look at me go!')
+    })
+  })
+
+  // yargs.parse(['foo', '--bar'], function (err, argv, output) {}
+  context('function passed as second argument to parse', function () {
+    it('does not print to stdout', function () {
+      var r = checkOutput(function () {
+        yargs()
+          .help('h')
+          .parse('-h', function (_err, argv, output) {})
+      })
+
+      r.logs.length.should.equal(0)
+      r.errors.length.should.equal(0)
+    })
+
+    it('gets passed error as first argument', function () {
+      var err = null
+      var r = checkOutput(function () {
+        yargs()
+          .demand('robin')
+          .parse('batman', function (_err, argv, output) {
+            err = _err
+          })
+      })
+      r.logs.length.should.equal(0)
+      r.errors.length.should.equal(0)
+      err.should.match(/Missing required argument/)
+    })
+
+    it('gets passed argv as second argument', function () {
+      var argv = null
+      var r = checkOutput(function () {
+        yargs()
+          .demand('robin')
+          .parse('batman --foo', function (_err, _argv, output) {
+            argv = _argv
+          })
+      })
+      r.logs.length.should.equal(0)
+      r.errors.length.should.equal(0)
+      argv.foo.should.equal(true)
+    })
+
+    it('gets passed output as third argument', function () {
+      var output = null
+      var r = checkOutput(function () {
+        yargs()
+          .demand('robin')
+          .help()
+          .parse('--help', function (_err, argv, _output) {
+            output = _output
+          })
+      })
+      r.logs.length.should.equal(0)
+      r.errors.length.should.equal(0)
+      output.should.match(/--robin.*\[required\]/)
+    })
+
+    it('reinstates original exitProcess setting after invocation', function () {
+      var callbackCalled = false
+      var r = checkOutput(function () {
+        yargs
+          .exitProcess(true)
+          .help()
+          .parse('--help', function () {
+            callbackCalled = true
+            yargs.getExitProcess().should.be.false
+          })
+      })
+      r.logs.length.should.equal(0)
+      r.errors.length.should.equal(0)
+      r.exit.should.be.false
+      callbackCalled.should.be.true
+      yargs.getExitProcess().should.be.true
+    })
+
+    it('does not call callback if subsequently called without callback', function () {
+      var callbackCalled = 0
+      var callback = function () {
+        callbackCalled++
+      }
+      yargs.help()
+      var r1 = checkOutput(function () {
+        yargs.parse('--help', callback)
+      })
+      var r2 = checkOutput(function () {
+        yargs.parse('--help')
+      })
+      callbackCalled.should.equal(1)
+      r1.logs.length.should.equal(0)
+      r1.errors.length.should.equal(0)
+      r1.exit.should.be.false
+      r2.exit.should.be.true
+      r2.errors.length.should.equal(0)
+      r2.logs[0].should.match(/--help.*Show help.*\[boolean\]/)
+    })
+
+    describe('commands', function () {
+      it('does not invoke command handler if output is populated', function () {
+        var err = null
+        var handlerCalled = false
+        var r = checkOutput(function () {
+          yargs()
+            .command('batman <api-token>', 'batman command', function () {}, function () {
+              handlerCalled = true
+            })
+            .parse('batman --what', function (_err, argv, output) {
+              err = _err
+            })
+        })
+        r.logs.length.should.equal(0)
+        r.errors.length.should.equal(0)
+        err.message.should.match(/Not enough non-option arguments/)
+        handlerCalled.should.equal(false)
+      })
+
+      it('invokes command handler normally if no output is populated', function () {
+        var argv = null
+        var output = null
+        var r = checkOutput(function () {
+          yargs()
+            .command('batman <api-token>', 'batman command', function () {}, function (_argv) {
+              argv = _argv
+            })
+            .parse('batman robin --what', function (_err, argv, _output) {
+              output = _output
+            })
+        })
+        r.logs.length.should.equal(0)
+        r.errors.length.should.equal(0)
+        output.should.equal('')
+        argv['api-token'].should.equal('robin')
+        argv.what.should.equal(true)
+      })
+
+      it('allows context object to be passed to parse', function () {
+        var argv = null
+        yargs()
+          .command('batman <api-token>', 'batman command', function () {}, function (_argv) {
+            argv = _argv
+          })
+          .parse('batman robin --what', {
+            state: 'grumpy but rich'
+          }, function (_err, argv, _output) {})
+
+        argv.state.should.equal('grumpy but rich')
+        argv['api-token'].should.equal('robin')
+        argv.what.should.equal(true)
+      })
+
+      it('populates argv appropriately when parse is called multiple times', function () {
+        var parser = yargs()
+          .command('batman <api-token>', 'batman command', function () {}, function (_argv) {})
+          .command('robin <egg>', 'robin command', function () {}, function (_argv) {})
+
+        var argv1 = null
+        parser.parse('batman abc123', function (_err, argv, _output) {
+          argv1 = argv
+        })
+        var argv2 = null
+        parser.parse('robin blue', function (_err, argv, _output) {
+          argv2 = argv
+        })
+        expect(argv1.egg).to.equal(undefined)
+        argv1['api-token'].should.equal('abc123')
+
+        expect(argv2['api-token']).to.equal(undefined)
+        argv2.egg.should.equal('blue')
+      })
+
+      it('populates output appropriately when parse is called multiple times', function () {
+        var parser = yargs()
+          .command('batman <api-token>', 'batman command', function () {}, function (_argv) {})
+          .command('robin <egg>', 'robin command', function () {}, function (_argv) {})
+          .wrap(null)
+          .help()
+
+        var output1 = null
+        parser.parse('batman help', function (_err, _argv, output) {
+          output1 = output
+        })
+        var output2 = null
+        parser.parse('robin help', function (_err, _argv, output) {
+          output2 = output
+        })
+
+        output1.split('\n').should.deep.equal([
+          'ndm batman <api-token>',
+          '',
+          'Options:',
+          '  --help  Show help  [boolean]',
+          ''
+        ])
+
+        output2.split('\n').should.deep.equal([
+          'ndm robin <egg>',
+          '',
+          'Options:',
+          '  --help  Show help  [boolean]',
+          ''
+        ])
+      })
+
+      it('resets errors when parse is called multiple times', function () {
+        var parser = yargs()
+          .command('batman <api-token>', 'batman command', function () {}, function (_argv) {})
+          .command('robin <egg>', 'robin command', function () {}, function (_argv) {})
+          .wrap(null)
+          .help()
+
+        var error1 = null
+        var output1 = null
+        parser.parse('batman', function (err, _argv, output) {
+          error1 = err
+          output1 = output
+        })
+        var error2 = null
+        var output2 = null
+        parser.parse('robin help', function (err, _argv, output) {
+          error2 = err
+          output2 = output
+        })
+
+        error1.message.should.match(/Not enough non-option arguments/)
+        output1.split('\n').should.deep.equal([
+          'ndm batman <api-token>',
+          '',
+          'Options:',
+          '  --help  Show help  [boolean]',
+          '',
+          'Not enough non-option arguments: got 0, need at least 1'
+        ])
+
+        expect(error2).to.equal(undefined)
+        output2.split('\n').should.deep.equal([
+          'ndm robin <egg>',
+          '',
+          'Options:',
+          '  --help  Show help  [boolean]',
+          ''
+        ])
+      })
+
+      it('preserves top-level config when parse is called multiple times', function () {
+        var x = 'wrong'
+        var err
+        var output
+        // set some top-level, reset-able config
+        var parser = yargs()
+          .demand(1, 'Must call a command')
+          .strict()
+          .command('one <x>', 'The one and only command')
+        // first call parse with command, which calls reset
+        parser.parse('one two', function (_, argv) {
+          x = argv.x
+        })
+        // then call parse without command, which should enforce top-level config
+        parser.parse('', function (_err, argv, _output) {
+          err = _err || {}
+          output = _output || ''
+        })
+        x.should.equal('two')
+        err.should.have.property('message').and.equal('Must call a command')
+        output.split('\n').should.deep.equal([
+          'Commands:',
+          '  one <x>  The one and only command',
+          '',
+          'Must call a command'
+        ])
+      })
     })
   })
 

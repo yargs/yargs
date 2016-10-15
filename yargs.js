@@ -16,6 +16,7 @@ function Yargs (processArgs, cwd, parentRequire) {
   var command = null
   var completion = null
   var groups = {}
+  var output = ''
   var preservedGroups = {}
   var usage = null
   var validation = null
@@ -64,6 +65,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     // hierarchy.
     var tmpOptions = {}
     tmpOptions.global = options.global ? options.global : []
+    tmpOptions.configObjects = options.configObjects ? options.configObjects : []
 
     // if a key has been set as a global, we
     // do not want to reset it or its aliases.
@@ -120,14 +122,41 @@ function Yargs (processArgs, cwd, parentRequire) {
     command = command ? command.reset() : Command(self, usage, validation)
     if (!completion) completion = Completion(self, usage, command)
 
-    exitProcess = true
     strict = false
     completionCommand = null
+    output = ''
+    exitError = null
+    hasOutput = false
     self.parsed = false
 
     return self
   }
   self.resetOptions()
+
+  // temporary hack: allow "freezing" of reset-able state for parse(msg, cb)
+  var frozen
+  function freeze () {
+    frozen = {}
+    frozen.options = options
+    frozen.exitProcess = exitProcess
+    frozen.groups = groups
+    usage.freeze()
+    validation.freeze()
+    command.freeze()
+    frozen.strict = strict
+    frozen.completionCommand = completionCommand
+  }
+  function unfreeze () {
+    options = frozen.options
+    exitProcess = frozen.exitProcess
+    groups = frozen.groups
+    usage.unfreeze()
+    validation.unfreeze()
+    command.unfreeze()
+    strict = frozen.strict
+    completionCommand = frozen.completionCommand
+    frozen = undefined
+  }
 
   self.boolean = function (bools) {
     options.boolean.push.apply(options.boolean, [].concat(bools))
@@ -382,9 +411,43 @@ function Yargs (processArgs, cwd, parentRequire) {
     return pkgs[npath]
   }
 
-  self.parse = function (args, shortCircuit) {
+  var parseFn = null
+  self.parse = function (args, shortCircuit, _parseFn) {
+    // a context object can optionally be provided, this allows
+    // additional information to be passed to a command handler.
+    if (typeof shortCircuit === 'object') {
+      self.config(shortCircuit)
+      shortCircuit = _parseFn
+    }
+
+    // by providing a function as a second argument to
+    // parse you can capture output that would otherwise
+    // default to printing to stdout/stderr.
+    if (typeof shortCircuit === 'function') {
+      parseFn = shortCircuit
+      shortCircuit = null
+    }
+    // completion short-circuits the parsing process,
+    // skipping validation, etc.
     if (!shortCircuit) processArgs = args
-    return parseArgs(args, shortCircuit)
+
+    if (parseFn) {
+      freeze()
+      exitProcess = false
+    }
+    var parsed = parseArgs(args, shortCircuit)
+    if (parseFn) {
+      parseFn(exitError, parsed, output)
+      self.reset()
+      unfreeze()
+      parseFn = null
+    }
+
+    return parsed
+  }
+
+  self._hasParseCallback = function () {
+    return !!parseFn
   }
 
   self.option = self.options = function (key, opt) {
@@ -636,7 +699,7 @@ function Yargs (processArgs, cwd, parentRequire) {
 
   self.showCompletionScript = function ($0) {
     $0 = $0 || self.$0
-    console.log(completion.generateCompletionScript($0))
+    _logger.log(completion.generateCompletionScript($0))
     return self
   }
 
@@ -667,6 +730,43 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
   self.getDetectLocale = function () {
     return detectLocale
+  }
+
+  var hasOutput = false
+  var exitError = null
+  // maybe exit, always capture
+  // context about why we wanted to exit.
+  self.exit = function (code, err) {
+    hasOutput = true
+    exitError = err
+    if (exitProcess) process.exit(code)
+  }
+
+  // we use a custom logger that buffers output,
+  // so that we can print to non-CLIs, e.g., chat-bots.
+  var _logger = {
+    log: function () {
+      var args = Array.prototype.slice.call(arguments)
+      if (!self._hasParseCallback()) console.log.apply(console, args)
+      hasOutput = true
+      if (output.length) output += '\n'
+      output += args.join(' ')
+    },
+    error: function () {
+      var args = Array.prototype.slice.call(arguments)
+      if (!self._hasParseCallback()) console.error.apply(console, args)
+      hasOutput = true
+      if (output.length) output += '\n'
+      output += args.join(' ')
+    }
+  }
+  self._getLoggerInstance = function () {
+    return _logger
+  }
+  // has yargs output an error our help
+  // message in the current execution context.
+  self._hasOutput = function () {
+    return hasOutput
   }
 
   var recommendCommands
@@ -772,9 +872,7 @@ function Yargs (processArgs, cwd, parentRequire) {
       if (completionCommand && ~argv._.indexOf(completionCommand) && !argv[completion.completionKey]) {
         if (exitProcess) setBlocking(true)
         self.showCompletionScript()
-        if (exitProcess) {
-          process.exit(0)
-        }
+        self.exit(0)
       }
     }
 
@@ -788,14 +886,12 @@ function Yargs (processArgs, cwd, parentRequire) {
       var completionArgs = args.slice(args.indexOf('--' + completion.completionKey) + 1)
       completion.getCompletion(completionArgs, function (completions) {
         ;(completions || []).forEach(function (completion) {
-          console.log(completion)
+          _logger.log(completion)
         })
 
-        if (exitProcess) {
-          process.exit(0)
-        }
+        self.exit(0)
       })
-      return
+      return setPlaceholderKeys(argv)
     }
 
     var skipValidation = false
@@ -807,17 +903,13 @@ function Yargs (processArgs, cwd, parentRequire) {
 
         skipValidation = true
         self.showHelp('log')
-        if (exitProcess) {
-          process.exit(0)
-        }
+        self.exit(0)
       } else if (key === versionOpt && argv[key]) {
         if (exitProcess) setBlocking(true)
 
         skipValidation = true
         usage.showVersion()
-        if (exitProcess) {
-          process.exit(0)
-        }
+        self.exit(0)
       }
     })
 
@@ -846,9 +938,7 @@ function Yargs (processArgs, cwd, parentRequire) {
       }
     }
 
-    setPlaceholderKeys(argv)
-
-    return argv
+    return setPlaceholderKeys(argv)
   }
 
   function guessLocale () {
@@ -870,6 +960,7 @@ function Yargs (processArgs, cwd, parentRequire) {
       if (~key.indexOf('.')) return
       if (typeof argv[key] === 'undefined') argv[key] = undefined
     })
+    return argv
   }
 
   return self

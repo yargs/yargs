@@ -1137,7 +1137,7 @@ Give some example invocations of your program. Inside `cmd`, the string
 present script similar to how `$0` works in bash or perl.
 Examples will be printed out as part of the help message.
 
-.exitProcess(enable)
+<a name="exitprocess"></a>.exitProcess(enable)
 ----------------------------------
 
 By default, yargs exits the process when the user passes a help flag, uses the
@@ -1488,12 +1488,46 @@ Valid `opt` keys include:
     - `'number'`: synonymous for `number: true`, see [`number()`](#number)
     - `'string'`: synonymous for `string: true`, see [`string()`](#string)
 
-.parse(args)
+.parse(args, [context], [parseCallback])
 ------------
 
 Parse `args` instead of `process.argv`. Returns the `argv` object.
-
 `args` may either be a pre-processed argv array, or a raw argument string.
+
+A `context` object can optionally be given as the second argument to `parse()`, providing a
+useful mechanism for passing state information to commands:
+
+```js
+const parser = yargs
+  .command('lunch-train <restaurant>', 'start lunch train', function () {}, function (argv) {
+    console.log(argv.restaurant, argv.time)
+  })
+  .parse("lunch-train rudy's", {time: '12:15'})
+```
+
+A `parseCallback` can also be provided to `.parse()`. If a callback is given, it will be invoked with three arguments:
+
+1. `err`: populated if any validation errors raised while parsing.
+2. `argv`: the parsed argv object.
+3. `output`: any text that would have been output to the terminal, had a
+  callback not been provided.
+
+```js
+// providing the `fn` argument to `parse()` runs yargs in headless mode, this
+// makes it easy to use yargs in contexts other than the CLI, e.g., writing
+// a chat-bot.
+const parser = yargs
+  .command('lunch-train <restaurant> <time>', 'start lunch train', function () {}, function (argv) {
+    api.scheduleLunch(argv.restaurant, moment(argv.time))
+  })
+  .help()
+
+parser.parse(bot.userText, function (err, argv, output) {
+  if (output) bot.respond(output)
+})
+```
+
+***Note:*** Providing a callback to `parse()` disables the [`exitProcess` setting](#exitprocess) until after the callback is invoked.
 
 .pkgConf(key, [cwd])
 ------------
