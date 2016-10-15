@@ -145,11 +145,19 @@ function Yargs (processArgs, cwd, parentRequire) {
     command.freeze()
     frozen.strict = strict
     frozen.completionCommand = completionCommand
+    frozen.output = output
+    frozen.exitError = exitError
+    frozen.hasOutput = hasOutput
+    frozen.parsed = self.parsed
   }
   function unfreeze () {
     options = frozen.options
     exitProcess = frozen.exitProcess
     groups = frozen.groups
+    output = frozen.output
+    exitError = frozen.exitError
+    hasOutput = frozen.hasOutput
+    self.parsed = frozen.parsed
     usage.unfreeze()
     validation.unfreeze()
     command.unfreeze()
@@ -438,7 +446,6 @@ function Yargs (processArgs, cwd, parentRequire) {
     var parsed = parseArgs(args, shortCircuit)
     if (parseFn) {
       parseFn(exitError, parsed, output)
-      self.reset()
       unfreeze()
       parseFn = null
     }

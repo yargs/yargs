@@ -851,6 +851,38 @@ describe('yargs dsl tests', function () {
       r2.logs[0].should.match(/--help.*Show help.*\[boolean\]/)
     })
 
+    it('resets error state between calls to parse', function () {
+      var y = yargs()
+        .demand(2)
+
+      var err1 = null
+      var out1 = null
+      var argv1 = null
+      y.parse('foo', function (err, argv, output) {
+        err1 = err
+        argv1 = argv
+        out1 = output
+      })
+
+      err1.message.should.match(/Not enough non-option arguments/)
+      argv1._.should.include('foo')
+      out1.should.match(/Not enough non-option arguments/)
+
+      var err2 = null
+      y.parse('foo bar', function (err, argv, output) {
+        err2 = err
+        argv2 = argv
+        out2 = output
+      })
+
+      expect(err2).to.equal(null)
+      argv2._.should.deep.equal([
+        'foo',
+        'bar'
+      ])
+      expect(out2).to.equal('')
+    })
+
     describe('commands', function () {
       it('does not invoke command handler if output is populated', function () {
         var err = null
