@@ -238,6 +238,7 @@ describe('yargs dsl tests', function () {
         normalize: [],
         number: [],
         config: {},
+        configObjects: [],
         envPrefix: 'YARGS', // preserved as global
         global: ['help'],
         demanded: {}
@@ -744,6 +745,15 @@ describe('yargs dsl tests', function () {
       var parsed = yargs.help().parse('help', true)
       parsed._.should.deep.equal(['help'])
     })
+
+    it('allows an optional context object to be provided', function () {
+      var a1 = yargs.parse('-x=2 --foo=bar', {
+        context: 'look at me go!'
+      })
+      a1.x.should.equal(2)
+      a1.foo.should.equal('bar')
+      a1.context.should.equal('look at me go!')
+    })
   })
 
   // yargs.parse(['foo', '--bar'], function (err, argv, output) {}
@@ -875,6 +885,21 @@ describe('yargs dsl tests', function () {
         r.logs.length.should.equal(0)
         r.errors.length.should.equal(0)
         output.should.equal('')
+        argv['api-token'].should.equal('robin')
+        argv.what.should.equal(true)
+      })
+
+      it('allows context object to be passed to parse', function () {
+        var argv = null
+        yargs()
+          .command('batman <api-token>', 'batman command', function () {}, function (_argv) {
+            argv = _argv
+          })
+          .parse('batman robin --what', {
+            state: 'grumpy but rich'
+          }, function (_err, argv, _output) {})
+
+        argv.state.should.equal('grumpy but rich')
         argv['api-token'].should.equal('robin')
         argv.what.should.equal(true)
       })

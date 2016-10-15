@@ -65,6 +65,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     // hierarchy.
     var tmpOptions = {}
     tmpOptions.global = options.global ? options.global : []
+    tmpOptions.configObjects = options.configObjects ? options.configObjects : []
 
     // if a key has been set as a global, we
     // do not want to reset it or its aliases.
@@ -416,7 +417,14 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   var parseFn = null
-  self.parse = function (args, shortCircuit) {
+  self.parse = function (args, shortCircuit, _parseFn) {
+    // a context object can optionally be provided, this allows
+    // additional information to be passed to a command handler.
+    if (typeof shortCircuit === 'object') {
+      self.config(shortCircuit)
+      shortCircuit = _parseFn
+    }
+
     // by providing a function as a second argument to
     // parse you can capture output that would otherwise
     // default to printing to stdout/stderr.

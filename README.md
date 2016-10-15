@@ -1488,14 +1488,24 @@ Valid `opt` keys include:
     - `'number'`: synonymous for `number: true`, see [`number()`](#number)
     - `'string'`: synonymous for `string: true`, see [`string()`](#string)
 
-.parse(args, [fn])
+.parse(args, [context], [parseCallback])
 ------------
 
 Parse `args` instead of `process.argv`. Returns the `argv` object.
 `args` may either be a pre-processed argv array, or a raw argument string.
 
-A callback `fn` can optionally be provided as the second argument to `.parse()`.
-If a callback is given, it will be invoked with three arguments:
+A `context` object can optionally as the second argument to `parse()`, providing a
+useful mechanism for passing state information to commands:
+
+```js
+const parser = yargs
+  .command('lunch-train <restaurant>', 'start lunch train', function () {}, function (argv) {
+    console.log(argv.restaurant, argv.time)
+  })
+  .parse("lunch-train rudy's", {time: '12:15'})
+```
+
+A `parseCallback` can also be provided to `.parse()`. If a callback is given, it will be invoked with three arguments:
 
 1. `err`: populated if any validation errors raised while parsing.
 2. `argv`: the parsed argv object.
@@ -1507,7 +1517,7 @@ If a callback is given, it will be invoked with three arguments:
 // makes it easy to use yargs in contexts other than the CLI, e.g., writing
 // a chat-bot.
 const parser = yargs
-  .command('lunch-train <restaurant> <time>', function () {}, function (argv) {
+  .command('lunch-train <restaurant> <time>', 'start lunch train', function () {}, function (argv) {
     api.scheduleLunch(argv.restaurant, moment(argv.time))
   })
   .help()
