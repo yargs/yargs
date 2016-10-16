@@ -938,6 +938,22 @@ describe('yargs dsl tests', function () {
         argv.what.should.equal(true)
       })
 
+      // see: https://github.com/yargs/yargs/issues/671
+      it('does not fail if context object has cyclical reference', function () {
+        var argv = null
+        var context = {state: 'grumpy but rich'}
+        context.res = context
+        yargs()
+          .command('batman <api-token>', 'batman command', function () {}, function (_argv) {
+            argv = _argv
+          })
+          .parse('batman robin --what', context, function (_err, argv, _output) {})
+
+        argv.state.should.equal('grumpy but rich')
+        argv['api-token'].should.equal('robin')
+        argv.what.should.equal(true)
+      })
+
       it('overwrites the prior context object, when parse is called multiple times', function () {
         var argv = null
         var parser = yargs()
