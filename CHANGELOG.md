@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="6.2.0"></a>
+# [6.2.0](https://github.com/yargs/yargs/compare/v6.1.1...v6.2.0) (2016-10-16)
+
+
+### Bug Fixes
+
+* stop applying parser to context object ([#675](https://github.com/yargs/yargs/issues/675)) ([3fe9b8f](https://github.com/yargs/yargs/commit/3fe9b8f))
+
+
+### Features
+
+* add new pt_BR translations ([#674](https://github.com/yargs/yargs/issues/674)) ([5615a82](https://github.com/yargs/yargs/commit/5615a82))
+* Italian translations for 'did you mean' and 'aliases' ([#673](https://github.com/yargs/yargs/issues/673)) ([81984e6](https://github.com/yargs/yargs/commit/81984e6))
+
+
+
 <a name="6.1.1"></a>
 ## [6.1.1](https://github.com/yargs/yargs/compare/v6.1.0...v6.1.1) (2016-10-15)
 
