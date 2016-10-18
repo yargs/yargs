@@ -102,7 +102,6 @@ All notable changes to this project will be documented in this file. See [standa
 * adds recommendCommands() for command suggestions ([#580](https://github.com/yargs/yargs/issues/580)) ([59474dc](https://github.com/yargs/yargs/commit/59474dc))
 * apply .env() globally ([#553](https://github.com/yargs/yargs/issues/553)) ([be65728](https://github.com/yargs/yargs/commit/be65728))
 * apply default builder to command() and apply fail() handlers globally ([#583](https://github.com/yargs/yargs/issues/583)) ([0aaa68b](https://github.com/yargs/yargs/commit/0aaa68b))
-* interpret demand() numbers as relative to executing command ([#582](https://github.com/yargs/yargs/issues/582)) ([927810c](https://github.com/yargs/yargs/commit/927810c))
 * update yargs-parser to version 3.1.0 ([#581](https://github.com/yargs/yargs/issues/581)) ([882a127](https://github.com/yargs/yargs/commit/882a127))
 
 
@@ -118,6 +117,7 @@ All notable changes to this project will be documented in this file. See [standa
 * yargs-parser now better handles negative integer values, at the cost of handling numeric option names, e.g., -1 hello
 * default: removed undocumented `defaults` alias for `default`.
 * introduces a default `help` command which outputs help, as an alternative to a help flag.
+* interpret demand() numbers as relative to executing command ([#582](https://github.com/yargs/yargs/issues/582)) ([927810c](https://github.com/yargs/yargs/commit/927810c))
 
 
 
