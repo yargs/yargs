@@ -1352,6 +1352,7 @@ Locales currently supported:
 * **pt_BR:** Brazilian Portuguese.
 * **tr:** Turkish.
 * **zh:** Chinese.
+* **th:** Thai.
 
 To submit a new translation for yargs:
 
