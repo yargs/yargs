@@ -954,6 +954,21 @@ describe('yargs dsl tests', function () {
         argv.what.should.equal(true)
       })
 
+      it('allows nested sub-commands to be invoked multiple times', function () {
+        var context = {counter: 0}
+
+        checkOutput(function () {
+          var parser = yargs()
+            .commandDir('fixtures/cmddir')
+
+          parser.parse('dream within-a-dream --what', {context: context}, function (_err, argv, _output) {})
+          parser.parse('dream within-a-dream --what', {context: context}, function (_err, argv, _output) {})
+          parser.parse('dream within-a-dream --what', {context: context}, function (_err, argv, _output) {})
+        })
+
+        context.counter.should.equal(3)
+      })
+
       it('overwrites the prior context object, when parse is called multiple times', function () {
         var argv = null
         var parser = yargs()
