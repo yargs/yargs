@@ -48,14 +48,10 @@ function Yargs (processArgs, cwd, parentRequire) {
 
   // use context object to keep track of resets, subcommand execution, etc
   // submodules should modify and check the state of context as necessary
-  var context = null
+  const context = { resets: -1, commands: [], files: [] }
   self.getContext = function () {
     return context
   }
-  function resetContext () {
-    context = { resets: -1, commands: [], files: [] }
-  }
-  resetContext()
 
   // puts yargs back into an initial state. any keys
   // that have been set to "global" will not be reset
@@ -173,7 +169,6 @@ function Yargs (processArgs, cwd, parentRequire) {
     parseFn = null
     parseContext = null
     frozen = undefined
-    resetContext()
   }
 
   self.boolean = function (bools) {
