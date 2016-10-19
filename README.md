@@ -1341,6 +1341,8 @@ Locales currently supported:
 * **en:** American English.
 * **es:** Spanish.
 * **fr:** French.
+* **hi:** Hindi.
+* **hu:** Hungarian.
 * **id:** Indonesian.
 * **it:** Italian.
 * **ja:** Japanese.
@@ -1350,9 +1352,10 @@ Locales currently supported:
 * **pl:** Polish.
 * **pt:** Portuguese.
 * **pt_BR:** Brazilian Portuguese.
-* **tr:** Turkish.
-* **zh:** Chinese.
+* **ru:** Russian.
 * **th:** Thai.
+* **tr:** Turkish.
+* **zh_CN:** Chinese.
 
 To submit a new translation for yargs:
 
