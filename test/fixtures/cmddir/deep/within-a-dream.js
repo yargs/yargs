@@ -12,6 +12,7 @@ module.exports = {
   },
   handler: function (argv) {
     var factor = 7
+    if (argv.context) argv.context.counter++ // keep track of how many times we've invoked this handler.
     if (argv.extract) {
       if (!argv.withKick) factor -= 2
       if (!chancesLevel2(factor)) throw new Error('Something went wrong at level 2! Check your options for increased chance of success.')
