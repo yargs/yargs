@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="6.3.0"></a>
+# [6.3.0](https://github.com/yargs/yargs/compare/v6.2.0...v6.3.0) (2016-10-19)
+
+
+### Bug Fixes
+
+* **command:** subcommands via commandDir() now supported for parse(msg, cb) ([#678](https://github.com/yargs/yargs/issues/678)) ([6b85cc6](https://github.com/yargs/yargs/commit/6b85cc6))
+
+
+### Features
+
+* **locales:** Add Thai locale file ([#679](https://github.com/yargs/yargs/issues/679)) ([c05e36b](https://github.com/yargs/yargs/commit/c05e36b))
+
+
+
 <a name="6.2.0"></a>
 # [6.2.0](https://github.com/yargs/yargs/compare/v6.1.1...v6.2.0) (2016-10-16)
 
