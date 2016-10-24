@@ -123,6 +123,34 @@ describe('validation tests', function () {
     })
   })
 
+  describe('conflicts', function () {
+    it('fails if both arguments are supplied', function (done) {
+      yargs(['-f', '-b'])
+          .conflicts('f', 'b')
+          .fail(function (msg) {
+            msg.should.equal('Arguments f and b are mutually exclusive')
+            return done()
+          })
+          .argv
+    })
+
+    it('should not fail if only one argument is supplied', function () {
+      yargs(['-b'])
+          .conflicts('f', 'b')
+          .fail(function (msg) {
+            expect.fail()
+          })
+          .argv
+
+      yargs(['-f'])
+      .conflicts('f', 'b')
+      .fail(function (msg) {
+        expect.fail()
+      })
+      .argv
+    })
+  })
+
   describe('demand', function () {
     it('fails with standard error message if msg is not defined', function (done) {
       yargs([])
