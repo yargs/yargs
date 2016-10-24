@@ -476,26 +476,23 @@ describe('usage tests', function () {
 
       it('gives the ability to log a per-command error message if failure occurs in a command', function () {
         var r = checkUsage(function () {
-          try {
-            return yargs
-              .command('foo', 'desc', {
-                bar: {
-                  describe: 'bar command'
-                }
-              }, function (argv) {
-                throw new Error('blah')
-              })
-              .fail(function (message, error, yargs) {
-                console.log(yargs.help())
-              })
-              .exitProcess(false)
-              .wrap(null)
-              .argv
-          } catch (e) {
-          }
-        }, 'foo')
+          return yargs('foo')
+            .command('foo', 'desc', {
+              bar: {
+                describe: 'bar command'
+              }
+            }, function (argv) {
+              throw new Error('blah')
+            })
+            .fail(function (message, error, yargs) {
+              yargs.showHelp()
+            })
+            .exitProcess(false)
+            .wrap(null)
+            .argv
+        })
 
-        r.logs[0].should.contain('bar command')
+        r.errors[0].should.contain('bar command')
       })
 
       describe('when check() throws error', function () {
