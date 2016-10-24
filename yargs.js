@@ -354,6 +354,11 @@ function Yargs (processArgs, cwd, parentRequire) {
     return self
   }
 
+  self.conflicts = function (key1, key2) {
+    validation.conflicts(key1, key2)
+    return self
+  }
+
   self.usage = function (msg, opts) {
     if (!opts && typeof msg === 'object') {
       opts = msg
@@ -949,6 +954,7 @@ function Yargs (processArgs, cwd, parentRequire) {
         validation.customChecks(argv, aliases)
         validation.limitedChoices(argv)
         validation.implications(argv)
+        validation.conflicting(argv)
       }
     }
 
