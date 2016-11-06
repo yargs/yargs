@@ -74,7 +74,7 @@ describe('validation tests', function () {
   describe('demand', function () {
     it('fails with standard error message if msg is not defined', function (done) {
       yargs([])
-        .demand(1)
+        .demandCommand(1)
         .fail(function (msg) {
           msg.should.equal('Not enough non-option arguments: got 0, need at least 1')
           return done()
@@ -86,7 +86,7 @@ describe('validation tests', function () {
       yargs(['koala'])
         .command('wombat', 'wombat burrows')
         .command('kangaroo', 'kangaroo handlers')
-        .demand(1)
+        .demandCommand(1)
         .strict()
         .fail(function (msg) {
           msg.should.equal('Unknown argument: koala')
@@ -97,7 +97,7 @@ describe('validation tests', function () {
 
     it('does not fail in strict mode when no commands configured', function () {
       var argv = yargs('koala')
-        .demand(1)
+        .demandCommand(1)
         .strict()
         .fail(function (msg) {
           expect.fail()
@@ -106,29 +106,9 @@ describe('validation tests', function () {
       argv._[0].should.equal('koala')
     })
 
-    it('fails when a required argument is missing', function (done) {
-      yargs('-w 10 marsupial')
-        .demand(1, ['w', 'b'])
-        .fail(function (msg) {
-          msg.should.equal('Missing required argument: b')
-          return done()
-        })
-        .argv
-    })
-
-    it('fails when required arguments are present, but a command is missing', function (done) {
-      yargs('-w 10 -m wombat')
-        .demand(1, ['w', 'm'])
-        .fail(function (msg) {
-          msg.should.equal('Not enough non-option arguments: got 0, need at least 1')
-          return done()
-        })
-        .argv
-    })
-
     it('fails without a message if msg is null', function (done) {
       yargs([])
-        .demand(1, null)
+        .demandCommand(1, null)
         .fail(function (msg) {
           expect(msg).to.equal(null)
           return done()
@@ -140,7 +120,7 @@ describe('validation tests', function () {
       var failureMsg
       yargs('lint')
         .command('lint', 'Lint a file', function (yargs) {
-          yargs.demand(1).fail(function (msg) {
+          yargs.demandCommand(1).fail(function (msg) {
             failureMsg = msg
           })
         })
@@ -152,7 +132,7 @@ describe('validation tests', function () {
       var failureMsg
       yargs('lint one.js two.js')
         .command('lint', 'Lint a file', function (yargs) {
-          yargs.demand(0, 1).fail(function (msg) {
+          yargs.demandCommand(0, 1).fail(function (msg) {
             failureMsg = msg
           })
         })

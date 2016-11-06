@@ -241,7 +241,8 @@ describe('yargs dsl tests', function () {
         configObjects: [],
         envPrefix: 'YARGS', // preserved as global
         global: ['help'],
-        demanded: {}
+        demandedCommand: {},
+        demandedOption: {}
       }
 
       expect(y.getOptions()).to.deep.equal(emptyOptions)
@@ -853,7 +854,7 @@ describe('yargs dsl tests', function () {
 
     it('resets error state between calls to parse', function () {
       var y = yargs()
-        .demand(2)
+        .demandCommand(2)
 
       var err1 = null
       var out1 = null
@@ -1086,7 +1087,7 @@ describe('yargs dsl tests', function () {
         var output
         // set some top-level, reset-able config
         var parser = yargs()
-          .demand(1, 'Must call a command')
+          .demandCommand(1, 'Must call a command')
           .strict()
           .command('one <x>', 'The one and only command')
         // first call parse with command, which calls reset
@@ -1241,11 +1242,11 @@ describe('yargs dsl tests', function () {
 
       options.key.foo.should.equal(true)
       options.string.should.include('awesome-sauce')
-      Object.keys(options.demanded).should.include('awesomeSauce')
+      Object.keys(options.demandedOption).should.include('awesomeSauce')
 
       expect(options.key.bar).to.equal(undefined)
       options.string.should.not.include('bar')
-      Object.keys(options.demanded).should.not.include('bar')
+      Object.keys(options.demandedOption).should.not.include('bar')
     })
 
     it('should set help to global option by default', function () {
@@ -1408,7 +1409,7 @@ describe('yargs dsl tests', function () {
 
     it('does not skip validation if no option with skipValidation is present', function (done) {
       var argv = yargs(['--koala'])
-          .demand(1)
+          .demandCommand(1)
           .fail(function (msg) {
             return done()
           })
@@ -1433,7 +1434,7 @@ describe('yargs dsl tests', function () {
     it('allows having an option that skips validation but not skipping validation if that option is not used', function () {
       var skippedValidation = true
       yargs(['--no-skip'])
-          .demand(5)
+          .demandCommand(5)
           .option('skip', {
             skipValidation: true
           })
