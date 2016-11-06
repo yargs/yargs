@@ -37,70 +37,6 @@ describe('usage tests', function () {
         r.exit.should.be.ok
       })
 
-      it('missing argument message given if one command, but an argument not on the list is provided', function () {
-        var r = checkUsage(function () {
-          return yargs('wombat -w 10 -y 10')
-            .usage('Usage: $0 -w NUM -m NUM')
-            .demand(1, ['w', 'm'])
-            .strict()
-            .wrap(null)
-            .argv
-        })
-        r.result.should.have.property('w', 10)
-        r.result.should.have.property('y', 10)
-        r.result.should.have.property('_').with.length(1)
-        r.errors.join('\n').split(/\n+/).should.deep.equal([
-          'Usage: ./usage -w NUM -m NUM',
-          'Options:',
-          '  -w  [required]',
-          '  -m  [required]',
-          'Missing required argument: m'
-        ])
-        r.logs.should.have.length(0)
-        r.exit.should.be.ok
-      })
-
-      it('missing command message if all the required arguments exist, but not enough commands are provided', function () {
-        var r = checkUsage(function () {
-          return yargs('-w 10 -y 10')
-            .usage('Usage: $0 -w NUM -m NUM')
-            .demand(1, ['w', 'm'])
-            .strict()
-            .wrap(null)
-            .argv
-        })
-        r.result.should.have.property('w', 10)
-        r.result.should.have.property('y', 10)
-        r.result.should.have.property('_').with.length(0)
-        r.errors.join('\n').split(/\n+/).should.deep.equal([
-          'Usage: ./usage -w NUM -m NUM',
-          'Options:',
-          '  -w  [required]',
-          '  -m  [required]',
-          'Not enough non-option arguments: got 0, need at least 1'
-        ])
-        r.logs.should.have.length(0)
-        r.exit.should.be.ok
-      })
-
-      it('no failure occurs if the required arguments and the required number of commands are provided.', function () {
-        var r = checkUsage(function () {
-          return yargs('wombat -w 10 -m 10')
-            .usage('Usage: $0 -w NUM -m NUM')
-            .command('wombat', 'wombat handlers')
-            .demand(1, ['w', 'm'])
-            .strict()
-            .wrap(null)
-            .argv
-        })
-        r.result.should.have.property('w', 10)
-        r.result.should.have.property('m', 10)
-        r.result.should.have.property('_').with.length(1)
-        r.should.have.property('errors').with.length(0)
-        r.should.have.property('logs').with.length(0)
-        r.should.have.property('exit', false)
-      })
-
       describe('using .require()', function () {
         it('should show an error along with the missing arguments on demand fail', function () {
           var r = checkUsage(function () {
@@ -123,51 +59,6 @@ describe('usage tests', function () {
           r.logs.should.have.length(0)
           r.exit.should.be.ok
         })
-        it('missing argument message given if one command and an argument not on the list are provided', function () {
-          var r = checkUsage(function () {
-            return yargs('wombat -w 10 -y 10')
-              .usage('Usage: $0 -w NUM -m NUM')
-              .required(1, ['w', 'm'])
-              .strict()
-              .wrap(null)
-              .argv
-          })
-          r.result.should.have.property('w', 10)
-          r.result.should.have.property('y', 10)
-          r.result.should.have.property('_').with.length(1)
-          r.errors.join('\n').split(/\n+/).should.deep.equal([
-            'Usage: ./usage -w NUM -m NUM',
-            'Options:',
-            '  -w  [required]',
-            '  -m  [required]',
-            'Missing required argument: m'
-          ])
-          r.logs.should.have.length(0)
-          r.exit.should.be.ok
-        })
-      })
-
-      it('missing command message if all the required arguments exist, but not enough commands are provided', function () {
-        var r = checkUsage(function () {
-          return yargs('-w 10 -y 10')
-            .usage('Usage: $0 -w NUM -m NUM')
-            .require(1, ['w', 'm'])
-            .strict()
-            .wrap(null)
-            .argv
-        })
-        r.result.should.have.property('w', 10)
-        r.result.should.have.property('y', 10)
-        r.result.should.have.property('_').with.length(0)
-        r.errors.join('\n').split(/\n+/).should.deep.equal([
-          'Usage: ./usage -w NUM -m NUM',
-          'Options:',
-          '  -w  [required]',
-          '  -m  [required]',
-          'Not enough non-option arguments: got 0, need at least 1'
-        ])
-        r.logs.should.have.length(0)
-        r.exit.should.be.ok
       })
 
       it('no failure occurs if the required arguments and the required number of commands are provided.', function () {
@@ -232,7 +123,7 @@ describe('usage tests', function () {
       var r = checkUsage(function () {
         return yargs('')
           .usage('Usage: foo')
-          .demand(1, null)
+          .demandCommand(1, null)
           .wrap(null)
           .argv
       })
@@ -249,7 +140,7 @@ describe('usage tests', function () {
         var r = checkUsage(function () {
           return yargs(['foo', 'bar', 'apple'])
             .usage('Usage: foo')
-            .demand(2, 3)
+            .demandCommand(2, 3)
             .wrap(null)
             .argv
         })
@@ -261,7 +152,7 @@ describe('usage tests', function () {
         var r = checkUsage(function () {
           return yargs(['foo', 'bar', 'apple', 'banana'])
             .usage('Usage: foo')
-            .demand(2, 3)
+            .demandCommand(2, 3)
             .wrap(null)
             .argv
         })
@@ -276,7 +167,7 @@ describe('usage tests', function () {
         var r = checkUsage(function () {
           return yargs(['foo'])
             .usage('Usage: foo')
-            .demand(2, 3)
+            .demandCommand(2, 3)
             .wrap(null)
             .argv
         })
@@ -291,7 +182,7 @@ describe('usage tests', function () {
         var r = checkUsage(function () {
           return yargs(['foo'])
             .usage('Usage: foo')
-            .demand(2, 3, 'pork chop sandwiches')
+            .demandCommand(2, 3, 'pork chop sandwiches')
             .wrap(null)
             .argv
         })
@@ -552,7 +443,7 @@ describe('usage tests', function () {
     var r = checkUsage(function () {
       return yargs('1 2 3 --moo')
       .usage('Usage: $0 [x] [y] [z] {OPTIONS}')
-      .demand(3)
+      .demandCommand(3)
       .argv
     })
     r.should.have.property('result')
@@ -567,7 +458,7 @@ describe('usage tests', function () {
     var r = checkUsage(function () {
       return yargs('1 2 --moo')
       .usage('Usage: $0 [x] [y] [z] {OPTIONS}')
-      .demand(3)
+      .demandCommand(3)
       .wrap(null)
       .argv
     })
@@ -587,7 +478,7 @@ describe('usage tests', function () {
     var r = checkUsage(function () {
       return yargs('src --moo')
       .usage('Usage: $0 [x] [y] [z] {OPTIONS} <src> <dest> [extra_files...]')
-      .demand(2, 'src and dest files are both required')
+      .demandCommand(2, 'src and dest files are both required')
       .wrap(null)
       .argv
     })
@@ -637,7 +528,7 @@ describe('usage tests', function () {
       return yargs('')
         .alias('f', 'foo')
         .default('f', 5)
-        .demand(1)
+        .demandCommand(1)
         .wrap(null)
         .argv
     })
@@ -765,8 +656,8 @@ describe('usage tests', function () {
     it('should fail given an option argument that is not demanded', function () {
       var r = checkUsage(function () {
         var opts = {
-          foo: { demand: 'foo option', alias: 'f' },
-          bar: { demand: 'bar option', alias: 'b' }
+          foo: { demandOption: 'foo option', alias: 'f' },
+          bar: { demandOption: 'bar option', alias: 'b' }
         }
 
         return yargs('-f 10 --bar 20 --baz 30')
@@ -916,8 +807,8 @@ describe('usage tests', function () {
           return yargs('-y 10 -z 20')
             .usage('Usage: $0 -x NUM [-y NUM]')
             .options({
-              'x': { description: 'an option', demand: true },
-              'y': { description: 'another option', demand: false }
+              'x': { description: 'an option', demandOption: true },
+              'y': { description: 'another option', demandOption: false }
             })
             .wrap(null)
             .argv
@@ -1358,7 +1249,7 @@ describe('usage tests', function () {
           .option('f', {
             alias: 'file',
             describe: noColorAddedDescr,
-            demand: true,
+            demandOption: true,
             type: 'string'
           })
           .help('h').alias('h', 'help')
@@ -1382,7 +1273,7 @@ describe('usage tests', function () {
           .option('f', {
             alias: 'file',
             describe: yellowDescription,
-            demand: true,
+            demandOption: true,
             type: 'string'
           })
           .help('h').alias('h', 'help')
@@ -1723,7 +1614,7 @@ describe('usage tests', function () {
         return yargs('upload --help')
           .command('upload', 'upload something', {
             builder: function (yargs) {
-              return yargs.usage('Usage: program upload <something> [opts]').demand(1)
+              return yargs.usage('Usage: program upload <something> [opts]').demandCommand(1)
             },
             handler: function (argv) {}
           })
