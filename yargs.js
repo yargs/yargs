@@ -316,11 +316,7 @@ function Yargs (processArgs, cwd, parentRequire) {
       max = Infinity
     }
 
-    if (typeof keys === 'number') {
-      if (!options.demandedOption._) options.demandedOption._ = { count: 0, msg: null, max: max }
-      options.demandedOption._.count = keys
-      options.demandedOption._.msg = msg
-    } else if (Array.isArray(keys)) {
+    if (Array.isArray(keys)) {
       keys.forEach(function (key) {
         self.demandOption(key, msg)
       })
@@ -339,18 +335,19 @@ function Yargs (processArgs, cwd, parentRequire) {
     if (typeof max !== 'number') {
       minMsg = max
       max = Infinity
-      options.demandedCommand._ = {
-        min: min,
-        max: max,
-        minMsg: minMsg,
-        maxMsg: maxMsg
-      }
+    }
+
+    options.demandedCommand._ = {
+      min: min,
+      max: max,
+      minMsg: minMsg,
+      maxMsg: maxMsg
     }
 
     return self
   }
 
-  self.getDemandedOption = function () {
+  self.getDemandedOption = self.getDemanded = function () {
     return options.demandedOption
   }
 
