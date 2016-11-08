@@ -12,7 +12,7 @@
     "LICENSE"
   ],
   "dependencies": {
-    "camelcase": "^3.0.0",
+    "camelcase": "^4.0.0",
     "cliui": "^3.2.0",
     "decamelize": "^1.1.1",
     "get-caller-file": "^1.0.1",
