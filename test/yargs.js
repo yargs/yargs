@@ -253,7 +253,8 @@ describe('yargs dsl tests', function () {
       expect(y.getCommandInstance().getCommandHandlers()).to.deep.equal({})
       expect(y.getExitProcess()).to.equal(false)
       expect(y.getStrict()).to.equal(false)
-      expect(y.getDemanded()).to.deep.equal({})
+      expect(y.getDemandedOption()).to.deep.equal({})
+      expect(y.getDemandedommand()).to.deep.equal({})
       expect(y.getGroups()).to.deep.equal({})
     })
 

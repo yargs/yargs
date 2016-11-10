@@ -61,25 +61,6 @@ describe('usage tests', function () {
         })
       })
 
-      it('no failure occurs if the required arguments and the required number of commands are provided.', function () {
-        var r = checkUsage(function () {
-          return yargs('wombat -w 10 -m 10')
-            .usage('Usage: $0 -w NUM -m NUM')
-            .command('wombat', 'wombat handlers')
-            .require(1, ['w', 'm'])
-            .strict()
-            .wrap(null)
-            .argv
-        })
-        r.result.should.have.property('w', 10)
-        r.result.should.have.property('m', 10)
-        r.result.should.have.property('_').with.length(1)
-        r.should.have.property('errors').with.length(0)
-        r.should.have.property('logs').with.length(0)
-        r.should.have.property('exit', false)
-      })
-    })
-
     it('should show an error along with a custom message on demand fail', function () {
       var r = checkUsage(function () {
         return yargs('-z 20')
@@ -491,6 +472,24 @@ describe('usage tests', function () {
     r.errors.join('\n').split(/\n+/).should.deep.equal([
       'Usage: ./usage [x] [y] [z] {OPTIONS} <src> <dest> [extra_files...]',
       'src and dest files are both required'
+    ])
+  })
+
+  it('should return a custom failure message when too many non-hyphenated arguments are found after a demand count', function () {
+    var r = checkUsage(function () {
+      return yargs(['src', 'dest'])
+        .usage('Usage: $0 [x] [y] [z] {OPTIONS} <src> <dest> [extra_files...]')
+        .demandCommand(0, 1, 'src and dest files are both required', 'too many arguments are provided')
+        .wrap(null)
+        .argv
+    })
+    r.should.have.property('result')
+    r.should.have.property('logs').with.length(2)
+    r.should.have.property('exit').and.be.ok
+    r.result.should.have.property('_').and.deep.equal(['src', 'dest'])
+    r.errors.join('\n').split(/\n+/).should.deep.equal([
+      'Usage: ./usage [x] [y] [z] {OPTIONS} <src> <dest> [extra_files...]',
+      'too many arguments are provided'
     ])
   })
 
