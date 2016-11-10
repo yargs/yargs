@@ -60,6 +60,7 @@ describe('usage tests', function () {
           r.exit.should.be.ok
         })
       })
+    })
 
     it('should show an error along with a custom message on demand fail', function () {
       var r = checkUsage(function () {
@@ -484,7 +485,7 @@ describe('usage tests', function () {
         .argv
     })
     r.should.have.property('result')
-    r.should.have.property('logs').with.length(2)
+    r.should.have.property('logs').with.length(0)
     r.should.have.property('exit').and.be.ok
     r.result.should.have.property('_').and.deep.equal(['src', 'dest'])
     r.errors.join('\n').split(/\n+/).should.deep.equal([
