@@ -1028,13 +1028,24 @@ require('yargs')
     alias: 'p', 
     describe: 'provide a path to file'
   })
-  .option('spec, {
+  .option('spec', {
     alias: 's', 
     describe: 'program specifications'
   })
   .demand(['run', 'path'], 'Please provide both run and path arguments to work with this tool')
   .help()
   .argv
+```
+which will provide the following output:
+```bash
+Options:
+  --run, -r   run your program                [required]
+  --path, -p  provide a path to file          [required]
+  --spec, -s  program specifications
+  --help      Show help                        [boolean]
+        
+  Missing required arguments: run, path
+  Please provide both run and path arguments to work with this tool
 ```
 
 If a `boolean` value is given, it controls whether the option is demanded;
@@ -1043,22 +1054,34 @@ this is useful when using `.options()` to specify command line parameters.
 ```javascript
 // demand individual options within the option constructor
 require('yargs')
-  .option('run', {
-    alias: 'r', 
-    describe: 'run your program',
-    demand: true
-  })
-  .option('path', {
-    alias: 'p', 
-    describe: 'provide a path to file', 
-    demand: true
-  })
-  .option('spec, {
-    alias: 's', 
-    describe: 'program specifications'
+  .options({
+    'run': {
+      alias: 'r', 
+      describe: 'run your program',
+      demand: true
+    },
+    path': {
+      alias: 'p', 
+      describe: 'provide a path to file', 
+      demand: true
+    },
+    'spec': {
+      alias: 's', 
+      describe: 'program specifications'
+    }
   })
   .help()
   .argv
+```
+which will provide the following output:
+```bash
+Options:
+  --run, -r   run your program                                       [required]
+  --path, -p  provide a path to file                                 [required]
+  --spec, -s  program specifications
+  --help      Show help                                               [boolean]
+        
+Missing required arguments: run, path
 ```
 
 <a name="demandCommand"></a>.demandCommand(min, [minMsg])
@@ -1078,9 +1101,20 @@ require('yargs')
       console.log(`setting ${argv.key} to ${argv.value}`)
     }
   })
-  .demandCommand(1)
+  // provide a minimum demand and a minimum demand message
+  .demandCommand(1, 'You need at least one command before moving on')
   .help()
   .argv
+```
+which will provide the following output:
+```bash
+Commands:
+  configure <key> [value]  Set a config variable         [aliases: config, cfg]
+  
+Options:
+  --help  Show help                                                   [boolean]
+    
+You need at least one command before moving on
 ```
 
 <a name="describe"></a>.describe(key, desc)
