@@ -416,7 +416,8 @@ function Yargs (processArgs, cwd, parentRequire) {
     var obj = {}
     try {
       obj = readPkgUp.sync({
-        cwd: path || require('require-main-filename')(parentRequire || require)
+        cwd: path || require('require-main-filename')(parentRequire || require),
+        normalize: false
       })
     } catch (noop) {}
 
