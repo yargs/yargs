@@ -74,7 +74,8 @@
   "greenkeeper": {
     "ignore": [
       "string-width",
-      "read-pkg-up"
+      "read-pkg-up",
+      "camelcase"
     ]
   }
 }
