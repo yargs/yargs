@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="6.4.0"></a>
+# [6.4.0](https://github.com/yargs/yargs/compare/v6.3.0...v6.4.0) (2016-11-13)
+
+
+### Bug Fixes
+
+* **locales:** correct some Russian translations ([#691](https://github.com/yargs/yargs/issues/691)) ([a980671](https://github.com/yargs/yargs/commit/a980671))
+
+
+### Features
+
+* **locales:** Added Belarusian translation ([#690](https://github.com/yargs/yargs/issues/690)) ([68dac1f](https://github.com/yargs/yargs/commit/68dac1f))
+* **locales:** Create nl.json ([#687](https://github.com/yargs/yargs/issues/687)) ([46ce1bb](https://github.com/yargs/yargs/commit/46ce1bb))
+* update to yargs-parser that addresses [#598](https://github.com/yargs/yargs/issues/598), [#617](https://github.com/yargs/yargs/issues/617) ([#700](https://github.com/yargs/yargs/issues/700)) ([54cb31d](https://github.com/yargs/yargs/commit/54cb31d))
+* yargs is now passed as the third-argument to fail handler ([#613](https://github.com/yargs/yargs/issues/613)) ([21b74f9](https://github.com/yargs/yargs/commit/21b74f9))
+
+
+### Performance Improvements
+
+* normalizing package data is an expensive operation ([#705](https://github.com/yargs/yargs/issues/705)) ([49cf533](https://github.com/yargs/yargs/commit/49cf533))
+
+
+
 <a name="6.3.0"></a>
 # [6.3.0](https://github.com/yargs/yargs/compare/v6.2.0...v6.3.0) (2016-10-19)
 
