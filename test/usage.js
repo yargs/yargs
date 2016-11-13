@@ -474,7 +474,7 @@ describe('usage tests', function () {
         r.should.have.property('exit').and.be.false
       })
 
-      it('gives the ability to log a per-command error message if failure occurs in a command', function () {
+      it('is invoked with yargs instance as third argument', function () {
         var r = checkUsage(function () {
           return yargs('foo')
             .command('foo', 'desc', {
