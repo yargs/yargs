@@ -1150,15 +1150,17 @@ yargs have been validated.
 
 Method to execute when a failure occurs, rather than printing the failure message.
 
-`fn` is called with the failure message that would have been printed and the
-`Error` instance originally thrown, if any.
+`fn` is called with the failure message that would have been printed, the
+`Error` instance originally thrown and yargs state when the failure
+occured. 
 
 ```js
 var argv = require('yargs')
-  .fail(function (msg, err) {
+  .fail(function (msg, err, yargs) {
     if (err) throw err // preserve stack
     console.error('You broke it!')
     console.error(msg)
+    console.error('You should be doing', yargs.help())
     process.exit(1)
   })
   .argv
