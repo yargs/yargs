@@ -113,7 +113,6 @@ describe('validation tests', function () {
         })
         .argv
 
-
       yargs(['-b'])
         .conflicts(['b', 'c', 'd'], ['f', 'g', 'h'])
         .fail(function (msg) {
@@ -121,7 +120,7 @@ describe('validation tests', function () {
         })
         .argv
 
-        yargs(['-b'])
+      yargs(['-b'])
         .conflicts(['b', 'c', 'd'])
         .fail(function (msg) {
           expect.fail()
