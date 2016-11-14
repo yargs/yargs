@@ -136,18 +136,49 @@ describe('validation tests', function () {
 
     it('should not fail if only one argument is supplied', function () {
       yargs(['-b'])
-          .conflicts('f', 'b')
-          .fail(function (msg) {
-            expect.fail()
-          })
-          .argv
+        .conflicts('f', 'b')
+        .fail(function (msg) {
+          expect.fail()
+        })
+        .argv
 
       yargs(['-f'])
-      .conflicts('f', 'b')
-      .fail(function (msg) {
-        expect.fail()
-      })
-      .argv
+        .conflicts('f', 'b')
+        .fail(function (msg) {
+          expect.fail()
+        })
+        .argv
+    })
+
+    it('should not fail with arrays as arguments', function () {
+      yargs(['-b'])
+        .conflicts('f', ['b', 'c', 'd'])
+        .fail(function (msg) {
+          expect.fail()
+        })
+        .argv
+
+      yargs(['-b'])
+        .conflicts(['b', 'c', 'd'], 'f')
+        .fail(function (msg) {
+          expect.fail()
+        })
+        .argv
+
+
+      yargs(['-b'])
+        .conflicts(['b', 'c', 'd'], ['f', 'g', 'h'])
+        .fail(function (msg) {
+          expect.fail()
+        })
+        .argv
+
+        yargs(['-b'])
+        .conflicts(['b', 'c', 'd'])
+        .fail(function (msg) {
+          expect.fail()
+        })
+        .argv
     })
   })
 
