@@ -1075,7 +1075,7 @@ require('yargs')
       describe: 'run your program',
       demand: true
     },
-    path': {
+    'path': {
       alias: 'p', 
       describe: 'provide a path to file', 
       demand: true
