@@ -98,7 +98,7 @@ function Yargs (processArgs, cwd, parentRequire) {
 
     var objectOptions = [
       'narg', 'key', 'alias', 'default', 'defaultDescription',
-      'config', 'choices', 'demandedOption', 'demandedCommand', 'coerce'
+      'config', 'choices', 'demandedOptions', 'demandedCommands', 'coerce'
     ]
 
     arrayOptions.forEach(function (k) {
@@ -322,9 +322,9 @@ function Yargs (processArgs, cwd, parentRequire) {
       })
     } else {
       if (typeof msg === 'string') {
-        options.demandedOption[keys] = { msg: msg }
+        options.demandedOptions[keys] = { msg: msg }
       } else if (msg === true || typeof msg === 'undefined') {
-        options.demandedOption[keys] = { msg: undefined }
+        options.demandedOptions[keys] = { msg: undefined }
       }
     }
 
@@ -337,7 +337,7 @@ function Yargs (processArgs, cwd, parentRequire) {
       max = Infinity
     }
 
-    options.demandedCommand._ = {
+    options.demandedCommands._ = {
       min: min,
       max: max,
       minMsg: minMsg,
@@ -347,12 +347,12 @@ function Yargs (processArgs, cwd, parentRequire) {
     return self
   }
 
-  self.getDemandedOption = self.getDemanded = function () {
-    return options.demandedOption
+  self.getDemandedOptions = self.getDemanded = function () {
+    return options.demandedOptions
   }
 
-  self.getDemandedCommand = function () {
-    return options.demandedCommand
+  self.getDemandedCommands = function () {
+    return options.demandedCommands
   }
 
   self.requiresArg = function (requiresArgs) {

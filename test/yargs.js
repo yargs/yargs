@@ -241,8 +241,8 @@ describe('yargs dsl tests', function () {
         configObjects: [],
         envPrefix: 'YARGS', // preserved as global
         global: ['help'],
-        demandedCommand: {},
-        demandedOption: {}
+        demandedCommands: {},
+        demandedOptions: {}
       }
 
       expect(y.getOptions()).to.deep.equal(emptyOptions)
@@ -251,8 +251,8 @@ describe('yargs dsl tests', function () {
       expect(y.getCommandInstance().getCommandHandlers()).to.deep.equal({})
       expect(y.getExitProcess()).to.equal(false)
       expect(y.getStrict()).to.equal(false)
-      expect(y.getDemandedOption()).to.deep.equal({})
-      expect(y.getDemandedCommand()).to.deep.equal({})
+      expect(y.getDemandedOptions()).to.deep.equal({})
+      expect(y.getDemandedCommands()).to.deep.equal({})
       expect(y.getGroups()).to.deep.equal({})
     })
 
@@ -1243,11 +1243,11 @@ describe('yargs dsl tests', function () {
 
       options.key.foo.should.equal(true)
       options.string.should.include('awesome-sauce')
-      Object.keys(options.demandedOption).should.include('awesomeSauce')
+      Object.keys(options.demandedOptions).should.include('awesomeSauce')
 
       expect(options.key.bar).to.equal(undefined)
       options.string.should.not.include('bar')
-      Object.keys(options.demandedOption).should.not.include('bar')
+      Object.keys(options.demandedOptions).should.not.include('bar')
     })
 
     it('should set help to global option by default', function () {
