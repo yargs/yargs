@@ -16,7 +16,7 @@
     "cliui": "^3.2.0",
     "decamelize": "^1.1.1",
     "get-caller-file": "^1.0.1",
-    "os-locale": "^1.4.0",
+    "os-locale": "^2.0.0",
     "read-pkg-up": "^1.0.1",
     "require-directory": "^2.1.1",
     "require-main-filename": "^1.0.1",
