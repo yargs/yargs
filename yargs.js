@@ -446,16 +446,12 @@ function Yargs (processArgs, cwd, parentRequire) {
     // skipping validation, etc.
     if (!shortCircuit) processArgs = args
 
-    if (parseFn) {
-      freeze()
-      exitProcess = false
-    }
+    freeze()
+    if (parseFn) exitProcess = false
 
     var parsed = parseArgs(args, shortCircuit)
-    if (parseFn) {
-      parseFn(exitError, parsed, output)
-      unfreeze()
-    }
+    if (parseFn) parseFn(exitError, parsed, output)
+    unfreeze()
 
     return parsed
   }
