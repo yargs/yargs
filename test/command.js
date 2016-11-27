@@ -735,6 +735,18 @@ describe('Command', function () {
     argv.second.should.equal('bar')
   })
 
+  // addresses https://github.com/yargs/yargs/issues/710
+  it('invokes command handler repeatedly if parse() is called multiple times', function () {
+    var counter = 0
+    var y = yargs([])
+      .command('foo', 'the foo command', {}, function (argv) {
+        counter++
+      })
+    y.parse(['foo'])
+    y.parse(['foo'])
+    counter.should.equal(2)
+  })
+
   // addresses https://github.com/yargs/yargs/issues/522
   it('does not require builder function to return', function () {
     var argv = yargs('yo')
