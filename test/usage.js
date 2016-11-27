@@ -2331,7 +2331,7 @@ describe('usage tests', function () {
           .argv
       })
 
-      r.logs.join(' ').should.match(/\[count\]/)
+      r.logs.join(' ').should.match(/\[count]/)
     })
   })
 
@@ -2348,7 +2348,7 @@ describe('usage tests', function () {
           .argv
       })
 
-      r.logs.join(' ').should.match(/\[array\]/)
+      r.logs.join(' ').should.match(/\[array]/)
     })
   })
 

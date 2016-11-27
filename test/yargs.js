@@ -450,7 +450,7 @@ describe('yargs dsl tests', function () {
           builder: function (yargs) { return yargs },
           handler: function (argv) {}
         })
-      }).to.throw(/No command name given for module: { desc: 'A command with no name',\n {2}builder: \[Function(: builder)?\],\n {2}handler: \[Function(: handler)?\] }/)
+      }).to.throw(/No command name given for module: { desc: 'A command with no name',\n {2}builder: \[Function(: builder)?],\n {2}handler: \[Function(: handler)?] }/)
     })
   })
 
@@ -809,7 +809,7 @@ describe('yargs dsl tests', function () {
       })
       r.logs.length.should.equal(0)
       r.errors.length.should.equal(0)
-      output.should.match(/--robin.*\[required\]/)
+      output.should.match(/--robin.*\[required]/)
     })
 
     it('reinstates original exitProcess setting after invocation', function () {
@@ -848,7 +848,7 @@ describe('yargs dsl tests', function () {
       r1.exit.should.be.false
       r2.exit.should.be.true
       r2.errors.length.should.equal(0)
-      r2.logs[0].should.match(/--help.*Show help.*\[boolean\]/)
+      r2.logs[0].should.match(/--help.*Show help.*\[boolean]/)
     })
 
     it('resets error state between calls to parse', function () {
