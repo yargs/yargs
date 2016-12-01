@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="6.5.0"></a>
+# [6.5.0](https://github.com/yargs/yargs/compare/v6.4.0...v6.5.0) (2016-12-01)
+
+
+### Bug Fixes
+
+* still freeze/unfreeze if parse() is called in isolation ([#717](https://github.com/yargs/yargs/issues/717)) ([30a9492](https://github.com/yargs/yargs/commit/30a9492))
+
+
+### Features
+
+* pull in yargs-parser introducing additional settings ([#688](https://github.com/yargs/yargs/issues/688)), and fixing [#716](https://github.com/yargs/yargs/issues/716) ([#722](https://github.com/yargs/yargs/issues/722)) ([702995a](https://github.com/yargs/yargs/commit/702995a))
+
+
+
 <a name="6.4.0"></a>
 # [6.4.0](https://github.com/yargs/yargs/compare/v6.3.0...v6.4.0) (2016-11-13)
 
