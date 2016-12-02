@@ -301,11 +301,39 @@ function Yargs (processArgs, cwd, parentRequire) {
     return self
   }
 
-  self.demandOption = self.demand = self.required = self.require = function (keys, max, msg) {
+  self.demand = self.required = self.require = function (keys, max, msg) {
     // you can optionally provide a 'max' key,
     // which will raise an exception if too many '_'
     // options are provided.
 
+    if (Array.isArray(max)) {
+      max.forEach(function (key) {
+        self.demandOption(key, msg)
+      })
+      max = Infinity
+    } else if (typeof max !== 'number') {
+      msg = max
+      max = Infinity
+    }
+
+    if (typeof keys === 'number') {
+      self.demandCommand(keys, max, msg)
+    } else if (Array.isArray(keys)) {
+      keys.forEach(function (key) {
+        self.demandOption(key, msg)
+      })
+    } else {
+      if (typeof msg === 'string') {
+        options.demandedOptions[keys] = { msg: msg }
+      } else if (msg === true || typeof msg === 'undefined') {
+        options.demandedOptions[keys] = { msg: undefined }
+      }
+    }
+
+    return self
+  }
+
+  self.demandOption = function (keys, max, msg) {
     if (Array.isArray(max)) {
       max.forEach(function (key) {
         self.demandOption(key, msg)
@@ -347,7 +375,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     return self
   }
 
-  self.getDemandedOptions = self.getDemanded = function () {
+  self.getDemandedOptions = function () {
     return options.demandedOptions
   }
 
@@ -499,6 +527,12 @@ function Yargs (processArgs, cwd, parentRequire) {
       var demandOption = opt.demandOption || opt.required || opt.require
 
       var demandCommand = opt.demandCommand
+
+      var demand = opt.demand
+
+      if (demand) {
+        self.demand(key, demand)
+      }
 
       if (demandOption) {
         self.demandOption(key, demandOption)

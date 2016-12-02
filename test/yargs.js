@@ -260,7 +260,7 @@ describe('yargs dsl tests', function () {
 
     it('does not invoke parse with an error if reset has been called', function (done) {
       var y = yargs()
-        .demand('cake')
+        .demandOption('cake')
 
       y.parse('hello', function (err) {
         err.message.should.match(/Missing required argumen/)
