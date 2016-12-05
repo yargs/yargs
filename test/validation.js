@@ -12,7 +12,7 @@ describe('validation tests', function () {
     it("fails if '_' populated, and implied argument not set", function (done) {
       yargs(['cat'])
         .implies({
-          1: 'foo'
+          1: 'foo' // 1 arg in _ means --foo is required
         })
         .fail(function (msg) {
           msg.should.match(/Implications failed/)
@@ -25,7 +25,7 @@ describe('validation tests', function () {
       yargs(['--foo'])
         .boolean('foo')
         .implies({
-          'foo': 1
+          'foo': 1 // --foo means 1 arg in _ is required
         })
         .fail(function (msg) {
           msg.should.match(/Implications failed/)
@@ -37,7 +37,7 @@ describe('validation tests', function () {
     it("fails if --no-foo's implied argument is not set", function (done) {
       yargs([])
         .implies({
-          '--no-bar': 'foo'
+          '--no-bar': 'foo' // when --bar is not given, --foo is required
         })
         .fail(function (msg) {
           msg.should.match(/Implications failed/)
@@ -49,13 +49,77 @@ describe('validation tests', function () {
     it('fails if a key is set, along with a key that it implies should not be set', function (done) {
       yargs(['--bar', '--foo'])
         .implies({
-          'bar': '--no-foo'
+          'bar': '--no-foo' // --bar means --foo cannot be given
         })
         .fail(function (msg) {
           msg.should.match(/Implications failed/)
           return done()
         })
         .argv
+    })
+
+    it('fails if implied key (with "no" in the name) is not set', function () {
+      var failCalled = false
+      yargs('--bar')
+        .implies({
+          'bar': 'noFoo' // --bar means --noFoo (or --no-foo with boolean-negation disabled) is required
+                         // note that this has nothing to do with --foo
+        })
+        .fail(function (msg) {
+          failCalled = true
+          msg.should.match(/Implications failed/)
+        })
+        .argv
+      failCalled.should.be.true
+    })
+
+    it('doesn\'t fail if implied key (with "no" in the name) is set', function () {
+      var failCalled = false
+      const argv = yargs('--bar --noFoo')
+        .implies({
+          'bar': 'noFoo' // --bar means --noFoo (or --no-foo with boolean-negation disabled) is required
+                         // note that this has nothing to do with --foo
+        })
+        .fail(function (msg) {
+          failCalled = true
+        })
+        .argv
+      failCalled.should.be.false
+      expect(argv.bar).to.be.true
+      expect(argv.noFoo).to.be.true
+      expect(argv.foo).to.not.exist
+    })
+
+    it('fails if implied key (with "no" in the name) is given when it should not', function () {
+      var failCalled = false
+      yargs('--bar --noFoo')
+        .implies({
+          'bar': '--no-noFoo' // --bar means --noFoo (or --no-foo with boolean-negation disabled) cannot be given
+                              // note that this has nothing to do with --foo
+        })
+        .fail(function (msg) {
+          failCalled = true
+          msg.should.match(/Implications failed/)
+        })
+        .argv
+      failCalled.should.be.true
+    })
+
+    it('doesn\'t fail if implied key (with "no" in the name) that should not be given is not set', function () {
+      var failCalled = false
+      const argv = yargs('--bar')
+        .implies({
+          'bar': '--no-noFoo' // --bar means --noFoo (or --no-foo with boolean-negation disabled) cannot be given
+                              // note that this has nothing to do with --foo
+        })
+        .fail(function (msg) {
+          failCalled = true
+        })
+        .argv
+      failCalled.should.be.false
+      expect(argv.bar).to.be.true
+      expect(argv.noFoo).to.not.exist
+      expect(argv.foo).to.not.exist
     })
   })
 
