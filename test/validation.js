@@ -57,18 +57,6 @@ describe('validation tests', function () {
         })
         .argv
     })
-
-    it('does not treat --no- as a special case if boolean negation is disabled', function (done) {
-      yargs(['--foo'], './test/fixtures')
-        .implies({
-          'foo': '--no-foo'
-        })
-        .fail(function (msg) {
-          msg.should.match(/Implications failed/)
-          return done()
-        })
-        .argv
-    })
   })
 
   describe('demand', function () {
