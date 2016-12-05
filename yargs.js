@@ -818,7 +818,7 @@ function Yargs (processArgs, cwd, parentRequire) {
 
   function parseArgs (args, shortCircuit) {
     options.__ = y18n.__
-    options.configuration = pkgUp(cwd)['yargs'] || {}
+    options.configuration = pkgUp()['yargs'] || {}
     const parsed = Parser.detailed(args, options)
     var argv = parsed.argv
     if (parseContext) argv = assign(parseContext, argv)
