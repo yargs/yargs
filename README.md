@@ -611,8 +611,8 @@ yargs.command('get <source> [proxy]', 'make a get HTTP request')
 
 #### Positional Argument Aliases
 
-Aliases can be provided for positional arguments using the
-`|` character. As an example, suppose our application allows either a username _or_
+Aliases can be provided for positional arguments using the `|` character.
+As an example, suppose our application allows either a username _or_
 an email as the first argument:
 
 ```js
@@ -620,6 +620,9 @@ yargs.command('get <username|email> [password]', 'fetch a user by username or em
   .help()
   .argv
 ```
+
+In this way, both `argv.username` and `argv.email` would be populated with the
+same value when the command is executed.
 
 #### Variadic Positional Arguments
 
