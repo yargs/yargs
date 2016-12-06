@@ -819,17 +819,20 @@ describe('Command', function () {
     })
 
     it('allows an alias to be defined for an optional positional argument', function () {
-      var argv = yargs('yo 113993')
-        .command('yo [ssn|sin]', 'Send someone a yo')
+      var argv
+      yargs('yo 113993')
+        .command('yo [ssn|sin]', 'Send someone a yo', {}, function (_argv) {
+          argv = _argv
+        })
         .argv
       argv.ssn.should.equal(113993)
       argv.sin.should.equal(113993)
     })
 
     it('allows variadic and positional arguments to be combined', function () {
-      var argv = yargs('yo bcoe 113993 112888')
-        .command('yo <user|email> [ssns|sins...]', 'Send someone a yo')
-        .argv
+      var parser = yargs
+        .command('yo <user|email> [ ssns | sins... ]', 'Send someone a yo')
+      var argv = parser.parse('yo bcoe 113993 112888')
       argv.user.should.equal('bcoe')
       argv.email.should.equal('bcoe')
       argv.ssns.should.deep.equal([113993, 112888])
