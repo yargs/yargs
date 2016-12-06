@@ -810,26 +810,26 @@ describe('Command', function () {
 
   describe('positional aliases', function () {
     it('allows an alias to be defined for a required positional argument', function () {
-      var parser = yargs('yo')
-        .command('yo <user|email> [ssn]', 'Send someone a yo')
-      var argv = parser.parse('yo bcoe 113993')
+      var argv = yargs('yo bcoe 113993')
+        .command('yo <user | email> [ssn]', 'Send someone a yo')
+        .argv
       argv.user.should.equal('bcoe')
       argv.email.should.equal('bcoe')
       argv.ssn.should.equal(113993)
     })
 
     it('allows an alias to be defined for an optional positional argument', function () {
-      var parser = yargs('yo')
+      var argv = yargs('yo 113993')
         .command('yo [ssn|sin]', 'Send someone a yo')
-      var argv = parser.parse('yo 113993')
+        .argv
       argv.ssn.should.equal(113993)
       argv.sin.should.equal(113993)
     })
 
     it('allows variadic and positional arguments to be combined', function () {
-      var parser = yargs('yo')
+      var argv = yargs('yo bcoe 113993 112888')
         .command('yo <user|email> [ssns|sins...]', 'Send someone a yo')
-      var argv = parser.parse('yo bcoe 113993 112888')
+        .argv
       argv.user.should.equal('bcoe')
       argv.email.should.equal('bcoe')
       argv.ssns.should.deep.equal([113993, 112888])
