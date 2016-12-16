@@ -124,7 +124,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     command = command ? command.reset() : Command(self, usage, validation)
     if (!completion) completion = Completion(self, usage, command)
 
-    strict = false
+    if (!strictGlobal) strict = false
     completionCommand = null
     output = ''
     exitError = null
@@ -664,8 +664,10 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   var strict = false
-  self.strict = function () {
-    strict = true
+  var strictGlobal = false
+  self.strict = function (_global) {
+    strict = _global !== false
+    strictGlobal = !!_global
     return self
   }
   self.getStrict = function () {
