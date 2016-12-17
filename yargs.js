@@ -383,7 +383,13 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   self.describe = function (key, desc) {
-    options.key[key] = true
+    if (typeof key === 'object') {
+      Object.keys(key).forEach(function (k) {
+        options.key[k] = true
+      })
+    } else {
+      options.key[key] = true
+    }
     usage.describe(key, desc)
     return self
   }

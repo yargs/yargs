@@ -64,6 +64,8 @@ describe('yargs dsl tests', function () {
     })
 
     r.errors[0].should.match(/really cool key/)
+    r.result.should.have.property('x')
+    r.result.should.not.have.property('[object Object]')
   })
 
   it('treats usage as alias for options, if object provided as first argument', function () {
