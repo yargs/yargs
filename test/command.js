@@ -19,11 +19,11 @@ describe('Command', function () {
       var command = y.getCommandInstance()
       var handlers = command.getCommandHandlers()
       handlers.foo.demanded.should.include({
-        cmd: 'bar',
+        cmd: ['bar'],
         variadic: false
       })
       handlers.foo.optional.should.include({
-        cmd: 'awesome',
+        cmd: ['awesome'],
         variadic: false
       })
     })
@@ -96,7 +96,7 @@ describe('Command', function () {
       var command = y.getCommandInstance()
       var handlers = command.getCommandHandlers()
       handlers.foo.optional.should.include({
-        cmd: 'awesome',
+        cmd: ['awesome'],
         variadic: false
       })
       handlers.foo.demanded.should.deep.equal([])
@@ -806,5 +806,37 @@ describe('Command', function () {
       .argv
     argv.should.have.property('someone').and.equal('world')
     commandCalled.should.be.true
+  })
+
+  describe('positional aliases', function () {
+    it('allows an alias to be defined for a required positional argument', function () {
+      var argv = yargs('yo bcoe 113993')
+        .command('yo <user | email> [ssn]', 'Send someone a yo')
+        .argv
+      argv.user.should.equal('bcoe')
+      argv.email.should.equal('bcoe')
+      argv.ssn.should.equal(113993)
+    })
+
+    it('allows an alias to be defined for an optional positional argument', function () {
+      var argv
+      yargs('yo 113993')
+        .command('yo [ssn|sin]', 'Send someone a yo', {}, function (_argv) {
+          argv = _argv
+        })
+        .argv
+      argv.ssn.should.equal(113993)
+      argv.sin.should.equal(113993)
+    })
+
+    it('allows variadic and positional arguments to be combined', function () {
+      var parser = yargs
+        .command('yo <user|email> [ ssns | sins... ]', 'Send someone a yo')
+      var argv = parser.parse('yo bcoe 113993 112888')
+      argv.user.should.equal('bcoe')
+      argv.email.should.equal('bcoe')
+      argv.ssns.should.deep.equal([113993, 112888])
+      argv.sins.should.deep.equal([113993, 112888])
+    })
   })
 })

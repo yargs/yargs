@@ -609,6 +609,21 @@ yargs.command('get <source> [proxy]', 'make a get HTTP request')
   .argv
 ```
 
+#### Positional Argument Aliases
+
+Aliases can be provided for positional arguments using the `|` character.
+As an example, suppose our application allows either a username _or_
+an email as the first argument:
+
+```js
+yargs.command('get <username|email> [password]', 'fetch a user by username or email.')
+  .help()
+  .argv
+```
+
+In this way, both `argv.username` and `argv.email` would be populated with the
+same value when the command is executed.
+
 #### Variadic Positional Arguments
 
 The last positional argument can optionally accept an array of
@@ -1152,7 +1167,7 @@ Method to execute when a failure occurs, rather than printing the failure messag
 
 `fn` is called with the failure message that would have been printed, the
 `Error` instance originally thrown and yargs state when the failure
-occured. 
+occured.
 
 ```js
 var argv = require('yargs')
