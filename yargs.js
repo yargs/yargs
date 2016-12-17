@@ -98,7 +98,7 @@ function Yargs (processArgs, cwd, parentRequire) {
 
     var objectOptions = [
       'narg', 'key', 'alias', 'default', 'defaultDescription',
-      'config', 'choices', 'demanded', 'coerce'
+      'config', 'choices', 'demandedOptions', 'demandedCommands', 'coerce'
     ]
 
     arrayOptions.forEach(function (k) {
@@ -308,7 +308,7 @@ function Yargs (processArgs, cwd, parentRequire) {
 
     if (Array.isArray(max)) {
       max.forEach(function (key) {
-        self.demand(key, msg)
+        self.demandOption(key, msg)
       })
       max = Infinity
     } else if (typeof max !== 'number') {
@@ -317,26 +317,70 @@ function Yargs (processArgs, cwd, parentRequire) {
     }
 
     if (typeof keys === 'number') {
-      if (!options.demanded._) options.demanded._ = { count: 0, msg: null, max: max }
-      options.demanded._.count = keys
-      options.demanded._.msg = msg
+      self.demandCommand(keys, max, msg)
     } else if (Array.isArray(keys)) {
       keys.forEach(function (key) {
-        self.demand(key, msg)
+        self.demandOption(key, msg)
       })
     } else {
       if (typeof msg === 'string') {
-        options.demanded[keys] = { msg: msg }
+        options.demandedOptions[keys] = { msg: msg }
       } else if (msg === true || typeof msg === 'undefined') {
-        options.demanded[keys] = { msg: undefined }
+        options.demandedOptions[keys] = { msg: undefined }
       }
     }
 
     return self
   }
 
-  self.getDemanded = function () {
-    return options.demanded
+  self.demandOption = function (keys, max, msg) {
+    if (Array.isArray(max)) {
+      max.forEach(function (key) {
+        self.demandOption(key, msg)
+      })
+      max = Infinity
+    } else if (typeof max !== 'number') {
+      msg = max
+      max = Infinity
+    }
+
+    if (Array.isArray(keys)) {
+      keys.forEach(function (key) {
+        self.demandOption(key, msg)
+      })
+    } else {
+      if (typeof msg === 'string') {
+        options.demandedOptions[keys] = { msg: msg }
+      } else if (msg === true || typeof msg === 'undefined') {
+        options.demandedOptions[keys] = { msg: undefined }
+      }
+    }
+
+    return self
+  }
+
+  self.demandCommand = function (min, max, minMsg, maxMsg) {
+    if (typeof max !== 'number') {
+      minMsg = max
+      max = Infinity
+    }
+
+    options.demandedCommands._ = {
+      min: min,
+      max: max,
+      minMsg: minMsg,
+      maxMsg: maxMsg
+    }
+
+    return self
+  }
+
+  self.getDemandedOptions = function () {
+    return options.demandedOptions
+  }
+
+  self.getDemandedCommands = function () {
+    return options.demandedCommands
   }
 
   self.requiresArg = function (requiresArgs) {
@@ -480,10 +524,22 @@ function Yargs (processArgs, cwd, parentRequire) {
 
       if (opt.alias) self.alias(key, opt.alias)
 
-      var demand = opt.demand || opt.required || opt.require
+      var demandOption = opt.demandOption || opt.required || opt.require
+
+      var demandCommand = opt.demandCommand
+
+      var demand = opt.demand
 
       if (demand) {
         self.demand(key, demand)
+      }
+
+      if (demandOption) {
+        self.demandOption(key, demandOption)
+      }
+
+      if (demandCommand) {
+        self.demandCommand(key, demandCommand)
       }
 
       if ('config' in opt) {

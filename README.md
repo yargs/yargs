@@ -160,7 +160,7 @@ area.js:
 #!/usr/bin/env node
 var argv = require('yargs')
     .usage('Usage: $0 -w [num] -h [num]')
-    .demand(['w','h'])
+    .demandOption(['w','h'])
     .argv;
 
 console.log("The area is:", argv.w * argv.h);
@@ -188,7 +188,7 @@ demand_count.js:
 ````javascript
 #!/usr/bin/env node
 var argv = require('yargs')
-    .demand(2)
+    .demandCommand(2)
     .argv;
 console.dir(argv);
 ````
@@ -298,7 +298,7 @@ var argv = require('yargs')
     .alias('f', 'file')
     .nargs('f', 1)
     .describe('f', 'Load a file')
-    .demand(1, ['f'])
+    .demandOption(['f'])
     .help('h')
     .alias('h', 'help')
     .epilog('copyright 2015')
@@ -678,7 +678,7 @@ require('yargs')
       console.log(`setting ${argv.key} to ${argv.value}`)
     }
   })
-  .demand(1)
+  .demandCommand(1)
   .help()
   .wrap(72)
   .argv
@@ -824,7 +824,7 @@ cli.js:
 #!/usr/bin/env node
 require('yargs')
   .commandDir('cmds')
-  .demand(1)
+  .demandCommand(1)
   .help()
   .argv
 ```
@@ -1020,44 +1020,116 @@ displaying the value in the usage instructions:
 .default('timeout', 60000, '(one-minute)')
 ```
 
-<a name="demand"></a>.demand(key, [msg | boolean])
+<a name="demandOption"></a>.demandOption(key, [msg | boolean])
 ------------------------------
-.demand(count, [max], [msg])
+.demandOption(count, [max], [msg])
 ------------------------------
 
 If `key` is a string, show the usage information and exit if `key` wasn't
 specified in `process.argv`.
 
-If `key` is a number, demand at least as many non-option arguments, which show
-up in `argv._`. A second number can also optionally be provided, which indicates
-the maximum number of non-option arguments.
-
 If `key` is an array, demand each element.
 
-If a `msg` string is given, it will be printed when the argument is missing,
-instead of the standard error message. This is especially helpful for the non-option arguments in `argv._`.
+If a `msg` string is given, it will be printed when the argument is missing, instead of the standard error message.
+
+```javascript
+// demand an array of keys to be provided
+require('yargs')
+  .option('run', {
+    alias: 'r', 
+    describe: 'run your program'
+  })
+  .option('path', {
+    alias: 'p', 
+    describe: 'provide a path to file'
+  })
+  .option('spec', {
+    alias: 's', 
+    describe: 'program specifications'
+  })
+  .demand(['run', 'path'], 'Please provide both run and path arguments to work with this tool')
+  .help()
+  .argv
+```
+which will provide the following output:
+```bash
+Options:
+  --run, -r   run your program                [required]
+  --path, -p  provide a path to file          [required]
+  --spec, -s  program specifications
+  --help      Show help                        [boolean]
+        
+  Missing required arguments: run, path
+  Please provide both run and path arguments to work with this tool
+```
 
 If a `boolean` value is given, it controls whether the option is demanded;
 this is useful when using `.options()` to specify command line parameters.
 
-A combination of `.demand(1)` and `.strict()` will allow you to require a user to pass at least one command:
-
-```js
-var argv = require('yargs')
-  .command('install', 'tis a mighty fine package to install')
-  .demand(1)
-  .strict()
+```javascript
+// demand individual options within the option constructor
+require('yargs')
+  .options({
+    'run': {
+      alias: 'r', 
+      describe: 'run your program',
+      demand: true
+    },
+    'path': {
+      alias: 'p', 
+      describe: 'provide a path to file', 
+      demand: true
+    },
+    'spec': {
+      alias: 's', 
+      describe: 'program specifications'
+    }
+  })
+  .help()
   .argv
 ```
+which will provide the following output:
+```bash
+Options:
+  --run, -r   run your program                                       [required]
+  --path, -p  provide a path to file                                 [required]
+  --spec, -s  program specifications
+  --help      Show help                                               [boolean]
+        
+Missing required arguments: run, path
+```
 
-Similarly, you can require a command and arguments at the same time:
+<a name="demandCommand"></a>.demandCommand(min, [minMsg])
+------------------------------
+.demandCommand(min, [max], [minMsg], [maxMsg])
+------------------------------
 
-```js
-var argv = require('yargs')
-  .command('install', 'tis a mighty fine package to install')
-  .demand(1, ['w', 'm'])
-  .strict()
+Demand in context of commands. You can demand a minimum and a maximum number a user can have within your program, as well as provide corresponding error messages if either of the demands is not met. 
+```javascript
+require('yargs')
+  .command({
+    command: 'configure <key> [value]',
+    aliases: ['config', 'cfg'],
+    desc: 'Set a config variable',
+    builder: (yargs) => yargs.default('value', 'true'),
+    handler: (argv) => {
+      console.log(`setting ${argv.key} to ${argv.value}`)
+    }
+  })
+  // provide a minimum demand and a minimum demand message
+  .demandCommand(1, 'You need at least one command before moving on')
+  .help()
   .argv
+```
+which will provide the following output:
+```bash
+Commands:
+  configure <key> [value]  Set a config variable         [aliases: config, cfg]
+  
+Options:
+  --help  Show help                                                   [boolean]
+    
+You need at least one command before moving on
 ```
 
 <a name="describe"></a>.describe(key, desc)
@@ -1492,7 +1564,7 @@ Valid `opt` keys include:
 - `count`: boolean, interpret option as a count of boolean flags, see [`count()`](#count)
 - `default`: value, set a default value for the option, see [`default()`](#default)
 - `defaultDescription`: string, use this description for the default value in help content, see [`default()`](#default)
-- `demand`/`require`/`required`: boolean or string, demand the option be given, with optional error message, see [`demand()`](#demand)
+- `demandOption`/`demand`/`require`/`required`: boolean or string, demand the option be given, with optional error message, see [`demand()`](#demand)
 - `desc`/`describe`/`description`: string, the option description for help content, see [`describe()`](#describe)
 - `global`: boolean, indicate that this key should not be [reset](#reset) when a command is invoked, see [`global()`](#global)
 - `group`: string, when displaying usage instructions place the option under an alternative group heading, see [`group()`](#group)
