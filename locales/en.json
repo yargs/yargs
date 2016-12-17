@@ -35,5 +35,6 @@
   "Path to JSON config file": "Path to JSON config file",
   "Show help": "Show help",
   "Show version number": "Show version number",
-  "Did you mean %s?": "Did you mean %s?"
+  "Did you mean %s?": "Did you mean %s?",
+  "Arguments %s and %s are mutually exclusive" : "Arguments %s and %s are mutually exclusive"
 }
