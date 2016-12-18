@@ -124,11 +124,41 @@ describe('validation tests', function () {
   })
 
   describe('demand', function () {
-    it('fails with standard error message if msg is not defined', function (done) {
+    it('fails with standard "not enough" error message if msg is not defined', function (done) {
       yargs([])
         .demand(1)
         .fail(function (msg) {
           msg.should.equal('Not enough non-option arguments: got 0, need at least 1')
+          return done()
+        })
+        .argv
+    })
+
+    it('fails with standard "too many" error message if msg is not defined', function (done) {
+      yargs(['a', 'b', 'c'])
+        .demand(1, 2)
+        .fail(function (msg) {
+          msg.should.equal('Too many non-option arguments: got 3, maximum of 2')
+          return done()
+        })
+        .argv
+    })
+
+    it('fails with substituted counts if "not enough" message is defined', function (done) {
+      yargs([])
+        .demand(1, 'got $0, expected $1 ($0 / $1)')
+        .fail(function (msg) {
+          msg.should.equal('got 0, expected 1 (0 / 1)')
+          return done()
+        })
+        .argv
+    })
+
+    it('fails with substituted counts if "too many" message is defined', function (done) {
+      yargs(['a', 'b', 'c'])
+        .demand(1, 2, undefined, 'got $0, expected $1 ($0 / $1)')
+        .fail(function (msg) {
+          msg.should.equal('got 3, expected 1 (3 / 1)')
           return done()
         })
         .argv

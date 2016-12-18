@@ -1036,6 +1036,8 @@ If `key` is an array, demand each element.
 
 If a `msg` string is given, it will be printed when the argument is missing,
 instead of the standard error message. This is especially helpful for the non-option arguments in `argv._`.
+Every occurrence of "$0" will be replaced with the number of non-option arguments in `argv._`;
+every occurrence of "$1" will be replaced with the number of non-option arguments demanded.
 
 If a `boolean` value is given, it controls whether the option is demanded;
 this is useful when using `.options()` to specify command line parameters.

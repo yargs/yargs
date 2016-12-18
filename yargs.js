@@ -301,34 +301,41 @@ function Yargs (processArgs, cwd, parentRequire) {
     return self
   }
 
-  self.demand = self.required = self.require = function (keys, max, msg) {
+  self.demand = self.required = self.require = function (keys, max, msg, maxMsg) {
     // you can optionally provide a 'max' key,
     // which will raise an exception if too many '_'
     // options are provided.
 
     if (Array.isArray(max)) {
       max.forEach(function (key) {
-        self.demand(key, msg)
+        self.demand(key, msg, maxMsg)
       })
       max = Infinity
     } else if (typeof max !== 'number') {
+      maxMsg = msg
       msg = max
       max = Infinity
     }
 
     if (typeof keys === 'number') {
-      if (!options.demanded._) options.demanded._ = { count: 0, msg: null, max: max }
+      if (!options.demanded._) options.demanded._ = { count: 0, msg: null, maxMsg: null, max: max }
       options.demanded._.count = keys
       options.demanded._.msg = msg
+      options.demanded._.maxMsg = maxMsg
     } else if (Array.isArray(keys)) {
       keys.forEach(function (key) {
-        self.demand(key, msg)
+        self.demand(key, msg, maxMsg)
       })
     } else {
       if (typeof msg === 'string') {
         options.demanded[keys] = { msg: msg }
       } else if (msg === true || typeof msg === 'undefined') {
         options.demanded[keys] = { msg: undefined }
+      }
+      if (typeof maxMsg === 'string') {
+        options.demanded[keys].maxMsg = maxMsg
+      } else if (maxMsg === true || typeof maxMsg === 'undefined') {
+        options.demanded[keys].maxMsg = undefined
       }
     }
 
