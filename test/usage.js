@@ -1284,7 +1284,7 @@ describe('usage tests', function () {
         return this.skip()
       }
 
-      var width = require('window-size').width
+      var width = process.stdout.columns
 
       var r = checkUsage(function () {
         return yargs([])

@@ -804,7 +804,7 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   self.terminalWidth = function () {
-    return require('window-size').width
+    return process.stdout.columns
   }
 
   Object.defineProperty(self, 'argv', {
