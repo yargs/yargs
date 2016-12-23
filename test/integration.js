@@ -168,6 +168,7 @@ describe('integration tests', function () {
             return done()
           })
         })
+      })
 
       after(function () {
         rimraf.sync('./test/fixtures/yargs')
