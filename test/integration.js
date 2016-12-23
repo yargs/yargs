@@ -168,6 +168,15 @@ describe('integration tests', function () {
             return done()
           })
         })
+
+        // see #659
+        // it('configuration parser called twice', function (done) {
+        //   testCmd('./issue-659.js', [ '--config', '/tmp/missing/file', 'command' ], function (stdout) {
+        //     stdout = stdout.replace(/(\r\n|\n|\r)/gm, '')
+        //     stdout.should.not.match(/(warning.*){2}/)
+        //     return done()
+        //   })
+        // })
       })
 
       after(function () {

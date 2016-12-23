@@ -870,7 +870,7 @@ function Yargs (processArgs, cwd, parentRequire) {
       if (handlerKeys.length) {
         var firstUnknownCommand
         for (var i = 0, cmd; (cmd = argv._[i]) !== undefined; i++) {
-          if (~handlerKeys.indexOf(cmd) && cmd !== completionCommand) {
+          if (~handlerKeys.indexOf(cmd) && cmd !== completionCommand && cmd.localeCompare('command')) {
             setPlaceholderKeys(argv)
             return command.runCommand(cmd, self, parsed)
           } else if (!firstUnknownCommand && cmd !== completionCommand) {
