@@ -301,11 +301,12 @@ function Yargs (processArgs, cwd, parentRequire) {
     return self
   }
 
+  // deprecated: the demand API is too overloaded, and is being
+  // deprecated in favor of .demandCommand() .demandOption().
   self.demand = self.required = self.require = function (keys, max, msg) {
     // you can optionally provide a 'max' key,
     // which will raise an exception if too many '_'
     // options are provided.
-
     if (Array.isArray(max)) {
       max.forEach(function (key) {
         self.demandOption(key, msg)
@@ -324,35 +325,26 @@ function Yargs (processArgs, cwd, parentRequire) {
       })
     } else {
       if (typeof msg === 'string') {
-        options.demandedOptions[keys] = { msg: msg }
+        self.demandOption(keys, msg)
       } else if (msg === true || typeof msg === 'undefined') {
-        options.demandedOptions[keys] = { msg: undefined }
+        self.demandOption(keys)
       }
     }
 
     return self
   }
 
-  self.demandOption = function (keys, max, msg) {
-    if (Array.isArray(max)) {
-      max.forEach(function (key) {
-        self.demandOption(key, msg)
-      })
-      max = Infinity
-    } else if (typeof max !== 'number') {
-      msg = max
-      max = Infinity
-    }
-
-    if (Array.isArray(keys)) {
-      keys.forEach(function (key) {
+  self.demandOption = function (key, msg) {
+    if (Array.isArray(key)) {
+      key.forEach(function (key) {
         self.demandOption(key, msg)
       })
     } else {
       if (typeof msg === 'string') {
-        options.demandedOptions[keys] = { msg: msg }
+        options.demandedOptions[key] = { msg: msg }
+      // allow edge-case of options: {a: {demand: true}, b: {demand: false}}
       } else if (msg === true || typeof msg === 'undefined') {
-        options.demandedOptions[keys] = { msg: undefined }
+        options.demandedOptions[key] = { msg: undefined }
       }
     }
 
@@ -524,22 +516,14 @@ function Yargs (processArgs, cwd, parentRequire) {
 
       if (opt.alias) self.alias(key, opt.alias)
 
-      var demandOption = opt.demandOption || opt.required || opt.require
-
-      var demandCommand = opt.demandCommand
-
-      var demand = opt.demand
+      var demand = opt.demand || opt.required || opt.require
 
       if (demand) {
         self.demand(key, demand)
       }
 
-      if (demandOption) {
-        self.demandOption(key, demandOption)
-      }
-
-      if (demandCommand) {
-        self.demandCommand(key, demandCommand)
+      if ('demandOption' in opt) {
+        self.demandOption(key, opt.demandOption)
       }
 
       if ('config' in opt) {

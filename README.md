@@ -1022,7 +1022,7 @@ displaying the value in the usage instructions:
 
 <a name="demandOption"></a>.demandOption(key, [msg | boolean])
 ------------------------------
-.demandOption(count, [max], [msg])
+.demandOption(key, msg)
 ------------------------------
 
 If `key` is a string, show the usage information and exit if `key` wasn't
@@ -1036,18 +1036,18 @@ If a `msg` string is given, it will be printed when the argument is missing, ins
 // demand an array of keys to be provided
 require('yargs')
   .option('run', {
-    alias: 'r', 
+    alias: 'r',
     describe: 'run your program'
   })
   .option('path', {
-    alias: 'p', 
+    alias: 'p',
     describe: 'provide a path to file'
   })
   .option('spec', {
-    alias: 's', 
+    alias: 's',
     describe: 'program specifications'
   })
-  .demand(['run', 'path'], 'Please provide both run and path arguments to work with this tool')
+  .demandOption(['run', 'path'], 'Please provide both run and path arguments to work with this tool')
   .help()
   .argv
 ```
@@ -1058,7 +1058,7 @@ Options:
   --path, -p  provide a path to file          [required]
   --spec, -s  program specifications
   --help      Show help                        [boolean]
-        
+
   Missing required arguments: run, path
   Please provide both run and path arguments to work with this tool
 ```
@@ -1071,17 +1071,17 @@ this is useful when using `.options()` to specify command line parameters.
 require('yargs')
   .options({
     'run': {
-      alias: 'r', 
+      alias: 'r',
       describe: 'run your program',
       demand: true
     },
     'path': {
-      alias: 'p', 
-      describe: 'provide a path to file', 
+      alias: 'p',
+      describe: 'provide a path to file',
       demand: true
     },
     'spec': {
-      alias: 's', 
+      alias: 's',
       describe: 'program specifications'
     }
   })
@@ -1095,7 +1095,7 @@ Options:
   --path, -p  provide a path to file                                 [required]
   --spec, -s  program specifications
   --help      Show help                                               [boolean]
-        
+
 Missing required arguments: run, path
 ```
 
@@ -1104,7 +1104,7 @@ Missing required arguments: run, path
 .demandCommand(min, [max], [minMsg], [maxMsg])
 ------------------------------
 
-Demand in context of commands. You can demand a minimum and a maximum number a user can have within your program, as well as provide corresponding error messages if either of the demands is not met. 
+Demand in context of commands. You can demand a minimum and a maximum number a user can have within your program, as well as provide corresponding error messages if either of the demands is not met.
 ```javascript
 require('yargs')
   .command({
@@ -1125,10 +1125,10 @@ which will provide the following output:
 ```bash
 Commands:
   configure <key> [value]  Set a config variable         [aliases: config, cfg]
-  
+
 Options:
   --help  Show help                                                   [boolean]
-    
+
 You need at least one command before moving on
 ```
 
@@ -1505,7 +1505,7 @@ var argv = require('yargs')
 
 This method can be used to make yargs aware of options that _could_
 exist. You can also pass an `opt` object which can hold further
-customization, like `.alias()`, `.demand()` etc. for that option.
+customization, like `.alias()`, `.demandOption()` etc. for that option.
 
 For example:
 
@@ -1527,7 +1527,7 @@ is the same as
 ````javascript
 var argv = require('yargs')
     .alias('f', 'file')
-    .demand('f')
+    .demandOption('f')
     .default('f', '/etc/passwd')
     .describe('f', 'x marks the spot')
     .string('f')
@@ -1564,7 +1564,7 @@ Valid `opt` keys include:
 - `count`: boolean, interpret option as a count of boolean flags, see [`count()`](#count)
 - `default`: value, set a default value for the option, see [`default()`](#default)
 - `defaultDescription`: string, use this description for the default value in help content, see [`default()`](#default)
-- `demandOption`/`demand`/`require`/`required`: boolean or string, demand the option be given, with optional error message, see [`demand()`](#demand)
+- `demandOption`: boolean or string, demand the option be given, with optional error message, see [`demandOption()`](#demandOption)
 - `desc`/`describe`/`description`: string, the option description for help content, see [`describe()`](#describe)
 - `global`: boolean, indicate that this key should not be [reset](#reset) when a command is invoked, see [`global()`](#global)
 - `group`: string, when displaying usage instructions place the option under an alternative group heading, see [`group()`](#group)
@@ -1666,7 +1666,7 @@ var yargs = require('yargs')
   .usage('$0 command')
   .command('hello', 'hello command')
   .command('world', 'world command')
-  .demand(1, 'must provide a valid command'),
+  .demandCommand(1, 'must provide a valid command'),
   argv = yargs.argv,
   command = argv._[0];
 
@@ -1733,7 +1733,7 @@ line_count.js:
 #!/usr/bin/env node
 var argv = require('yargs')
     .usage('Count the lines in a file.\nUsage: $0 -f <file>')
-    .demand('f')
+    .demandOption('f')
     .alias('f', 'file')
     .describe('f', 'Load a file')
     .string('f')

@@ -13,7 +13,9 @@ describe('usage tests', function () {
     yargs.reset()
   })
 
-  describe('demand options', function () {
+  // deprecated: the demand API is too overloaded, and is being
+  // deprecated in favor of .demandCommand() .demandOption().
+  describe('demand', function () {
     describe('using .demand()', function () {
       it('should show an error along with the missing arguments on demand fail', function () {
         var r = checkUsage(function () {
@@ -32,6 +34,28 @@ describe('usage tests', function () {
           '  -x  [required]',
           '  -y  [required]',
           'Missing required argument: y'
+        ])
+        r.logs.should.have.length(0)
+        r.exit.should.be.ok
+      })
+
+      it('should allow for a key message pair', function () {
+        var r = checkUsage(function () {
+          return yargs('-y 10 -z 20')
+            .usage('Usage: $0 -x NUM -y NUM')
+            .demand('x', 'my custom message')
+            .wrap(null)
+            .argv
+        })
+        r.result.should.have.property('y', 10)
+        r.result.should.have.property('z', 20)
+        r.result.should.have.property('_').with.length(0)
+        r.errors.join('\n').split(/\n+/).should.deep.equal([
+          'Usage: ./usage -x NUM -y NUM',
+          'Options:',
+          '  -x  [required]',
+          'Missing required argument: x',
+          'my custom message'
         ])
         r.logs.should.have.length(0)
         r.exit.should.be.ok
@@ -346,28 +370,6 @@ describe('usage tests', function () {
         r.logs.should.deep.equal(['foo'])
         r.should.have.property('exit').and.be.false
       })
-
-      it('is invoked with yargs instance as third argument', function () {
-        var r = checkUsage(function () {
-          return yargs('foo')
-            .command('foo', 'desc', {
-              bar: {
-                describe: 'bar command'
-              }
-            }, function (argv) {
-              throw new Error('blah')
-            })
-            .fail(function (message, error, yargs) {
-              yargs.showHelp()
-            })
-            .exitProcess(false)
-            .wrap(null)
-            .argv
-        })
-
-        r.errors[0].should.contain('bar command')
-      })
-
       describe('when check() throws error', function () {
         it('fail() is called with the original error object as the second parameter', function () {
           var r = checkUsage(function () {
@@ -390,6 +392,7 @@ describe('usage tests', function () {
           r.should.have.property('exit').and.be.false
         })
       })
+
       describe('when command() throws error', function () {
         it('fail() is called with the original error object as the second parameter', function () {
           var r = checkUsage(function () {

@@ -210,7 +210,8 @@ describe('yargs dsl tests', function () {
         .command('foo', 'bar', function () {})
         .default('foo', 'bar')
         .describe('foo', 'foo variable')
-        .demand('foo')
+        .demandCommand(1)
+        .demandOption('foo')
         .string('foo')
         .alias('foo', 'bar')
         .string('foo')
@@ -260,7 +261,7 @@ describe('yargs dsl tests', function () {
 
     it('does not invoke parse with an error if reset has been called', function (done) {
       var y = yargs()
-        .demandOption('cake')
+        .demand('cake')
 
       y.parse('hello', function (err) {
         err.message.should.match(/Missing required argumen/)
@@ -857,7 +858,7 @@ describe('yargs dsl tests', function () {
 
     it('resets error state between calls to parse', function () {
       var y = yargs()
-        .demandCommand(2)
+        .demand(2)
 
       var err1 = null
       var out1 = null
@@ -1090,7 +1091,7 @@ describe('yargs dsl tests', function () {
         var output
         // set some top-level, reset-able config
         var parser = yargs()
-          .demandCommand(1, 'Must call a command')
+          .demand(1, 'Must call a command')
           .strict()
           .command('one <x>', 'The one and only command')
         // first call parse with command, which calls reset
@@ -1412,7 +1413,7 @@ describe('yargs dsl tests', function () {
 
     it('does not skip validation if no option with skipValidation is present', function (done) {
       var argv = yargs(['--koala'])
-          .demandCommand(1)
+          .demand(1)
           .fail(function (msg) {
             return done()
           })
@@ -1437,7 +1438,7 @@ describe('yargs dsl tests', function () {
     it('allows having an option that skips validation but not skipping validation if that option is not used', function () {
       var skippedValidation = true
       yargs(['--no-skip'])
-          .demandCommand(5)
+          .demand(5)
           .option('skip', {
             skipValidation: true
           })
