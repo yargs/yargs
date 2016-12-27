@@ -3,6 +3,8 @@
 var expect = require('chai').expect
 var yargs = require('../')
 
+require('chai').should()
+
 describe('validation tests', function () {
   beforeEach(function () {
     yargs.reset()
@@ -134,15 +136,8 @@ describe('validation tests', function () {
           .argv
     })
 
-    it('should not fail if only one argument is supplied', function () {
-      yargs(['-b'])
-        .conflicts('f', 'b')
-        .fail(function (msg) {
-          expect.fail()
-        })
-        .argv
-
-      yargs(['-f'])
+    it('should not fail if no conflicting arguments are provided', function () {
+      yargs(['-b', '-c'])
         .conflicts('f', 'b')
         .fail(function (msg) {
           expect.fail()
@@ -150,32 +145,15 @@ describe('validation tests', function () {
         .argv
     })
 
-    it('should not fail with arrays as arguments', function () {
-      yargs(['-b'])
-        .conflicts('f', ['b', 'c', 'd'])
-        .fail(function (msg) {
-          expect.fail()
+    it('allows an object to be provided defining conflicting option pairs', function (done) {
+      yargs(['-t', '-s'])
+        .conflicts({
+          'c': 'a',
+          's': 't'
         })
-        .argv
-
-      yargs(['-b'])
-        .conflicts(['b', 'c', 'd'], 'f')
         .fail(function (msg) {
-          expect.fail()
-        })
-        .argv
-
-      yargs(['-b'])
-        .conflicts(['b', 'c', 'd'], ['f', 'g', 'h'])
-        .fail(function (msg) {
-          expect.fail()
-        })
-        .argv
-
-      yargs(['-b'])
-        .conflicts(['b', 'c', 'd'])
-        .fail(function (msg) {
-          expect.fail()
+          console.log(msg)
+          return done()
         })
         .argv
     })

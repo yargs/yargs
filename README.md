@@ -985,25 +985,12 @@ $ node test.js
   '$0': 'test.js' }
 ```
 
-<a name="conflicts"></a>.conflicts(key1, key2)
+<a name="conflicts"></a>.conflicts(x, y)
 ----------------------------------------------
 
-Implements mutual exclusion between `key1` and `key2`, it accepts only one or another.
+Given the key `x` is set, the key `y` must not be set.
 
-Setting `test.js` like this:
-```js
-var argv = require('yargs')
-  .conflicts('f', 'b')
-  .argv
-```
-
-Gives an error when calling with both arguments
-```
-$ node test.js -f -b
-Arguments f and b are mutually exclusive
-```
-
-You can also pass arrays as arguments.
+Optionally `.conflicts()` can accept an object specifying multiple conflicting keys.
 
 <a name="count"></a>.count(key)
 ------------
