@@ -453,7 +453,7 @@ describe('validation tests', function () {
         .argv
     })
 
-    it('allows demandCommand in option shorthand', function (done) {
+    it('allows demandOption in option shorthand', function (done) {
       yargs('-a 10 marsupial')
         .option('c', {
           demandOption: true
@@ -483,6 +483,28 @@ describe('validation tests', function () {
         'Usage: ./usage [x] [y] [z] {OPTIONS} <src> <dest> [extra_files...]',
         'too many arguments are provided'
       ])
+    })
+
+    // see: https://github.com/yargs/yargs/pull/438
+    it('allows a custom min message to be provided', function (done) {
+      yargs('-a 10 marsupial')
+        .demandCommand(2, 'totes got $0 totes expected $1')
+        .fail(function (msg) {
+          msg.should.equal('totes got 1 totes expected 2')
+          return done()
+        })
+        .argv
+    })
+
+    // see: https://github.com/yargs/yargs/pull/438
+    it('allows a custom min and max message to be provided', function (done) {
+      yargs('-a 10 marsupial mammal bro')
+        .demandCommand(1, 2, 'totes too few, got $0 totes expected $1', 'totes too many, got $0 totes expected $1')
+        .fail(function (msg) {
+          msg.should.equal('totes too many, got 3 totes expected 2')
+          return done()
+        })
+        .argv
     })
   })
 })

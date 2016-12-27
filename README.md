@@ -1132,6 +1132,10 @@ Options:
 You need at least one command before moving on
 ```
 
+_Note: in `minMsg` and `maxMsg`, every occurrence of `$0` will be replaced
+with the observed value, and every instance of `$1` will be replaced with the
+expected value._
+
 <a name="describe"></a>.describe(key, desc)
 --------------------
 

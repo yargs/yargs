@@ -264,7 +264,7 @@ describe('yargs dsl tests', function () {
         .demand('cake')
 
       y.parse('hello', function (err) {
-        err.message.should.match(/Missing required argumen/)
+        err.message.should.match(/Missing required argument/)
       })
       y.reset()
       y.parse('cake', function (err) {
