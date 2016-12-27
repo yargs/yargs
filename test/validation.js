@@ -152,7 +152,21 @@ describe('validation tests', function () {
           's': 't'
         })
         .fail(function (msg) {
-          console.log(msg)
+          msg.should.equal('Arguments s and t are mutually exclusive')
+          return done()
+        })
+        .argv
+    })
+
+    it('takes into account aliases when applying conflicts logic', function (done) {
+      yargs(['-t', '-c'])
+        .conflicts({
+          'c': 'a',
+          's': 't'
+        })
+        .alias('c', 's')
+        .fail(function (msg) {
+          msg.should.equal('Arguments s and t are mutually exclusive')
           return done()
         })
         .argv
