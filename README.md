@@ -1020,6 +1020,12 @@ displaying the value in the usage instructions:
 .default('timeout', 60000, '(one-minute)')
 ```
 
+<a name="demand"></a>.demand(key, msg) [DEPRECATED]
+--------------------
+
+`demand()` has been deprecated, please instead see [`demandOption()`](#demandOption) and
+[`demandCommand()`](#demandCommand).
+
 <a name="demandOption"></a>.demandOption(key, [msg | boolean])
 ------------------------------
 .demandOption(key, msg)
