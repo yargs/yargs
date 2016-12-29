@@ -210,7 +210,8 @@ describe('yargs dsl tests', function () {
         .command('foo', 'bar', function () {})
         .default('foo', 'bar')
         .describe('foo', 'foo variable')
-        .demand('foo')
+        .demandCommand(1)
+        .demandOption('foo')
         .string('foo')
         .alias('foo', 'bar')
         .string('foo')
@@ -244,7 +245,8 @@ describe('yargs dsl tests', function () {
         configObjects: [],
         envPrefix: 'YARGS', // preserved as global
         global: ['help'],
-        demanded: {}
+        demandedCommands: {},
+        demandedOptions: {}
       }
 
       expect(y.getOptions()).to.deep.equal(emptyOptions)
@@ -254,7 +256,8 @@ describe('yargs dsl tests', function () {
       expect(y.getCommandInstance().getCommandHandlers()).to.deep.equal({})
       expect(y.getExitProcess()).to.equal(false)
       expect(y.getStrict()).to.equal(false)
-      expect(y.getDemanded()).to.deep.equal({})
+      expect(y.getDemandedOptions()).to.deep.equal({})
+      expect(y.getDemandedCommands()).to.deep.equal({})
       expect(y.getGroups()).to.deep.equal({})
     })
 
@@ -263,7 +266,7 @@ describe('yargs dsl tests', function () {
         .demand('cake')
 
       y.parse('hello', function (err) {
-        err.message.should.match(/Missing required argumen/)
+        err.message.should.match(/Missing required argument/)
       })
       y.reset()
       y.parse('cake', function (err) {
@@ -1245,11 +1248,11 @@ describe('yargs dsl tests', function () {
 
       options.key.foo.should.equal(true)
       options.string.should.include('awesome-sauce')
-      Object.keys(options.demanded).should.include('awesomeSauce')
+      Object.keys(options.demandedOptions).should.include('awesomeSauce')
 
       expect(options.key.bar).to.equal(undefined)
       options.string.should.not.include('bar')
-      Object.keys(options.demanded).should.not.include('bar')
+      Object.keys(options.demandedOptions).should.not.include('bar')
     })
 
     it('should set help to global option by default', function () {

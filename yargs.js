@@ -98,7 +98,7 @@ function Yargs (processArgs, cwd, parentRequire) {
 
     var objectOptions = [
       'narg', 'key', 'alias', 'default', 'defaultDescription',
-      'config', 'choices', 'demanded', 'coerce'
+      'config', 'choices', 'demandedOptions', 'demandedCommands', 'coerce'
     ]
 
     arrayOptions.forEach(function (k) {
@@ -301,14 +301,15 @@ function Yargs (processArgs, cwd, parentRequire) {
     return self
   }
 
+  // deprecated: the demand API is too overloaded, and is being
+  // deprecated in favor of .demandCommand() .demandOption().
   self.demand = self.required = self.require = function (keys, max, msg) {
     // you can optionally provide a 'max' key,
     // which will raise an exception if too many '_'
     // options are provided.
-
     if (Array.isArray(max)) {
       max.forEach(function (key) {
-        self.demand(key, msg)
+        self.demandOption(key, msg)
       })
       max = Infinity
     } else if (typeof max !== 'number') {
@@ -317,26 +318,61 @@ function Yargs (processArgs, cwd, parentRequire) {
     }
 
     if (typeof keys === 'number') {
-      if (!options.demanded._) options.demanded._ = { count: 0, msg: null, max: max }
-      options.demanded._.count = keys
-      options.demanded._.msg = msg
+      self.demandCommand(keys, max, msg)
     } else if (Array.isArray(keys)) {
       keys.forEach(function (key) {
-        self.demand(key, msg)
+        self.demandOption(key, msg)
       })
     } else {
       if (typeof msg === 'string') {
-        options.demanded[keys] = { msg: msg }
+        self.demandOption(keys, msg)
       } else if (msg === true || typeof msg === 'undefined') {
-        options.demanded[keys] = { msg: undefined }
+        self.demandOption(keys)
       }
     }
 
     return self
   }
 
-  self.getDemanded = function () {
-    return options.demanded
+  self.demandOption = function (key, msg) {
+    if (Array.isArray(key)) {
+      key.forEach(function (key) {
+        self.demandOption(key, msg)
+      })
+    } else {
+      if (typeof msg === 'string') {
+        options.demandedOptions[key] = { msg: msg }
+      // allow edge-case of options: {a: {demand: true}, b: {demand: false}}
+      } else if (msg === true || typeof msg === 'undefined') {
+        options.demandedOptions[key] = { msg: undefined }
+      }
+    }
+
+    return self
+  }
+
+  self.demandCommand = function (min, max, minMsg, maxMsg) {
+    if (typeof max !== 'number') {
+      minMsg = max
+      max = Infinity
+    }
+
+    options.demandedCommands._ = {
+      min: min,
+      max: max,
+      minMsg: minMsg,
+      maxMsg: maxMsg
+    }
+
+    return self
+  }
+
+  self.getDemandedOptions = function () {
+    return options.demandedOptions
+  }
+
+  self.getDemandedCommands = function () {
+    return options.demandedCommands
   }
 
   self.requiresArg = function (requiresArgs) {
@@ -489,6 +525,10 @@ function Yargs (processArgs, cwd, parentRequire) {
 
       if (demand) {
         self.demand(key, demand)
+      }
+
+      if ('demandOption' in opt) {
+        self.demandOption(key, opt.demandOption)
       }
 
       if ('config' in opt) {

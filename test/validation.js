@@ -1,5 +1,6 @@
 /* global describe, it, beforeEach */
 
+var checkUsage = require('./helpers/utils').checkOutput
 var expect = require('chai').expect
 var yargs = require('../')
 
@@ -361,7 +362,6 @@ describe('validation tests', function () {
     })
 
     it('should be displayed in the help message', function () {
-      var checkUsage = require('./helpers/utils').checkOutput
       var r = checkUsage(function () {
         return yargs(['--help'])
           .config('settings')
@@ -485,6 +485,72 @@ describe('validation tests', function () {
             })
         }, function (argv) {
           argv._[0].should.equal('one')
+        })
+        .argv
+    })
+  })
+
+  describe('demandOption', function () {
+    it('allows an array of options to be demanded', function (done) {
+      yargs('-a 10 marsupial')
+        .demandOption(['a', 'b'])
+        .fail(function (msg) {
+          msg.should.equal('Missing required argument: b')
+          return done()
+        })
+        .argv
+    })
+
+    it('allows demandOption in option shorthand', function (done) {
+      yargs('-a 10 marsupial')
+        .option('c', {
+          demandOption: true
+        })
+        .fail(function (msg) {
+          msg.should.equal('Missing required argument: c')
+          return done()
+        })
+        .argv
+    })
+  })
+
+  describe('demandCommand', function () {
+    it('should return a custom failure message when too many non-hyphenated arguments are found after a demand count', function () {
+      var r = checkUsage(function () {
+        return yargs(['src', 'dest'])
+          .usage('Usage: $0 [x] [y] [z] {OPTIONS} <src> <dest> [extra_files...]')
+          .demandCommand(0, 1, 'src and dest files are both required', 'too many arguments are provided')
+          .wrap(null)
+          .argv
+      })
+      r.should.have.property('result')
+      r.should.have.property('logs').with.length(0)
+      r.should.have.property('exit').and.be.ok
+      r.result.should.have.property('_').and.deep.equal(['src', 'dest'])
+      r.errors.join('\n').split(/\n+/).should.deep.equal([
+        'Usage: ./usage [x] [y] [z] {OPTIONS} <src> <dest> [extra_files...]',
+        'too many arguments are provided'
+      ])
+    })
+
+    // see: https://github.com/yargs/yargs/pull/438
+    it('allows a custom min message to be provided', function (done) {
+      yargs('-a 10 marsupial')
+        .demandCommand(2, 'totes got $0 totes expected $1')
+        .fail(function (msg) {
+          msg.should.equal('totes got 1 totes expected 2')
+          return done()
+        })
+        .argv
+    })
+
+    // see: https://github.com/yargs/yargs/pull/438
+    it('allows a custom min and max message to be provided', function (done) {
+      yargs('-a 10 marsupial mammal bro')
+        .demandCommand(1, 2, 'totes too few, got $0 totes expected $1', 'totes too many, got $0 totes expected $1')
+        .fail(function (msg) {
+          msg.should.equal('totes too many, got 3 totes expected 2')
+          return done()
         })
         .argv
     })
