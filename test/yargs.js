@@ -217,6 +217,7 @@ describe('yargs dsl tests', function () {
         .choices('foo', ['bar', 'baz'])
         .coerce('foo', function (foo) { return foo + 'bar' })
         .implies('foo', 'snuh')
+        .conflicts('qux', 'xyzzy')
         .group('foo', 'Group:')
         .strict()
         .exitProcess(false)  // defaults to true.
@@ -249,6 +250,7 @@ describe('yargs dsl tests', function () {
       expect(y.getOptions()).to.deep.equal(emptyOptions)
       expect(y.getUsageInstance().getDescriptions()).to.deep.equal({help: '__yargsString__:Show help'})
       expect(y.getValidationInstance().getImplied()).to.deep.equal({})
+      expect(y.getValidationInstance().getConflicting()).to.deep.equal({})
       expect(y.getCommandInstance().getCommandHandlers()).to.deep.equal({})
       expect(y.getExitProcess()).to.equal(false)
       expect(y.getStrict()).to.equal(false)

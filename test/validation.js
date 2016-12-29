@@ -3,6 +3,8 @@
 var expect = require('chai').expect
 var yargs = require('../')
 
+require('chai').should()
+
 describe('validation tests', function () {
   beforeEach(function () {
     yargs.reset()
@@ -120,6 +122,54 @@ describe('validation tests', function () {
       expect(argv.bar).to.be.true
       expect(argv.noFoo).to.not.exist
       expect(argv.foo).to.not.exist
+    })
+  })
+
+  describe('conflicts', function () {
+    it('fails if both arguments are supplied', function (done) {
+      yargs(['-f', '-b'])
+          .conflicts('f', 'b')
+          .fail(function (msg) {
+            msg.should.equal('Arguments f and b are mutually exclusive')
+            return done()
+          })
+          .argv
+    })
+
+    it('should not fail if no conflicting arguments are provided', function () {
+      yargs(['-b', '-c'])
+        .conflicts('f', 'b')
+        .fail(function (msg) {
+          expect.fail()
+        })
+        .argv
+    })
+
+    it('allows an object to be provided defining conflicting option pairs', function (done) {
+      yargs(['-t', '-s'])
+        .conflicts({
+          'c': 'a',
+          's': 't'
+        })
+        .fail(function (msg) {
+          msg.should.equal('Arguments s and t are mutually exclusive')
+          return done()
+        })
+        .argv
+    })
+
+    it('takes into account aliases when applying conflicts logic', function (done) {
+      yargs(['-t', '-c'])
+        .conflicts({
+          'c': 'a',
+          's': 't'
+        })
+        .alias('c', 's')
+        .fail(function (msg) {
+          msg.should.equal('Arguments s and t are mutually exclusive')
+          return done()
+        })
+        .argv
     })
   })
 

@@ -985,6 +985,13 @@ $ node test.js
   '$0': 'test.js' }
 ```
 
+<a name="conflicts"></a>.conflicts(x, y)
+----------------------------------------------
+
+Given the key `x` is set, the key `y` must not be set.
+
+Optionally `.conflicts()` can accept an object specifying multiple conflicting keys.
+
 <a name="count"></a>.count(key)
 ------------
 
