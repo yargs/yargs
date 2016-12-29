@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="6.6.0"></a>
+# [6.6.0](https://github.com/yargs/yargs/compare/v6.5.0...v6.6.0) (2016-12-29)
+
+
+### Bug Fixes
+
+* [object Object] was accidentally being populated on options object ([#736](https://github.com/yargs/yargs/issues/736)) ([f755e27](https://github.com/yargs/yargs/commit/f755e27))
+* do not use cwd when resolving package.json for yargs parsing config ([#726](https://github.com/yargs/yargs/issues/726)) ([9bdaab7](https://github.com/yargs/yargs/commit/9bdaab7))
+
+
+### Features
+
+* implement conflicts() for defining mutually exclusive arguments; thanks [@madcampos](https://github.com/madcampos)! ([#741](https://github.com/yargs/yargs/issues/741)) ([5883779](https://github.com/yargs/yargs/commit/5883779))
+* split demand() into demandCommand()/demandOption() ([#740](https://github.com/yargs/yargs/issues/740)) ([66573c8](https://github.com/yargs/yargs/commit/66573c8))
+* support for positional argument aliases ([#727](https://github.com/yargs/yargs/issues/727)) ([27e1a57](https://github.com/yargs/yargs/commit/27e1a57))
+
+
+
 <a name="6.5.0"></a>
 # [6.5.0](https://github.com/yargs/yargs/compare/v6.4.0...v6.5.0) (2016-12-01)
 
