@@ -318,7 +318,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     }
 
     if (typeof keys === 'number') {
-      self.demandCommand(keys, max, msg)
+      self.demandCommand(keys, max, msg, msg)
     } else if (Array.isArray(keys)) {
       keys.forEach(function (key) {
         self.demandOption(key, msg)
