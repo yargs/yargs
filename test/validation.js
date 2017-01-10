@@ -239,6 +239,17 @@ describe('validation tests', function () {
         .argv
     })
 
+    // address regression in: https://github.com/yargs/yargs/pull/740
+    it('custom failure message should be printed for both min and max constraints', function (done) {
+      yargs(['foo'])
+        .demand(0, 0, 'hey! give me a custom exit message')
+        .fail(function (msg) {
+          expect(msg).to.equal('hey! give me a custom exit message')
+          return done()
+        })
+        .argv
+    })
+
     it('interprets min relative to command', function () {
       var failureMsg
       yargs('lint')
