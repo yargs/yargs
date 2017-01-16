@@ -1337,6 +1337,25 @@ describe('usage tests', function () {
       })
     })
 
+    it('should not wrap left-hand-column if no description is provided', function () {
+      var r = checkUsage(function () {
+        return yargs([])
+          .example('i am a fairly long example that is like really long woooo')
+          .demand('foo')
+          .wrap(50)
+          .argv
+      })
+
+      r.errors[0].split('\n').forEach(function (line, i) {
+        // ignore headings and blank lines.
+        if (!line.match('i am a fairly long example')) return
+
+        // with two white space characters on the left,
+        // line length should be 50 - 2
+        line.length.should.equal(48)
+      })
+    })
+
     it('should wrap the usage string', function () {
       var r = checkUsage(function () {
         return yargs([])
