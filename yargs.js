@@ -535,8 +535,16 @@ function Yargs (processArgs, cwd, parentRequire) {
         self.config(key, opt.configParser)
       }
 
+      if ('conflicts' in opt) {
+        self.conflicts(key, opt.conflicts)
+      }
+
       if ('default' in opt) {
         self.default(key, opt.default)
+      }
+
+      if ('implies' in opt) {
+        self.implies(key, opt.implies)
       }
 
       if ('nargs' in opt) {

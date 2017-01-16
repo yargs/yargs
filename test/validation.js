@@ -124,6 +124,18 @@ describe('validation tests', function () {
       expect(argv.noFoo).to.not.exist
       expect(argv.foo).to.not.exist
     })
+
+    it('allows key to be specified with option shorthand', function (done) {
+      yargs('--bar')
+        .option('bar', {
+          implies: 'foo'
+        })
+        .fail(function (msg) {
+          msg.should.match(/Implications failed/)
+          return done()
+        })
+        .argv
+    })
   })
 
   describe('conflicts', function () {
@@ -171,6 +183,18 @@ describe('validation tests', function () {
           return done()
         })
         .argv
+    })
+
+    it('allows key to be specified with option shorthand', function (done) {
+      yargs(['-f', '-b'])
+          .option('f', {
+            conflicts: 'b'
+          })
+          .fail(function (msg) {
+            msg.should.equal('Arguments f and b are mutually exclusive')
+            return done()
+          })
+          .argv
     })
   })
 
