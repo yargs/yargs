@@ -8,6 +8,7 @@ const Validation = require('./lib/validation')
 const Y18n = require('y18n')
 const objFilter = require('./lib/obj-filter')
 const setBlocking = require('set-blocking')
+const YError = require('./lib/yerror')
 
 var exports = module.exports = Yargs
 function Yargs (processArgs, cwd, parentRequire) {
@@ -867,7 +868,8 @@ function Yargs (processArgs, cwd, parentRequire) {
       try {
         args = parseArgs(processArgs)
       } catch (err) {
-        usage.fail(err.message, err)
+        if (err instanceof YError) usage.fail(err.message, err)
+        else throw err
       }
 
       return args
@@ -993,7 +995,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     // If the help or version options where used and exitProcess is false,
     // or if explicitly skipped, we won't run validations
     if (!skipValidation) {
-      if (parsed.error) throw parsed.error
+      if (parsed.error) throw new YError(parsed.error.message)
 
       // if we're executed via bash completion, don't
       // bother with validation.
