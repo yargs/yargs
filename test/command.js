@@ -938,13 +938,13 @@ describe('Command', function () {
         commandCalled.should.be.true
       })
 
-      it('is true but non-global when called without arguments', function () {
+      it('is true and global when called without arguments', function () {
         var commandCalled = false
         yargs('hi')
           .strict()
           .command('hi', 'The hi command', function (innerYargs) {
             commandCalled = true
-            innerYargs.getStrict().should.be.false
+            innerYargs.getStrict().should.be.true
           })
         yargs.getStrict().should.be.true
         yargs.argv // parse and run command

@@ -665,9 +665,9 @@ function Yargs (processArgs, cwd, parentRequire) {
 
   var strict = false
   var strictGlobal = false
-  self.strict = function (_global) {
-    strict = _global !== false
-    strictGlobal = !!_global
+  self.strict = function (_strict, _global) {
+    strict = _strict !== false
+    strictGlobal = _global !== false
     return self
   }
   self.getStrict = function () {
