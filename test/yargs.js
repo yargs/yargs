@@ -1123,6 +1123,7 @@ describe('yargs dsl tests', function () {
         .config('config', function (path) {
           return JSON.parse(fs.readFileSync(path))
         })
+        .global('config', false)
         .argv
 
       argv.foo.should.equal('baz')
@@ -1131,7 +1132,8 @@ describe('yargs dsl tests', function () {
     it('allows key to be specified with option shorthand', function () {
       var argv = yargs('--config ./test/fixtures/config.json')
         .option('config', {
-          config: true
+          config: true,
+          global: false
         })
         .argv
 
@@ -1218,7 +1220,8 @@ describe('yargs dsl tests', function () {
           nargs: 2
         })
         .option('bar', {
-          nargs: 2
+          nargs: 2,
+          global: false
         })
         .global('foo')
         .reset()
@@ -1238,7 +1241,8 @@ describe('yargs dsl tests', function () {
         .option('bar', {
           nargs: 2,
           string: true,
-          demand: true
+          demand: true,
+          global: false
         })
         .global('foo')
         .reset({
@@ -1298,11 +1302,11 @@ describe('yargs dsl tests', function () {
     it('should expose an options short-hand for declaring global options', function () {
       var y = yargs('--foo a b c')
         .option('foo', {
-          nargs: 2,
-          global: true
+          nargs: 2
         })
         .option('bar', {
-          nargs: 2
+          nargs: 2,
+          global: false
         })
         .reset()
       var options = y.getOptions()

@@ -228,6 +228,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     }
 
     key = key || 'config'
+    self.global(key)
     self.describe(key, msg || usage.deferY18nLookup('Path to JSON config file'))
     ;(Array.isArray(key) ? key : [key]).forEach(function (k) {
       options.config[k] = parseFn || true
@@ -436,14 +437,23 @@ function Yargs (processArgs, cwd, parentRequire) {
     return self
   }
 
-  self.global = function (globals) {
-    options.global.push.apply(options.global, [].concat(globals))
+  self.global = function (globals, isGlobal) {
+    globals = [].concat(globals)
+    // if isGlobal isn't provided, assume true.
+    if (isGlobal || typeof isGlobal === 'undefined') {
+      globals.forEach(function (g) {
+        if (options.global.indexOf(g) === -1) options.global.push(g)
+      })
+    } else {
+      options.global = options.global.filter(function (g) {
+        return globals.indexOf(g) === -1
+      })
+    }
     return self
   }
 
   self.pkgConf = function (key, path) {
     var conf = null
-
     var obj = pkgUp(path)
 
     // If an object exists in the key, add it to options.configObjects
@@ -568,9 +578,9 @@ function Yargs (processArgs, cwd, parentRequire) {
         self.group(key, opt.group)
       }
 
-      if (opt.global) {
-        self.global(key)
-      }
+      // options default to global, this behavior can be disabled with global: false.
+      const isGlobal = typeof opt.global === 'undefined' ? true : opt.global
+      self.global(key, isGlobal)
 
       if (opt.boolean || opt.type === 'boolean') {
         self.boolean(key)

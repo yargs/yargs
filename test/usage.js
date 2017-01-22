@@ -1598,7 +1598,7 @@ describe('usage tests', function () {
       ])
     })
 
-    it('preserves groups with global keys', function () {
+    it('allows global option to be disabled', function () {
       var r = checkUsage(function () {
         return yargs(['upload', '-h'])
           .command('upload', 'upload something', function (yargs) {

@@ -839,4 +839,98 @@ describe('Command', function () {
       argv.sins.should.deep.equal([113993, 112888])
     })
   })
+
+  // make sure yargs parsing features configured on
+  // the top-level apply appropriately to commands.
+  describe('global', function () {
+    context('false', function () {
+      describe('config', function () {
+        it('does not load config in argv passed to command', function (done) {
+          yargs('command --foo ./package.json')
+            .command('command', 'a command', {}, function (argv) {
+              expect(argv.license).to.equal(undefined)
+              return done()
+            })
+            .config('foo')
+            .global('foo', false)
+            .argv
+        })
+      })
+
+      describe('validation', function () {
+        it('resets implies logic for command', function (done) {
+          yargs('command --foo 99')
+            .command('command', 'a command', {}, function (argv) {
+              argv.foo.should.equal(99)
+              return done()
+            })
+            .implies('foo', 'bar')
+            .global('foo', false)
+            .argv
+        })
+
+        it('resets conflicts logic for command', function (done) {
+          yargs('command --foo --bar')
+            .command('command', 'a command', {}, function (argv) {
+              argv.foo.should.equal(true)
+              argv.bar.should.equal(true)
+              return done()
+            })
+            .conflicts('foo', 'bar')
+            .global('foo', false)
+            .argv
+        })
+      })
+    })
+
+    // TODO: tests for:
+    // strict mode.
+    // custom checks.
+    // aliases.
+    // types (array, boolean, number, choices, count, nargs, normalize)
+    // coerce.
+    // defaults.
+    // demand (demandOption, demandCommand).
+    // describe.
+    // groups.
+    // help, version.
+
+    context('true (default)', function () {
+      describe('config', function () {
+        it('loads config for in argv passed to command', function (done) {
+          yargs('command --foo ./package.json')
+            .command('command', 'a command', {}, function (argv) {
+              argv.license.should.equal('MIT')
+              return done()
+            })
+            .config('foo')
+            .argv
+        })
+      })
+
+      describe('validation', function () {
+        it('applies implies logic for command', function (done) {
+          yargs('command --foo 99')
+            .command('command', 'a command', {}, function (argv) {})
+            .fail(function (msg) {
+              msg.should.match(/foo -> bar/)
+              return done()
+            })
+            .implies('foo', 'bar')
+            .argv
+        })
+
+        it('applies conflicts logic for command', function (done) {
+          yargs('command --foo --bar')
+            .command('command', 'a command', {}, function (argv) {})
+            .fail(function (msg) {
+              msg.should.match(/foo -> bar/)
+              return done()
+            })
+            .conflicts('foo', 'bar')
+            .argv
+        })
+      })
+    })
+  })
 })
