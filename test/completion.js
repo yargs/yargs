@@ -97,7 +97,6 @@ describe('Completion', function () {
                 describe: 'first option'
               }
             })
-            .argv
           })
           .command('cmd2', 'second command', function (subYargs) {
             subYargs.options({
@@ -105,7 +104,6 @@ describe('Completion', function () {
                 describe: 'second option'
               }
             })
-            .argv
           })
           .completion()
           .argv

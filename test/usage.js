@@ -1,10 +1,11 @@
 /* global describe, it, beforeEach */
 
-var checkUsage = require('./helpers/utils').checkOutput
-var chalk = require('chalk')
-var path = require('path')
-var yargs = require('../')
-var rebase = require('../yargs').rebase
+const checkUsage = require('./helpers/utils').checkOutput
+const chalk = require('chalk')
+const path = require('path')
+const yargs = require('../')
+const rebase = require('../yargs').rebase
+const YError = require('../lib/yerror')
 
 require('chai').should()
 
@@ -482,7 +483,7 @@ describe('usage tests', function () {
                 describe: 'bar command'
               }
             }, function (argv) {
-              throw new Error('blah')
+              throw new YError('blah')
             })
             .fail(function (message, error, yargs) {
               yargs.showHelp()
@@ -534,14 +535,14 @@ describe('usage tests', function () {
                     })
                     .exitProcess(false)
                 }, function (argv) {
-                  throw new Error('foo')
+                  throw new YError('foo')
                 })
                 .argv
             } catch (error) {
 
             }
           })
-          r.logs.should.deep.equal([['Error', 'foo'], 'is triggered last'])
+          r.logs.should.deep.equal([['YError', 'foo'], 'is triggered last'])
           r.should.have.property('exit').and.be.false
         })
       })
