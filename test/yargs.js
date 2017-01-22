@@ -1280,6 +1280,7 @@ describe('yargs dsl tests', function () {
         .describe('bar', 'my awesome bar option')
         .describe('foo', 'my awesome foo option')
         .global('foo')
+        .global('bar', false)
         .reset()
       var descriptions = y.getUsageInstance().getDescriptions()
       Object.keys(descriptions).should.include('foo')

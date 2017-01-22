@@ -911,6 +911,31 @@ describe('Command', function () {
           .conflicts('foo', 'bar')
           .argv
       })
+
+      it('applies custom checks globally by default', function (done) {
+        yargs('command blerg --foo')
+          .command('command <snuh>', 'a command')
+          .check(function (argv) {
+            argv.snuh.should.equal('blerg')
+            argv.foo.should.equal(true)
+            argv._.should.include('command')
+            done()
+            return true
+          })
+          .argv
+      })
+
+      it('resets custom check if global is false', function () {
+        var checkCalled = false
+        yargs('command blerg --foo')
+          .command('command <snuh>', 'a command')
+          .check(function (argv) {
+            checkCalled = true
+            return true
+          }, false)
+          .argv
+        checkCalled.should.equal(false)
+      })
     })
 
     describe('strict', function () {
@@ -977,9 +1002,38 @@ describe('Command', function () {
         commandCalled.should.be.true
       })
     })
+
+    describe('types', function () {
+      it('applies array type globally', function () {
+        const argv = yargs('command --foo 1 2')
+          .command('command', 'a command')
+          .array('foo')
+          .argv
+        argv.foo.should.eql([1, 2])
+      })
+
+      it('allows global setting to be disabled for array type', function () {
+        const argv = yargs('command --foo 1 2')
+          .command('command', 'a command')
+          .array('foo')
+          .global('foo', false)
+          .argv
+        argv.foo.should.eql(1)
+      })
+
+      it('applies choices type globally', function (done) {
+        yargs('command --foo 99')
+          .command('command', 'a command')
+          .choices('foo', [33, 88])
+          .fail(function (msg) {
+            msg.should.match(/Choices: 33, 88/)
+            return done()
+          })
+          .argv
+      })
+    })
+
     // TODO: tests for:
-    // strict mode.
-    // custom checks.
     // aliases.
     // types (array, boolean, number, choices, count, nargs, normalize)
     // coerce.

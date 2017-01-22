@@ -408,7 +408,7 @@ explicitly set.
 
 If `key` is an array, interpret all the elements as booleans.
 
-.check(fn)
+.check(fn, [global=true])
 ----------
 
 Check that certain conditions are met in the provided arguments.
@@ -417,6 +417,9 @@ Check that certain conditions are met in the provided arguments.
 
 If `fn` throws or returns a non-truthy value, show the thrown error, usage information, and
 exit.
+
+`global` indicates whether or not `check()` should be enabled both
+at the top-level and for each sub-command.
 
 <a name="choices"></a>.choices(key, choices)
 ----------------------
@@ -1285,7 +1288,7 @@ require('yargs')
 
 Outputs the same completion choices as `./test.js --foo`<kbd>TAB</kbd>: `--foobar` and `--foobaz`
 
-<a name="global"></a>.global(globals, [isGlobal=true])
+<a name="global"></a>.global(globals, [global=true])
 ------------
 
 Indicate that an option (or group of options) should not be reset when a command
@@ -1778,8 +1781,8 @@ If any of the options is present, yargs validation is skipped.
 Any command-line argument given that is not demanded, or does not have a
 corresponding description, will be reported as an error.
 
-`global` indicates whether or not `strict()` should be applied both
-at the top-level and to sub-commands.
+`global` indicates whether or not `strict()` should be enabled both
+at the top-level and for each sub-command.
 
 <a name="string"></a>.string(key)
 ------------
