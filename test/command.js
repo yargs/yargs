@@ -1,4 +1,4 @@
-/* global describe, it, beforeEach */
+/* global context, describe, it, beforeEach */
 var yargs = require('../')
 var expect = require('chai').expect
 var checkOutput = require('./helpers/utils').checkOutput

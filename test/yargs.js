@@ -222,6 +222,8 @@ describe('yargs dsl tests', function () {
         .group('foo', 'Group:')
         .strict()
         .exitProcess(false)  // defaults to true.
+        .global('foo', false)
+        .global('qux', false)
         .env('YARGS')
         .reset()
 
@@ -1292,7 +1294,7 @@ describe('yargs dsl tests', function () {
         .implies({
           z: 'w'
         })
-        .global(['x'])
+        .global(['z'], false)
         .reset()
       var implied = y.getValidationInstance().getImplied()
       Object.keys(implied).should.include('x')
