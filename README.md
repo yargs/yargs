@@ -673,7 +673,7 @@ require('yargs')
       console.log(`setting ${argv.key} to ${argv.value}`)
     }
   })
-  .demandCommand(1)
+  .demandCommand()
   .help()
   .wrap(72)
   .argv
@@ -819,7 +819,7 @@ cli.js:
 #!/usr/bin/env node
 require('yargs')
   .commandDir('cmds')
-  .demandCommand(1)
+  .demandCommand()
   .help()
   .argv
 ```
@@ -1107,9 +1107,9 @@ Options:
 Missing required arguments: run, path
 ```
 
-<a name="demandCommand"></a>.demandCommand(min, [minMsg])
+<a name="demandCommand"></a>.demandCommand([min=1], [minMsg])
 ------------------------------
-.demandCommand(min, [max], [minMsg], [maxMsg])
+.demandCommand([min=1], [max], [minMsg], [maxMsg])
 ------------------------------
 
 Demand in context of commands. You can demand a minimum and a maximum number a user can have within your program, as well as provide corresponding error messages if either of the demands is not met.
@@ -1129,7 +1129,9 @@ require('yargs')
   .help()
   .argv
 ```
+
 which will provide the following output:
+
 ```bash
 Commands:
   configure <key> [value]  Set a config variable         [aliases: config, cfg]

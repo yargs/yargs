@@ -212,7 +212,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     return self
   }
 
-  function populateParserHintArray (type, keys) {
+  function populateParserHintArray (type, keys, value) {
     keys = [].concat(keys)
     keys.forEach(function (key) {
       self.global(key)
@@ -220,10 +220,6 @@ function Yargs (processArgs, cwd, parentRequire) {
     })
   }
 
-  /*
-  TODO: make sure everything goes through our setter helper.
-  'config', 'demandedOptions', 'demandedCommands', 'coerce'
-  */
   self.nargs = function (key, value) {
     populateParserHintObject(self.nargs, false, 'narg', key, value)
     return self
@@ -239,7 +235,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     return self
   }
 
-  // The 'defaults' alias is deprecated. It will be removed in the next major version.
+  // TODO: actually deprecate self.defaults.
   self.default = self.defaults = function (key, value, defaultDescription) {
     if (defaultDescription) options.defaultDescription[key] = defaultDescription
     if (typeof value === 'function') {
@@ -256,12 +252,32 @@ function Yargs (processArgs, cwd, parentRequire) {
     return self
   }
 
+  self.demandOption = function (keys, msg) {
+    var value = { msg: typeof msg === 'string' ? msg : undefined }
+    populateParserHintObject(self.demandOption, false, 'demandedOptions', keys, value)
+    return self
+  }
+
+  self.coerce = function (keys, value) {
+    populateParserHintObject(self.coerce, false, 'coerce', keys, value)
+    return self
+  }
+
   function populateParserHintObject (builder, isArray, type, key, value) {
-    if (typeof key === 'object') {
+    if (Array.isArray(key)) {
+      // an array of keys with one value ['x', 'y', 'z'], function parse () {}
+      var temp = {}
+      key.forEach(function (k) {
+        temp[k] = value
+      })
+      builder(temp)
+    } else if (typeof key === 'object') {
+      // an object of key value pairs: {'x': parse () {}, 'y': parse() {}}
       Object.keys(key).forEach(function (k) {
         builder(k, key[k])
       })
     } else {
+      // a single key value pair 'x', parse() {}
       self.global(key)
       if (isArray) {
         options[type][key] = (options[type][key] || []).concat(value)
@@ -272,20 +288,19 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   self.config = function (key, msg, parseFn) {
-    // allow to pass a configuration object
+    // allow a config object to be provided directly.
     if (typeof key === 'object') {
       options.configObjects = (options.configObjects || []).concat(key)
       return self
     }
 
-    // allow to provide a parsing function
+    // allow for a custom parsing function.
     if (typeof msg === 'function') {
       parseFn = msg
       msg = null
     }
 
     key = key || 'config'
-    self.global(key)
     self.describe(key, msg || usage.deferY18nLookup('Path to JSON config file'))
     ;(Array.isArray(key) ? key : [key]).forEach(function (k) {
       options.config[k] = parseFn || true
@@ -309,21 +324,8 @@ function Yargs (processArgs, cwd, parentRequire) {
     return self
   }
 
-  self.coerce = function (key, fn) {
-    if (typeof key === 'object' && !Array.isArray(key)) {
-      Object.keys(key).forEach(function (k) {
-        self.coerce(k, key[k])
-      })
-    } else {
-      [].concat(key).forEach(function (k) {
-        options.coerce[k] = fn
-      })
-    }
-    return self
-  }
-
-  // deprecated: the demand API is too overloaded, and is being
-  // deprecated in favor of .demandCommand() .demandOption().
+  // TODO: deprecate self.demand in favor of
+  // .demandCommand() .demandOption().
   self.demand = self.required = self.require = function (keys, max, msg) {
     // you can optionally provide a 'max' key,
     // which will raise an exception if too many '_'
@@ -355,24 +357,9 @@ function Yargs (processArgs, cwd, parentRequire) {
     return self
   }
 
-  self.demandOption = function (key, msg) {
-    if (Array.isArray(key)) {
-      key.forEach(function (key) {
-        self.demandOption(key, msg)
-      })
-    } else {
-      if (typeof msg === 'string') {
-        options.demandedOptions[key] = { msg: msg }
-      // allow edge-case of options: {a: {demand: true}, b: {demand: false}}
-      } else if (msg === true || typeof msg === 'undefined') {
-        options.demandedOptions[key] = { msg: undefined }
-      }
-    }
-
-    return self
-  }
-
   self.demandCommand = function (min, max, minMsg, maxMsg) {
+    if (typeof min === 'undefined') min = 1
+
     if (typeof max !== 'number') {
       minMsg = max
       max = Infinity

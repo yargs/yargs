@@ -263,9 +263,10 @@ describe('yargs dsl tests', function () {
       expect(y.getGroups()).to.deep.equal({})
     })
 
-    it('does not invoke parse with an error if reset has been called', function (done) {
+    it('does not invoke parse with an error if reset has been called and option is not global', function (done) {
       var y = yargs()
         .demand('cake')
+        .global('cake', false)
 
       y.parse('hello', function (err) {
         err.message.should.match(/Missing required argument/)

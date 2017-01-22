@@ -840,9 +840,7 @@ describe('Command', function () {
     })
   })
 
-  // make sure yargs parsing features configured on
-  // the top-level apply appropriately to commands.
-  describe('global', function () {
+  describe('global parsing hints', function () {
     describe('config', function () {
       it('does not load config for command if global is false', function (done) {
         yargs('command --foo ./package.json')
@@ -935,6 +933,17 @@ describe('Command', function () {
           }, false)
           .argv
         checkCalled.should.equal(false)
+      })
+
+      it('applies demandOption globally', function (done) {
+        yargs('command blerg --foo')
+          .command('command <snuh>', 'a command')
+          .fail(function (msg) {
+            msg.should.match(/Missing required argument: bar/)
+            return done()
+          })
+          .demandOption('bar')
+          .argv
       })
     })
 
@@ -1033,14 +1042,80 @@ describe('Command', function () {
       })
     })
 
+    describe('aliases', function () {
+      it('defaults to applying aliases globally', function (done) {
+        yargs('command blerg --foo 22')
+          .command('command <snuh>', 'a command', {}, function (argv) {
+            argv.foo.should.equal(22)
+            argv.bar.should.equal(22)
+            argv.snuh.should.equal('blerg')
+            return done()
+          })
+          .alias('foo', 'bar')
+          .argv
+      })
+
+      it('allows global application of alias to be disabled', function (done) {
+        yargs('command blerg --foo 22')
+          .command('command <snuh>', 'a command', {}, function (argv) {
+            argv.foo.should.equal(22)
+            expect(argv.bar).to.equal(undefined)
+            argv.snuh.should.equal('blerg')
+            return done()
+          })
+          .option('foo', {
+            alias: 'bar',
+            global: false
+          })
+          .argv
+      })
+    })
+
+    describe('coerce', function () {
+      it('defaults to applying coerce rules globally', function (done) {
+        yargs('command blerg --foo 22')
+          .command('command <snuh>', 'a command', {}, function (argv) {
+            argv.foo.should.equal(44)
+            argv.snuh.should.equal('blerg')
+            return done()
+          })
+          .coerce('foo', function (arg) {
+            return arg * 2
+          })
+          .argv
+      })
+    })
+
+    describe('defaults', function () {
+      it('defaults to applying defaults globally', function (done) {
+        yargs('command --foo 22')
+          .command('command [snuh]', 'a command', {}, function (argv) {
+            argv.foo.should.equal(22)
+            argv.snuh.should.equal(55)
+            return done()
+          })
+          .default('snuh', 55)
+          .argv
+      })
+    })
+
+    describe('describe', function () {
+      it('sets description for command if described at top-level', function (done) {
+        yargs()
+          .command('command [snuh]', 'a command')
+          .describe('foo', 'an awesome argument')
+          .help()
+          .parse('command --help', function (err, argv, output) {
+            if (err) return done(err)
+            output.should.not.match(/Commands:/)
+            output.should.match(/an awesome argument/)
+            return done()
+          })
+      })
+    })
+
     // TODO: tests for:
-    // aliases.
-    // types (array, boolean, number, choices, count, nargs, normalize)
-    // coerce.
-    // defaults.
-    // demand (demandOption, demandCommand).
-    // describe.
-    // groups.
     // help, version.
+    // groups.
   })
 })

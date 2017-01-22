@@ -589,5 +589,15 @@ describe('validation tests', function () {
         })
         .argv
     })
+
+    it('defaults to demanding 1 command', function (done) {
+      yargs('-a 10')
+        .demandCommand()
+        .fail(function (msg) {
+          msg.should.equal('Not enough non-option arguments: got 0, need at least 1')
+          return done()
+        })
+        .argv
+    })
   })
 })
