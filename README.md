@@ -551,14 +551,6 @@ yargs
   .argv
 ```
 
-Note that commands will not automatically inherit configuration _or_ options
-of their parent context. This means you'll have to re-apply configuration
-if necessary, and make options global manually using the [global](#global) method.
-
-Additionally, the [`help`](#help) and [`version`](#version)
-options (if used) **always** apply globally, just like the
-[`.wrap()`](#wrap) configuration.
-
 `builder` can also be a function. This function is executed
 with a `yargs` instance, and can be used to provide _advanced_ command specific help:
 
@@ -1293,7 +1285,7 @@ require('yargs')
 
 Outputs the same completion choices as `./test.js --foo`<kbd>TAB</kbd>: `--foobar` and `--foobaz`
 
-<a name="global"></a>.global(globals)
+<a name="global"></a>.global(globals, [isGlobal=true])
 ------------
 
 Indicate that an option (or group of options) should not be reset when a command
@@ -1303,11 +1295,13 @@ is executed, as an example:
 var argv = require('yargs')
   .option('a', {
     alias: 'all',
-    default: true
+    default: true,
+    global: false
   })
   .option('n', {
     alias: 'none',
-    default: true
+    default: true,
+    global: false
   })
   .command('foo', 'foo command', function (yargs) {
     return yargs.option('b', {
@@ -1322,7 +1316,7 @@ var argv = require('yargs')
 If the `foo` command is executed the `all` option will remain, but the `none`
 option will have been eliminated.
 
-`help`, `version`, and `completion` options default to being global.
+Options default to being global.
 
 <a name="group"></a>.group(key(s), groupName)
 --------------------
@@ -1778,11 +1772,14 @@ Specify --help for available options
 Specifies either a single option key (string), or an array of options.
 If any of the options is present, yargs validation is skipped.
 
-.strict()
+.strict([global=true])
 ---------
 
 Any command-line argument given that is not demanded, or does not have a
 corresponding description, will be reported as an error.
+
+`global` indicates whether or not `strict()` should be applied both
+at the top-level and to sub-commands.
 
 <a name="string"></a>.string(key)
 ------------

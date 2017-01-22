@@ -220,7 +220,7 @@ describe('yargs dsl tests', function () {
         .implies('foo', 'snuh')
         .conflicts('qux', 'xyzzy')
         .group('foo', 'Group:')
-        .strict(true, false)
+        .strict(false)
         .exitProcess(false)  // defaults to true.
         .global('foo', false)
         .global('qux', false)
