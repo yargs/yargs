@@ -1,4 +1,4 @@
-/* global context, describe, it, beforeEach */
+/* global describe, it, beforeEach */
 var yargs = require('../')
 var expect = require('chai').expect
 var checkOutput = require('./helpers/utils').checkOutput
@@ -843,46 +843,153 @@ describe('Command', function () {
   // make sure yargs parsing features configured on
   // the top-level apply appropriately to commands.
   describe('global', function () {
-    context('false', function () {
-      describe('config', function () {
-        it('does not load config in argv passed to command', function (done) {
-          yargs('command --foo ./package.json')
-            .command('command', 'a command', {}, function (argv) {
-              expect(argv.license).to.equal(undefined)
-              return done()
-            })
-            .config('foo')
-            .global('foo', false)
-            .argv
-        })
+    describe('config', function () {
+      it('does not load config for command if global is false', function (done) {
+        yargs('command --foo ./package.json')
+          .command('command', 'a command', {}, function (argv) {
+            expect(argv.license).to.equal(undefined)
+            return done()
+          })
+          .config('foo')
+          .global('foo', false)
+          .argv
       })
 
-      describe('validation', function () {
-        it('resets implies logic for command', function (done) {
-          yargs('command --foo 99')
-            .command('command', 'a command', {}, function (argv) {
-              argv.foo.should.equal(99)
-              return done()
-            })
-            .implies('foo', 'bar')
-            .global('foo', false)
-            .argv
-        })
-
-        it('resets conflicts logic for command', function (done) {
-          yargs('command --foo --bar')
-            .command('command', 'a command', {}, function (argv) {
-              argv.foo.should.equal(true)
-              argv.bar.should.equal(true)
-              return done()
-            })
-            .conflicts('foo', 'bar')
-            .global('foo', false)
-            .argv
-        })
+      it('loads config for command by default', function (done) {
+        yargs('command --foo ./package.json')
+          .command('command', 'a command', {}, function (argv) {
+            argv.license.should.equal('MIT')
+            return done()
+          })
+          .config('foo')
+          .argv
       })
     })
 
+    describe('validation', function () {
+      it('resets implies logic for command if global is false', function (done) {
+        yargs('command --foo 99')
+          .command('command', 'a command', {}, function (argv) {
+            argv.foo.should.equal(99)
+            return done()
+          })
+          .implies('foo', 'bar')
+          .global('foo', false)
+          .argv
+      })
+
+      it('applies implies logic for command by default', function (done) {
+        yargs('command --foo 99')
+          .command('command', 'a command', {}, function (argv) {})
+          .fail(function (msg) {
+            msg.should.match(/foo -> bar/)
+            return done()
+          })
+          .implies('foo', 'bar')
+          .argv
+      })
+
+      it('resets conflicts logic for command if global is false', function (done) {
+        yargs('command --foo --bar')
+          .command('command', 'a command', {}, function (argv) {
+            argv.foo.should.equal(true)
+            argv.bar.should.equal(true)
+            return done()
+          })
+          .conflicts('foo', 'bar')
+          .global('foo', false)
+          .argv
+      })
+
+      it('applies conflicts logic for command by default', function (done) {
+        yargs('command --foo --bar')
+          .command('command', 'a command', {}, function (argv) {})
+          .fail(function (msg) {
+            msg.should.match(/mutually exclusive/)
+            return done()
+          })
+          .conflicts('foo', 'bar')
+          .argv
+      })
+    })
+
+    describe('strict', function () {
+      it('defaults to false when not called', function () {
+        var commandCalled = false
+        yargs('hi')
+          .command('hi', 'The hi command', function (innerYargs) {
+            commandCalled = true
+            innerYargs.getStrict().should.be.false
+          })
+        yargs.getStrict().should.be.false
+        yargs.argv // parse and run command
+        commandCalled.should.be.true
+      })
+
+      it('can be enabled just for a command', function () {
+        var commandCalled = false
+        yargs('hi')
+          .command('hi', 'The hi command', function (innerYargs) {
+            commandCalled = true
+            innerYargs.strict().getStrict().should.be.true
+          })
+        yargs.getStrict().should.be.false
+        yargs.argv // parse and run command
+        commandCalled.should.be.true
+      })
+
+      it('is true but non-global when called without arguments', function () {
+        var commandCalled = false
+        yargs('hi')
+          .strict()
+          .command('hi', 'The hi command', function (innerYargs) {
+            commandCalled = true
+            innerYargs.getStrict().should.be.false
+          })
+        yargs.getStrict().should.be.true
+        yargs.argv // parse and run command
+        commandCalled.should.be.true
+      })
+
+      it('is false when passed a value of `false`', function () {
+        var commandCalled = false
+        yargs('hi')
+          .strict(false)
+          .command('hi', 'The hi command', function (innerYargs) {
+            commandCalled = true
+            innerYargs.getStrict().should.be.false
+          })
+        yargs.getStrict().should.be.false
+        yargs.argv // parse and run command
+        commandCalled.should.be.true
+      })
+
+      it('is true and global when passed a value of `true`', function () {
+        var commandCalled = false
+        yargs('hi')
+          .strict(true)
+          .command('hi', 'The hi command', function (innerYargs) {
+            commandCalled = true
+            innerYargs.getStrict().should.be.true
+          })
+        yargs.getStrict().should.be.true
+        yargs.argv // parse and run command
+        commandCalled.should.be.true
+      })
+
+      it('allows a command to override global with a value of `false`', function () {
+        var commandCalled = false
+        yargs('hi')
+          .strict(true)
+          .command('hi', 'The hi command', function (innerYargs) {
+            commandCalled = true
+            innerYargs.strict(false).getStrict().should.be.false
+          })
+        yargs.getStrict().should.be.true
+        yargs.argv // parse and run command
+        commandCalled.should.be.true
+      })
+    })
     // TODO: tests for:
     // strict mode.
     // custom checks.
@@ -894,43 +1001,5 @@ describe('Command', function () {
     // describe.
     // groups.
     // help, version.
-
-    context('true (default)', function () {
-      describe('config', function () {
-        it('loads config for in argv passed to command', function (done) {
-          yargs('command --foo ./package.json')
-            .command('command', 'a command', {}, function (argv) {
-              argv.license.should.equal('MIT')
-              return done()
-            })
-            .config('foo')
-            .argv
-        })
-      })
-
-      describe('validation', function () {
-        it('applies implies logic for command', function (done) {
-          yargs('command --foo 99')
-            .command('command', 'a command', {}, function (argv) {})
-            .fail(function (msg) {
-              msg.should.match(/foo -> bar/)
-              return done()
-            })
-            .implies('foo', 'bar')
-            .argv
-        })
-
-        it('applies conflicts logic for command', function (done) {
-          yargs('command --foo --bar')
-            .command('command', 'a command', {}, function (argv) {})
-            .fail(function (msg) {
-              msg.should.match(/foo -> bar/)
-              return done()
-            })
-            .conflicts('foo', 'bar')
-            .argv
-        })
-      })
-    })
   })
 })
