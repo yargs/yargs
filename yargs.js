@@ -423,7 +423,6 @@ function Yargs (processArgs, cwd, parentRequire) {
 
   self.global = function (globals, global) {
     globals = [].concat(globals)
-    // if isGlobal isn't provided, assume true.
     if (global !== false) {
       globals.forEach(function (g) {
         if (options.global.indexOf(g) === -1) options.global.push(g)
