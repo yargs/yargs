@@ -766,7 +766,7 @@ describe('yargs dsl tests', function () {
     })
   })
 
-  // yargs.parse(['foo', '--bar'], function (err, argv, output) {})
+  // yargs.parse(['foo', '--bar'], function (err, argv, output) {}
   context('function passed as second argument to parse', function () {
     it('does not print to stdout', function () {
       var r = checkOutput(function () {
