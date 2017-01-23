@@ -615,8 +615,7 @@ function Yargs (processArgs, cwd, parentRequire) {
   self.group = function (opts, groupName) {
     var existing = preservedGroups[groupName] || groups[groupName]
     if (preservedGroups[groupName]) {
-      // the preserved group will be moved to the set of explicitly declared
-      // groups
+      // we now only need to track this group name in groups.
       delete preservedGroups[groupName]
     }
 

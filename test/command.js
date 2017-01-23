@@ -876,14 +876,14 @@ describe('Command', function () {
           .argv
       })
 
-      it('applies implies logic for command by default', function (done) {
-        yargs('command --foo 99')
+      it('applies conflicts logic for command by default', function (done) {
+        yargs('command --foo --bar')
           .command('command', 'a command', {}, function (argv) {})
           .fail(function (msg) {
-            msg.should.match(/foo -> bar/)
+            msg.should.match(/mutually exclusive/)
             return done()
           })
-          .implies('foo', 'bar')
+          .conflicts('foo', 'bar')
           .argv
       })
 
@@ -896,17 +896,6 @@ describe('Command', function () {
           })
           .conflicts('foo', 'bar')
           .global('foo', false)
-          .argv
-      })
-
-      it('applies conflicts logic for command by default', function (done) {
-        yargs('command --foo --bar')
-          .command('command', 'a command', {}, function (argv) {})
-          .fail(function (msg) {
-            msg.should.match(/mutually exclusive/)
-            return done()
-          })
-          .conflicts('foo', 'bar')
           .argv
       })
 
@@ -972,7 +961,7 @@ describe('Command', function () {
         commandCalled.should.be.true
       })
 
-      it('is true and global when called without arguments', function () {
+      it('applies strict globally by default', function () {
         var commandCalled = false
         yargs('hi')
           .strict()
@@ -992,19 +981,6 @@ describe('Command', function () {
           .command('hi', 'The hi command', function (innerYargs) {
             commandCalled = true
             innerYargs.getStrict().should.be.false
-          })
-        yargs.getStrict().should.be.true
-        yargs.argv // parse and run command
-        commandCalled.should.be.true
-      })
-
-      it('applies strict globally passed a value of `true`', function () {
-        var commandCalled = false
-        yargs('hi')
-          .strict(true)
-          .command('hi', 'The hi command', function (innerYargs) {
-            commandCalled = true
-            innerYargs.getStrict().should.be.true
           })
         yargs.getStrict().should.be.true
         yargs.argv // parse and run command
@@ -1087,7 +1063,7 @@ describe('Command', function () {
     })
 
     describe('defaults', function () {
-      it('defaults to applying defaults globally', function (done) {
+      it('applies defaults globally', function (done) {
         yargs('command --foo 22')
           .command('command [snuh]', 'a command', {}, function (argv) {
             argv.foo.should.equal(22)
@@ -1100,7 +1076,7 @@ describe('Command', function () {
     })
 
     describe('describe', function () {
-      it('sets description for command if described at top-level', function (done) {
+      it('flags an option as global if a description is set', function (done) {
         yargs()
           .command('command [snuh]', 'a command')
           .describe('foo', 'an awesome argument')
@@ -1114,8 +1090,49 @@ describe('Command', function () {
       })
     })
 
-    // TODO: tests for:
-    // help, version.
-    // groups.
+    describe('help', function () {
+      it('applies help globally', function (done) {
+        yargs()
+          .command('command [snuh]', 'a command')
+          .describe('foo', 'an awesome argument')
+          .help('hellllllp')
+          .parse('command --hellllllp', function (err, argv, output) {
+            if (err) return done(err)
+            output.should.match(/--hellllllp {2}Show help/)
+            return done()
+          })
+      })
+    })
+
+    describe('version', function () {
+      it('applies version globally', function (done) {
+        yargs()
+          .command('command [snuh]', 'a command')
+          .describe('foo', 'an awesome argument')
+          .version('ver', 'show version', '9.9.9')
+          .parse('command --ver', function (err, argv, output) {
+            if (err) return done(err)
+            output.should.equal('9.9.9')
+            return done()
+          })
+      })
+    })
+
+    describe('groups', function () {
+      it('should apply custom option groups globally', function (done) {
+        yargs()
+          .command('command [snuh]', 'a command')
+          .group('foo', 'Bad Variable Names:')
+          .group('snuh', 'Bad Variable Names:')
+          .describe('foo', 'foo option')
+          .describe('snuh', 'snuh positional')
+          .help()
+          .parse('command --help', function (err, argv, output) {
+            if (err) return done(err)
+            output.should.match(/Bad Variable Names:\W*--foo/)
+            return done()
+          })
+      })
+    })
   })
 })
