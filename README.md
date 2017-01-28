@@ -418,7 +418,7 @@ Check that certain conditions are met in the provided arguments.
 If `fn` throws or returns a non-truthy value, show the thrown error, usage information, and
 exit.
 
-`global` indicates whether or not `check()` should be enabled both
+`global` indicates whether `check()` should be enabled both
 at the top-level and for each sub-command.
 
 <a name="choices"></a>.choices(key, choices)
@@ -1783,7 +1783,7 @@ If any of the options is present, yargs validation is skipped.
 Any command-line argument given that is not demanded, or does not have a
 corresponding description, will be reported as an error.
 
-`global` indicates whether or not `strict()` should be enabled both
+`global` indicates whether `strict()` should be enabled both
 at the top-level and for each sub-command.
 
 <a name="string"></a>.string(key)
