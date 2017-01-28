@@ -66,23 +66,23 @@ function Yargs (processArgs, cwd, parentRequire) {
     // logic is used to build a nested command
     // hierarchy.
     var tmpOptions = {}
-    tmpOptions.global = options.global ? options.global : []
+    tmpOptions.local = options.local ? options.local : []
     tmpOptions.configObjects = options.configObjects ? options.configObjects : []
 
-    // if a key has been set as a global, we
-    // do not want to reset it or its aliases.
-    var globalLookup = {}
-    tmpOptions.global.forEach(function (g) {
-      globalLookup[g] = true
-      ;(aliases[g] || []).forEach(function (a) {
-        globalLookup[a] = true
+    // if a key has been explicitly set as local,
+    // we should reset it before passing options to command.
+    var localLookup = {}
+    tmpOptions.local.forEach(function (l) {
+      localLookup[l] = true
+      ;(aliases[l] || []).forEach(function (a) {
+        localLookup[a] = true
       })
     })
 
-    // preserve groups containing global keys
+    // preserve all groups not set to local.
     preservedGroups = Object.keys(groups).reduce(function (acc, groupName) {
       var keys = groups[groupName].filter(function (key) {
-        return key in globalLookup
+        return !(key in localLookup)
       })
       if (keys.length > 0) {
         acc[groupName] = keys
@@ -104,13 +104,13 @@ function Yargs (processArgs, cwd, parentRequire) {
 
     arrayOptions.forEach(function (k) {
       tmpOptions[k] = (options[k] || []).filter(function (k) {
-        return globalLookup[k]
+        return !localLookup[k]
       })
     })
 
     objectOptions.forEach(function (k) {
       tmpOptions[k] = objFilter(options[k], function (k, v) {
-        return globalLookup[k]
+        return !localLookup[k]
       })
     })
 
@@ -119,8 +119,8 @@ function Yargs (processArgs, cwd, parentRequire) {
 
     // if this is the first time being executed, create
     // instances of all our helpers -- otherwise just reset.
-    usage = usage ? usage.reset(globalLookup) : Usage(self, y18n)
-    validation = validation ? validation.reset(globalLookup) : Validation(self, usage, y18n)
+    usage = usage ? usage.reset(localLookup) : Usage(self, y18n)
+    validation = validation ? validation.reset(localLookup) : Validation(self, usage, y18n)
     command = command ? command.reset() : Command(self, usage, validation)
     if (!completion) completion = Completion(self, usage, command)
 
@@ -215,7 +215,6 @@ function Yargs (processArgs, cwd, parentRequire) {
   function populateParserHintArray (type, keys, value) {
     keys = [].concat(keys)
     keys.forEach(function (key) {
-      self.global(key)
       options[type].push(key)
     })
   }
@@ -278,7 +277,6 @@ function Yargs (processArgs, cwd, parentRequire) {
       })
     } else {
       // a single key value pair 'x', parse() {}
-      self.global(key)
       if (isArray) {
         options[type][key] = (options[type][key] || []).concat(value)
       } else {
@@ -365,6 +363,8 @@ function Yargs (processArgs, cwd, parentRequire) {
       max = Infinity
     }
 
+    self.global('_', false)
+
     options.demandedCommands._ = {
       min: min,
       max: max,
@@ -424,12 +424,12 @@ function Yargs (processArgs, cwd, parentRequire) {
   self.global = function (globals, global) {
     globals = [].concat(globals)
     if (global !== false) {
-      globals.forEach(function (g) {
-        if (options.global.indexOf(g) === -1) options.global.push(g)
+      options.local = options.local.filter(function (l) {
+        return globals.indexOf(l) === -1
       })
     } else {
-      options.global = options.global.filter(function (g) {
-        return globals.indexOf(g) === -1
+      globals.forEach(function (g) {
+        if (options.local.indexOf(g) === -1) options.local.push(g)
       })
     }
     return self
@@ -585,7 +585,9 @@ function Yargs (processArgs, cwd, parentRequire) {
         self.count(key)
       }
 
-      self.global(key, opt.global !== false)
+      if (typeof opt.global === 'boolean') {
+        self.global(key, opt.global)
+      }
 
       if (opt.defaultDescription) {
         options.defaultDescription[key] = opt.defaultDescription
@@ -677,7 +679,6 @@ function Yargs (processArgs, cwd, parentRequire) {
 
     usage.version(ver || undefined)
     self.boolean(versionOpt)
-    self.global(versionOpt)
     self.describe(versionOpt, msg)
     return self
   }
@@ -714,7 +715,6 @@ function Yargs (processArgs, cwd, parentRequire) {
     // use arguments, fallback to defaults for opt and msg
     helpOpt = opt || 'help'
     self.boolean(helpOpt)
-    self.global(helpOpt)
     self.describe(helpOpt, msg || usage.deferY18nLookup('Show help'))
     return self
   }

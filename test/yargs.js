@@ -246,9 +246,13 @@ describe('yargs dsl tests', function () {
         config: {},
         configObjects: [],
         envPrefix: 'YARGS', // preserved as global
-        global: ['help'],
         demandedCommands: {},
-        demandedOptions: {}
+        demandedOptions: {},
+        local: [
+          '_',
+          'foo',
+          'qux'
+        ]
       }
 
       expect(y.getOptions()).to.deep.equal(emptyOptions)
@@ -1266,14 +1270,14 @@ describe('yargs dsl tests', function () {
       var y = yargs('--foo')
         .help('help')
       var options = y.getOptions()
-      options.global.should.include('help')
+      options.local.should.not.include('help')
     })
 
     it('should set version to global option by default', function () {
       var y = yargs('--foo')
         .version()
       var options = y.getOptions()
-      options.global.should.include('version')
+      options.local.should.not.include('version')
     })
 
     it('should not reset usage descriptions of global options', function () {

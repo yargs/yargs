@@ -93,6 +93,7 @@ describe('usage tests', function () {
             .wrap(null)
             .argv
         })
+
         r.result.should.have.property('w', 10)
         r.result.should.have.property('m', 10)
         r.result.should.have.property('_').with.length(1)
