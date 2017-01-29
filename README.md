@@ -408,7 +408,7 @@ explicitly set.
 
 If `key` is an array, interpret all the elements as booleans.
 
-.check(fn)
+.check(fn, [global=true])
 ----------
 
 Check that certain conditions are met in the provided arguments.
@@ -417,6 +417,9 @@ Check that certain conditions are met in the provided arguments.
 
 If `fn` throws or returns a non-truthy value, show the thrown error, usage information, and
 exit.
+
+`global` indicates whether `check()` should be enabled both
+at the top-level and for each sub-command.
 
 <a name="choices"></a>.choices(key, choices)
 ----------------------
@@ -551,14 +554,6 @@ yargs
   .argv
 ```
 
-Note that commands will not automatically inherit configuration _or_ options
-of their parent context. This means you'll have to re-apply configuration
-if necessary, and make options global manually using the [global](#global) method.
-
-Additionally, the [`help`](#help) and [`version`](#version)
-options (if used) **always** apply globally, just like the
-[`.wrap()`](#wrap) configuration.
-
 `builder` can also be a function. This function is executed
 with a `yargs` instance, and can be used to provide _advanced_ command specific help:
 
@@ -678,7 +673,7 @@ require('yargs')
       console.log(`setting ${argv.key} to ${argv.value}`)
     }
   })
-  .demandCommand(1)
+  .demandCommand()
   .help()
   .wrap(72)
   .argv
@@ -824,7 +819,7 @@ cli.js:
 #!/usr/bin/env node
 require('yargs')
   .commandDir('cmds')
-  .demandCommand(1)
+  .demandCommand()
   .help()
   .argv
 ```
@@ -1112,9 +1107,9 @@ Options:
 Missing required arguments: run, path
 ```
 
-<a name="demandCommand"></a>.demandCommand(min, [minMsg])
+<a name="demandCommand"></a>.demandCommand([min=1], [minMsg])
 ------------------------------
-.demandCommand(min, [max], [minMsg], [maxMsg])
+.demandCommand([min=1], [max], [minMsg], [maxMsg])
 ------------------------------
 
 Demand in context of commands. You can demand a minimum and a maximum number a user can have within your program, as well as provide corresponding error messages if either of the demands is not met.
@@ -1134,7 +1129,9 @@ require('yargs')
   .help()
   .argv
 ```
+
 which will provide the following output:
+
 ```bash
 Commands:
   configure <key> [value]  Set a config variable         [aliases: config, cfg]
@@ -1293,7 +1290,7 @@ require('yargs')
 
 Outputs the same completion choices as `./test.js --foo`<kbd>TAB</kbd>: `--foobar` and `--foobaz`
 
-<a name="global"></a>.global(globals)
+<a name="global"></a>.global(globals, [global=true])
 ------------
 
 Indicate that an option (or group of options) should not be reset when a command
@@ -1303,11 +1300,13 @@ is executed, as an example:
 var argv = require('yargs')
   .option('a', {
     alias: 'all',
-    default: true
+    default: true,
+    global: false
   })
   .option('n', {
     alias: 'none',
-    default: true
+    default: true,
+    global: false
   })
   .command('foo', 'foo command', function (yargs) {
     return yargs.option('b', {
@@ -1322,7 +1321,7 @@ var argv = require('yargs')
 If the `foo` command is executed the `all` option will remain, but the `none`
 option will have been eliminated.
 
-`help`, `version`, and `completion` options default to being global.
+Options default to being global.
 
 <a name="group"></a>.group(key(s), groupName)
 --------------------
@@ -1778,11 +1777,14 @@ Specify --help for available options
 Specifies either a single option key (string), or an array of options.
 If any of the options is present, yargs validation is skipped.
 
-.strict()
+.strict([global=true])
 ---------
 
 Any command-line argument given that is not demanded, or does not have a
 corresponding description, will be reported as an error.
+
+`global` indicates whether `strict()` should be enabled both
+at the top-level and for each sub-command.
 
 <a name="string"></a>.string(key)
 ------------
