@@ -517,6 +517,7 @@ function Yargs (processArgs, cwd, parentRequire) {
 
       var demand = opt.demand || opt.required || opt.require
 
+      // deprecated, use 'demandOption' instead
       if (demand) {
         self.demand(key, demand)
       }
