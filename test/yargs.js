@@ -220,8 +220,10 @@ describe('yargs dsl tests', function () {
         .implies('foo', 'snuh')
         .conflicts('qux', 'xyzzy')
         .group('foo', 'Group:')
-        .strict()
+        .strict(false)
         .exitProcess(false)  // defaults to true.
+        .global('foo', false)
+        .global('qux', false)
         .env('YARGS')
         .reset()
 
@@ -244,9 +246,13 @@ describe('yargs dsl tests', function () {
         config: {},
         configObjects: [],
         envPrefix: 'YARGS', // preserved as global
-        global: ['help'],
         demandedCommands: {},
-        demandedOptions: {}
+        demandedOptions: {},
+        local: [
+          '_',
+          'foo',
+          'qux'
+        ]
       }
 
       expect(y.getOptions()).to.deep.equal(emptyOptions)
@@ -261,9 +267,10 @@ describe('yargs dsl tests', function () {
       expect(y.getGroups()).to.deep.equal({})
     })
 
-    it('does not invoke parse with an error if reset has been called', function (done) {
+    it('does not invoke parse with an error if reset has been called and option is not global', function (done) {
       var y = yargs()
         .demand('cake')
+        .global('cake', false)
 
       y.parse('hello', function (err) {
         err.message.should.match(/Missing required argument/)
@@ -1123,6 +1130,7 @@ describe('yargs dsl tests', function () {
         .config('config', function (path) {
           return JSON.parse(fs.readFileSync(path))
         })
+        .global('config', false)
         .argv
 
       argv.foo.should.equal('baz')
@@ -1131,7 +1139,8 @@ describe('yargs dsl tests', function () {
     it('allows key to be specified with option shorthand', function () {
       var argv = yargs('--config ./test/fixtures/config.json')
         .option('config', {
-          config: true
+          config: true,
+          global: false
         })
         .argv
 
@@ -1218,7 +1227,8 @@ describe('yargs dsl tests', function () {
           nargs: 2
         })
         .option('bar', {
-          nargs: 2
+          nargs: 2,
+          global: false
         })
         .global('foo')
         .reset()
@@ -1238,7 +1248,8 @@ describe('yargs dsl tests', function () {
         .option('bar', {
           nargs: 2,
           string: true,
-          demand: true
+          demand: true,
+          global: false
         })
         .global('foo')
         .reset({
@@ -1259,14 +1270,14 @@ describe('yargs dsl tests', function () {
       var y = yargs('--foo')
         .help('help')
       var options = y.getOptions()
-      options.global.should.include('help')
+      options.local.should.not.include('help')
     })
 
     it('should set version to global option by default', function () {
       var y = yargs('--foo')
         .version()
       var options = y.getOptions()
-      options.global.should.include('version')
+      options.local.should.not.include('version')
     })
 
     it('should not reset usage descriptions of global options', function () {
@@ -1274,6 +1285,7 @@ describe('yargs dsl tests', function () {
         .describe('bar', 'my awesome bar option')
         .describe('foo', 'my awesome foo option')
         .global('foo')
+        .global('bar', false)
         .reset()
       var descriptions = y.getUsageInstance().getDescriptions()
       Object.keys(descriptions).should.include('foo')
@@ -1288,7 +1300,7 @@ describe('yargs dsl tests', function () {
         .implies({
           z: 'w'
         })
-        .global(['x'])
+        .global(['z'], false)
         .reset()
       var implied = y.getValidationInstance().getImplied()
       Object.keys(implied).should.include('x')
@@ -1298,11 +1310,11 @@ describe('yargs dsl tests', function () {
     it('should expose an options short-hand for declaring global options', function () {
       var y = yargs('--foo a b c')
         .option('foo', {
-          nargs: 2,
-          global: true
+          nargs: 2
         })
         .option('bar', {
-          nargs: 2
+          nargs: 2,
+          global: false
         })
         .reset()
       var options = y.getOptions()

@@ -66,23 +66,23 @@ function Yargs (processArgs, cwd, parentRequire) {
     // logic is used to build a nested command
     // hierarchy.
     var tmpOptions = {}
-    tmpOptions.global = options.global ? options.global : []
+    tmpOptions.local = options.local ? options.local : []
     tmpOptions.configObjects = options.configObjects ? options.configObjects : []
 
-    // if a key has been set as a global, we
-    // do not want to reset it or its aliases.
-    var globalLookup = {}
-    tmpOptions.global.forEach(function (g) {
-      globalLookup[g] = true
-      ;(aliases[g] || []).forEach(function (a) {
-        globalLookup[a] = true
+    // if a key has been explicitly set as local,
+    // we should reset it before passing options to command.
+    var localLookup = {}
+    tmpOptions.local.forEach(function (l) {
+      localLookup[l] = true
+      ;(aliases[l] || []).forEach(function (a) {
+        localLookup[a] = true
       })
     })
 
-    // preserve groups containing global keys
+    // preserve all groups not set to local.
     preservedGroups = Object.keys(groups).reduce(function (acc, groupName) {
       var keys = groups[groupName].filter(function (key) {
-        return key in globalLookup
+        return !(key in localLookup)
       })
       if (keys.length > 0) {
         acc[groupName] = keys
@@ -104,13 +104,13 @@ function Yargs (processArgs, cwd, parentRequire) {
 
     arrayOptions.forEach(function (k) {
       tmpOptions[k] = (options[k] || []).filter(function (k) {
-        return globalLookup[k]
+        return !localLookup[k]
       })
     })
 
     objectOptions.forEach(function (k) {
       tmpOptions[k] = objFilter(options[k], function (k, v) {
-        return globalLookup[k]
+        return !localLookup[k]
       })
     })
 
@@ -119,12 +119,12 @@ function Yargs (processArgs, cwd, parentRequire) {
 
     // if this is the first time being executed, create
     // instances of all our helpers -- otherwise just reset.
-    usage = usage ? usage.reset(globalLookup) : Usage(self, y18n)
-    validation = validation ? validation.reset(globalLookup) : Validation(self, usage, y18n)
+    usage = usage ? usage.reset(localLookup) : Usage(self, y18n)
+    validation = validation ? validation.reset(localLookup) : Validation(self, usage, y18n)
     command = command ? command.reset() : Command(self, usage, validation)
     if (!completion) completion = Completion(self, usage, command)
 
-    strict = false
+    if (!strictGlobal) strict = false
     completionCommand = null
     output = ''
     exitError = null
@@ -172,56 +172,127 @@ function Yargs (processArgs, cwd, parentRequire) {
     frozen = undefined
   }
 
-  self.boolean = function (bools) {
-    options.boolean.push.apply(options.boolean, [].concat(bools))
+  self.boolean = function (keys) {
+    populateParserHintArray('boolean', keys)
     return self
   }
 
-  self.array = function (arrays) {
-    options.array.push.apply(options.array, [].concat(arrays))
+  self.array = function (keys) {
+    populateParserHintArray('array', keys)
     return self
   }
 
-  self.nargs = function (key, n) {
-    if (typeof key === 'object') {
+  self.number = function (keys) {
+    populateParserHintArray('number', keys)
+    return self
+  }
+
+  self.normalize = function (keys) {
+    populateParserHintArray('normalize', keys)
+    return self
+  }
+
+  self.count = function (keys) {
+    populateParserHintArray('count', keys)
+    return self
+  }
+
+  self.string = function (keys) {
+    populateParserHintArray('string', keys)
+    return self
+  }
+
+  self.requiresArg = function (keys) {
+    populateParserHintArray('requiresArg', keys)
+    return self
+  }
+
+  self.skipValidation = function (keys) {
+    populateParserHintArray('skipValidation', keys)
+    return self
+  }
+
+  function populateParserHintArray (type, keys, value) {
+    keys = [].concat(keys)
+    keys.forEach(function (key) {
+      options[type].push(key)
+    })
+  }
+
+  self.nargs = function (key, value) {
+    populateParserHintObject(self.nargs, false, 'narg', key, value)
+    return self
+  }
+
+  self.choices = function (key, value) {
+    populateParserHintObject(self.choices, true, 'choices', key, value)
+    return self
+  }
+
+  self.alias = function (key, value) {
+    populateParserHintObject(self.alias, true, 'alias', key, value)
+    return self
+  }
+
+  // TODO: actually deprecate self.defaults.
+  self.default = self.defaults = function (key, value, defaultDescription) {
+    if (defaultDescription) options.defaultDescription[key] = defaultDescription
+    if (typeof value === 'function') {
+      if (!options.defaultDescription[key]) options.defaultDescription[key] = usage.functionDescription(value)
+      value = value.call()
+    }
+    populateParserHintObject(self.default, false, 'default', key, value)
+    return self
+  }
+
+  self.describe = function (key, desc) {
+    populateParserHintObject(self.describe, false, 'key', key, true)
+    usage.describe(key, desc)
+    return self
+  }
+
+  self.demandOption = function (keys, msg) {
+    var value = { msg: typeof msg === 'string' ? msg : undefined }
+    populateParserHintObject(self.demandOption, false, 'demandedOptions', keys, value)
+    return self
+  }
+
+  self.coerce = function (keys, value) {
+    populateParserHintObject(self.coerce, false, 'coerce', keys, value)
+    return self
+  }
+
+  function populateParserHintObject (builder, isArray, type, key, value) {
+    if (Array.isArray(key)) {
+      // an array of keys with one value ['x', 'y', 'z'], function parse () {}
+      var temp = {}
+      key.forEach(function (k) {
+        temp[k] = value
+      })
+      builder(temp)
+    } else if (typeof key === 'object') {
+      // an object of key value pairs: {'x': parse () {}, 'y': parse() {}}
       Object.keys(key).forEach(function (k) {
-        self.nargs(k, key[k])
+        builder(k, key[k])
       })
     } else {
-      options.narg[key] = n
+      // a single key value pair 'x', parse() {}
+      if (isArray) {
+        options[type][key] = (options[type][key] || []).concat(value)
+      } else {
+        options[type][key] = value
+      }
     }
-    return self
-  }
-
-  self.number = function (numbers) {
-    options.number.push.apply(options.number, [].concat(numbers))
-    return self
-  }
-
-  self.choices = function (key, values) {
-    if (typeof key === 'object') {
-      Object.keys(key).forEach(function (k) {
-        self.choices(k, key[k])
-      })
-    } else {
-      options.choices[key] = (options.choices[key] || []).concat(values)
-    }
-    return self
-  }
-
-  self.normalize = function (strings) {
-    options.normalize.push.apply(options.normalize, [].concat(strings))
-    return self
   }
 
   self.config = function (key, msg, parseFn) {
-    // allow to pass a configuration object
+    // allow a config object to be provided directly.
     if (typeof key === 'object') {
       options.configObjects = (options.configObjects || []).concat(key)
       return self
     }
 
-    // allow to provide a parsing function
+    // allow for a custom parsing function.
     if (typeof msg === 'function') {
       parseFn = msg
       msg = null
@@ -251,59 +322,8 @@ function Yargs (processArgs, cwd, parentRequire) {
     return self
   }
 
-  self.string = function (strings) {
-    options.string.push.apply(options.string, [].concat(strings))
-    return self
-  }
-
-  // The 'defaults' alias is deprecated. It will be removed in the next major version.
-  self.default = self.defaults = function (key, value, defaultDescription) {
-    if (typeof key === 'object') {
-      Object.keys(key).forEach(function (k) {
-        self.default(k, key[k])
-      })
-    } else {
-      if (defaultDescription) options.defaultDescription[key] = defaultDescription
-      if (typeof value === 'function') {
-        if (!options.defaultDescription[key]) options.defaultDescription[key] = usage.functionDescription(value)
-        value = value.call()
-      }
-      options.default[key] = value
-    }
-    return self
-  }
-
-  self.alias = function (x, y) {
-    if (typeof x === 'object') {
-      Object.keys(x).forEach(function (key) {
-        self.alias(key, x[key])
-      })
-    } else {
-      options.alias[x] = (options.alias[x] || []).concat(y)
-    }
-    return self
-  }
-
-  self.coerce = function (key, fn) {
-    if (typeof key === 'object' && !Array.isArray(key)) {
-      Object.keys(key).forEach(function (k) {
-        self.coerce(k, key[k])
-      })
-    } else {
-      [].concat(key).forEach(function (k) {
-        options.coerce[k] = fn
-      })
-    }
-    return self
-  }
-
-  self.count = function (counts) {
-    options.count.push.apply(options.count, [].concat(counts))
-    return self
-  }
-
-  // deprecated: the demand API is too overloaded, and is being
-  // deprecated in favor of .demandCommand() .demandOption().
+  // TODO: deprecate self.demand in favor of
+  // .demandCommand() .demandOption().
   self.demand = self.required = self.require = function (keys, max, msg) {
     // you can optionally provide a 'max' key,
     // which will raise an exception if too many '_'
@@ -335,28 +355,15 @@ function Yargs (processArgs, cwd, parentRequire) {
     return self
   }
 
-  self.demandOption = function (key, msg) {
-    if (Array.isArray(key)) {
-      key.forEach(function (key) {
-        self.demandOption(key, msg)
-      })
-    } else {
-      if (typeof msg === 'string') {
-        options.demandedOptions[key] = { msg: msg }
-      // allow edge-case of options: {a: {demand: true}, b: {demand: false}}
-      } else if (msg === true || typeof msg === 'undefined') {
-        options.demandedOptions[key] = { msg: undefined }
-      }
-    }
-
-    return self
-  }
-
   self.demandCommand = function (min, max, minMsg, maxMsg) {
+    if (typeof min === 'undefined') min = 1
+
     if (typeof max !== 'number') {
       minMsg = max
       max = Infinity
     }
+
+    self.global('_', false)
 
     options.demandedCommands._ = {
       min: min,
@@ -374,16 +381,6 @@ function Yargs (processArgs, cwd, parentRequire) {
 
   self.getDemandedCommands = function () {
     return options.demandedCommands
-  }
-
-  self.requiresArg = function (requiresArgs) {
-    options.requiresArg.push.apply(options.requiresArg, [].concat(requiresArgs))
-    return self
-  }
-
-  self.skipValidation = function (skipValidations) {
-    options.skipValidation.push.apply(options.skipValidation, [].concat(skipValidations))
-    return self
   }
 
   self.implies = function (key, value) {
@@ -419,31 +416,27 @@ function Yargs (processArgs, cwd, parentRequire) {
     return self
   }
 
-  self.check = function (f) {
-    validation.check(f)
+  self.check = function (f, _global) {
+    validation.check(f, _global !== false)
     return self
   }
 
-  self.describe = function (key, desc) {
-    if (typeof key === 'object') {
-      Object.keys(key).forEach(function (k) {
-        options.key[k] = true
+  self.global = function (globals, global) {
+    globals = [].concat(globals)
+    if (global !== false) {
+      options.local = options.local.filter(function (l) {
+        return globals.indexOf(l) === -1
       })
     } else {
-      options.key[key] = true
+      globals.forEach(function (g) {
+        if (options.local.indexOf(g) === -1) options.local.push(g)
+      })
     }
-    usage.describe(key, desc)
-    return self
-  }
-
-  self.global = function (globals) {
-    options.global.push.apply(options.global, [].concat(globals))
     return self
   }
 
   self.pkgConf = function (key, path) {
     var conf = null
-
     var obj = pkgUp(path)
 
     // If an object exists in the key, add it to options.configObjects
@@ -497,7 +490,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     freeze()
     if (parseFn) exitProcess = false
 
-    var parsed = parseArgs(args, shortCircuit)
+    var parsed = self._parseArgs(args, shortCircuit)
     if (parseFn) parseFn(exitError, parsed, output)
     unfreeze()
 
@@ -568,10 +561,6 @@ function Yargs (processArgs, cwd, parentRequire) {
         self.group(key, opt.group)
       }
 
-      if (opt.global) {
-        self.global(key)
-      }
-
       if (opt.boolean || opt.type === 'boolean') {
         self.boolean(key)
         if (opt.alias) self.boolean(opt.alias)
@@ -594,6 +583,10 @@ function Yargs (processArgs, cwd, parentRequire) {
 
       if (opt.count || opt.type === 'count') {
         self.count(key)
+      }
+
+      if (typeof opt.global === 'boolean') {
+        self.global(key, opt.global)
       }
 
       if (opt.defaultDescription) {
@@ -623,8 +616,7 @@ function Yargs (processArgs, cwd, parentRequire) {
   self.group = function (opts, groupName) {
     var existing = preservedGroups[groupName] || groups[groupName]
     if (preservedGroups[groupName]) {
-      // the preserved group will be moved to the set of explicitly declared
-      // groups
+      // we now only need to track this group name in groups.
       delete preservedGroups[groupName]
     }
 
@@ -654,8 +646,10 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   var strict = false
-  self.strict = function () {
+  var strictGlobal = false
+  self.strict = function (global) {
     strict = true
+    strictGlobal = global !== false
     return self
   }
   self.getStrict = function () {
@@ -663,7 +657,7 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   self.showHelp = function (level) {
-    if (!self.parsed) parseArgs(processArgs) // run parser, if it has not already been executed.
+    if (!self.parsed) self._parseArgs(processArgs) // run parser, if it has not already been executed.
     usage.showHelp(level)
     return self
   }
@@ -685,7 +679,6 @@ function Yargs (processArgs, cwd, parentRequire) {
 
     usage.version(ver || undefined)
     self.boolean(versionOpt)
-    self.global(versionOpt)
     self.describe(versionOpt, msg)
     return self
   }
@@ -722,7 +715,6 @@ function Yargs (processArgs, cwd, parentRequire) {
     // use arguments, fallback to defaults for opt and msg
     helpOpt = opt || 'help'
     self.boolean(helpOpt)
-    self.global(helpOpt)
     self.describe(helpOpt, msg || usage.deferY18nLookup('Show help'))
     return self
   }
@@ -866,7 +858,7 @@ function Yargs (processArgs, cwd, parentRequire) {
       var args = null
 
       try {
-        args = parseArgs(processArgs)
+        args = self._parseArgs(processArgs)
       } catch (err) {
         if (err instanceof YError) usage.fail(err.message, err)
         else throw err
@@ -877,7 +869,10 @@ function Yargs (processArgs, cwd, parentRequire) {
     enumerable: true
   })
 
-  function parseArgs (args, shortCircuit) {
+  self._parseArgs = function (args, shortCircuit, _skipValidation) {
+    var skipValidation = !!_skipValidation
+    args = args || processArgs
+
     options.__ = y18n.__
     options.configuration = pkgUp()['yargs'] || {}
     const parsed = Parser.detailed(args, options)
@@ -966,8 +961,6 @@ function Yargs (processArgs, cwd, parentRequire) {
       return setPlaceholderKeys(argv)
     }
 
-    var skipValidation = false
-
     // Handle 'help' and 'version' options
     Object.keys(argv).forEach(function (key) {
       if (key === helpOpt && argv[key]) {
@@ -993,25 +986,29 @@ function Yargs (processArgs, cwd, parentRequire) {
     }
 
     // If the help or version options where used and exitProcess is false,
-    // or if explicitly skipped, we won't run validations
+    // or if explicitly skipped, we won't run validations.
     if (!skipValidation) {
       if (parsed.error) throw new YError(parsed.error.message)
 
       // if we're executed via bash completion, don't
       // bother with validation.
       if (!argv[completion.completionKey]) {
-        validation.nonOptionCount(argv)
-        validation.missingArgumentValue(argv)
-        validation.requiredArguments(argv)
-        if (strict) validation.unknownArguments(argv, aliases)
-        validation.customChecks(argv, aliases)
-        validation.limitedChoices(argv)
-        validation.implications(argv)
-        validation.conflicting(argv)
+        self._runValidation(argv, aliases)
       }
     }
 
     return setPlaceholderKeys(argv)
+  }
+
+  self._runValidation = function (argv, aliases) {
+    validation.nonOptionCount(argv)
+    validation.missingArgumentValue(argv)
+    validation.requiredArguments(argv)
+    if (strict) validation.unknownArguments(argv, aliases)
+    validation.customChecks(argv, aliases)
+    validation.limitedChoices(argv)
+    validation.implications(argv)
+    validation.conflicting(argv)
   }
 
   function guessLocale () {
