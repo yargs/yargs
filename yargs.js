@@ -1,3 +1,4 @@
+const argsert = require('./lib/argsert')
 const assign = require('./lib/assign')
 const Command = require('./lib/command')
 const Completion = require('./lib/completion')
@@ -173,41 +174,49 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   self.boolean = function (keys) {
+    argsert('<array|string>', arguments)
     populateParserHintArray('boolean', keys)
     return self
   }
 
   self.array = function (keys) {
+    argsert('<array|string>', arguments)
     populateParserHintArray('array', keys)
     return self
   }
 
   self.number = function (keys) {
+    argsert('<array|string>', arguments)
     populateParserHintArray('number', keys)
     return self
   }
 
   self.normalize = function (keys) {
+    argsert('<array|string>', arguments)
     populateParserHintArray('normalize', keys)
     return self
   }
 
   self.count = function (keys) {
+    argsert('<array|string>', arguments)
     populateParserHintArray('count', keys)
     return self
   }
 
   self.string = function (keys) {
+    argsert('<array|string>', arguments)
     populateParserHintArray('string', keys)
     return self
   }
 
   self.requiresArg = function (keys) {
+    argsert('<array|string>', arguments)
     populateParserHintArray('requiresArg', keys)
     return self
   }
 
   self.skipValidation = function (keys) {
+    argsert('<array|string>', arguments)
     populateParserHintArray('skipValidation', keys)
     return self
   }
@@ -220,6 +229,7 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   self.nargs = function (key, value) {
+    argsert('<string|object> [number]', arguments)
     populateParserHintObject(self.nargs, false, 'narg', key, value)
     return self
   }
