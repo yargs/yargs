@@ -174,49 +174,49 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   self.boolean = function (keys) {
-    argsert('<array|string>', arguments)
+    argsert('<array|string>', [].slice.call(arguments))
     populateParserHintArray('boolean', keys)
     return self
   }
 
   self.array = function (keys) {
-    argsert('<array|string>', arguments)
+    argsert('<array|string>', [].slice.call(arguments))
     populateParserHintArray('array', keys)
     return self
   }
 
   self.number = function (keys) {
-    argsert('<array|string>', arguments)
+    argsert('<array|string>', [].slice.call(arguments))
     populateParserHintArray('number', keys)
     return self
   }
 
   self.normalize = function (keys) {
-    argsert('<array|string>', arguments)
+    argsert('<array|string>', [].slice.call(arguments))
     populateParserHintArray('normalize', keys)
     return self
   }
 
   self.count = function (keys) {
-    argsert('<array|string>', arguments)
+    argsert('<array|string>', [].slice.call(arguments))
     populateParserHintArray('count', keys)
     return self
   }
 
   self.string = function (keys) {
-    argsert('<array|string>', arguments)
+    argsert('<array|string>', [].slice.call(arguments))
     populateParserHintArray('string', keys)
     return self
   }
 
   self.requiresArg = function (keys) {
-    argsert('<array|string>', arguments)
+    argsert('<array|string>', [].slice.call(arguments))
     populateParserHintArray('requiresArg', keys)
     return self
   }
 
   self.skipValidation = function (keys) {
-    argsert('<array|string>', arguments)
+    argsert('<array|string>', [].slice.call(arguments))
     populateParserHintArray('skipValidation', keys)
     return self
   }
@@ -229,23 +229,26 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   self.nargs = function (key, value) {
-    argsert('<string|object> [number]', arguments)
+    argsert('<string|object|array> [number]', [].slice.call(arguments))
     populateParserHintObject(self.nargs, false, 'narg', key, value)
     return self
   }
 
   self.choices = function (key, value) {
+    argsert('<object|string|array> [string|array]', [].slice.call(arguments))
     populateParserHintObject(self.choices, true, 'choices', key, value)
     return self
   }
 
   self.alias = function (key, value) {
+    argsert('<object|string|array> [string|array]', [].slice.call(arguments))
     populateParserHintObject(self.alias, true, 'alias', key, value)
     return self
   }
 
   // TODO: actually deprecate self.defaults.
   self.default = self.defaults = function (key, value, defaultDescription) {
+    argsert('<object|string|array> [*] [string]', [].slice.call(arguments))
     if (defaultDescription) options.defaultDescription[key] = defaultDescription
     if (typeof value === 'function') {
       if (!options.defaultDescription[key]) options.defaultDescription[key] = usage.functionDescription(value)
@@ -256,18 +259,20 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   self.describe = function (key, desc) {
+    argsert('<object|string|array> [string]', [].slice.call(arguments))
     populateParserHintObject(self.describe, false, 'key', key, true)
     usage.describe(key, desc)
     return self
   }
 
   self.demandOption = function (keys, msg) {
-    var value = { msg: typeof msg === 'string' ? msg : undefined }
-    populateParserHintObject(self.demandOption, false, 'demandedOptions', keys, value)
+    argsert('<object|string|array> [string]', [].slice.call(arguments))
+    populateParserHintObject(self.demandOption, false, 'demandedOptions', keys, msg)
     return self
   }
 
   self.coerce = function (keys, value) {
+    argsert('<object|string|array> [function]', [].slice.call(arguments))
     populateParserHintObject(self.coerce, false, 'coerce', keys, value)
     return self
   }
@@ -532,7 +537,7 @@ function Yargs (processArgs, cwd, parentRequire) {
       }
 
       if ('demandOption' in opt) {
-        self.demandOption(key, opt.demandOption)
+        self.demandOption(key, typeof opt.demandOption === 'string' ? opt.demandOption : undefined)
       }
 
       if ('config' in opt) {
@@ -682,6 +687,7 @@ function Yargs (processArgs, cwd, parentRequire) {
       opt = 'version'
     } else if (arguments.length === 2) {
       ver = msg
+      msg = null
     }
 
     versionOpt = opt
