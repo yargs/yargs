@@ -1,0 +1,4 @@
+{
+  "a": 44,
+  "extends": "./circular_2.json"
+}

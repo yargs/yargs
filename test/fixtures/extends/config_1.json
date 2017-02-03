@@ -1,0 +1,5 @@
+{
+  "a": 30,
+  "b": 22,
+  "extends": "./config_2.json"
+}
