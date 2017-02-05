@@ -88,4 +88,11 @@ describe('Argsert', function () {
       foo('bar', undefined, undefined, 33)
     }).to.throw(/Too many arguments provided. Expected 1 but received 4./)
   })
+
+  it('supports null as special type', function () {
+    function foo (arg) {
+      argsert('<null>', [].slice.call(arguments))
+    }
+    foo(null)
+  })
 })

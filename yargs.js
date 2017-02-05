@@ -301,6 +301,7 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   self.config = function (key, msg, parseFn) {
+    argsert('[object|string] [string|function] [function]', [].slice.call(arguments))
     // allow a config object to be provided directly.
     if (typeof key === 'object') {
       options.configObjects = (options.configObjects || []).concat(key)
@@ -322,16 +323,19 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   self.example = function (cmd, description) {
+    argsert('<string> [string]', [].slice.call(arguments))
     usage.example(cmd, description)
     return self
   }
 
   self.command = function (cmd, description, builder, handler) {
+    argsert('<string|array|object> [string|boolean] [function|object] [function]', [].slice.call(arguments))
     command.addHandler(cmd, description, builder, handler)
     return self
   }
 
   self.commandDir = function (dir, opts) {
+    argsert('<string> [object]', [].slice.call(arguments))
     const req = parentRequire || require
     command.addDirectory(dir, self.getContext(), req, require('get-caller-file')(), opts)
     return self
@@ -371,6 +375,8 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   self.demandCommand = function (min, max, minMsg, maxMsg) {
+    argsert('[number] [number|string] [string|null] [string|null]', [].slice.call(arguments))
+
     if (typeof min === 'undefined') min = 1
 
     if (typeof max !== 'number') {
@@ -391,24 +397,30 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   self.getDemandedOptions = function () {
+    argsert([].slice.call(arguments))
     return options.demandedOptions
   }
 
   self.getDemandedCommands = function () {
+    argsert([].slice.call(arguments))
     return options.demandedCommands
   }
 
   self.implies = function (key, value) {
+    argsert('<string|object> [string]', [].slice.call(arguments))
     validation.implies(key, value)
     return self
   }
 
   self.conflicts = function (key1, key2) {
+    argsert('<string|object> [string]', [].slice.call(arguments))
     validation.conflicts(key1, key2)
     return self
   }
 
   self.usage = function (msg, opts) {
+    argsert('<string|null|object> [object]', [].slice.call(arguments))
+
     if (!opts && typeof msg === 'object') {
       opts = msg
       msg = null
@@ -422,21 +434,25 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   self.epilogue = self.epilog = function (msg) {
+    argsert('<string>', [].slice.call(arguments))
     usage.epilog(msg)
     return self
   }
 
   self.fail = function (f) {
+    argsert('<function>', [].slice.call(arguments))
     usage.failFn(f)
     return self
   }
 
   self.check = function (f, _global) {
+    argsert('<function> [boolean]', [].slice.call(arguments))
     validation.check(f, _global !== false)
     return self
   }
 
   self.global = function (globals, global) {
+    argsert('<string|array> [boolean]', [].slice.call(arguments))
     globals = [].concat(globals)
     if (global !== false) {
       options.local = options.local.filter(function (l) {
@@ -451,6 +467,7 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   self.pkgConf = function (key, path) {
+    argsert('<string> [string]', [].slice.call(arguments))
     var conf = null
     var obj = pkgUp(path)
 
@@ -484,6 +501,8 @@ function Yargs (processArgs, cwd, parentRequire) {
   var parseFn = null
   var parseContext = null
   self.parse = function (args, shortCircuit, _parseFn) {
+    argsert('<string|array> [function|boolean|object] [function]', [].slice.call(arguments))
+
     // a context object can optionally be provided, this allows
     // additional information to be passed to a command handler.
     if (typeof shortCircuit === 'object') {
@@ -517,6 +536,7 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   self.option = self.options = function (key, opt) {
+    argsert('<string|object> [object]', [].slice.call(arguments))
     if (typeof key === 'object') {
       Object.keys(key).forEach(function (k) {
         self.options(k, key[k])
@@ -629,6 +649,7 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   self.group = function (opts, groupName) {
+    argsert('<string|array> <string>', [].slice.call(arguments))
     var existing = preservedGroups[groupName] || groups[groupName]
     if (preservedGroups[groupName]) {
       // we now only need to track this group name in groups.
@@ -650,6 +671,7 @@ function Yargs (processArgs, cwd, parentRequire) {
   // as long as options.envPrefix is not undefined,
   // parser will apply env vars matching prefix to argv
   self.env = function (prefix) {
+    argsert('[string|boolean]', [].slice.call(arguments))
     if (prefix === false) options.envPrefix = undefined
     else options.envPrefix = prefix || ''
     return self
