@@ -678,6 +678,7 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   self.wrap = function (cols) {
+    argsert('<number|null>', [].slice.call(arguments))
     usage.wrap(cols)
     return self
   }
@@ -685,6 +686,7 @@ function Yargs (processArgs, cwd, parentRequire) {
   var strict = false
   var strictGlobal = false
   self.strict = function (global) {
+    argsert('[boolean]', [].slice.call(arguments))
     strict = true
     strictGlobal = global !== false
     return self
@@ -694,6 +696,7 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   self.showHelp = function (level) {
+    argsert('[string|function]', [].slice.call(arguments))
     if (!self.parsed) self._parseArgs(processArgs) // run parser, if it has not already been executed.
     usage.showHelp(level)
     return self
@@ -701,6 +704,7 @@ function Yargs (processArgs, cwd, parentRequire) {
 
   var versionOpt = null
   self.version = function (opt, msg, ver) {
+    argsert('[string|function] [string|function] [string]', [].slice.call(arguments))
     if (arguments.length === 0) {
       ver = guessVersion()
       opt = 'version'
@@ -730,6 +734,8 @@ function Yargs (processArgs, cwd, parentRequire) {
   var helpOpt = null
   var useHelpOptAsCommand = false // a call to .help() will enable this
   self.addHelpOpt = self.help = function (opt, msg, addImplicitCmd) {
+    argsert('[string|boolean] [string|boolean] [boolean]', [].slice.call(arguments))
+
     // argument shuffle
     if (arguments.length === 0) {
       useHelpOptAsCommand = true
@@ -758,12 +764,14 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   self.showHelpOnFail = function (enabled, message) {
+    argsert('[boolean|string] [string]', [].slice.call(arguments))
     usage.showHelpOnFail(enabled, message)
     return self
   }
 
   var exitProcess = true
   self.exitProcess = function (enabled) {
+    argsert('[boolean]', [].slice.call(arguments))
     if (typeof enabled !== 'boolean') {
       enabled = true
     }
@@ -776,6 +784,8 @@ function Yargs (processArgs, cwd, parentRequire) {
 
   var completionCommand = null
   self.completion = function (cmd, desc, fn) {
+    argsert('[string] [string|boolean|function] [function]', [].slice.call(arguments))
+
     // a function to execute when generating
     // completions can be provided as the second
     // or third argument to completion.
@@ -798,16 +808,19 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   self.showCompletionScript = function ($0) {
+    argsert('[string]', [].slice.call(arguments))
     $0 = $0 || self.$0
     _logger.log(completion.generateCompletionScript($0))
     return self
   }
 
   self.getCompletion = function (args, done) {
+    argsert('<array> <function>', [].slice.call(arguments))
     completion.getCompletion(args, done)
   }
 
   self.locale = function (locale) {
+    argsert('[string]', [].slice.call(arguments))
     if (arguments.length === 0) {
       guessLocale()
       return y18n.getLocale()
@@ -818,6 +831,7 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   self.updateStrings = self.updateLocale = function (obj) {
+    argsert('<object>', [].slice.call(arguments))
     detectLocale = false
     y18n.updateLocale(obj)
     return self
@@ -825,6 +839,7 @@ function Yargs (processArgs, cwd, parentRequire) {
 
   var detectLocale = true
   self.detectLocale = function (detect) {
+    argsert('<boolean>', [].slice.call(arguments))
     detectLocale = detect
     return self
   }
@@ -870,8 +885,9 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   var recommendCommands
-  self.recommendCommands = function () {
-    recommendCommands = true
+  self.recommendCommands = function (recommend) {
+    argsert('[boolean]', [].slice.call(arguments))
+    recommendCommands = typeof recommend === 'boolean' ? recommend : true
     return self
   }
 
@@ -888,6 +904,7 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   self.terminalWidth = function () {
+    argsert([].slice.call(arguments))
     return process.stdout.columns
   }
 

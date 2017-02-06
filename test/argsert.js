@@ -50,11 +50,11 @@ describe('Argsert', function () {
 
   it('throws an exception if too many arguments are provided', function () {
     function foo (expected) {
-      argsert('<array>', [].slice.call(arguments))
+      argsert('<array> [batman]', [].slice.call(arguments))
     }
     expect(function () {
-      foo([], 33)
-    }).to.throw(/Too many arguments provided. Expected 1 but received 2./)
+      foo([], 33, 99)
+    }).to.throw(/Too many arguments provided. Expected max 2 but received 3./)
   })
 
   it('configures function to accept 0 parameters, if only arguments object is provided', function () {
@@ -63,7 +63,7 @@ describe('Argsert', function () {
     }
     expect(function () {
       foo(99)
-    }).to.throw(/Too many arguments provided. Expected 0 but received 1./)
+    }).to.throw(/Too many arguments provided. Expected max 0 but received 1./)
   })
 
   it('allows for any type if * is provided', function () {
@@ -86,7 +86,7 @@ describe('Argsert', function () {
     }
     expect(function () {
       foo('bar', undefined, undefined, 33)
-    }).to.throw(/Too many arguments provided. Expected 1 but received 4./)
+    }).to.throw(/Too many arguments provided. Expected max 1 but received 4./)
   })
 
   it('supports null as special type', function () {
