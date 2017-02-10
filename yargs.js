@@ -1,3 +1,4 @@
+const argsert = require('./lib/argsert')
 const assign = require('./lib/assign')
 const Command = require('./lib/command')
 const Completion = require('./lib/completion')
@@ -173,41 +174,49 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   self.boolean = function (keys) {
+    argsert('<array|string>', [keys], arguments.length)
     populateParserHintArray('boolean', keys)
     return self
   }
 
   self.array = function (keys) {
+    argsert('<array|string>', [keys], arguments.length)
     populateParserHintArray('array', keys)
     return self
   }
 
   self.number = function (keys) {
+    argsert('<array|string>', [keys], arguments.length)
     populateParserHintArray('number', keys)
     return self
   }
 
   self.normalize = function (keys) {
+    argsert('<array|string>', [keys], arguments.length)
     populateParserHintArray('normalize', keys)
     return self
   }
 
   self.count = function (keys) {
+    argsert('<array|string>', [keys], arguments.length)
     populateParserHintArray('count', keys)
     return self
   }
 
   self.string = function (keys) {
+    argsert('<array|string>', [keys], arguments.length)
     populateParserHintArray('string', keys)
     return self
   }
 
   self.requiresArg = function (keys) {
+    argsert('<array|string>', [keys], arguments.length)
     populateParserHintArray('requiresArg', keys)
     return self
   }
 
   self.skipValidation = function (keys) {
+    argsert('<array|string>', [keys], arguments.length)
     populateParserHintArray('skipValidation', keys)
     return self
   }
@@ -220,22 +229,26 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   self.nargs = function (key, value) {
+    argsert('<string|object|array> [number]', [key, value], arguments.length)
     populateParserHintObject(self.nargs, false, 'narg', key, value)
     return self
   }
 
   self.choices = function (key, value) {
+    argsert('<object|string|array> [string|array]', [key, value], arguments.length)
     populateParserHintObject(self.choices, true, 'choices', key, value)
     return self
   }
 
   self.alias = function (key, value) {
+    argsert('<object|string|array> [string|array]', [key, value], arguments.length)
     populateParserHintObject(self.alias, true, 'alias', key, value)
     return self
   }
 
   // TODO: actually deprecate self.defaults.
   self.default = self.defaults = function (key, value, defaultDescription) {
+    argsert('<object|string|array> [*] [string]', [key, value, defaultDescription], arguments.length)
     if (defaultDescription) options.defaultDescription[key] = defaultDescription
     if (typeof value === 'function') {
       if (!options.defaultDescription[key]) options.defaultDescription[key] = usage.functionDescription(value)
@@ -246,18 +259,20 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   self.describe = function (key, desc) {
+    argsert('<object|string|array> [string]', [key, desc], arguments.length)
     populateParserHintObject(self.describe, false, 'key', key, true)
     usage.describe(key, desc)
     return self
   }
 
   self.demandOption = function (keys, msg) {
-    var value = { msg: typeof msg === 'string' ? msg : undefined }
-    populateParserHintObject(self.demandOption, false, 'demandedOptions', keys, value)
+    argsert('<object|string|array> [string]', [keys, msg], arguments.length)
+    populateParserHintObject(self.demandOption, false, 'demandedOptions', keys, msg)
     return self
   }
 
   self.coerce = function (keys, value) {
+    argsert('<object|string|array> [function]', [keys, value], arguments.length)
     populateParserHintObject(self.coerce, false, 'coerce', keys, value)
     return self
   }
@@ -286,6 +301,7 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   self.config = function (key, msg, parseFn) {
+    argsert('[object|string] [string|function] [function]', [key, msg, parseFn], arguments.length)
     // allow a config object to be provided directly.
     if (typeof key === 'object') {
       options.configObjects = (options.configObjects || []).concat(key)
@@ -307,16 +323,19 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   self.example = function (cmd, description) {
+    argsert('<string> [string]', [cmd, description], arguments.length)
     usage.example(cmd, description)
     return self
   }
 
   self.command = function (cmd, description, builder, handler) {
+    argsert('<string|array|object> [string|boolean] [function|object] [function]', [cmd, description, builder, handler], arguments.length)
     command.addHandler(cmd, description, builder, handler)
     return self
   }
 
   self.commandDir = function (dir, opts) {
+    argsert('<string> [object]', [dir, opts], arguments.length)
     const req = parentRequire || require
     command.addDirectory(dir, self.getContext(), req, require('get-caller-file')(), opts)
     return self
@@ -356,6 +375,8 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   self.demandCommand = function (min, max, minMsg, maxMsg) {
+    argsert('[number] [number|string] [string|null] [string|null]', [min, max, minMsg, maxMsg], arguments.length)
+
     if (typeof min === 'undefined') min = 1
 
     if (typeof max !== 'number') {
@@ -376,24 +397,30 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   self.getDemandedOptions = function () {
+    argsert([], 0)
     return options.demandedOptions
   }
 
   self.getDemandedCommands = function () {
+    argsert([], 0)
     return options.demandedCommands
   }
 
   self.implies = function (key, value) {
+    argsert('<string|object> [string]', [key, value], arguments.length)
     validation.implies(key, value)
     return self
   }
 
   self.conflicts = function (key1, key2) {
+    argsert('<string|object> [string]', [key1, key2], arguments.length)
     validation.conflicts(key1, key2)
     return self
   }
 
   self.usage = function (msg, opts) {
+    argsert('<string|null|object> [object]', [msg, opts], arguments.length)
+
     if (!opts && typeof msg === 'object') {
       opts = msg
       msg = null
@@ -407,21 +434,25 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   self.epilogue = self.epilog = function (msg) {
+    argsert('<string>', [msg], arguments.length)
     usage.epilog(msg)
     return self
   }
 
   self.fail = function (f) {
+    argsert('<function>', [f], arguments.length)
     usage.failFn(f)
     return self
   }
 
   self.check = function (f, _global) {
+    argsert('<function> [boolean]', [f, _global], arguments.length)
     validation.check(f, _global !== false)
     return self
   }
 
   self.global = function (globals, global) {
+    argsert('<string|array> [boolean]', [globals, global], arguments.length)
     globals = [].concat(globals)
     if (global !== false) {
       options.local = options.local.filter(function (l) {
@@ -436,6 +467,7 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   self.pkgConf = function (key, path) {
+    argsert('<string> [string]', [key, path], arguments.length)
     var conf = null
     var obj = pkgUp(path)
 
@@ -469,6 +501,8 @@ function Yargs (processArgs, cwd, parentRequire) {
   var parseFn = null
   var parseContext = null
   self.parse = function (args, shortCircuit, _parseFn) {
+    argsert('<string|array> [function|boolean|object] [function]', [args, shortCircuit, _parseFn], arguments.length)
+
     // a context object can optionally be provided, this allows
     // additional information to be passed to a command handler.
     if (typeof shortCircuit === 'object') {
@@ -502,6 +536,7 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   self.option = self.options = function (key, opt) {
+    argsert('<string|object> [object]', [key, opt], arguments.length)
     if (typeof key === 'object') {
       Object.keys(key).forEach(function (k) {
         self.options(k, key[k])
@@ -522,7 +557,7 @@ function Yargs (processArgs, cwd, parentRequire) {
       }
 
       if ('demandOption' in opt) {
-        self.demandOption(key, opt.demandOption)
+        self.demandOption(key, typeof opt.demandOption === 'string' ? opt.demandOption : undefined)
       }
 
       if ('config' in opt) {
@@ -614,6 +649,7 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   self.group = function (opts, groupName) {
+    argsert('<string|array> <string>', [opts, groupName], arguments.length)
     var existing = preservedGroups[groupName] || groups[groupName]
     if (preservedGroups[groupName]) {
       // we now only need to track this group name in groups.
@@ -635,12 +671,14 @@ function Yargs (processArgs, cwd, parentRequire) {
   // as long as options.envPrefix is not undefined,
   // parser will apply env vars matching prefix to argv
   self.env = function (prefix) {
+    argsert('[string|boolean]', [prefix], arguments.length)
     if (prefix === false) options.envPrefix = undefined
     else options.envPrefix = prefix || ''
     return self
   }
 
   self.wrap = function (cols) {
+    argsert('<number|null>', [cols], arguments.length)
     usage.wrap(cols)
     return self
   }
@@ -648,6 +686,7 @@ function Yargs (processArgs, cwd, parentRequire) {
   var strict = false
   var strictGlobal = false
   self.strict = function (global) {
+    argsert('[boolean]', [global], arguments.length)
     strict = true
     strictGlobal = global !== false
     return self
@@ -657,6 +696,7 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   self.showHelp = function (level) {
+    argsert('[string|function]', [level], arguments.length)
     if (!self.parsed) self._parseArgs(processArgs) // run parser, if it has not already been executed.
     usage.showHelp(level)
     return self
@@ -664,6 +704,7 @@ function Yargs (processArgs, cwd, parentRequire) {
 
   var versionOpt = null
   self.version = function (opt, msg, ver) {
+    argsert('[string|function] [string|function] [string]', [opt, msg, ver], arguments.length)
     if (arguments.length === 0) {
       ver = guessVersion()
       opt = 'version'
@@ -672,6 +713,7 @@ function Yargs (processArgs, cwd, parentRequire) {
       opt = 'version'
     } else if (arguments.length === 2) {
       ver = msg
+      msg = null
     }
 
     versionOpt = opt
@@ -692,6 +734,8 @@ function Yargs (processArgs, cwd, parentRequire) {
   var helpOpt = null
   var useHelpOptAsCommand = false // a call to .help() will enable this
   self.addHelpOpt = self.help = function (opt, msg, addImplicitCmd) {
+    argsert('[string|boolean] [string|boolean] [boolean]', [opt, msg, addImplicitCmd], arguments.length)
+
     // argument shuffle
     if (arguments.length === 0) {
       useHelpOptAsCommand = true
@@ -720,12 +764,14 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   self.showHelpOnFail = function (enabled, message) {
+    argsert('[boolean|string] [string]', [enabled, message], arguments.length)
     usage.showHelpOnFail(enabled, message)
     return self
   }
 
   var exitProcess = true
   self.exitProcess = function (enabled) {
+    argsert('[boolean]', [enabled], arguments.length)
     if (typeof enabled !== 'boolean') {
       enabled = true
     }
@@ -738,6 +784,8 @@ function Yargs (processArgs, cwd, parentRequire) {
 
   var completionCommand = null
   self.completion = function (cmd, desc, fn) {
+    argsert('[string] [string|boolean|function] [function]', [cmd, desc, fn], arguments.length)
+
     // a function to execute when generating
     // completions can be provided as the second
     // or third argument to completion.
@@ -760,16 +808,19 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   self.showCompletionScript = function ($0) {
+    argsert('[string]', [$0], arguments.length)
     $0 = $0 || self.$0
     _logger.log(completion.generateCompletionScript($0))
     return self
   }
 
   self.getCompletion = function (args, done) {
+    argsert('<array> <function>', [args, done], arguments.length)
     completion.getCompletion(args, done)
   }
 
   self.locale = function (locale) {
+    argsert('[string]', [locale], arguments.length)
     if (arguments.length === 0) {
       guessLocale()
       return y18n.getLocale()
@@ -780,6 +831,7 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   self.updateStrings = self.updateLocale = function (obj) {
+    argsert('<object>', [obj], arguments.length)
     detectLocale = false
     y18n.updateLocale(obj)
     return self
@@ -787,6 +839,7 @@ function Yargs (processArgs, cwd, parentRequire) {
 
   var detectLocale = true
   self.detectLocale = function (detect) {
+    argsert('<boolean>', [detect], arguments.length)
     detectLocale = detect
     return self
   }
@@ -808,14 +861,16 @@ function Yargs (processArgs, cwd, parentRequire) {
   // so that we can print to non-CLIs, e.g., chat-bots.
   var _logger = {
     log: function () {
-      var args = Array.prototype.slice.call(arguments)
+      const args = []
+      for (var i = 0; i < arguments.length; i++) args.push(arguments[i])
       if (!self._hasParseCallback()) console.log.apply(console, args)
       hasOutput = true
       if (output.length) output += '\n'
       output += args.join(' ')
     },
     error: function () {
-      var args = Array.prototype.slice.call(arguments)
+      const args = []
+      for (var i = 0; i < arguments.length; i++) args.push(arguments[i])
       if (!self._hasParseCallback()) console.error.apply(console, args)
       hasOutput = true
       if (output.length) output += '\n'
@@ -832,8 +887,9 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   var recommendCommands
-  self.recommendCommands = function () {
-    recommendCommands = true
+  self.recommendCommands = function (recommend) {
+    argsert('[boolean]', [recommend], arguments.length)
+    recommendCommands = typeof recommend === 'boolean' ? recommend : true
     return self
   }
 
@@ -850,6 +906,7 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   self.terminalWidth = function () {
+    argsert([], 0)
     return process.stdout.columns
   }
 
