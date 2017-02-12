@@ -181,21 +181,23 @@ describe('Command', function () {
     it('accepts string, string as first 2 arguments', function () {
       var cmd = 'foo'
       var desc = 'i\'m not feeling very creative at the moment'
+      var isDefault = false
       var aliases = []
 
       var y = yargs([]).command(cmd, desc)
       var commands = y.getUsageInstance().getCommands()
-      commands[0].should.deep.equal([cmd, desc, aliases])
+      commands[0].should.deep.equal([cmd, desc, isDefault, aliases])
     })
 
     it('accepts array, string as first 2 arguments', function () {
       var aliases = ['bar', 'baz']
       var cmd = 'foo <qux>'
       var desc = 'i\'m not feeling very creative at the moment'
+      var isDefault = false
 
       var y = yargs([]).command([cmd].concat(aliases), desc)
       var usageCommands = y.getUsageInstance().getCommands()
-      usageCommands[0].should.deep.equal([cmd, desc, aliases])
+      usageCommands[0].should.deep.equal([cmd, desc, isDefault, aliases])
       var cmdCommands = y.getCommandInstance().getCommands()
       cmdCommands.should.deep.equal(['foo', 'bar', 'baz'])
     })
@@ -284,6 +286,7 @@ describe('Command', function () {
         builder: function (yargs) { return yargs },
         handler: function (argv) {}
       }
+      var isDefault = false
       var aliases = []
 
       var y = yargs([]).command(module)
@@ -292,7 +295,7 @@ describe('Command', function () {
       handlers.foo.builder.should.equal(module.builder)
       handlers.foo.handler.should.equal(module.handler)
       var commands = y.getUsageInstance().getCommands()
-      commands[0].should.deep.equal([module.command, module.describe, aliases])
+      commands[0].should.deep.equal([module.command, module.describe, isDefault, aliases])
     })
 
     it('accepts module (description key, builder function) as 1st argument', function () {
@@ -302,6 +305,7 @@ describe('Command', function () {
         builder: function (yargs) { return yargs },
         handler: function (argv) {}
       }
+      var isDefault = false
       var aliases = []
 
       var y = yargs([]).command(module)
@@ -310,7 +314,7 @@ describe('Command', function () {
       handlers.foo.builder.should.equal(module.builder)
       handlers.foo.handler.should.equal(module.handler)
       var commands = y.getUsageInstance().getCommands()
-      commands[0].should.deep.equal([module.command, module.description, aliases])
+      commands[0].should.deep.equal([module.command, module.description, isDefault, aliases])
     })
 
     it('accepts module (desc key, builder function) as 1st argument', function () {
@@ -320,6 +324,7 @@ describe('Command', function () {
         builder: function (yargs) { return yargs },
         handler: function (argv) {}
       }
+      var isDefault = false
       var aliases = []
 
       var y = yargs([]).command(module)
@@ -328,7 +333,7 @@ describe('Command', function () {
       handlers.foo.builder.should.equal(module.builder)
       handlers.foo.handler.should.equal(module.handler)
       var commands = y.getUsageInstance().getCommands()
-      commands[0].should.deep.equal([module.command, module.desc, aliases])
+      commands[0].should.deep.equal([module.command, module.desc, isDefault, aliases])
     })
 
     it('accepts module (false describe, builder function) as 1st argument', function () {
@@ -375,6 +380,7 @@ describe('Command', function () {
         },
         handler: function (argv) {}
       }
+      var isDefault = false
       var aliases = []
 
       var y = yargs([]).command(module)
@@ -383,7 +389,7 @@ describe('Command', function () {
       handlers.foo.builder.should.equal(module.builder)
       handlers.foo.handler.should.equal(module.handler)
       var commands = y.getUsageInstance().getCommands()
-      commands[0].should.deep.equal([module.command, module.describe, aliases])
+      commands[0].should.deep.equal([module.command, module.describe, isDefault, aliases])
     })
 
     it('accepts module (missing handler function) as 1st argument', function () {
@@ -396,6 +402,7 @@ describe('Command', function () {
           }
         }
       }
+      var isDefault = false
       var aliases = []
 
       var y = yargs([]).command(module)
@@ -404,7 +411,7 @@ describe('Command', function () {
       handlers.foo.builder.should.equal(module.builder)
       expect(handlers.foo.handler).to.equal(undefined)
       var commands = y.getUsageInstance().getCommands()
-      commands[0].should.deep.equal([module.command, module.describe, aliases])
+      commands[0].should.deep.equal([module.command, module.describe, isDefault, aliases])
     })
 
     it('accepts module (with command array) as 1st argument', function () {
@@ -414,6 +421,7 @@ describe('Command', function () {
         builder: function (yargs) { return yargs },
         handler: function (argv) {}
       }
+      var isDefault = false
 
       var y = yargs([]).command(module)
       var handlers = y.getCommandInstance().getCommandHandlers()
@@ -421,7 +429,7 @@ describe('Command', function () {
       handlers.foo.builder.should.equal(module.builder)
       handlers.foo.handler.should.equal(module.handler)
       var usageCommands = y.getUsageInstance().getCommands()
-      usageCommands[0].should.deep.equal([module.command[0], module.describe, ['bar', 'baz']])
+      usageCommands[0].should.deep.equal([module.command[0], module.describe, isDefault, ['bar', 'baz']])
       var cmdCommands = y.getCommandInstance().getCommands()
       cmdCommands.should.deep.equal(['foo', 'bar', 'baz'])
     })
@@ -434,6 +442,7 @@ describe('Command', function () {
         builder: function (yargs) { return yargs },
         handler: function (argv) {}
       }
+      var isDefault = false
 
       var y = yargs([]).command(module)
       var handlers = y.getCommandInstance().getCommandHandlers()
@@ -441,7 +450,7 @@ describe('Command', function () {
       handlers.foo.builder.should.equal(module.builder)
       handlers.foo.handler.should.equal(module.handler)
       var usageCommands = y.getUsageInstance().getCommands()
-      usageCommands[0].should.deep.equal([module.command, module.describe, module.aliases])
+      usageCommands[0].should.deep.equal([module.command, module.describe, isDefault, module.aliases])
       var cmdCommands = y.getCommandInstance().getCommands()
       cmdCommands.should.deep.equal(['foo', 'bar', 'baz'])
     })
@@ -454,6 +463,7 @@ describe('Command', function () {
         builder: function (yargs) { return yargs },
         handler: function (argv) {}
       }
+      var isDefault = false
 
       var y = yargs([]).command(module)
       var handlers = y.getCommandInstance().getCommandHandlers()
@@ -461,7 +471,7 @@ describe('Command', function () {
       handlers.foo.builder.should.equal(module.builder)
       handlers.foo.handler.should.equal(module.handler)
       var usageCommands = y.getUsageInstance().getCommands()
-      usageCommands[0].should.deep.equal([module.command[0], module.describe, ['bar', 'baz', 'nat']])
+      usageCommands[0].should.deep.equal([module.command[0], module.describe, isDefault, ['bar', 'baz', 'nat']])
       var cmdCommands = y.getCommandInstance().getCommands()
       cmdCommands.should.deep.equal(['foo', 'bar', 'baz', 'nat'])
     })
@@ -474,6 +484,7 @@ describe('Command', function () {
         builder: function (yargs) { return yargs },
         handler: function (argv) {}
       }
+      var isDefault = false
 
       var y = yargs([]).command(module)
       var handlers = y.getCommandInstance().getCommandHandlers()
@@ -481,7 +492,7 @@ describe('Command', function () {
       handlers.foo.builder.should.equal(module.builder)
       handlers.foo.handler.should.equal(module.handler)
       var usageCommands = y.getUsageInstance().getCommands()
-      usageCommands[0].should.deep.equal([module.command, module.describe, ['bar']])
+      usageCommands[0].should.deep.equal([module.command, module.describe, isDefault, ['bar']])
       var cmdCommands = y.getCommandInstance().getCommands()
       cmdCommands.should.deep.equal(['foo', 'bar'])
     })
