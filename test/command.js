@@ -997,6 +997,20 @@ describe('Command', function () {
             return done()
           })
       })
+
+      it('does not fire command if validation fails', function (done) {
+        var commandRun = false
+        yargs()
+          .strict()
+          .command('hi <name>', 'The hi command', function () {}, function (argv) {
+            commandRun = true
+          })
+          .parse('hi ben --hello=world', function (err, argv, output) {
+            commandRun.should.equal(false)
+            err.message.should.equal('Unknown argument: hello')
+            return done()
+          })
+      })
     })
 
     describe('types', function () {
