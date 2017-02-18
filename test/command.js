@@ -986,6 +986,31 @@ describe('Command', function () {
         yargs.argv // parse and run command
         commandCalled.should.be.true
       })
+
+      // address regression introduced in #766, thanks @nexdrew!
+      it('does not fail strict check due to postional command arguments', function (done) {
+        yargs()
+          .strict()
+          .command('hi <name>', 'The hi command')
+          .parse('hi ben', function (err, argv, output) {
+            expect(err).to.equal(null)
+            return done()
+          })
+      })
+
+      it('does not fire command if validation fails', function (done) {
+        var commandRun = false
+        yargs()
+          .strict()
+          .command('hi <name>', 'The hi command', function () {}, function (argv) {
+            commandRun = true
+          })
+          .parse('hi ben --hello=world', function (err, argv, output) {
+            commandRun.should.equal(false)
+            err.message.should.equal('Unknown argument: hello')
+            return done()
+          })
+      })
     })
 
     describe('types', function () {
