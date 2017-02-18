@@ -935,7 +935,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     options.configuration = pkgUp()['yargs'] || {}
     const parsed = Parser.detailed(args, options)
     var argv = parsed.argv
-    if (parseContext) argv = assign(parseContext, argv)
+    if (parseContext) argv = assign(argv, parseContext)
     var aliases = parsed.aliases
 
     argv.$0 = self.$0
