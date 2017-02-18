@@ -1051,18 +1051,18 @@ function Yargs (processArgs, cwd, parentRequire) {
       // if we're executed via bash completion, don't
       // bother with validation.
       if (!argv[completion.completionKey]) {
-        self._runValidation(argv, aliases)
+        self._runValidation(argv, aliases, {})
       }
     }
 
     return setPlaceholderKeys(argv)
   }
 
-  self._runValidation = function (argv, aliases) {
+  self._runValidation = function (argv, aliases, positionalMap) {
     validation.nonOptionCount(argv)
     validation.missingArgumentValue(argv)
     validation.requiredArguments(argv)
-    if (strict) validation.unknownArguments(argv, aliases)
+    if (strict) validation.unknownArguments(argv, aliases, positionalMap)
     validation.customChecks(argv, aliases)
     validation.limitedChoices(argv)
     validation.implications(argv)
