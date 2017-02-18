@@ -1286,4 +1286,90 @@ describe('Command', function () {
       })
     })
   })
+
+  describe('default commands', function () {
+    it('executes default command if no positional arguments given', function (done) {
+      yargs('--foo bar')
+        .command('*', 'default command', function () {}, function (argv) {
+          argv.foo.should.equal('bar')
+          return done()
+        })
+        .argv
+    })
+
+    it('does not execute default command if another command is provided', function (done) {
+      yargs('run bcoe --foo bar')
+        .command('*', 'default command', function () {}, function (argv) {})
+        .command('run <name>', 'run command', function () {}, function (argv) {
+          argv.name.should.equal('bcoe')
+          argv.foo.should.equal('bar')
+          return done()
+        })
+        .argv
+    })
+
+    it('allows default command to be set as alias', function (done) {
+      yargs('bcoe --foo bar')
+        .command(['start <name>', '*'], 'start command', function () {}, function (argv) {
+          argv._.should.eql([])
+          argv.name.should.equal('bcoe')
+          argv.foo.should.equal('bar')
+          return done()
+        })
+        .argv
+    })
+
+    it('allows command to be run when alias is default command', function (done) {
+      yargs('start bcoe --foo bar')
+        .command(['start <name>', '*'], 'start command', function () {}, function (argv) {
+          argv._.should.eql(['start'])
+          argv.name.should.equal('bcoe')
+          argv.foo.should.equal('bar')
+          return done()
+        })
+        .argv
+    })
+
+    it('the last default command set should take precedence', function (done) {
+      yargs('bcoe --foo bar')
+        .command(['first', '*'], 'override me', function () {}, function () {})
+        .command(['second <name>', '*'], 'start command', function () {}, function (argv) {
+          argv._.should.eql([])
+          argv.name.should.equal('bcoe')
+          argv.foo.should.equal('bar')
+          return done()
+        })
+        .argv
+    })
+
+    describe('strict', function () {
+      it('executes default command when strict mode is enabled', function (done) {
+        yargs('--foo bar')
+          .command('*', 'default command', function () {}, function (argv) {
+            argv.foo.should.equal('bar')
+            return done()
+          })
+          .option('foo', {
+            describe: 'a foo command'
+          })
+          .strict()
+          .argv
+      })
+
+      it('allows default command aliases, when strict mode is enabled', function (done) {
+        yargs('bcoe --foo bar')
+          .command(['start <name>', '*'], 'start command', function () {}, function (argv) {
+            argv._.should.eql([])
+            argv.name.should.equal('bcoe')
+            argv.foo.should.equal('bar')
+            return done()
+          })
+          .strict()
+          .option('foo', {
+            describe: 'a foo command'
+          })
+          .argv
+      })
+    })
+  })
 })
