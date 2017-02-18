@@ -92,6 +92,122 @@ describe('yargs dsl tests', function () {
       .argv
   })
 
+  describe('different cases for flags and options', function () {
+    var helper = function (args, options) {
+      return yargs(args.split(/ /g))
+        .options(options)
+        .argv
+    }
+    describe('single string', function () {
+      it('hyphenated flag, hyphenated option, hyphenated argv', function () {
+        var argv = helper('--small-cat=kitten', {
+          'small-cat': {type: 'string'}
+        })
+        argv['small-cat'].should.eql('kitten')
+      })
+      it('hyphenated flag, hyphenated option, camelCase argv', function () {
+        var argv = helper('--small-cat=kitten', {
+          'small-cat': {type: 'string'}
+        })
+        argv['smallCat'].should.eql('kitten')
+      })
+      it('hyphenated flag, camelCase option, hyphenated argv', function () {
+        var argv = helper('--small-cat=kitten', {
+          'smallCat': {type: 'string'}
+        })
+        argv['small-cat'].should.eql('kitten')
+      })
+      it('hyphenated flag, camelCase option, camelCase argv', function () {
+        var argv = helper('--small-cat=kitten', {
+          'smallCat': {type: 'string'}
+        })
+        argv['smallCat'].should.eql('kitten')
+      })
+      it('camelCase flag, hyphenated option, hyphenated argv', function () {
+        var argv = helper('--smallCat=kitten', {
+          'small-cat': {type: 'string'}
+        })
+        argv['small-cat'].should.eql('kitten')
+      })
+      it.skip('camelCase flag, camelCase option, hyphenated argv', function () {
+        var argv = helper('--smallCat=kitten', {
+          'smallCat': {type: 'string'}
+        })
+        argv['small-cat'].should.eql('kitten')
+      })
+      it('camelCase flag, hyphenated option, camelCase argv', function () {
+        var argv = helper('--smallCat=kitten', {
+          'small-cat': {type: 'string'}
+        })
+        argv['smallCat'].should.eql('kitten')
+      })
+      it('camelCase flag, camelCase option, camelCase argv', function () {
+        var argv = helper('--smallCat=kitten', {
+          'smallCat': {type: 'string'}
+        })
+        argv['smallCat'].should.eql('kitten')
+      })
+    })
+    describe('multiple arrays', function () {
+      it('hyphenated flag, hyphenated option, hyphenated argv', function () {
+        var argv = helper('--small-cats kitten kitty --big-cats tiger leopard', {
+          'small-cats': {type: 'array'},
+          'big-cats': {type: 'array'}
+        })
+        argv['small-cats'].should.deep.eql(['kitten', 'kitty'])
+        argv['big-cats'].should.deep.eql(['tiger', 'leopard'])
+      })
+      it('hyphenated|camelCase flag, hyphenated option, hyphenated argv', function () {
+        var argv = helper('--small-cats kitten kitty --bigCats tiger leopard', {
+          'small-cats': {type: 'array'},
+          'big-cats': {type: 'array'}
+        })
+        argv['small-cats'].should.deep.eql(['kitten', 'kitty'])
+        argv['big-cats'].should.deep.eql(['tiger', 'leopard'])
+      })
+      it('camelCase|hyphenated flag, hyphenated option, hyphenated argv', function () {
+        var argv = helper('--smallCats kitten kitty --big-cats tiger leopard', {
+          'small-cats': {type: 'array'},
+          'big-cats': {type: 'array'}
+        })
+        argv['small-cats'].should.deep.eql(['kitten', 'kitty'])
+        argv['big-cats'].should.deep.eql(['tiger', 'leopard'])
+      })
+      it.skip('hyphenated|camelCase flag, hyphenated|camelCase option, hyphenated argv', function () {
+        var argv = helper('--small-cats kitten kitty --bigCats tiger leopard', {
+          'small-cats': {type: 'array'},
+          'bigCats': {type: 'array'}
+        })
+        argv['small-cats'].should.deep.eql(['kitten', 'kitty'])
+        argv['big-cats'].should.deep.eql(['tiger', 'leopard'])
+      })
+      it('hyphenated|camelCase flag, hyphenated|camelCase option, hyphenated|camelCase argv', function () {
+        var argv = helper('--small-cats kitten kitty --bigCats tiger leopard', {
+          'small-cats': {type: 'array'},
+          'bigCats': {type: 'array'}
+        })
+        argv['small-cats'].should.deep.eql(['kitten', 'kitty'])
+        argv['bigCats'].should.deep.eql(['tiger', 'leopard'])
+      })
+      it('hyphenated|camelCase flag, camelCase|hyphenated option, hyphenated|camelCase argv', function () {
+        var argv = helper('--small-cats kitten kitty --bigCats tiger leopard', {
+          'smallCats': {type: 'array'},
+          'big-cats': {type: 'array'}
+        })
+        argv['small-cats'].should.deep.eql(['kitten', 'kitty'])
+        argv['bigCats'].should.deep.eql(['tiger', 'leopard'])
+      })
+      it('camelCase|hyphenated flag, camelCase|hyphenated option, hyphenated|camelCase argv', function () {
+        var argv = helper('--smallCats kitten kitty --big-cats tiger leopard', {
+          'small-cats': {type: 'array'},
+          'bigCats': {type: 'array'}
+        })
+        argv['small-cats'].should.deep.eql(['kitten', 'kitty'])
+        argv['bigCats'].should.deep.eql(['tiger', 'leopard'])
+      })
+    })
+  })
+
   it('should set alias to string if option is string', function () {
     var argv = yargs(['--cat=99'])
       .options('c', {

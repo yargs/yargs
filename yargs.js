@@ -8,6 +8,8 @@ const Validation = require('./lib/validation')
 const Y18n = require('y18n')
 const objFilter = require('./lib/obj-filter')
 const setBlocking = require('set-blocking')
+const camelcase = require('camelcase')
+const decamelize = require('decamelize')
 
 var exports = module.exports = Yargs
 function Yargs (processArgs, cwd, parentRequire) {
@@ -878,6 +880,11 @@ function Yargs (processArgs, cwd, parentRequire) {
   function parseArgs (args, shortCircuit) {
     options.__ = y18n.__
     options.configuration = pkgUp()['yargs'] || {}
+    options.array = options.array.reduce(function (array, key) {
+      array.push(camelcase(key))
+      array.push(decamelize(key, '-'))
+      return array
+    }, [])
     const parsed = Parser.detailed(args, options)
     var argv = parsed.argv
     if (parseContext) argv = assign(parseContext, argv)
