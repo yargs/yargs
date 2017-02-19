@@ -8,6 +8,7 @@ const Validation = require('./lib/validation')
 const Y18n = require('y18n')
 const objFilter = require('./lib/obj-filter')
 const setBlocking = require('set-blocking')
+const applyExtends = require('./lib/apply-extends')
 
 var exports = module.exports = Yargs
 function Yargs (processArgs, cwd, parentRequire) {
@@ -216,6 +217,7 @@ function Yargs (processArgs, cwd, parentRequire) {
   self.config = function (key, msg, parseFn) {
     // allow to pass a configuration object
     if (typeof key === 'object') {
+      key = applyExtends(key, cwd)
       options.configObjects = (options.configObjects || []).concat(key)
       return self
     }
@@ -231,6 +233,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     ;(Array.isArray(key) ? key : [key]).forEach(function (k) {
       options.config[k] = parseFn || true
     })
+
     return self
   }
 

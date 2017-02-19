@@ -1146,6 +1146,21 @@ describe('yargs dsl tests', function () {
       argv.foo.should.equal(1)
       argv.bar.should.equal(2)
     })
+
+    describe('extends', function () {
+      it('applies default configurations when given config object', function () {
+        var argv = yargs
+            .config({
+              extends: './test/fixtures/extends/config_1.json',
+              a: 1
+            })
+          .argv
+
+        argv.a.should.equal(1)
+        argv.b.should.equal(22)
+        argv.z.should.equal(15)
+      })
+    })
   })
 
   describe('normalize', function () {
