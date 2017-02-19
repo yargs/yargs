@@ -882,6 +882,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     var argv = parsed.argv
     if (parseContext) argv = assign(parseContext, argv)
     var aliases = parsed.aliases
+    var processed = parsed.processedKeys
 
     argv.$0 = self.$0
     self.parsed = parsed
@@ -985,8 +986,8 @@ function Yargs (processArgs, cwd, parentRequire) {
 
     // Check if any of the options to skip validation were provided
     if (!skipValidation && options.skipValidation.length > 0) {
-      skipValidation = Object.keys(argv).some(function (key) {
-        return options.skipValidation.indexOf(key) >= 0 && argv[key] === true
+      skipValidation = processed.some(function (key) {
+        return options.skipValidation.indexOf(key) >= 0
       })
     }
 

@@ -1439,7 +1439,7 @@ describe('yargs dsl tests', function () {
 
     it('allows having an option that skips validation but not skipping validation if that option is not used', function () {
       var skippedValidation = true
-      yargs(['--no-skip'])
+      yargs(['--dont-skip'])
           .demand(5)
           .option('skip', {
             skipValidation: true
@@ -1449,6 +1449,23 @@ describe('yargs dsl tests', function () {
           })
           .argv
       expect(skippedValidation).to.equal(false)
+    })
+
+    it('allows skipping validation with non-boolean, aliased options', function () {
+      var skippedValidation = true
+      yargs(['--do-skip'])
+          .demand(5)
+          .option('d', {
+            alias: 'do-skip',
+            type: 'string',
+            default: 'yes',
+            skipValidation: true
+          })
+          .fail(function (msg) {
+            skippedValidation = false
+          })
+          .argv
+      expect(skippedValidation).to.equal(true)
     })
   })
 
