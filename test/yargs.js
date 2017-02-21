@@ -763,7 +763,7 @@ describe('yargs dsl tests', function () {
     })
   })
 
-  // yargs.parse(['foo', '--bar'], function (err, argv, output) {}
+  // yargs.parse(['foo', '--bar'], function (err, argv, output) {})
   context('function passed as second argument to parse', function () {
     it('does not print to stdout', function () {
       var r = checkOutput(function () {
@@ -1865,6 +1865,84 @@ describe('yargs dsl tests', function () {
         .argv
       expect(msg).to.equal('ball')
       expect(err).to.exist
+    })
+  })
+
+  describe('strict', function () {
+    it('defaults to false when not called', function () {
+      var commandCalled = false
+      yargs('hi')
+        .command('hi', 'The hi command', function (innerYargs) {
+          commandCalled = true
+          innerYargs.getStrict().should.be.false
+        })
+      yargs.getStrict().should.be.false
+      yargs.argv // parse and run command
+      commandCalled.should.be.true
+    })
+
+    it('can be enabled just for a command', function () {
+      var commandCalled = false
+      yargs('hi')
+        .command('hi', 'The hi command', function (innerYargs) {
+          commandCalled = true
+          innerYargs.strict().getStrict().should.be.true
+        })
+      yargs.getStrict().should.be.false
+      yargs.argv // parse and run command
+      commandCalled.should.be.true
+    })
+
+    it('is true but non-global when called without arguments', function () {
+      var commandCalled = false
+      yargs('hi')
+        .strict()
+        .command('hi', 'The hi command', function (innerYargs) {
+          commandCalled = true
+          innerYargs.getStrict().should.be.false
+        })
+      yargs.getStrict().should.be.true
+      yargs.argv // parse and run command
+      commandCalled.should.be.true
+    })
+
+    it('is false when passed a value of `false`', function () {
+      var commandCalled = false
+      yargs('hi')
+        .strict(false)
+        .command('hi', 'The hi command', function (innerYargs) {
+          commandCalled = true
+          innerYargs.getStrict().should.be.false
+        })
+      yargs.getStrict().should.be.false
+      yargs.argv // parse and run command
+      commandCalled.should.be.true
+    })
+
+    it('is true and global when passed a value of `true`', function () {
+      var commandCalled = false
+      yargs('hi')
+        .strict(true)
+        .command('hi', 'The hi command', function (innerYargs) {
+          commandCalled = true
+          innerYargs.getStrict().should.be.true
+        })
+      yargs.getStrict().should.be.true
+      yargs.argv // parse and run command
+      commandCalled.should.be.true
+    })
+
+    it('allows a command to override global with a value of `false`', function () {
+      var commandCalled = false
+      yargs('hi')
+        .strict(true)
+        .command('hi', 'The hi command', function (innerYargs) {
+          commandCalled = true
+          innerYargs.strict(false).getStrict().should.be.false
+        })
+      yargs.getStrict().should.be.true
+      yargs.argv // parse and run command
+      commandCalled.should.be.true
     })
   })
 })
