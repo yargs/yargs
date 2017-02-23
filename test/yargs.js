@@ -1,17 +1,21 @@
-/* global context, describe, it, beforeEach */
+/* global context, describe, it, beforeEach, afterEach */
 
 var expect = require('chai').expect
 var fs = require('fs')
 var path = require('path')
 var checkOutput = require('./helpers/utils').checkOutput
-var yargs = require('../')
+var yargs
 var YError = require('../lib/yerror')
 
 require('chai').should()
 
 describe('yargs dsl tests', function () {
   beforeEach(function () {
-    yargs.reset()
+    yargs = require('../')
+  })
+
+  afterEach(function () {
+    delete require.cache[require.resolve('../')]
   })
 
   it('should use bin name for $0, eliminating path', function () {
@@ -1176,6 +1180,21 @@ describe('yargs dsl tests', function () {
           yargs.config({extends: './test/fixtures/extends/circular_1.json'})
         }).to.throw(YError)
       })
+
+      it('handles aboslute paths', function () {
+        var absolutePath = path.join(process.cwd(), 'test', 'fixtures', 'extends', 'config_1.json')
+
+        var argv = yargs
+          .config({
+            a: 2,
+            extends: absolutePath
+          })
+          .argv
+
+        argv.a.should.equal(2)
+        argv.b.should.equal(22)
+        argv.z.should.equal(15)
+      })
     })
   })
 
@@ -1436,6 +1455,13 @@ describe('yargs dsl tests', function () {
 
     it('should apply default configurations from extended packages', function () {
       var argv = yargs().pkgConf('foo', 'test/fixtures/extends/packageA').argv
+
+      argv.a.should.equal(80)
+      argv.b.should.equals('riffiwobbles')
+    })
+
+    it('should apply extended configurations from cwd when no path is given', function () {
+      var argv = yargs('', 'test/fixtures/extends/packageA').pkgConf('foo').argv
 
       argv.a.should.equal(80)
       argv.b.should.equals('riffiwobbles')
