@@ -1,0 +1,4 @@
+{
+  "b": "any",
+  "extends": "./circular_1.json"
+}
