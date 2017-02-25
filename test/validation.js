@@ -233,6 +233,43 @@ describe('validation tests', function () {
       argv._[0].should.equal('koala')
     })
 
+    // addresses: https://github.com/yargs/yargs/issues/791
+    it('should recognize context variables in strict mode', function (done) {
+      yargs()
+        .command('foo <y>')
+        .strict()
+        .parse('foo 99', {x: 33}, function (err, argv, output) {
+          expect(err).to.equal(null)
+          expect(output).to.equal('')
+          argv.y.should.equal(99)
+          argv.x.should.equal(33)
+          argv._.should.include('foo')
+          return done()
+        })
+    })
+
+    // addresses: https://github.com/yargs/yargs/issues/791
+    it('should recognize context variables in strict mode, when running sub-commands', function (done) {
+      yargs()
+        .command('request', 'request command', function (yargs) {
+          yargs
+            .command('get', 'sub-command')
+            .option('y', {
+              describe: 'y inner option'
+            })
+        })
+        .strict()
+        .parse('request get --y=22', {x: 33}, function (err, argv, output) {
+          expect(err).to.equal(null)
+          expect(output).to.equal('')
+          argv.y.should.equal(22)
+          argv.x.should.equal(33)
+          argv._.should.include('request')
+          argv._.should.include('get')
+          return done()
+        })
+    })
+
     it('fails when a required argument is missing', function (done) {
       yargs('-w 10 marsupial')
         .demand(1, ['w', 'b'])
