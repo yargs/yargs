@@ -768,6 +768,14 @@ describe('yargs dsl tests', function () {
       a1.foo.should.equal('bar')
       a1.context.should.equal('look at me go!')
     })
+
+    // see https://github.com/yargs/yargs/issues/724
+    it('overrides parsed value of argv with context object', function () {
+      var a1 = yargs.parse('-x=33', {
+        x: 42
+      })
+      a1.x.should.equal(42)
+    })
   })
 
   // yargs.parse(['foo', '--bar'], function (err, argv, output) {}
