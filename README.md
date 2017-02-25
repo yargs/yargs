@@ -980,6 +980,8 @@ $ node test.js
   '$0': 'test.js' }
 ```
 
+Note that a configuration object may extend from a JSON file using the `"extends"` property. When doing so, the `"extends"` value should be a path (relative or absolute) to the extended JSON file.
+
 <a name="conflicts"></a>.conflicts(x, y)
 ----------------------------------------------
 
@@ -1648,6 +1650,8 @@ as a configuration object.
 
 `cwd` can optionally be provided, the package.json will be read
 from this location.
+
+Note that a configuration stanza in package.json may extend from an identically keyed stanza in another package.json file using the `"extends"` property. When doing so, the `"extends"` value should be a path (relative or absolute) to the extended package.json file.
 
 .recommendCommands()
 ---------------------------
