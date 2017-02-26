@@ -988,6 +988,12 @@ function Yargs (processArgs, cwd, parentRequire) {
             }
           }
 
+          // run the default command, if defined
+          if (command.hasDefaultCommand() && !argv[helpOpt]) {
+            setPlaceholderKeys(argv)
+            return command.runCommand(null, self, parsed)
+          }
+
           // recommend a command if recommendCommands() has
           // been enabled, and no commands were found to execute
           if (recommendCommands && firstUnknownCommand) {
@@ -1001,6 +1007,9 @@ function Yargs (processArgs, cwd, parentRequire) {
           self.showCompletionScript()
           self.exit(0)
         }
+      } else if (command.hasDefaultCommand()) {
+        setPlaceholderKeys(argv)
+        return command.runCommand(null, self, parsed)
       }
 
       // we must run completions first, a user might
