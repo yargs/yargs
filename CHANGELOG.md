@@ -37,9 +37,9 @@ All notable changes to this project will be documented in this file. See [standa
 * `extends` key in config file is now used for extending other config files
 * environment variables now take precedence over config files.
 * context now takes precedence over argv and defaults
-* there's a good chance this will throw exceptions for a few folks who are using the API in an unexpected way.
+* the arguments passed to functions are now validated, there's a good chance this will throw exceptions for a few folks who are using the API in an unexpected way.
 * by default options, and many of yargs' parsing helpers will now default to being applied globally; such that they are no-longer reset before being passed into commands.
-* yargs will no longer aggressively supress errors, allowing errors that are not generated internally to bubble.
+* yargs will no longer aggressively suppress errors, allowing errors that are not generated internally to bubble.
 
 
 
