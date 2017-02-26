@@ -537,10 +537,6 @@ function Yargs (processArgs, cwd, parentRequire) {
     return parsed
   }
 
-  self._getParseContext = function () {
-    return parseContext || {}
-  }
-
   self._hasParseCallback = function () {
     return !!parseFn
   }
@@ -923,16 +919,7 @@ function Yargs (processArgs, cwd, parentRequire) {
 
   Object.defineProperty(self, 'argv', {
     get: function () {
-      var args = null
-
-      try {
-        args = self._parseArgs(processArgs)
-      } catch (err) {
-        if (err instanceof YError) usage.fail(err.message, err)
-        else throw err
-      }
-
-      return args
+      return self._parseArgs(processArgs)
     },
     enumerable: true
   })
@@ -951,124 +938,130 @@ function Yargs (processArgs, cwd, parentRequire) {
     argv.$0 = self.$0
     self.parsed = parsed
 
-    guessLocale() // guess locale lazily, so that it can be turned off in chain.
+    try {
+      guessLocale() // guess locale lazily, so that it can be turned off in chain.
 
-    // while building up the argv object, there
-    // are two passes through the parser. If completion
-    // is being performed short-circuit on the first pass.
-    if (shortCircuit) {
-      return argv
-    }
-
-    if (argv._.length) {
-      // check for helpOpt in argv._ before running commands
-      // assumes helpOpt must be valid if useHelpOptAsCommand is true
-      if (useHelpOptAsCommand) {
-        // consider any multi-char helpOpt alias as a valid help command
-        // unless all helpOpt aliases are single-char
-        // note that parsed.aliases is a normalized bidirectional map :)
-        var helpCmds = [helpOpt].concat(aliases[helpOpt] || [])
-        var multiCharHelpCmds = helpCmds.filter(function (k) {
-          return k.length > 1
-        })
-        if (multiCharHelpCmds.length) helpCmds = multiCharHelpCmds
-        // look for and strip any helpCmds from argv._
-        argv._ = argv._.filter(function (cmd) {
-          if (~helpCmds.indexOf(cmd)) {
-            argv[helpOpt] = true
-            return false
-          }
-          return true
-        })
+      // while building up the argv object, there
+      // are two passes through the parser. If completion
+      // is being performed short-circuit on the first pass.
+      if (shortCircuit) {
+        return argv
       }
 
-      // if there's a handler associated with a
-      // command defer processing to it.
-      var handlerKeys = command.getCommands()
-      if (handlerKeys.length) {
-        var firstUnknownCommand
-        for (var i = 0, cmd; (cmd = argv._[i]) !== undefined; i++) {
-          if (~handlerKeys.indexOf(cmd) && cmd !== completionCommand) {
-            setPlaceholderKeys(argv)
-            return command.runCommand(cmd, self, parsed)
-          } else if (!firstUnknownCommand && cmd !== completionCommand) {
-            firstUnknownCommand = cmd
+      if (argv._.length) {
+        // check for helpOpt in argv._ before running commands
+        // assumes helpOpt must be valid if useHelpOptAsCommand is true
+        if (useHelpOptAsCommand) {
+          // consider any multi-char helpOpt alias as a valid help command
+          // unless all helpOpt aliases are single-char
+          // note that parsed.aliases is a normalized bidirectional map :)
+          var helpCmds = [helpOpt].concat(aliases[helpOpt] || [])
+          var multiCharHelpCmds = helpCmds.filter(function (k) {
+            return k.length > 1
+          })
+          if (multiCharHelpCmds.length) helpCmds = multiCharHelpCmds
+          // look for and strip any helpCmds from argv._
+          argv._ = argv._.filter(function (cmd) {
+            if (~helpCmds.indexOf(cmd)) {
+              argv[helpOpt] = true
+              return false
+            }
+            return true
+          })
+        }
+
+        // if there's a handler associated with a
+        // command defer processing to it.
+        var handlerKeys = command.getCommands()
+        if (handlerKeys.length) {
+          var firstUnknownCommand
+          for (var i = 0, cmd; (cmd = argv._[i]) !== undefined; i++) {
+            if (~handlerKeys.indexOf(cmd) && cmd !== completionCommand) {
+              setPlaceholderKeys(argv)
+              return command.runCommand(cmd, self, parsed)
+            } else if (!firstUnknownCommand && cmd !== completionCommand) {
+              firstUnknownCommand = cmd
+            }
+          }
+
+          // recommend a command if recommendCommands() has
+          // been enabled, and no commands were found to execute
+          if (recommendCommands && firstUnknownCommand) {
+            validation.recommendCommands(firstUnknownCommand, handlerKeys)
           }
         }
 
-        // recommend a command if recommendCommands() has
-        // been enabled, and no commands were found to execute
-        if (recommendCommands && firstUnknownCommand) {
-          validation.recommendCommands(firstUnknownCommand, handlerKeys)
+        // generate a completion script for adding to ~/.bashrc.
+        if (completionCommand && ~argv._.indexOf(completionCommand) && !argv[completion.completionKey]) {
+          if (exitProcess) setBlocking(true)
+          self.showCompletionScript()
+          self.exit(0)
         }
       }
 
-      // generate a completion script for adding to ~/.bashrc.
-      if (completionCommand && ~argv._.indexOf(completionCommand) && !argv[completion.completionKey]) {
+      // we must run completions first, a user might
+      // want to complete the --help or --version option.
+      if (completion.completionKey in argv) {
         if (exitProcess) setBlocking(true)
-        self.showCompletionScript()
-        self.exit(0)
-      }
-    }
 
-    // we must run completions first, a user might
-    // want to complete the --help or --version option.
-    if (completion.completionKey in argv) {
-      if (exitProcess) setBlocking(true)
+        // we allow for asynchronous completions,
+        // e.g., loading in a list of commands from an API.
+        var completionArgs = args.slice(args.indexOf('--' + completion.completionKey) + 1)
+        completion.getCompletion(completionArgs, function (completions) {
+          ;(completions || []).forEach(function (completion) {
+            _logger.log(completion)
+          })
 
-      // we allow for asynchronous completions,
-      // e.g., loading in a list of commands from an API.
-      var completionArgs = args.slice(args.indexOf('--' + completion.completionKey) + 1)
-      completion.getCompletion(completionArgs, function (completions) {
-        ;(completions || []).forEach(function (completion) {
-          _logger.log(completion)
+          self.exit(0)
         })
-
-        self.exit(0)
-      })
-      return setPlaceholderKeys(argv)
-    }
-
-    // Handle 'help' and 'version' options
-    Object.keys(argv).forEach(function (key) {
-      if (key === helpOpt && argv[key]) {
-        if (exitProcess) setBlocking(true)
-
-        skipValidation = true
-        self.showHelp('log')
-        self.exit(0)
-      } else if (key === versionOpt && argv[key]) {
-        if (exitProcess) setBlocking(true)
-
-        skipValidation = true
-        usage.showVersion()
-        self.exit(0)
+        return setPlaceholderKeys(argv)
       }
-    })
 
-    // Check if any of the options to skip validation were provided
-    if (!skipValidation && options.skipValidation.length > 0) {
-      skipValidation = Object.keys(argv).some(function (key) {
-        return options.skipValidation.indexOf(key) >= 0 && argv[key] === true
+      // Handle 'help' and 'version' options
+      Object.keys(argv).forEach(function (key) {
+        if (key === helpOpt && argv[key]) {
+          if (exitProcess) setBlocking(true)
+
+          skipValidation = true
+          self.showHelp('log')
+          self.exit(0)
+        } else if (key === versionOpt && argv[key]) {
+          if (exitProcess) setBlocking(true)
+
+          skipValidation = true
+          usage.showVersion()
+          self.exit(0)
+        }
       })
-    }
 
-    // If the help or version options where used and exitProcess is false,
-    // or if explicitly skipped, we won't run validations.
-    if (!skipValidation) {
-      if (parsed.error) throw new YError(parsed.error.message)
-
-      // if we're executed via bash completion, don't
-      // bother with validation.
-      if (!argv[completion.completionKey]) {
-        self._runValidation(argv, aliases, {})
+      // Check if any of the options to skip validation were provided
+      if (!skipValidation && options.skipValidation.length > 0) {
+        skipValidation = Object.keys(argv).some(function (key) {
+          return options.skipValidation.indexOf(key) >= 0 && argv[key] === true
+        })
       }
+
+      // If the help or version options where used and exitProcess is false,
+      // or if explicitly skipped, we won't run validations.
+      if (!skipValidation) {
+        if (parsed.error) throw new YError(parsed.error.message)
+
+        // if we're executed via bash completion, don't
+        // bother with validation.
+        if (!argv[completion.completionKey]) {
+          self._runValidation(argv, aliases, {}, parsed.error)
+        }
+      }
+    } catch (err) {
+      if (err instanceof YError) usage.fail(err.message, err)
+      else throw err
     }
 
     return setPlaceholderKeys(argv)
   }
 
-  self._runValidation = function (argv, aliases, positionalMap) {
+  self._runValidation = function (argv, aliases, positionalMap, parseErrors) {
+    if (parseErrors) throw new YError(parseErrors.message)
     validation.nonOptionCount(argv)
     validation.missingArgumentValue(argv)
     validation.requiredArguments(argv)
