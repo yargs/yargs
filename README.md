@@ -591,6 +591,34 @@ yargs
   .argv
 ```
 
+### Default Commands
+
+To specify a default command use the character `*`. A default command
+will be run if the positional arguments provided match no known
+commands:
+
+```js
+const argv = require('yargs')
+  .command('*', 'the default command', () => {}, (argv) => {
+    console.log('this command will be run by default')
+  })
+```
+
+The command defined above will be executed if the program
+is run with `./my-cli.js --x=22`.
+
+Default commands can also be used as a command alias, like so:
+
+```js
+const argv = require('yargs')
+  .command(['serve', '*'], 'the serve command', () => {}, (argv) => {
+    console.log('this command will be run by default')
+  })
+```
+
+The command defined above will be executed if the program
+is run with `./my-cli.js --x=22`, or with `./my-cli.js serve --x=22`.
+
 ### Positional Arguments
 
 Commands can accept _optional_ and _required_ positional arguments. Required
