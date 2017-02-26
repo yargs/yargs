@@ -537,6 +537,10 @@ function Yargs (processArgs, cwd, parentRequire) {
     return parsed
   }
 
+  self._getParseContext = function () {
+    return parseContext || {}
+  }
+
   self._hasParseCallback = function () {
     return !!parseFn
   }
