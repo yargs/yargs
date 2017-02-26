@@ -2,7 +2,6 @@
 
 const argsert = require('../lib/argsert')
 const checkOutput = require('./helpers/utils').checkOutput
-const expect = require('chai').expect
 
 require('chai').should()
 
