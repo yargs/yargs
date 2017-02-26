@@ -897,6 +897,10 @@ function Yargs (processArgs, cwd, parentRequire) {
     return hasOutput
   }
 
+  self._setHasOutput = function () {
+    hasOutput = true
+  }
+
   var recommendCommands
   self.recommendCommands = function (recommend) {
     argsert('[boolean]', [recommend], arguments.length)

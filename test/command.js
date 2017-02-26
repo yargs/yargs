@@ -1024,6 +1024,19 @@ describe('Command', function () {
           })
       })
 
+      // address https://github.com/yargs/yargs/issues/795
+      it('does not fail strict check due to postional command arguments in nested commands', function (done) {
+        yargs()
+          .strict()
+          .command('hi', 'The hi command', function (yargs) {
+            yargs.command('ben <age>', 'ben command', function () {}, function () {})
+          })
+          .parse('hi ben 99', function (err, argv, output) {
+            expect(err).to.equal(null)
+            return done()
+          })
+      })
+
       it('does not fire command if validation fails', function (done) {
         var commandRun = false
         yargs()
