@@ -10,6 +10,7 @@ exports.checkOutput = function (f, argv, cb) {
   var _argv = process.argv
   var _error = console.error
   var _log = console.log
+  var _warn = console.warn
 
   process.exit = function () { exit = true }
   process.env = Hash.merge(process.env, { _: 'node' })
@@ -17,9 +18,11 @@ exports.checkOutput = function (f, argv, cb) {
 
   var errors = []
   var logs = []
+  var warnings = []
 
   console.error = function (msg) { errors.push(msg) }
   console.log = function (msg) { logs.push(msg) }
+  console.warn = function (msg) { warnings.push(msg) }
 
   var result
 
@@ -57,6 +60,7 @@ exports.checkOutput = function (f, argv, cb) {
 
     console.error = _error
     console.log = _log
+    console.warn = _warn
   }
 
   function done () {
@@ -65,6 +69,7 @@ exports.checkOutput = function (f, argv, cb) {
     return {
       errors: errors,
       logs: logs,
+      warnings: warnings,
       exit: exit,
       result: result
     }
