@@ -2,6 +2,47 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="7.0.0"></a>
+# [7.0.0](https://github.com/yargs/yargs/compare/v6.6.0...v7.0.0) (2017-02-26)
+
+
+### Bug Fixes
+
+* address min/max validation message regression ([#750](https://github.com/yargs/yargs/issues/750)) ([2e5ce0f](https://github.com/yargs/yargs/commit/2e5ce0f))
+* address positional argument strict() bug introduced in [#766](https://github.com/yargs/yargs/issues/766) ([#784](https://github.com/yargs/yargs/issues/784)) ([a8528e6](https://github.com/yargs/yargs/commit/a8528e6))
+* console.warn() rather than throwing errors when api signatures are incorrect ([#804](https://github.com/yargs/yargs/issues/804)) ([a607061](https://github.com/yargs/yargs/commit/a607061))
+* context should override parsed argv ([#786](https://github.com/yargs/yargs/issues/786)) ([0997288](https://github.com/yargs/yargs/commit/0997288))
+* context variables are now recognized in strict() mode ([#796](https://github.com/yargs/yargs/issues/796)) ([48575cd](https://github.com/yargs/yargs/commit/48575cd))
+* errors were not bubbling appropriately from sub-commands to top-level ([#802](https://github.com/yargs/yargs/issues/802)) ([8a992f5](https://github.com/yargs/yargs/commit/8a992f5))
+* positional arguments of sub-commands threw strict() exception ([#805](https://github.com/yargs/yargs/issues/805)) ([f3f074b](https://github.com/yargs/yargs/commit/f3f074b))
+* pull in yargs-parser with modified env precedence ([#787](https://github.com/yargs/yargs/issues/787)) ([e0fbbe5](https://github.com/yargs/yargs/commit/e0fbbe5))
+* running parse() multiple times on the same yargs instance caused exception if help() enabled ([#790](https://github.com/yargs/yargs/issues/790)) ([07e39b7](https://github.com/yargs/yargs/commit/07e39b7))
+* use path.resolve() to support node 0.10 ([#797](https://github.com/yargs/yargs/issues/797)) ([49a93fc](https://github.com/yargs/yargs/commit/49a93fc))
+
+
+### Features
+
+* add conflicts and implies shorthands. ([#753](https://github.com/yargs/yargs/issues/753)) ([bd1472b](https://github.com/yargs/yargs/commit/bd1472b))
+* add traditional Chinese translation ([#780](https://github.com/yargs/yargs/issues/780)) ([6ab6a95](https://github.com/yargs/yargs/commit/6ab6a95))
+* allow provided config object to extend other configs ([#779](https://github.com/yargs/yargs/issues/779)) ([3280dd0](https://github.com/yargs/yargs/commit/3280dd0))
+* function argument validation ([#773](https://github.com/yargs/yargs/issues/773)) ([22ed9bb](https://github.com/yargs/yargs/commit/22ed9bb))
+* if only one column is provided for examples, allow it to take up the entire line ([#749](https://github.com/yargs/yargs/issues/749)) ([7931652](https://github.com/yargs/yargs/commit/7931652))
+* introduce custom yargs error object ([#765](https://github.com/yargs/yargs/issues/765)) ([8308efa](https://github.com/yargs/yargs/commit/8308efa))
+* introduces support for default commands, using the '*' identifier ([#785](https://github.com/yargs/yargs/issues/785)) ([d78a0f5](https://github.com/yargs/yargs/commit/d78a0f5))
+* rethink how options are inherited by commands ([#766](https://github.com/yargs/yargs/issues/766)) ([ab1fa4b](https://github.com/yargs/yargs/commit/ab1fa4b))
+
+
+### BREAKING CHANGES
+
+* `extends` key in config file is now used for extending other config files
+* environment variables now take precedence over config files.
+* context now takes precedence over argv and defaults
+* there's a good chance this will throw exceptions for a few folks who are using the API in an unexpected way.
+* by default options, and many of yargs' parsing helpers will now default to being applied globally; such that they are no-longer reset before being passed into commands.
+* yargs will no longer aggressively supress errors, allowing errors that are not generated internally to bubble.
+
+
+
 <a name="6.6.0"></a>
 # [6.6.0](https://github.com/yargs/yargs/compare/v6.5.0...v6.6.0) (2016-12-29)
 
