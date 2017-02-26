@@ -1104,7 +1104,7 @@ describe('Command', function () {
       // addresses https://github.com/yargs/yargs/issues/794
       it('should bubble errors thrown by coerce function inside commands', function (done) {
         yargs
-          .command('foo', 'the foo command', (yargs) => {
+          .command('foo', 'the foo command', function (yargs) {
             yargs.coerce('x', function (arg) {
               throw Error('yikes an error')
             })
