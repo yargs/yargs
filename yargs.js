@@ -967,7 +967,7 @@ function Yargs (processArgs, cwd, parentRequire) {
         // consider any multi-char helpOpt alias as a valid help command
         // unless all helpOpt aliases are single-char
         // note that parsed.aliases is a normalized bidirectional map :)
-        var helpCmds = [helpOpt].concat(aliases[helpOpt])
+        var helpCmds = [helpOpt].concat(aliases[helpOpt] || [])
         var multiCharHelpCmds = helpCmds.filter(function (k) {
           return k.length > 1
         })

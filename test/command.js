@@ -747,6 +747,21 @@ describe('Command', function () {
     counter.should.equal(2)
   })
 
+  // addresses: https://github.com/yargs/yargs/issues/776
+  it('allows command handler to be invoked repeatedly when help is enabled', function (done) {
+    var counter = 0
+    var y = yargs([])
+      .command('foo', 'the foo command', {}, function (argv) {
+        counter++
+      })
+      .help()
+    y.parse(['foo'], function () {})
+    y.parse(['foo'], function () {
+      counter.should.equal(2)
+      return done()
+    })
+  })
+
   // addresses https://github.com/yargs/yargs/issues/522
   it('does not require builder function to return', function () {
     var argv = yargs('yo')
