@@ -1203,8 +1203,8 @@ then all env vars will be applied to argv.
 Program arguments are defined in this order of precedence:
 
 1. Command line args
-2. Config file
-3. Env var
+2. Env vars
+3. Config file/objects
 4. Configured defaults
 
 ```js
