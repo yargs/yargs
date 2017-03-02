@@ -2521,4 +2521,28 @@ describe('usage tests', function () {
       ])
     })
   })
+
+  describe('default command', function () {
+    it('--help should display top-level help with no command given', function () {
+      var r = checkUsage(function () {
+        return yargs('--help')
+          .command(['list [pattern]', 'ls', '*'], 'List key-value pairs for pattern', {}, function () {})
+          .command('get <key>', 'Get value for key', {}, function () {})
+          .command('set <key> [value]', 'Set value for key', {}, function () {})
+          .help()
+          .argv
+      })
+
+      r.logs[0].split('\n').should.deep.equal([
+        'Commands:',
+        '  list [pattern]     List key-value pairs for pattern    [default] [aliases: ls]',
+        '  get <key>          Get value for key',
+        '  set <key> [value]  Set value for key',
+        '',
+        'Options:',
+        '  --help  Show help                                                    [boolean]',
+        ''
+      ])
+    })
+  })
 })

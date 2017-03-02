@@ -1011,7 +1011,7 @@ function Yargs (processArgs, cwd, parentRequire) {
           self.showCompletionScript()
           self.exit(0)
         }
-      } else if (command.hasDefaultCommand()) {
+      } else if (command.hasDefaultCommand() && !argv[helpOpt]) {
         setPlaceholderKeys(argv)
         return command.runCommand(null, self, parsed)
       }
