@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="7.0.1"></a>
+## [7.0.1](https://github.com/yargs/yargs/compare/v7.0.0...v7.0.1) (2017-03-03)
+
+
+### Bug Fixes
+
+* --help with default command should print top-level help ([#810](https://github.com/yargs/yargs/issues/810)) ([9c03fa4](https://github.com/yargs/yargs/commit/9c03fa4))
+
+
+
 <a name="7.0.0"></a>
 # [7.0.0](https://github.com/yargs/yargs/compare/v6.6.0...v7.0.0) (2017-02-26)
 
