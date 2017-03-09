@@ -1301,7 +1301,7 @@ describe('Command', function () {
   })
 
   // addresses: https://github.com/yargs/yargs/issues/819
-  it('should apply strict argument validation to inner commands', function () {
+  it('should kick along [demand] configuration to commands', function () {
     var called = false
     var r = checkOutput(function () {
       yargs('foo')
