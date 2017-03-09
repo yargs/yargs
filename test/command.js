@@ -1299,4 +1299,22 @@ describe('Command', function () {
       })
     })
   })
+
+  // addresses: https://github.com/yargs/yargs/issues/819
+  it('should apply strict argument validation to inner commands', function () {
+    var called = false
+    var r = checkOutput(function () {
+      yargs('foo')
+        .command('foo', 'foo command', function () {}, function (argv) {
+          called = true
+        })
+        .option('bar', {
+          describe: 'a foo command',
+          demand: true
+        })
+        .argv
+    })
+    called.should.equal(false)
+    r.errors.should.match(/Missing required argument/)
+  })
 })
