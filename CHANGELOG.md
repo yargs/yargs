@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="7.0.2"></a>
+## [7.0.2](https://github.com/yargs/yargs/compare/v7.0.1...v7.0.2) (2017-03-10)
+
+
+### Bug Fixes
+
+* populating placeholder arguments broke validation ([b3eb2fe](https://github.com/yargs/yargs/commit/b3eb2fe))
+
+
+
 <a name="7.0.1"></a>
 ## [7.0.1](https://github.com/yargs/yargs/compare/v7.0.0...v7.0.1) (2017-03-03)
 
