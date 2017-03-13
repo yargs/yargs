@@ -1317,4 +1317,14 @@ describe('Command', function () {
     called.should.equal(false)
     r.errors.should.match(/Missing required argument/)
   })
+
+  it('should support numeric commands', function () {
+    var output = []
+    yargs('1')
+      .command('1', 'numeric command', function (yargs) {
+        output.push('1')
+      })
+      .argv
+    output.should.include('1')
+  })
 })
