@@ -567,7 +567,7 @@ function Yargs (processArgs, cwd, parentRequire) {
         self.demand(key, demand)
       }
 
-      if ('demandOption' in opt) {
+      if (opt.demandOption) {
         self.demandOption(key, typeof opt.demandOption === 'string' ? opt.demandOption : undefined)
       }
 
