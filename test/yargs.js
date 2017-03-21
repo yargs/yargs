@@ -1823,8 +1823,14 @@ describe('yargs dsl tests', function () {
     it('allows an error to be handled by fail() handler', function () {
       var msg
       var err
+      var jsonErrMessage
       yargs('--json invalid')
         .coerce('json', function (arg) {
+          try {
+            JSON.parse(arg)
+          } catch (err) {
+            jsonErrMessage = err.message
+          }
           return JSON.parse(arg)
         })
         .fail(function (m, e) {
@@ -1832,7 +1838,7 @@ describe('yargs dsl tests', function () {
           err = e
         })
         .argv
-      expect(msg).to.match(/Unexpected token i/)
+      expect(msg).to.equal(jsonErrMessage)
       expect(err).to.exist
     })
 
