@@ -1037,6 +1037,19 @@ describe('Command', function () {
           })
       })
 
+      it('allows a command to override global`', function () {
+        var commandCalled = false
+        yargs('hi')
+         .strict(true)
+         .command('hi', 'The hi command', function (innerYargs) {
+           commandCalled = true
+           innerYargs.strict(false, false).getStrict().should.be.false
+         })
+        yargs.getStrict().should.be.true
+        yargs.argv // parse and run command
+        commandCalled.should.be.true
+      })
+
       it('does not fire command if validation fails', function (done) {
         var commandRun = false
         yargs()
