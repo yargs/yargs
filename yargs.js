@@ -983,7 +983,8 @@ function Yargs (processArgs, cwd, parentRequire) {
         var handlerKeys = command.getCommands()
         if (handlerKeys.length) {
           var firstUnknownCommand
-          for (var i = 0, cmd; (cmd = argv._[i]) !== undefined; i++) {
+          for (var i = 0, cmd; argv._[i] !== undefined; i++) {
+            cmd = String(argv._[i])
             if (~handlerKeys.indexOf(cmd) && cmd !== completionCommand) {
               setPlaceholderKeys(argv)
               return command.runCommand(cmd, self, parsed)
