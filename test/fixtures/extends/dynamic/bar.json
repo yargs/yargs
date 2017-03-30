@@ -1,0 +1,8 @@
+{
+  "ignore": {
+    "foo": "this"
+  },
+  "readHere": {
+    "c": 45
+  }
+}

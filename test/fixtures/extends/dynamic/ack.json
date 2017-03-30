@@ -1,0 +1,5 @@
+{
+  "b": 123,
+  "extends": "./bar.json",
+  "extendsKey": "readHere"
+}

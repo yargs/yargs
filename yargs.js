@@ -479,7 +479,7 @@ function Yargs (processArgs, cwd, parentRequire) {
 
     // If an object exists in the key, add it to options.configObjects
     if (obj[key] && typeof obj[key] === 'object') {
-      conf = applyExtends(obj[key], path || cwd, key)
+      conf = applyExtends(obj[key], path || cwd)
       options.configObjects = (options.configObjects || []).concat(conf)
     }
 

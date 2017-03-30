@@ -1,6 +1,7 @@
 {
   "foo": {
     "a": 80,
-    "extends": "../packageB/package.json"
+    "extends": "../packageB/package.json",
+    "extendsKey": "bar"
   }
 }
