@@ -1036,21 +1036,24 @@ function Yargs (processArgs, cwd, parentRequire) {
       }
 
       // Handle 'help' and 'version' options
-      Object.keys(argv).forEach(function (key) {
-        if (key === helpOpt && argv[key]) {
-          if (exitProcess) setBlocking(true)
+      // if we haven't already output help!
+      if (!hasOutput) {
+        Object.keys(argv).forEach(function (key) {
+          if (key === helpOpt && argv[key]) {
+            if (exitProcess) setBlocking(true)
 
-          skipValidation = true
-          self.showHelp('log')
-          self.exit(0)
-        } else if (key === versionOpt && argv[key]) {
-          if (exitProcess) setBlocking(true)
+            skipValidation = true
+            self.showHelp('log')
+            self.exit(0)
+          } else if (key === versionOpt && argv[key]) {
+            if (exitProcess) setBlocking(true)
 
-          skipValidation = true
-          usage.showVersion()
-          self.exit(0)
-        }
-      })
+            skipValidation = true
+            usage.showVersion()
+            self.exit(0)
+          }
+        })
+      }
 
       // Check if any of the options to skip validation were provided
       if (!skipValidation && options.skipValidation.length > 0) {
