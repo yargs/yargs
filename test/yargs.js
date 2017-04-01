@@ -346,8 +346,9 @@ describe('yargs dsl tests', function () {
         .help()
         .recommendCommands()
 
-      parser.parse('boat help', {}, function (_err, argv, output) {
+      parser.parse('boat help', {}, function (err, _argv, output) {
         // it should not have printed the help text twice!
+        err.message.should.equal('Did you mean goat?')
         output.split('Commands:').length.should.equal(2)
         return done()
       })
