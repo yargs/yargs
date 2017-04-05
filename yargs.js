@@ -696,8 +696,8 @@ function Yargs (processArgs, cwd, parentRequire) {
 
   var strict = false
   var strictGlobal = false
-  self.strict = function (global, enabled) {
-    argsert('[boolean] [boolean]', [global], arguments.length)
+  self.strict = function (enabled, global) {
+    argsert('[boolean] [boolean]', [enabled, global], arguments.length)
     strict = enabled !== false
     strictGlobal = global !== false
     return self

@@ -1003,7 +1003,7 @@ describe('Command', function () {
       it('does not apply strict globally when passed value of `false`', function () {
         var commandCalled = false
         yargs('hi')
-          .strict(false)
+          .strict(true, false)
           .command('hi', 'The hi command', function (innerYargs) {
             commandCalled = true
             innerYargs.getStrict().should.be.false
@@ -1040,10 +1040,10 @@ describe('Command', function () {
       it('allows a command to override global`', function () {
         var commandCalled = false
         yargs('hi')
-         .strict(true)
+         .strict()
          .command('hi', 'The hi command', function (innerYargs) {
            commandCalled = true
-           innerYargs.strict(false, false).getStrict().should.be.false
+           innerYargs.strict(false).getStrict().should.be.false
          })
         yargs.getStrict().should.be.true
         yargs.argv // parse and run command
