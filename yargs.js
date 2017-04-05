@@ -126,7 +126,6 @@ function Yargs (processArgs, cwd, parentRequire) {
     command = command ? command.reset() : Command(self, usage, validation)
     if (!completion) completion = Completion(self, usage, command)
 
-    if (!strictGlobal) strict = false
     completionCommand = null
     output = ''
     exitError = null
@@ -695,11 +694,9 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   var strict = false
-  var strictGlobal = false
-  self.strict = function (enabled, global) {
-    argsert('[boolean] [boolean]', [enabled, global], arguments.length)
+  self.strict = function (enabled) {
+    argsert('[boolean]', [enabled], arguments.length)
     strict = enabled !== false
-    strictGlobal = global !== false
     return self
   }
   self.getStrict = function () {

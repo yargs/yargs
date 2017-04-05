@@ -1000,19 +1000,6 @@ describe('Command', function () {
         commandCalled.should.be.true
       })
 
-      it('does not apply strict globally when passed value of `false`', function () {
-        var commandCalled = false
-        yargs('hi')
-          .strict(true, false)
-          .command('hi', 'The hi command', function (innerYargs) {
-            commandCalled = true
-            innerYargs.getStrict().should.be.false
-          })
-        yargs.getStrict().should.be.true
-        yargs.argv // parse and run command
-        commandCalled.should.be.true
-      })
-
       // address regression introduced in #766, thanks @nexdrew!
       it('does not fail strict check due to postional command arguments', function (done) {
         yargs()
