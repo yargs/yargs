@@ -339,6 +339,21 @@ describe('yargs dsl tests', function () {
       r.errors[1].should.match(/Did you mean goat/)
     })
 
+    // see: https://github.com/yargs/yargs/issues/822
+    it('does not print help message if recommendation has been made', function (done) {
+      const parser = yargs()
+        .command('goat')
+        .help()
+        .recommendCommands()
+
+      parser.parse('boat help', {}, function (err, _argv, output) {
+        // it should not have printed the help text twice!
+        err.message.should.equal('Did you mean goat?')
+        output.split('Commands:').length.should.equal(2)
+        return done()
+      })
+    })
+
     it("skips executing top-level command if builder's help is executed", function () {
       var r = checkOutput(function () {
         yargs(['blerg', '-h'])
