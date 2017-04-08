@@ -10,7 +10,7 @@ With yargs, ye be havin' a map that leads straight to yer treasure! Treasure of 
 [![NPM version][npm-image]][npm-url]
 [![Windows Tests][windows-image]][windows-url]
 [![js-standard-style][standard-image]][standard-url]
-[![standard-version][standard-version-image]][standard-version-url]
+[![Conventional Commits][conventional-commits-image]][conventional-commits-url]
 [![Gitter][gitter-image]][gitter-url]
 
 > Yargs is the official successor to optimist. Please feel free to submit issues and pull requests. If you'd like to contribute and don't know where to start, have a look at [the issue list](https://github.com/yargs/yargs/issues) :)
@@ -2011,7 +2011,7 @@ This module is loosely inspired by Perl's
 [windows-image]: https://img.shields.io/appveyor/ci/bcoe/yargs-ljwvf/master.svg?label=Windows%20Tests
 [standard-image]: https://img.shields.io/badge/code%20style-standard-brightgreen.svg
 [standard-url]: http://standardjs.com/
-[standard-version-image]: https://img.shields.io/badge/release-standard%20version-brightgreen.svg
-[standard-version-url]: https://github.com/conventional-changelog/standard-version
+[conventional-commits-image]: https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg
+[conventional-commits-url]: https://conventionalcommits.org/
 [gitter-image]: https://img.shields.io/gitter/room/nwjs/nw.js.svg?maxAge=2592000
 [gitter-url]: https://gitter.im/yargs/Lobby?utm_source=share-link&utm_medium=link&utm_campaign=share-link
