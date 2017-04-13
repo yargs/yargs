@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="7.1.0"></a>
+# [7.1.0](https://github.com/yargs/yargs/compare/v7.0.2...v7.1.0) (2017-04-13)
+
+
+### Bug Fixes
+
+* fix demandOption no longer treats 'false' as truthy ([#829](https://github.com/yargs/yargs/issues/829)) ([c748dd2](https://github.com/yargs/yargs/commit/c748dd2))
+* get terminalWidth in non interactive mode no longer causes a validation exception ([#837](https://github.com/yargs/yargs/issues/837)) ([360e301](https://github.com/yargs/yargs/commit/360e301))
+* we shouldn't output help if we've printed a prior help-like message ([#847](https://github.com/yargs/yargs/issues/847)) ([17e89bd](https://github.com/yargs/yargs/commit/17e89bd))
+
+
+### Features
+
+* add support for numeric commands ([#825](https://github.com/yargs/yargs/issues/825)) ([fde0564](https://github.com/yargs/yargs/commit/fde0564))
+
+
+
 <a name="7.0.2"></a>
 ## [7.0.2](https://github.com/yargs/yargs/compare/v7.0.1...v7.0.2) (2017-03-10)
 
