@@ -1327,4 +1327,16 @@ describe('Command', function () {
       .argv
     output.should.include('1')
   })
+
+  // see: https://github.com/yargs/yargs/issues/853
+  it('should not execute command if it is proceeded by another positional argument', () => {
+    var commandCalled = false
+    yargs()
+      .command('foo', 'foo command', function () {}, function () { commandCalled = true })
+      .parse('bar foo', function (err, argv) {
+        expect(err).to.equal(null)
+        commandCalled.should.equal(false)
+        argv._.should.eql(['bar', 'foo'])
+      })
+  })
 })
