@@ -225,7 +225,6 @@ describe('yargs dsl tests', function () {
         .implies('foo', 'snuh')
         .conflicts('qux', 'xyzzy')
         .group('foo', 'Group:')
-        .strict(false)
         .exitProcess(false)  // defaults to true.
         .global('foo', false)
         .global('qux', false)
@@ -266,7 +265,6 @@ describe('yargs dsl tests', function () {
       expect(y.getValidationInstance().getConflicting()).to.deep.equal({})
       expect(y.getCommandInstance().getCommandHandlers()).to.deep.equal({})
       expect(y.getExitProcess()).to.equal(false)
-      expect(y.getStrict()).to.equal(false)
       expect(y.getDemandedOptions()).to.deep.equal({})
       expect(y.getDemandedCommands()).to.deep.equal({})
       expect(y.getGroups()).to.deep.equal({})

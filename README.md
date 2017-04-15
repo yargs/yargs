@@ -1809,7 +1809,7 @@ Specify --help for available options
 Specifies either a single option key (string), or an array of options.
 If any of the options is present, yargs validation is skipped.
 
-.strict([global=true])
+.strict([enabled=true])
 ---------
 
 Any command-line argument given that is not demanded, or does not have a
