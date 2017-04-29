@@ -929,7 +929,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     enumerable: true
   })
 
-  self._parseArgs = function (args, shortCircuit, _skipValidation) {
+  self._parseArgs = function (args, shortCircuit, _skipValidation, commandIndex) {
     var skipValidation = !!_skipValidation
     args = args || processArgs
 
@@ -980,13 +980,17 @@ function Yargs (processArgs, cwd, parentRequire) {
         var handlerKeys = command.getCommands()
         if (handlerKeys.length) {
           var firstUnknownCommand
-          for (var i = 0, cmd; argv._[i] !== undefined; i++) {
+          for (var i = (commandIndex || 0), cmd; argv._[i] !== undefined; i++) {
             cmd = String(argv._[i])
             if (~handlerKeys.indexOf(cmd) && cmd !== completionCommand) {
               setPlaceholderKeys(argv)
-              return command.runCommand(cmd, self, parsed)
+              // commands are executed using a recursive algorithm that executes
+              // the deepest command first; we keep track of the position in the
+              // argv._ array that is currently being executed.
+              return command.runCommand(cmd, self, parsed, i + 1)
             } else if (!firstUnknownCommand && cmd !== completionCommand) {
               firstUnknownCommand = cmd
+              break
             }
           }
 
