@@ -409,7 +409,7 @@ describe('Command', function () {
       var handlers = y.getCommandInstance().getCommandHandlers()
       handlers.foo.original.should.equal(module.command)
       handlers.foo.builder.should.equal(module.builder)
-      expect(handlers.foo.handler).to.equal(undefined)
+      expect(typeof handlers.foo.handler).to.equal('function')
       var commands = y.getUsageInstance().getCommands()
       commands[0].should.deep.equal([module.command, module.describe, isDefault, aliases])
     })
@@ -1337,6 +1337,20 @@ describe('Command', function () {
         expect(err).to.equal(null)
         commandCalled.should.equal(false)
         argv._.should.eql(['bar', 'foo'])
+      })
+  })
+
+  // see: https://github.com/yargs/yargs/issues/861 phew! that's an edge-case.
+  it('should allow positional arguments for inner commands in strict mode, when no handler is provided', () => {
+    yargs()
+      .command('foo', 'outer command', (yargs) => {
+        yargs.command('bar [optional]', 'inner command')
+      })
+      .strict()
+      .parse('foo bar 33', function (err, argv) {
+        expect(err).to.equal(null)
+        argv.optional.should.equal(33)
+        argv._.should.eql(['foo', 'bar'])
       })
   })
 })
