@@ -1202,7 +1202,7 @@ describe('yargs dsl tests', function () {
         }).to.throw(YError)
       })
 
-      it('handles aboslute paths', function () {
+      it('handles absolute paths', function () {
         var absolutePath = path.join(process.cwd(), 'test', 'fixtures', 'extends', 'config_1.json')
 
         var argv = yargs
@@ -1215,6 +1215,31 @@ describe('yargs dsl tests', function () {
         argv.a.should.equal(2)
         argv.b.should.equal(22)
         argv.z.should.equal(15)
+      })
+
+      it('handles dynamic keys to read from', function () {
+        var argv = yargs
+          .config({
+            extends: './test/fixtures/extends/dynamic/ack.json',
+            a: 1
+          })
+          .argv
+
+        argv.a.should.equal(1)
+        argv.b.should.equal(123)
+        argv.c.should.equal(45)
+      })
+
+      it('ignores extends keywords in resulting config', function () {
+        var argv = yargs
+          .config({
+            extends: './test/fixtures/extends/dynamic/ack.json',
+            a: 1
+          })
+          .argv
+
+        expect(argv.extends).to.not.exist
+        expect(argv.extendsKey).to.not.exist
       })
     })
   })
