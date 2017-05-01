@@ -1002,7 +1002,7 @@ function Yargs (processArgs, cwd, parentRequire) {
 
           // recommend a command if recommendCommands() has
           // been enabled, and no commands were found to execute
-          if (recommendCommands && firstUnknownCommand) {
+          if (recommendCommands && firstUnknownCommand && !argv[helpOpt]) {
             validation.recommendCommands(firstUnknownCommand, handlerKeys)
           }
         }
