@@ -1216,6 +1216,31 @@ describe('yargs dsl tests', function () {
         argv.b.should.equal(22)
         argv.z.should.equal(15)
       })
+
+      // see: https://www.npmjs.com/package/yargs-test-extends
+      it('allows a module to be extended, rather than a JSON file', () => {
+        var argv = yargs()
+          .config({
+            a: 2,
+            extends: 'yargs-test-extends'
+          })
+          .argv
+
+        argv.a.should.equal(2)
+        argv.c.should.equal(201)
+      })
+
+      it('ignores an extends key that does not look like a path or module', () => {
+        var argv = yargs()
+          .config({
+            a: 2,
+            extends: 'batman'
+          })
+          .argv
+
+        argv.a.should.equal(2)
+        argv.extends.should.equal('batman')
+      })
     })
   })
 
