@@ -2,6 +2,43 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="8.0.0"></a>
+# [8.0.0](https://github.com/yargs/yargs/compare/v7.0.0...v8.0.0) (2017-05-01)
+
+
+### Bug Fixes
+
+* --help with default command should print top-level help ([#810](https://github.com/yargs/yargs/issues/810)) ([9c03fa4](https://github.com/yargs/yargs/commit/9c03fa4))
+* commands are now applied in order, from left to right ([#857](https://github.com/yargs/yargs/issues/857)) ([baba863](https://github.com/yargs/yargs/commit/baba863))
+* fix demandOption no longer treats 'false' as truthy ([#829](https://github.com/yargs/yargs/issues/829)) ([c748dd2](https://github.com/yargs/yargs/commit/c748dd2))
+* get terminalWidth in non interactive mode no longer causes a validation exception ([#837](https://github.com/yargs/yargs/issues/837)) ([360e301](https://github.com/yargs/yargs/commit/360e301))
+* help now takes precedence over command recommendation ([#866](https://github.com/yargs/yargs/issues/866)) ([17e3567](https://github.com/yargs/yargs/commit/17e3567))
+* populating placeholder arguments broke validation ([b3eb2fe](https://github.com/yargs/yargs/commit/b3eb2fe))
+* positional arguments now work if no handler is provided to inner command ([#864](https://github.com/yargs/yargs/issues/864)) ([e28ded3](https://github.com/yargs/yargs/commit/e28ded3))
+* we shouldn't output help if we've printed a prior help-like message ([#847](https://github.com/yargs/yargs/issues/847)) ([17e89bd](https://github.com/yargs/yargs/commit/17e89bd))
+
+
+### Chores
+
+* upgrade yargs-parser ([#867](https://github.com/yargs/yargs/issues/867)) ([8f9c6c6](https://github.com/yargs/yargs/commit/8f9c6c6))
+
+
+### Features
+
+* add support for numeric commands ([#825](https://github.com/yargs/yargs/issues/825)) ([fde0564](https://github.com/yargs/yargs/commit/fde0564))
+* allow extends to inherit from a module ([#865](https://github.com/yargs/yargs/issues/865)) ([89456d9](https://github.com/yargs/yargs/commit/89456d9))
+* allow strict mode to be disabled ([#840](https://github.com/yargs/yargs/issues/840)) ([6f78c05](https://github.com/yargs/yargs/commit/6f78c05))
+
+
+### BREAKING CHANGES
+
+* environment variables will now override config files, '--' is now populated rather than '_' when parsing is stopped.
+* extends functionality now always loads the JSON provided, rather than reading from a specific key
+* this pull requests introduces language features that require Node 4+.
+* the first argument to strict() is now used to enable/disable its functionality, rather than controlling whether or not it is global.
+
+
+
 <a name="7.1.0"></a>
 # [7.1.0](https://github.com/yargs/yargs/compare/v7.0.2...v7.1.0) (2017-04-13)
 
