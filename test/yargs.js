@@ -338,15 +338,14 @@ describe('yargs dsl tests', function () {
     })
 
     // see: https://github.com/yargs/yargs/issues/822
-    it('does not print help message if recommendation has been made', function (done) {
+    it('does not print command recommendation if help message will be shown', function (done) {
       const parser = yargs()
         .command('goat')
         .help()
         .recommendCommands()
 
       parser.parse('boat help', {}, function (err, _argv, output) {
-        // it should not have printed the help text twice!
-        err.message.should.equal('Did you mean goat?')
+        if (err) return done(err)
         output.split('Commands:').length.should.equal(2)
         return done()
       })
