@@ -1985,6 +1985,16 @@ describe('yargs dsl tests', function () {
       expect(err).to.exist
     })
   })
+
+  describe('stop parsing', () => {
+    it('populates "--" with unparsed arguments after "--"', () => {
+      const argv = yargs.parse('--foo 33 --bar=99 -- --grep=foobar')
+      argv.foo.should.equal(33)
+      argv.bar.should.equal(99)
+      argv['--'].length.should.equal(1)
+      argv['--'][0].should.equal('--grep=foobar')
+    })
+  })
 })
 
 describe('yargs context', function () {
