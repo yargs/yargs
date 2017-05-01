@@ -26,9 +26,10 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### BREAKING CHANGES
 
-* environment variables will now override config files, '--' is now populated rather than '_' when parsing is stopped.
+* environment variables now override config files in order of precedence.
+* '--' is now populated rather than '_' when parsing is stopped.
 * extends functionality now always loads the JSON provided, rather than reading from a specific key
-* this pull requests introduces language features that require Node 4+.
+* Node 4+ is now required; this will allow us to start updating our dependencies.
 * the first argument to strict() is now used to enable/disable its functionality, rather than controlling whether or not it is global.
 
 
