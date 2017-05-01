@@ -1008,7 +1008,41 @@ $ node test.js
   '$0': 'test.js' }
 ```
 
-Note that a configuration object may extend from a JSON file using the `"extends"` property. When doing so, the `"extends"` value should be a path (relative or absolute) to the extended JSON file.
+### `extends` Keyword
+
+`config` and `pkgConf` can provide the `extends` keyword to
+indicate that configuration should inherit from another location.
+
+The value of extends can be either a relative or absolute path to a JSON
+configuration file, e.g.,
+
+```js
+yargs.config({
+  extends: './configs/a.json',
+  logLevel: 'verbose'
+})
+```
+
+Or, a module can be provided (this is useful for creating functionality like
+  [babel-presets](https://babeljs.io/docs/plugins/)).
+
+**my-library.js**
+
+```js
+yargs.pkgConf('nyc')
+```
+
+**consuming package.json**
+
+```json
+{
+  "nyc": {
+    "extends": "nyc-babel-config"
+  }
+}
+```
+
+Where `nyc-babel-config` is a package that exports configuration in its index.
 
 <a name="conflicts"></a>.conflicts(x, y)
 ----------------------------------------------
@@ -1678,8 +1712,6 @@ as a configuration object.
 
 `cwd` can optionally be provided, the package.json will be read
 from this location.
-
-Note that a configuration stanza in package.json may extend from an identically keyed stanza in another package.json file using the `"extends"` property. When doing so, the `"extends"` value should be a path (relative or absolute) to the extended package.json file.
 
 .recommendCommands()
 ---------------------------
