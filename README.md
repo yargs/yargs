@@ -1938,7 +1938,7 @@ parsing tricks
 stop parsing
 ------------
 
-Use `--` to stop parsing flags and stuff the remainder into `argv['--']`.
+Use `--` to stop parsing flags and stuff the remainder into `argv._`.
 
     $ node examples/reflect.js -a 1 -b 2 -- -c 3 -d 4
     { _: [ '-c', '3', '-d', '4' ],
