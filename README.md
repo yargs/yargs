@@ -1847,8 +1847,7 @@ If any of the options is present, yargs validation is skipped.
 Any command-line argument given that is not demanded, or does not have a
 corresponding description, will be reported as an error.
 
-`global` indicates whether `strict()` should be enabled both
-at the top-level and for each sub-command.
+Unrecognized commands will also be reported as errors.
 
 <a name="string"></a>.string(key)
 ------------
