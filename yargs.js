@@ -56,6 +56,11 @@ function Yargs (processArgs, cwd, parentRequire) {
     return context
   }
 
+  var rawOptions = {}
+  self.getRawOptions = function () {
+    return rawOptions
+  }
+
   // puts yargs back into an initial state. any keys
   // that have been set to "global" will not be reset
   // by this action.
@@ -555,6 +560,7 @@ function Yargs (processArgs, cwd, parentRequire) {
         opt = {}
       }
 
+      rawOptions[key] = opt
       options.key[key] = true // track manually set keys.
 
       if (opt.alias) self.alias(key, opt.alias)
