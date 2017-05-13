@@ -289,7 +289,25 @@ describe('yargs dsl tests', () => {
         .exitProcess(false) // defaults to true.
         .argv
     })
-
+    it('run middlewares before reaching the handler', function (done) {
+      yargs(['foo'])
+        .command(
+          'foo',
+          'handle foo things',
+          function () {},
+          function (argv) {
+            // we should get the argv filled with data from the middleware
+            argv._[0].should.equal('foo')
+            argv.hello.should.equal('world')
+            return done()
+          },
+        [function (argv) {
+          argv.hello = 'world'
+        }]
+        )
+        .exitProcess(false) // defaults to true.
+        .argv
+    })
     it('recommends a similar command if no command handler is found', () => {
       const r = checkOutput(() => {
         yargs(['boat'])
