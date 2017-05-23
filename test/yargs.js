@@ -298,11 +298,12 @@ describe('yargs dsl tests', () => {
           function (argv) {
             // we should get the argv filled with data from the middleware
             argv._[0].should.equal('foo')
+            console.log(argv)
             argv.hello.should.equal('world')
             return done()
           },
         [function (argv) {
-          argv.hello = 'world'
+          return {hello: 'world'}
         }]
         )
         .exitProcess(false) // defaults to true.
