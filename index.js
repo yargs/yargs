@@ -24,8 +24,8 @@ function singletonify (inst) {
   Object.keys(inst).forEach(function (key) {
     if (key === 'argv') {
       Argv.__defineGetter__(key, inst.__lookupGetter__(key))
-    } else {
-      Argv[key] = typeof inst[key] === 'function' ? inst[key].bind(inst) : inst[key]
+    } else { // no need to bind these functions; they don't ever use `this`
+      Argv[key] = inst[key]
     }
   })
 }
