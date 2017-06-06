@@ -55,7 +55,6 @@ const yargs = require('yargs') // eslint-disable-line
 * [Advanced Topics](/docs/advanced.md)
   * [Commands](/docs/advanced.md#commands)
   * [Configuration Management](/docs/advanced.md#configuration)
-  * [Plugins](/docs/advanced.md#plugins)
 * [Best Practices](/docs/best-practices.md)
   * [Building a Feature-Rich CLI App](/docs/best-practices.md#example)
 * [Contributing](/contributing.md)
