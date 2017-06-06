@@ -43,7 +43,7 @@ const yargs = require('yargs') // eslint-disable-line
 ## Table of Contents
 
 * [Installation](/docs/installation.md)
-  * [Configuring](/docs/installation.md#configuring)
+  * [Configuration](/docs/installation.md#configuration)
 * [Examples](/docs/examples.md)
 * [API](/docs/api.md) **(you probably want me.)**
 * [Parsing Tricks](/docs/tricks.md)
@@ -53,7 +53,6 @@ const yargs = require('yargs') // eslint-disable-line
   * [Building Plugins](/docs/advanced.md#plugins)
 * [Best Practices](/docs/best-practices.md)
 * [Contributing](/contributing.md)
-
 
 [travis-url]: https://travis-ci.org/yargs/yargs
 [travis-image]: https://img.shields.io/travis/yargs/yargs/master.svg
