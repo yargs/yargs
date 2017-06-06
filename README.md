@@ -42,17 +42,17 @@ const yargs = require('yargs') // eslint-disable-line
 
 ## Table of Contents
 
-1. [Installation](/docs/installation.md)
-  1. [Configuring](/docs/installation.md#configuring)
-2. [Examples](/docs/examples.md)
-3. [API](/docs/api.md)
-4. [Parsing Tricks](/docs/tricks.md)
-5. [Advanced Topics](/docs/advanced.md)
-  1. [Commands](/docs/advanced.md#commands)
-  2. [Configuration Management](/docs/advanced.md#configuration)
-  3. [Building Plugins](/docs/advanced.md#plugins)
-6. [Best Practices](/docs/best-practices.md)
-7. [Contributing](/contributing.md)
+* [Installation](/docs/installation.md)
+  * [Configuring](/docs/installation.md#configuring)
+* [Examples](/docs/examples.md)
+* [API](/docs/api.md)
+* [Parsing Tricks](/docs/tricks.md)
+* [Advanced Topics](/docs/advanced.md)
+  * [Commands](/docs/advanced.md#commands)
+  * [Configuration Management](/docs/advanced.md#configuration)
+  * [Building Plugins](/docs/advanced.md#plugins)
+* [Best Practices](/docs/best-practices.md)
+* [Contributing](/contributing.md)
 
 
 [travis-url]: https://travis-ci.org/yargs/yargs
