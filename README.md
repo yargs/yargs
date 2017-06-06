@@ -14,7 +14,7 @@ Yargs helps you build interactive command line tools, by parsing arguments and g
 
 Yargs gives you:
 
-* commands and (grouped) options (`my-program.js serve --port=5000`),
+* commands and (grouped) options (`my-program.js serve --port=5000`).
 * a dynamically generated help menu based on your arguments.
 * bash-completion shortcuts for commands and options.
 * and tons more.
@@ -45,7 +45,7 @@ const yargs = require('yargs') // eslint-disable-line
 * [Installation](/docs/installation.md)
   * [Configuring](/docs/installation.md#configuring)
 * [Examples](/docs/examples.md)
-* [API](/docs/api.md)
+* [API](/docs/api.md) **(you probably want me.)**
 * [Parsing Tricks](/docs/tricks.md)
 * [Advanced Topics](/docs/advanced.md)
   * [Commands](/docs/advanced.md#commands)

@@ -1,4 +1,4 @@
-parsing tricks
+Parsing tricks
 ==============
 
 stop parsing

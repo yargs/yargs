@@ -1,4 +1,4 @@
-examples
+Examples
 ========
 
 With yargs, the options be just a hash!
