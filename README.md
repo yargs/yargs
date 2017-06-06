@@ -1,5 +1,12 @@
-  yargs
-========
+# yargs
+
+[![Build Status][travis-image]][travis-url]
+[![Coverage Status][coveralls-image]][coveralls-url]
+[![NPM version][npm-image]][npm-url]
+[![Windows Tests][windows-image]][windows-url]
+[![js-standard-style][standard-image]][standard-url]
+[![Conventional Commits][conventional-commits-image]][conventional-commits-url]
+[![Gitter][gitter-image]][gitter-url]
 
 > Yargs be a node.js library fer hearties tryin' ter parse optstrings.
 
@@ -11,14 +18,6 @@ Yargs gives you:
 * a dynamically generated help menu based on your arguments.
 * bash-completion shortcuts for commands and options.
 * and tons more.
-
-[![Build Status][travis-image]][travis-url]
-[![Coverage Status][coveralls-image]][coveralls-url]
-[![NPM version][npm-image]][npm-url]
-[![Windows Tests][windows-image]][windows-url]
-[![js-standard-style][standard-image]][standard-url]
-[![Conventional Commits][conventional-commits-image]][conventional-commits-url]
-[![Gitter][gitter-image]][gitter-url]
 
 _tldr;_
 
