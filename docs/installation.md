@@ -1,5 +1,4 @@
-Installation
-============
+# Installation
 
 With [npm](https://github.com/npm/npm), just do:
 
@@ -14,8 +13,7 @@ To run the tests with npm, just do:
     npm test
 
 <a name="configuration"></a>
-Configuration
-=============
+## Configuration
 
 Using the `yargs` stanza in your `package.json` you can turn on and off
 some of yargs' parsing features:

@@ -1,5 +1,4 @@
-Parsing tricks
-==============
+# Parsing Tricks
 
 stop parsing
 ------------
@@ -29,7 +28,7 @@ one. This way you can just `net.createConnection(argv.port)` and you can add
 numbers out of `argv` with `+` without having that mean concatenation,
 which is super frustrating.
 
-duplicates
+arrays
 ----------
 
 If you specify a flag multiple times it will get turned into an array containing
@@ -38,7 +37,7 @@ all the values in order.
     $ node examples/reflect.js -x 5 -x 8 -x 0
     { _: [], x: [ 5, 8, 0 ], '$0': 'examples/reflect.js' }
 
-dot notation
+objects
 ------------
 
 When you use dots (`.`s) in argument names, an implicit object path is assumed.
@@ -48,11 +47,3 @@ This lets you organize arguments into nested objects.
     { _: [],
       foo: { bar: { baz: 33 }, quux: 5 },
       '$0': 'examples/reflect.js' }
-
-short numbers
--------------
-
-Short numeric `-n5` style arguments work too:
-
-    $ node examples/reflect.js -n123 -m456
-    { _: [], n: 123, m: 456, '$0': 'examples/reflect.js' }
