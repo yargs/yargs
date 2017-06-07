@@ -1,5 +1,7 @@
-Examples
-========
+# Examples
+
+See the [Example Folder][/example] for more demonstrations of
+yargs in the wild. Feel free to create a pull request for more examples!
 
 With yargs, the options be just a hash!
 -------------------------------------------------------------------
