@@ -1,5 +1,6 @@
 # Parsing Tricks
 
+<a name="stop"></a>
 stop parsing
 ------------
 
@@ -11,6 +12,7 @@ Use `--` to stop parsing flags and stuff the remainder into `argv._`.
       b: 2,
       '$0': 'examples/reflect.js' }
 
+<a name="negate"></a>
 negate fields
 -------------
 
@@ -20,6 +22,7 @@ undefined or to override a default you can do `--no-key`.
     $ node examples/reflect.js -a --no-b
     { _: [], a: true, b: false, '$0': 'examples/reflect.js' }
 
+<a name="numbers"></a>
 numbers
 -------
 
@@ -28,6 +31,7 @@ one. This way you can just `net.createConnection(argv.port)` and you can add
 numbers out of `argv` with `+` without having that mean concatenation,
 which is super frustrating.
 
+<a name="arrays"></a>
 arrays
 ----------
 
@@ -37,6 +41,10 @@ all the values in order.
     $ node examples/reflect.js -x 5 -x 8 -x 0
     { _: [], x: [ 5, 8, 0 ], '$0': 'examples/reflect.js' }
 
+You can also configure an option as the [type `array`](/docs/api.md#array), to
+support arrays of the form `-x 5 6 7 8`.
+
+<a name="objects"></a>
 objects
 ------------
 

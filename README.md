@@ -50,13 +50,11 @@ const yargs = require('yargs') // eslint-disable-line
   * [Stop the Parser](/docs/tricks.md#stop)
   * [Negating Boolean Arguments](/docs/tricks.md#negate)
   * [Numbers](/docs/tricks.md#numbers)
-  * [Arrays](/docs/tricks.md#arrays)
-  * [Objects](/docs/tricks.md#objects)
+  * [Arrays](/docs/tricks.md#array)
+  * [Objects](/docs/tricks.md#object)
 * [Advanced Topics](/docs/advanced.md)
   * [Commands](/docs/advanced.md#commands)
-  * [Configuration Management](/docs/advanced.md#configuration)
-* [Best Practices](/docs/best-practices.md)
-  * [Building a Feature-Rich CLI App](/docs/best-practices.md#example)
+  * [Building Configurable CLI Apps](/docs/advanced.md#configuration)
 * [Contributing](/contributing.md)
 
 [travis-url]: https://travis-ci.org/yargs/yargs
