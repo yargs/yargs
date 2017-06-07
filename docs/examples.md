@@ -25,8 +25,6 @@ if (argv.ships > 3 && argv.distance < 53.5) {
     $ ./plunder.js --ships 12 --distance 98.7
     Retreat from the xupptumblers!
 
-![Joe was one optimistic pirate.](https://i.imgur.com/4WFGVJ9.png)
-
 But don't walk the plank just yet! There be more! You can do short options:
 -------------------------------------------------
 

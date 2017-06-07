@@ -19,6 +19,8 @@ Yargs gives you:
 * bash-completion shortcuts for commands and options.
 * and tons more.
 
+![Joe was one optimistic pirate.](https://i.imgur.com/4WFGVJ9.png)
+
 _tldr;_
 
 ```js
