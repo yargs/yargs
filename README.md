@@ -20,7 +20,7 @@ Yargs helps you build interactive command line tools, by parsing arguments and g
 > <img width="400" src="/screen.png">
 
 * bash-completion shortcuts for commands and options.
-* and tons more.
+* and [tons more](/docs/api.md).
 
 ## Installation
 
@@ -28,9 +28,31 @@ Yargs helps you build interactive command line tools, by parsing arguments and g
 npm i yargs --save
 ```
 
-## Example
+## Simple Example
+
+````javascript
+#!/usr/bin/env node
+const argv = require('yargs').argv
+
+if (argv.ships > 3 && argv.distance < 53.5) {
+  console.log('Plunder more riffiwobbles!')
+} else {
+  console.log('Retreat from the xupptumblers!')
+}
+````
+
+```bash
+$ ./plunder.js --ships=4 --distance=22
+Plunder more riffiwobbles!
+
+$ ./plunder.js --ships 12 --distance 98.7
+Retreat from the xupptumblers!
+```
+
+## Complex Example
 
 ```js
+#!/usr/bin/env node
 const yargs = require('yargs') // eslint-disable-line
   .command('serve', 'start the server', (yargs) => {
     yargs.option('port', {
