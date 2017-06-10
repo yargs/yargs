@@ -10,9 +10,7 @@
 
 > Yargs be a node.js library fer hearties tryin' ter parse optstrings.
 
-Yargs helps you build interactive command line tools, by parsing arguments and generating an elegant user interface.
-
-Yargs gives you:
+Yargs helps you build interactive command line tools, by parsing arguments and generating an elegant user interface. It gives you:
 
 * commands and (grouped) options (`my-program.js serve --port=5000`).
 * a dynamically generated help menu based on your arguments.
