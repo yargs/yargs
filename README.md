@@ -14,7 +14,9 @@ Yargs helps you build interactive command line tools, by parsing arguments and g
 
 * commands and (grouped) options (`my-program.js serve --port=5000`).
 * a dynamically generated help menu based on your arguments.
-  <img width="250" src="/screen.png">
+
+<img width="250" src="/screen.png">
+
 * bash-completion shortcuts for commands and options.
 * and tons more.
 
