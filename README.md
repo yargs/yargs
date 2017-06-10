@@ -14,10 +14,11 @@ Yargs helps you build interactive command line tools, by parsing arguments and g
 
 * commands and (grouped) options (`my-program.js serve --port=5000`).
 * a dynamically generated help menu based on your arguments.
+  <img width="250" src="/screen.png">
 * bash-completion shortcuts for commands and options.
 * and tons more.
 
-<img width="250" src="https://raw.githubusercontent.com/yargs/yargs-parser/master/yargs-logo.png">
+<img width="250" src="/yargs-logo.png">
 
 ## Installation
 
@@ -57,9 +58,9 @@ const yargs = require('yargs') // eslint-disable-line
   * [Arrays](/docs/tricks.md#arrays)
   * [Objects](/docs/tricks.md#objects)
 * [Advanced Topics](/docs/advanced.md)
-  * [Commands](/docs/advanced.md#commands)
+  * [Composing Your App Using Commands](/docs/advanced.md#commands)
   * [Building Configurable CLI Apps](/docs/advanced.md#configuration)
-  * [Customizing the Parser](/docs/advanced.md#customizing)
+  * [Customizing Yargs' Parser](/docs/advanced.md#customizing)
 * [Contributing](/contributing.md)
 
 [travis-url]: https://travis-ci.org/yargs/yargs

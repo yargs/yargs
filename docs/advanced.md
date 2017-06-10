@@ -385,7 +385,7 @@ possible to build plugin architectures similar to [Babel's presets](https://babe
 }
 ```
 
-## Customizing the Parser
+## Customizing Yargs' Parser
 
 Not everyone always agrees on how `process.argv` should be interpreted;
 using the `yargs` stanza in your `package.json` you can turn on and off

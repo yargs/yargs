@@ -1,7 +1,7 @@
 API
 =======
 
-You can run yargs without any configuration, and it will do its
+You can run Yargs without any configuration, and it will do its
 best to parse `process.argv`:
 
 ````javascript

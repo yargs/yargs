@@ -1,7 +1,8 @@
 # Examples
 
 See the [Example Folder](/example) for more demonstrations of
-yargs in the wild. Feel free to create a pull request for more examples!
+Yargs in the wild. We would love fixes to old examples and pull
+requests for fancy new examples, [help contribute!](https://github.com/yargs/yargs/blob/master/contributing.md).
 
 With yargs, the options be just a hash!
 -------------------------------------------------------------------
