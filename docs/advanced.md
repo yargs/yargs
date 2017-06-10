@@ -385,6 +385,7 @@ possible to build plugin architectures similar to [Babel's presets](https://babe
 }
 ```
 
+<a name="customizing"></a>
 ## Customizing Yargs' Parser
 
 Not everyone always agrees on how `process.argv` should be interpreted;
