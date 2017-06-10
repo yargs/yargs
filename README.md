@@ -10,17 +10,17 @@
 
 > Yargs be a node.js library fer hearties tryin' ter parse optstrings.
 
+<img width="250" src="/yargs-logo.png">
+
 Yargs helps you build interactive command line tools, by parsing arguments and generating an elegant user interface. It gives you:
 
 * commands and (grouped) options (`my-program.js serve --port=5000`).
 * a dynamically generated help menu based on your arguments.
 
-<img width="250" src="/screen.png">
+> <img width="400" src="/screen.png">
 
 * bash-completion shortcuts for commands and options.
 * and tons more.
-
-<img width="250" src="/yargs-logo.png">
 
 ## Installation
 
