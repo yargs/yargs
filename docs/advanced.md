@@ -3,7 +3,7 @@
 <a name="commands"></a>
 ## Commands
 
-Yargs provides a powerful set of tools for composing modular command-driven applications.
+Yargs provides a powerful set of tools for composing modular command-driven-applications.
 In this section we cover some of the advanced features available in this API:
 
 ### Default Commands
@@ -319,11 +319,11 @@ exports.handler = function (argv) {
 ## Building Configurable CLI Apps
 
 One of the goals of yargs has been to examine practices common in the
-JavaScript CLI ecosystem, and to make to make it easy to apply these
-conventions in your own application.
+JavaScript CLI community, and to make to make it easy to apply these
+conventions to your own application.
 
 One useful set of conventions that has emerged is around how applications
-allow users to extend on their functionality.
+allow users to extend and customize their functionality.
 
 ### .rc files
 
@@ -344,3 +344,64 @@ const argv = require('yargs')
 ```
 
 ### Providing Configuration in Your package.json
+
+Another common practice is to allow users to provide configuration via
+a reserved field in the package.json. You can configure [nyc](https://github.com/istanbuljs/nyc#configuring-nyc) or [babel](https://babeljs.io/docs/usage/babelrc/#lookup-behavior), for instance,
+using the `nyc` and `babel` key respectively:
+
+```json
+{
+  "nyc": {
+    "watermarks": {
+      "lines": [80, 95],
+      "functions": [80, 95],
+      "branches": [80, 95],
+      "statements": [80, 95]
+    }
+  }
+}
+```
+
+Yargs gives you this functionality using the [`pkgConf()`](/docs/api.md#config)
+method:
+
+```js
+const argv = require('yargs')
+  .pkgConf('nyc')
+  .argv
+```
+
+### Creating a Plugin Architecture
+
+Both [`pkgConf()`](/docs/api.md#config) and [`config()`](/docs/api.md#config) support
+the `extends` keyword. `extends` allows you to inherit configuration from [other npm modules](https://www.npmjs.com/package/@istanbuljs/nyc-config-babel), making it
+possible to build plugin architectures similar to [Babel's presets](https://babeljs.io/docs/plugins/#presets):
+
+```json
+{
+  "nyc": {
+    "extends": "@istanbuljs/nyc-config-babel"
+  }
+}
+```
+
+## Customizing the Parser
+
+Not everyone always agrees on how `process.argv` should be interpreted;
+using the `yargs` stanza in your `package.json` you can turn on and off
+some of yargs' parsing features:
+
+```json
+{
+  "yargs": {
+    "short-option-groups": true,
+    "camel-case-expansion": true,
+    "dot-notation": true,
+    "parse-numbers": true,
+    "boolean-negation": true
+  }
+}
+```
+
+See the [yargs-parser](https://github.com/yargs/yargs-parser#configuration) module
+for detailed documentation of this feature.

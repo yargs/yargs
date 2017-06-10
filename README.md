@@ -19,9 +19,15 @@ Yargs gives you:
 * bash-completion shortcuts for commands and options.
 * and tons more.
 
-![Joe was one optimistic pirate.](https://i.imgur.com/4WFGVJ9.png)
+<img width="250" src="https://raw.githubusercontent.com/yargs/yargs-parser/master/yargs-logo.png">
 
-_tldr;_
+## Installation
+
+```bash
+npm i yargs --save
+```
+
+## Example
 
 ```js
 const yargs = require('yargs') // eslint-disable-line
@@ -44,19 +50,18 @@ const yargs = require('yargs') // eslint-disable-line
 
 ## Table of Contents
 
-* [Installation](/docs/installation.md)
-  * [Configuration](/docs/installation.md#configuration)
+* [Yargs' API](/docs/api.md)
 * [Examples](/docs/examples.md)
-* [API](/docs/api.md) **(you probably want me.)**
 * [Parsing Tricks](/docs/tricks.md)
   * [Stop the Parser](/docs/tricks.md#stop)
   * [Negating Boolean Arguments](/docs/tricks.md#negate)
   * [Numbers](/docs/tricks.md#numbers)
-  * [Arrays](/docs/tricks.md#array)
-  * [Objects](/docs/tricks.md#object)
+  * [Arrays](/docs/tricks.md#arrays)
+  * [Objects](/docs/tricks.md#objects)
 * [Advanced Topics](/docs/advanced.md)
   * [Commands](/docs/advanced.md#commands)
   * [Building Configurable CLI Apps](/docs/advanced.md#configuration)
+  * [Customizing the Parser](/docs/advanced.md#customizing)
 * [Contributing](/contributing.md)
 
 [travis-url]: https://travis-ci.org/yargs/yargs

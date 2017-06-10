@@ -1,7 +1,7 @@
 # Parsing Tricks
 
 <a name="stop"></a>
-stop parsing
+Stop Parsing
 ------------
 
 Use `--` to stop parsing flags and stuff the remainder into `argv._`.
@@ -13,7 +13,7 @@ Use `--` to stop parsing flags and stuff the remainder into `argv._`.
       '$0': 'examples/reflect.js' }
 
 <a name="negate"></a>
-negate fields
+Negating Boolean Arguments
 -------------
 
 If you want to explicitly set a field to false instead of just leaving it
@@ -23,7 +23,7 @@ undefined or to override a default you can do `--no-key`.
     { _: [], a: true, b: false, '$0': 'examples/reflect.js' }
 
 <a name="numbers"></a>
-numbers
+Numbers
 -------
 
 Every argument that looks like a number (`!isNaN(Number(arg))`) is converted to
@@ -32,7 +32,7 @@ numbers out of `argv` with `+` without having that mean concatenation,
 which is super frustrating.
 
 <a name="arrays"></a>
-arrays
+Arrays
 ----------
 
 If you specify a flag multiple times it will get turned into an array containing
@@ -45,7 +45,7 @@ You can also configure an option as the [type `array`](/docs/api.md#array), to
 support arrays of the form `-x 5 6 7 8`.
 
 <a name="objects"></a>
-objects
+Objects
 ------------
 
 When you use dots (`.`s) in argument names, an implicit object path is assumed.

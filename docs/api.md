@@ -1054,6 +1054,8 @@ parser.parse(bot.userText, function (err, argv, output) {
 
 ***Note:*** Providing a callback to `parse()` disables the [`exitProcess` setting](#exitprocess) until after the callback is invoked.
 
+
+<a name="pkg-conf"></a>
 .pkgConf(key, [cwd])
 ------------
 
