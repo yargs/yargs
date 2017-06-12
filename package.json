@@ -38,7 +38,7 @@
     "nyc": "^10.3.0",
     "rimraf": "^2.5.0",
     "standard": "^8.6.0",
-    "standard-version": "^4.0.0",
+    "standard-version": "^4.2.0",
     "which": "^1.2.9",
     "yargs-test-extends": "^1.0.1"
   },
