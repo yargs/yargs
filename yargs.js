@@ -594,7 +594,7 @@ function Yargs (processArgs, cwd, parentRequire) {
         self.normalize(key)
       }
 
-      if ('choices' in opt) {
+      if ('choices' in opt && (opt.demandOption || (!('demandOption' in opt) && (opt.describe || opt.description || opt.desc)))) {
         self.choices(key, opt.choices)
       }
 

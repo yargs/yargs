@@ -584,6 +584,90 @@ describe('validation tests', function () {
         })
         .argv
     })
+
+    // addresses: https://github.com/yargs/yargs/issues/849
+    it('allows demandOption with value true in options shorthand for hidden option', function (done) {
+      yargs('one -c 1')
+        .command('one', 'level one', function (yargs) {
+          yargs
+            .options({
+              'c': {
+                demandOption: true,
+                choices: ['1', '2']
+              }
+            })
+        }, function (argv) {
+          expect.fail()
+        })
+        .fail(function (msg) {
+          msg.should.equal('Invalid values:\n  Argument: c, Given: 1, Choices: "1", "2"')
+          return done()
+        })
+        .argv
+    })
+
+    // addresses: https://github.com/yargs/yargs/issues/849
+    it('allows demandOption with value false in options shorthand for hidden option', function () {
+      yargs('one')
+        .command('one', 'level one', function (yargs) {
+          yargs
+            .options({
+              'c': {
+                demandOption: false,
+                choices: ['1', '2']
+              }
+            })
+        }, function (argv) {
+          argv._[0].should.equal('one')
+        })
+        .fail(function (msg) {
+          expect.fail()
+        })
+        .argv
+    })
+
+    // addresses: https://github.com/yargs/yargs/issues/849
+    it('allows demandOption with value true in options shorthand for non-hidden option', function (done) {
+      yargs('one -c 1')
+        .command('one', 'level one', function (yargs) {
+          yargs
+            .options({
+              'c': {
+                describe: 'C',
+                demandOption: true,
+                choices: ['1', '2']
+              }
+            })
+        }, function (argv) {
+          expect.fail()
+        })
+        .fail(function (msg) {
+          msg.should.equal('Invalid values:\n  Argument: c, Given: 1, Choices: "1", "2"')
+          return done()
+        })
+        .argv
+    })
+
+    // addresses: https://github.com/yargs/yargs/issues/849
+    it('allows demandOption with value false in options shorthand for non-hidden option', function () {
+      yargs('one')
+        .command('one', 'level one', function (yargs) {
+          yargs
+            .options({
+              'c': {
+                describe: 'C',
+                demandOption: false,
+                choices: ['1', '2']
+              }
+            })
+        }, function (argv) {
+          argv._[0].should.equal('one')
+        })
+        .fail(function (msg) {
+          expect.fail()
+        })
+        .argv
+    })
   })
 
   describe('demandCommand', function () {
