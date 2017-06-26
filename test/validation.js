@@ -158,6 +158,40 @@ describe('validation tests', function () {
         .argv
     })
 
+    it('should not fail if no conflicting arguments are provided and the .command()' +
+     'syntax is used (first conflicting option specified)', function () {
+      yargs(['command', '-f', '-c'])
+            .command('command')
+            .option('f', {
+              describe: 'a foo'
+            })
+            .option('b', {
+              describe: 'a bar'
+            })
+            .conflicts('f', 'b')
+            .fail(function (msg) {
+              expect.fail()
+            })
+            .argv
+    })
+
+    it('should not fail if no conflicting arguments are provided and the .command()' +
+     'syntax is used (second conflicting option specified)', function () {
+      yargs(['command', '-b', '-c'])
+            .command('command')
+            .option('f', {
+              describe: 'a foo'
+            })
+            .option('b', {
+              describe: 'a bar'
+            })
+            .conflicts('f', 'b')
+            .fail(function (msg) {
+              expect.fail()
+            })
+            .argv
+    })
+
     it('allows an object to be provided defining conflicting option pairs', function (done) {
       yargs(['-t', '-s'])
         .conflicts({
