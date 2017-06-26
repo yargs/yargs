@@ -53,7 +53,7 @@ Retreat from the xupptumblers!
 
 ```js
 #!/usr/bin/env node
-const yargs = require('yargs') // eslint-disable-line
+require('yargs') // eslint-disable-line
   .command('serve', 'start the server', (yargs) => {
     yargs.option('port', {
       describe: 'port to bind on',
