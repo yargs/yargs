@@ -640,8 +640,29 @@ describe('validation tests', function () {
     })
 
     // addresses: https://github.com/yargs/yargs/issues/849
-    it('allows demandOption with value true in options shorthand for hidden option', function (done) {
-      yargs('one -c 1')
+    it('allows demandOption with value true in options shorthand for hidden option', function () {
+      yargs('one -a 10 marsupial')
+        .command('one', 'level one', function (yargs) {
+          yargs
+            .options({
+              'a': {
+                demandOption: true,
+                choices: [10, 20]
+              }
+            })
+        }, function (argv) {
+          argv._[0].should.equal('one')
+          argv.a.should.equal(10)
+        })
+        .fail(function (msg) {
+          expect.fail()
+        })
+        .argv
+    })
+
+    // addresses: https://github.com/yargs/yargs/issues/849
+    it('should fail demandOption with value true in options shorthand for hidden option', function (done) {
+      yargs('one -a 10 marsupial')
         .command('one', 'level one', function (yargs) {
           yargs
             .options({
@@ -654,7 +675,7 @@ describe('validation tests', function () {
           expect.fail()
         })
         .fail(function (msg) {
-          msg.should.equal('Invalid values:\n  Argument: c, Given: 1, Choices: "1", "2"')
+          msg.should.equal('Missing required argument: c')
           return done()
         })
         .argv
@@ -666,9 +687,9 @@ describe('validation tests', function () {
         .command('one', 'level one', function (yargs) {
           yargs
             .options({
-              'c': {
+              'a': {
                 demandOption: false,
-                choices: ['1', '2']
+                choices: [10, 20]
               }
             })
         }, function (argv) {
@@ -681,8 +702,30 @@ describe('validation tests', function () {
     })
 
     // addresses: https://github.com/yargs/yargs/issues/849
-    it('allows demandOption with value true in options shorthand for non-hidden option', function (done) {
-      yargs('one -c 1')
+    it('allows demandOption with value true in options shorthand for non-hidden option', function () {
+      yargs('one -a 10 marsupial')
+        .command('one', 'level one', function (yargs) {
+          yargs
+            .options({
+              'a': {
+                describe: 'A',
+                demandOption: true,
+                choices: [10, 20]
+              }
+            })
+        }, function (argv) {
+          argv._[0].should.equal('one')
+          argv.a.should.equal(10)
+        })
+        .fail(function (msg) {
+          expect.fail()
+        })
+        .argv
+    })
+
+    // addresses: https://github.com/yargs/yargs/issues/849
+    it('should fail demandOption with value true in options shorthand for non-hidden option', function (done) {
+      yargs('one -a 10 marsupial')
         .command('one', 'level one', function (yargs) {
           yargs
             .options({
@@ -696,7 +739,7 @@ describe('validation tests', function () {
           expect.fail()
         })
         .fail(function (msg) {
-          msg.should.equal('Invalid values:\n  Argument: c, Given: 1, Choices: "1", "2"')
+          msg.should.equal('Missing required argument: c')
           return done()
         })
         .argv
@@ -708,10 +751,10 @@ describe('validation tests', function () {
         .command('one', 'level one', function (yargs) {
           yargs
             .options({
-              'c': {
-                describe: 'C',
+              'a': {
+                describe: 'A',
                 demandOption: false,
-                choices: ['1', '2']
+                choices: [10, 20]
               }
             })
         }, function (argv) {
