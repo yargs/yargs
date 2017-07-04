@@ -158,38 +158,36 @@ describe('validation tests', function () {
         .argv
     })
 
-    it('should not fail if no conflicting arguments are provided and the .command()' +
-     'syntax is used (first conflicting option specified)', function () {
+    it('should not fail if argument with conflict is provided, but not the argument it conflicts with', function () {
       yargs(['command', '-f', '-c'])
-            .command('command')
-            .option('f', {
-              describe: 'a foo'
-            })
-            .option('b', {
-              describe: 'a bar'
-            })
-            .conflicts('f', 'b')
-            .fail(function (msg) {
-              expect.fail()
-            })
-            .argv
+        .command('command')
+        .option('f', {
+          describe: 'a foo'
+        })
+        .option('b', {
+          describe: 'a bar'
+        })
+        .conflicts('f', 'b')
+        .fail(function (msg) {
+          expect.fail()
+        })
+        .argv
     })
 
-    it('should not fail if no conflicting arguments are provided and the .command()' +
-     'syntax is used (second conflicting option specified)', function () {
+    it('should not fail if conflicting argument is provided, without argument with conflict', function () {
       yargs(['command', '-b', '-c'])
-            .command('command')
-            .option('f', {
-              describe: 'a foo'
-            })
-            .option('b', {
-              describe: 'a bar'
-            })
-            .conflicts('f', 'b')
-            .fail(function (msg) {
-              expect.fail()
-            })
-            .argv
+          .command('command')
+          .option('f', {
+            describe: 'a foo'
+          })
+          .option('b', {
+            describe: 'a bar'
+          })
+          .conflicts('f', 'b')
+          .fail(function (msg) {
+            expect.fail()
+          })
+          .argv
     })
 
     it('allows an object to be provided defining conflicting option pairs', function (done) {
@@ -229,6 +227,28 @@ describe('validation tests', function () {
             return done()
           })
           .argv
+    })
+
+    it('should fail if alias of conflicting argument is provided', function (done) {
+      yargs(['-f', '--batman=99'])
+        .conflicts('f', 'b')
+        .alias('b', 'batman')
+        .fail(function (msg) {
+          msg.should.equal('Arguments f and b are mutually exclusive')
+          return done()
+        })
+        .argv
+    })
+
+    it('should fail if alias of argument with conflict is provided', function (done) {
+      yargs(['--foo', '-b'])
+        .conflicts('f', 'b')
+        .alias('foo', 'f')
+        .fail(function (msg) {
+          msg.should.equal('Arguments f and b are mutually exclusive')
+          return done()
+        })
+        .argv
     })
   })
 
