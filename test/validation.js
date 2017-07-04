@@ -403,6 +403,88 @@ describe('validation tests', function () {
         })
         .argv
     })
+
+    // addresses: https://github.com/yargs/yargs/issues/849
+    it('succeeds when demandOption is true and valid choice is provided', function (done) {
+      yargs('one -a 10 marsupial')
+        .command('one', 'level one', function (yargs) {
+          yargs
+            .options({
+              'a': {
+                demandOption: true,
+                choices: [10, 20]
+              }
+            })
+        }, function (argv) {
+          argv._[0].should.equal('one')
+          argv.a.should.equal(10)
+          return done()
+        })
+        .fail(function (msg) {
+          expect.fail()
+        })
+        .argv
+    })
+
+    // addresses: https://github.com/yargs/yargs/issues/849
+    it('fails when demandOption is true and choice is not provided', function (done) {
+      yargs('one -a 10 marsupial')
+        .command('one', 'level one', function (yargs) {
+          yargs
+            .options({
+              'c': {
+                choices: ['1', '2']
+              }
+            })
+            .demandOption('c')
+        }, function (argv) {
+          expect.fail()
+        })
+        .fail(function (msg) {
+          msg.should.equal('Missing required argument: c')
+          return done()
+        })
+        .argv
+    })
+
+    // addresses: https://github.com/yargs/yargs/issues/849
+    it('succeeds when demandOption is false and no choice is provided', function () {
+      yargs('one')
+        .command('one', 'level one', function (yargs) {
+          yargs
+            .options({
+              'a': {
+                demandOption: false,
+                choices: [10, 20]
+              }
+            })
+        }, function (argv) {
+          argv._[0].should.equal('one')
+        })
+        .fail(function (msg) {
+          expect.fail()
+        })
+        .argv
+    })
+
+    // addresses: https://github.com/yargs/yargs/issues/849
+    it('succeeds when demandOption is not provided and no choice is provided', function () {
+      yargs('one')
+        .command('one', 'level one', function (yargs) {
+          yargs
+            .options({
+              'a': {
+                choices: [10, 20]
+              }
+            })
+        }, function (argv) {
+          argv._[0].should.equal('one')
+        })
+        .fail(function (msg) {
+          expect.fail()
+        })
+        .argv
+    })
   })
 
   describe('config', function () {
@@ -581,133 +663,6 @@ describe('validation tests', function () {
         .fail(function (msg) {
           msg.should.equal('Missing required argument: c')
           return done()
-        })
-        .argv
-    })
-
-    // addresses: https://github.com/yargs/yargs/issues/849
-    it('allows demandOption with value true in options shorthand for hidden option', function () {
-      yargs('one -a 10 marsupial')
-        .command('one', 'level one', function (yargs) {
-          yargs
-            .options({
-              'a': {
-                demandOption: true,
-                choices: [10, 20]
-              }
-            })
-        }, function (argv) {
-          argv._[0].should.equal('one')
-          argv.a.should.equal(10)
-        })
-        .fail(function (msg) {
-          expect.fail()
-        })
-        .argv
-    })
-
-    // addresses: https://github.com/yargs/yargs/issues/849
-    it('should fail demandOption with value true in options shorthand for hidden option', function (done) {
-      yargs('one -a 10 marsupial')
-        .command('one', 'level one', function (yargs) {
-          yargs
-            .options({
-              'c': {
-                demandOption: true,
-                choices: ['1', '2']
-              }
-            })
-        }, function (argv) {
-          expect.fail()
-        })
-        .fail(function (msg) {
-          msg.should.equal('Missing required argument: c')
-          return done()
-        })
-        .argv
-    })
-
-    // addresses: https://github.com/yargs/yargs/issues/849
-    it('allows demandOption with value false in options shorthand for hidden option', function () {
-      yargs('one')
-        .command('one', 'level one', function (yargs) {
-          yargs
-            .options({
-              'a': {
-                demandOption: false,
-                choices: [10, 20]
-              }
-            })
-        }, function (argv) {
-          argv._[0].should.equal('one')
-        })
-        .fail(function (msg) {
-          expect.fail()
-        })
-        .argv
-    })
-
-    // addresses: https://github.com/yargs/yargs/issues/849
-    it('allows demandOption with value true in options shorthand for non-hidden option', function () {
-      yargs('one -a 10 marsupial')
-        .command('one', 'level one', function (yargs) {
-          yargs
-            .options({
-              'a': {
-                describe: 'A',
-                demandOption: true,
-                choices: [10, 20]
-              }
-            })
-        }, function (argv) {
-          argv._[0].should.equal('one')
-          argv.a.should.equal(10)
-        })
-        .fail(function (msg) {
-          expect.fail()
-        })
-        .argv
-    })
-
-    // addresses: https://github.com/yargs/yargs/issues/849
-    it('should fail demandOption with value true in options shorthand for non-hidden option', function (done) {
-      yargs('one -a 10 marsupial')
-        .command('one', 'level one', function (yargs) {
-          yargs
-            .options({
-              'c': {
-                describe: 'C',
-                demandOption: true,
-                choices: ['1', '2']
-              }
-            })
-        }, function (argv) {
-          expect.fail()
-        })
-        .fail(function (msg) {
-          msg.should.equal('Missing required argument: c')
-          return done()
-        })
-        .argv
-    })
-
-    // addresses: https://github.com/yargs/yargs/issues/849
-    it('allows demandOption with value false in options shorthand for non-hidden option', function () {
-      yargs('one')
-        .command('one', 'level one', function (yargs) {
-          yargs
-            .options({
-              'a': {
-                describe: 'A',
-                demandOption: false,
-                choices: [10, 20]
-              }
-            })
-        }, function (argv) {
-          argv._[0].should.equal('one')
-        })
-        .fail(function (msg) {
-          expect.fail()
         })
         .argv
     })
