@@ -247,7 +247,7 @@ yargs
   .argv
 ```
 
-Please see [Advanced Topics: Commands](/docs/advanced.md#commands) for a thorough
+Please see [Advanced Topics: Commands](https://github.com/yargs/yargs/blob/master/docs/advanced.md#commands) for a thorough
 discussion of the advanced features exposed in the Command API.
 
 .completion([cmd], [description], [fn])
