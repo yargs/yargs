@@ -77,7 +77,8 @@ describe('Completion', function () {
                 describe: 'bar option'
               }
             })
-            .help('help')
+            .help(true)
+            .version(false)
           })
           .completion()
           .argv
@@ -91,6 +92,8 @@ describe('Completion', function () {
     it('completes options for the correct command', function () {
       var r = checkUsage(function () {
         return yargs(['./completion', '--get-yargs-completions', 'cmd2', '--o'])
+          .help(false)
+          .version(false)
           .command('cmd1', 'first command', function (subYargs) {
             subYargs.options({
               opt1: {
@@ -129,6 +132,8 @@ describe('Completion', function () {
     it('works if command has no options', function () {
       var r = checkUsage(function () {
         return yargs(['./completion', '--get-yargs-completions', 'foo', '--b'])
+          .help(false)
+          .version(false)
           .command('foo', 'foo command', function (subYargs) {
             subYargs.completion().argv
           })

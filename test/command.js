@@ -501,7 +501,7 @@ describe('Command', function () {
   describe('commandDir', function () {
     it('supports relative dirs', function () {
       var r = checkOutput(function () {
-        return yargs('--help').help().wrap(null)
+        return yargs('--help').wrap(null)
           .commandDir('fixtures/cmddir')
           .argv
       })
@@ -512,14 +512,15 @@ describe('Command', function () {
         'Commands:',
         '  dream [command] [opts]  Go to sleep and dream',
         'Options:',
-        '  --help  Show help  [boolean]',
+        '  --help     Show help  [boolean]',
+        '  --version  Show version number  [boolean]',
         ''
       ])
     })
 
     it('supports nested subcommands', function () {
       var r = checkOutput(function () {
-        return yargs('dream --help').help().wrap(null)
+        return yargs('dream --help').wrap(null)
           .commandDir('fixtures/cmddir')
           .argv
       }, [ './command' ])
@@ -533,6 +534,7 @@ describe('Command', function () {
         '  within-a-dream [command] [opts]  Dream within a dream',
         'Options:',
         '  --help     Show help  [boolean]',
+        '  --version  Show version number  [boolean]',
         '  --shared   Is the dream shared with others?  [boolean]',
         '  --extract  Attempt extraction?  [boolean]',
         ''
@@ -541,7 +543,7 @@ describe('Command', function () {
 
     it('supports a "recurse" boolean option', function () {
       var r = checkOutput(function () {
-        return yargs('--help').help().wrap(null)
+        return yargs('--help').wrap(null)
           .commandDir('fixtures/cmddir', { recurse: true })
           .argv
       })
@@ -555,7 +557,8 @@ describe('Command', function () {
         '  within-a-dream [command] [opts]  Dream within a dream',
         '  dream [command] [opts]           Go to sleep and dream',
         'Options:',
-        '  --help  Show help  [boolean]',
+        '  --help     Show help  [boolean]',
+        '  --version  Show version number  [boolean]',
         ''
       ])
     })
@@ -565,7 +568,7 @@ describe('Command', function () {
       var pathToFile
       var filename
       var r = checkOutput(function () {
-        return yargs('--help').help().wrap(null)
+        return yargs('--help').wrap(null)
           .commandDir('fixtures/cmddir', {
             visit: function (_commandObject, _pathToFile, _filename) {
               commandObject = _commandObject
@@ -587,14 +590,15 @@ describe('Command', function () {
       r.should.have.property('logs')
       r.logs.join('\n').split(/\n+/).should.deep.equal([
         'Options:',
-        '  --help  Show help  [boolean]',
+        '  --help     Show help  [boolean]',
+        '  --version  Show version number  [boolean]',
         ''
       ])
     })
 
     it('detects and ignores cyclic dir references', function () {
       var r = checkOutput(function () {
-        return yargs('cyclic --help').help().wrap(null)
+        return yargs('cyclic --help').wrap(null)
           .commandDir('fixtures/cmddir_cyclic')
           .argv
       }, [ './command' ])
@@ -604,14 +608,15 @@ describe('Command', function () {
       r.logs.join('\n').split(/\n+/).should.deep.equal([
         './command cyclic',
         'Options:',
-        '  --help  Show help  [boolean]',
+        '  --help     Show help  [boolean]',
+        '  --version  Show version number  [boolean]',
         ''
       ])
     })
 
     it('derives \'command\' string from filename when not exported', function () {
       var r = checkOutput(function () {
-        return yargs('--help').help().wrap(null)
+        return yargs('--help').wrap(null)
           .commandDir('fixtures/cmddir_noname')
           .argv
       })
@@ -622,7 +627,8 @@ describe('Command', function () {
         'Commands:',
         '  nameless  Command name derived from module filename',
         'Options:',
-        '  --help  Show help  [boolean]',
+        '  --help     Show help  [boolean]',
+        '  --version  Show version number  [boolean]',
         ''
       ])
     })
@@ -648,35 +654,35 @@ describe('Command', function () {
 
       var helpCmd = checkOutput(function () {
         return yargs('help cmd')
-          .help().wrap(null)
+          .wrap(null)
           .command(cmd)
           .argv
       }, [ './command' ])
 
       var cmdHelp = checkOutput(function () {
         return yargs('cmd help')
-          .help().wrap(null)
+          .wrap(null)
           .command(cmd)
           .argv
       }, [ './command' ])
 
       var helpCmdSub = checkOutput(function () {
         return yargs('help cmd sub')
-          .help().wrap(null)
+          .wrap(null)
           .command(cmd)
           .argv
       }, [ './command' ])
 
       var cmdHelpSub = checkOutput(function () {
         return yargs('cmd help sub')
-          .help().wrap(null)
+          .wrap(null)
           .command(cmd)
           .argv
       }, [ './command' ])
 
       var cmdSubHelp = checkOutput(function () {
         return yargs('cmd sub help')
-          .help().wrap(null)
+          .wrap(null)
           .command(cmd)
           .argv
       }, [ './command' ])
@@ -686,14 +692,16 @@ describe('Command', function () {
         'Commands:',
         '  sub  Run the subcommand',
         'Options:',
-        '  --help  Show help  [boolean]',
+        '  --help     Show help  [boolean]',
+        '  --version  Show version number  [boolean]',
         ''
       ]
 
       var expectedSub = [
         './command cmd sub',
         'Options:',
-        '  --help  Show help  [boolean]',
+        '  --help     Show help  [boolean]',
+        '  --version  Show version number  [boolean]',
         ''
       ]
 
@@ -765,7 +773,6 @@ describe('Command', function () {
       .command('foo', 'the foo command', {}, function (argv) {
         counter++
       })
-      .help()
     y.parse(['foo'], function () {})
     y.parse(['foo'], function () {
       counter.should.equal(2)
@@ -1158,7 +1165,6 @@ describe('Command', function () {
         yargs()
           .command('command [snuh]', 'a command')
           .describe('foo', 'an awesome argument')
-          .help()
           .parse('command --help', function (err, argv, output) {
             if (err) return done(err)
             output.should.not.match(/Commands:/)
@@ -1204,7 +1210,6 @@ describe('Command', function () {
           .group('snuh', 'Bad Variable Names:')
           .describe('foo', 'foo option')
           .describe('snuh', 'snuh positional')
-          .help()
           .parse('command --help', function (err, argv, output) {
             if (err) return done(err)
             output.should.match(/Bad Variable Names:\W*--foo/)
