@@ -30,6 +30,8 @@ describe('usage tests', function () {
         r.errors.join('\n').split(/\n+/).should.deep.equal([
           'Usage: ./usage -x NUM -y NUM',
           'Options:',
+          '  --help     Show help  [boolean]',
+          '  --version  Show version number  [boolean]',
           '  -x  [required]',
           '  -y  [required]',
           'Missing required argument: y'
@@ -53,6 +55,8 @@ describe('usage tests', function () {
         r.errors.join('\n').split(/\n+/).should.deep.equal([
           'Usage: ./usage -w NUM -m NUM',
           'Options:',
+          '  --help     Show help  [boolean]',
+          '  --version  Show version number  [boolean]',
           '  -w  [required]',
           '  -m  [required]',
           'Missing required argument: m'
@@ -76,6 +80,8 @@ describe('usage tests', function () {
         r.errors.join('\n').split(/\n+/).should.deep.equal([
           'Usage: ./usage -w NUM -m NUM',
           'Options:',
+          '  --help     Show help  [boolean]',
+          '  --version  Show version number  [boolean]',
           '  -w  [required]',
           '  -m  [required]',
           'Not enough non-option arguments: got 0, need at least 1'
@@ -117,6 +123,8 @@ describe('usage tests', function () {
           r.errors.join('\n').split(/\n+/).should.deep.equal([
             'Usage: ./usage -x NUM -y NUM',
             'Options:',
+            '  --help     Show help  [boolean]',
+            '  --version  Show version number  [boolean]',
             '  -x  [required]',
             '  -y  [required]',
             'Missing required argument: y'
@@ -139,6 +147,8 @@ describe('usage tests', function () {
           r.errors.join('\n').split(/\n+/).should.deep.equal([
             'Usage: ./usage -w NUM -m NUM',
             'Options:',
+            '  --help     Show help  [boolean]',
+            '  --version  Show version number  [boolean]',
             '  -w  [required]',
             '  -m  [required]',
             'Missing required argument: m'
@@ -163,6 +173,8 @@ describe('usage tests', function () {
         r.errors.join('\n').split(/\n+/).should.deep.equal([
           'Usage: ./usage -w NUM -m NUM',
           'Options:',
+          '  --help     Show help  [boolean]',
+          '  --version  Show version number  [boolean]',
           '  -w  [required]',
           '  -m  [required]',
           'Not enough non-option arguments: got 0, need at least 1'
@@ -185,6 +197,8 @@ describe('usage tests', function () {
       r.errors.join('\n').split(/\n+/).should.deep.equal([
         'Usage: ./usage -x NUM -y NUM',
         'Options:',
+        '  --help     Show help  [boolean]',
+        '  --version  Show version number  [boolean]',
         '  -x  [required]',
         '  -y  [required]',
         'Missing required arguments: x, y',
@@ -222,6 +236,9 @@ describe('usage tests', function () {
 
       r.errors.join('\n').split(/\n+/).should.deep.equal([
         'Usage: foo',
+        'Options:',
+        '  --help     Show help  [boolean]',
+        '  --version  Show version number  [boolean]',
         ''
       ])
     })
@@ -251,6 +268,9 @@ describe('usage tests', function () {
 
         r.errors.join('\n').split(/\n+/).should.deep.equal([
           'Usage: foo',
+          'Options:',
+          '  --help     Show help  [boolean]',
+          '  --version  Show version number  [boolean]',
           'Too many non-option arguments: got 4, maximum of 3'
         ])
       })
@@ -266,6 +286,9 @@ describe('usage tests', function () {
 
         r.errors.join('\n').split(/\n+/).should.deep.equal([
           'Usage: foo',
+          'Options:',
+          '  --help     Show help  [boolean]',
+          '  --version  Show version number  [boolean]',
           'Not enough non-option arguments: got 1, need at least 2'
         ])
       })
@@ -281,6 +304,9 @@ describe('usage tests', function () {
 
         r.errors.join('\n').split(/\n+/).should.deep.equal([
           'Usage: foo',
+          'Options:',
+          '  --help     Show help  [boolean]',
+          '  --version  Show version number  [boolean]',
           'pork chop sandwiches'
         ])
       })
@@ -336,6 +362,9 @@ describe('usage tests', function () {
     r.result.should.have.property('_').with.length(0)
     r.errors.join('\n').split(/\n+/).should.deep.equal([
       'Usage: ./usage -x NUM -y NUM',
+      'Options:',
+      '  --help     Show help  [boolean]',
+      '  --version  Show version number  [boolean]',
       'You forgot about -y'
     ])
     r.should.have.property('logs').with.length(0)
@@ -362,6 +391,9 @@ describe('usage tests', function () {
     r.should.have.property('errors')
     r.errors.join('\n').split(/\n+/).should.deep.equal([
       'Usage: ./usage -x NUM -y NUM',
+      'Options:',
+      '  --help     Show help  [boolean]',
+      '  --version  Show version number  [boolean]',
       'You forgot about -y'
     ])
   })
@@ -405,6 +437,9 @@ describe('usage tests', function () {
     r.should.have.property('errors')
     r.errors.join('\n').split(/\n+/).join('\n').should.equal(
       'Usage: ./usage -x NUM -y NUM\n' +
+      'Options:\n' +
+      '  --help     Show help  [boolean]\n' +
+      '  --version  Show version number  [boolean]\n' +
       'Argument check failed: ' + checker.toString()
     )
   })
@@ -429,6 +464,9 @@ describe('usage tests', function () {
         })
         r.errors.join('\n').split(/\n+/).should.deep.equal([
           'Usage: ./usage -x NUM -y NUM',
+          'Options:',
+          '  --help     Show help  [boolean]',
+          '  --version  Show version number  [boolean]',
           'You forgot about -y'
         ])
         r.should.have.property('logs').with.length(0)
@@ -562,6 +600,9 @@ describe('usage tests', function () {
     r.should.have.property('errors')
     r.errors.join('\n').split(/\n+/).should.deep.equal([
       'Usage: ./usage [x] [y] [z] {OPTIONS}',
+      'Options:',
+      '  --help     Show help  [boolean]',
+      '  --version  Show version number  [boolean]',
       'Not enough non-option arguments: got 2, need at least 3'
     ])
   })
@@ -582,6 +623,9 @@ describe('usage tests', function () {
     r.should.have.property('errors')
     r.errors.join('\n').split(/\n+/).should.deep.equal([
       'Usage: ./usage [x] [y] [z] {OPTIONS} <src> <dest> [extra_files...]',
+      'Options:',
+      '  --help     Show help  [boolean]',
+      '  --version  Show version number  [boolean]',
       'src and dest files are both required'
     ])
   })
@@ -626,6 +670,8 @@ describe('usage tests', function () {
     })
     r.errors.join('\n').split(/\n+/).should.deep.equal([
       'Options:',
+      '  --help     Show help  [boolean]',
+      '  --version  Show version number  [boolean]',
       '  -f, --foo  [default: 5]',
       'Not enough non-option arguments: got 0, need at least 1'
     ])
@@ -667,6 +713,8 @@ describe('usage tests', function () {
         r.errors.join('\n').split(/\n+/).should.deep.equal([
           'Usage: ./usage [options]',
           'Options:',
+          '  --help     Show help  [boolean]',
+          '  --version  Show version number  [boolean]',
           '  --foo, -f  foo option',
           '  --bar, -b  bar option',
           'Missing argument value: foo'
@@ -693,6 +741,8 @@ describe('usage tests', function () {
         r.errors.join('\n').split(/\n+/).should.deep.equal([
           'Usage: ./usage [options]',
           'Options:',
+          '  --help     Show help  [boolean]',
+          '  --version  Show version number  [boolean]',
           '  --foo, -f  foo option',
           '  --bar, -b  bar option',
           'Missing argument values: foo, bar'
@@ -722,6 +772,8 @@ describe('usage tests', function () {
         r.errors.join('\n').split(/\n+/).should.deep.equal([
           'Usage: ./usage [options]',
           'Options:',
+          '  --help     Show help  [boolean]',
+          '  --version  Show version number  [boolean]',
           '  --foo, -f  foo option',
           '  --bar, -b  bar option',
           'Missing argument value: foo'
@@ -770,6 +822,8 @@ describe('usage tests', function () {
       r.errors.join('\n').split(/\n+/).should.deep.equal([
         'Usage: ./usage [options]',
         'Options:',
+        '  --help     Show help  [boolean]',
+        '  --version  Show version number  [boolean]',
         '  --foo, -f  [required]',
         '  --bar, -b  [required]',
         'Unknown argument: baz'
@@ -803,6 +857,8 @@ describe('usage tests', function () {
       r.errors.join('\n').split(/\n+/).should.deep.equal([
         'Usage: ./usage [options]',
         'Options:',
+        '  --help     Show help  [boolean]',
+        '  --version  Show version number  [boolean]',
         '  --foo, -f  foo option',
         '  --bar, -b  bar option',
         'Unknown argument: baz'
@@ -837,6 +893,8 @@ describe('usage tests', function () {
       r.errors.join('\n').split(/\n+/).should.deep.equal([
         'Usage: ./usage [options]',
         'Options:',
+        '  --help     Show help  [boolean]',
+        '  --version  Show version number  [boolean]',
         '  --foo, -f  foo option',
         '  --bar, -b  bar option',
         'Unknown arguments: baz, q'
@@ -884,6 +942,8 @@ describe('usage tests', function () {
     r.should.have.property('exit').and.be.ok
     r.errors.join('\n').split(/\n+/).should.deep.equal([
       'Options:',
+      '  --help     Show help  [boolean]',
+      '  --version  Show version number  [boolean]',
       '  -y  [required]',
       'Examples:',
       '  ./usage something       description',
@@ -912,8 +972,10 @@ describe('usage tests', function () {
           'Usage: ./usage -x NUM [-y NUM]',
           '',
           'Options:',
-          '  -x  an option  [required]',
-          '  -y  another option',
+          '  --help     Show help  [boolean]',
+          '  --version  Show version number  [boolean]',
+          '  -x         an option  [required]',
+          '  -y         another option',
           '',
           'Missing required argument: x'
         ])
@@ -941,8 +1003,10 @@ describe('usage tests', function () {
           'Usage: ./usage -x NUM [-y NUM]',
           '',
           'Options:',
-          '  -x  an option  [required]',
-          '  -y  another option',
+          '  --help     Show help  [boolean]',
+          '  --version  Show version number  [boolean]',
+          '  -x         an option  [required]',
+          '  -y         another option',
           '',
           'Missing required argument: x'
         ])
@@ -974,7 +1038,6 @@ describe('usage tests', function () {
       var r = checkUsage(function () {
         return yargs(['--help'])
           .demand(['y'])
-          .help('help')
           .wrap(null)
           .argv
       })
@@ -985,7 +1048,8 @@ describe('usage tests', function () {
       r.should.have.property('exit').and.be.ok
       r.logs.join('\n').split(/\n+/).should.deep.equal([
         'Options:',
-        '  --help  Show help  [boolean]',
+        '  --help     Show help  [boolean]',
+        '  --version  Show version number  [boolean]',
         '  -y  [required]',
         ''
       ])
@@ -995,7 +1059,6 @@ describe('usage tests', function () {
       var r = checkUsage(function () {
         return yargs(['--help'])
           .usage('Usage: $0 options')
-          .help('help')
           .describe('some-opt', 'Some option')
           .default('some-opt', 2)
           .wrap(null)
@@ -1010,6 +1073,7 @@ describe('usage tests', function () {
         'Usage: ./usage options',
         'Options:',
         '  --help      Show help  [boolean]',
+        '  --version   Show version number  [boolean]',
         '  --some-opt  Some option  [default: 2]',
         ''
       ])
@@ -1020,7 +1084,6 @@ describe('usage tests', function () {
         var r = checkUsage(function () {
           return yargs(['--help'])
             .usage('Usage: $0 options')
-            .help('help')
             .alias('help', 'h')
             .describe('some-opt', 'Some option')
             .demand('some-opt')
@@ -1039,6 +1102,7 @@ describe('usage tests', function () {
           'Usage: ./usage options',
           'Options:',
           '  --help, -h  Show help  [boolean]',
+          '  --version   Show version number  [boolean]',
           '  --some-opt  Some option  [required]',
           ''
         ])
@@ -1050,7 +1114,6 @@ describe('usage tests', function () {
         var r = checkUsage(function () {
           return yargs(['--help', '--some-opt'])
             .usage('Usage: $0 options')
-            .help('help')
             .alias('help', 'h')
             .describe('some-opt', 'Some option')
             .demand('some-opt')
@@ -1070,6 +1133,7 @@ describe('usage tests', function () {
           'Usage: ./usage options',
           'Options:',
           '  --help, -h  Show help  [boolean]',
+          '  --version   Show version number  [boolean]',
           '  --some-opt  Some option  [required]',
           ''
         ])
@@ -1103,24 +1167,10 @@ describe('usage tests', function () {
       r.logs[0].should.eql('1.0.0')
     })
 
-    it('should allow a function to be provided, rather than a number', function () {
-      var r = checkUsage(function () {
-        return yargs(['--version'])
-        .version('version', function () {
-          return require('./fixtures/config').version
-        })
-        .wrap(null)
-        .argv
-      })
-      r.logs[0].should.eql('1.0.2')
-    })
-
     it("should default to 'version' as version option", function () {
       var r = checkUsage(function () {
         return yargs(['--version'])
-        .version(function () {
-          return require('./fixtures/config').version
-        })
+        .version('1.0.2')
         .wrap(null)
         .argv
       })
@@ -1177,12 +1227,12 @@ describe('usage tests', function () {
 
       var r = checkUsage(function () {
         return yargs(['--foo'])
-        .usage('Usage: $0 [options]')
-        .options(opts)
-        .demand(['foo', 'bar'])
-        .showHelpOnFail(false, 'Specify --help for available options')
-        .wrap(null)
-        .argv
+          .usage('Usage: $0 [options]')
+          .options(opts)
+          .demand(['foo', 'bar'])
+          .showHelpOnFail(false, 'Specify --help for available options')
+          .wrap(null)
+          .argv
       })
       r.should.have.property('result')
       r.result.should.have.property('_').with.length(0)
@@ -1309,7 +1359,7 @@ describe('usage tests', function () {
       })
 
       // should split example usage onto multiple lines.
-      r.errors[0].split('\n').length.should.equal(8)
+      r.errors[0].split('\n').length.should.equal(11)
 
       // should wrap within appropriate boundaries.
       r.errors[0].split('\n').forEach(function (line, i) {
@@ -1370,6 +1420,7 @@ describe('usage tests', function () {
 
       r.logs.join('\n').split(/\n+/).should.deep.equal([
         'Options:',
+        '  --version   Show version number                                      [boolean]',
         '  -f, --file  ' + noColorAddedDescr + '                      [string] [required]',
         '  -h, --help  Show help                                                [boolean]',
         ''
@@ -1394,6 +1445,7 @@ describe('usage tests', function () {
 
       r.logs.join('\n').split(/\n+/).should.deep.equal([
         'Options:',
+        '  --version   Show version number                                      [boolean]',
         '  -f, --file  ' + yellowDescription + '                      [string] [required]',
         '  -h, --help  Show help                                                [boolean]',
         ''
@@ -1417,6 +1469,8 @@ describe('usage tests', function () {
         '  upload    upload something',
         '  download  download something from somewhere',
         'Options:',
+        '  --help     Show help  [boolean]',
+        '  --version  Show version number  [boolean]',
         '  -y  [required]',
         'Missing required argument: y'
       ])
@@ -1436,6 +1490,8 @@ describe('usage tests', function () {
         'Commands:',
         'upload', 'upload', 'something',
         'Options:',
+        '--help', 'Show', 'help', '[boolean]',
+        '--version', 'Show', 'version', 'number', '[boolean]',
         '-y', '[required]',
         'Missing', 'required', 'argument:', 'y'
       ])
@@ -1455,6 +1511,8 @@ describe('usage tests', function () {
         'Commands:',
         'upload', 'upload', 'something',
         'Options:',
+        '--help', 'Show', 'help', '[boolean]',
+        '--version', 'Show', 'version', 'number', '[boolean]',
         '-y', '[required]',
         'Missing', 'required', 'argument:', 'y'
       ])
@@ -1474,14 +1532,12 @@ describe('usage tests', function () {
       var generalHelp = checkUsage(function () {
         return yargs('--help')
           .command(uploadCommand, uploadDesc, uploadOpts, uploadHandler)
-          .help()
           .wrap(null)
           .argv
       })
       var commandHelp = checkUsage(function () {
         return yargs('upload --help')
           .command(uploadCommand, uploadDesc, uploadOpts, uploadHandler)
-          .help()
           .wrap(null)
           .argv
       })
@@ -1491,15 +1547,17 @@ describe('usage tests', function () {
         '  upload <dest>  Upload cwd to remote destination',
         '',
         'Options:',
-        '  --help  Show help  [boolean]',
+        '  --help     Show help  [boolean]',
+        '  --version  Show version number  [boolean]',
         ''
       ])
       commandHelp.logs[0].split('\n').should.deep.equal([
         './usage upload <dest>',
         '',
         'Options:',
-        '  --help   Show help  [boolean]',
-        '  --force  Force overwrite of remote directory contents  [boolean]',
+        '  --help     Show help  [boolean]',
+        '  --version  Show version number  [boolean]',
+        '  --force    Force overwrite of remote directory contents  [boolean]',
         ''
       ])
     })
@@ -1520,14 +1578,12 @@ describe('usage tests', function () {
       var generalHelp = checkUsage(function () {
         return yargs('--help')
           .command(uploadCommand, uploadDesc, uploadBuilder, uploadHandler)
-          .help()
           .wrap(null)
           .argv
       })
       var commandHelp = checkUsage(function () {
         return yargs('upload --help')
           .command(uploadCommand, uploadDesc, uploadBuilder, uploadHandler)
-          .help()
           .wrap(null)
           .argv
       })
@@ -1537,16 +1593,18 @@ describe('usage tests', function () {
         '  upload <dest>  Upload cwd to remote destination',
         '',
         'Options:',
-        '  --help  Show help  [boolean]',
+        '  --help     Show help  [boolean]',
+        '  --version  Show version number  [boolean]',
         ''
       ])
       commandHelp.logs[0].split('\n').should.deep.equal([
         './usage upload <dest>',
         '',
         'Options:',
-        '  --help   Show help                 [boolean]',
-        '  --force  Force overwrite of remote directory',
-        '           contents                  [boolean]',
+        '  --help     Show help               [boolean]',
+        '  --version  Show version number     [boolean]',
+        '  --force    Force overwrite of remote',
+        '             directory contents      [boolean]',
         ''
       ])
     })
@@ -1576,6 +1634,9 @@ describe('usage tests', function () {
         '',
         'Global Flags:',
         '  -h  Show help  [boolean]',
+        '',
+        'Options:',
+        '  --version  Show version number  [boolean]',
         ''
       ])
     })
@@ -1616,7 +1677,8 @@ describe('usage tests', function () {
         '  -i  [boolean]',
         '',
         'Options:',
-        '  -h  Show help  [boolean]',
+        '  --version  Show version number  [boolean]',
+        '  -h         Show help  [boolean]',
         ''
       ])
     })
@@ -1650,7 +1712,8 @@ describe('usage tests', function () {
         '  -q  [boolean]',
         '',
         'Options:',
-        '  -h  Show help  [boolean]',
+        '  --version  Show version number  [boolean]',
+        '  -h         Show help  [boolean]',
         ''
       ])
     })
@@ -1692,7 +1755,8 @@ describe('usage tests', function () {
         '  -q  [boolean]',
         '',
         'Options:',
-        '  -h  Show help  [boolean]',
+        '  --version  Show version number  [boolean]',
+        '  -h         Show help  [boolean]',
         ''
       ])
     })
@@ -1706,7 +1770,7 @@ describe('usage tests', function () {
             },
             handler: function (argv) {}
           })
-          .help().wrap(null)
+          .wrap(null)
           .argv
       })
 
@@ -1715,7 +1779,8 @@ describe('usage tests', function () {
         '  upload  upload something',
         '',
         'Options:',
-        '  --help  Show help  [boolean]',
+        '  --help     Show help  [boolean]',
+        '  --version  Show version number  [boolean]',
         ''
       ])
     })
@@ -1729,7 +1794,7 @@ describe('usage tests', function () {
             },
             handler: function (argv) {}
           })
-          .help().wrap(null)
+          .wrap(null)
           .argv
       })
 
@@ -1737,7 +1802,8 @@ describe('usage tests', function () {
         'Usage: program upload <something> [opts]',
         '',
         'Options:',
-        '  --help  Show help  [boolean]',
+        '  --help     Show help  [boolean]',
+        '  --version  Show version number  [boolean]',
         ''
       ])
     })
@@ -1748,13 +1814,14 @@ describe('usage tests', function () {
           .command('upload', 'upload something', function (yargs) {
             return yargs.usage(null)
           }, function (argv) {})
-          .help().wrap(null)
+          .wrap(null)
           .argv
       })
 
       r.logs[0].split('\n').should.deep.equal([
         'Options:',
-        '  --help  Show help  [boolean]',
+        '  --help     Show help  [boolean]',
+        '  --version  Show version number  [boolean]',
         ''
       ])
     })
@@ -1765,7 +1832,7 @@ describe('usage tests', function () {
           .command('one <sub>', 'level one, requires subcommand', function (yargs) {
             return yargs.command('two [next]', 'level two', {}, function (argv) {})
           }, function (argv) {})
-          .help().wrap(null)
+          .wrap(null)
           .argv
       })
 
@@ -1773,7 +1840,8 @@ describe('usage tests', function () {
         './usage one two [next]',
         '',
         'Options:',
-        '  --help  Show help  [boolean]',
+        '  --help     Show help  [boolean]',
+        '  --version  Show version number  [boolean]',
         ''
       ])
     })
@@ -1784,7 +1852,7 @@ describe('usage tests', function () {
           .command('one <sub>', 'level one, requires subcommand', function (yargs) {
             return yargs.command('two [next]', 'level two', function (yargs) { return yargs }, function (argv) {})
           }, function (argv) {})
-          .help().wrap(null)
+          .wrap(null)
           .argv
       })
 
@@ -1792,7 +1860,8 @@ describe('usage tests', function () {
         './usage one two [next]',
         '',
         'Options:',
-        '  --help  Show help  [boolean]',
+        '  --help     Show help  [boolean]',
+        '  --version  Show version number  [boolean]',
         ''
       ])
     })
@@ -1801,7 +1870,7 @@ describe('usage tests', function () {
       var r = checkUsage(function () {
         return yargs('help')
           .command(['copy <src> [dest]', 'cp', 'dupe'], 'Copy something')
-          .help().wrap(null)
+          .wrap(null)
           .argv
       })
 
@@ -1810,7 +1879,8 @@ describe('usage tests', function () {
         '  copy <src> [dest]  Copy something  [aliases: cp, dupe]',
         '',
         'Options:',
-        '  --help  Show help  [boolean]',
+        '  --help     Show help  [boolean]',
+        '  --version  Show version number  [boolean]',
         ''
       ])
     })
@@ -1819,7 +1889,7 @@ describe('usage tests', function () {
       var r = checkUsage(function () {
         return yargs('help')
           .command(['copy <src> [dest]', 'cp', 'dupe'], 'Copy something')
-          .help().wrap(80)
+          .wrap(80)
           .argv
       })
 
@@ -1828,7 +1898,8 @@ describe('usage tests', function () {
         '  copy <src> [dest]  Copy something                          [aliases: cp, dupe]',
         '',
         'Options:',
-        '  --help  Show help                                                    [boolean]',
+        '  --help     Show help                                                 [boolean]',
+        '  --version  Show version number                                       [boolean]',
         ''
       ])
     })
@@ -1846,6 +1917,8 @@ describe('usage tests', function () {
 
       r.errors.join('\n').split(/\n+/).should.deep.equal([
         'Options:',
+        '  --help     Show help  [boolean]',
+        '  --version  Show version number  [boolean]',
         '  -y  [required]',
         'for more info view the manual at http://example.com',
         'Missing required argument: y'
@@ -1863,6 +1936,8 @@ describe('usage tests', function () {
 
       r.errors.join('\n').split(/\n+/).should.deep.equal([
         'Options:',
+        '  --help     Show help  [boolean]',
+        '  --version  Show version number  [boolean]',
         '  -y  [required]',
         'Try \'./usage --long-help\' for more information',
         'Missing required argument: y'
@@ -2049,6 +2124,7 @@ describe('usage tests', function () {
 
       r.logs.join('\n').split(/\n+/).should.deep.equal([
         'Options:',
+        '  --version  Show version number  [boolean]',
         '  -h         Show help  [boolean]',
         '  -f, --foo  foo option',
         ''
@@ -2067,6 +2143,7 @@ describe('usage tests', function () {
 
       r.logs.join('\n').split(/\n+/).should.deep.equal([
         'Options:',
+        '  --version  Show version number  [boolean]',
         '  -h         Show help  [boolean]',
         '  -f, --foo  [required]',
         ''
@@ -2086,6 +2163,7 @@ describe('usage tests', function () {
 
       r.logs.join('\n').split(/\n+/).should.deep.equal([
         'Options:',
+        '  --version  Show version number  [boolean]',
         '  -h         Show help  [boolean]',
         '  -f, --foo  bar  [string]',
         ''
@@ -2106,6 +2184,7 @@ describe('usage tests', function () {
 
       r.logs.join('\n').split(/\n+/).should.deep.equal([
         'Options:',
+        '  --version  Show version number  [boolean]',
         '  -h         Show help  [boolean]',
         '  -f, --foo  bar  [number]',
         ''
@@ -2129,6 +2208,8 @@ describe('usage tests', function () {
 
       r.errors.join('\n').split(/\n+/).should.deep.equal([
         'Options:',
+        '  --help     Show help  [boolean]',
+        '  --version  Show version number  [boolean]',
         '  --foo, -f  foo option',
         ''
       ])
@@ -2149,6 +2230,8 @@ describe('usage tests', function () {
       r.errors.length.should.eql(0)
       r.logs.join('\n').split(/\n+/).should.deep.equal([
         'Options:',
+        '  --help     Show help  [boolean]',
+        '  --version  Show version number  [boolean]',
         '  --foo, -f  foo option',
         ''
       ])
@@ -2166,6 +2249,8 @@ describe('usage tests', function () {
       function testHandler (msg) {
         msg.split(/\n+/).should.deep.equal([
           'Options:',
+          '  --help     Show help  [boolean]',
+          '  --version  Show version number  [boolean]',
           '  --foo, -f  foo option',
           ''
         ])
@@ -2283,16 +2368,16 @@ describe('usage tests', function () {
             describe: 'percentage of confidence',
             choices: [0, 25, 50, 75, 100]
           })
-          .help('help')
           .wrap(null)
           .argv
       })
 
       r.logs[0].split('\n').should.deep.equal([
         'Options:',
+        '  --help        Show help  [boolean]',
+        '  --version     Show version number  [boolean]',
         '  --answer      does this look good?  [choices: "yes", "no", "maybe"]',
         '  --confidence  percentage of confidence  [choices: 0, 25, 50, 75, 100]',
-        '  --help        Show help  [boolean]',
         ''
       ])
     })
@@ -2307,14 +2392,14 @@ describe('usage tests', function () {
           .option('confidence', {
             choices: [0, 25, 50, 75, 100]
           })
-          .help('help')
           .wrap(null)
           .argv
       })
 
       r.logs[0].split('\n').should.deep.equal([
         'Options:',
-        '  --help  Show help  [boolean]',
+        '  --help     Show help  [boolean]',
+        '  --version  Show version number  [boolean]',
         ''
       ])
     })
@@ -2364,7 +2449,6 @@ describe('usage tests', function () {
             default: 'Bruce Wayne'
           })
           .group('batman', 'Heroes:')
-          .help('help')
           .wrap(null)
           .argv
       })
@@ -2374,7 +2458,8 @@ describe('usage tests', function () {
         "  --batman  not the world's happiest guy  [string] [default: \"Bruce Wayne\"]",
         '',
         'Options:',
-        '  --help  Show help  [boolean]',
+        '  --help     Show help  [boolean]',
+        '  --version  Show version number  [boolean]',
         ''
       ])
     })
@@ -2396,6 +2481,9 @@ describe('usage tests', function () {
         'Heroes:',
         "  --batman  not the world's happiest guy  [string] [default: \"Bruce Wayne\"]",
         '  -h        Show help  [boolean]',
+        '',
+        'Options:',
+        '  --version  Show version number  [boolean]',
         ''
       ])
     })
@@ -2403,9 +2491,9 @@ describe('usage tests', function () {
     it('displays alias keys appropriately within a grouping', function () {
       var r = checkUsage(function () {
         return yargs(['-h'])
-          .help('help')
           .alias('h', 'help')
           .group('help', 'Magic Variable:')
+          .group('version', 'Magic Variable:')
           .wrap(null)
           .argv
       })
@@ -2413,14 +2501,14 @@ describe('usage tests', function () {
       r.logs[0].split('\n').should.deep.equal([
         'Magic Variable:',
         '  -h, --help  Show help  [boolean]',
+        '  --version   Show version number  [boolean]',
         ''
       ])
     })
 
     it('allows a group to be provided as the only information about an option', function () {
       var r = checkUsage(function () {
-        return yargs(['-h'])
-          .help('h')
+        return yargs(['--help'])
           .group('batman', 'Heroes:')
           .wrap(null)
           .argv
@@ -2431,7 +2519,8 @@ describe('usage tests', function () {
         '  --batman',
         '',
         'Options:',
-        '  -h  Show help  [boolean]',
+        '  --help     Show help  [boolean]',
+        '  --version  Show version number  [boolean]',
         ''
       ])
     })
@@ -2448,7 +2537,8 @@ describe('usage tests', function () {
 
       r.logs[0].split('\n').should.deep.equal([
         'Options:',
-        '  -h  Show help  [boolean]',
+        '  -h         Show help  [boolean]',
+        '  --version  Show version number  [boolean]',
         '',
         'Heroes:',
         '  --batman',
@@ -2474,15 +2564,15 @@ describe('usage tests', function () {
         '  --batman  [string]',
         '',
         'Options:',
-        '  -h  Show help  [boolean]',
+        '  --version  Show version number  [boolean]',
+        '  -h         Show help  [boolean]',
         ''
       ])
     })
 
     it('only displays a duplicated option once per group', function () {
       var r = checkUsage(function () {
-        return yargs(['-h'])
-          .help('h')
+        return yargs(['--help'])
           .group(['batman', 'batman'], 'Heroes:')
           .group('robin', 'Heroes:')
           .option('robin', {
@@ -2498,7 +2588,8 @@ describe('usage tests', function () {
         '  --robin',
         '',
         'Options:',
-        '  -h  Show help  [boolean]',
+        '  --help     Show help  [boolean]',
+        '  --version  Show version number  [boolean]',
         ''
       ])
     })
@@ -2515,6 +2606,9 @@ describe('usage tests', function () {
       })
 
       r.errors.join('\n').split(/\n+/).should.deep.equal([
+        'Options:',
+        '  --help     Show help                                                 [boolean]',
+        '  --version  Show version number                                       [boolean]',
         'Examples:',
         '  안녕하세요 선생님 안녕 친구야  인사하는 어린이 착한 어린이',
         ''
@@ -2529,7 +2623,6 @@ describe('usage tests', function () {
           .command(['list [pattern]', 'ls', '*'], 'List key-value pairs for pattern', {}, function () {})
           .command('get <key>', 'Get value for key', {}, function () {})
           .command('set <key> [value]', 'Set value for key', {}, function () {})
-          .help()
           .argv
       })
 
@@ -2540,7 +2633,8 @@ describe('usage tests', function () {
         '  set <key> [value]  Set value for key',
         '',
         'Options:',
-        '  --help  Show help                                                    [boolean]',
+        '  --help     Show help                                                 [boolean]',
+        '  --version  Show version number                                       [boolean]',
         ''
       ])
     })

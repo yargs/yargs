@@ -762,20 +762,16 @@ var yargs = require('yargs')(['--help'])
 -----------------------------------------
 .help([option | boolean])
 -----------------------------------------
-.help([option, [description | boolean]])
------------------------------------------
-.help([option, [description, [boolean]]])
+.help([option, [description]])
 -----------------------------------------
 
-Add an option (e.g. `--help`) and implicit command that displays the usage
-string and exits the process.
+Configure an (e.g. `--help`) and implicit command that displays the usage
+string and exits the process. By default yargs enables help on the `--help` option.
 
 If present, the `description` parameter customizes the description of
 the help option in the usage string.
 
-If a boolean argument is provided, it will enable or disable the use of an
-implicit command. The implicit command is enabled by default, but it can be
-disabled by passing `false`.
+If the boolean argument `false` is provided, it will disable `--help`.
 
 Note that any multi-char aliases (e.g. `help`) used for the help option will
 also be used for the implicit command. If there are no multi-char aliases (e.g.
@@ -787,13 +783,11 @@ If invoked without parameters, `.help()` will use `--help` as the option and
 Example:
 
 ```js
-var yargs = require("yargs")(['--help'])
+var yargs = require("yargs")(['--info'])
   .usage("$0 -operand1 number -operand2 number -operation [add|subtract]")
-  .help()
+  .help('info')
   .argv
 ```
-
-Later on, `argv` can be retrieved with `yargs.argv`.
 
 <a name="implies"></a>.implies(x, y)
 --------------
@@ -1254,25 +1248,21 @@ present script similar to how `$0` works in bash or perl.
 
 `opts` is optional and acts like calling `.options(opts)`.
 
-<a name="version"></a>.version([option], [description], [version])
+<a name="version"></a>
+.version()
+----------------------------------------
+.version([version|boolean])
+----------------------------------------
+.version([option], [description], [version])
 ----------------------------------------
 
 Add an option (e.g. `--version`) that displays the version number (given by the
-`version` parameter) and exits the process.
+`version` parameter) and exits the process. By default yargs enables version for the `--version` option.
 
 If no arguments are passed to `version` (`.version()`), yargs will parse the `package.json`
-of your module and use its `version` value. The default value of `option` is `--version`.
+of your module and use its `version` value.
 
-You can provide a `function` for version, rather than a string.
-This is useful if you want to use a version stored in a location other than package.json:
-
-```js
-var argv = require('yargs')
-  .version(function() {
-    return require('../lib/version').version;
-  })
-  .argv;
-```
+If the boolean argument `false` is provided, it will disable `--version`.
 
 <a name="wrap"></a>.wrap(columns)
 --------------

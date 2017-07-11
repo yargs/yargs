@@ -67,9 +67,10 @@ require('yargs') // eslint-disable-line
     alias: 'v',
     default: false
   })
-  .help()
   .argv
 ```
+
+Run the example above with `--help` to see the help for the application.
 
 ## Table of Contents
 

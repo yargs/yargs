@@ -574,6 +574,7 @@ describe('validation tests', function () {
         return yargs(['--help'])
           .config('settings')
           .help('help')
+          .version(false)
           .wrap(null)
           .argv
       })
@@ -592,6 +593,7 @@ describe('validation tests', function () {
         return yargs(['--help'])
             .config()
             .help('help')
+            .version(false)
             .wrap(null)
             .argv
       })
@@ -610,6 +612,7 @@ describe('validation tests', function () {
         return yargs(['--help'])
           .config('settings', 'pork chop sandwiches')
           .help('help')
+          .version(false)
           .wrap(null)
           .argv
       })
@@ -636,6 +639,7 @@ describe('validation tests', function () {
 
       r.errors.join('\n').split(/\n+/).should.deep.equal([
         'Options:',
+        '  --version   Show version number  [boolean]',
         '  --settings  path to config file',
         '  --help      Show help  [boolean]',
         'someone set us up the bomb'
@@ -649,15 +653,15 @@ describe('validation tests', function () {
           .config('settings', 'path to config file', function (configPath) {
             throw Error('someone set us up the bomb')
           })
-          .help('help')
           .wrap(null)
           .argv
       })
 
       r.errors.join('\n').split(/\n+/).should.deep.equal([
         'Options:',
-        '  --settings  path to config file',
         '  --help      Show help  [boolean]',
+        '  --version   Show version number  [boolean]',
+        '  --settings  path to config file',
         'someone set us up the bomb'
       ])
     })
@@ -729,6 +733,8 @@ describe('validation tests', function () {
           .usage('Usage: $0 [x] [y] [z] {OPTIONS} <src> <dest> [extra_files...]')
           .demandCommand(0, 1, 'src and dest files are both required', 'too many arguments are provided')
           .wrap(null)
+          .help(false)
+          .version(false)
           .argv
       })
       r.should.have.property('result')

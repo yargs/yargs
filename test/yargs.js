@@ -211,7 +211,6 @@ describe('yargs dsl tests', function () {
       // create a command line with all the things.
       // so that we can confirm they're reset.
       var y = yargs(['--help'])
-        .help('help')
         .command('foo', 'bar', function () {})
         .default('foo', 'bar')
         .describe('foo', 'foo variable')
@@ -233,11 +232,11 @@ describe('yargs dsl tests', function () {
 
       var emptyOptions = {
         array: [],
-        boolean: ['help'],
+        boolean: ['help', 'version'],
         string: [],
         alias: {},
         default: {},
-        key: {help: true},
+        key: {help: true, version: true},
         narg: {},
         defaultDescription: {},
         choices: {},
@@ -260,7 +259,10 @@ describe('yargs dsl tests', function () {
       }
 
       expect(y.getOptions()).to.deep.equal(emptyOptions)
-      expect(y.getUsageInstance().getDescriptions()).to.deep.equal({help: '__yargsString__:Show help'})
+      expect(y.getUsageInstance().getDescriptions()).to.deep.equal({
+        help: '__yargsString__:Show help',
+        version: '__yargsString__:Show version number'
+      })
       expect(y.getValidationInstance().getImplied()).to.deep.equal({})
       expect(y.getValidationInstance().getConflicting()).to.deep.equal({})
       expect(y.getCommandInstance().getCommandHandlers()).to.deep.equal({})
@@ -378,7 +380,8 @@ describe('yargs dsl tests', function () {
         '  snuh  snuh command',
         '',
         'Options:',
-        '  -h  Show help  [boolean]',
+        '  --version  Show version number  [boolean]',
+        '  -h         Show help  [boolean]',
         ''
       ])
     })
@@ -402,7 +405,8 @@ describe('yargs dsl tests', function () {
         '  blerg  handle blerg things',
         '',
         'Options:',
-        '  -h  Show help  [boolean]',
+        '  --version  Show version number  [boolean]',
+        '  -h         Show help  [boolean]',
         ''
       ])
     })
@@ -1051,7 +1055,6 @@ describe('yargs dsl tests', function () {
           .command('batman <api-token>', 'batman command', function () {}, function (_argv) {})
           .command('robin <egg>', 'robin command', function () {}, function (_argv) {})
           .wrap(null)
-          .help()
 
         var output1 = null
         parser.parse('batman help', function (_err, _argv, output) {
@@ -1066,7 +1069,8 @@ describe('yargs dsl tests', function () {
           'ndm batman <api-token>',
           '',
           'Options:',
-          '  --help  Show help  [boolean]',
+          '  --help     Show help  [boolean]',
+          '  --version  Show version number  [boolean]',
           ''
         ])
 
@@ -1074,7 +1078,8 @@ describe('yargs dsl tests', function () {
           'ndm robin <egg>',
           '',
           'Options:',
-          '  --help  Show help  [boolean]',
+          '  --help     Show help  [boolean]',
+          '  --version  Show version number  [boolean]',
           ''
         ])
       })
@@ -1084,7 +1089,6 @@ describe('yargs dsl tests', function () {
           .command('batman <api-token>', 'batman command', function () {}, function (_argv) {})
           .command('robin <egg>', 'robin command', function () {}, function (_argv) {})
           .wrap(null)
-          .help()
 
         var error1 = null
         var output1 = null
@@ -1104,7 +1108,8 @@ describe('yargs dsl tests', function () {
           'ndm batman <api-token>',
           '',
           'Options:',
-          '  --help  Show help  [boolean]',
+          '  --help     Show help  [boolean]',
+          '  --version  Show version number  [boolean]',
           '',
           'Not enough non-option arguments: got 0, need at least 1'
         ])
@@ -1114,7 +1119,8 @@ describe('yargs dsl tests', function () {
           'ndm robin <egg>',
           '',
           'Options:',
-          '  --help  Show help  [boolean]',
+          '  --help     Show help  [boolean]',
+          '  --version  Show version number  [boolean]',
           ''
         ])
       })
@@ -1127,6 +1133,7 @@ describe('yargs dsl tests', function () {
         var parser = yargs()
           .demand(1, 'Must call a command')
           .strict()
+          .wrap(null)
           .command('one <x>', 'The one and only command')
         // first call parse with command, which calls reset
         parser.parse('one two', function (_, argv) {
@@ -1142,6 +1149,10 @@ describe('yargs dsl tests', function () {
         output.split('\n').should.deep.equal([
           'Commands:',
           '  one <x>  The one and only command',
+          '',
+          'Options:',
+          '  --help     Show help  [boolean]',
+          '  --version  Show version number  [boolean]',
           '',
           'Must call a command'
         ])
@@ -1568,19 +1579,18 @@ describe('yargs dsl tests', function () {
     it('enables `--help` option and `help` command without arguments', function () {
       var option = checkOutput(function () {
         return yargs('--help')
-          .help()
           .wrap(null)
           .argv
       })
       var command = checkOutput(function () {
         return yargs('help')
-          .help()
           .wrap(null)
           .argv
       })
       var expected = [
         'Options:',
-        '  --help  Show help  [boolean]',
+        '  --help     Show help  [boolean]',
+        '  --version  Show version number  [boolean]',
         ''
       ]
       option.logs[0].split('\n').should.deep.equal(expected)
@@ -1602,32 +1612,12 @@ describe('yargs dsl tests', function () {
       })
       var expected = [
         'Options:',
-        '  --help  Show help  [boolean]',
+        '  --version  Show version number  [boolean]',
+        '  --help     Show help  [boolean]',
         ''
       ]
       option.logs[0].split('\n').should.deep.equal(expected)
       command.logs[0].split('\n').should.deep.equal(expected)
-    })
-
-    it('enables only `--help` option with `false` argument', function () {
-      var option = checkOutput(function () {
-        return yargs('--help')
-          .help(false)
-          .wrap(null)
-          .argv
-      })
-      var command = checkOutput(function () {
-        return yargs('help')
-          .help(false)
-          .wrap(null)
-          .argv
-      })
-      option.logs[0].split('\n').should.deep.equal([
-        'Options:',
-        '  --help  Show help  [boolean]',
-        ''
-      ])
-      command.result.should.have.property('_').and.deep.equal(['help'])
     })
 
     it('enables given string as help option and command with string argument', function () {
@@ -1651,62 +1641,13 @@ describe('yargs dsl tests', function () {
       })
       var expected = [
         'Options:',
-        '  --info  Show help  [boolean]',
+        '  --version  Show version number  [boolean]',
+        '  --info     Show help  [boolean]',
         ''
       ]
       option.logs[0].split('\n').should.deep.equal(expected)
       command.logs[0].split('\n').should.deep.equal(expected)
       helpOption.result.should.have.property('help').and.be.true
-    })
-
-    it('enables given string as help option and command with string argument and `true` argument', function () {
-      var option = checkOutput(function () {
-        return yargs('--info')
-          .help('info', true)
-          .wrap(null)
-          .argv
-      })
-      var command = checkOutput(function () {
-        return yargs('info')
-          .help('info', true)
-          .wrap(null)
-          .argv
-      })
-      var helpOption = checkOutput(function () {
-        return yargs('--help')
-          .help('info', true)
-          .wrap(null)
-          .argv
-      })
-      var expected = [
-        'Options:',
-        '  --info  Show help  [boolean]',
-        ''
-      ]
-      option.logs[0].split('\n').should.deep.equal(expected)
-      command.logs[0].split('\n').should.deep.equal(expected)
-      helpOption.result.should.have.property('help').and.be.true
-    })
-
-    it('enables given string as help option only with string argument and `false` argument', function () {
-      var option = checkOutput(function () {
-        return yargs('--info')
-          .help('info', false)
-          .wrap(null)
-          .argv
-      })
-      var command = checkOutput(function () {
-        return yargs('info')
-          .help('info', false)
-          .wrap(null)
-          .argv
-      })
-      option.logs[0].split('\n').should.deep.equal([
-        'Options:',
-        '  --info  Show help  [boolean]',
-        ''
-      ])
-      command.result.should.have.property('_').and.deep.equal(['info'])
     })
 
     it('enables given string as help option and command with custom description with two string arguments', function () {
@@ -1724,7 +1665,8 @@ describe('yargs dsl tests', function () {
       })
       var expected = [
         'Options:',
-        '  --info  Display info  [boolean]',
+        '  --version  Show version number  [boolean]',
+        '  --info     Display info  [boolean]',
         ''
       ]
       option.logs[0].split('\n').should.deep.equal(expected)
@@ -1746,32 +1688,12 @@ describe('yargs dsl tests', function () {
       })
       var expected = [
         'Options:',
-        '  --info  Display info  [boolean]',
+        '  --version  Show version number  [boolean]',
+        '  --info     Display info  [boolean]',
         ''
       ]
       option.logs[0].split('\n').should.deep.equal(expected)
       command.logs[0].split('\n').should.deep.equal(expected)
-    })
-
-    it('enables given string as help option only and custom description with two string arguments and `false` argument', function () {
-      var option = checkOutput(function () {
-        return yargs('--info')
-          .help('info', 'Display info', false)
-          .wrap(null)
-          .argv
-      })
-      var command = checkOutput(function () {
-        return yargs('info')
-          .help('info', 'Display info', false)
-          .wrap(null)
-          .argv
-      })
-      option.logs[0].split('\n').should.deep.equal([
-        'Options:',
-        '  --info  Display info  [boolean]',
-        ''
-      ])
-      command.result.should.have.property('_').and.deep.equal(['info'])
     })
   })
 
@@ -1791,6 +1713,7 @@ describe('yargs dsl tests', function () {
       })
       info.logs[0].split('\n').should.deep.equal([
         'Options:',
+        '  --version           Show version number  [boolean]',
         '  -h, --help, --info  Show help  [boolean]',
         ''
       ])
@@ -1812,7 +1735,8 @@ describe('yargs dsl tests', function () {
       })
       var expected = [
         'Options:',
-        '  -h, -?  Show help  [boolean]',
+        '  --version  Show version number  [boolean]',
+        '  -h, -?     Show help  [boolean]',
         ''
       ]
       h.logs[0].split('\n').should.deep.equal(expected)

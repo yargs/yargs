@@ -300,6 +300,21 @@ function Yargs (processArgs, cwd, parentRequire) {
     }
   }
 
+  function deleteFromParserHintObject (optionKey) {
+    // delete from all parsing hints:
+    // boolean, array, key, alias, etc.
+    Object.keys(options).forEach((hintKey) => {
+      const hint = options[hintKey]
+      if (Array.isArray(hint)) {
+        if (~hint.indexOf(optionKey)) hint.splice(hint.indexOf(optionKey), 1)
+      } else if (typeof hint === 'object') {
+        delete hint[optionKey]
+      }
+    })
+    // now delete the description from usage.js.
+    delete usage.getDescriptions()[optionKey]
+  }
+
   self.config = function (key, msg, parseFn) {
     argsert('[object|string] [string|function] [function]', [key, msg, parseFn], arguments.length)
     // allow a config object to be provided directly.
@@ -712,19 +727,32 @@ function Yargs (processArgs, cwd, parentRequire) {
 
   var versionOpt = null
   self.version = function (opt, msg, ver) {
-    argsert('[string|function] [string|function] [string]', [opt, msg, ver], arguments.length)
+    const defaultVersionOpt = 'version'
+    argsert('[boolean|string] [string] [string]', [opt, msg, ver], arguments.length)
+
+    // nuke the key previously configured
+    // to return version #.
+    if (versionOpt) {
+      deleteFromParserHintObject(versionOpt)
+      usage.version(undefined)
+      versionOpt = null
+    }
+
     if (arguments.length === 0) {
       ver = guessVersion()
-      opt = 'version'
+      opt = defaultVersionOpt
     } else if (arguments.length === 1) {
+      if (opt === false) { // disable default 'version' key.
+        return self
+      }
       ver = opt
-      opt = 'version'
+      opt = defaultVersionOpt
     } else if (arguments.length === 2) {
       ver = msg
       msg = null
     }
 
-    versionOpt = opt
+    versionOpt = typeof opt === 'string' ? opt : defaultVersionOpt
     msg = msg || usage.deferY18nLookup('Show version number')
 
     usage.version(ver || undefined)
@@ -740,32 +768,23 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   var helpOpt = null
-  var useHelpOptAsCommand = false // a call to .help() will enable this
-  self.addHelpOpt = self.help = function (opt, msg, addImplicitCmd) {
-    argsert('[string|boolean] [string|boolean] [boolean]', [opt, msg, addImplicitCmd], arguments.length)
+  self.addHelpOpt = self.help = function (opt, msg) {
+    const defaultHelpOpt = 'help'
+    argsert('[string|boolean] [string]', [opt, msg], arguments.length)
 
-    // argument shuffle
-    if (arguments.length === 0) {
-      useHelpOptAsCommand = true
-    } else if (arguments.length === 1) {
-      if (typeof opt === 'boolean') {
-        useHelpOptAsCommand = opt
-        opt = null
-      } else {
-        useHelpOptAsCommand = true
-      }
-    } else if (arguments.length === 2) {
-      if (typeof msg === 'boolean') {
-        useHelpOptAsCommand = msg
-        msg = null
-      } else {
-        useHelpOptAsCommand = true
-      }
-    } else {
-      useHelpOptAsCommand = Boolean(addImplicitCmd)
+    // nuke the key previously configured
+    // to return help.
+    if (helpOpt) {
+      deleteFromParserHintObject(helpOpt)
+      helpOpt = null
     }
+
+    if (arguments.length === 1) {
+      if (opt === false) return self
+    }
+
     // use arguments, fallback to defaults for opt and msg
-    helpOpt = opt || 'help'
+    helpOpt = typeof opt === 'string' ? opt : defaultHelpOpt
     self.boolean(helpOpt)
     self.describe(helpOpt, msg || usage.deferY18nLookup('Show help'))
     return self
@@ -954,9 +973,7 @@ function Yargs (processArgs, cwd, parentRequire) {
       }
 
       if (argv._.length) {
-        // check for helpOpt in argv._ before running commands
-        // assumes helpOpt must be valid if useHelpOptAsCommand is true
-        if (useHelpOptAsCommand) {
+        if (helpOpt) {
           // consider any multi-char helpOpt alias as a valid help command
           // unless all helpOpt aliases are single-char
           // note that parsed.aliases is a normalized bidirectional map :)
@@ -1115,6 +1132,11 @@ function Yargs (processArgs, cwd, parentRequire) {
     })
     return argv
   }
+
+  // an app should almost always have --version and --help,
+  // if you *really* want to disable this use .help(false)/.version(false).
+  self.help()
+  self.version()
 
   return self
 }
