@@ -20,7 +20,27 @@ or use `.parse()` to do the same thing:
 require('yargs').parse([ '-x', '1', '-y', '2' ])
 ````
 
-The rest of these methods below come in just before the terminating `.argv`.
+If you prefer, you can use `.then()` to create a promise that is resolved with `argv`:
+
+```javascript
+require('yargs').then(argv => ...)
+```
+
+or just as an alternative to referencing `.argv`:
+
+```javascript
+require('yargs')
+  .command('thing', 'it does stuff')
+  .then()
+```
+
+In fact, simply resolving a promise with a yargs instance will run the parser:
+
+```javascript
+Promise.resolve(require('yargs')).then(argv => ...)
+```
+
+The rest of these methods below come in just before the terminating `.argv` or `.then()`.
 
 <a name="alias"></a>.alias(key, alias)
 ------------------
