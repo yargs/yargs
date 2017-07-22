@@ -416,13 +416,13 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   self.implies = function (key, value) {
-    argsert('<string|object> [string]', [key, value], arguments.length)
+    argsert('<string|object> [string|array]', [key, value], arguments.length)
     validation.implies(key, value)
     return self
   }
 
   self.conflicts = function (key1, key2) {
-    argsert('<string|object> [string]', [key1, key2], arguments.length)
+    argsert('<string|object> [string|array]', [key1, key2], arguments.length)
     validation.conflicts(key1, key2)
     return self
   }
