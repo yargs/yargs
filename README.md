@@ -8,7 +8,7 @@
 [![Conventional Commits][conventional-commits-image]][conventional-commits-url]
 [![Slack][slack-image]][slack-url]
 
-_Having problems? want to contribute? join our [community slack](slack-url)_.
+_Having problems? want to contribute? join our [community slack](http://devtoolscommunity.herokuapp.com)_.
 
 > Yargs be a node.js library fer hearties tryin' ter parse optstrings.
 
