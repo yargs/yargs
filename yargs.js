@@ -1,5 +1,4 @@
 const argsert = require('./lib/argsert')
-const assign = require('./lib/assign')
 const Command = require('./lib/command')
 const Completion = require('./lib/completion')
 const Parser = require('yargs-parser')
@@ -690,7 +689,7 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
   self.getGroups = function () {
     // combine explicit and preserved groups. explicit groups should be first
-    return assign(groups, preservedGroups)
+    return Object.assign({}, groups, preservedGroups)
   }
 
   // as long as options.envPrefix is not undefined,
@@ -956,7 +955,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     options.configuration = pkgUp()['yargs'] || {}
     const parsed = Parser.detailed(args, options)
     var argv = parsed.argv
-    if (parseContext) argv = assign(argv, parseContext)
+    if (parseContext) argv = Object.assign({}, argv, parseContext)
     var aliases = parsed.aliases
 
     argv.$0 = self.$0
