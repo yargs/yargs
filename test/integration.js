@@ -1,54 +1,55 @@
+'use strict'
 /* global describe, it, before, after */
 
-var spawn = require('cross-spawn')
-var path = require('path')
-var which = require('which')
-var rimraf = require('rimraf')
-var cpr = require('cpr')
-var fs = require('fs')
+const spawn = require('cross-spawn')
+const path = require('path')
+const which = require('which')
+const rimraf = require('rimraf')
+const cpr = require('cpr')
+const fs = require('fs')
 
 require('chai').should()
 
-describe('integration tests', function () {
-  it('should run as a shell script with no arguments', function (done) {
+describe('integration tests', () => {
+  it('should run as a shell script with no arguments', (done) => {
     testArgs('./bin.js', [], done)
   })
 
-  it('should run as a shell script with arguments', function (done) {
+  it('should run as a shell script with arguments', (done) => {
     testArgs('./bin.js', [ 'a', 'b', 'c' ], done)
   })
 
-  it('should run as a node script with no arguments', function (done) {
+  it('should run as a node script with no arguments', (done) => {
     testArgs('node bin.js', [], done)
   })
 
-  it('should run as a node script with arguments', function (done) {
+  it('should run as a node script with arguments', (done) => {
     testArgs('node bin.js', [ 'x', 'y', 'z' ], done)
   })
 
-  describe('path returned by "which"', function () {
-    it('should match the actual path to the script file', function (done) {
-      which('node', function (err, path) {
+  describe('path returned by "which"', () => {
+    it('should match the actual path to the script file', (done) => {
+      which('node', (err, path) => {
         if (err) return done(err)
-        testArgs(path.replace('Program Files (x86)', 'Progra~2')
-                     .replace('Program Files', 'Progra~1') + ' bin.js', [], done)
+        testArgs(`${path.replace('Program Files (x86)', 'Progra~2')
+                     .replace('Program Files', 'Progra~1')} bin.js`, [], done)
       })
     })
 
-    it('should match the actual path to the script file, with arguments', function (done) {
-      which('node', function (err, path) {
+    it('should match the actual path to the script file, with arguments', (done) => {
+      which('node', (err, path) => {
         if (err) return done(err)
-        testArgs(path.replace('Program Files (x86)', 'Progra~2')
-                     .replace('Program Files', 'Progra~1') + ' bin.js', [ 'q', 'r' ], done)
+        testArgs(`${path.replace('Program Files (x86)', 'Progra~2')
+                     .replace('Program Files', 'Progra~1')} bin.js`, [ 'q', 'r' ], done)
       })
     })
   })
 
   // see #177
-  it('allows --help to be completed without returning help message', function (done) {
-    testCmd('./bin.js', [ '--get-yargs-completions', '--h' ], function (code, stdout) {
+  it('allows --help to be completed without returning help message', (done) => {
+    testCmd('./bin.js', [ '--get-yargs-completions', '--h' ], (code, stdout) => {
       if (code) {
-        done(new Error('cmd exited with code ' + code))
+        done(new Error(`cmd exited with code ${code}`))
         return
       }
 
@@ -65,9 +66,9 @@ describe('integration tests', function () {
       return this.skip()
     }
 
-    testCmd('./issue-497.js', [ '--help' ], function (code, stdout) {
+    testCmd('./issue-497.js', [ '--help' ], (code, stdout) => {
       if (code) {
-        done(new Error('cmd exited with code ' + code))
+        done(new Error(`cmd exited with code ${code}`))
         return
       }
 
@@ -77,14 +78,14 @@ describe('integration tests', function () {
     })
   })
 
-  it('correctly fills positional command args with preceding option', function (done) {
-    testCmd('./opt-assignment-and-positional-command-arg.js', ['--foo', 'fOo', 'bar', 'bAz'], function (code, stdout) {
+  it('correctly fills positional command args with preceding option', (done) => {
+    testCmd('./opt-assignment-and-positional-command-arg.js', ['--foo', 'fOo', 'bar', 'bAz'], (code, stdout) => {
       if (code) {
-        done(new Error('cmd exited with code ' + code))
+        done(new Error(`cmd exited with code ${code}`))
         return
       }
 
-      var argv = JSON.parse(stdout)
+      const argv = JSON.parse(stdout)
       argv._.should.deep.equal(['bar'])
       argv.foo.should.equal('fOo')
       argv.baz.should.equal('bAz')
@@ -92,14 +93,14 @@ describe('integration tests', function () {
     })
   })
 
-  it('correctly fills positional command args with = assignment in preceding option', function (done) {
-    testCmd('./opt-assignment-and-positional-command-arg.js', ['--foo=fOo', 'bar', 'bAz'], function (code, stdout) {
+  it('correctly fills positional command args with = assignment in preceding option', (done) => {
+    testCmd('./opt-assignment-and-positional-command-arg.js', ['--foo=fOo', 'bar', 'bAz'], (code, stdout) => {
       if (code) {
-        done(new Error('cmd exited with code ' + code))
+        done(new Error(`cmd exited with code ${code}`))
         return
       }
 
-      var argv = JSON.parse(stdout)
+      const argv = JSON.parse(stdout)
       argv._.should.deep.equal(['bar'])
       argv.foo.should.equal('fOo')
       argv.baz.should.equal('bAz')
@@ -108,7 +109,7 @@ describe('integration tests', function () {
   })
 
   if (process.platform !== 'win32') {
-    describe('load root package.json', function () {
+    describe('load root package.json', () => {
       before(function (done) {
         this.timeout(10000)
         // create a symlinked, and a physical copy of yargs in
@@ -116,17 +117,17 @@ describe('integration tests', function () {
         // nearest package.json is appropriately loaded.
         cpr('./', './test/fixtures/yargs', {
           filter: /node_modules|example|test|package\.json/
-        }, function () {
+        }, () => {
           fs.symlinkSync(process.cwd(), './test/fixtures/yargs-symlink')
           return done()
         })
       })
 
-      describe('version #', function () {
-        it('defaults to appropriate version # when yargs is installed normally', function (done) {
-          testCmd('./normal-bin.js', [ '--version' ], function (code, stdout) {
+      describe('version #', () => {
+        it('defaults to appropriate version # when yargs is installed normally', (done) => {
+          testCmd('./normal-bin.js', [ '--version' ], (code, stdout) => {
             if (code) {
-              return done(new Error('cmd exited with code ' + code))
+              return done(new Error(`cmd exited with code ${code}`))
             }
 
             stdout.should.match(/9\.9\.9/)
@@ -134,10 +135,10 @@ describe('integration tests', function () {
           })
         })
 
-        it('defaults to appropriate version # when yargs is symlinked', function (done) {
-          testCmd('./symlink-bin.js', [ '--version' ], function (code, stdout) {
+        it('defaults to appropriate version # when yargs is symlinked', (done) => {
+          testCmd('./symlink-bin.js', [ '--version' ], (code, stdout) => {
             if (code) {
-              return done(new Error('cmd exited with code ' + code))
+              return done(new Error(`cmd exited with code ${code}`))
             }
 
             stdout.should.match(/9\.9\.9/)
@@ -146,11 +147,11 @@ describe('integration tests', function () {
         })
       })
 
-      describe('parser settings', function (done) {
-        it('reads parser config settings when yargs is installed normally', function (done) {
-          testCmd('./normal-bin.js', [ '--foo.bar' ], function (code, stdout) {
+      describe('parser settings', () => {
+        it('reads parser config settings when yargs is installed normally', (done) => {
+          testCmd('./normal-bin.js', [ '--foo.bar' ], (code, stdout) => {
             if (code) {
-              return done(new Error('cmd exited with code ' + code))
+              return done(new Error(`cmd exited with code ${code}`))
             }
 
             stdout.should.match(/foo\.bar/)
@@ -158,10 +159,10 @@ describe('integration tests', function () {
           })
         })
 
-        it('reads parser config settings when yargs is installed as a symlink', function (done) {
-          testCmd('./symlink-bin.js', [ '--foo.bar' ], function (code, stdout) {
+        it('reads parser config settings when yargs is installed as a symlink', (done) => {
+          testCmd('./symlink-bin.js', [ '--foo.bar' ], (code, stdout) => {
             if (code) {
-              return done(new Error('cmd exited with code ' + code))
+              return done(new Error(`cmd exited with code ${code}`))
             }
 
             stdout.should.match(/foo\.bar/)
@@ -170,7 +171,7 @@ describe('integration tests', function () {
         })
       })
 
-      after(function () {
+      after(() => {
         rimraf.sync('./test/fixtures/yargs')
         fs.unlinkSync('./test/fixtures/yargs-symlink')
       })
@@ -179,36 +180,35 @@ describe('integration tests', function () {
 })
 
 function testCmd (cmd, args, cb) {
-  var oldDir = process.cwd()
+  const oldDir = process.cwd()
   process.chdir(path.join(__dirname, '/fixtures'))
 
-  var cmds = cmd.split(' ')
+  const cmds = cmd.split(' ')
 
-  var bin = spawn(cmds[0], cmds.slice(1).concat(args.map(String)))
+  const bin = spawn(cmds[0], cmds.slice(1).concat(args.map(String)))
   process.chdir(oldDir)
 
-  var stdout = ''
+  let stdout = ''
   bin.stdout.setEncoding('utf8')
-  bin.stdout.on('data', function (str) { stdout += str })
+  bin.stdout.on('data', (str) => { stdout += str })
 
-  var stderr = ''
+  let stderr = ''
   bin.stderr.setEncoding('utf8')
-  bin.stderr.on('data', function (str) { stderr += str })
+  bin.stderr.on('data', (str) => { stderr += str })
 
-  bin.on('close', function (code) {
+  bin.on('close', (code) => {
     cb(code, stdout, stderr)
   })
 }
 
 function testArgs (cmd, args, done) {
-  testCmd(cmd, args, function (code, stdout, stderr) {
+  testCmd(cmd, args, (code, stdout, stderr) => {
     if (code) {
-      done(new Error('cmd ' + cmd + ' ' + args + ' exited with code ' + code +
-          '\n' + stdout + '\n' + stderr))
+      done(new Error(`cmd ${cmd} ${args} exited with code ${code}\n${stdout}\n${stderr}`))
       return
     }
 
-    var _ = JSON.parse(stdout)
+    const _ = JSON.parse(stdout)
     _.map(String).should.deep.equal(args.map(String))
     done()
   })
