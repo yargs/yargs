@@ -1,3 +1,4 @@
+'use strict'
 const argsert = require('./lib/argsert')
 const Command = require('./lib/command')
 const Completion = require('./lib/completion')
@@ -11,18 +12,18 @@ const setBlocking = require('set-blocking')
 const applyExtends = require('./lib/apply-extends')
 const YError = require('./lib/yerror')
 
-var exports = module.exports = Yargs
+exports = module.exports = Yargs
 function Yargs (processArgs, cwd, parentRequire) {
   processArgs = processArgs || [] // handle calling yargs().
 
   const self = {}
-  var command = null
-  var completion = null
-  var groups = {}
-  var output = ''
-  var preservedGroups = {}
-  var usage = null
-  var validation = null
+  let command = null
+  let completion = null
+  let groups = {}
+  let output = ''
+  let preservedGroups = {}
+  let usage = null
+  let validation = null
 
   const y18n = Y18n({
     directory: path.resolve(__dirname, './locales'),
@@ -33,58 +34,54 @@ function Yargs (processArgs, cwd, parentRequire) {
 
   self.$0 = process.argv
     .slice(0, 2)
-    .map(function (x, i) {
+    .map((x, i) => {
       // ignore the node bin, specify this in your
       // bin file with #!/usr/bin/env node
       if (i === 0 && /\b(node|iojs)(\.exe)?$/.test(x)) return
-      var b = rebase(cwd, x)
+      const b = rebase(cwd, x)
       return x.match(/^(\/|([a-zA-Z]:)?\\)/) && b.length < x.length ? b : x
     })
     .join(' ').trim()
 
   if (process.env._ !== undefined && process.argv[1] === process.env._) {
     self.$0 = process.env._.replace(
-      path.dirname(process.execPath) + '/', ''
+      `${path.dirname(process.execPath)}/`, ''
     )
   }
 
   // use context object to keep track of resets, subcommand execution, etc
   // submodules should modify and check the state of context as necessary
   const context = { resets: -1, commands: [], files: [] }
-  self.getContext = function () {
-    return context
-  }
+  self.getContext = () => context
 
   // puts yargs back into an initial state. any keys
   // that have been set to "global" will not be reset
   // by this action.
-  var options
-  self.resetOptions = self.reset = function (aliases) {
+  let options
+  self.resetOptions = self.reset = function resetOptions (aliases) {
     context.resets++
     aliases = aliases || {}
     options = options || {}
     // put yargs back into an initial state, this
     // logic is used to build a nested command
     // hierarchy.
-    var tmpOptions = {}
+    const tmpOptions = {}
     tmpOptions.local = options.local ? options.local : []
     tmpOptions.configObjects = options.configObjects ? options.configObjects : []
 
     // if a key has been explicitly set as local,
     // we should reset it before passing options to command.
-    var localLookup = {}
-    tmpOptions.local.forEach(function (l) {
+    const localLookup = {}
+    tmpOptions.local.forEach((l) => {
       localLookup[l] = true
-      ;(aliases[l] || []).forEach(function (a) {
+      ;(aliases[l] || []).forEach((a) => {
         localLookup[a] = true
       })
     })
 
     // preserve all groups not set to local.
-    preservedGroups = Object.keys(groups).reduce(function (acc, groupName) {
-      var keys = groups[groupName].filter(function (key) {
-        return !(key in localLookup)
-      })
+    preservedGroups = Object.keys(groups).reduce((acc, groupName) => {
+      const keys = groups[groupName].filter(key => !(key in localLookup))
       if (keys.length > 0) {
         acc[groupName] = keys
       }
@@ -93,26 +90,22 @@ function Yargs (processArgs, cwd, parentRequire) {
     // groups can now be reset
     groups = {}
 
-    var arrayOptions = [
+    const arrayOptions = [
       'array', 'boolean', 'string', 'requiresArg', 'skipValidation',
       'count', 'normalize', 'number'
     ]
 
-    var objectOptions = [
+    const objectOptions = [
       'narg', 'key', 'alias', 'default', 'defaultDescription',
       'config', 'choices', 'demandedOptions', 'demandedCommands', 'coerce'
     ]
 
-    arrayOptions.forEach(function (k) {
-      tmpOptions[k] = (options[k] || []).filter(function (k) {
-        return !localLookup[k]
-      })
+    arrayOptions.forEach((k) => {
+      tmpOptions[k] = (options[k] || []).filter(k => !localLookup[k])
     })
 
-    objectOptions.forEach(function (k) {
-      tmpOptions[k] = objFilter(options[k], function (k, v) {
-        return !localLookup[k]
-      })
+    objectOptions.forEach((k) => {
+      tmpOptions[k] = objFilter(options[k], (k, v) => !localLookup[k])
     })
 
     tmpOptions.envPrefix = options.envPrefix
@@ -136,7 +129,7 @@ function Yargs (processArgs, cwd, parentRequire) {
   self.resetOptions()
 
   // temporary hack: allow "freezing" of reset-able state for parse(msg, cb)
-  var frozen
+  let frozen
   function freeze () {
     frozen = {}
     frozen.options = options
@@ -222,7 +215,7 @@ function Yargs (processArgs, cwd, parentRequire) {
 
   function populateParserHintArray (type, keys, value) {
     keys = [].concat(keys)
-    keys.forEach(function (key) {
+    keys.forEach((key) => {
       options[type].push(key)
     })
   }
@@ -279,14 +272,14 @@ function Yargs (processArgs, cwd, parentRequire) {
   function populateParserHintObject (builder, isArray, type, key, value) {
     if (Array.isArray(key)) {
       // an array of keys with one value ['x', 'y', 'z'], function parse () {}
-      var temp = {}
-      key.forEach(function (k) {
+      const temp = {}
+      key.forEach((k) => {
         temp[k] = value
       })
       builder(temp)
     } else if (typeof key === 'object') {
       // an object of key value pairs: {'x': parse () {}, 'y': parse() {}}
-      Object.keys(key).forEach(function (k) {
+      Object.keys(key).forEach((k) => {
         builder(k, key[k])
       })
     } else {
@@ -314,7 +307,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     delete usage.getDescriptions()[optionKey]
   }
 
-  self.config = function (key, msg, parseFn) {
+  self.config = function config (key, msg, parseFn) {
     argsert('[object|string] [string|function] [function]', [key, msg, parseFn], arguments.length)
     // allow a config object to be provided directly.
     if (typeof key === 'object') {
@@ -331,7 +324,7 @@ function Yargs (processArgs, cwd, parentRequire) {
 
     key = key || 'config'
     self.describe(key, msg || usage.deferY18nLookup('Path to JSON config file'))
-    ;(Array.isArray(key) ? key : [key]).forEach(function (k) {
+    ;(Array.isArray(key) ? key : [key]).forEach((k) => {
       options.config[k] = parseFn || true
     })
 
@@ -359,12 +352,12 @@ function Yargs (processArgs, cwd, parentRequire) {
 
   // TODO: deprecate self.demand in favor of
   // .demandCommand() .demandOption().
-  self.demand = self.required = self.require = function (keys, max, msg) {
+  self.demand = self.required = self.require = function demand (keys, max, msg) {
     // you can optionally provide a 'max' key,
     // which will raise an exception if too many '_'
     // options are provided.
     if (Array.isArray(max)) {
-      max.forEach(function (key) {
+      max.forEach((key) => {
         self.demandOption(key, msg)
       })
       max = Infinity
@@ -376,7 +369,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     if (typeof keys === 'number') {
       self.demandCommand(keys, max, msg, msg)
     } else if (Array.isArray(keys)) {
-      keys.forEach(function (key) {
+      keys.forEach((key) => {
         self.demandOption(key, msg)
       })
     } else {
@@ -390,7 +383,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     return self
   }
 
-  self.demandCommand = function (min, max, minMsg, maxMsg) {
+  self.demandCommand = function demandCommand (min, max, minMsg, maxMsg) {
     argsert('[number] [number|string] [string|null] [string|null]', [min, max, minMsg, maxMsg], arguments.length)
 
     if (typeof min === 'undefined') min = 1
@@ -403,21 +396,21 @@ function Yargs (processArgs, cwd, parentRequire) {
     self.global('_', false)
 
     options.demandedCommands._ = {
-      min: min,
-      max: max,
-      minMsg: minMsg,
-      maxMsg: maxMsg
+      min,
+      max,
+      minMsg,
+      maxMsg
     }
 
     return self
   }
 
-  self.getDemandedOptions = function () {
+  self.getDemandedOptions = () => {
     argsert([], 0)
     return options.demandedOptions
   }
 
-  self.getDemandedCommands = function () {
+  self.getDemandedCommands = () => {
     argsert([], 0)
     return options.demandedCommands
   }
@@ -467,28 +460,26 @@ function Yargs (processArgs, cwd, parentRequire) {
     return self
   }
 
-  self.global = function (globals, global) {
+  self.global = function global (globals, global) {
     argsert('<string|array> [boolean]', [globals, global], arguments.length)
     globals = [].concat(globals)
     if (global !== false) {
-      options.local = options.local.filter(function (l) {
-        return globals.indexOf(l) === -1
-      })
+      options.local = options.local.filter(l => globals.indexOf(l) === -1)
     } else {
-      globals.forEach(function (g) {
+      globals.forEach((g) => {
         if (options.local.indexOf(g) === -1) options.local.push(g)
       })
     }
     return self
   }
 
-  self.pkgConf = function (key, path) {
+  self.pkgConf = function pkgConf (key, path) {
     argsert('<string> [string]', [key, path], arguments.length)
-    var conf = null
+    let conf = null
     // prefer cwd to require-main-filename in this method
     // since we're looking for e.g. "nyc" config in nyc consumer
     // rather than "yargs" config in nyc (where nyc is the main filename)
-    var obj = pkgUp(path || cwd)
+    const obj = pkgUp(path || cwd)
 
     // If an object exists in the key, add it to options.configObjects
     if (obj[key] && typeof obj[key] === 'object') {
@@ -499,13 +490,13 @@ function Yargs (processArgs, cwd, parentRequire) {
     return self
   }
 
-  var pkgs = {}
+  const pkgs = {}
   function pkgUp (path) {
-    var npath = path || '*'
+    const npath = path || '*'
     if (pkgs[npath]) return pkgs[npath]
     const readPkgUp = require('read-pkg-up')
 
-    var obj = {}
+    let obj = {}
     try {
       obj = readPkgUp.sync({
         cwd: path || require('require-main-filename')(parentRequire || require),
@@ -517,9 +508,9 @@ function Yargs (processArgs, cwd, parentRequire) {
     return pkgs[npath]
   }
 
-  var parseFn = null
-  var parseContext = null
-  self.parse = function (args, shortCircuit, _parseFn) {
+  let parseFn = null
+  let parseContext = null
+  self.parse = function parse (args, shortCircuit, _parseFn) {
     argsert('<string|array> [function|boolean|object] [function]', [args, shortCircuit, _parseFn], arguments.length)
 
     // a context object can optionally be provided, this allows
@@ -543,25 +534,21 @@ function Yargs (processArgs, cwd, parentRequire) {
     freeze()
     if (parseFn) exitProcess = false
 
-    var parsed = self._parseArgs(args, shortCircuit)
+    const parsed = self._parseArgs(args, shortCircuit)
     if (parseFn) parseFn(exitError, parsed, output)
     unfreeze()
 
     return parsed
   }
 
-  self._getParseContext = function () {
-    return parseContext || {}
-  }
+  self._getParseContext = () => parseContext || {}
 
-  self._hasParseCallback = function () {
-    return !!parseFn
-  }
+  self._hasParseCallback = () => !!parseFn
 
-  self.option = self.options = function (key, opt) {
+  self.option = self.options = function option (key, opt) {
     argsert('<string|object> [object]', [key, opt], arguments.length)
     if (typeof key === 'object') {
-      Object.keys(key).forEach(function (k) {
+      Object.keys(key).forEach((k) => {
         self.options(k, key[k])
       })
     } else {
@@ -573,7 +560,7 @@ function Yargs (processArgs, cwd, parentRequire) {
 
       if (opt.alias) self.alias(key, opt.alias)
 
-      var demand = opt.demand || opt.required || opt.require
+      const demand = opt.demand || opt.required || opt.require
 
       // deprecated, use 'demandOption' instead
       if (demand) {
@@ -656,7 +643,7 @@ function Yargs (processArgs, cwd, parentRequire) {
         self.skipValidation(key)
       }
 
-      var desc = opt.describe || opt.description || opt.desc
+      const desc = opt.describe || opt.description || opt.desc
       if (desc) {
         self.describe(key, desc)
       }
@@ -668,29 +655,25 @@ function Yargs (processArgs, cwd, parentRequire) {
 
     return self
   }
-  self.getOptions = function () {
-    return options
-  }
+  self.getOptions = () => options
 
-  self.group = function (opts, groupName) {
+  self.group = function group (opts, groupName) {
     argsert('<string|array> <string>', [opts, groupName], arguments.length)
-    var existing = preservedGroups[groupName] || groups[groupName]
+    const existing = preservedGroups[groupName] || groups[groupName]
     if (preservedGroups[groupName]) {
       // we now only need to track this group name in groups.
       delete preservedGroups[groupName]
     }
 
-    var seen = {}
-    groups[groupName] = (existing || []).concat(opts).filter(function (key) {
+    const seen = {}
+    groups[groupName] = (existing || []).concat(opts).filter((key) => {
       if (seen[key]) return false
       return (seen[key] = true)
     })
     return self
   }
-  self.getGroups = function () {
-    // combine explicit and preserved groups. explicit groups should be first
-    return Object.assign({}, groups, preservedGroups)
-  }
+  // combine explicit and preserved groups. explicit groups should be first
+  self.getGroups = () => Object.assign({}, groups, preservedGroups)
 
   // as long as options.envPrefix is not undefined,
   // parser will apply env vars matching prefix to argv
@@ -707,15 +690,13 @@ function Yargs (processArgs, cwd, parentRequire) {
     return self
   }
 
-  var strict = false
+  let strict = false
   self.strict = function (enabled) {
     argsert('[boolean]', [enabled], arguments.length)
     strict = enabled !== false
     return self
   }
-  self.getStrict = function () {
-    return strict
-  }
+  self.getStrict = () => strict
 
   self.showHelp = function (level) {
     argsert('[string|function]', [level], arguments.length)
@@ -724,8 +705,8 @@ function Yargs (processArgs, cwd, parentRequire) {
     return self
   }
 
-  var versionOpt = null
-  self.version = function (opt, msg, ver) {
+  let versionOpt = null
+  self.version = function version (opt, msg, ver) {
     const defaultVersionOpt = 'version'
     argsert('[boolean|string] [string] [string]', [opt, msg, ver], arguments.length)
 
@@ -761,13 +742,13 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   function guessVersion () {
-    var obj = pkgUp()
+    const obj = pkgUp()
 
     return obj.version || 'unknown'
   }
 
-  var helpOpt = null
-  self.addHelpOpt = self.help = function (opt, msg) {
+  let helpOpt = null
+  self.addHelpOpt = self.help = function addHelpOpt (opt, msg) {
     const defaultHelpOpt = 'help'
     argsert('[string|boolean] [string]', [opt, msg], arguments.length)
 
@@ -789,7 +770,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     return self
   }
 
-  self.showHelpOnFail = function (enabled, message) {
+  self.showHelpOnFail = function showHelpOnFail (enabled, message) {
     argsert('[boolean|string] [string]', [enabled, message], arguments.length)
     usage.showHelpOnFail(enabled, message)
     return self
@@ -804,9 +785,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     exitProcess = enabled
     return self
   }
-  self.getExitProcess = function () {
-    return exitProcess
-  }
+  self.getExitProcess = () => exitProcess
 
   var completionCommand = null
   self.completion = function (cmd, desc, fn) {
@@ -863,21 +842,19 @@ function Yargs (processArgs, cwd, parentRequire) {
     return self
   }
 
-  var detectLocale = true
+  let detectLocale = true
   self.detectLocale = function (detect) {
     argsert('<boolean>', [detect], arguments.length)
     detectLocale = detect
     return self
   }
-  self.getDetectLocale = function () {
-    return detectLocale
-  }
+  self.getDetectLocale = () => detectLocale
 
   var hasOutput = false
   var exitError = null
   // maybe exit, always capture
   // context about why we wanted to exit.
-  self.exit = function (code, err) {
+  self.exit = (code, err) => {
     hasOutput = true
     exitError = err
     if (exitProcess) process.exit(code)
@@ -885,78 +862,66 @@ function Yargs (processArgs, cwd, parentRequire) {
 
   // we use a custom logger that buffers output,
   // so that we can print to non-CLIs, e.g., chat-bots.
-  var _logger = {
-    log: function () {
+  const _logger = {
+    log () {
       const args = []
-      for (var i = 0; i < arguments.length; i++) args.push(arguments[i])
+      for (let i = 0; i < arguments.length; i++) args.push(arguments[i])
       if (!self._hasParseCallback()) console.log.apply(console, args)
       hasOutput = true
       if (output.length) output += '\n'
       output += args.join(' ')
     },
-    error: function () {
+    error () {
       const args = []
-      for (var i = 0; i < arguments.length; i++) args.push(arguments[i])
+      for (let i = 0; i < arguments.length; i++) args.push(arguments[i])
       if (!self._hasParseCallback()) console.error.apply(console, args)
       hasOutput = true
       if (output.length) output += '\n'
       output += args.join(' ')
     }
   }
-  self._getLoggerInstance = function () {
-    return _logger
-  }
+  self._getLoggerInstance = () => _logger
   // has yargs output an error our help
   // message in the current execution context.
-  self._hasOutput = function () {
-    return hasOutput
-  }
+  self._hasOutput = () => hasOutput
 
-  self._setHasOutput = function () {
+  self._setHasOutput = () => {
     hasOutput = true
   }
 
-  var recommendCommands
+  let recommendCommands
   self.recommendCommands = function (recommend) {
     argsert('[boolean]', [recommend], arguments.length)
     recommendCommands = typeof recommend === 'boolean' ? recommend : true
     return self
   }
 
-  self.getUsageInstance = function () {
-    return usage
-  }
+  self.getUsageInstance = () => usage
 
-  self.getValidationInstance = function () {
-    return validation
-  }
+  self.getValidationInstance = () => validation
 
-  self.getCommandInstance = function () {
-    return command
-  }
+  self.getCommandInstance = () => command
 
-  self.terminalWidth = function () {
+  self.terminalWidth = () => {
     argsert([], 0)
     return typeof process.stdout.columns !== 'undefined' ? process.stdout.columns : null
   }
 
   Object.defineProperty(self, 'argv', {
-    get: function () {
-      return self._parseArgs(processArgs)
-    },
+    get: () => self._parseArgs(processArgs),
     enumerable: true
   })
 
-  self._parseArgs = function (args, shortCircuit, _skipValidation, commandIndex) {
-    var skipValidation = !!_skipValidation
+  self._parseArgs = function parseArgs (args, shortCircuit, _skipValidation, commandIndex) {
+    let skipValidation = !!_skipValidation
     args = args || processArgs
 
     options.__ = y18n.__
     options.configuration = pkgUp()['yargs'] || {}
     const parsed = Parser.detailed(args, options)
-    var argv = parsed.argv
+    let argv = parsed.argv
     if (parseContext) argv = Object.assign({}, argv, parseContext)
-    var aliases = parsed.aliases
+    const aliases = parsed.aliases
 
     argv.$0 = self.$0
     self.parsed = parsed
@@ -976,13 +941,11 @@ function Yargs (processArgs, cwd, parentRequire) {
           // consider any multi-char helpOpt alias as a valid help command
           // unless all helpOpt aliases are single-char
           // note that parsed.aliases is a normalized bidirectional map :)
-          var helpCmds = [helpOpt].concat(aliases[helpOpt] || [])
-          var multiCharHelpCmds = helpCmds.filter(function (k) {
-            return k.length > 1
-          })
+          let helpCmds = [helpOpt].concat(aliases[helpOpt] || [])
+          const multiCharHelpCmds = helpCmds.filter(k => k.length > 1)
           if (multiCharHelpCmds.length) helpCmds = multiCharHelpCmds
           // look for and strip any helpCmds from argv._
-          argv._ = argv._.filter(function (cmd) {
+          argv._ = argv._.filter((cmd) => {
             if (~helpCmds.indexOf(cmd)) {
               argv[helpOpt] = true
               return false
@@ -993,10 +956,10 @@ function Yargs (processArgs, cwd, parentRequire) {
 
         // if there's a handler associated with a
         // command defer processing to it.
-        var handlerKeys = command.getCommands()
+        const handlerKeys = command.getCommands()
         if (handlerKeys.length) {
-          var firstUnknownCommand
-          for (var i = (commandIndex || 0), cmd; argv._[i] !== undefined; i++) {
+          let firstUnknownCommand
+          for (let i = (commandIndex || 0), cmd; argv._[i] !== undefined; i++) {
             cmd = String(argv._[i])
             if (~handlerKeys.indexOf(cmd) && cmd !== completionCommand) {
               setPlaceholderKeys(argv)
@@ -1041,9 +1004,9 @@ function Yargs (processArgs, cwd, parentRequire) {
 
         // we allow for asynchronous completions,
         // e.g., loading in a list of commands from an API.
-        var completionArgs = args.slice(args.indexOf('--' + completion.completionKey) + 1)
-        completion.getCompletion(completionArgs, function (completions) {
-          ;(completions || []).forEach(function (completion) {
+        const completionArgs = args.slice(args.indexOf(`--${completion.completionKey}`) + 1)
+        completion.getCompletion(completionArgs, (completions) => {
+          ;(completions || []).forEach((completion) => {
             _logger.log(completion)
           })
 
@@ -1055,7 +1018,7 @@ function Yargs (processArgs, cwd, parentRequire) {
       // Handle 'help' and 'version' options
       // if we haven't already output help!
       if (!hasOutput) {
-        Object.keys(argv).forEach(function (key) {
+        Object.keys(argv).forEach((key) => {
           if (key === helpOpt && argv[key]) {
             if (exitProcess) setBlocking(true)
 
@@ -1074,9 +1037,7 @@ function Yargs (processArgs, cwd, parentRequire) {
 
       // Check if any of the options to skip validation were provided
       if (!skipValidation && options.skipValidation.length > 0) {
-        skipValidation = Object.keys(argv).some(function (key) {
-          return options.skipValidation.indexOf(key) >= 0 && argv[key] === true
-        })
+        skipValidation = Object.keys(argv).some(key => options.skipValidation.indexOf(key) >= 0 && argv[key] === true)
       }
 
       // If the help or version options where used and exitProcess is false,
@@ -1098,7 +1059,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     return setPlaceholderKeys(argv)
   }
 
-  self._runValidation = function (argv, aliases, positionalMap, parseErrors) {
+  self._runValidation = function runValidation (argv, aliases, positionalMap, parseErrors) {
     if (parseErrors) throw new YError(parseErrors.message)
     validation.nonOptionCount(argv)
     validation.missingArgumentValue(argv)
@@ -1123,7 +1084,7 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   function setPlaceholderKeys (argv) {
-    Object.keys(options.key).forEach(function (key) {
+    Object.keys(options.key).forEach((key) => {
       // don't set placeholder keys for dot
       // notation options 'foo.bar'.
       if (~key.indexOf('.')) return

@@ -1,37 +1,38 @@
-var Hash = require('hashish')
+'use strict'
+const Hash = require('hashish')
 
 // capture terminal output, so that we might
 // assert against it.
-exports.checkOutput = function (f, argv, cb) {
-  var exit = false
-  var _exit = process.exit
-  var _emit = process.emit
-  var _env = process.env
-  var _argv = process.argv
-  var _error = console.error
-  var _log = console.log
-  var _warn = console.warn
+exports.checkOutput = function checkOutput (f, argv, cb) {
+  let exit = false
+  const _exit = process.exit
+  const _emit = process.emit
+  const _env = process.env
+  const _argv = process.argv
+  const _error = console.error
+  const _log = console.log
+  const _warn = console.warn
 
-  process.exit = function () { exit = true }
+  process.exit = () => { exit = true }
   process.env = Hash.merge(process.env, { _: 'node' })
   process.argv = argv || [ './usage' ]
 
-  var errors = []
-  var logs = []
-  var warnings = []
+  const errors = []
+  const logs = []
+  const warnings = []
 
-  console.error = function (msg) { errors.push(msg) }
-  console.log = function (msg) { logs.push(msg) }
-  console.warn = function (msg) { warnings.push(msg) }
+  console.error = (msg) => { errors.push(msg) }
+  console.log = (msg) => { logs.push(msg) }
+  console.warn = (msg) => { warnings.push(msg) }
 
-  var result
+  let result
 
   if (typeof cb === 'function') {
-    process.exit = function () {
+    process.exit = () => {
       exit = true
       cb(null, done())
     }
-    process.emit = function (ev, value) {
+    process.emit = function emit (ev, value) {
       if (ev === 'uncaughtException') {
         done()
         cb(value)
@@ -67,11 +68,11 @@ exports.checkOutput = function (f, argv, cb) {
     reset()
 
     return {
-      errors: errors,
-      logs: logs,
-      warnings: warnings,
-      exit: exit,
-      result: result
+      errors,
+      logs,
+      warnings,
+      exit,
+      result
     }
   }
 }
