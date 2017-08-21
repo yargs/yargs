@@ -135,7 +135,7 @@ DEBUG("Extra chatty mode");
     Showing semi-important stuff too
     Extra chatty mode
 
-Tell users how to use yer options and make demands.
+Tell users how to use your options and make demands.
 -------------------------------------------------
 
 area.js:
@@ -164,7 +164,7 @@ console.log("The area is:", argv.w * argv.h);
 
     Missing required arguments: h
 
-After yer demands have been met, demand more! Ask for non-hyphenated arguments!
+After your demands have been met, demand more! Ask for non-hyphenated arguments!
 -----------------------------------------
 
 demand_count.js:
@@ -268,8 +268,8 @@ console.dir(argv._);
 Yargs is here to help you...
 ---------------------------
 
-Ye can describe parameters fer help messages and set aliases. Yargs figures
-out how ter format a handy help string automatically.
+You can describe parameters for help messages and set aliases. Yargs figures
+out how to format a handy help string automatically.
 
 line_count.js:
 
