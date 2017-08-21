@@ -1,3 +1,4 @@
+'use strict'
 /* global describe, it, beforeEach */
 
 const checkUsage = require('./helpers/utils').checkOutput
@@ -9,21 +10,22 @@ const YError = require('../lib/yerror')
 
 require('chai').should()
 
-describe('usage tests', function () {
-  beforeEach(function () {
+const noop = () => {}
+
+describe('usage tests', () => {
+  beforeEach(() => {
     yargs.reset()
   })
 
-  describe('demand options', function () {
-    describe('using .demand()', function () {
-      it('should show an error along with the missing arguments on demand fail', function () {
-        var r = checkUsage(function () {
-          return yargs('-x 10 -z 20')
+  describe('demand options', () => {
+    describe('using .demand()', () => {
+      it('should show an error along with the missing arguments on demand fail', () => {
+        const r = checkUsage(() => yargs('-x 10 -z 20')
             .usage('Usage: $0 -x NUM -y NUM')
             .demand(['x', 'y'])
             .wrap(null)
             .argv
-        })
+          )
         r.result.should.have.property('x', 10)
         r.result.should.have.property('z', 20)
         r.result.should.have.property('_').with.length(0)
@@ -40,15 +42,14 @@ describe('usage tests', function () {
         r.exit.should.be.ok
       })
 
-      it('missing argument message given if one command, but an argument not on the list is provided', function () {
-        var r = checkUsage(function () {
-          return yargs('wombat -w 10 -y 10')
+      it('missing argument message given if one command, but an argument not on the list is provided', () => {
+        const r = checkUsage(() => yargs('wombat -w 10 -y 10')
             .usage('Usage: $0 -w NUM -m NUM')
             .demand(1, ['w', 'm'])
             .strict()
             .wrap(null)
             .argv
-        })
+          )
         r.result.should.have.property('w', 10)
         r.result.should.have.property('y', 10)
         r.result.should.have.property('_').with.length(1)
@@ -65,15 +66,14 @@ describe('usage tests', function () {
         r.exit.should.be.ok
       })
 
-      it('missing command message if all the required arguments exist, but not enough commands are provided', function () {
-        var r = checkUsage(function () {
-          return yargs('-w 10 -y 10')
+      it('missing command message if all the required arguments exist, but not enough commands are provided', () => {
+        const r = checkUsage(() => yargs('-w 10 -y 10')
             .usage('Usage: $0 -w NUM -m NUM')
             .demand(1, ['w', 'm'])
             .strict()
             .wrap(null)
             .argv
-        })
+          )
         r.result.should.have.property('w', 10)
         r.result.should.have.property('y', 10)
         r.result.should.have.property('_').with.length(0)
@@ -90,15 +90,14 @@ describe('usage tests', function () {
         r.exit.should.be.ok
       })
 
-      it('no failure occurs if the required arguments and the required number of commands are provided', function () {
-        var r = checkUsage(function () {
-          return yargs('wombat -w 10 -m 10')
+      it('no failure occurs if the required arguments and the required number of commands are provided', () => {
+        const r = checkUsage(() => yargs('wombat -w 10 -m 10')
             .usage('Usage: $0 -w NUM -m NUM')
             .command('wombat', 'wombat handlers')
             .demand(1, ['w', 'm'])
             .wrap(null)
             .argv
-        })
+          )
 
         r.result.should.have.property('w', 10)
         r.result.should.have.property('m', 10)
@@ -108,15 +107,14 @@ describe('usage tests', function () {
         r.should.have.property('exit', false)
       })
 
-      describe('using .require()', function () {
-        it('should show an error along with the missing arguments on demand fail', function () {
-          var r = checkUsage(function () {
-            return yargs('-x 10 -z 20')
+      describe('using .require()', () => {
+        it('should show an error along with the missing arguments on demand fail', () => {
+          const r = checkUsage(() => yargs('-x 10 -z 20')
               .usage('Usage: $0 -x NUM -y NUM')
               .require(['x', 'y'])
               .wrap(null)
               .argv
-          })
+            )
           r.result.should.have.property('x', 10)
           r.result.should.have.property('z', 20)
           r.result.should.have.property('_').with.length(0)
@@ -132,15 +130,14 @@ describe('usage tests', function () {
           r.logs.should.have.length(0)
           r.exit.should.be.ok
         })
-        it('missing argument message given if one command and an argument not on the list are provided', function () {
-          var r = checkUsage(function () {
-            return yargs('wombat -w 10 -y 10')
+        it('missing argument message given if one command and an argument not on the list are provided', () => {
+          const r = checkUsage(() => yargs('wombat -w 10 -y 10')
               .usage('Usage: $0 -w NUM -m NUM')
               .required(1, ['w', 'm'])
               .strict()
               .wrap(null)
               .argv
-          })
+            )
           r.result.should.have.property('w', 10)
           r.result.should.have.property('y', 10)
           r.result.should.have.property('_').with.length(1)
@@ -158,15 +155,14 @@ describe('usage tests', function () {
         })
       })
 
-      it('missing command message if all the required arguments exist, but not enough commands are provided', function () {
-        var r = checkUsage(function () {
-          return yargs('-w 10 -y 10')
+      it('missing command message if all the required arguments exist, but not enough commands are provided', () => {
+        const r = checkUsage(() => yargs('-w 10 -y 10')
             .usage('Usage: $0 -w NUM -m NUM')
             .require(1, ['w', 'm'])
             .strict()
             .wrap(null)
             .argv
-        })
+          )
         r.result.should.have.property('w', 10)
         r.result.should.have.property('y', 10)
         r.result.should.have.property('_').with.length(0)
@@ -184,14 +180,13 @@ describe('usage tests', function () {
       })
     })
 
-    it('should show an error along with a custom message on demand fail', function () {
-      var r = checkUsage(function () {
-        return yargs('-z 20')
+    it('should show an error along with a custom message on demand fail', () => {
+      const r = checkUsage(() => yargs('-z 20')
         .usage('Usage: $0 -x NUM -y NUM')
         .demand(['x', 'y'], 'x and y are both required to multiply all the things')
         .wrap(null)
         .argv
-      })
+      )
       r.result.should.have.property('z', 20)
       r.result.should.have.property('_').with.length(0)
       r.errors.join('\n').split(/\n+/).should.deep.equal([
@@ -208,14 +203,13 @@ describe('usage tests', function () {
       r.exit.should.be.ok
     })
 
-    it('should return valid values when demand passes', function () {
-      var r = checkUsage(function () {
-        return yargs('-x 10 -y 20')
+    it('should return valid values when demand passes', () => {
+      const r = checkUsage(() => yargs('-x 10 -y 20')
         .usage('Usage: $0 -x NUM -y NUM')
         .demand(['x', 'y'])
         .wrap(null)
         .argv
-      })
+      )
       r.should.have.property('result')
       r.result.should.have.property('x', 10)
       r.result.should.have.property('y', 20)
@@ -225,14 +219,13 @@ describe('usage tests', function () {
       r.should.have.property('exit', false)
     })
 
-    it('should not show a custom message if msg is null', function () {
-      var r = checkUsage(function () {
-        return yargs('')
+    it('should not show a custom message if msg is null', () => {
+      const r = checkUsage(() => yargs('')
           .usage('Usage: foo')
           .demand(1, null)
           .wrap(null)
           .argv
-      })
+        )
 
       r.errors.join('\n').split(/\n+/).should.deep.equal([
         'Usage: foo',
@@ -244,27 +237,25 @@ describe('usage tests', function () {
     })
 
     // see #169.
-    describe('min/max demanded count', function () {
-      it("does not output an error if '_' count is within the min/max range", function () {
-        var r = checkUsage(function () {
-          return yargs(['foo', 'bar', 'apple'])
+    describe('min/max demanded count', () => {
+      it("does not output an error if '_' count is within the min/max range", () => {
+        const r = checkUsage(() => yargs(['foo', 'bar', 'apple'])
             .usage('Usage: foo')
             .demand(2, 3)
             .wrap(null)
             .argv
-        })
+          )
 
         r.errors.length.should.equal(0)
       })
 
-      it("outputs an error if '_' count is above max", function () {
-        var r = checkUsage(function () {
-          return yargs(['foo', 'bar', 'apple', 'banana'])
+      it("outputs an error if '_' count is above max", () => {
+        const r = checkUsage(() => yargs(['foo', 'bar', 'apple', 'banana'])
             .usage('Usage: foo')
             .demand(2, 3)
             .wrap(null)
             .argv
-        })
+          )
 
         r.errors.join('\n').split(/\n+/).should.deep.equal([
           'Usage: foo',
@@ -275,14 +266,13 @@ describe('usage tests', function () {
         ])
       })
 
-      it("outputs an error if '_' count is below min", function () {
-        var r = checkUsage(function () {
-          return yargs(['foo'])
+      it("outputs an error if '_' count is below min", () => {
+        const r = checkUsage(() => yargs(['foo'])
             .usage('Usage: foo')
             .demand(2, 3)
             .wrap(null)
             .argv
-        })
+          )
 
         r.errors.join('\n').split(/\n+/).should.deep.equal([
           'Usage: foo',
@@ -293,14 +283,13 @@ describe('usage tests', function () {
         ])
       })
 
-      it('allows a customer error message to be provided', function () {
-        var r = checkUsage(function () {
-          return yargs(['foo'])
+      it('allows a customer error message to be provided', () => {
+        const r = checkUsage(() => yargs(['foo'])
             .usage('Usage: foo')
             .demand(2, 3, 'pork chop sandwiches')
             .wrap(null)
             .argv
-        })
+          )
 
         r.errors.join('\n').split(/\n+/).should.deep.equal([
           'Usage: foo',
@@ -311,31 +300,29 @@ describe('usage tests', function () {
         ])
       })
 
-      it("shouldn't interpret the second argument as a max when it is an array", function () {
-        var r = checkUsage(function () {
-          return yargs(['koala', 'wombat', '--1'])
+      it("shouldn't interpret the second argument as a max when it is an array", () => {
+        const r = checkUsage(() => yargs(['koala', 'wombat', '--1'])
               .usage('Usage: foo')
               .demand(1, ['1'])
               .wrap(null)
               .argv
-        })
+            )
 
         r.errors.length.should.equal(0)
       })
     })
   })
 
-  it('should return valid values when check passes', function () {
-    var r = checkUsage(function () {
-      return yargs('-x 10 -y 20')
+  it('should return valid values when check passes', () => {
+    const r = checkUsage(() => yargs('-x 10 -y 20')
       .usage('Usage: $0 -x NUM -y NUM')
-      .check(function (argv) {
+      .check((argv) => {
         if (!('x' in argv)) throw Error('You forgot about -x')
         if (!('y' in argv)) throw Error('You forgot about -y')
         else return true
       })
       .argv
-    })
+    )
     r.should.have.property('result')
     r.result.should.have.property('x', 10)
     r.result.should.have.property('y', 20)
@@ -345,17 +332,16 @@ describe('usage tests', function () {
     r.should.have.property('exit', false)
   })
 
-  it('should display missing arguments when check fails with a thrown exception', function () {
-    var r = checkUsage(function () {
-      return yargs('-x 10 -z 20')
+  it('should display missing arguments when check fails with a thrown exception', () => {
+    const r = checkUsage(() => yargs('-x 10 -z 20')
         .usage('Usage: $0 -x NUM -y NUM')
         .wrap(null)
-        .check(function (argv) {
+        .check((argv) => {
           if (!('x' in argv)) throw Error('You forgot about -x')
           if (!('y' in argv)) throw Error('You forgot about -y')
         })
         .argv
-    })
+      )
     r.should.have.property('result')
     r.result.should.have.property('x', 10)
     r.result.should.have.property('z', 20)
@@ -371,17 +357,16 @@ describe('usage tests', function () {
     r.should.have.property('exit').and.be.ok
   })
 
-  it('should display missing arguments when check fails with a return value', function () {
-    var r = checkUsage(function () {
-      return yargs('-x 10 -z 20')
+  it('should display missing arguments when check fails with a return value', () => {
+    const r = checkUsage(() => yargs('-x 10 -z 20')
       .usage('Usage: $0 -x NUM -y NUM')
       .wrap(null)
-      .check(function (argv) {
+      .check((argv) => {
         if (!('x' in argv)) return 'You forgot about -x'
         if (!('y' in argv)) return 'You forgot about -y'
       })
       .argv
-    })
+    )
     r.should.have.property('result')
     r.result.should.have.property('x', 10)
     r.result.should.have.property('z', 20)
@@ -398,16 +383,15 @@ describe('usage tests', function () {
     ])
   })
 
-  it('should return a valid result when check condition passes', function () {
+  it('should return a valid result when check condition passes', () => {
     function checker (argv) {
       return 'x' in argv && 'y' in argv
     }
-    var r = checkUsage(function () {
-      return yargs('-x 10 -y 20')
+    const r = checkUsage(() => yargs('-x 10 -y 20')
       .usage('Usage: $0 -x NUM -y NUM')
       .check(checker)
       .argv
-    })
+    )
     r.should.have.property('result')
     r.result.should.have.property('x', 10)
     r.result.should.have.property('y', 20)
@@ -417,17 +401,16 @@ describe('usage tests', function () {
     r.should.have.property('exit', false)
   })
 
-  it('should display a failed message when check condition fails', function () {
+  it('should display a failed message when check condition fails', () => {
     function checker (argv) {
       return 'x' in argv && 'y' in argv
     }
-    var r = checkUsage(function () {
-      return yargs('-x 10 -z 20')
+    const r = checkUsage(() => yargs('-x 10 -z 20')
       .usage('Usage: $0 -x NUM -y NUM')
       .check(checker)
       .wrap(null)
       .argv
-    })
+    )
     r.should.have.property('result')
     r.result.should.have.property('x', 10)
     r.result.should.have.property('z', 20)
@@ -440,20 +423,20 @@ describe('usage tests', function () {
       'Options:\n' +
       '  --help     Show help  [boolean]\n' +
       '  --version  Show version number  [boolean]\n' +
-      'Argument check failed: ' + checker.toString()
+      `Argument check failed: ${checker.toString()}`
     )
   })
 
-  describe('when exitProcess is false', function () {
-    describe('when check fails with a thrown exception', function () {
-      it('should display missing arguments once', function () {
-        var r = checkUsage(function () {
+  describe('when exitProcess is false', () => {
+    describe('when check fails with a thrown exception', () => {
+      it('should display missing arguments once', () => {
+        const r = checkUsage(() => {
           try {
             return yargs('-x 10 -z 20')
               .usage('Usage: $0 -x NUM -y NUM')
               .exitProcess(false)
               .wrap(null)
-              .check(function (argv) {
+              .check((argv) => {
                 if (!('x' in argv)) throw Error('You forgot about -x')
                 if (!('y' in argv)) throw Error('You forgot about -y')
               })
@@ -473,17 +456,17 @@ describe('usage tests', function () {
         r.should.have.property('exit').and.be.false
       })
     })
-    describe('fail()', function () {
-      it('is called with the original error message as the first parameter', function () {
-        var r = checkUsage(function () {
+    describe('fail()', () => {
+      it('is called with the original error message as the first parameter', () => {
+        const r = checkUsage(() => {
           try {
             return yargs()
-              .fail(function (message) {
+              .fail((message) => {
                 console.log(message)
               })
               .exitProcess(false)
               .wrap(null)
-              .check(function (argv) {
+              .check((argv) => {
                 throw new Error('foo')
               })
               .argv
@@ -495,38 +478,37 @@ describe('usage tests', function () {
         r.should.have.property('exit').and.be.false
       })
 
-      it('is invoked with yargs instance as third argument', function () {
-        var r = checkUsage(function () {
-          return yargs('foo')
+      it('is invoked with yargs instance as third argument', () => {
+        const r = checkUsage(() => yargs('foo')
             .command('foo', 'desc', {
               bar: {
                 describe: 'bar command'
               }
-            }, function (argv) {
+            }, (argv) => {
               throw new YError('blah')
             })
-            .fail(function (message, error, yargs) {
+            .fail((message, error, yargs) => {
               yargs.showHelp()
             })
             .exitProcess(false)
             .wrap(null)
             .argv
-        })
+          )
 
         r.errors[0].should.contain('bar command')
       })
 
-      describe('when check() throws error', function () {
-        it('fail() is called with the original error object as the second parameter', function () {
-          var r = checkUsage(function () {
+      describe('when check() throws error', () => {
+        it('fail() is called with the original error object as the second parameter', () => {
+          const r = checkUsage(() => {
             try {
               return yargs()
-                .fail(function (message, error) {
+                .fail((message, error) => {
                   console.log(error.message)
                 })
                 .exitProcess(false)
                 .wrap(null)
-                .check(function () {
+                .check(() => {
                   throw new Error('foo')
                 })
                 .argv
@@ -538,23 +520,23 @@ describe('usage tests', function () {
           r.should.have.property('exit').and.be.false
         })
       })
-      describe('when command() throws error', function () {
-        it('fail() is called with the original error object as the second parameter', function () {
-          var r = checkUsage(function () {
+      describe('when command() throws error', () => {
+        it('fail() is called with the original error object as the second parameter', () => {
+          const r = checkUsage(() => {
             try {
               return yargs('test')
-                .fail(function () {
+                .fail(() => {
                   console.log('is triggered last')
                 })
                 .exitProcess(false)
                 .wrap(null)
-                .command('test', 'test', function (subYargs) {
+                .command('test', 'test', (subYargs) => {
                   subYargs
-                    .fail(function (message, error) {
+                    .fail((message, error) => {
                       console.log([error.name, error.message])
                     })
                     .exitProcess(false)
-                }, function (argv) {
+                }, (argv) => {
                   throw new YError('foo')
                 })
                 .argv
@@ -569,13 +551,12 @@ describe('usage tests', function () {
     })
   })
 
-  it('should return a valid result when demanding a count of non-hyphenated values', function () {
-    var r = checkUsage(function () {
-      return yargs('1 2 3 --moo')
+  it('should return a valid result when demanding a count of non-hyphenated values', () => {
+    const r = checkUsage(() => yargs('1 2 3 --moo')
       .usage('Usage: $0 [x] [y] [z] {OPTIONS}')
       .demand(3)
       .argv
-    })
+    )
     r.should.have.property('result')
     r.should.have.property('errors').with.length(0)
     r.should.have.property('logs').with.length(0)
@@ -584,14 +565,13 @@ describe('usage tests', function () {
     r.result.should.have.property('moo', true)
   })
 
-  it('should return a failure message when not enough non-hyphenated arguments are found after a demand count', function () {
-    var r = checkUsage(function () {
-      return yargs('1 2 --moo')
+  it('should return a failure message when not enough non-hyphenated arguments are found after a demand count', () => {
+    const r = checkUsage(() => yargs('1 2 --moo')
       .usage('Usage: $0 [x] [y] [z] {OPTIONS}')
       .demand(3)
       .wrap(null)
       .argv
-    })
+    )
     r.should.have.property('result')
     r.should.have.property('logs').with.length(0)
     r.should.have.property('exit').and.be.ok
@@ -607,14 +587,13 @@ describe('usage tests', function () {
     ])
   })
 
-  it('should return a custom failure message when not enough non-hyphenated arguments are found after a demand count', function () {
-    var r = checkUsage(function () {
-      return yargs('src --moo')
+  it('should return a custom failure message when not enough non-hyphenated arguments are found after a demand count', () => {
+    const r = checkUsage(() => yargs('src --moo')
       .usage('Usage: $0 [x] [y] [z] {OPTIONS} <src> <dest> [extra_files...]')
       .demand(2, 'src and dest files are both required')
       .wrap(null)
       .argv
-    })
+    )
     r.should.have.property('result')
     r.should.have.property('logs').with.length(0)
     r.should.have.property('exit').and.be.ok
@@ -630,14 +609,13 @@ describe('usage tests', function () {
     ])
   })
 
-  it('should return a valid result when setting defaults for singles', function () {
-    var r = checkUsage(function () {
-      return yargs('--foo 50 --baz 70 --powsy')
+  it('should return a valid result when setting defaults for singles', () => {
+    const r = checkUsage(() => yargs('--foo 50 --baz 70 --powsy')
       .default('foo', 5)
       .default('bar', 6)
       .default('baz', 7)
       .argv
-    })
+    )
     r.should.have.property('result')
     r.result.should.have.property('foo', 50)
     r.result.should.have.property('bar', 6)
@@ -646,28 +624,26 @@ describe('usage tests', function () {
     r.result.should.have.property('_').with.length(0)
   })
 
-  it('should return a valid result when default is set for an alias', function () {
-    var r = checkUsage(function () {
-      return yargs('')
+  it('should return a valid result when default is set for an alias', () => {
+    const r = checkUsage(() => yargs('')
       .alias('f', 'foo')
       .default('f', 5)
       .argv
-    })
+    )
     r.should.have.property('result')
     r.result.should.have.property('f', 5)
     r.result.should.have.property('foo', 5)
     r.result.should.have.property('_').with.length(0)
   })
 
-  it('should print a single line when failing and default is set for an alias', function () {
-    var r = checkUsage(function () {
-      return yargs('')
+  it('should print a single line when failing and default is set for an alias', () => {
+    const r = checkUsage(() => yargs('')
         .alias('f', 'foo')
         .default('f', 5)
         .demand(1)
         .wrap(null)
         .argv
-    })
+      )
     r.errors.join('\n').split(/\n+/).should.deep.equal([
       'Options:',
       '  --help     Show help  [boolean]',
@@ -677,12 +653,11 @@ describe('usage tests', function () {
     ])
   })
 
-  it('should allow you to set default values for a hash of options', function () {
-    var r = checkUsage(function () {
-      return yargs('--foo 50 --baz 70')
+  it('should allow you to set default values for a hash of options', () => {
+    const r = checkUsage(() => yargs('--foo 50 --baz 70')
       .default({ foo: 10, bar: 20, quux: 30 })
       .argv
-    })
+    )
     r.should.have.property('result')
     r.result.should.have.property('_').with.length(0)
     r.result.should.have.property('foo', 50)
@@ -691,11 +666,11 @@ describe('usage tests', function () {
     r.result.should.have.property('quux', 30)
   })
 
-  describe('required arguments', function () {
-    describe('with options object', function () {
-      it('should show a failure message if a required option is missing', function () {
-        var r = checkUsage(function () {
-          var opts = {
+  describe('required arguments', () => {
+    describe('with options object', () => {
+      it('should show a failure message if a required option is missing', () => {
+        const r = checkUsage(() => {
+          const opts = {
             foo: { description: 'foo option', alias: 'f', requiresArg: true },
             bar: { description: 'bar option', alias: 'b', requiresArg: true }
           }
@@ -721,9 +696,9 @@ describe('usage tests', function () {
         ])
       })
 
-      it('should show a failure message if more than one required option is missing', function () {
-        var r = checkUsage(function () {
-          var opts = {
+      it('should show a failure message if more than one required option is missing', () => {
+        const r = checkUsage(() => {
+          const opts = {
             foo: { description: 'foo option', alias: 'f', requiresArg: true },
             bar: { description: 'bar option', alias: 'b', requiresArg: true }
           }
@@ -750,10 +725,10 @@ describe('usage tests', function () {
       })
     })
 
-    describe('with requiresArg method', function () {
-      it('should show a failure message if a required option is missing', function () {
-        var r = checkUsage(function () {
-          var opts = {
+    describe('with requiresArg method', () => {
+      it('should show a failure message if a required option is missing', () => {
+        const r = checkUsage(() => {
+          const opts = {
             foo: { description: 'foo option', alias: 'f' },
             bar: { description: 'bar option', alias: 'b' }
           }
@@ -781,25 +756,24 @@ describe('usage tests', function () {
       })
     })
 
-    it("still requires argument if 'type' hints are given", function () {
-      var r = checkUsage(function () {
-        return yargs('--foo --bar')
+    it("still requires argument if 'type' hints are given", () => {
+      const r = checkUsage(() => yargs('--foo --bar')
           .requiresArg('foo')
           .string('foo')
           .requiresArg('bar')
           .array('bar')
           .wrap(null)
           .argv
-      })
+        )
 
       r.errors[1].should.equal('Missing argument values: foo, bar')
     })
   })
 
-  describe('with strict() option set', function () {
-    it('should fail given an option argument that is not demanded', function () {
-      var r = checkUsage(function () {
-        var opts = {
+  describe('with strict() option set', () => {
+    it('should fail given an option argument that is not demanded', () => {
+      const r = checkUsage(() => {
+        const opts = {
           foo: { demand: 'foo option', alias: 'f' },
           bar: { demand: 'bar option', alias: 'b' }
         }
@@ -832,9 +806,9 @@ describe('usage tests', function () {
       r.should.have.property('exit').and.be.ok
     })
 
-    it('should fail given an option argument without a corresponding description', function () {
-      var r = checkUsage(function () {
-        var opts = {
+    it('should fail given an option argument without a corresponding description', () => {
+      const r = checkUsage(() => {
+        const opts = {
           foo: { description: 'foo option', alias: 'f' },
           bar: { description: 'bar option', alias: 'b' }
         }
@@ -867,9 +841,9 @@ describe('usage tests', function () {
       r.should.have.property('exit').and.be.ok
     })
 
-    it('should fail given multiple option arguments without corresponding descriptions', function () {
-      var r = checkUsage(function () {
-        var opts = {
+    it('should fail given multiple option arguments without corresponding descriptions', () => {
+      const r = checkUsage(() => {
+        const opts = {
           foo: { description: 'foo option', alias: 'f' },
           bar: { description: 'bar option', alias: 'b' }
         }
@@ -903,9 +877,9 @@ describe('usage tests', function () {
       r.should.have.property('exit').and.be.ok
     })
 
-    it('should pass given option arguments with corresponding descriptions', function () {
-      var r = checkUsage(function () {
-        var opts = {
+    it('should pass given option arguments with corresponding descriptions', () => {
+      const r = checkUsage(() => {
+        const opts = {
           foo: { description: 'foo option' },
           bar: { description: 'bar option' }
         }
@@ -926,15 +900,14 @@ describe('usage tests', function () {
     })
   })
 
-  it('should display example on fail', function () {
-    var r = checkUsage(function () {
-      return yargs('')
+  it('should display example on fail', () => {
+    const r = checkUsage(() => yargs('')
         .example('$0 something', 'description')
         .example('$0 something else', 'other description')
         .demand(['y'])
         .wrap(null)
         .argv
-    })
+      )
     r.should.have.property('result')
     r.result.should.have.property('_').with.length(0)
     r.should.have.property('errors')
@@ -952,11 +925,10 @@ describe('usage tests', function () {
     ])
   })
 
-  describe('demand option with boolean flag', function () {
-    describe('with demand option', function () {
-      it('should report missing required arguments', function () {
-        var r = checkUsage(function () {
-          return yargs('-y 10 -z 20')
+  describe('demand option with boolean flag', () => {
+    describe('with demand option', () => {
+      it('should report missing required arguments', () => {
+        const r = checkUsage(() => yargs('-y 10 -z 20')
             .usage('Usage: $0 -x NUM [-y NUM]')
             .options({
               'x': { description: 'an option', demand: true },
@@ -964,7 +936,7 @@ describe('usage tests', function () {
             })
             .wrap(null)
             .argv
-        })
+          )
         r.result.should.have.property('y', 10)
         r.result.should.have.property('z', 20)
         r.result.should.have.property('_').with.length(0)
@@ -984,10 +956,9 @@ describe('usage tests', function () {
       })
     })
 
-    describe('with required option', function () {
-      it('should report missing required arguments', function () {
-        var r = checkUsage(function () {
-          return yargs('-y 10 -z 20')
+    describe('with required option', () => {
+      it('should report missing required arguments', () => {
+        const r = checkUsage(() => yargs('-y 10 -z 20')
             .usage('Usage: $0 -x NUM [-y NUM]')
             .options({
               'x': { description: 'an option', required: true },
@@ -995,7 +966,7 @@ describe('usage tests', function () {
             })
             .wrap(null)
             .argv
-        })
+          )
         r.result.should.have.property('y', 10)
         r.result.should.have.property('z', 20)
         r.result.should.have.property('_').with.length(0)
@@ -1015,9 +986,8 @@ describe('usage tests', function () {
       })
     })
 
-    it('should not report missing required arguments when given an alias', function () {
-      var r = checkUsage(function () {
-        return yargs('-w 10')
+    it('should not report missing required arguments when given an alias', () => {
+      const r = checkUsage(() => yargs('-w 10')
         .usage('Usage: $0 --width NUM [--height NUM]')
         .options({
           'width': { description: 'Width', alias: 'w', demand: true },
@@ -1025,7 +995,7 @@ describe('usage tests', function () {
         })
         .wrap(null)
         .argv
-      })
+      )
       r.result.should.have.property('w', 10)
       r.result.should.have.property('_').with.length(0)
       r.should.have.property('errors').with.length(0)
@@ -1033,14 +1003,13 @@ describe('usage tests', function () {
     })
   })
 
-  describe('help option', function () {
-    it('should display usage', function () {
-      var r = checkUsage(function () {
-        return yargs(['--help'])
+  describe('help option', () => {
+    it('should display usage', () => {
+      const r = checkUsage(() => yargs(['--help'])
           .demand(['y'])
           .wrap(null)
           .argv
-      })
+        )
       r.should.have.property('result')
       r.result.should.have.property('_').with.length(0)
       r.should.have.property('errors')
@@ -1055,15 +1024,14 @@ describe('usage tests', function () {
       ])
     })
 
-    it('should not show both dashed and camelCase aliases', function () {
-      var r = checkUsage(function () {
-        return yargs(['--help'])
+    it('should not show both dashed and camelCase aliases', () => {
+      const r = checkUsage(() => yargs(['--help'])
           .usage('Usage: $0 options')
           .describe('some-opt', 'Some option')
           .default('some-opt', 2)
           .wrap(null)
           .argv
-      })
+        )
       r.should.have.property('result')
       r.result.should.have.property('_').with.length(0)
       r.should.have.property('exit').and.be.ok
@@ -1079,10 +1047,9 @@ describe('usage tests', function () {
       ])
     })
 
-    describe('when exitProcess is false', function () {
-      it('should not validate arguments (required argument)', function () {
-        var r = checkUsage(function () {
-          return yargs(['--help'])
+    describe('when exitProcess is false', () => {
+      it('should not validate arguments (required argument)', () => {
+        const r = checkUsage(() => yargs(['--help'])
             .usage('Usage: $0 options')
             .alias('help', 'h')
             .describe('some-opt', 'Some option')
@@ -1090,7 +1057,7 @@ describe('usage tests', function () {
             .wrap(null)
             .exitProcess(false)
             .argv
-        })
+          )
         r.should.have.property('result')
         r.result.should.have.property('_').with.length(0)
         r.result.should.have.property('help').and.be.true
@@ -1110,9 +1077,8 @@ describe('usage tests', function () {
 
       // We need both this and the previous spec because a required argument
       // is a validation error and nargs is a parse error
-      it('should not validate arguments (nargs)', function () {
-        var r = checkUsage(function () {
-          return yargs(['--help', '--some-opt'])
+      it('should not validate arguments (nargs)', () => {
+        const r = checkUsage(() => yargs(['--help', '--some-opt'])
             .usage('Usage: $0 options')
             .alias('help', 'h')
             .describe('some-opt', 'Some option')
@@ -1121,7 +1087,7 @@ describe('usage tests', function () {
             .wrap(null)
             .exitProcess(false)
             .argv
-        })
+          )
         r.should.have.property('result')
         r.result.should.have.property('_').with.length(0)
         r.result.should.have.property('help').and.be.true
@@ -1141,14 +1107,13 @@ describe('usage tests', function () {
     })
   })
 
-  describe('version option', function () {
-    it('should display version', function () {
-      var r = checkUsage(function () {
-        return yargs(['--version'])
+  describe('version option', () => {
+    it('should display version', () => {
+      const r = checkUsage(() => yargs(['--version'])
         .version('version', 'Show version number', '1.0.1')
         .wrap(null)
         .argv
-      })
+      )
       r.should.have.property('result')
       r.result.should.have.property('_').with.length(0)
       r.should.have.property('errors')
@@ -1157,36 +1122,33 @@ describe('usage tests', function () {
       r.logs[0].should.eql('1.0.1')
     })
 
-    it('accepts version option as first argument, and version number as second argument', function () {
-      var r = checkUsage(function () {
-        return yargs(['--version'])
+    it('accepts version option as first argument, and version number as second argument', () => {
+      const r = checkUsage(() => yargs(['--version'])
         .version('version', '1.0.0')
         .wrap(null)
         .argv
-      })
+      )
       r.logs[0].should.eql('1.0.0')
     })
 
-    it("should default to 'version' as version option", function () {
-      var r = checkUsage(function () {
-        return yargs(['--version'])
+    it("should default to 'version' as version option", () => {
+      const r = checkUsage(() => yargs(['--version'])
         .version('1.0.2')
         .wrap(null)
         .argv
-      })
+      )
       r.logs[0].should.eql('1.0.2')
     })
 
-    describe('when exitProcess is false', function () {
-      it('should not validate arguments (required argument)', function () {
-        var r = checkUsage(function () {
-          return yargs(['--version'])
+    describe('when exitProcess is false', () => {
+      it('should not validate arguments (required argument)', () => {
+        const r = checkUsage(() => yargs(['--version'])
             .version('version', 'Show version number', '1.0.1')
             .demand('some-opt')
             .wrap(null)
             .exitProcess(false)
             .argv
-        })
+          )
         r.should.have.property('result')
         r.result.should.have.property('_').with.length(0)
         r.result.should.have.property('version').and.be.true
@@ -1198,15 +1160,14 @@ describe('usage tests', function () {
 
       // We need both this and the previous spec because a required argument
       // is a validation error and nargs is a parse error
-      it('should not validate arguments (nargs)', function () {
-        var r = checkUsage(function () {
-          return yargs(['--version', '--some-opt'])
+      it('should not validate arguments (nargs)', () => {
+        const r = checkUsage(() => yargs(['--version', '--some-opt'])
             .nargs('some-opt', 3)
             .version('version', 'Show version number', '1.0.1')
             .wrap(null)
             .exitProcess(false)
             .argv
-        })
+          )
         r.should.have.property('result')
         r.result.should.have.property('_').with.length(0)
         r.result.should.have.property('version').and.be.true
@@ -1218,22 +1179,21 @@ describe('usage tests', function () {
     })
   })
 
-  describe('showHelpOnFail', function () {
-    it('should display user supplied message', function () {
-      var opts = {
+  describe('showHelpOnFail', () => {
+    it('should display user supplied message', () => {
+      const opts = {
         foo: { desc: 'foo option', alias: 'f' },
         bar: { desc: 'bar option', alias: 'b' }
       }
 
-      var r = checkUsage(function () {
-        return yargs(['--foo'])
+      const r = checkUsage(() => yargs(['--foo'])
           .usage('Usage: $0 [options]')
           .options(opts)
           .demand(['foo', 'bar'])
           .showHelpOnFail(false, 'Specify --help for available options')
           .wrap(null)
           .argv
-      })
+        )
       r.should.have.property('result')
       r.result.should.have.property('_').with.length(0)
       r.should.have.property('errors')
@@ -1247,21 +1207,20 @@ describe('usage tests', function () {
     })
   })
 
-  describe('exitProcess', function () {
-    it('should not call process.exit on error if disabled', function () {
-      var opts = {
+  describe('exitProcess', () => {
+    it('should not call process.exit on error if disabled', () => {
+      const opts = {
         foo: { desc: 'foo option', alias: 'f' }
       }
 
-      var r = checkUsage(function () {
-        return yargs(['--foo'])
+      const r = checkUsage(() => yargs(['--foo'])
           .exitProcess(false)
           .usage('Usage: $0 [options]')
           .options(opts)
           .demand(['foo'])
           .wrap(null)
           .argv
-      })
+        )
       r.should.have.property('result')
       r.result.should.have.property('_').with.length(0)
       r.should.have.property('errors')
@@ -1270,32 +1229,29 @@ describe('usage tests', function () {
     })
   })
 
-  it('should succeed when rebase', function () {
+  it('should succeed when rebase', () => {
     rebase(['home', 'chevex'].join(path.sep), ['home', 'chevex', 'foo', 'bar', 'baz'].join(path.sep)).should.equal(['foo', 'bar', 'baz'].join(path.sep))
     rebase(['home', 'chevex', 'foo', 'bar', 'baz'].join(path.sep), ['home', 'chevex'].join(path.sep)).should.equal(['..', '..', '..'].join(path.sep))
     rebase(['home', 'chevex', 'foo'].join(path.sep), ['home', 'chevex', 'pow', 'zoom.txt'].join(path.sep)).should.equal(['..', 'pow', 'zoom.txt'].join(path.sep))
   })
 
-  it('should not print usage string if help() is called without arguments', function () {
-    var r = checkUsage(function () {
-      return yargs([]).usage('foo').help().argv
-    })
+  it('should not print usage string if help() is called without arguments', () => {
+    const r = checkUsage(() => yargs([]).usage('foo').help().argv
+  )
 
     r.logs.length.should.equal(0)
   })
 
-  it('should add --help as an option for printing usage text if help() is called without arguments', function () {
-    var r = checkUsage(function () {
-      return yargs(['--help']).usage('foo').help().argv
-    })
+  it('should add --help as an option for printing usage text if help() is called without arguments', () => {
+    const r = checkUsage(() => yargs(['--help']).usage('foo').help().argv
+  )
 
     r.logs.length.should.not.equal(0)
   })
 
-  describe('wrap', function () {
-    it('should wrap argument descriptions onto multiple lines', function () {
-      var r = checkUsage(function () {
-        return yargs([])
+  describe('wrap', () => {
+    it('should wrap argument descriptions onto multiple lines', () => {
+      const r = checkUsage(() => yargs([])
         .option('fairly-long-option', {
           alias: 'f',
           default: 'fairly-long-default',
@@ -1304,9 +1260,9 @@ describe('usage tests', function () {
         .demand('foo')
         .wrap(50)
         .argv
-      })
+      )
 
-      r.errors[0].split('\n').forEach(function (line, i) {
+      r.errors[0].split('\n').forEach((line, i) => {
         if (!i || !line) return // ignore first and last line.
         line.length.should.lte(50)
       })
@@ -1317,10 +1273,9 @@ describe('usage tests', function () {
         return this.skip()
       }
 
-      var width = process.stdout.columns
+      const width = process.stdout.columns
 
-      var r = checkUsage(function () {
-        return yargs([])
+      const r = checkUsage(() => yargs([])
           .option('fairly-long-option', {
             alias: 'f',
             // create a giant string that should wrap.
@@ -1328,27 +1283,24 @@ describe('usage tests', function () {
           })
           .demand('foo')
           .argv
-      })
+        )
 
       // the long description should cause several line
       // breaks when wrapped.
       r.errors[0].split('\n').length.should.gte(4)
     })
 
-    it('should not raise an exception when long default and description are provided', function () {
-      return yargs([])
+    it('should not raise an exception when long default and description are provided', () => yargs([])
       .option('fairly-long-option', {
         alias: 'f',
         default: 'npm prefix used to locate globally installed npm packages',
         description: 'npm prefix used to locate globally installed npm packages'
       })
       .wrap(40)
-      .help()
-    })
+      .help())
 
-    it('should wrap the left-hand-column if it takes up more than 50% of the screen', function () {
-      var r = checkUsage(function () {
-        return yargs([])
+    it('should wrap the left-hand-column if it takes up more than 50% of the screen', () => {
+      const r = checkUsage(() => yargs([])
           .example(
             'i am a fairly long example',
             'description that is also fairly long'
@@ -1356,13 +1308,13 @@ describe('usage tests', function () {
           .demand('foo')
           .wrap(40)
           .argv
-      })
+        )
 
       // should split example usage onto multiple lines.
       r.errors[0].split('\n').length.should.equal(11)
 
       // should wrap within appropriate boundaries.
-      r.errors[0].split('\n').forEach(function (line, i) {
+      r.errors[0].split('\n').forEach((line, i) => {
         // ignore headings and blank lines.
         if (!line || line.match('Examples:') || line.match('Options:')) return
 
@@ -1370,16 +1322,15 @@ describe('usage tests', function () {
       })
     })
 
-    it('should not wrap left-hand-column if no description is provided', function () {
-      var r = checkUsage(function () {
-        return yargs([])
+    it('should not wrap left-hand-column if no description is provided', () => {
+      const r = checkUsage(() => yargs([])
           .example('i am a fairly long example that is like really long woooo')
           .demand('foo')
           .wrap(50)
           .argv
-      })
+        )
 
-      r.errors[0].split('\n').forEach(function (line, i) {
+      r.errors[0].split('\n').forEach((line, i) => {
         // ignore headings and blank lines.
         if (!line.match('i am a fairly long example')) return
 
@@ -1389,24 +1340,22 @@ describe('usage tests', function () {
       })
     })
 
-    it('should wrap the usage string', function () {
-      var r = checkUsage(function () {
-        return yargs([])
+    it('should wrap the usage string', () => {
+      const r = checkUsage(() => yargs([])
         .usage('i am a fairly long usage string look at me go.')
         .demand('foo')
         .wrap(20)
         .argv
-      })
+      )
 
       // the long usage string should cause line-breaks.
       r.errors[0].split('\n').length.should.gt(6)
     })
 
-    it('should align span columns when ansi colors are not used in a description', function () {
-      var noColorAddedDescr = 'The file to add or remove'
+    it('should align span columns when ansi colors are not used in a description', () => {
+      const noColorAddedDescr = 'The file to add or remove'
 
-      var r = checkUsage(function () {
-        return yargs(['-h'])
+      const r = checkUsage(() => yargs(['-h'])
           .option('f', {
             alias: 'file',
             describe: noColorAddedDescr,
@@ -1416,22 +1365,21 @@ describe('usage tests', function () {
           .help('h').alias('h', 'help')
           .wrap(80)
           .argv
-      })
+        )
 
       r.logs.join('\n').split(/\n+/).should.deep.equal([
         'Options:',
         '  --version   Show version number                                      [boolean]',
-        '  -f, --file  ' + noColorAddedDescr + '                      [string] [required]',
+        `  -f, --file  ${noColorAddedDescr}                      [string] [required]`,
         '  -h, --help  Show help                                                [boolean]',
         ''
       ])
     })
 
-    it('should align span columns when ansi colors are used in a description', function () {
-      var yellowDescription = chalk.yellow('The file to add or remove')
+    it('should align span columns when ansi colors are used in a description', () => {
+      const yellowDescription = chalk.yellow('The file to add or remove')
 
-      var r = checkUsage(function () {
-        return yargs(['-h'])
+      const r = checkUsage(() => yargs(['-h'])
           .option('f', {
             alias: 'file',
             describe: yellowDescription,
@@ -1441,28 +1389,27 @@ describe('usage tests', function () {
           .help('h').alias('h', 'help')
           .wrap(80)
           .argv
-      })
+        )
 
       r.logs.join('\n').split(/\n+/).should.deep.equal([
         'Options:',
         '  --version   Show version number                                      [boolean]',
-        '  -f, --file  ' + yellowDescription + '                      [string] [required]',
+        `  -f, --file  ${yellowDescription}                      [string] [required]`,
         '  -h, --help  Show help                                                [boolean]',
         ''
       ])
     })
   })
 
-  describe('commands', function () {
-    it('should output a list of available commands', function () {
-      var r = checkUsage(function () {
-        return yargs('')
+  describe('commands', () => {
+    it('should output a list of available commands', () => {
+      const r = checkUsage(() => yargs('')
           .command('upload', 'upload something')
           .command('download', 'download something from somewhere')
           .demand('y')
           .wrap(null)
           .argv
-      })
+        )
 
       r.errors.join('\n').split(/\n+/).should.deep.equal([
         'Commands:',
@@ -1476,15 +1423,14 @@ describe('usage tests', function () {
       ])
     })
 
-    it('should not show hidden commands', function () {
-      var r = checkUsage(function () {
-        return yargs('')
+    it('should not show hidden commands', () => {
+      const r = checkUsage(() => yargs('')
           .command('upload', 'upload something')
           .command('secret', false)
           .demand('y')
           .wrap(null)
           .argv
-      })
+        )
 
       r.errors.join('\n').split(/\s+/).should.deep.equal([
         'Commands:',
@@ -1497,15 +1443,14 @@ describe('usage tests', function () {
       ])
     })
 
-    it('allows completion command to be hidden', function () {
-      var r = checkUsage(function () {
-        return yargs('')
+    it('allows completion command to be hidden', () => {
+      const r = checkUsage(() => yargs('')
           .command('upload', 'upload something')
           .completion('completion', false)
           .demand('y')
           .wrap(null)
           .argv
-      })
+        )
 
       r.errors.join('\n').split(/\s+/).should.deep.equal([
         'Commands:',
@@ -1518,29 +1463,27 @@ describe('usage tests', function () {
       ])
     })
 
-    it('preserves global wrap() for commands that do not override it', function () {
-      var uploadCommand = 'upload <dest>'
-      var uploadDesc = 'Upload cwd to remote destination'
-      var uploadOpts = {
+    it('preserves global wrap() for commands that do not override it', () => {
+      const uploadCommand = 'upload <dest>'
+      const uploadDesc = 'Upload cwd to remote destination'
+      const uploadOpts = {
         force: {
           describe: 'Force overwrite of remote directory contents',
           type: 'boolean'
         }
       }
-      var uploadHandler = function (argv) {}
+      const uploadHandler = (argv) => {}
 
-      var generalHelp = checkUsage(function () {
-        return yargs('--help')
+      const generalHelp = checkUsage(() => yargs('--help')
           .command(uploadCommand, uploadDesc, uploadOpts, uploadHandler)
           .wrap(null)
           .argv
-      })
-      var commandHelp = checkUsage(function () {
-        return yargs('upload --help')
+        )
+      const commandHelp = checkUsage(() => yargs('upload --help')
           .command(uploadCommand, uploadDesc, uploadOpts, uploadHandler)
           .wrap(null)
           .argv
-      })
+        )
 
       generalHelp.logs[0].split('\n').should.deep.equal([
         'Commands:',
@@ -1562,31 +1505,27 @@ describe('usage tests', function () {
       ])
     })
 
-    it('allows a command to override global wrap()', function () {
-      var uploadCommand = 'upload <dest>'
-      var uploadDesc = 'Upload cwd to remote destination'
-      var uploadBuilder = function (yargs) {
-        return yargs
+    it('allows a command to override global wrap()', () => {
+      const uploadCommand = 'upload <dest>'
+      const uploadDesc = 'Upload cwd to remote destination'
+      const uploadBuilder = yargs => yargs
           .option('force', {
             describe: 'Force overwrite of remote directory contents',
             type: 'boolean'
           })
           .wrap(46)
-      }
-      var uploadHandler = function (argv) {}
+      const uploadHandler = argv => {}
 
-      var generalHelp = checkUsage(function () {
-        return yargs('--help')
+      const generalHelp = checkUsage(() => yargs('--help')
           .command(uploadCommand, uploadDesc, uploadBuilder, uploadHandler)
           .wrap(null)
           .argv
-      })
-      var commandHelp = checkUsage(function () {
-        return yargs('upload --help')
+        )
+      const commandHelp = checkUsage(() => yargs('upload --help')
           .command(uploadCommand, uploadDesc, uploadBuilder, uploadHandler)
           .wrap(null)
           .argv
-      })
+        )
 
       generalHelp.logs[0].split('\n').should.deep.equal([
         'Commands:',
@@ -1609,22 +1548,19 @@ describe('usage tests', function () {
       ])
     })
 
-    it('resets groups for a command handler, respecting order', function () {
-      var r = checkUsage(function () {
-        return yargs(['upload', '-h'])
-          .command('upload', 'upload something', function (yargs) {
-            return yargs
+    it('resets groups for a command handler, respecting order', () => {
+      const r = checkUsage(() => yargs(['upload', '-h'])
+          .command('upload', 'upload something', yargs => yargs
               .option('q', {
                 type: 'boolean',
                 group: 'Flags:'
               })
               .help('h').group('h', 'Global Flags:')
-              .wrap(null)
-          })
+              .wrap(null))
           .help('h').group('h', 'Global Flags:')
           .wrap(null)
           .argv
-      })
+        )
 
       r.logs[0].split('\n').should.deep.equal([
         './usage upload',
@@ -1641,17 +1577,14 @@ describe('usage tests', function () {
       ])
     })
 
-    it('allows global option to be disabled', function () {
-      var r = checkUsage(function () {
-        return yargs(['upload', '-h'])
-          .command('upload', 'upload something', function (yargs) {
-            return yargs
+    it('allows global option to be disabled', () => {
+      const r = checkUsage(() => yargs(['upload', '-h'])
+          .command('upload', 'upload something', yargs => yargs
               .option('q', {
                 type: 'boolean',
                 group: 'Flags:'
               })
-              .wrap(null)
-          })
+              .wrap(null))
           .option('i', {
             type: 'boolean',
             global: true,
@@ -1665,7 +1598,7 @@ describe('usage tests', function () {
           .help('h')
           .wrap(null)
           .argv
-      })
+        )
 
       r.logs[0].split('\n').should.deep.equal([
         './usage upload',
@@ -1683,17 +1616,14 @@ describe('usage tests', function () {
       ])
     })
 
-    it('can add to preserved groups', function () {
-      var r = checkUsage(function () {
-        return yargs(['upload', '-h'])
-          .command('upload', 'upload something', function (yargs) {
-            return yargs
+    it('can add to preserved groups', () => {
+      const r = checkUsage(() => yargs(['upload', '-h'])
+          .command('upload', 'upload something', yargs => yargs
               .option('q', {
                 type: 'boolean',
                 group: 'Awesome Flags:'
               })
-              .wrap(null)
-          })
+              .wrap(null))
           .option('i', {
             type: 'boolean',
             global: true,
@@ -1702,7 +1632,7 @@ describe('usage tests', function () {
           .help('h')
           .wrap(null)
           .argv
-      })
+        )
 
       r.logs[0].split('\n').should.deep.equal([
         './usage upload',
@@ -1718,18 +1648,15 @@ describe('usage tests', function () {
       ])
     })
 
-    it('can bump up preserved groups', function () {
-      var r = checkUsage(function () {
-        return yargs(['upload', '-h'])
-          .command('upload', 'upload something', function (yargs) {
-            return yargs
+    it('can bump up preserved groups', () => {
+      const r = checkUsage(() => yargs(['upload', '-h'])
+          .command('upload', 'upload something', yargs => yargs
               .group([], 'Awesome Flags:')
               .option('q', {
                 type: 'boolean',
                 group: 'Flags:'
               })
-              .wrap(null)
-          })
+              .wrap(null))
           .option('i', {
             type: 'boolean',
             global: true,
@@ -1743,7 +1670,7 @@ describe('usage tests', function () {
           .help('h')
           .wrap(null)
           .argv
-      })
+        )
 
       r.logs[0].split('\n').should.deep.equal([
         './usage upload',
@@ -1761,18 +1688,17 @@ describe('usage tests', function () {
       ])
     })
 
-    it('should list a module command only once', function () {
-      var r = checkUsage(function () {
-        return yargs('--help')
+    it('should list a module command only once', () => {
+      const r = checkUsage(() => yargs('--help')
           .command('upload', 'upload something', {
-            builder: function (yargs) {
+            builder (yargs) {
               return yargs
             },
-            handler: function (argv) {}
+            handler (argv) {}
           })
           .wrap(null)
           .argv
-      })
+        )
 
       r.logs[0].split('\n').should.deep.equal([
         'Commands:',
@@ -1785,18 +1711,17 @@ describe('usage tests', function () {
       ])
     })
 
-    it('allows a builder function to override default usage() string', function () {
-      var r = checkUsage(function () {
-        return yargs('upload --help')
+    it('allows a builder function to override default usage() string', () => {
+      const r = checkUsage(() => yargs('upload --help')
           .command('upload', 'upload something', {
-            builder: function (yargs) {
+            builder (yargs) {
               return yargs.usage('Usage: program upload <something> [opts]').demand(1)
             },
-            handler: function (argv) {}
+            handler (argv) {}
           })
           .wrap(null)
           .argv
-      })
+        )
 
       r.logs[0].split('\n').should.deep.equal([
         'Usage: program upload <something> [opts]',
@@ -1808,15 +1733,12 @@ describe('usage tests', function () {
       ])
     })
 
-    it('allows a builder function to disable default usage() with null', function () {
-      var r = checkUsage(function () {
-        return yargs('upload --help')
-          .command('upload', 'upload something', function (yargs) {
-            return yargs.usage(null)
-          }, function (argv) {})
+    it('allows a builder function to disable default usage() with null', () => {
+      const r = checkUsage(() => yargs('upload --help')
+          .command('upload', 'upload something', yargs => yargs.usage(null), (argv) => {})
           .wrap(null)
           .argv
-      })
+        )
 
       r.logs[0].split('\n').should.deep.equal([
         'Options:',
@@ -1826,15 +1748,12 @@ describe('usage tests', function () {
       ])
     })
 
-    it('displays given command chain with positional args in default usage for subcommand with builder object', function () {
-      var r = checkUsage(function () {
-        return yargs('one two --help')
-          .command('one <sub>', 'level one, requires subcommand', function (yargs) {
-            return yargs.command('two [next]', 'level two', {}, function (argv) {})
-          }, function (argv) {})
+    it('displays given command chain with positional args in default usage for subcommand with builder object', () => {
+      const r = checkUsage(() => yargs('one two --help')
+          .command('one <sub>', 'level one, requires subcommand', yargs => yargs.command('two [next]', 'level two', {}, (argv) => {}), (argv) => {})
           .wrap(null)
           .argv
-      })
+        )
 
       r.logs[0].split('\n').should.deep.equal([
         './usage one two [next]',
@@ -1846,15 +1765,12 @@ describe('usage tests', function () {
       ])
     })
 
-    it('displays given command chain with positional args in default usage for subcommand with builder function', function () {
-      var r = checkUsage(function () {
-        return yargs('one two --help')
-          .command('one <sub>', 'level one, requires subcommand', function (yargs) {
-            return yargs.command('two [next]', 'level two', function (yargs) { return yargs }, function (argv) {})
-          }, function (argv) {})
+    it('displays given command chain with positional args in default usage for subcommand with builder function', () => {
+      const r = checkUsage(() => yargs('one two --help')
+          .command('one <sub>', 'level one, requires subcommand', yargs => yargs.command('two [next]', 'level two', yargs => yargs, (argv) => {}), (argv) => {})
           .wrap(null)
           .argv
-      })
+        )
 
       r.logs[0].split('\n').should.deep.equal([
         './usage one two [next]',
@@ -1866,13 +1782,12 @@ describe('usage tests', function () {
       ])
     })
 
-    it('displays aliases for commands that have them (no wrap)', function () {
-      var r = checkUsage(function () {
-        return yargs('help')
+    it('displays aliases for commands that have them (no wrap)', () => {
+      const r = checkUsage(() => yargs('help')
           .command(['copy <src> [dest]', 'cp', 'dupe'], 'Copy something')
           .wrap(null)
           .argv
-      })
+        )
 
       r.logs[0].split('\n').should.deep.equal([
         'Commands:',
@@ -1885,13 +1800,12 @@ describe('usage tests', function () {
       ])
     })
 
-    it('displays aliases for commands that have them (with wrap)', function () {
-      var r = checkUsage(function () {
-        return yargs('help')
+    it('displays aliases for commands that have them (with wrap)', () => {
+      const r = checkUsage(() => yargs('help')
           .command(['copy <src> [dest]', 'cp', 'dupe'], 'Copy something')
           .wrap(80)
           .argv
-      })
+        )
 
       r.logs[0].split('\n').should.deep.equal([
         'Commands:',
@@ -1905,15 +1819,14 @@ describe('usage tests', function () {
     })
   })
 
-  describe('epilogue', function () {
-    it('should display an epilog message at the end of the usage instructions', function () {
-      var r = checkUsage(function () {
-        return yargs('')
+  describe('epilogue', () => {
+    it('should display an epilog message at the end of the usage instructions', () => {
+      const r = checkUsage(() => yargs('')
           .epilog('for more info view the manual at http://example.com')
           .demand('y')
           .wrap(null)
           .argv
-      })
+        )
 
       r.errors.join('\n').split(/\n+/).should.deep.equal([
         'Options:',
@@ -1925,14 +1838,13 @@ describe('usage tests', function () {
       ])
     })
 
-    it('replaces $0 in epilog string', function () {
-      var r = checkUsage(function () {
-        return yargs('')
+    it('replaces $0 in epilog string', () => {
+      const r = checkUsage(() => yargs('')
           .epilog("Try '$0 --long-help' for more information")
           .demand('y')
           .wrap(null)
           .argv
-      })
+        )
 
       r.errors.join('\n').split(/\n+/).should.deep.equal([
         'Options:',
@@ -1945,59 +1857,53 @@ describe('usage tests', function () {
     })
   })
 
-  describe('default', function () {
-    it('should indicate that the default is a generated-value, if function is provided', function () {
-      var r = checkUsage(function () {
-        return yargs(['-h'])
+  describe('default', () => {
+    it('should indicate that the default is a generated-value, if function is provided', () => {
+      const r = checkUsage(() => yargs(['-h'])
           .help('h')
-          .default('f', function () {
-            return 99
-          })
+          .default('f', () => 99)
           .wrap(null)
           .argv
-      })
+        )
 
       r.logs[0].should.include('default: (generated-value)')
     })
 
-    it('if a named function is provided, should use name rather than (generated-value)', function () {
-      var r = checkUsage(function () {
-        return yargs(['-h'])
+    it('if a named function is provided, should use name rather than (generated-value)', () => {
+      const r = checkUsage(() => yargs(['-h'])
           .help('h')
           .default('f', function randomNumber () {
             return Math.random() * 256
           })
           .wrap(null)
           .argv
-      })
+        )
 
       r.logs[0].should.include('default: (random-number)')
     })
 
-    it('default-description take precedence if one is provided', function () {
-      var r = checkUsage(function () {
-        return yargs(['-h'])
+    it('default-description take precedence if one is provided', () => {
+      const r = checkUsage(() => yargs(['-h'])
           .help('h')
           .default('f', function randomNumber () {
             return Math.random() * 256
           }, 'foo-description')
           .wrap(null)
           .argv
-      })
+        )
 
       r.logs[0].should.include('default: foo-description')
     })
 
-    it('serializes object and array defaults', function () {
-      var r = checkUsage(function () {
-        return yargs(['-h'])
+    it('serializes object and array defaults', () => {
+      const r = checkUsage(() => yargs(['-h'])
         .help('h')
         .default('a', [])
         .default('a2', [3])
         .default('o', {a: '33'})
         .wrap(null)
         .argv
-      })
+      )
 
       r.logs[0].should.include('default: []')
       r.logs[0].should.include('default: {"a":"33"}')
@@ -2005,11 +1911,10 @@ describe('usage tests', function () {
     })
   })
 
-  describe('defaultDescription', function () {
-    describe('using option() without default()', function () {
-      it('should output given desc with default value', function () {
-        var r = checkUsage(function () {
-          return yargs(['-h'])
+  describe('defaultDescription', () => {
+    describe('using option() without default()', () => {
+      it('should output given desc with default value', () => {
+        const r = checkUsage(() => yargs(['-h'])
             .help('h')
             .option('port', {
               describe: 'The port value for URL',
@@ -2018,14 +1923,13 @@ describe('usage tests', function () {
             })
             .wrap(null)
             .argv
-        })
+          )
 
         r.logs[0].should.include('default: 80 for HTTP and 443 for HTTPS')
       })
 
-      it('should output given desc without default value', function () {
-        var r = checkUsage(function () {
-          return yargs(['-h'])
+      it('should output given desc without default value', () => {
+        const r = checkUsage(() => yargs(['-h'])
             .help('h')
             .option('port', {
               describe: 'The port value for URL',
@@ -2033,14 +1937,13 @@ describe('usage tests', function () {
             })
             .wrap(null)
             .argv
-        })
+          )
 
         r.logs[0].should.include('default: 80 for HTTP and 443 for HTTPS')
       })
 
-      it('should prefer given desc over function desc', function () {
-        var r = checkUsage(function () {
-          return yargs(['-h'])
+      it('should prefer given desc over function desc', () => {
+        const r = checkUsage(() => yargs(['-h'])
             .help('h')
             .option('port', {
               describe: 'The port value for URL',
@@ -2051,16 +1954,15 @@ describe('usage tests', function () {
             })
             .wrap(null)
             .argv
-        })
+          )
 
         r.logs[0].should.include('default: 80 for HTTP and 443 for HTTPS')
       })
     })
 
-    describe('using option() with default()', function () {
-      it('should prefer default() desc when given last', function () {
-        var r = checkUsage(function () {
-          return yargs(['-h'])
+    describe('using option() with default()', () => {
+      it('should prefer default() desc when given last', () => {
+        const r = checkUsage(() => yargs(['-h'])
             .help('h')
             .option('port', {
               describe: 'The port value for URL',
@@ -2069,14 +1971,13 @@ describe('usage tests', function () {
             .default('port', null, '80 for HTTP and 443 for HTTPS')
             .wrap(null)
             .argv
-        })
+          )
 
         r.logs[0].should.include('default: 80 for HTTP and 443 for HTTPS')
       })
 
-      it('should prefer option() desc when given last', function () {
-        var r = checkUsage(function () {
-          return yargs(['-h'])
+      it('should prefer option() desc when given last', () => {
+        const r = checkUsage(() => yargs(['-h'])
             .help('h')
             .default('port', null, '80 for HTTP and 443 for HTTPS')
             .option('port', {
@@ -2085,14 +1986,13 @@ describe('usage tests', function () {
             })
             .wrap(null)
             .argv
-        })
+          )
 
         r.logs[0].should.include('default: depends on protocol')
       })
 
-      it('should prefer option() desc over default() function', function () {
-        var r = checkUsage(function () {
-          return yargs(['-h'])
+      it('should prefer option() desc over default() function', () => {
+        const r = checkUsage(() => yargs(['-h'])
             .help('h')
             .option('port', {
               describe: 'The port value for URL',
@@ -2103,24 +2003,23 @@ describe('usage tests', function () {
             })
             .wrap(null)
             .argv
-        })
+          )
 
         r.logs[0].should.include('default: 80 for HTTP and 443 for HTTPS')
       })
     })
   })
 
-  describe('normalizeAliases', function () {
+  describe('normalizeAliases', () => {
     // see #128
-    it("should display 'description' string in help message if set for alias", function () {
-      var r = checkUsage(function () {
-        return yargs(['-h'])
+    it("should display 'description' string in help message if set for alias", () => {
+      const r = checkUsage(() => yargs(['-h'])
           .describe('foo', 'foo option')
           .alias('f', 'foo')
           .help('h')
           .wrap(null)
           .argv
-      })
+        )
 
       r.logs.join('\n').split(/\n+/).should.deep.equal([
         'Options:',
@@ -2131,15 +2030,14 @@ describe('usage tests', function () {
       ])
     })
 
-    it("should display 'required' string in help message if set for alias", function () {
-      var r = checkUsage(function () {
-        return yargs(['-h'])
+    it("should display 'required' string in help message if set for alias", () => {
+      const r = checkUsage(() => yargs(['-h'])
           .demand('foo')
           .alias('f', 'foo')
           .help('h')
           .wrap(null)
           .argv
-      })
+        )
 
       r.logs.join('\n').split(/\n+/).should.deep.equal([
         'Options:',
@@ -2150,16 +2048,15 @@ describe('usage tests', function () {
       ])
     })
 
-    it("should display 'type' string in help message if set for alias", function () {
-      var r = checkUsage(function () {
-        return yargs(['-h'])
+    it("should display 'type' string in help message if set for alias", () => {
+      const r = checkUsage(() => yargs(['-h'])
           .string('foo')
           .describe('foo', 'bar')
           .alias('f', 'foo')
           .help('h')
           .wrap(null)
           .argv
-      })
+        )
 
       r.logs.join('\n').split(/\n+/).should.deep.equal([
         'Options:',
@@ -2170,9 +2067,8 @@ describe('usage tests', function () {
       ])
     })
 
-    it("should display 'type' number in help message if set for alias", function () {
-      var r = checkUsage(function () {
-        return yargs(['-h'])
+    it("should display 'type' number in help message if set for alias", () => {
+      const r = checkUsage(() => yargs(['-h'])
           .string('foo')
           .describe('foo', 'bar')
           .alias('f', 'foo')
@@ -2180,7 +2076,7 @@ describe('usage tests', function () {
           .help('h')
           .wrap(null)
           .argv
-      })
+        )
 
       r.logs.join('\n').split(/\n+/).should.deep.equal([
         'Options:',
@@ -2192,11 +2088,11 @@ describe('usage tests', function () {
     })
   })
 
-  describe('showHelp', function (done) {
+  describe('showHelp', () => {
     // see #143.
-    it('should show help regardless of whether argv has been called', function () {
-      var r = checkUsage(function () {
-        var y = yargs(['--foo'])
+    it('should show help regardless of whether argv has been called', () => {
+      const r = checkUsage(() => {
+        const y = yargs(['--foo'])
           .options('foo', {
             alias: 'f',
             describe: 'foo option'
@@ -2215,9 +2111,9 @@ describe('usage tests', function () {
       ])
     })
 
-    it('should call the correct console.log method', function () {
-      var r = checkUsage(function () {
-        var y = yargs(['--foo'])
+    it('should call the correct console.log method', () => {
+      const r = checkUsage(() => {
+        const y = yargs(['--foo'])
           .options('foo', {
             alias: 'f',
             describe: 'foo option'
@@ -2237,8 +2133,8 @@ describe('usage tests', function () {
       ])
     })
 
-    it('should provide a help string to handler when provided', function (done) {
-      var y = yargs(['--foo'])
+    it('should provide a help string to handler when provided', (done) => {
+      const y = yargs(['--foo'])
         .options('foo', {
           alias: 'f',
           describe: 'foo option'
@@ -2259,9 +2155,9 @@ describe('usage tests', function () {
     })
   })
 
-  describe('$0', function () {
+  describe('$0', () => {
     function mockProcessArgv (argv, cb) {
-      var argvOld = process.argv
+      const argvOld = process.argv
       process.argv = argv
       // cb must be sync for now
       try {
@@ -2273,93 +2169,92 @@ describe('usage tests', function () {
       }
     }
 
-    it('is detected correctly for a basic script', function () {
-      mockProcessArgv(['script.js'], function () {
+    it('is detected correctly for a basic script', () => {
+      mockProcessArgv(['script.js'], () => {
         yargs([]).$0.should.equal('script.js')
       })
     })
 
-    it('is detected correctly when argv contains "node"', function () {
-      mockProcessArgv(['node', 'script.js'], function () {
+    it('is detected correctly when argv contains "node"', () => {
+      mockProcessArgv(['node', 'script.js'], () => {
         yargs([]).$0.should.equal('script.js')
       })
     })
 
-    it('is detected correctly when dirname contains "node"', function () {
-      mockProcessArgv(['/code/node/script.js'], function () {
+    it('is detected correctly when dirname contains "node"', () => {
+      mockProcessArgv(['/code/node/script.js'], () => {
         yargs([]).$0.should.equal('/code/node/script.js')
       })
     })
 
-    it('is detected correctly when dirname and argv contain "node"', function () {
-      mockProcessArgv(['node', '/code/node/script.js'], function () {
+    it('is detected correctly when dirname and argv contain "node"', () => {
+      mockProcessArgv(['node', '/code/node/script.js'], () => {
         yargs([]).$0.should.equal('/code/node/script.js')
       })
     })
 
-    it('is detected correctly when argv contains "iojs"', function () {
-      mockProcessArgv(['iojs', 'script.js'], function () {
+    it('is detected correctly when argv contains "iojs"', () => {
+      mockProcessArgv(['iojs', 'script.js'], () => {
         yargs([]).$0.should.equal('script.js')
       })
     })
 
-    it('is detected correctly when dirname contains "iojs"', function () {
-      mockProcessArgv(['/code/iojs/script.js'], function () {
+    it('is detected correctly when dirname contains "iojs"', () => {
+      mockProcessArgv(['/code/iojs/script.js'], () => {
         yargs([]).$0.should.equal('/code/iojs/script.js')
       })
     })
 
-    it('is detected correctly when dirname and argv contain "iojs"', function () {
-      mockProcessArgv(['iojs', '/code/iojs/script.js'], function () {
+    it('is detected correctly when dirname and argv contain "iojs"', () => {
+      mockProcessArgv(['iojs', '/code/iojs/script.js'], () => {
         yargs([]).$0.should.equal('/code/iojs/script.js')
       })
     })
 
-    it('is detected correctly when argv contains "node.exe"', function () {
-      mockProcessArgv(['node.exe', 'script.js'], function () {
+    it('is detected correctly when argv contains "node.exe"', () => {
+      mockProcessArgv(['node.exe', 'script.js'], () => {
         yargs([]).$0.should.equal('script.js')
       })
     })
 
-    it('is detected correctly when argv contains "iojs.exe"', function () {
-      mockProcessArgv(['iojs.exe', 'script.js'], function () {
+    it('is detected correctly when argv contains "iojs.exe"', () => {
+      mockProcessArgv(['iojs.exe', 'script.js'], () => {
         yargs([]).$0.should.equal('script.js')
       })
     })
 
     if (process.platform !== 'win32') {
-      it('is resolved to the relative path if it is shorter', function () {
-        mockProcessArgv(['node', '/code/node/script.js'], function () {
+      it('is resolved to the relative path if it is shorter', () => {
+        mockProcessArgv(['node', '/code/node/script.js'], () => {
           yargs([], '/code/python/').$0.should.equal('../node/script.js')
         })
       })
 
-      it('is not resolved to the relative path if it is larger', function () {
-        mockProcessArgv(['node', '/script.js'], function () {
+      it('is not resolved to the relative path if it is larger', () => {
+        mockProcessArgv(['node', '/script.js'], () => {
           yargs([], '/very/long/current/directory/').$0.should.equal('/script.js')
         })
       })
     }
 
     if (process.platform === 'win32') {
-      it('is resolved to the relative path if it is shorter, using Windows paths', function () {
-        mockProcessArgv(['node.exe', 'C:\\code\\node\\script.js'], function () {
+      it('is resolved to the relative path if it is shorter, using Windows paths', () => {
+        mockProcessArgv(['node.exe', 'C:\\code\\node\\script.js'], () => {
           yargs([], 'C:\\code\\python\\').$0.should.equal('..\\node\\script.js')
         })
       })
 
-      it('is not resolved to the relative path if it is larger, using Windows paths', function () {
-        mockProcessArgv(['node', 'C:\\script.js'], function () {
+      it('is not resolved to the relative path if it is larger, using Windows paths', () => {
+        mockProcessArgv(['node', 'C:\\script.js'], () => {
           yargs([], 'C:\\very\\long\\current\\directory\\').$0.should.equal('C:\\script.js')
         })
       })
     }
   })
 
-  describe('choices', function () {
-    it('should output choices when defined for non-hidden options', function () {
-      var r = checkUsage(function () {
-        return yargs(['--help'])
+  describe('choices', () => {
+    it('should output choices when defined for non-hidden options', () => {
+      const r = checkUsage(() => yargs(['--help'])
           .option('answer', {
             describe: 'does this look good?',
             choices: ['yes', 'no', 'maybe']
@@ -2370,7 +2265,7 @@ describe('usage tests', function () {
           })
           .wrap(null)
           .argv
-      })
+        )
 
       r.logs[0].split('\n').should.deep.equal([
         'Options:',
@@ -2382,9 +2277,8 @@ describe('usage tests', function () {
       ])
     })
 
-    it('should not output choices when defined for hidden options', function () {
-      var r = checkUsage(function () {
-        return yargs(['--help'])
+    it('should not output choices when defined for hidden options', () => {
+      const r = checkUsage(() => yargs(['--help'])
           .option('answer', {
             type: 'string',
             choices: ['yes', 'no', 'maybe']
@@ -2394,7 +2288,7 @@ describe('usage tests', function () {
           })
           .wrap(null)
           .argv
-      })
+        )
 
       r.logs[0].split('\n').should.deep.equal([
         'Options:',
@@ -2405,10 +2299,9 @@ describe('usage tests', function () {
     })
   })
 
-  describe('count', function () {
-    it('should indicate when an option is a count', function () {
-      var r = checkUsage(function () {
-        return yargs(['--help'])
+  describe('count', () => {
+    it('should indicate when an option is a count', () => {
+      const r = checkUsage(() => yargs(['--help'])
           .option('verbose', {
             describe: 'verbose level',
             count: true
@@ -2416,16 +2309,15 @@ describe('usage tests', function () {
           .help('help')
           .wrap(null)
           .argv
-      })
+        )
 
       r.logs.join(' ').should.match(/\[count]/)
     })
   })
 
-  describe('array', function () {
-    it('should indicate when an option is an array', function () {
-      var r = checkUsage(function () {
-        return yargs(['--help'])
+  describe('array', () => {
+    it('should indicate when an option is an array', () => {
+      const r = checkUsage(() => yargs(['--help'])
           .option('arr', {
             describe: 'array option',
             array: true
@@ -2433,16 +2325,15 @@ describe('usage tests', function () {
           .help('help')
           .wrap(null)
           .argv
-      })
+        )
 
       r.logs.join(' ').should.match(/\[array]/)
     })
   })
 
-  describe('group', function () {
-    it('allows an an option to be placed in an alternative group', function () {
-      var r = checkUsage(function () {
-        return yargs(['--help'])
+  describe('group', () => {
+    it('allows an an option to be placed in an alternative group', () => {
+      const r = checkUsage(() => yargs(['--help'])
           .option('batman', {
             type: 'string',
             describe: "not the world's happiest guy",
@@ -2451,7 +2342,7 @@ describe('usage tests', function () {
           .group('batman', 'Heroes:')
           .wrap(null)
           .argv
-      })
+        )
 
       r.logs[0].split('\n').should.deep.equal([
         'Heroes:',
@@ -2464,9 +2355,8 @@ describe('usage tests', function () {
       ])
     })
 
-    it("does not print the 'Options:' group if no keys are in it", function () {
-      var r = checkUsage(function () {
-        return yargs(['-h'])
+    it("does not print the 'Options:' group if no keys are in it", () => {
+      const r = checkUsage(() => yargs(['-h'])
           .string('batman')
           .describe('batman', "not the world's happiest guy")
           .default('batman', 'Bruce Wayne')
@@ -2475,7 +2365,7 @@ describe('usage tests', function () {
           .help('h')
           .wrap(null)
           .argv
-      })
+        )
 
       r.logs[0].split('\n').should.deep.equal([
         'Heroes:',
@@ -2488,15 +2378,14 @@ describe('usage tests', function () {
       ])
     })
 
-    it('displays alias keys appropriately within a grouping', function () {
-      var r = checkUsage(function () {
-        return yargs(['-h'])
+    it('displays alias keys appropriately within a grouping', () => {
+      const r = checkUsage(() => yargs(['-h'])
           .alias('h', 'help')
           .group('help', 'Magic Variable:')
           .group('version', 'Magic Variable:')
           .wrap(null)
           .argv
-      })
+        )
 
       r.logs[0].split('\n').should.deep.equal([
         'Magic Variable:',
@@ -2506,13 +2395,12 @@ describe('usage tests', function () {
       ])
     })
 
-    it('allows a group to be provided as the only information about an option', function () {
-      var r = checkUsage(function () {
-        return yargs(['--help'])
+    it('allows a group to be provided as the only information about an option', () => {
+      const r = checkUsage(() => yargs(['--help'])
           .group('batman', 'Heroes:')
           .wrap(null)
           .argv
-      })
+        )
 
       r.logs[0].split('\n').should.deep.equal([
         'Heroes:',
@@ -2525,15 +2413,14 @@ describe('usage tests', function () {
       ])
     })
 
-    it('allows multiple options to be grouped at the same time', function () {
-      var r = checkUsage(function () {
-        return yargs(['-h'])
+    it('allows multiple options to be grouped at the same time', () => {
+      const r = checkUsage(() => yargs(['-h'])
           .help('h')
           .group('h', 'Options:')
           .group(['batman', 'robin'], 'Heroes:')
           .wrap(null)
           .argv
-      })
+        )
 
       r.logs[0].split('\n').should.deep.equal([
         'Options:',
@@ -2547,9 +2434,8 @@ describe('usage tests', function () {
       ])
     })
 
-    it('allows group to be provided in the options object', function () {
-      var r = checkUsage(function () {
-        return yargs(['-h'])
+    it('allows group to be provided in the options object', () => {
+      const r = checkUsage(() => yargs(['-h'])
           .help('h')
           .option('batman', {
             group: 'Heroes:',
@@ -2557,7 +2443,7 @@ describe('usage tests', function () {
           })
           .wrap(null)
           .argv
-      })
+        )
 
       r.logs[0].split('\n').should.deep.equal([
         'Heroes:',
@@ -2570,9 +2456,8 @@ describe('usage tests', function () {
       ])
     })
 
-    it('only displays a duplicated option once per group', function () {
-      var r = checkUsage(function () {
-        return yargs(['--help'])
+    it('only displays a duplicated option once per group', () => {
+      const r = checkUsage(() => yargs(['--help'])
           .group(['batman', 'batman'], 'Heroes:')
           .group('robin', 'Heroes:')
           .option('robin', {
@@ -2580,7 +2465,7 @@ describe('usage tests', function () {
           })
           .wrap(null)
           .argv
-      })
+        )
 
       r.logs[0].split('\n').should.deep.equal([
         'Heroes:',
@@ -2595,10 +2480,10 @@ describe('usage tests', function () {
     })
   })
 
-  describe('cjk', function () {
-    it('should calculate width of cjk text correctly', function () {
-      var r = checkUsage(function () {
-        var y = yargs()
+  describe('cjk', () => {
+    it('should calculate width of cjk text correctly', () => {
+      const r = checkUsage(() => {
+        const y = yargs()
           .example('안녕하세요 선생님 안녕 친구야', '인사하는 어린이 착한 어린이')
           .wrap(80)
 
@@ -2616,15 +2501,14 @@ describe('usage tests', function () {
     })
   })
 
-  describe('default command', function () {
-    it('--help should display top-level help with no command given', function () {
-      var r = checkUsage(function () {
-        return yargs('--help')
-          .command(['list [pattern]', 'ls', '*'], 'List key-value pairs for pattern', {}, function () {})
-          .command('get <key>', 'Get value for key', {}, function () {})
-          .command('set <key> [value]', 'Set value for key', {}, function () {})
+  describe('default command', () => {
+    it('--help should display top-level help with no command given', () => {
+      const r = checkUsage(() => yargs('--help')
+          .command(['list [pattern]', 'ls', '*'], 'List key-value pairs for pattern', {}, noop)
+          .command('get <key>', 'Get value for key', {}, noop)
+          .command('set <key> [value]', 'Set value for key', {}, noop)
           .argv
-      })
+        )
 
       r.logs[0].split('\n').should.deep.equal([
         'Commands:',

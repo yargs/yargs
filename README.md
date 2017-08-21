@@ -6,7 +6,9 @@
 [![Windows Tests][windows-image]][windows-url]
 [![js-standard-style][standard-image]][standard-url]
 [![Conventional Commits][conventional-commits-image]][conventional-commits-url]
-[![Gitter][gitter-image]][gitter-url]
+[![Slack][slack-image]][slack-url]
+
+_Having problems? want to contribute? join our [community slack](http://devtoolscommunity.herokuapp.com)_.
 
 > Yargs be a node.js library fer hearties tryin' ter parse optstrings.
 
@@ -100,5 +102,5 @@ Run the example above with `--help` to see the help for the application.
 [standard-url]: http://standardjs.com/
 [conventional-commits-image]: https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg
 [conventional-commits-url]: https://conventionalcommits.org/
-[gitter-image]: https://img.shields.io/gitter/room/nwjs/nw.js.svg?maxAge=2592000
-[gitter-url]: https://gitter.im/yargs/Lobby?utm_source=share-link&utm_medium=link&utm_campaign=share-link
+[slack-image]: http://devtoolscommunity.herokuapp.com/badge.svg
+[slack-url]: http://devtoolscommunity.herokuapp.com

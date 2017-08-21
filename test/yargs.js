@@ -1,33 +1,36 @@
+'use strict'
 /* global context, describe, it, beforeEach, afterEach */
 
-var expect = require('chai').expect
-var fs = require('fs')
-var path = require('path')
-var checkOutput = require('./helpers/utils').checkOutput
-var yargs
-var YError = require('../lib/yerror')
+const expect = require('chai').expect
+const fs = require('fs')
+const path = require('path')
+const checkOutput = require('./helpers/utils').checkOutput
+let yargs
+const YError = require('../lib/yerror')
 
 require('chai').should()
 
-describe('yargs dsl tests', function () {
-  beforeEach(function () {
+const noop = () => {}
+
+describe('yargs dsl tests', () => {
+  beforeEach(() => {
     yargs = require('../')
   })
 
-  afterEach(function () {
+  afterEach(() => {
     delete require.cache[require.resolve('../')]
   })
 
-  it('should use bin name for $0, eliminating path', function () {
+  it('should use bin name for $0, eliminating path', () => {
     process.argv[1] = '/usr/local/bin/ndm'
     process.env._ = '/usr/local/bin/ndm'
     process.execPath = '/usr/local/bin/ndm'
-    var argv = yargs([]).argv
+    const argv = yargs([]).argv
     argv['$0'].should.eql('ndm')
   })
 
-  it('accepts an object for aliases', function () {
-    var argv = yargs([])
+  it('accepts an object for aliases', () => {
+    const argv = yargs([])
     .alias({
       cool: 'cat'
     })
@@ -37,44 +40,42 @@ describe('yargs dsl tests', function () {
     argv.cat.should.eql(33)
   })
 
-  it('populates argv with placeholder keys for all options', function () {
-    var argv = yargs([])
+  it('populates argv with placeholder keys for all options', () => {
+    const argv = yargs([])
       .option('cool', {})
       .argv
 
     Object.keys(argv).should.include('cool')
   })
 
-  it('accepts an object for implies', function () {
-    var r = checkOutput(function () {
-      return yargs(['--x=33'])
+  it('accepts an object for implies', () => {
+    const r = checkOutput(() => yargs(['--x=33'])
         .implies({
           x: 'y'
         })
         .argv
-    })
+      )
 
     r.errors[1].should.match(/Implications failed/)
   })
 
-  it('accepts an object for describes', function () {
-    var r = checkOutput(function () {
-      return yargs([])
+  it('accepts an object for describes', () => {
+    const r = checkOutput(() => yargs([])
         .describe({
           x: 'really cool key'
         })
         .demand('x')
         .wrap(null)
         .argv
-    })
+      )
 
     r.errors[0].should.match(/really cool key/)
     r.result.should.have.property('x')
     r.result.should.not.have.property('[object Object]')
   })
 
-  it('treats usage as alias for options, if object provided as first argument', function () {
-    var argv = yargs([])
+  it('treats usage as alias for options, if object provided as first argument', () => {
+    const argv = yargs([])
       .usage({
         a: {
           default: 99
@@ -85,20 +86,20 @@ describe('yargs dsl tests', function () {
     argv.a.should.eql(99)
   })
 
-  it('a function can be provided, to execute when a parsing failure occurs', function (done) {
+  it('a function can be provided, to execute when a parsing failure occurs', (done) => {
     yargs(['--x=33'])
       .implies({
         x: 'y'
       })
-      .fail(function (msg) {
+      .fail((msg) => {
         msg.should.match(/Implications failed/)
         return done()
       })
       .argv
   })
 
-  it('should set alias to string if option is string', function () {
-    var argv = yargs(['--cat=99'])
+  it('should set alias to string if option is string', () => {
+    const argv = yargs(['--cat=99'])
       .options('c', {
         alias: 'cat',
         string: true
@@ -109,8 +110,8 @@ describe('yargs dsl tests', function () {
     argv.c.should.eql('99')
   })
 
-  it('should allow a valid choice', function () {
-    var argv = yargs(['--looks=good'])
+  it('should allow a valid choice', () => {
+    const argv = yargs(['--looks=good'])
       .option('looks', {
         choices: ['good', 'bad']
       })
@@ -119,8 +120,8 @@ describe('yargs dsl tests', function () {
     argv.looks.should.eql('good')
   })
 
-  it('should allow defaultDescription to be set with .option()', function () {
-    var optDefaultDescriptions = yargs([])
+  it('should allow defaultDescription to be set with .option()', () => {
+    const optDefaultDescriptions = yargs([])
       .option('port', {
         defaultDescription: '80 for HTTP and 443 for HTTPS'
       })
@@ -131,45 +132,42 @@ describe('yargs dsl tests', function () {
     })
   })
 
-  it('should not require config object for an option', function () {
-    var r = checkOutput(function () {
-      return yargs([])
+  it('should not require config object for an option', () => {
+    const r = checkOutput(() => yargs([])
         .option('x')
         .argv
-    })
+      )
 
     expect(r.errors).to.deep.equal([])
   })
 
-  describe('showHelpOnFail', function () {
-    it('should display custom failure message, if string is provided as first argument', function () {
-      var r = checkOutput(function () {
-        return yargs([])
+  describe('showHelpOnFail', () => {
+    it('should display custom failure message, if string is provided as first argument', () => {
+      const r = checkOutput(() => yargs([])
           .showHelpOnFail('pork chop sandwiches')
           .demand('cat')
           .argv
-      })
+        )
 
       r.errors[3].should.match(/pork chop sandwiches/)
     })
 
-    it('calling with no arguments should default to displaying help', function () {
-      var r = checkOutput(function () {
-        return yargs([])
+    it('calling with no arguments should default to displaying help', () => {
+      const r = checkOutput(() => yargs([])
           .showHelpOnFail()
           .demand('cat')
           .argv
-      })
+        )
 
       r.errors[1].should.match(/required argument/)
     })
   })
 
-  describe('exitProcess', function () {
-    describe('when exitProcess is set to false and a failure occurs', function () {
-      it('should throw an exception', function () {
-        checkOutput(function () {
-          expect(function () {
+  describe('exitProcess', () => {
+    describe('when exitProcess is set to false and a failure occurs', () => {
+      it('should throw an exception', () => {
+        checkOutput(() => {
+          expect(() => {
             yargs([])
               .demand('cat')
               .showHelpOnFail(false)
@@ -178,8 +176,8 @@ describe('yargs dsl tests', function () {
           }).to.throw(/Missing required argument/)
         })
       })
-      it('should output the errors to stderr once', function () {
-        var r = checkOutput(function () {
+      it('should output the errors to stderr once', () => {
+        const r = checkOutput(() => {
           try {
             yargs([])
               .demand('cat')
@@ -194,24 +192,23 @@ describe('yargs dsl tests', function () {
         expect(r.errors).to.deep.equal(['Missing required argument: cat'])
       })
     })
-    it('should set exit process to true, if no argument provided', function () {
-      var r = checkOutput(function () {
-        return yargs([])
+    it('should set exit process to true, if no argument provided', () => {
+      const r = checkOutput(() => yargs([])
           .demand('cat')
           .exitProcess()
           .argv
-      })
+        )
 
       r.exit.should.eql(true)
     })
   })
 
-  describe('reset', function () {
-    it('should put yargs back into its initial state', function () {
+  describe('reset', () => {
+    it('should put yargs back into its initial state', () => {
       // create a command line with all the things.
       // so that we can confirm they're reset.
-      var y = yargs(['--help'])
-        .command('foo', 'bar', function () {})
+      const y = yargs(['--help'])
+        .command('foo', 'bar', noop)
         .default('foo', 'bar')
         .describe('foo', 'foo variable')
         .demandCommand(1)
@@ -220,7 +217,7 @@ describe('yargs dsl tests', function () {
         .alias('foo', 'bar')
         .string('foo')
         .choices('foo', ['bar', 'baz'])
-        .coerce('foo', function (foo) { return foo + 'bar' })
+        .coerce('foo', foo => `${foo}bar`)
         .implies('foo', 'snuh')
         .conflicts('qux', 'xyzzy')
         .group('foo', 'Group:')
@@ -230,7 +227,7 @@ describe('yargs dsl tests', function () {
         .env('YARGS')
         .reset()
 
-      var emptyOptions = {
+      const emptyOptions = {
         array: [],
         boolean: ['help', 'version'],
         string: [],
@@ -272,30 +269,30 @@ describe('yargs dsl tests', function () {
       expect(y.getGroups()).to.deep.equal({})
     })
 
-    it('does not invoke parse with an error if reset has been called and option is not global', function (done) {
-      var y = yargs()
+    it('does not invoke parse with an error if reset has been called and option is not global', (done) => {
+      const y = yargs()
         .demand('cake')
         .global('cake', false)
 
-      y.parse('hello', function (err) {
+      y.parse('hello', (err) => {
         err.message.should.match(/Missing required argument/)
       })
       y.reset()
-      y.parse('cake', function (err) {
+      y.parse('cake', (err) => {
         expect(err).to.equal(null)
         return done()
       })
     })
   })
 
-  describe('command', function () {
-    it('executes command handler with parsed argv', function (done) {
+  describe('command', () => {
+    it('executes command handler with parsed argv', (done) => {
       yargs(['blerg'])
         .command(
           'blerg',
           'handle blerg things',
-          function () {},
-          function (argv) {
+          noop,
+          (argv) => {
             // we should get the argv from the prior yargs.
             argv._[0].should.equal('blerg')
             return done()
@@ -305,8 +302,8 @@ describe('yargs dsl tests', function () {
         .argv
     })
 
-    it('recommends a similar command if no command handler is found', function () {
-      var r = checkOutput(function () {
+    it('recommends a similar command if no command handler is found', () => {
+      const r = checkOutput(() => {
         yargs(['boat'])
           .command('goat')
           .recommendCommands()
@@ -316,8 +313,8 @@ describe('yargs dsl tests', function () {
       r.errors[1].should.match(/Did you mean goat/)
     })
 
-    it('does not recommend a similiar command if no similar command exists', function () {
-      var r = checkOutput(function () {
+    it('does not recommend a similiar command if no similar command exists', () => {
+      const r = checkOutput(() => {
         yargs(['foo'])
           .command('nothingSimilar')
           .recommendCommands()
@@ -327,8 +324,8 @@ describe('yargs dsl tests', function () {
       r.logs.should.be.empty
     })
 
-    it('recommends the longest match first', function () {
-      var r = checkOutput(function () {
+    it('recommends the longest match first', () => {
+      const r = checkOutput(() => {
         yargs(['boat'])
           .command('bot')
           .command('goat')
@@ -340,32 +337,30 @@ describe('yargs dsl tests', function () {
     })
 
     // see: https://github.com/yargs/yargs/issues/822
-    it('does not print command recommendation if help message will be shown', function (done) {
+    it('does not print command recommendation if help message will be shown', (done) => {
       const parser = yargs()
         .command('goat')
         .help()
         .recommendCommands()
 
-      parser.parse('boat help', {}, function (err, _argv, output) {
+      parser.parse('boat help', {}, (err, _argv, output) => {
         if (err) return done(err)
         output.split('Commands:').length.should.equal(2)
         return done()
       })
     })
 
-    it("skips executing top-level command if builder's help is executed", function () {
-      var r = checkOutput(function () {
+    it("skips executing top-level command if builder's help is executed", () => {
+      const r = checkOutput(() => {
         yargs(['blerg', '-h'])
           .command(
             'blerg',
             'handle blerg things',
-            function (yargs) {
-              return yargs
+            yargs => yargs
                 .command('snuh', 'snuh command')
                 .help('h')
-                .wrap(null)
-            },
-            function () {
+                .wrap(null),
+            () => {
               throw Error('should not happen')
             }
           )
@@ -386,15 +381,14 @@ describe('yargs dsl tests', function () {
       ])
     })
 
-    it('executes top-level help if no handled command is provided', function () {
-      var r = checkOutput(function () {
+    it('executes top-level help if no handled command is provided', () => {
+      const r = checkOutput(() => {
         yargs(['snuh', '-h'])
-          .command('blerg', 'handle blerg things', function (yargs) {
-            return yargs
+          .command('blerg', 'handle blerg things', yargs => yargs
               .command('snuh', 'snuh command')
               .help('h')
               .argv
-          })
+            )
           .help('h')
           .wrap(null)
           .argv
@@ -411,8 +405,8 @@ describe('yargs dsl tests', function () {
       ])
     })
 
-    it("accepts an object for describing a command's options", function () {
-      var r = checkOutput(function () {
+    it("accepts an object for describing a command's options", () => {
+      const r = checkOutput(() => {
         yargs(['blerg', '-h'])
           .command('blerg <foo>', 'handle blerg things', {
             foo: {
@@ -427,14 +421,14 @@ describe('yargs dsl tests', function () {
           .argv
       })
 
-      var usageString = r.logs[0]
+      const usageString = r.logs[0]
       usageString.should.match(/usage blerg <foo>/)
       usageString.should.match(/--foo.*default: 99/)
       usageString.should.match(/--bar.*default: "hello world"/)
     })
 
-    it("accepts a module with a 'builder' and 'handler' key", function () {
-      var argv = yargs(['blerg', 'bar'])
+    it("accepts a module with a 'builder' and 'handler' key", () => {
+      const argv = yargs(['blerg', 'bar'])
         .command('blerg <foo>', 'handle blerg things', require('./fixtures/command'))
         .argv
 
@@ -448,8 +442,8 @@ describe('yargs dsl tests', function () {
       delete global.commandHandlerCalledWith
     })
 
-    it("accepts a module with a keys 'command', 'describe', 'builder', and 'handler'", function () {
-      var argv = yargs(['blerg', 'bar'])
+    it("accepts a module with a keys 'command', 'describe', 'builder', and 'handler'", () => {
+      const argv = yargs(['blerg', 'bar'])
         .command(require('./fixtures/command-module'))
         .argv
 
@@ -463,8 +457,8 @@ describe('yargs dsl tests', function () {
       delete global.commandHandlerCalledWith
     })
 
-    it('derives \'command\' string from filename when missing', function () {
-      var argv = yargs('nameless --foo bar')
+    it('derives \'command\' string from filename when missing', () => {
+      const argv = yargs('nameless --foo bar')
         .command(require('./fixtures/cmddir_noname/nameless'))
         .argv
 
@@ -478,18 +472,18 @@ describe('yargs dsl tests', function () {
       delete global.commandHandlerCalledWith
     })
 
-    it('throws error for non-module command object missing \'command\' string', function () {
-      expect(function () {
+    it('throws error for non-module command object missing \'command\' string', () => {
+      expect(() => {
         yargs.command({
           desc: 'A command with no name',
-          builder: function (yargs) { return yargs },
-          handler: function (argv) {}
+          builder (yargs) { return yargs },
+          handler (argv) {}
         })
       }).to.throw(/No command name given for module: { desc: 'A command with no name',\n {2}builder: \[Function(: builder)?],\n {2}handler: \[Function(: handler)?] }/)
     })
   })
 
-  describe('terminalWidth', function () {
+  describe('terminalWidth', () => {
     it('returns the maximum width of the terminal', function () {
       if (!process.stdout.isTTY) {
         return this.skip()
@@ -499,17 +493,17 @@ describe('yargs dsl tests', function () {
     })
   })
 
-  describe('number', function () {
-    it('accepts number arguments when a number type is specified', function () {
-      var argv = yargs('-w banana')
+  describe('number', () => {
+    it('accepts number arguments when a number type is specified', () => {
+      const argv = yargs('-w banana')
         .number('w')
         .argv
 
       expect(typeof argv.w).to.equal('number')
     })
 
-    it('should expose an options short-hand for numbers', function () {
-      var argv = yargs('-w banana')
+    it('should expose an options short-hand for numbers', () => {
+      const argv = yargs('-w banana')
         .option('w', {
           number: true
         })
@@ -521,9 +515,9 @@ describe('yargs dsl tests', function () {
     })
   })
 
-  describe('choices', function () {
-    it('accepts an object', function () {
-      var optChoices = yargs([])
+  describe('choices', () => {
+    it('accepts an object', () => {
+      const optChoices = yargs([])
         .choices({
           color: ['red', 'green', 'blue'],
           stars: [1, 2, 3, 4, 5]
@@ -540,8 +534,8 @@ describe('yargs dsl tests', function () {
       })
     })
 
-    it('accepts a string and array', function () {
-      var optChoices = yargs([])
+    it('accepts a string and array', () => {
+      const optChoices = yargs([])
         .choices('meat', ['beef', 'chicken', 'pork', 'bison'])
         .choices('temp', ['rare', 'med-rare', 'med', 'med-well', 'well'])
         .getOptions().choices
@@ -552,8 +546,8 @@ describe('yargs dsl tests', function () {
       })
     })
 
-    it('accepts a string and single value', function () {
-      var optChoices = yargs([])
+    it('accepts a string and single value', () => {
+      const optChoices = yargs([])
         .choices('gender', 'male')
         .choices('gender', 'female')
         .getOptions().choices
@@ -564,24 +558,24 @@ describe('yargs dsl tests', function () {
     })
   })
 
-  describe('locale', function () {
-    it('uses english as a default locale', function () {
-      ['LANGUAGE', 'LC_ALL', 'LANG', 'LC_MESSAGES'].forEach(function (e) {
+  describe('locale', () => {
+    it('uses english as a default locale', () => {
+      ['LANGUAGE', 'LC_ALL', 'LANG', 'LC_MESSAGES'].forEach((e) => {
         delete process.env[e]
       })
       yargs.locale().should.equal('en_US')
     })
 
-    it("detects the operating system's locale", function () {
+    it("detects the operating system's locale", () => {
       loadLocale('es_ES.UTF-8')
       yargs.locale().should.equal('es_ES')
       loadLocale('en_US.UTF-8')
     })
 
-    it("should not detect the OS locale if detectLocale is 'false'", function () {
+    it("should not detect the OS locale if detectLocale is 'false'", () => {
       loadLocale('es_ES.UTF-8')
 
-      var r = checkOutput(function () {
+      const r = checkOutput(() => {
         yargs(['snuh', '-h'])
           .command('blerg', 'blerg command')
           .help('h')
@@ -604,8 +598,8 @@ describe('yargs dsl tests', function () {
       process.env.LC_ALL = locale
     }
 
-    it("allows a locale other than the default 'en' to be specified", function () {
-      var r = checkOutput(function () {
+    it("allows a locale other than the default 'en' to be specified", () => {
+      const r = checkOutput(() => {
         yargs(['snuh', '-h'])
           .command('blerg', 'blerg command')
           .help('h')
@@ -617,10 +611,10 @@ describe('yargs dsl tests', function () {
       r.logs.join(' ').should.match(/Choose yer command:/)
     })
 
-    it('handles a missing locale', function () {
+    it('handles a missing locale', () => {
       loadLocale('zz_ZZ.UTF-8')
 
-      var r = checkOutput(function () {
+      const r = checkOutput(() => {
         yargs(['snuh', '-h'])
           .command('blerg', 'blerg command')
           .help('h')
@@ -633,10 +627,10 @@ describe('yargs dsl tests', function () {
       r.logs.join(' ').should.match(/Commands:/)
     })
 
-    it('properly translates a region-specific locale file', function () {
+    it('properly translates a region-specific locale file', () => {
       loadLocale('pt_BR.UTF-8')
 
-      var r = checkOutput(function () {
+      const r = checkOutput(() => {
         yargs(['-h'])
           .help('h')
           .wrap(null)
@@ -648,10 +642,10 @@ describe('yargs dsl tests', function () {
       r.logs.join(' ').should.match(/Exibe ajuda/)
     })
 
-    it('handles os-locale throwing an exception', function () {
+    it('handles os-locale throwing an exception', () => {
       // make os-locale throw.
       require('os-locale')
-      require.cache[require.resolve('os-locale')].exports.sync = function () { throw Error('an error!') }
+      require.cache[require.resolve('os-locale')].exports.sync = () => { throw Error('an error!') }
 
       delete require.cache[require.resolve('../')]
       yargs = require('../')
@@ -659,8 +653,8 @@ describe('yargs dsl tests', function () {
       yargs.locale().should.equal('en')
     })
 
-    it('uses locale string for help option default desc on .locale().help()', function () {
-      var r = checkOutput(function () {
+    it('uses locale string for help option default desc on .locale().help()', () => {
+      const r = checkOutput(() => {
         yargs(['-h'])
           .locale('pirate')
           .help('h')
@@ -671,8 +665,8 @@ describe('yargs dsl tests', function () {
       r.logs.join(' ').should.match(/Parlay this here code of conduct/)
     })
 
-    it('uses locale string for help option default desc on .help().locale()', function () {
-      var r = checkOutput(function () {
+    it('uses locale string for help option default desc on .help().locale()', () => {
+      const r = checkOutput(() => {
         yargs(['-h'])
           .help('h')
           .locale('pirate')
@@ -683,9 +677,9 @@ describe('yargs dsl tests', function () {
       r.logs.join(' ').should.match(/Parlay this here code of conduct/)
     })
 
-    describe('updateLocale', function () {
-      it('allows you to override the default locale strings', function () {
-        var r = checkOutput(function () {
+    describe('updateLocale', () => {
+      it('allows you to override the default locale strings', () => {
+        const r = checkOutput(() => {
           yargs(['snuh', '-h'])
             .command('blerg', 'blerg command')
             .help('h')
@@ -699,8 +693,8 @@ describe('yargs dsl tests', function () {
         r.logs.join(' ').should.match(/COMMANDS!/)
       })
 
-      it('allows you to use updateStrings() as an alias for updateLocale()', function () {
-        var r = checkOutput(function () {
+      it('allows you to use updateStrings() as an alias for updateLocale()', () => {
+        const r = checkOutput(() => {
           yargs(['snuh', '-h'])
             .command('blerg', 'blerg command')
             .help('h')
@@ -716,37 +710,37 @@ describe('yargs dsl tests', function () {
     })
   })
 
-  describe('env', function () {
-    it('translates no arg as empty prefix (parser applies all env vars)', function () {
-      var options = yargs.env().getOptions()
+  describe('env', () => {
+    it('translates no arg as empty prefix (parser applies all env vars)', () => {
+      const options = yargs.env().getOptions()
       options.envPrefix.should.equal('')
     })
 
-    it('accepts true as a valid prefix (parser applies all env vars)', function () {
-      var options = yargs.env(true).getOptions()
+    it('accepts true as a valid prefix (parser applies all env vars)', () => {
+      const options = yargs.env(true).getOptions()
       options.envPrefix.should.equal(true)
     })
 
-    it('accepts empty string as a valid prefix (parser applies all env vars)', function () {
-      var options = yargs.env('').getOptions()
+    it('accepts empty string as a valid prefix (parser applies all env vars)', () => {
+      const options = yargs.env('').getOptions()
       options.envPrefix.should.equal('')
     })
 
-    it('accepts a string prefix', function () {
-      var options = yargs.env('COOL').getOptions()
+    it('accepts a string prefix', () => {
+      const options = yargs.env('COOL').getOptions()
       options.envPrefix.should.equal('COOL')
     })
 
-    it('translates false as undefined prefix (disables parsing of env vars)', function () {
-      var options = yargs.env(false).getOptions()
+    it('translates false as undefined prefix (disables parsing of env vars)', () => {
+      const options = yargs.env(false).getOptions()
       expect(options.envPrefix).to.be.undefined
     })
   })
 
-  describe('parse', function () {
-    it('parses a simple string', function () {
-      var a1 = yargs.parse('-x=2 --foo=bar')
-      var a2 = yargs('-x=2 --foo=bar').argv
+  describe('parse', () => {
+    it('parses a simple string', () => {
+      const a1 = yargs.parse('-x=2 --foo=bar')
+      const a2 = yargs('-x=2 --foo=bar').argv
       a1.x.should.equal(2)
       a2.x.should.equal(2)
 
@@ -754,9 +748,9 @@ describe('yargs dsl tests', function () {
       a2.foo.should.equal('bar')
     })
 
-    it('parses a quoted string', function () {
-      var a1 = yargs.parse('-x=\'marks "the" spot\' --foo "break \'dance\'"')
-      var a2 = yargs('-x=\'marks "the" spot\' --foo "break \'dance\'"').argv
+    it('parses a quoted string', () => {
+      const a1 = yargs.parse('-x=\'marks "the" spot\' --foo "break \'dance\'"')
+      const a2 = yargs('-x=\'marks "the" spot\' --foo "break \'dance\'"').argv
 
       a1.x.should.equal('marks "the" spot')
       a2.x.should.equal('marks "the" spot')
@@ -765,9 +759,9 @@ describe('yargs dsl tests', function () {
       a2.foo.should.equal("break 'dance'")
     })
 
-    it('parses an array', function () {
-      var a1 = yargs.parse(['-x', '99', '--why=hello world'])
-      var a2 = yargs(['-x', '99', '--why=hello world']).argv
+    it('parses an array', () => {
+      const a1 = yargs.parse(['-x', '99', '--why=hello world'])
+      const a2 = yargs(['-x', '99', '--why=hello world']).argv
 
       a1.x.should.equal(99)
       a2.x.should.equal(99)
@@ -776,13 +770,13 @@ describe('yargs dsl tests', function () {
       a2.why.should.equal('hello world')
     })
 
-    it('ignores implicit help command (with short-circuit)', function () {
-      var parsed = yargs.help().parse('help', true)
+    it('ignores implicit help command (with short-circuit)', () => {
+      const parsed = yargs.help().parse('help', true)
       parsed._.should.deep.equal(['help'])
     })
 
-    it('allows an optional context object to be provided', function () {
-      var a1 = yargs.parse('-x=2 --foo=bar', {
+    it('allows an optional context object to be provided', () => {
+      const a1 = yargs.parse('-x=2 --foo=bar', {
         context: 'look at me go!'
       })
       a1.x.should.equal(2)
@@ -791,8 +785,8 @@ describe('yargs dsl tests', function () {
     })
 
     // see https://github.com/yargs/yargs/issues/724
-    it('overrides parsed value of argv with context object', function () {
-      var a1 = yargs.parse('-x=33', {
+    it('overrides parsed value of argv with context object', () => {
+      const a1 = yargs.parse('-x=33', {
         x: 42
       })
       a1.x.should.equal(42)
@@ -800,24 +794,24 @@ describe('yargs dsl tests', function () {
   })
 
   // yargs.parse(['foo', '--bar'], function (err, argv, output) {}
-  context('function passed as second argument to parse', function () {
-    it('does not print to stdout', function () {
-      var r = checkOutput(function () {
+  context('function passed as second argument to parse', () => {
+    it('does not print to stdout', () => {
+      const r = checkOutput(() => {
         yargs()
           .help('h')
-          .parse('-h', function (_err, argv, output) {})
+          .parse('-h', (_err, argv, output) => {})
       })
 
       r.logs.length.should.equal(0)
       r.errors.length.should.equal(0)
     })
 
-    it('gets passed error as first argument', function () {
-      var err = null
-      var r = checkOutput(function () {
+    it('gets passed error as first argument', () => {
+      let err = null
+      const r = checkOutput(() => {
         yargs()
           .demand('robin')
-          .parse('batman', function (_err, argv, output) {
+          .parse('batman', (_err, argv, output) => {
             err = _err
           })
       })
@@ -826,12 +820,12 @@ describe('yargs dsl tests', function () {
       err.should.match(/Missing required argument/)
     })
 
-    it('gets passed argv as second argument', function () {
-      var argv = null
-      var r = checkOutput(function () {
+    it('gets passed argv as second argument', () => {
+      let argv = null
+      const r = checkOutput(() => {
         yargs()
           .demand('robin')
-          .parse('batman --foo', function (_err, _argv, output) {
+          .parse('batman --foo', (_err, _argv, output) => {
             argv = _argv
           })
       })
@@ -840,13 +834,13 @@ describe('yargs dsl tests', function () {
       argv.foo.should.equal(true)
     })
 
-    it('gets passed output as third argument', function () {
-      var output = null
-      var r = checkOutput(function () {
+    it('gets passed output as third argument', () => {
+      let output = null
+      const r = checkOutput(() => {
         yargs()
           .demand('robin')
           .help()
-          .parse('--help', function (_err, argv, _output) {
+          .parse('--help', (_err, argv, _output) => {
             output = _output
           })
       })
@@ -855,13 +849,13 @@ describe('yargs dsl tests', function () {
       output.should.match(/--robin.*\[required]/)
     })
 
-    it('reinstates original exitProcess setting after invocation', function () {
-      var callbackCalled = false
-      var r = checkOutput(function () {
+    it('reinstates original exitProcess setting after invocation', () => {
+      let callbackCalled = false
+      const r = checkOutput(() => {
         yargs
           .exitProcess(true)
           .help()
-          .parse('--help', function () {
+          .parse('--help', () => {
             callbackCalled = true
             yargs.getExitProcess().should.be.false
           })
@@ -873,16 +867,16 @@ describe('yargs dsl tests', function () {
       yargs.getExitProcess().should.be.true
     })
 
-    it('does not call callback if subsequently called without callback', function () {
-      var callbackCalled = 0
-      var callback = function () {
+    it('does not call callback if subsequently called without callback', () => {
+      let callbackCalled = 0
+      const callback = () => {
         callbackCalled++
       }
       yargs.help()
-      var r1 = checkOutput(function () {
+      const r1 = checkOutput(() => {
         yargs.parse('--help', callback)
       })
-      var r2 = checkOutput(function () {
+      const r2 = checkOutput(() => {
         yargs.parse('--help')
       })
       callbackCalled.should.equal(1)
@@ -894,14 +888,14 @@ describe('yargs dsl tests', function () {
       r2.logs[0].should.match(/--help.*Show help.*\[boolean]/)
     })
 
-    it('resets error state between calls to parse', function () {
-      var y = yargs()
+    it('resets error state between calls to parse', () => {
+      const y = yargs()
         .demand(2)
 
-      var err1 = null
-      var out1 = null
-      var argv1 = null
-      y.parse('foo', function (err, argv, output) {
+      let err1 = null
+      let out1 = null
+      let argv1 = null
+      y.parse('foo', (err, argv, output) => {
         err1 = err
         argv1 = argv
         out1 = output
@@ -911,10 +905,10 @@ describe('yargs dsl tests', function () {
       argv1._.should.include('foo')
       out1.should.match(/Not enough non-option arguments/)
 
-      var err2 = null
-      var argv2 = null
-      var out2 = null
-      y.parse('foo bar', function (err, argv, output) {
+      let err2 = null
+      let argv2 = null
+      let out2 = null
+      y.parse('foo bar', (err, argv, output) => {
         err2 = err
         argv2 = argv
         out2 = output
@@ -928,16 +922,16 @@ describe('yargs dsl tests', function () {
       expect(out2).to.equal('')
     })
 
-    describe('commands', function () {
-      it('does not invoke command handler if output is populated', function () {
-        var err = null
-        var handlerCalled = false
-        var r = checkOutput(function () {
+    describe('commands', () => {
+      it('does not invoke command handler if output is populated', () => {
+        let err = null
+        let handlerCalled = false
+        const r = checkOutput(() => {
           yargs()
-            .command('batman <api-token>', 'batman command', function () {}, function () {
+            .command('batman <api-token>', 'batman command', noop, () => {
               handlerCalled = true
             })
-            .parse('batman --what', function (_err, argv, output) {
+            .parse('batman --what', (_err, argv, output) => {
               err = _err
             })
         })
@@ -947,15 +941,15 @@ describe('yargs dsl tests', function () {
         handlerCalled.should.equal(false)
       })
 
-      it('invokes command handler normally if no output is populated', function () {
-        var argv = null
-        var output = null
-        var r = checkOutput(function () {
+      it('invokes command handler normally if no output is populated', () => {
+        let argv = null
+        let output = null
+        const r = checkOutput(() => {
           yargs()
-            .command('batman <api-token>', 'batman command', function () {}, function (_argv) {
+            .command('batman <api-token>', 'batman command', noop, (_argv) => {
               argv = _argv
             })
-            .parse('batman robin --what', function (_err, argv, _output) {
+            .parse('batman robin --what', (_err, argv, _output) => {
               output = _output
             })
         })
@@ -966,15 +960,15 @@ describe('yargs dsl tests', function () {
         argv.what.should.equal(true)
       })
 
-      it('allows context object to be passed to parse', function () {
-        var argv = null
+      it('allows context object to be passed to parse', () => {
+        let argv = null
         yargs()
-          .command('batman <api-token>', 'batman command', function () {}, function (_argv) {
+          .command('batman <api-token>', 'batman command', noop, (_argv) => {
             argv = _argv
           })
           .parse('batman robin --what', {
             state: 'grumpy but rich'
-          }, function (_err, argv, _output) {})
+          }, (_err, argv, _output) => {})
 
         argv.state.should.equal('grumpy but rich')
         argv['api-token'].should.equal('robin')
@@ -982,65 +976,65 @@ describe('yargs dsl tests', function () {
       })
 
       // see: https://github.com/yargs/yargs/issues/671
-      it('does not fail if context object has cyclical reference', function () {
-        var argv = null
-        var context = {state: 'grumpy but rich'}
+      it('does not fail if context object has cyclical reference', () => {
+        let argv = null
+        const context = {state: 'grumpy but rich'}
         context.res = context
         yargs()
-          .command('batman <api-token>', 'batman command', function () {}, function (_argv) {
+          .command('batman <api-token>', 'batman command', noop, (_argv) => {
             argv = _argv
           })
-          .parse('batman robin --what', context, function (_err, argv, _output) {})
+          .parse('batman robin --what', context, (_err, argv, _output) => {})
 
         argv.state.should.equal('grumpy but rich')
         argv['api-token'].should.equal('robin')
         argv.what.should.equal(true)
       })
 
-      it('allows nested sub-commands to be invoked multiple times', function () {
-        var context = {counter: 0}
+      it('allows nested sub-commands to be invoked multiple times', () => {
+        const context = {counter: 0}
 
-        checkOutput(function () {
-          var parser = yargs()
+        checkOutput(() => {
+          const parser = yargs()
             .commandDir('fixtures/cmddir')
 
-          parser.parse('dream within-a-dream --what', {context: context}, function (_err, argv, _output) {})
-          parser.parse('dream within-a-dream --what', {context: context}, function (_err, argv, _output) {})
-          parser.parse('dream within-a-dream --what', {context: context}, function (_err, argv, _output) {})
+          parser.parse('dream within-a-dream --what', {context}, (_err, argv, _output) => {})
+          parser.parse('dream within-a-dream --what', {context}, (_err, argv, _output) => {})
+          parser.parse('dream within-a-dream --what', {context}, (_err, argv, _output) => {})
         })
 
         context.counter.should.equal(3)
       })
 
-      it('overwrites the prior context object, when parse is called multiple times', function () {
-        var argv = null
-        var parser = yargs()
-          .command('batman <api-token>', 'batman command', function () {}, function (_argv) {})
+      it('overwrites the prior context object, when parse is called multiple times', () => {
+        let argv = null
+        const parser = yargs()
+          .command('batman <api-token>', 'batman command', noop, (_argv) => {})
 
         parser.parse('batman robin --what', {
           state: 'grumpy but rich'
-        }, function (_err, _argv, _output) {})
+        }, (_err, _argv, _output) => {})
 
         parser.parse('batman robin --what', {
           state: 'the hero we need'
-        }, function (_err, _argv, _output) {
+        }, (_err, _argv, _output) => {
           argv = _argv
         })
 
         argv.state.should.equal('the hero we need')
       })
 
-      it('populates argv appropriately when parse is called multiple times', function () {
-        var parser = yargs()
-          .command('batman <api-token>', 'batman command', function () {}, function (_argv) {})
-          .command('robin <egg>', 'robin command', function () {}, function (_argv) {})
+      it('populates argv appropriately when parse is called multiple times', () => {
+        const parser = yargs()
+          .command('batman <api-token>', 'batman command', noop, (_argv) => {})
+          .command('robin <egg>', 'robin command', noop, (_argv) => {})
 
-        var argv1 = null
-        parser.parse('batman abc123', function (_err, argv, _output) {
+        let argv1 = null
+        parser.parse('batman abc123', (_err, argv, _output) => {
           argv1 = argv
         })
-        var argv2 = null
-        parser.parse('robin blue', function (_err, argv, _output) {
+        let argv2 = null
+        parser.parse('robin blue', (_err, argv, _output) => {
           argv2 = argv
         })
         expect(argv1.egg).to.equal(undefined)
@@ -1050,18 +1044,18 @@ describe('yargs dsl tests', function () {
         argv2.egg.should.equal('blue')
       })
 
-      it('populates output appropriately when parse is called multiple times', function () {
-        var parser = yargs()
-          .command('batman <api-token>', 'batman command', function () {}, function (_argv) {})
-          .command('robin <egg>', 'robin command', function () {}, function (_argv) {})
+      it('populates output appropriately when parse is called multiple times', () => {
+        const parser = yargs()
+          .command('batman <api-token>', 'batman command', noop, (_argv) => {})
+          .command('robin <egg>', 'robin command', noop, (_argv) => {})
           .wrap(null)
 
-        var output1 = null
-        parser.parse('batman help', function (_err, _argv, output) {
+        let output1 = null
+        parser.parse('batman help', (_err, _argv, output) => {
           output1 = output
         })
-        var output2 = null
-        parser.parse('robin help', function (_err, _argv, output) {
+        let output2 = null
+        parser.parse('robin help', (_err, _argv, output) => {
           output2 = output
         })
 
@@ -1084,21 +1078,21 @@ describe('yargs dsl tests', function () {
         ])
       })
 
-      it('resets errors when parse is called multiple times', function () {
-        var parser = yargs()
-          .command('batman <api-token>', 'batman command', function () {}, function (_argv) {})
-          .command('robin <egg>', 'robin command', function () {}, function (_argv) {})
+      it('resets errors when parse is called multiple times', () => {
+        const parser = yargs()
+          .command('batman <api-token>', 'batman command', noop, (_argv) => {})
+          .command('robin <egg>', 'robin command', noop, (_argv) => {})
           .wrap(null)
 
-        var error1 = null
-        var output1 = null
-        parser.parse('batman', function (err, _argv, output) {
+        let error1 = null
+        let output1 = null
+        parser.parse('batman', (err, _argv, output) => {
           error1 = err
           output1 = output
         })
-        var error2 = null
-        var output2 = null
-        parser.parse('robin help', function (err, _argv, output) {
+        let error2 = null
+        let output2 = null
+        parser.parse('robin help', (err, _argv, output) => {
           error2 = err
           output2 = output
         })
@@ -1125,22 +1119,22 @@ describe('yargs dsl tests', function () {
         ])
       })
 
-      it('preserves top-level config when parse is called multiple times', function () {
-        var x = 'wrong'
-        var err
-        var output
+      it('preserves top-level config when parse is called multiple times', () => {
+        let x = 'wrong'
+        let err
+        let output
         // set some top-level, reset-able config
-        var parser = yargs()
+        const parser = yargs()
           .demand(1, 'Must call a command')
           .strict()
           .wrap(null)
           .command('one <x>', 'The one and only command')
         // first call parse with command, which calls reset
-        parser.parse('one two', function (_, argv) {
+        parser.parse('one two', (_, argv) => {
           x = argv.x
         })
         // then call parse without command, which should enforce top-level config
-        parser.parse('', function (_err, argv, _output) {
+        parser.parse('', (_err, argv, _output) => {
           err = _err || {}
           output = _output || ''
         })
@@ -1160,20 +1154,18 @@ describe('yargs dsl tests', function () {
     })
   })
 
-  describe('config', function () {
-    it('allows a parsing function to be provided as a second argument', function () {
-      var argv = yargs('--config ./test/fixtures/config.json')
-        .config('config', function (path) {
-          return JSON.parse(fs.readFileSync(path))
-        })
+  describe('config', () => {
+    it('allows a parsing function to be provided as a second argument', () => {
+      const argv = yargs('--config ./test/fixtures/config.json')
+        .config('config', path => JSON.parse(fs.readFileSync(path)))
         .global('config', false)
         .argv
 
       argv.foo.should.equal('baz')
     })
 
-    it('allows key to be specified with option shorthand', function () {
-      var argv = yargs('--config ./test/fixtures/config.json')
+    it('allows key to be specified with option shorthand', () => {
+      const argv = yargs('--config ./test/fixtures/config.json')
         .option('config', {
           config: true,
           global: false
@@ -1183,8 +1175,8 @@ describe('yargs dsl tests', function () {
       argv.foo.should.equal('baz')
     })
 
-    it('allows to pass a configuration object', function () {
-      var argv = yargs
+    it('allows to pass a configuration object', () => {
+      const argv = yargs
           .config({foo: 1, bar: 2})
           .argv
 
@@ -1192,9 +1184,9 @@ describe('yargs dsl tests', function () {
       argv.bar.should.equal(2)
     })
 
-    describe('extends', function () {
-      it('applies default configurations when given config object', function () {
-        var argv = yargs
+    describe('extends', () => {
+      it('applies default configurations when given config object', () => {
+        const argv = yargs
           .config({
             extends: './test/fixtures/extends/config_1.json',
             a: 1
@@ -1206,16 +1198,16 @@ describe('yargs dsl tests', function () {
         argv.z.should.equal(15)
       })
 
-      it('protects against circular extended configurations', function () {
-        expect(function () {
+      it('protects against circular extended configurations', () => {
+        expect(() => {
           yargs.config({extends: './test/fixtures/extends/circular_1.json'})
         }).to.throw(YError)
       })
 
-      it('handles aboslute paths', function () {
-        var absolutePath = path.join(process.cwd(), 'test', 'fixtures', 'extends', 'config_1.json')
+      it('handles aboslute paths', () => {
+        const absolutePath = path.join(process.cwd(), 'test', 'fixtures', 'extends', 'config_1.json')
 
-        var argv = yargs
+        const argv = yargs
           .config({
             a: 2,
             extends: absolutePath
@@ -1229,7 +1221,7 @@ describe('yargs dsl tests', function () {
 
       // see: https://www.npmjs.com/package/yargs-test-extends
       it('allows a module to be extended, rather than a JSON file', () => {
-        var argv = yargs()
+        const argv = yargs()
           .config({
             a: 2,
             extends: 'yargs-test-extends'
@@ -1241,7 +1233,7 @@ describe('yargs dsl tests', function () {
       })
 
       it('ignores an extends key that does not look like a path or module', () => {
-        var argv = yargs()
+        const argv = yargs()
           .config({
             a: 2,
             extends: 'batman'
@@ -1254,17 +1246,17 @@ describe('yargs dsl tests', function () {
     })
   })
 
-  describe('normalize', function () {
-    it('normalizes paths passed as arguments', function () {
-      var argv = yargs('--path /foo/bar//baz/asdf/quux/..')
+  describe('normalize', () => {
+    it('normalizes paths passed as arguments', () => {
+      const argv = yargs('--path /foo/bar//baz/asdf/quux/..')
         .normalize(['path'])
         .argv
 
       argv.path.should.equal(['', 'foo', 'bar', 'baz', 'asdf'].join(path.sep))
     })
 
-    it('normalizes path when when it is updated', function () {
-      var argv = yargs('--path /batman')
+    it('normalizes path when when it is updated', () => {
+      const argv = yargs('--path /batman')
         .normalize(['path'])
         .argv
 
@@ -1272,8 +1264,8 @@ describe('yargs dsl tests', function () {
       argv.path.should.equal(['', 'foo', 'bar', 'baz', 'asdf'].join(path.sep))
     })
 
-    it('allows key to be specified with option shorthand', function () {
-      var argv = yargs('--path /batman')
+    it('allows key to be specified with option shorthand', () => {
+      const argv = yargs('--path /batman')
         .option('path', {
           normalize: true
         })
@@ -1284,9 +1276,9 @@ describe('yargs dsl tests', function () {
     })
   })
 
-  describe('narg', function () {
-    it('accepts a key as the first argument and a count as the second', function () {
-      var argv = yargs('--foo a b c')
+  describe('narg', () => {
+    it('accepts a key as the first argument and a count as the second', () => {
+      const argv = yargs('--foo a b c')
         .nargs('foo', 2)
         .argv
 
@@ -1294,8 +1286,8 @@ describe('yargs dsl tests', function () {
       argv._.should.deep.equal(['c'])
     })
 
-    it('accepts a hash of keys and counts', function () {
-      var argv = yargs('--foo a b c')
+    it('accepts a hash of keys and counts', () => {
+      const argv = yargs('--foo a b c')
         .nargs({
           foo: 2
         })
@@ -1305,8 +1297,8 @@ describe('yargs dsl tests', function () {
       argv._.should.deep.equal(['c'])
     })
 
-    it('allows key to be specified with option shorthand', function () {
-      var argv = yargs('--foo a b c')
+    it('allows key to be specified with option shorthand', () => {
+      const argv = yargs('--foo a b c')
         .option('foo', {
           nargs: 2
         })
@@ -1317,9 +1309,9 @@ describe('yargs dsl tests', function () {
     })
   })
 
-  describe('global', function () {
-    it('does not reset a global options when reset is called', function () {
-      var y = yargs('--foo a b c')
+  describe('global', () => {
+    it('does not reset a global options when reset is called', () => {
+      const y = yargs('--foo a b c')
         .option('foo', {
           nargs: 2
         })
@@ -1329,13 +1321,13 @@ describe('yargs dsl tests', function () {
         })
         .global('foo')
         .reset()
-      var options = y.getOptions()
+      const options = y.getOptions()
       options.key.foo.should.equal(true)
       expect(options.key.bar).to.equal(undefined)
     })
 
-    it('does not reset alias of global option', function () {
-      var y = yargs('--foo a b c')
+    it('does not reset alias of global option', () => {
+      const y = yargs('--foo a b c')
         .option('foo', {
           nargs: 2,
           alias: 'awesome-sauce'
@@ -1352,7 +1344,7 @@ describe('yargs dsl tests', function () {
         .reset({
           foo: ['awesome-sauce', 'awesomeSauce']
         })
-      var options = y.getOptions()
+      const options = y.getOptions()
 
       options.key.foo.should.equal(true)
       options.string.should.include('awesome-sauce')
@@ -1363,34 +1355,34 @@ describe('yargs dsl tests', function () {
       Object.keys(options.demandedOptions).should.not.include('bar')
     })
 
-    it('should set help to global option by default', function () {
-      var y = yargs('--foo')
+    it('should set help to global option by default', () => {
+      const y = yargs('--foo')
         .help('help')
-      var options = y.getOptions()
+      const options = y.getOptions()
       options.local.should.not.include('help')
     })
 
-    it('should set version to global option by default', function () {
-      var y = yargs('--foo')
+    it('should set version to global option by default', () => {
+      const y = yargs('--foo')
         .version()
-      var options = y.getOptions()
+      const options = y.getOptions()
       options.local.should.not.include('version')
     })
 
-    it('should not reset usage descriptions of global options', function () {
-      var y = yargs('--foo')
+    it('should not reset usage descriptions of global options', () => {
+      const y = yargs('--foo')
         .describe('bar', 'my awesome bar option')
         .describe('foo', 'my awesome foo option')
         .global('foo')
         .global('bar', false)
         .reset()
-      var descriptions = y.getUsageInstance().getDescriptions()
+      const descriptions = y.getUsageInstance().getDescriptions()
       Object.keys(descriptions).should.include('foo')
       Object.keys(descriptions).should.not.include('bar')
     })
 
-    it('should not reset implications of global options', function () {
-      var y = yargs(['--x=33'])
+    it('should not reset implications of global options', () => {
+      const y = yargs(['--x=33'])
         .implies({
           x: 'y'
         })
@@ -1399,13 +1391,13 @@ describe('yargs dsl tests', function () {
         })
         .global(['z'], false)
         .reset()
-      var implied = y.getValidationInstance().getImplied()
+      const implied = y.getValidationInstance().getImplied()
       Object.keys(implied).should.include('x')
       Object.keys(implied).should.not.include('z')
     })
 
-    it('should expose an options short-hand for declaring global options', function () {
-      var y = yargs('--foo a b c')
+    it('should expose an options short-hand for declaring global options', () => {
+      const y = yargs('--foo a b c')
         .option('foo', {
           nargs: 2
         })
@@ -1414,22 +1406,22 @@ describe('yargs dsl tests', function () {
           global: false
         })
         .reset()
-      var options = y.getOptions()
+      const options = y.getOptions()
       options.key.foo.should.equal(true)
       expect(options.key.bar).to.equal(undefined)
     })
   })
 
-  describe('pkgConf', function () {
-    it('uses values from package.json', function () {
-      var argv = yargs('--foo a').pkgConf('repository').argv
+  describe('pkgConf', () => {
+    it('uses values from package.json', () => {
+      const argv = yargs('--foo a').pkgConf('repository').argv
 
       argv.foo.should.equal('a')
       argv.type.should.equal('git')
     })
 
-    it('combines yargs defaults with package.json values', function () {
-      var argv = yargs('--foo a')
+    it('combines yargs defaults with package.json values', () => {
+      const argv = yargs('--foo a')
         .default('b', 99)
         .pkgConf('repository')
         .argv
@@ -1439,8 +1431,8 @@ describe('yargs dsl tests', function () {
       argv.type.should.equal('git')
     })
 
-    it('should use value from package.json, if argv value is using default value', function () {
-      var argv = yargs('--foo a')
+    it('should use value from package.json, if argv value is using default value', () => {
+      const argv = yargs('--foo a')
         .default('b', 99)
         .pkgConf('repository')
         .default('type', 'default')
@@ -1451,8 +1443,8 @@ describe('yargs dsl tests', function () {
       argv.type.should.equal('git')
     })
 
-    it('should apply value from config object to all aliases', function () {
-      var argv = yargs('--foo a')
+    it('should apply value from config object to all aliases', () => {
+      const argv = yargs('--foo a')
         .pkgConf('repository')
         .alias('type', 't')
         .alias('t', 'u')
@@ -1464,8 +1456,8 @@ describe('yargs dsl tests', function () {
       argv.u.should.equal('git')
     })
 
-    it('is cool with a key not existing', function () {
-      var argv = yargs('--foo a')
+    it('is cool with a key not existing', () => {
+      const argv = yargs('--foo a')
         .default('b', 99)
         .pkgConf('banana')
         .argv
@@ -1475,8 +1467,8 @@ describe('yargs dsl tests', function () {
       expect(argv.type).to.equal(undefined)
     })
 
-    it('allows an alternative cwd to be specified', function () {
-      var argv = yargs('--foo a')
+    it('allows an alternative cwd to be specified', () => {
+      const argv = yargs('--foo a')
         .pkgConf('yargs', './test/fixtures')
         .argv
 
@@ -1484,13 +1476,12 @@ describe('yargs dsl tests', function () {
       argv.dotNotation.should.equal(false)
     })
 
-    it('doesn\'t mess up other pkg lookups when cwd is specified', function () {
-      var r = checkOutput(function () {
-        return yargs('--version')
+    it('doesn\'t mess up other pkg lookups when cwd is specified', () => {
+      const r = checkOutput(() => yargs('--version')
           .pkgConf('repository', './test/fixtures')
           .version()
           .argv
-      })
+        )
       const options = yargs.getOptions()
 
       // assert pkgConf lookup (test/fixtures/package.json)
@@ -1501,34 +1492,34 @@ describe('yargs dsl tests', function () {
     })
 
     // see https://github.com/yargs/yargs/issues/485
-    it('handles an invalid package.json', function () {
-      var argv = yargs('--foo a')
+    it('handles an invalid package.json', () => {
+      const argv = yargs('--foo a')
         .pkgConf('yargs', './test/fixtures/broken-json')
         .argv
 
       argv.foo.should.equal('a')
     })
 
-    it('should apply default configurations from extended packages', function () {
-      var argv = yargs().pkgConf('foo', 'test/fixtures/extends/packageA').argv
+    it('should apply default configurations from extended packages', () => {
+      const argv = yargs().pkgConf('foo', 'test/fixtures/extends/packageA').argv
 
       argv.a.should.equal(80)
       argv.b.should.equals('riffiwobbles')
     })
 
-    it('should apply extended configurations from cwd when no path is given', function () {
-      var argv = yargs('', 'test/fixtures/extends/packageA').pkgConf('foo').argv
+    it('should apply extended configurations from cwd when no path is given', () => {
+      const argv = yargs('', 'test/fixtures/extends/packageA').pkgConf('foo').argv
 
       argv.a.should.equal(80)
       argv.b.should.equals('riffiwobbles')
     })
   })
 
-  describe('skipValidation', function () {
-    it('skips validation if an option with skipValidation is present', function () {
-      var argv = yargs(['--koala', '--skip'])
+  describe('skipValidation', () => {
+    it('skips validation if an option with skipValidation is present', () => {
+      const argv = yargs(['--koala', '--skip'])
           .demand(1)
-          .fail(function (msg) {
+          .fail((msg) => {
             expect.fail()
           })
           .skipValidation(['skip', 'reallySkip'])
@@ -1536,21 +1527,19 @@ describe('yargs dsl tests', function () {
       argv.koala.should.equal(true)
     })
 
-    it('does not skip validation if no option with skipValidation is present', function (done) {
-      var argv = yargs(['--koala'])
+    it('does not skip validation if no option with skipValidation is present', (done) => {
+      const argv = yargs(['--koala'])
           .demand(1)
-          .fail(function (msg) {
-            return done()
-          })
+          .fail(msg => done())
           .skipValidation(['skip', 'reallySkip'])
           .argv
       argv.koala.should.equal(true)
     })
 
-    it('allows key to be specified with option shorthand', function () {
-      var argv = yargs(['--koala', '--skip'])
+    it('allows key to be specified with option shorthand', () => {
+      const argv = yargs(['--koala', '--skip'])
           .demand(1)
-          .fail(function (msg) {
+          .fail((msg) => {
             expect.fail()
           })
           .option('skip', {
@@ -1560,14 +1549,14 @@ describe('yargs dsl tests', function () {
       argv.koala.should.equal(true)
     })
 
-    it('allows having an option that skips validation but not skipping validation if that option is not used', function () {
-      var skippedValidation = true
+    it('allows having an option that skips validation but not skipping validation if that option is not used', () => {
+      let skippedValidation = true
       yargs(['--no-skip'])
           .demand(5)
           .option('skip', {
             skipValidation: true
           })
-          .fail(function (msg) {
+          .fail((msg) => {
             skippedValidation = false
           })
           .argv
@@ -1575,19 +1564,17 @@ describe('yargs dsl tests', function () {
     })
   })
 
-  describe('.help()', function () {
-    it('enables `--help` option and `help` command without arguments', function () {
-      var option = checkOutput(function () {
-        return yargs('--help')
+  describe('.help()', () => {
+    it('enables `--help` option and `help` command without arguments', () => {
+      const option = checkOutput(() => yargs('--help')
           .wrap(null)
           .argv
-      })
-      var command = checkOutput(function () {
-        return yargs('help')
+        )
+      const command = checkOutput(() => yargs('help')
           .wrap(null)
           .argv
-      })
-      var expected = [
+        )
+      const expected = [
         'Options:',
         '  --help     Show help  [boolean]',
         '  --version  Show version number  [boolean]',
@@ -1597,20 +1584,18 @@ describe('yargs dsl tests', function () {
       command.logs[0].split('\n').should.deep.equal(expected)
     })
 
-    it('enables `--help` option and `help` command with `true` argument', function () {
-      var option = checkOutput(function () {
-        return yargs('--help')
+    it('enables `--help` option and `help` command with `true` argument', () => {
+      const option = checkOutput(() => yargs('--help')
           .help(true)
           .wrap(null)
           .argv
-      })
-      var command = checkOutput(function () {
-        return yargs('help')
+        )
+      const command = checkOutput(() => yargs('help')
           .help(true)
           .wrap(null)
           .argv
-      })
-      var expected = [
+        )
+      const expected = [
         'Options:',
         '  --version  Show version number  [boolean]',
         '  --help     Show help  [boolean]',
@@ -1620,26 +1605,23 @@ describe('yargs dsl tests', function () {
       command.logs[0].split('\n').should.deep.equal(expected)
     })
 
-    it('enables given string as help option and command with string argument', function () {
-      var option = checkOutput(function () {
-        return yargs('--info')
+    it('enables given string as help option and command with string argument', () => {
+      const option = checkOutput(() => yargs('--info')
           .help('info')
           .wrap(null)
           .argv
-      })
-      var command = checkOutput(function () {
-        return yargs('info')
+        )
+      const command = checkOutput(() => yargs('info')
           .help('info')
           .wrap(null)
           .argv
-      })
-      var helpOption = checkOutput(function () {
-        return yargs('--help')
+        )
+      const helpOption = checkOutput(() => yargs('--help')
           .help('info')
           .wrap(null)
           .argv
-      })
-      var expected = [
+        )
+      const expected = [
         'Options:',
         '  --version  Show version number  [boolean]',
         '  --info     Show help  [boolean]',
@@ -1650,20 +1632,18 @@ describe('yargs dsl tests', function () {
       helpOption.result.should.have.property('help').and.be.true
     })
 
-    it('enables given string as help option and command with custom description with two string arguments', function () {
-      var option = checkOutput(function () {
-        return yargs('--info')
+    it('enables given string as help option and command with custom description with two string arguments', () => {
+      const option = checkOutput(() => yargs('--info')
           .help('info', 'Display info')
           .wrap(null)
           .argv
-      })
-      var command = checkOutput(function () {
-        return yargs('info')
+        )
+      const command = checkOutput(() => yargs('info')
           .help('info', 'Display info')
           .wrap(null)
           .argv
-      })
-      var expected = [
+        )
+      const expected = [
         'Options:',
         '  --version  Show version number  [boolean]',
         '  --info     Display info  [boolean]',
@@ -1673,20 +1653,18 @@ describe('yargs dsl tests', function () {
       command.logs[0].split('\n').should.deep.equal(expected)
     })
 
-    it('enables given string as help option and command with custom description with two string arguments and `true` argument', function () {
-      var option = checkOutput(function () {
-        return yargs('--info')
+    it('enables given string as help option and command with custom description with two string arguments and `true` argument', () => {
+      const option = checkOutput(() => yargs('--info')
           .help('info', 'Display info', true)
           .wrap(null)
           .argv
-      })
-      var command = checkOutput(function () {
-        return yargs('info')
+        )
+      const command = checkOutput(() => yargs('info')
           .help('info', 'Display info', true)
           .wrap(null)
           .argv
-      })
-      var expected = [
+        )
+      const expected = [
         'Options:',
         '  --version  Show version number  [boolean]',
         '  --info     Display info  [boolean]',
@@ -1697,20 +1675,18 @@ describe('yargs dsl tests', function () {
     })
   })
 
-  describe('.help() with .alias()', function () {
-    it('uses multi-char (but not single-char) help alias as command', function () {
-      var info = checkOutput(function () {
-        return yargs('info')
+  describe('.help() with .alias()', () => {
+    it('uses multi-char (but not single-char) help alias as command', () => {
+      const info = checkOutput(() => yargs('info')
           .help().alias('h', 'help').alias('h', 'info')
           .wrap(null)
           .argv
-      })
-      var h = checkOutput(function () {
-        return yargs('h')
+        )
+      const h = checkOutput(() => yargs('h')
           .help().alias('h', 'help').alias('h', 'info')
           .wrap(null)
           .argv
-      })
+        )
       info.logs[0].split('\n').should.deep.equal([
         'Options:',
         '  --version           Show version number  [boolean]',
@@ -1720,20 +1696,18 @@ describe('yargs dsl tests', function () {
       h.result.should.have.property('_').and.deep.equal(['h'])
     })
 
-    it('uses single-char help alias as command if there are no multi-char aliases', function () {
-      var h = checkOutput(function () {
-        return yargs('h')
+    it('uses single-char help alias as command if there are no multi-char aliases', () => {
+      const h = checkOutput(() => yargs('h')
           .help('h').alias('h', '?')
           .wrap(null)
           .argv
-      })
-      var q = checkOutput(function () {
-        return yargs('?')
+        )
+      const q = checkOutput(() => yargs('?')
           .help('h').alias('h', '?')
           .wrap(null)
           .argv
-      })
-      var expected = [
+        )
+      const expected = [
         'Options:',
         '  --version  Show version number  [boolean]',
         '  -h, -?     Show help  [boolean]',
@@ -1744,24 +1718,22 @@ describe('yargs dsl tests', function () {
     })
   })
 
-  describe('.coerce()', function () {
-    it('supports string and function args (as option key and coerce function)', function () {
-      var argv = yargs(['--file', path.join(__dirname, 'fixtures', 'package.json')])
-        .coerce('file', function (arg) {
-          return JSON.parse(fs.readFileSync(arg, 'utf8'))
-        })
+  describe('.coerce()', () => {
+    it('supports string and function args (as option key and coerce function)', () => {
+      const argv = yargs(['--file', path.join(__dirname, 'fixtures', 'package.json')])
+        .coerce('file', arg => JSON.parse(fs.readFileSync(arg, 'utf8')))
         .argv
       expect(argv.file).to.have.property('version').and.equal('9.9.9')
     })
 
-    it('supports object arg (as map of multiple options)', function () {
-      var argv = yargs('--expand abc --range 1..3')
+    it('supports object arg (as map of multiple options)', () => {
+      const argv = yargs('--expand abc --range 1..3')
         .coerce({
-          expand: function (arg) {
+          expand (arg) {
             return arg.split('')
           },
-          range: function (arg) {
-            var arr = arg.split('..').map(Number)
+          range (arg) {
+            const arr = arg.split('..').map(Number)
             return { begin: arr[0], end: arr[1] }
           }
         })
@@ -1771,22 +1743,20 @@ describe('yargs dsl tests', function () {
       expect(argv.range).to.have.property('end').and.equal(3)
     })
 
-    it('supports array and function args (as option keys and coerce function)', function () {
-      var argv = yargs(['--src', 'in', '--dest', 'out'])
-        .coerce(['src', 'dest'], function (arg) {
-          return path.resolve(arg)
-        })
+    it('supports array and function args (as option keys and coerce function)', () => {
+      const argv = yargs(['--src', 'in', '--dest', 'out'])
+        .coerce(['src', 'dest'], arg => path.resolve(arg))
         .argv
       argv.src.should.match(/in/).and.have.length.above(2)
       argv.dest.should.match(/out/).and.have.length.above(3)
     })
 
-    it('allows an error to be handled by fail() handler', function () {
-      var msg
-      var err
-      var jsonErrMessage
+    it('allows an error to be handled by fail() handler', () => {
+      let msg
+      let err
+      let jsonErrMessage
       yargs('--json invalid')
-        .coerce('json', function (arg) {
+        .coerce('json', (arg) => {
           try {
             JSON.parse(arg)
           } catch (err) {
@@ -1794,7 +1764,7 @@ describe('yargs dsl tests', function () {
           }
           return JSON.parse(arg)
         })
-        .fail(function (m, e) {
+        .fail((m, e) => {
           msg = m
           err = e
         })
@@ -1803,20 +1773,20 @@ describe('yargs dsl tests', function () {
       expect(err).to.exist
     })
 
-    it('supports an option alias', function () {
-      var argv = yargs('-d 2016-08-12')
+    it('supports an option alias', () => {
+      const argv = yargs('-d 2016-08-12')
         .coerce('date', Date.parse)
         .alias('date', 'd')
         .argv
       argv.date.should.equal(1470960000000)
     })
 
-    it('supports a global option within command', function () {
-      var regex
+    it('supports a global option within command', () => {
+      let regex
       yargs('check --regex x')
         .global('regex')
         .coerce('regex', RegExp)
-        .command('check', 'Check something', {}, function (argv) {
+        .command('check', 'Check something', {}, (argv) => {
           regex = argv.regex
         })
         .argv
@@ -1824,11 +1794,11 @@ describe('yargs dsl tests', function () {
       regex.toString().should.equal('/x/')
     })
 
-    it('is supported by .option()', function () {
-      var argv = yargs('--env SHELL=/bin/bash')
+    it('is supported by .option()', () => {
+      const argv = yargs('--env SHELL=/bin/bash')
         .option('env', {
-          coerce: function (arg) {
-            var arr = arg.split('=')
+          coerce (arg) {
+            const arr = arg.split('=')
             return { name: arr[0], value: arr[1] || '' }
           }
         })
@@ -1837,24 +1807,16 @@ describe('yargs dsl tests', function () {
       expect(argv.env).to.have.property('value').and.equal('/bin/bash')
     })
 
-    it('supports positional and variadic args for a command', function () {
-      var age
-      var dates
+    it('supports positional and variadic args for a command', () => {
+      let age
+      let dates
       yargs('add 30days 2016-06-13 2016-07-18')
-        .command('add <age> [dates..]', 'Testing', function (yargs) {
-          return yargs
-            .coerce('age', function (arg) {
-              return parseInt(arg, 10) * 86400000
+        .command('add <age> [dates..]', 'Testing', yargs => yargs
+            .coerce('age', arg => parseInt(arg, 10) * 86400000)
+            .coerce('dates', arg => arg.map(str => new Date(str))), (argv) => {
+              age = argv.age
+              dates = argv.dates
             })
-            .coerce('dates', function (arg) {
-              return arg.map(function (str) {
-                return new Date(str)
-              })
-            })
-        }, function (argv) {
-          age = argv.age
-          dates = argv.dates
-        })
         .argv
       expect(age).to.equal(2592000000)
       expect(dates).to.have.lengthOf(2)
@@ -1862,26 +1824,18 @@ describe('yargs dsl tests', function () {
       dates[1].toString().should.equal(new Date('2016-07-18').toString())
     })
 
-    it('returns camelcase args for a command', function () {
-      var age1
-      var age2
-      var dates
+    it('returns camelcase args for a command', () => {
+      let age1
+      let age2
+      let dates
       yargs('add 30days 2016-06-13 2016-07-18')
-        .command('add <age-in-days> [dates..]', 'Testing', function (yargs) {
-          return yargs
-            .coerce('age-in-days', function (arg) {
-              return parseInt(arg, 10) * 86400000
+        .command('add <age-in-days> [dates..]', 'Testing', yargs => yargs
+            .coerce('age-in-days', arg => parseInt(arg, 10) * 86400000)
+            .coerce('dates', arg => arg.map(str => new Date(str))), (argv) => {
+              age1 = argv.ageInDays
+              age2 = argv['age-in-days']
+              dates = argv.dates
             })
-            .coerce('dates', function (arg) {
-              return arg.map(function (str) {
-                return new Date(str)
-              })
-            })
-        }, function (argv) {
-          age1 = argv.ageInDays
-          age2 = argv['age-in-days']
-          dates = argv.dates
-        })
         .argv
       expect(age1).to.equal(2592000000)
       expect(age2).to.equal(2592000000)
@@ -1890,20 +1844,18 @@ describe('yargs dsl tests', function () {
       dates[1].toString().should.equal(new Date('2016-07-18').toString())
     })
 
-    it('allows an error from positional arg to be handled by fail() handler', function () {
-      var msg
-      var err
+    it('allows an error from positional arg to be handled by fail() handler', () => {
+      let msg
+      let err
       yargs('throw ball')
-        .command('throw <msg>', false, function (yargs) {
-          return yargs
-            .coerce('msg', function (arg) {
+        .command('throw <msg>', false, yargs => yargs
+            .coerce('msg', (arg) => {
               throw new Error(arg)
             })
-            .fail(function (m, e) {
+            .fail((m, e) => {
               msg = m
               err = e
-            })
-        })
+            }))
         .argv
       expect(msg).to.equal('ball')
       expect(err).to.exist
@@ -1990,20 +1942,20 @@ describe('yargs dsl tests', function () {
   })
 })
 
-describe('yargs context', function () {
-  beforeEach(function () {
+describe('yargs context', () => {
+  beforeEach(() => {
     delete require.cache[require.resolve('../')]
     yargs = require('../')
   })
 
-  it('should begin with initial state', function () {
-    var context = yargs.getContext()
+  it('should begin with initial state', () => {
+    const context = yargs.getContext()
     context.resets.should.equal(0)
     context.commands.should.deep.equal([])
   })
 
-  it('should track number of resets', function () {
-    var context = yargs.getContext()
+  it('should track number of resets', () => {
+    const context = yargs.getContext()
     yargs.reset()
     context.resets.should.equal(1)
     yargs.reset()
@@ -2011,18 +1963,18 @@ describe('yargs context', function () {
     context.resets.should.equal(3)
   })
 
-  it('should track commands being executed', function () {
-    var context
+  it('should track commands being executed', () => {
+    let context
     yargs('one two')
-      .command('one', 'level one', function (yargs) {
+      .command('one', 'level one', (yargs) => {
         context = yargs.getContext()
         context.commands.should.deep.equal(['one'])
-        return yargs.command('two', 'level two', function (yargs) {
+        return yargs.command('two', 'level two', (yargs) => {
           context.commands.should.deep.equal(['one', 'two'])
-        }, function (argv) {
+        }, (argv) => {
           context.commands.should.deep.equal(['one', 'two'])
         })
-      }, function (argv) {
+      }, (argv) => {
         context.commands.should.deep.equal(['one'])
       })
       .argv
