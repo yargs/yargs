@@ -74,9 +74,10 @@ require('yargs') // eslint-disable-line
 
 Run the example above with `--help` to see the help for the application.
 
-## Heck, You Can Even Use Promises
+## You Can Also Use Promises
 
 ```js
+#!/usr/bin/env node
 require('yargs')
   .option('username', {describe: 'your username'})
   .option('password', {describe: 'your password'})
