@@ -912,6 +912,11 @@ function Yargs (processArgs, cwd, parentRequire) {
     enumerable: true
   })
 
+  self.then = function (onFulfilled, onRejected) {
+    return new Promise(resolve => resolve(self.argv))
+      .then(onFulfilled, onRejected)
+  }
+
   self._parseArgs = function parseArgs (args, shortCircuit, _skipValidation, commandIndex) {
     let skipValidation = !!_skipValidation
     args = args || processArgs

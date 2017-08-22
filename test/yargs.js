@@ -1871,6 +1871,75 @@ describe('yargs dsl tests', () => {
       argv._[0].should.equal('--grep=foobar')
     })
   })
+
+  describe('then', () => {
+    it('should return a promise that is resolved with parsed arguments', () => {
+      var program = yargs.command('thing', 'it does stuff')
+      var _parseArgs = program._parseArgs
+      var callCount = 0
+
+      program._parseArgs = () => {
+        callCount++
+        return _parseArgs.apply(program, arguments)
+      }
+
+      var result = program.then((argv) => {
+        expect(argv).to.deep.equal(program.argv)
+        expect(callCount).to.equal(2)
+      })
+
+      expect(result).to.be.an.instanceOf(Promise)
+
+      return result
+    })
+
+    it('should return a rejected promise if an error occurs while parsing', () => {
+      var program = yargs.command('thing', 'it does stuff')
+      var error = new Error('test')
+      var caught
+
+      program._parseArgs = () => {
+        throw error
+      }
+
+      return program
+        .then(() => {
+          throw new Error('Promise was not rejected!')
+        })
+        .catch((err) => {
+          expect(err).to.equal(error)
+          caught = true
+        })
+        .then(() => expect(caught).to.equal(true))
+    })
+
+    it('should be called when a promise is resolved with a yargs instance', () => {
+      var program = yargs.command('thing', 'it does stuff')
+      var _parseArgs = program._parseArgs
+      var callCount = 0
+
+      program._parseArgs = () => {
+        callCount++
+        return _parseArgs.apply(program, arguments)
+      }
+
+      return Promise.resolve(program).then((argv) => {
+        expect(argv).to.deep.equal(program.argv)
+        expect(callCount).to.equal(2)
+      })
+    })
+
+    it('should not require any arguments', () => {
+      var program = yargs.command('thing', 'it does stuff')
+      var callCount = 0
+
+      program._parseArgs = () => callCount++
+
+      return program.then().then(() => {
+        expect(callCount).to.equal(1)
+      })
+    })
+  })
 })
 
 describe('yargs context', () => {
