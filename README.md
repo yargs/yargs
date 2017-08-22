@@ -85,7 +85,13 @@ require('yargs')
     if (output) console.info(output)
     else login(argv.username, argv.password)
   })
+  .catch(err => {
+    if (err.output) console.error(err.output)
+  })
 ```
+
+The promise API lets you decide whether or not to output yargs' help message,
+making it great for applications like chat bots.
 
 ## Table of Contents
 
