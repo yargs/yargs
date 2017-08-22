@@ -20,18 +20,24 @@ or use `.parse()` to do the same thing:
 require('yargs').parse([ '-x', '1', '-y', '2' ])
 ````
 
-If you prefer, you can use `.then()` to create a promise that is resolved with `argv`:
+If you prefer, you can use `.then()` to create a promise that is resolved with `argv` and the text to output:
 
 ```javascript
-require('yargs').then(argv => ...)
+require('yargs').then({argv, output} => ...)
 ```
 
-or just as an alternative to referencing `.argv`:
+to use this as an alternative to calling `yargs.argv`, simply do this:
 
 ```javascript
 require('yargs')
   .command('thing', 'it does stuff')
-  .then()
+  .then(({argv, output}) => {
+    if (output) console.info(output)
+    else // do something with argv.
+  })
+  .catch(({output}) => {
+    console.error(output)
+  })
 ```
 
 In fact, simply resolving a promise with a yargs instance will run the parser:
@@ -1225,6 +1231,19 @@ If `key` is an array, interpret all the elements as strings.
 
 `.string('_')` will result in non-hyphenated arguments being interpreted as strings,
 regardless of whether they resemble numbers.
+
+<a name="then"></a>.then()
+------------
+
+Returns a promise that resolves with an object containing two keys:
+
+`argv`: the parsed command line arguments.
+`output`: help text that should be presented to the user.
+
+If `.argv` would have resulted in the application exiting with an error, e.g.,
+perhaps [implications failed](/docs/api.md#implies), the promise returned
+by `.then()` will be rejected. The error object contains the key `output`,
+which contains text that should be output to the user.
 
 .updateLocale(obj)
 ------------------

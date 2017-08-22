@@ -1874,18 +1874,10 @@ describe('yargs dsl tests', () => {
 
   describe('then', () => {
     it('should return a promise that is resolved with parsed arguments', () => {
-      var program = yargs.command('thing', 'it does stuff')
-      var _parseArgs = program._parseArgs
-      var callCount = 0
+      const program = yargs(['--foo', '99'])
 
-      program._parseArgs = () => {
-        callCount++
-        return _parseArgs.apply(program, arguments)
-      }
-
-      var result = program.then((argv) => {
-        expect(argv).to.deep.equal(program.argv)
-        expect(callCount).to.equal(2)
+      const result = program.then((output) => {
+        expect(output.argv).to.deep.equal(program.argv)
       })
 
       expect(result).to.be.an.instanceOf(Promise)
@@ -1894,50 +1886,43 @@ describe('yargs dsl tests', () => {
     })
 
     it('should return a rejected promise if an error occurs while parsing', () => {
-      var program = yargs.command('thing', 'it does stuff')
-      var error = new Error('test')
-      var caught
-
-      program._parseArgs = () => {
-        throw error
-      }
+      const program = yargs(['--foo', '99']).implies('foo', 'bar')
 
       return program
         .then(() => {
           throw new Error('Promise was not rejected!')
         })
         .catch((err) => {
-          expect(err).to.equal(error)
-          caught = true
+          err.message.should.not.equal('Promise was not rejected!')
+          err.output.should.match(/Implications failed:/)
         })
-        .then(() => expect(caught).to.equal(true))
     })
 
     it('should be called when a promise is resolved with a yargs instance', () => {
-      var program = yargs.command('thing', 'it does stuff')
-      var _parseArgs = program._parseArgs
-      var callCount = 0
+      const program = yargs(['--foo', '99'])
 
-      program._parseArgs = () => {
-        callCount++
-        return _parseArgs.apply(program, arguments)
-      }
-
-      return Promise.resolve(program).then((argv) => {
-        expect(argv).to.deep.equal(program.argv)
-        expect(callCount).to.equal(2)
+      return Promise.resolve(program).then((parsed) => {
+        expect(parsed.argv).to.deep.equal(program.argv)
       })
     })
 
     it('should not require any arguments', () => {
-      var program = yargs.command('thing', 'it does stuff')
-      var callCount = 0
-
-      program._parseArgs = () => callCount++
-
-      return program.then().then(() => {
-        expect(callCount).to.equal(1)
+      const program = yargs(['--foo', '99'])
+      return program.then().then((parsed) => {
+        expect(parsed.argv).to.deep.equal(program.argv)
       })
+    })
+
+    it('should populate output with help text, if help is invoked', () => {
+      const program = yargs(['--foo', '99', '--help'])
+      return Promise.resolve('foo')
+        .then(() => {
+          return program
+        })
+        .then((result) => {
+          result.argv.foo.should.equal(99)
+          result.output.should.match(/Show version number/)
+        })
     })
   })
 })

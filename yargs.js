@@ -545,6 +545,23 @@ function Yargs (processArgs, cwd, parentRequire) {
 
   self._hasParseCallback = () => !!parseFn
 
+  self.then = function (onFulfilled, onRejected) {
+    argsert('[function] [function]', [onFulfilled, onRejected], arguments.length)
+    return new Promise((resolve, reject) => {
+      self.parse(processArgs, (err, argv, output) => {
+        if (err) {
+          err.output = output
+          return reject(err)
+        }
+        return resolve({
+          argv: argv,
+          output: output
+        })
+      })
+    })
+    .then(onFulfilled, onRejected)
+  }
+
   self.option = self.options = function option (key, opt) {
     argsert('<string|object> [object]', [key, opt], arguments.length)
     if (typeof key === 'object') {
@@ -912,12 +929,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     enumerable: true
   })
 
-  self.then = function (onFulfilled, onRejected) {
-    return new Promise(resolve => resolve(self.argv))
-      .then(onFulfilled, onRejected)
-  }
-
-  self._parseArgs = function parseArgs (args, shortCircuit, _skipValidation, commandIndex) {
+  self._parseArgs = (args, shortCircuit, _skipValidation, commandIndex) => {
     let skipValidation = !!_skipValidation
     args = args || processArgs
 
