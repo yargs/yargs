@@ -74,6 +74,18 @@ require('yargs') // eslint-disable-line
 
 Run the example above with `--help` to see the help for the application.
 
+## Heck, You Can Even Use Promises
+
+```js
+require('yargs')
+  .option('username', {describe: 'your username'})
+  .option('password', {describe: 'your password'})
+  .then(({argv, output}) => {
+    if (output) console.info(output)
+    else login(argv.username, argv.password)
+  })
+```
+
 ## Table of Contents
 
 * [Yargs' API](/docs/api.md)
