@@ -121,6 +121,20 @@ describe('Completion', () => {
       r.logs.should.include('cmd1')
     })
 
+    it('does not include possitional arguments', function () {
+      var r = checkUsage(function () {
+        return yargs(['./completion', '--get-yargs-completions', 'cmd'])
+          .command('cmd1 [arg]', 'first command')
+          .command('cmd2 <arg>', 'second command')
+          .completion('completion', false)
+          .argv
+      })
+
+      r.logs.should.have.length(2)
+      r.logs.should.include('cmd1')
+      r.logs.should.include('cmd2')
+    })
+
     it('works if command has no options', () => {
       const r = checkUsage(() => yargs(['./completion', '--get-yargs-completions', 'foo', '--b'])
           .help(false)
