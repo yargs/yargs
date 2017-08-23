@@ -38,6 +38,35 @@ describe('validation tests', () => {
         .argv
     })
 
+    it('fails if either implied argument is not set', (done) => {
+      let fail1 = false
+      let fail2 = false
+      yargs(['--foo', '-a'])
+          .boolean('foo')
+          .implies({
+            'foo': ['a', 'b']
+          })
+          .fail((msg1) => {
+            fail1 = true
+            yargs(['--foo', '-b'])
+                .boolean('foo')
+                .implies({
+                  'foo': ['a', 'b']
+                })
+                .fail((msg2) => {
+                  fail2 = true
+                  msg1.should.match(/Implications failed/)
+                  msg2.should.match(/Implications failed/)
+                  return done()
+                })
+                .argv
+          })
+          .argv
+      // Prevent timeouts
+      fail1.should.be.true
+      fail2.should.be.true
+    })
+
     it("fails if --no-foo's implied argument is not set", (done) => {
       yargs([])
         .implies({
@@ -150,9 +179,25 @@ describe('validation tests', () => {
           .argv
     })
 
+    it('fails if argument is supplied along with either conflicting argument', (done) => {
+      yargs(['-f', '-b'])
+          .conflicts('f', ['b', 'c'])
+          .fail((msg1) => {
+            yargs(['-f', '-c'])
+                .conflicts('f', ['b', 'c'])
+                .fail((msg2) => {
+                  msg1.should.equal('Arguments f and b are mutually exclusive')
+                  msg2.should.equal('Arguments f and c are mutually exclusive')
+                  return done()
+                })
+                .argv
+          })
+          .argv
+    })
+
     it('should not fail if no conflicting arguments are provided', () => {
       yargs(['-b', '-c'])
-        .conflicts('f', 'b')
+        .conflicts('f', ['b', 'c'])
         .fail((msg) => {
           expect.fail()
         })
