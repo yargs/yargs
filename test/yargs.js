@@ -1871,6 +1871,72 @@ describe('yargs dsl tests', () => {
       argv._[0].should.equal('--grep=foobar')
     })
   })
+
+  describe('then', () => {
+    it('should return a promise that is resolved with parsed arguments', () => {
+      const program = yargs(['--foo', '99'])
+
+      const result = program.then((output) => {
+        expect(output.argv).to.deep.equal(program.argv)
+      })
+
+      expect(result).to.be.an.instanceOf(Promise)
+
+      return result
+    })
+
+    it('should return a rejected promise if an error occurs while parsing', () => {
+      const program = yargs(['--foo', '99']).implies('foo', 'bar')
+
+      return program
+        .then(() => {
+          throw new Error('Promise was not rejected!')
+        })
+        .catch((err) => {
+          err.message.should.not.equal('Promise was not rejected!')
+          err.output.should.match(/Implications failed:/)
+        })
+    })
+
+    it('should be called when a promise is resolved with a yargs instance', () => {
+      const program = yargs(['--foo', '99'])
+
+      return Promise.resolve(program).then((parsed) => {
+        expect(parsed.argv).to.deep.equal(program.argv)
+      })
+    })
+
+    it('should not require any arguments', () => {
+      const program = yargs(['--foo', '99'])
+      return program.then().then((parsed) => {
+        expect(parsed.argv).to.deep.equal(program.argv)
+      })
+    })
+
+    it('should populate output with help text, if help is invoked', () => {
+      const program = yargs(['--foo', '99', '--help'])
+      return Promise.resolve('foo')
+        .then(() => {
+          return program
+        })
+        .then((result) => {
+          result.argv.foo.should.equal(99)
+          result.output.should.match(/Show version number/)
+        })
+    })
+
+    it('allows a context object to be provided', (done) => {
+      const program = yargs(['blerg'])
+        .command('blerg', 'blerg command', () => {}, (argv) => {
+          argv._[0].should.equal('blerg')
+          argv.data.should.equal(99)
+          return done()
+        })
+      program.then({
+        data: 99
+      })
+    })
+  })
 })
 
 describe('yargs context', () => {

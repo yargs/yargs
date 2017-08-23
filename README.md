@@ -74,6 +74,25 @@ require('yargs') // eslint-disable-line
 
 Run the example above with `--help` to see the help for the application.
 
+## You Can Also Use Promises
+
+```js
+#!/usr/bin/env node
+require('yargs')
+  .option('username', {describe: 'your username'})
+  .option('password', {describe: 'your password'})
+  .then(({argv, output}) => {
+    if (output) console.info(output)
+    else login(argv.username, argv.password)
+  })
+  .catch(err => {
+    if (err.output) console.error(err.output)
+  })
+```
+
+The promise API lets you decide whether or not to output yargs' help message,
+making it great for applications like chat bots.
+
 ## Table of Contents
 
 * [Yargs' API](/docs/api.md)
