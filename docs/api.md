@@ -1231,13 +1231,13 @@ regardless of whether they resemble numbers.
 
 Returns a promise that resolves with an object containing two keys:
 
-`argv`: the parsed command line arguments.
-`output`: help text that should be presented to the user.
+* `argv`: the parsed command line arguments.
+* `output`: help text that should be presented to the user.
 
 If `.argv` would have resulted in the application exiting with an error, e.g.,
 perhaps [implications failed](/docs/api.md#implies), the promise returned
 by `.then()` will be rejected. The error object contains the key `output`,
-which contains text that should be output to the user.
+which contains a human-readable message for the user.
 
 As with `.parse()`, a context object may be provided. This is useful for passing
 state information to commands. See our [slack-bot example](https://github.com/yargs/pirate-joe) for a demonstration of where passing
