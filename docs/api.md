@@ -20,7 +20,7 @@ or use `.parse()` to do the same thing:
 require('yargs').parse([ '-x', '1', '-y', '2' ])
 ````
 
-If you prefer, you can use `.then()` to create a promise that is resolved with `argv` and the text to output:
+If you prefer, you can use `.then()` to create a promise that is resolved with `argv` and the program's help text:
 
 ```javascript
 require('yargs').then({argv, output} => ...)
@@ -38,12 +38,6 @@ require('yargs')
   .catch(({output}) => {
     console.error(output)
   })
-```
-
-In fact, simply resolving a promise with a yargs instance will run the parser:
-
-```javascript
-Promise.resolve(require('yargs')).then(argv => ...)
 ```
 
 The rest of these methods below come in just before the terminating `.argv` or `.then()`.
@@ -1232,7 +1226,7 @@ If `key` is an array, interpret all the elements as strings.
 `.string('_')` will result in non-hyphenated arguments being interpreted as strings,
 regardless of whether they resemble numbers.
 
-<a name="then"></a>.then()
+<a name="then"></a>.then([onFulfilled|context], [onRejected|context], [context])
 ------------
 
 Returns a promise that resolves with an object containing two keys:
@@ -1244,6 +1238,10 @@ If `.argv` would have resulted in the application exiting with an error, e.g.,
 perhaps [implications failed](/docs/api.md#implies), the promise returned
 by `.then()` will be rejected. The error object contains the key `output`,
 which contains text that should be output to the user.
+
+As with `.parse()`, a context object may be provided. This is useful for passing
+state information to commands. See our [slack-bot example](https://github.com/yargs/pirate-joe) for a demonstration of where passing
+around `context` can be useful.
 
 .updateLocale(obj)
 ------------------

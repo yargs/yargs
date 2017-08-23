@@ -545,10 +545,20 @@ function Yargs (processArgs, cwd, parentRequire) {
 
   self._hasParseCallback = () => !!parseFn
 
-  self.then = function (onFulfilled, onRejected) {
-    argsert('[function] [function]', [onFulfilled, onRejected], arguments.length)
+  self.then = function (onFulfilled, onRejected, context) {
+    argsert('[function|object] [function|object] [object]', [onFulfilled, onRejected, context], arguments.length)
+
+    // allow context object in any position.
+    if (typeof onFulfilled === 'object') {
+      context = onFulfilled
+      onFulfilled = undefined
+    } else if (typeof onRejected === 'object') {
+      context = onRejected
+      onRejected = undefined
+    }
+
     return new Promise((resolve, reject) => {
-      self.parse(processArgs, (err, argv, output) => {
+      self.parse(processArgs, context || {}, (err, argv, output) => {
         if (err) {
           err.output = output
           return reject(err)

@@ -1924,6 +1924,18 @@ describe('yargs dsl tests', () => {
           result.output.should.match(/Show version number/)
         })
     })
+
+    it('allows a context object to be provided', (done) => {
+      const program = yargs(['blerg'])
+        .command('blerg', 'blerg command', () => {}, (argv) => {
+          argv._[0].should.equal('blerg')
+          argv.data.should.equal(99)
+          return done()
+        })
+      program.then({
+        data: 99
+      })
+    })
   })
 })
 
