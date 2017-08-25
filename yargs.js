@@ -384,7 +384,7 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   self.demandCommand = function demandCommand (min, max, minMsg, maxMsg) {
-    argsert('[number] [number|string] [string|null] [string|null]', [min, max, minMsg, maxMsg], arguments.length)
+    argsert('[number] [number|string] [string|null|undefined] [string|null|undefined]', [min, max, minMsg, maxMsg], arguments.length)
 
     if (typeof min === 'undefined') min = 1
 
@@ -428,7 +428,7 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   self.usage = function (msg, opts) {
-    argsert('<string|null|object> [object]', [msg, opts], arguments.length)
+    argsert('<string|null|undefined|object> [object]', [msg, opts], arguments.length)
 
     if (!opts && typeof msg === 'object') {
       opts = msg
@@ -685,7 +685,7 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   self.wrap = function (cols) {
-    argsert('<number|null>', [cols], arguments.length)
+    argsert('<number|null|undefined>', [cols], arguments.length)
     usage.wrap(cols)
     return self
   }
