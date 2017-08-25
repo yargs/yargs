@@ -20,6 +20,12 @@ or use `.parse()` to do the same thing:
 require('yargs').parse([ '-x', '1', '-y', '2' ])
 ````
 
+Calling `.parse()` with no arguments is equivalent to calling `yargs.argv`:
+
+```javascript
+require('yargs').parse()
+```
+
 The rest of these methods below come in just before the terminating `.argv`.
 
 <a name="alias"></a>.alias(key, alias)
@@ -1007,7 +1013,7 @@ Valid `opt` keys include:
     - `'number'`: synonymous for `number: true`, see [`number()`](#number)
     - `'string'`: synonymous for `string: true`, see [`string()`](#string)
 
-.parse(args, [context], [parseCallback])
+.parse([args], [context], [parseCallback])
 ------------
 
 Parse `args` instead of `process.argv`. Returns the `argv` object.
