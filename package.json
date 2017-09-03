@@ -16,7 +16,6 @@
     "decamelize": "^1.1.1",
     "find-up": "^2.1.0",
     "get-caller-file": "^1.0.1",
-    "object-assign": "^4.1.1",
     "os-locale": "^2.0.0",
     "require-directory": "^2.1.1",
     "require-main-filename": "^1.0.1",
