@@ -724,6 +724,32 @@ describe('validation tests', () => {
             })
         .argv
     })
+
+    it('does not fail for hidden options', () => {
+      const args = yargs('--foo hey')
+        .strict()
+        .option('foo', {boolean: true, describe: false})
+        .fail((msg) => {
+          expect.fail()
+        })
+        .argv
+      args.foo.should.equal(true)
+    })
+
+    it('does not fail if an alias is provided, rather than option itself', () => {
+      const args = yargs('--cat hey')
+        .strict()
+        .option('foo', {boolean: true, describe: false})
+        .alias('foo', 'bar')
+        .alias('bar', 'cat')
+        .fail((msg) => {
+          expect.fail()
+        })
+        .argv
+      args.cat.should.equal(true)
+      args.foo.should.equal(true)
+      args.bar.should.equal(true)
+    })
   })
 
   describe('demandOption', () => {
