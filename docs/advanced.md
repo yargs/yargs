@@ -422,6 +422,51 @@ some of yargs' parsing features:
   }
 }
 ```
+## Midlewares
+Sometimes you want to perform operations on the args just before reaching the command.
+For example, you want to validate the args or check if the an argument is passed otherwise you load it from local file.
+Middlwares are basically functions ran before the command to prepare the args for them.
+
+Diagram:
+
+```
+                        --------------         --------------        ---------
+stdin ----> argv ----> | Middleware 1 | ----> | Middleware 2 | ---> | Command |
+                        --------------         --------------        ---------
+```
+### Usage
+
+Here the middleware will check if the `username` and `password` is passed by the user
+if not it will load them from `~./credential` file and fil in the argv.username and argv.password.
+This means in your command you are sure that `argv.username` and `argv.password` have values in them.
+
+#### middlware
+
+```
+const normalizeCredentials = (argv) => {
+  if (!argv.username || !argv.password) {
+    const credentials = JSON.parse(fs.readSync('~/.credentials'))
+    return credentials
+  }
+  return {}
+}
+```
+
+#### yarg
+
+```
+var argv = require('yargs')
+  .usage('Usage: $0 <command> [options]')
+  .command('login', 'Authenticate user', (yargs) =>{
+        return yargs.option('username')
+                    .option('password')
+      } ,(argv) => {
+        authenticateUser(argv.username, argv.password)
+      })
+  .middlewares([normalizeCredentials])
+  .argv;
+```
+
 
 See the [yargs-parser](https://github.com/yargs/yargs-parser#configuration) module
 for detailed documentation of this feature.
