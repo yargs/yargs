@@ -791,6 +791,17 @@ describe('yargs dsl tests', () => {
       })
       a1.x.should.equal(42)
     })
+
+    it('parses process.argv if no arguments are provided', () => {
+      const r = checkOutput(() => {
+        yargs(['--help'])
+          .command('blerg', 'blerg command')
+          .wrap(null)
+          .parse()
+      })
+
+      r.logs[0].should.match(/Commands:[\s\S]*blerg command/)
+    })
   })
 
   // yargs.parse(['foo', '--bar'], function (err, argv, output) {}
