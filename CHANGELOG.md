@@ -2,6 +2,34 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="9.0.0"></a>
+# [9.0.0](https://github.com/yargs/yargs/compare/v8.0.2...v9.0.0) (2017-09-03)
+
+
+### Bug Fixes
+
+* 'undefined' default value for choices resulted in validation failing ([782b896](https://github.com/yargs/yargs/commit/782b896))
+* address bug with handling of arrays of implications ([c240661](https://github.com/yargs/yargs/commit/c240661))
+* defaulting keys to 'undefined' interfered with conflicting key logic ([a8e0cff](https://github.com/yargs/yargs/commit/a8e0cff))
+* don't bother calling JSON.stringify() on string default values ([#891](https://github.com/yargs/yargs/issues/891)) ([628be21](https://github.com/yargs/yargs/commit/628be21))
+* exclude positional arguments from completion output ([#927](https://github.com/yargs/yargs/issues/927)) ([71c7ec7](https://github.com/yargs/yargs/commit/71c7ec7))
+* strict mode should not fail for hidden options ([#949](https://github.com/yargs/yargs/issues/949)) ([0e0c58d](https://github.com/yargs/yargs/commit/0e0c58d))
+
+
+### Features
+
+* allow implies and conflicts to accept array values ([#922](https://github.com/yargs/yargs/issues/922)) ([abdc7da](https://github.com/yargs/yargs/commit/abdc7da))
+* allow parse with no arguments as alias for yargs.argv ([#944](https://github.com/yargs/yargs/issues/944)) ([a9f03e7](https://github.com/yargs/yargs/commit/a9f03e7))
+* enable .help() and .version() by default ([#912](https://github.com/yargs/yargs/issues/912)) ([1ef44e0](https://github.com/yargs/yargs/commit/1ef44e0))
+* to allow both undefined and nulls, for benefit of TypeScript  ([#945](https://github.com/yargs/yargs/issues/945)) ([792564d](https://github.com/yargs/yargs/commit/792564d))
+
+
+### BREAKING CHANGES
+
+* version() and help() are now enabled by default, and show up in help output; the implicit help command can no longer be enabled/disabled independently from the help command itself (which can now be disabled).
+
+
+
 <a name="8.0.2"></a>
 ## [8.0.2](https://github.com/yargs/yargs/compare/v8.0.1...v8.0.2) (2017-06-12)
 
