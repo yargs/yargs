@@ -39,32 +39,19 @@ describe('validation tests', () => {
     })
 
     it('fails if either implied argument is not set', (done) => {
-      let fail1 = false
-      let fail2 = false
-      yargs(['--foo', '-a'])
-          .boolean('foo')
-          .implies({
-            'foo': ['a', 'b']
-          })
+      yargs(['-f', '-b'])
+          .implies('f', ['b', 'c'])
           .fail((msg1) => {
-            fail1 = true
-            yargs(['--foo', '-b'])
-                .boolean('foo')
-                .implies({
-                  'foo': ['a', 'b']
-                })
+            yargs(['-f', '-c'])
+                .implies('f', ['b', 'c'])
                 .fail((msg2) => {
-                  fail2 = true
-                  msg1.should.match(/Implications failed/)
-                  msg2.should.match(/Implications failed/)
+                  msg1.should.match(/f -> b f -> c/)
+                  msg2.should.match(/f -> b f -> c/)
                   return done()
                 })
                 .argv
           })
           .argv
-      // Prevent timeouts
-      fail1.should.be.true
-      fail2.should.be.true
     })
 
     it("fails if --no-foo's implied argument is not set", (done) => {
