@@ -403,7 +403,8 @@ Where `nyc-babel-config` is a package that exports configuration in its index.
 <a name="conflicts"></a>.conflicts(x, y)
 ----------------------------------------------
 
-Given the key `x` is set, the key `y` must not be set.
+Given the key `x` is set, the key `y` must not be set. `y` can either be a single
+string or an array of argument names that `x` conflicts with.
 
 Optionally `.conflicts()` can accept an object specifying multiple conflicting keys.
 
@@ -798,7 +799,9 @@ var yargs = require("yargs")(['--info'])
 <a name="implies"></a>.implies(x, y)
 --------------
 
-Given the key `x` is set, it is required that the key `y` is set.
+Given the key `x` is set, it is required that the key `y` is set. `y` can either
+be the name of an argument to imply, a number indicating a number indicating the
+position of an argument or an array of multiple implications to associate with `x`.
 
 Optionally `.implies()` can accept an object specifying multiple implications.
 
