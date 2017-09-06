@@ -985,6 +985,9 @@ function Yargs (processArgs, cwd, parentRequire) {
           if (recommendCommands && firstUnknownCommand && !argv[helpOpt]) {
             validation.recommendCommands(firstUnknownCommand, handlerKeys)
           }
+        } else if (command.hasDefaultCommand() && !argv[helpOpt]) {
+          setPlaceholderKeys(argv)
+          return command.runCommand(null, self, parsed)
         }
 
         // generate a completion script for adding to ~/.bashrc.

@@ -1198,6 +1198,26 @@ describe('Command', () => {
         .argv
     })
 
+    it('executes default command if undefined positional arguments and only command', (done) => {
+      yargs('baz --foo bar')
+        .command('*', 'default command', noop, (argv) => {
+          argv.foo.should.equal('bar')
+          argv._.should.contain('baz')
+          return done()
+        })
+        .argv
+    })
+
+    it('executes default command if defined positional arguments and only command', (done) => {
+      yargs('baz --foo bar')
+        .command('* <target>', 'default command', noop, (argv) => {
+          argv.foo.should.equal('bar')
+          argv.target.should.equal('baz')
+          return done()
+        })
+        .argv
+    })
+
     it('does not execute default command if another command is provided', (done) => {
       yargs('run bcoe --foo bar')
         .command('*', 'default command', noop, (argv) => {})
