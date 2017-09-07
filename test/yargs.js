@@ -289,7 +289,7 @@ describe('yargs dsl tests', () => {
         .exitProcess(false) // defaults to true.
         .argv
     })
-    it('run middlewares before reaching the handler', function (done) {
+    it('runs all middleware before reaching the handler', function (done) {
       yargs(['foo'])
         .command(
           'foo',
@@ -298,7 +298,6 @@ describe('yargs dsl tests', () => {
           function (argv) {
             // we should get the argv filled with data from the middleware
             argv._[0].should.equal('foo')
-            console.log(argv)
             argv.hello.should.equal('world')
             return done()
           },
