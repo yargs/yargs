@@ -153,6 +153,155 @@ describe('validation tests', () => {
         })
         .argv
     })
+
+    it('allows to pass an object with AND/OR option but fails when missing one', (done) => {
+      yargs('--bar --foo --bar-bar')
+        .option('bar', {
+          implies: {
+            and: ['foo', 'foo-foo'],
+            or: 'bar-bar'
+          }
+        })
+        .fail((msg) => {
+          msg.should.match(/Implications failed/)
+          return done()
+        })
+        .argv
+    })
+
+    it('allows to pass an object with AND/OR option but succeed if match the criteria', () => {
+      let failCalled = false
+      yargs('--bar --foo --foo-foo')
+        .option('bar', {
+          implies: {
+            and: ['foo-foo'],
+            or: ['foo', 'bar-bar']
+          }
+        })
+        .fail((msg) => {
+          failCalled = true
+        })
+        .argv
+
+      failCalled.should.be.false
+    })
+
+    it('fails if OR condition is satisfied but not AND condition', (done) => {
+      yargs('--bar --bar-bar')
+        .option('bar', {
+          implies: {
+            and: ['foo', 'foo-foo'],
+            or: 'bar-bar'
+          }
+        })
+        .fail((msg) => {
+          msg.should.match(/Implications failed/)
+          return done()
+        })
+        .argv
+    })
+
+    it('fails if AND condition is satisfied but not OR condition', (done) => {
+      yargs('--bar --foo')
+        .option('bar', {
+          implies: {
+            and: 'foo',
+            or: 'bar-bar'
+          }
+        })
+        .fail((msg) => {
+          msg.should.match(/Implications failed/)
+          return done()
+        })
+        .argv
+    })
+
+    it('fails if ONE option is set, and it matches more than one option', (done) => {
+      yargs('--bar --foo --foo-bar')
+        .option('bar', {
+          implies: {
+            one: ['foo', 'foo-bar']
+          }
+        })
+        .fail((msg) => {
+          msg.should.match(/Implications failed/)
+          return done()
+        })
+        .argv
+    })
+
+    it('fails if ONE option is set, and it matches no option', (done) => {
+      yargs('--bar')
+        .option('bar', {
+          implies: {
+            one: ['foo', 'foo-bar']
+          }
+        })
+        .fail((msg) => {
+          msg.should.match(/Implications failed/)
+          return done()
+        })
+        .argv
+    })
+
+    it('allows to pass an object with ONE option', () => {
+      let failCalled = false
+      yargs('--bar --foo')
+        .option('bar', {
+          implies: {
+            one: ['foo', 'foo-foo']
+          }
+        })
+        .fail((msg) => {
+          failCalled = true
+        })
+        .argv
+      failCalled.should.be.false
+    })
+
+    it('allows to pass an object with OR option', () => {
+      let failCalled = false
+      yargs('--bar --foo')
+        .option('bar', {
+          implies: {
+            or: ['foo', 'foo-foo']
+          }
+        })
+        .fail((msg) => {
+          failCalled = true
+        })
+        .argv
+
+      failCalled.should.be.false
+    })
+
+    it('fails if no arguments in "or" is supplied with implied key', (done) => {
+      yargs('--bar')
+        .option('bar', {
+          implies: {
+            or: ['foo', 'foo-foo']
+          }
+        })
+        .fail((msg) => {
+          msg.should.match(/Implications failed/)
+          return done()
+        })
+        .argv
+    })
+
+    it('fails if one of two arguments in "and" is supplied with implied key', (done) => {
+      yargs('--bar --foo')
+        .option('bar', {
+          implies: {
+            and: ['foo', 'foo-foo']
+          }
+        })
+        .fail((msg) => {
+          msg.should.match(/Implications failed/)
+          return done()
+        })
+        .argv
+    })
   })
 
   describe('conflicts', () => {

@@ -416,7 +416,7 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   self.implies = function (key, value) {
-    argsert('<string|object> [number|string|array]', [key, value], arguments.length)
+    argsert('<string|object> [number|string|array|object]', [key, value], arguments.length)
     validation.implies(key, value)
     return self
   }
