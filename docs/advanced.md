@@ -422,10 +422,14 @@ some of yargs' parsing features:
   }
 }
 ```
-## Midlewares
-Sometimes you want to perform operations on the args just before reaching the command.
-For example, you want to validate the args or check if the an argument is passed otherwise you load it from local file.
-Middlwares are basically functions ran before the command to prepare the args for them.
+
+See the [yargs-parser](https://github.com/yargs/yargs-parser#configuration) module
+for detailed documentation of this feature.
+
+## Midleware
+Sometimes you might want to transform arguments before they reach the command handler.
+For example, you perhaps you want to validate that credentials have been provided and otherwise load credentials from a file.
+Middleware is simply a stack of functions, each of which is passed the the current parsed arguments, which it can in turn update by adding values, removing values, or overwriting values.
 
 Diagram:
 
@@ -434,13 +438,12 @@ Diagram:
 stdin ----> argv ----> | Middleware 1 | ----> | Middleware 2 | ---> | Command |
                         --------------         --------------        ---------
 ```
-### Usage
 
-Here the middleware will check if the `username` and `password` is passed by the user
-if not it will load them from `~./credential` file and fil in the argv.username and argv.password.
-This means in your command you are sure that `argv.username` and `argv.password` have values in them.
+### Example Credentials Middleware
 
-#### middlware
+In this example, our middleware will check if the `username` and `password` is provided. If not, it will load them from `~/.credentials`, and fill in the `argv.username` and `argv.password` values.
+
+#### Middleware function
 
 ```
 const normalizeCredentials = (argv) => {
@@ -452,7 +455,7 @@ const normalizeCredentials = (argv) => {
 }
 ```
 
-#### yarg
+#### yargs parsing configuration
 
 ```
 var argv = require('yargs')
@@ -466,7 +469,3 @@ var argv = require('yargs')
   .middlewares([normalizeCredentials])
   .argv;
 ```
-
-
-See the [yargs-parser](https://github.com/yargs/yargs-parser#configuration) module
-for detailed documentation of this feature.
