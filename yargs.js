@@ -572,10 +572,6 @@ function Yargs (processArgs, cwd, parentRequire) {
         self.demandOption(key, typeof opt.demandOption === 'string' ? opt.demandOption : undefined)
       }
 
-      if ('config' in opt) {
-        self.config(key, opt.configParser)
-      }
-
       if ('conflicts' in opt) {
         self.conflicts(key, opt.conflicts)
       }
@@ -592,7 +588,11 @@ function Yargs (processArgs, cwd, parentRequire) {
         self.nargs(key, opt.nargs)
       }
 
-      if ('normalize' in opt) {
+      if (opt.config) {
+        self.config(key, opt.configParser)
+      }
+
+      if (opt.normalize) {
         self.normalize(key)
       }
 
