@@ -183,7 +183,7 @@ var argv = require('yargs')
   .argv
 ```
 
-.command(cmd, desc, [builder], [handler])
+.command(cmd, desc, [builder], [handler], [errorHandler])
 -----------------------------------------
 .command(cmd, desc, [module])
 -----------------------------
@@ -252,6 +252,31 @@ yargs
   .help()
   .argv
 ```
+
+You can also provide an error handler function, which will be executed with thrown `Error`  or rejected Promises if any.
+
+```js
+yargs
+  .command(
+    'get',
+    'make a get HTTP request',
+    function (yargs) {
+      return yargs.option('u', {
+        alias: 'url',
+        describe: 'the URL to make an HTTP request to'
+      })
+    },
+    function (argv) {
+      throw new Error('test')
+    },
+    function (error) {
+      console.log('error catched', error);
+    }
+  )
+  .help()
+  .argv
+```
+
 
 Please see [Advanced Topics: Commands](https://github.com/yargs/yargs/blob/master/docs/advanced.md#commands) for a thorough
 discussion of the advanced features exposed in the Command API.
