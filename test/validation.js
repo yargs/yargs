@@ -38,15 +38,17 @@ describe('validation tests', () => {
         .argv
     })
 
-    it('fails if either implied argument is not set', (done) => {
+    it('fails if either implied argument is not set and displays only failed', (done) => {
       yargs(['-f', '-b'])
           .implies('f', ['b', 'c'])
           .fail((msg1) => {
             yargs(['-f', '-c'])
                 .implies('f', ['b', 'c'])
                 .fail((msg2) => {
-                  msg1.should.match(/f -> b f -> c/)
-                  msg2.should.match(/f -> b f -> c/)
+                  msg1.should.match(/f -> c/)
+                  msg1.should.not.match(/f -> b/)
+                  msg2.should.match(/f -> b/)
+                  msg2.should.not.match(/f -> c/)
                   return done()
                 })
                 .argv
