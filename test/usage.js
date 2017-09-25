@@ -1817,6 +1817,39 @@ describe('usage tests', () => {
         ''
       ])
     })
+
+    it('allows a builder to add more than one usage with mutiple usage calls', () => {
+      const r = checkUsage(() => yargs('upload --help')
+        .command('upload', 'upload something', yargs => yargs.usage('$0 upload [something]').usage('$0 upload [something else]'), (argv) => {})
+        .wrap(null)
+        .argv
+      )
+
+      r.logs[0].split('\n').should.deep.equal([
+        './usage upload [something]',
+        './usage upload [something else]',
+        '',
+        'Options:',
+        '  --help     Show help  [boolean]',
+        '  --version  Show version number  [boolean]',
+        ''
+      ])
+    })
+
+    it('allows a builder to disable usage with null after mutiple usage calls', () => {
+      const r = checkUsage(() => yargs('upload --help')
+        .command('upload', 'upload something', yargs => yargs.usage('$0 upload [something]').usage('$0 upload [something else]').usage(null), (argv) => {})
+        .wrap(null)
+        .argv
+      )
+
+      r.logs[0].split('\n').should.deep.equal([
+        'Options:',
+        '  --help     Show help  [boolean]',
+        '  --version  Show version number  [boolean]',
+        ''
+      ])
+    })
   })
 
   describe('epilogue', () => {
