@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="9.1.0"></a>
+# [9.1.0](https://github.com/yargs/yargs/compare/v9.0.1...v9.1.0) (2017-09-25)
+
+
+### Bug Fixes
+
+* **command:** Run default cmd even if the only cmd ([#950](https://github.com/yargs/yargs/issues/950)) ([7b22203](https://github.com/yargs/yargs/commit/7b22203))
+
+
+### Features
+
+* multiple usage calls are now collected, not replaced ([#958](https://github.com/yargs/yargs/issues/958)) ([74a38b2](https://github.com/yargs/yargs/commit/74a38b2))
+
+
+
 <a name="9.0.1"></a>
 ## [9.0.1](https://github.com/yargs/yargs/compare/v9.0.0...v9.0.1) (2017-09-17)
 
