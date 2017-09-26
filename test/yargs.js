@@ -1186,6 +1186,17 @@ describe('yargs dsl tests', () => {
       argv.foo.should.equal('baz')
     })
 
+    it('can be disabled with option shorthand', () => {
+      const argv = yargs('--config ./test/fixtures/config.json')
+        .option('config', {
+          config: false,
+          global: false
+        })
+        .argv
+
+      argv.config.should.equal('./test/fixtures/config.json')
+    })
+
     it('allows to pass a configuration object', () => {
       const argv = yargs
           .config({foo: 1, bar: 2})
@@ -1284,6 +1295,17 @@ describe('yargs dsl tests', () => {
 
       argv.path = '/foo/bar//baz/asdf/quux/..'
       argv.path.should.equal(['', 'foo', 'bar', 'baz', 'asdf'].join(path.sep))
+    })
+
+    it('can be disabled with option shorthand', () => {
+      const argv = yargs('--path /batman')
+        .option('path', {
+          normalize: false
+        })
+        .argv
+
+      argv.path = 'mongodb://url'
+      argv.path.should.equal('mongodb://url')
     })
   })
 
