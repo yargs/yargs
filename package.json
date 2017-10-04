@@ -12,7 +12,6 @@
     "LICENSE"
   ],
   "dependencies": {
-    "camelcase": "^4.1.0",
     "cliui": "^3.2.0",
     "decamelize": "^1.1.1",
     "get-caller-file": "^1.0.1",
@@ -43,7 +42,7 @@
     "yargs-test-extends": "^1.0.1"
   },
   "scripts": {
-    "pretest": "standard",
+    "posttest": "standard",
     "test": "nyc --cache mocha --require ./test/before.js --timeout=8000 --check-leaks",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
     "release": "standard-version"
