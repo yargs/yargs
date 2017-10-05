@@ -2556,4 +2556,29 @@ describe('usage tests', () => {
       ])
     })
   })
+
+  describe('positional', () => {
+    it('should display help section for positionals', () => {
+      const r = checkUsage(() => yargs('--help list')
+        .command('list <pattern>', 'List key-value pairs for pattern', (yargs) => {
+          yargs.positional('pattern', {
+            describe: 'the pattern to list keys for'
+          })
+        })
+        .argv
+      )
+
+      r.logs[0].split('\n').should.deep.equal([
+        './usage list <pattern>',
+        '',
+        'Positionals:',
+        '  pattern  the pattern to list keys for',
+        '',
+        'Options:',
+        '  --help     Show help                                                 [boolean]',
+        '  --version  Show version number                                       [boolean]',
+        ''
+      ])
+    })
+  })
 })

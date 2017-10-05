@@ -658,6 +658,13 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
   self.getOptions = () => options
 
+  self.positional = function (key, opts) {
+    argsert('<string> <object>', [key, opts], arguments.length)
+    console.log(context)
+    if (!opts.group) self.group(key, usage.getPositionalGroupName())
+    return self.option(key, opts)
+  }
+
   self.group = function group (opts, groupName) {
     argsert('<string|array> <string>', [opts, groupName], arguments.length)
     const existing = preservedGroups[groupName] || groups[groupName]
