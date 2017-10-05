@@ -51,7 +51,7 @@ function Yargs (processArgs, cwd, parentRequire) {
 
   // use context object to keep track of resets, subcommand execution, etc
   // submodules should modify and check the state of context as necessary
-  const context = { resets: -1, commands: [], files: [] }
+  const context = { resets: -1, commands: [], fullCommands: [], files: [] }
   self.getContext = () => context
 
   // puts yargs back into an initial state. any keys
