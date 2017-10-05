@@ -660,7 +660,6 @@ function Yargs (processArgs, cwd, parentRequire) {
 
   self.positional = function (key, opts) {
     argsert('<string> <object>', [key, opts], arguments.length)
-    console.log(context)
     if (!opts.group) self.group(key, usage.getPositionalGroupName())
     return self.option(key, opts)
   }
