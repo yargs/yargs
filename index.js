@@ -8,8 +8,8 @@ Argv(process.argv.slice(2))
 
 module.exports = Argv
 
-function Argv (processArgs, cwd) {
-  const argv = yargs(processArgs, cwd, require)
+function Argv (processArgs, cwd, parentRequire) {
+  const argv = yargs(processArgs, cwd, parentRequire || require)
   singletonify(argv)
   return argv
 }
