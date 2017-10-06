@@ -1904,44 +1904,89 @@ describe('yargs dsl tests', () => {
       argv._[0].should.equal('--grep=foobar')
     })
   })
-})
 
-describe('yargs context', () => {
-  beforeEach(() => {
-    delete require.cache[require.resolve('../')]
-    yargs = require('../')
-  })
+  describe('yargs context', () => {
+    beforeEach(() => {
+      delete require.cache[require.resolve('../')]
+      yargs = require('../')
+    })
 
-  it('should begin with initial state', () => {
-    const context = yargs.getContext()
-    context.resets.should.equal(0)
-    context.commands.should.deep.equal([])
-  })
+    it('should begin with initial state', () => {
+      const context = yargs.getContext()
+      context.resets.should.equal(0)
+      context.commands.should.deep.equal([])
+    })
 
-  it('should track number of resets', () => {
-    const context = yargs.getContext()
-    yargs.reset()
-    context.resets.should.equal(1)
-    yargs.reset()
-    yargs.reset()
-    context.resets.should.equal(3)
-  })
+    it('should track number of resets', () => {
+      const context = yargs.getContext()
+      yargs.reset()
+      context.resets.should.equal(1)
+      yargs.reset()
+      yargs.reset()
+      context.resets.should.equal(3)
+    })
 
-  it('should track commands being executed', () => {
-    let context
-    yargs('one two')
-      .command('one', 'level one', (yargs) => {
-        context = yargs.getContext()
-        context.commands.should.deep.equal(['one'])
-        return yargs.command('two', 'level two', (yargs) => {
-          context.commands.should.deep.equal(['one', 'two'])
+    it('should track commands being executed', () => {
+      let context
+      yargs('one two')
+        .command('one', 'level one', (yargs) => {
+          context = yargs.getContext()
+          context.commands.should.deep.equal(['one'])
+          return yargs.command('two', 'level two', (yargs) => {
+            context.commands.should.deep.equal(['one', 'two'])
+          }, (argv) => {
+            context.commands.should.deep.equal(['one', 'two'])
+          })
         }, (argv) => {
-          context.commands.should.deep.equal(['one', 'two'])
+          context.commands.should.deep.equal(['one'])
         })
-      }, (argv) => {
-        context.commands.should.deep.equal(['one'])
-      })
-      .argv
-    context.commands.should.deep.equal([])
+        .argv
+      context.commands.should.deep.equal([])
+    })
+  })
+
+  describe(':positional', () => {
+    it('defaults a variadic array with no values to []', () => {
+      const args = yargs('cmd')
+        .command('cmd [foo..]', 'run the cmd', (yargs) => {
+          yargs.positional('foo', {
+            describe: 'foo positionals'
+          })
+        })
+        .argv
+      args.foo.should.eql([])
+    })
+
+    it('populates a variadic array with appropriate values', () => {
+      const args = yargs('cmd /tmp/foo/bar a b')
+        .command('cmd <file> [foo..]', 'run the cmd', (yargs) => {
+          yargs
+            .positional('file', {
+              describe: 'the required bit'
+            })
+            .positional('foo', {
+              describe: 'the variadic bit'
+            })
+        })
+        .argv
+      args.file.should.equal('/tmp/foo/bar')
+      args.foo.should.eql(['a', 'b'])
+    })
+    // populates a variadic array appropriately.
+    /*
+    if ('conflicts' in opt) {
+    if ('default' in opt) {
+    if ('implies' in opt) {
+    if ('normalize' in opt) {
+    if ('choices' in opt) {
+    if ('coerce' in opt) {
+    if (opt.boolean || opt.type === 'boolean') {
+    if (opt.number || opt.type === 'number') {
+    if (opt.string || opt.type === 'string') {
+    const desc = opt.describe || opt.description || opt.desc
+    // allows positional arguments for subcommands to be configured
+    // returns error if used at top-level.
+    // default takes precedence over [].
+    */
   })
 })

@@ -2572,7 +2572,7 @@ describe('usage tests', () => {
         './usage list <pattern>',
         '',
         'Positionals:',
-        '  pattern  the pattern to list keys for',
+        '  pattern  the pattern to list keys for                               [required]',
         '',
         'Options:',
         '  --help     Show help                                                 [boolean]',
@@ -2580,5 +2580,14 @@ describe('usage tests', () => {
         ''
       ])
     })
+
+    // shows that variadic positional arguments are arrays
+    // indicates that non-optional positional arguments are required
+    // displays aliases appropriately
+    // indicates numeric types
+    // indicates boolean types
+    // indicates string types
+    // indicates choices type
+    // allows positional arguments for subcommands to be configured
   })
 })
