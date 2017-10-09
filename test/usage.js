@@ -2584,10 +2584,7 @@ describe('usage tests', () => {
     // shows that variadic positional arguments are arrays
     // indicates that non-optional positional arguments are required
     // displays aliases appropriately
-    // indicates numeric types
-    // indicates boolean types
-    // indicates string types
-    // indicates choices type
-    // allows positional arguments for subcommands to be configured
+    // indicates types.
+    // indicates choices array
   })
 })

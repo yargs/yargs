@@ -1945,8 +1945,8 @@ describe('yargs dsl tests', () => {
     })
   })
 
-  describe(':positional', () => {
-    it('defaults a variadic array with no values to []', () => {
+  describe('positional', () => {
+    it('defaults array with no arguments to []', () => {
       const args = yargs('cmd')
         .command('cmd [foo..]', 'run the cmd', (yargs) => {
           yargs.positional('foo', {
@@ -1957,7 +1957,7 @@ describe('yargs dsl tests', () => {
       args.foo.should.eql([])
     })
 
-    it('populates a variadic array with appropriate values', () => {
+    it('populates array with appropriate arguments', () => {
       const args = yargs('cmd /tmp/foo/bar a b')
         .command('cmd <file> [foo..]', 'run the cmd', (yargs) => {
           yargs
@@ -1972,21 +1972,144 @@ describe('yargs dsl tests', () => {
       args.file.should.equal('/tmp/foo/bar')
       args.foo.should.eql(['a', 'b'])
     })
-    // populates a variadic array appropriately.
-    /*
-    if ('conflicts' in opt) {
-    if ('default' in opt) {
-    if ('implies' in opt) {
-    if ('normalize' in opt) {
-    if ('choices' in opt) {
-    if ('coerce' in opt) {
-    if (opt.boolean || opt.type === 'boolean') {
-    if (opt.number || opt.type === 'number') {
-    if (opt.string || opt.type === 'string') {
-    const desc = opt.describe || opt.description || opt.desc
-    // allows positional arguments for subcommands to be configured
-    // returns error if used at top-level.
-    // default takes precedence over [].
-    */
+
+    it('allows a conflicting argument to be specified', (done) => {
+      yargs()
+        .command('cmd <hero>', 'a command', (yargs) => {
+          yargs.positional('hero', {
+            conflicts: 'conflicting'
+          })
+        }).parse('cmd batman --conflicting', (err) => {
+          err.message.should.equal(
+            'Arguments hero and conflicting are mutually exclusive'
+          )
+          return done()
+        })
+    })
+
+    it('allows a default to be set', () => {
+      const argv = yargs('cmd')
+        .command('cmd [heroes...]', 'a command', (yargs) => {
+          yargs.positional('heroes', {
+            default: ['batman', 'Iron Man']
+          })
+        }).argv
+      argv.heroes.should.eql(['batman', 'Iron Man'])
+    })
+
+    it('allows an implied argument to be specified', (done) => {
+      yargs()
+        .command('cmd <hero>', 'a command', (yargs) => {
+          yargs.positional('hero', {
+            implies: 'universe'
+          })
+        }).parse('cmd batman', (err) => {
+          err.message.should.match(/hero -> universe/)
+          return done()
+        })
+    })
+
+    it('allows an alias to be provided', () => {
+      const argv = yargs('cmd')
+        .command('cmd [heroes...]', 'a command', (yargs) => {
+          yargs.positional('heroes', {
+            alias: 'do-gooders',
+            default: ['batman', 'robin']
+          })
+        }).argv
+      argv.heroes.should.eql(['batman', 'robin'])
+      argv.doGooders.should.eql(['batman', 'robin'])
+      argv['do-gooders'].should.eql(['batman', 'robin'])
+    })
+
+    it('allows normalize to be specified', () => {
+      const argv = yargs('cmd /tmp/awesome/../ /tmp/awesome/b/../')
+        .command('cmd <files...>', 'a command', (yargs) => {
+          yargs.positional('files', {
+            normalize: true
+          })
+        }).argv
+      argv.files.should.eql(['/tmp/', '/tmp/awesome/'])
+    })
+
+    it('allows a choices array to be specified', (done) => {
+      yargs()
+        .command('cmd <hero>', 'a command', (yargs) => {
+          yargs.positional('hero', {
+            choices: ['batman', 'Iron Man', 'robin']
+          })
+        }).parse('cmd joker', (err) => {
+          err.message.should.match(
+            /Argument: hero, Given: "joker", Choices: "batman"/
+          )
+          return done()
+        })
+    })
+
+    it('allows a coerce method to be provided', () => {
+      const argv = yargs('cmd batman')
+        .command('cmd <hero>', 'a command', (yargs) => {
+          yargs.positional('hero', {
+            coerce: function (arg) {
+              return arg.toUpperCase()
+            },
+            alias: 'do-gooder'
+          })
+        }).argv
+      argv.hero.should.equal('BATMAN')
+      argv.doGooder.should.equal('BATMAN')
+    })
+
+    it('allows a boolean type to be specified', () => {
+      const argv = yargs('cmd false')
+        .command('cmd [run]', 'a command', (yargs) => {
+          yargs.positional('run', {
+            type: 'boolean'
+          })
+        }).argv
+      argv.run.should.equal(false)
+    })
+
+    it('allows a number type to be specified', () => {
+      const argv = yargs('cmd nan')
+        .command('cmd [count]', 'a command', (yargs) => {
+          yargs.positional('count', {
+            type: 'number'
+          })
+        }).argv
+      isNaN(argv.count).should.equal(true)
+    })
+
+    it('allows a string type to be specified', () => {
+      const argv = yargs('cmd 33')
+        .command('cmd [str]', 'a command', (yargs) => {
+          yargs.positional('str', {
+            type: 'string'
+          })
+        }).argv
+      argv.str.should.equal('33')
+    })
+
+    it('allows positional arguments for subcommands to be configured', () => {
+      const argv = yargs('cmd subcommand 33')
+        .command('cmd', 'a command', (yargs) => {
+          yargs.command('subcommand [str]', 'a subcommand', (yargs) => {
+            yargs.positional('str', {
+              type: 'string'
+            })
+          })
+        }).argv
+
+      argv.str.should.equal('33')
+    })
+
+    it("can only be used as part of a command's builder function", () => {
+      expect(() => {
+        yargs('foo')
+          .positional('foo', {
+            describe: 'I should not work'
+          })
+      }).to.throw(/\.positional\(\) can only be called/)
+    })
   })
 })

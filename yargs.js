@@ -660,15 +660,19 @@ function Yargs (processArgs, cwd, parentRequire) {
 
   self.positional = function (key, opts) {
     argsert('<string> <object>', [key, opts], arguments.length)
+    if (context.fullCommands.length === 0) {
+      throw new YError(".positional() can only be called in a command's builder function")
+    }
 
     // .positional() only supports a subset of the configuration
     // options availble to .option().
     const supportedOpts = ['default', 'implies', 'normalize',
-      'choices', 'coerce', 'type', 'describe', 'desc', 'description']
+      'choices', 'conflicts', 'coerce', 'type', 'describe',
+      'desc', 'description', 'alias']
     opts = objFilter(opts, (k, v) => {
       let accept = supportedOpts.indexOf(k) !== -1
       // type can be one of string|number|boolean.
-      if (k === 'type' && ['string', 'number', 'boolean'].indexOf(v) !== -1) accept = false
+      if (k === 'type' && ['string', 'number', 'boolean'].indexOf(v) === -1) accept = false
       return accept
     })
 
@@ -684,7 +688,7 @@ function Yargs (processArgs, cwd, parentRequire) {
       if (Array.isArray(parseOptions[pk])) {
         if (parseOptions[pk].indexOf(key) !== -1) opts[pk] = true
       } else {
-        if (parseOptions[pk][key] && ~(pk in opts)) opts[pk] = parseOptions[pk][key]
+        if (parseOptions[pk][key] && !(pk in opts)) opts[pk] = parseOptions[pk][key]
       }
     })
 
