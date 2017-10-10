@@ -10,7 +10,8 @@ In this section we cover some of the advanced features available in this API:
 
 To specify a default command use the string `*` or `$0`. A default command
 will be run if the positional arguments provided match no known
-commands:
+commands. tldr; default commands allow you to define the entry point to your
+application using a similar API to subcommands.
 
 ```js
 const argv = require('yargs')
