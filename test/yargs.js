@@ -2029,7 +2029,10 @@ describe('yargs dsl tests', () => {
             normalize: true
           })
         }).argv
-      argv.files.should.eql(['/tmp/', '/tmp/awesome/'])
+      argv.files.should.eql([
+        '/tmp/'.replace(/\//g, path.sep),
+        '/tmp/awesome/'.replace(/\//g, path.sep)
+      ])
     })
 
     it('allows a choices array to be specified', (done) => {
