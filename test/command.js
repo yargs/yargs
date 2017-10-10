@@ -1218,6 +1218,15 @@ describe('Command', () => {
         .argv
     })
 
+    it('allows $0 as an alias for a default command', (done) => {
+      yargs('9999')
+        .command('$0 [port]', 'default command', noop, (argv) => {
+          argv.port.should.equal(9999)
+          return done()
+        })
+        .argv
+    })
+
     it('does not execute default command if another command is provided', (done) => {
       yargs('run bcoe --foo bar')
         .command('*', 'default command', noop, (argv) => {})

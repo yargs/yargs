@@ -14,7 +14,7 @@ commands:
 
 ```js
 const argv = require('yargs')
-  .command('*', 'the default command', () => {}, (argv) => {
+  .command('$0', 'the default command', () => {}, (argv) => {
     console.log('this command will be run by default')
   })
 ```
@@ -26,7 +26,7 @@ Default commands can also be used as a command alias, like so:
 
 ```js
 const argv = require('yargs')
-  .command(['serve', '*'], 'the serve command', () => {}, (argv) => {
+  .command(['serve', '$0'], 'the serve command', () => {}, (argv) => {
     console.log('this command will be run by default')
   })
 ```
@@ -71,6 +71,24 @@ values, by using the `..` operator:
 yargs.command('download <url> [files..]', 'download several files')
   .help()
   .argv
+```
+
+#### Describing Positional Arguments
+
+You can use the method [`.positional()`](/docs/api.md#positional) in a command's builder function to describe and configure a positional argument:
+
+```js
+yargs.command('get <source> [proxy]', 'make a get HTTP request', (yargs) => {
+  yargs.positional('source', {
+    describe: 'URL to fetch content from',
+    type: 'string',
+    default: 'http://www.google.com'
+  }).positional('proxy', {
+    describe: 'optional proxy URL'
+  })
+})
+.help()
+.argv
 ```
 
 ### Command Execution

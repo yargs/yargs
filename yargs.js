@@ -660,7 +660,7 @@ function Yargs (processArgs, cwd, parentRequire) {
 
   self.positional = function (key, opts) {
     argsert('<string> <object>', [key, opts], arguments.length)
-    if (context.fullCommands.length === 0) {
+    if (context.resets === 0) {
       throw new YError(".positional() can only be called in a command's builder function")
     }
 
@@ -992,7 +992,6 @@ function Yargs (processArgs, cwd, parentRequire) {
             return true
           })
         }
-
         // if there's a handler associated with a
         // command defer processing to it.
         const handlerKeys = command.getCommands()
