@@ -76,7 +76,7 @@ yargs.command('download <url> [files..]', 'download several files')
 
 #### Describing Positional Arguments
 
-You can use the method [`.positional()`](/docs/api.md#positional) in a command's builder function to describe and configure a positional argument:
+You can use the method [`.positional()`](/docs/api.md#positionalkey-opt) in a command's builder function to describe and configure a positional argument:
 
 ```js
 yargs.command('get <source> [proxy]', 'make a get HTTP request', (yargs) => {
