@@ -2560,6 +2560,52 @@ describe('usage tests', () => {
   describe('positional', () => {
     it('should display help section for positionals', () => {
       const r = checkUsage(() => yargs('--help list')
+        .command('list [pattern]', 'List key-value pairs for pattern', (yargs) => {
+          yargs.positional('pattern', {
+            describe: 'the pattern to list keys for'
+          })
+        })
+        .argv
+      )
+
+      r.logs[0].split('\n').should.deep.equal([
+        './usage list [pattern]',
+        '',
+        'Positionals:',
+        '  pattern  the pattern to list keys for',
+        '',
+        'Options:',
+        '  --help     Show help                                                 [boolean]',
+        '  --version  Show version number                                       [boolean]',
+        ''
+      ])
+    })
+
+    it('shows that variadic positional arguments are arrays', () => {
+      const r = checkUsage(() => yargs('--help list')
+        .command('list [pattern...]', 'List key-value pairs for pattern', (yargs) => {
+          yargs.positional('pattern', {
+            describe: 'the pattern to list keys for'
+          })
+        })
+        .argv
+      )
+
+      r.logs[0].split('\n').should.deep.equal([
+        './usage list [pattern...]',
+        '',
+        'Positionals:',
+        '  pattern  the pattern to list keys for                    [array] [default: []]',
+        '',
+        'Options:',
+        '  --help     Show help                                                 [boolean]',
+        '  --version  Show version number                                       [boolean]',
+        ''
+      ])
+    })
+
+    it('indicates that <foo> positional arguments are required', () => {
+      const r = checkUsage(() => yargs('--help list')
         .command('list <pattern>', 'List key-value pairs for pattern', (yargs) => {
           yargs.positional('pattern', {
             describe: 'the pattern to list keys for'
@@ -2581,10 +2627,75 @@ describe('usage tests', () => {
       ])
     })
 
-    // shows that variadic positional arguments are arrays
-    // indicates that non-optional positional arguments are required
-    // displays aliases appropriately
-    // indicates types.
-    // indicates choices array
+    it('displays aliases appropriately', () => {
+      const r = checkUsage(() => yargs('--help list')
+        .command('list [pattern|thingy]', 'List key-value pairs for pattern', (yargs) => {
+          yargs.positional('pattern', {
+            describe: 'the pattern to list keys for'
+          })
+        })
+        .argv
+      )
+
+      r.logs[0].split('\n').should.deep.equal([
+        './usage list [pattern|thingy]',
+        '',
+        'Positionals:',
+        '  pattern, thingy  the pattern to list keys for',
+        '',
+        'Options:',
+        '  --help     Show help                                                 [boolean]',
+        '  --version  Show version number                                       [boolean]',
+        ''
+      ])
+    })
+
+    it('displays type information', () => {
+      const r = checkUsage(() => yargs('--help list')
+        .command('list [pattern]', 'List key-value pairs for pattern', (yargs) => {
+          yargs.positional('pattern', {
+            describe: 'the pattern to list keys for',
+            type: 'string'
+          })
+        })
+        .argv
+      )
+
+      r.logs[0].split('\n').should.deep.equal([
+        './usage list [pattern]',
+        '',
+        'Positionals:',
+        '  pattern  the pattern to list keys for                                 [string]',
+        '',
+        'Options:',
+        '  --help     Show help                                                 [boolean]',
+        '  --version  Show version number                                       [boolean]',
+        ''
+      ])
+    })
+
+    it('displays choices array', () => {
+      const r = checkUsage(() => yargs('--help list')
+        .command('list [pattern]', 'List key-value pairs for pattern', (yargs) => {
+          yargs.positional('pattern', {
+            describe: 'the pattern to list keys for',
+            choices: ['foo', 'bar']
+          })
+        })
+        .argv
+      )
+
+      r.logs[0].split('\n').should.deep.equal([
+        './usage list [pattern]',
+        '',
+        'Positionals:',
+        '  pattern  the pattern to list keys for                  [choices: "foo", "bar"]',
+        '',
+        'Options:',
+        '  --help     Show help                                                 [boolean]',
+        '  --version  Show version number                                       [boolean]',
+        ''
+      ])
+    })
   })
 })
