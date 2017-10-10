@@ -8,7 +8,7 @@ In this section we cover some of the advanced features available in this API:
 
 ### Default Commands
 
-To specify a default command use the character `*`. A default command
+To specify a default command use the string `*` or `$0`. A default command
 will be run if the positional arguments provided match no known
 commands:
 
