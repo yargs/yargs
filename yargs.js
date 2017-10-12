@@ -1,5 +1,6 @@
 'use strict'
 const argsert = require('./lib/argsert')
+const fs = require('fs')
 const Command = require('./lib/command')
 const Completion = require('./lib/completion')
 const Parser = require('yargs-parser')
@@ -494,17 +495,18 @@ function Yargs (processArgs, cwd, parentRequire) {
   function pkgUp (path) {
     const npath = path || '*'
     if (pkgs[npath]) return pkgs[npath]
-    const readPkgUp = require('read-pkg-up')
+    const findUp = require('find-up')
 
     let obj = {}
     try {
-      obj = readPkgUp.sync({
+      const pkgJsonPath = findUp.sync('package.json', {
         cwd: path || require('require-main-filename')(parentRequire || require),
         normalize: false
       })
+      obj = JSON.parse(fs.readFileSync(pkgJsonPath))
     } catch (noop) {}
 
-    pkgs[npath] = obj.pkg || {}
+    pkgs[npath] = obj || {}
     return pkgs[npath]
   }
 

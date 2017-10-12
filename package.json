@@ -14,9 +14,9 @@
   "dependencies": {
     "cliui": "^3.2.0",
     "decamelize": "^1.1.1",
+    "find-up": "^2.1.0",
     "get-caller-file": "^1.0.1",
     "os-locale": "^2.0.0",
-    "read-pkg-up": "^2.0.0",
     "require-directory": "^2.1.1",
     "require-main-filename": "^1.0.1",
     "set-blocking": "^2.0.0",
