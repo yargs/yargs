@@ -51,7 +51,7 @@ function Yargs (processArgs, cwd, parentRequire) {
 
   // use context object to keep track of resets, subcommand execution, etc
   // submodules should modify and check the state of context as necessary
-  const context = { resets: -1, commands: [], files: [] }
+  const context = { resets: -1, commands: [], fullCommands: [], files: [] }
   self.getContext = () => context
 
   // puts yargs back into an initial state. any keys
@@ -658,6 +658,44 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
   self.getOptions = () => options
 
+  self.positional = function (key, opts) {
+    argsert('<string> <object>', [key, opts], arguments.length)
+    if (context.resets === 0) {
+      throw new YError(".positional() can only be called in a command's builder function")
+    }
+
+    // .positional() only supports a subset of the configuration
+    // options availble to .option().
+    const supportedOpts = ['default', 'implies', 'normalize',
+      'choices', 'conflicts', 'coerce', 'type', 'describe',
+      'desc', 'description', 'alias']
+    opts = objFilter(opts, (k, v) => {
+      let accept = supportedOpts.indexOf(k) !== -1
+      // type can be one of string|number|boolean.
+      if (k === 'type' && ['string', 'number', 'boolean'].indexOf(v) === -1) accept = false
+      return accept
+    })
+
+    // copy over any settings that can be inferred from the command string.
+    const fullCommand = context.fullCommands[context.fullCommands.length - 1]
+    const parseOptions = fullCommand ? command.cmdToParseOptions(fullCommand) : {
+      array: [],
+      alias: {},
+      default: {},
+      demand: {}
+    }
+    Object.keys(parseOptions).forEach((pk) => {
+      if (Array.isArray(parseOptions[pk])) {
+        if (parseOptions[pk].indexOf(key) !== -1) opts[pk] = true
+      } else {
+        if (parseOptions[pk][key] && !(pk in opts)) opts[pk] = parseOptions[pk][key]
+      }
+    })
+
+    self.group(key, usage.getPositionalGroupName())
+    return self.option(key, opts)
+  }
+
   self.group = function group (opts, groupName) {
     argsert('<string|array> <string>', [opts, groupName], arguments.length)
     const existing = preservedGroups[groupName] || groups[groupName]
@@ -954,7 +992,6 @@ function Yargs (processArgs, cwd, parentRequire) {
             return true
           })
         }
-
         // if there's a handler associated with a
         // command defer processing to it.
         const handlerKeys = command.getCommands()
@@ -985,9 +1022,6 @@ function Yargs (processArgs, cwd, parentRequire) {
           if (recommendCommands && firstUnknownCommand && !argv[helpOpt]) {
             validation.recommendCommands(firstUnknownCommand, handlerKeys)
           }
-        } else if (command.hasDefaultCommand() && !argv[helpOpt]) {
-          setPlaceholderKeys(argv)
-          return command.runCommand(null, self, parsed)
         }
 
         // generate a completion script for adding to ~/.bashrc.

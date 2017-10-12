@@ -1068,6 +1068,43 @@ as a configuration object.
 `cwd` can optionally be provided, the package.json will be read
 from this location.
 
+.positional(key, opt)
+------------
+
+`.positional()` allows you to configure a command's positional arguments
+with an API similar to [`.option()`](#optionkey-opt). `.positional()`
+should be called in a command's builder function, and is not
+available on the top-level yargs instance.
+
+> _you can describe top-level positional arguments using
+  [default commands](/docs/advanced.md#default-commands)._
+
+```js
+const argv = require('yargs')('run --help')
+  .command('run <port> <guid>', 'run the server', (yargs) => {
+    yargs.positional('guid', {
+      describe: 'a unique identifier for the server',
+      type: 'string'
+    })
+  }).argv
+console.log(argv)
+```
+
+Valid `opt` keys include:
+
+  - `alias`: string or array of strings, see [`alias()`](#alias)
+  - `choices`: value or array of values, limit valid option arguments to a predefined set, see [`choices()`](#choices)
+  - `coerce`: function, coerce or transform parsed command line values into another value, see [`coerce()`](#coerce)
+  - `conflicts`: string or object, require certain keys not to be set, see [`conflicts()`](#conflicts)
+  - `default`: value, set a default value for the option, see [`default()`](#default)
+  - `desc`/`describe`/`description`: string, the option description for help content, see [`describe()`](#describe)
+  - `implies`: string or object, require certain keys to be set, see [`implies()`](#implies)
+  - `normalize`: boolean, apply `path.normalize()` to the option, see [`normalize()`](#normalize)
+  - `type`: one of the following strings
+      - `'boolean'`: synonymous for `boolean: true`, see [`boolean()`](#boolean)
+      - `'number'`: synonymous for `number: true`, see [`number()`](#number)
+      - `'string'`: synonymous for `string: true`, see [`string()`](#string)
+
 .recommendCommands()
 ---------------------------
 
