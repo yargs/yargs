@@ -682,10 +682,14 @@ describe('Command', () => {
         ''
       ]
 
-      helpCmd.logs.join('\n').split(/\n+/).should.deep.equal(expectedCmd)
+      // no help is output if help isn't last
+      // positional argument.
+      helpCmd.logs.should.eql([])
+      helpCmdSub.logs.should.eql([])
+      cmdHelpSub.logs.should.eql([])
+
+      // shows help if it is the last positional argument.
       cmdHelp.logs.join('\n').split(/\n+/).should.deep.equal(expectedCmd)
-      helpCmdSub.logs.join('\n').split(/\n+/).should.deep.equal(expectedSub)
-      cmdHelpSub.logs.join('\n').split(/\n+/).should.deep.equal(expectedSub)
       cmdSubHelp.logs.join('\n').split(/\n+/).should.deep.equal(expectedSub)
     })
   })

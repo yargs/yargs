@@ -693,7 +693,6 @@ function Yargs (processArgs, cwd, parentRequire) {
         if (parseOptions[pk][key] && !(pk in opts)) opts[pk] = parseOptions[pk][key]
       }
     })
-
     self.group(key, usage.getPositionalGroupName())
     return self.option(key, opts)
   }
@@ -982,17 +981,14 @@ function Yargs (processArgs, cwd, parentRequire) {
           // consider any multi-char helpOpt alias as a valid help command
           // unless all helpOpt aliases are single-char
           // note that parsed.aliases is a normalized bidirectional map :)
-          let helpCmds = [helpOpt].concat(aliases[helpOpt] || [])
-          const multiCharHelpCmds = helpCmds.filter(k => k.length > 1)
-          if (multiCharHelpCmds.length) helpCmds = multiCharHelpCmds
-          // look for and strip any helpCmds from argv._
-          argv._ = argv._.filter((cmd) => {
-            if (~helpCmds.indexOf(cmd)) {
-              argv[helpOpt] = true
-              return false
-            }
-            return true
-          })
+          const helpCmds = [helpOpt]
+            .concat(aliases[helpOpt] || [])
+            .filter(k => k.length > 1)
+          // check if help should trigger and strip it from _.
+          if (~helpCmds.indexOf(argv._[argv._.length - 1])) {
+            argv._.pop()
+            argv[helpOpt] = true
+          }
         }
         // if there's a handler associated with a
         // command defer processing to it.
