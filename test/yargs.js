@@ -1728,27 +1728,6 @@ describe('yargs dsl tests', () => {
       ])
       h.result.should.have.property('_').and.deep.equal(['h'])
     })
-
-    it('uses single-char help alias as command if there are no multi-char aliases', () => {
-      const h = checkOutput(() => yargs('h')
-          .help('h').alias('h', '?')
-          .wrap(null)
-          .argv
-        )
-      const q = checkOutput(() => yargs('?')
-          .help('h').alias('h', '?')
-          .wrap(null)
-          .argv
-        )
-      const expected = [
-        'Options:',
-        '  --version  Show version number  [boolean]',
-        '  -h, -?     Show help  [boolean]',
-        ''
-      ]
-      h.logs[0].split('\n').should.deep.equal(expected)
-      q.logs[0].split('\n').should.deep.equal(expected)
-    })
   })
 
   describe('.coerce()', () => {
