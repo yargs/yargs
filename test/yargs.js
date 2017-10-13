@@ -129,6 +129,42 @@ describe('yargs dsl tests', () => {
     expect(r.errors).to.deep.equal([])
   })
 
+  describe('hide', () => {
+    it('should add the key to hiddenOptions', () => {
+      const options = yargs('')
+        .hide('someKey')
+        .getOptions()
+      options.should.have.property('hiddenOptions')
+      options.hiddenOptions.should.include('someKey')
+    })
+  })
+
+  describe('showHidden', () => {
+    it('should have a default show-hidden private option pre-configured', () => {
+      const options = yargs('').getOptions()
+      options.should.have.property('showHiddenOpt')
+      options.showHiddenOpt.should.eql('show-hidden')
+    })
+    it('should not have show-hidden as an actual option described by default', () => {
+      const options = yargs('').getOptions()
+      options.key.should.not.have.property('show-hidden')
+    })
+    it('should set show-hidden option', () => {
+      const options = yargs('')
+        .showHidden()
+        .getOptions()
+      options.key.should.have.property('show-hidden')
+    })
+    it('should set custom-show-hidden option', () => {
+      const options = yargs('')
+        .showHidden('custom-show-hidden')
+        .getOptions()
+      options.key.should.have.property('custom-show-hidden')
+      options.should.have.property('showHiddenOpt')
+      options.showHiddenOpt.should.eql('custom-show-hidden')
+    })
+  })
+
   describe('showHelpOnFail', () => {
     it('should display custom failure message, if string is provided as first argument', () => {
       const r = checkOutput(() => yargs([])
@@ -233,6 +269,7 @@ describe('yargs dsl tests', () => {
         config: {},
         configObjects: [],
         envPrefix: 'YARGS', // preserved as global
+        hiddenOptions: [],
         demandedCommands: {},
         demandedOptions: {},
         local: [

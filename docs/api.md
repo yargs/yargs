@@ -576,6 +576,11 @@ Describe a `key` for the generated usage information.
 
 Optionally `.describe()` can take an object that maps keys to descriptions.
 
+<a name="hide"></a>.hide(key)
+--------------------
+
+Hides a `key` from the generated usage information. Unless a `--show-hidden` option is also passed with `--help` (see [`showHidden()`](#showHidden)).
+
 .detectLocale(boolean)
 -----------
 
@@ -795,6 +800,29 @@ Example:
 var yargs = require("yargs")(['--info'])
   .usage("$0 -operand1 number -operand2 number -operation [add|subtract]")
   .help('info')
+  .argv
+```
+
+<a name="showHidden"></a>.showHidden()
+-----------------------------------------
+.showHidden([option | boolean])
+-----------------------------------------
+.showHidden([option, [description]])
+-----------------------------------------
+
+Configure the `--show-hidden` option that displays the hidden keys (see [`hide()`](#hide)).
+
+If the first argument is a boolean, it enables/disables this option altogether. I.e. hidden keys will be permanently hidden if first argument is `false`.
+
+If the first argument is a string it changes the key name ("--show-hidden").
+
+Second argument changes the default description ("Show hidden options")
+
+Example:
+
+```js
+var yargs = require("yargs")(['--help'])
+  .showHidden('show-hidden', 'Show hidden options')
   .argv
 ```
 
