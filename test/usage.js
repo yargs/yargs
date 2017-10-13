@@ -2726,5 +2726,45 @@ describe('usage tests', () => {
         ''
       ])
     })
+    it('--help should display all options (including hidden ones) with showHelp(log, {hidden: true})', () => {
+      const r = checkUsage(() => {
+        const argv = yargs('--help --show-hidden')
+          .help(false)
+          .options({
+            foo: {
+              describe: 'FOO'
+            },
+            bar: {},
+            baz: {
+              describe: 'BAZ',
+              hidden: true
+            },
+            'help': {
+              describe: 'Show help',
+              type: 'boolean'
+            },
+            'show-hidden': {
+              describe: 'Show hidden options',
+              type: 'boolean'
+            }
+          })
+          .argv
+
+        if (yargs.help) {
+          yargs.showHelp('log', {hidden: argv.showHidden})
+        }
+      })
+
+      r.logs[0].split('\n').should.deep.equal([
+        'Options:',
+        '  --version      Show version number                                   [boolean]',
+        '  --foo          FOO',
+        '  --bar',
+        '  --baz          BAZ',
+        '  --help         Show help                                             [boolean]',
+        '  --show-hidden  Show hidden options                                   [boolean]',
+        ''
+      ])
+    })
   })
 })
