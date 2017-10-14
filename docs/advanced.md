@@ -35,8 +35,6 @@ const argv = require('yargs')
 The command defined above will be executed if the program
 is run with `./my-cli.js --x=22`, or with `./my-cli.js serve --x=22`.
 
-
-
 ### Positional Arguments
 
 Commands can accept _optional_ and _required_ positional arguments. Required
