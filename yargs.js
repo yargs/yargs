@@ -428,19 +428,21 @@ function Yargs (processArgs, cwd, parentRequire) {
     return self
   }
 
-  self.usage = function (msg, opts) {
-    argsert('<string|null|undefined|object> [object]', [msg, opts], arguments.length)
-
-    if (!opts && typeof msg === 'object') {
-      opts = msg
-      msg = null
-    }
+  self.usage = function (msg, description, builder, handler) {
+    argsert('<string|null|undefined> [string|boolean] [function] [function]', [msg, description, builder, handler], arguments.length)
 
     usage.usage(msg)
-
-    if (opts) self.options(opts)
-
-    return self
+    if (description !== undefined) {
+      // .usage() can be used as an alias for defining
+      // a default command.
+      if ((msg || '').match(/^\$0( |$)/)) {
+        return self.command(msg, description, builder, handler)
+      } else {
+        throw new YError('.usage() description must start with $0 if being used as alias for .command()')
+      }
+    } else {
+      return self
+    }
   }
 
   self.epilogue = self.epilog = function (msg) {
@@ -741,6 +743,10 @@ function Yargs (processArgs, cwd, parentRequire) {
   self.showHelp = function (level) {
     argsert('[string|function]', [level], arguments.length)
     if (!self.parsed) self._parseArgs(processArgs) // run parser, if it has not already been executed.
+    if (command.hasDefaultCommand()) {
+      context.resets++ // override the restriction on top-level positoinals.
+      command.runDefaultBuilderOn(self, true)
+    }
     usage.showHelp(level)
     return self
   }

@@ -515,6 +515,7 @@ describe('Command', () => {
       r.should.have.property('errors').with.length(0)
       r.should.have.property('logs')
       r.logs.join('\n').split(/\n+/).should.deep.equal([
+        './usage [command]',
         'Commands:',
         '  dream [command] [opts]  Go to sleep and dream',
         'Options:',
@@ -553,6 +554,7 @@ describe('Command', () => {
       r.should.have.property('errors').with.length(0)
       r.should.have.property('logs')
       r.logs.join('\n').split(/\n+/).should.deep.equal([
+        './usage [command]',
         'Commands:',
         '  limbo [opts]                     Get lost in pure subconscious',
         '  inception [command] [opts]       Enter another dream, where inception is possible',
@@ -620,6 +622,7 @@ describe('Command', () => {
       r.should.have.property('errors').with.length(0)
       r.should.have.property('logs')
       r.logs.join('\n').split(/\n+/).should.deep.equal([
+        './usage [command]',
         'Commands:',
         '  nameless  Command name derived from module filename',
         'Options:',
@@ -1368,5 +1371,31 @@ describe('Command', () => {
         argv.optional.should.equal(33)
         argv._.should.eql(['foo', 'bar'])
       })
+  })
+
+  describe('usage', () => {
+    it('allows you to configure a default command', () => {
+      yargs()
+        .usage('$0 <port>', 'default command', (yargs) => {
+          yargs.positional('port', {
+            type: 'string'
+          })
+        })
+        .parse('33', (err, argv) => {
+          expect(err).to.equal(null)
+          argv.port.should.equal('33')
+        })
+    })
+
+    it('throws exception if default command does not have leading $0', () => {
+      expect(() => {
+        yargs()
+          .usage('<port>', 'default command', (yargs) => {
+            yargs.positional('port', {
+              type: 'string'
+            })
+          })
+      }).to.throw(/.*\.usage\(\) description must start with \$0.*/)
+    })
   })
 })

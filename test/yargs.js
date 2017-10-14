@@ -74,18 +74,6 @@ describe('yargs dsl tests', () => {
     r.result.should.not.have.property('[object Object]')
   })
 
-  it('treats usage as alias for options, if object provided as first argument', () => {
-    const argv = yargs([])
-      .usage({
-        a: {
-          default: 99
-        }
-      })
-      .argv
-
-    argv.a.should.eql(99)
-  })
-
   it('a function can be provided, to execute when a parsing failure occurs', (done) => {
     yargs(['--x=33'])
       .implies({
@@ -395,6 +383,8 @@ describe('yargs dsl tests', () => {
       })
 
       r.logs[0].split('\n').should.deep.equal([
+        './usage [command]',
+        '',
         'Commands:',
         '  blerg  handle blerg things',
         '',
@@ -1152,6 +1142,8 @@ describe('yargs dsl tests', () => {
         x.should.equal('two')
         err.should.have.property('message').and.equal('Must call a command')
         output.split('\n').should.deep.equal([
+          'ndm <command>',
+          '',
           'Commands:',
           '  one <x>  The one and only command',
           '',
