@@ -1292,7 +1292,7 @@ Set a usage message to show which commands to use. Inside `message`, the string
 `$0` will get interpolated to the current script name or node command for the
 present script similar to how `$0` works in bash or perl.
 
-If the optional `desc`/`builder`/`handler` are provided `.usage()`
+If the optional `desc`/`builder`/`handler` are provided, `.usage()`
 acts an an alias for [`.command()`](#commandmodule). This allows you to use
 `.usage()` to configure the [default command](/docs/advanced.md#default-commands) that will be run as an entry-point to your application.
 
