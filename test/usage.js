@@ -2314,10 +2314,12 @@ describe('usage tests', () => {
       const r = checkUsage(() => yargs(['--help'])
           .option('answer', {
             type: 'string',
-            choices: ['yes', 'no', 'maybe']
+            choices: ['yes', 'no', 'maybe'],
+            hidden: true
           })
           .option('confidence', {
-            choices: [0, 25, 50, 75, 100]
+            choices: [0, 25, 50, 75, 100],
+            hidden: true
           })
           .wrap(null)
           .argv
@@ -2694,6 +2696,33 @@ describe('usage tests', () => {
         'Options:',
         '  --help     Show help                                                 [boolean]',
         '  --version  Show version number                                       [boolean]',
+        ''
+      ])
+    })
+  })
+
+  describe('hidden options', () => {
+    it('--help should display all options except for hidden ones', () => {
+      const r = checkUsage(() => yargs('--help')
+          .options({
+            foo: {
+              describe: 'FOO'
+            },
+            bar: {},
+            baz: {
+              describe: 'BAZ',
+              hidden: true
+            }
+          })
+          .argv
+        )
+
+      r.logs[0].split('\n').should.deep.equal([
+        'Options:',
+        '  --help     Show help                                                 [boolean]',
+        '  --version  Show version number                                       [boolean]',
+        '  --foo      FOO',
+        '  --bar',
         ''
       ])
     })

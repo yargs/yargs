@@ -647,7 +647,7 @@ function Yargs (processArgs, cwd, parentRequire) {
       }
 
       const desc = opt.describe || opt.description || opt.desc
-      if (desc) {
+      if (!opt.hidden) {
         self.describe(key, desc)
       }
 
