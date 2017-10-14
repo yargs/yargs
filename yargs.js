@@ -429,7 +429,7 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   self.usage = function (msg, description, builder, handler) {
-    argsert('<string|null|undefined> [string|boolean] [function] [function]', [msg, description, builder, handler], arguments.length)
+    argsert('<string|null|undefined> [string|boolean] [function|object] [function]', [msg, description, builder, handler], arguments.length)
 
     usage.usage(msg)
     if (description !== undefined) {
