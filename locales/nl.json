@@ -36,4 +36,5 @@
   "Show help": "Toon help",
   "Show version number": "Toon versie nummer",
   "Did you mean %s?": "Bedoelde u misschien %s?"
+  "Arguments %s and %s are mutually exclusive" : "Argumenten %s en %s zijn onderling uitsluitend"
 }
