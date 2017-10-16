@@ -523,7 +523,7 @@ describe('Command', () => {
       r.should.have.property('errors').with.length(0)
       r.should.have.property('logs')
       r.logs[0].split(/\n+/).should.deep.equal([
-        './command dream [command] [opts]',
+        'command dream [command] [opts]',
         'Commands:',
         '  of-memory <memory>               Dream about a specific memory',
         '  within-a-dream [command] [opts]  Dream within a dream',
@@ -595,7 +595,7 @@ describe('Command', () => {
       r.should.have.property('errors').with.length(0)
       r.should.have.property('logs')
       r.logs.join('\n').split(/\n+/).should.deep.equal([
-        './command cyclic',
+        'command cyclic',
         'Options:',
         '  --help     Show help  [boolean]',
         '  --version  Show version number  [boolean]',
@@ -665,7 +665,7 @@ describe('Command', () => {
           .argv, [ './command' ])
 
       const expectedCmd = [
-        './command cmd <sub>',
+        'command cmd <sub>',
         'Commands:',
         '  sub  Run the subcommand',
         'Options:',
@@ -675,7 +675,7 @@ describe('Command', () => {
       ]
 
       const expectedSub = [
-        './command cmd sub',
+        'command cmd sub',
         'Options:',
         '  --help     Show help  [boolean]',
         '  --version  Show version number  [boolean]',

@@ -793,7 +793,7 @@ describe('validation tests', () => {
       r.should.have.property('exit').and.be.ok
       r.result.should.have.property('_').and.deep.equal(['src', 'dest'])
       r.errors.join('\n').split(/\n+/).should.deep.equal([
-        'Usage: ./usage [x] [y] [z] {OPTIONS} <src> <dest> [extra_files...]',
+        'Usage: usage [x] [y] [z] {OPTIONS} <src> <dest> [extra_files...]',
         'too many arguments are provided'
       ])
     })
