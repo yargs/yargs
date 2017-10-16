@@ -102,6 +102,15 @@ describe('Command', () => {
       expect(handlers.wat).to.not.exist
       command.getCommands().should.deep.equal(['foo', 'wat'])
     })
+
+    it('does not overwrite existing values in argv for keys that are not positional', () => {
+      const argv = yargs('foo foo.js --reporter=html')
+        .command('foo <file>')
+        .default('reporter', 'text')
+        .argv
+      argv.file.should.equal('foo.js')
+      argv.reporter.should.equal('html')
+    })
   })
 
   describe('variadic', () => {
