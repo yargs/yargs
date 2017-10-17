@@ -1419,10 +1419,10 @@ describe('usage tests', () => {
         )
 
       r.errors.join('\n').split(/\n+/).should.deep.equal([
-        './usage [command]',
+        'usage [command]',
         'Commands:',
-        '  ./usage upload    upload something',
-        '  ./usage download  download something from somewhere',
+        '  usage upload    upload something',
+        '  usage download  download something from somewhere',
         'Options:',
         '  --help     Show help  [boolean]',
         '  --version  Show version number  [boolean]',
@@ -1441,10 +1441,10 @@ describe('usage tests', () => {
         )
 
       r.errors.join('\n').split(/\s+/).should.deep.equal([
-        './usage',
+        'usage',
         '[command]',
         'Commands:',
-        './usage', 'upload', 'upload', 'something',
+        'usage', 'upload', 'upload', 'something',
         'Options:',
         '--help', 'Show', 'help', '[boolean]',
         '--version', 'Show', 'version', 'number', '[boolean]',
@@ -1463,10 +1463,10 @@ describe('usage tests', () => {
         )
 
       r.errors.join('\n').split(/\s+/).should.deep.equal([
-        './usage',
+        'usage',
         '[command]',
         'Commands:',
-        './usage', 'upload', 'upload', 'something',
+        'usage', 'upload', 'upload', 'something',
         'Options:',
         '--help', 'Show', 'help', '[boolean]',
         '--version', 'Show', 'version', 'number', '[boolean]',
@@ -1498,10 +1498,10 @@ describe('usage tests', () => {
         )
 
       generalHelp.logs[0].split('\n').should.deep.equal([
-        './usage [command]',
+        'usage [command]',
         '',
         'Commands:',
-        '  ./usage upload <dest>  Upload cwd to remote destination',
+        '  usage upload <dest>  Upload cwd to remote destination',
         '',
         'Options:',
         '  --help     Show help  [boolean]',
@@ -1542,10 +1542,10 @@ describe('usage tests', () => {
         )
 
       generalHelp.logs[0].split('\n').should.deep.equal([
-        './usage [command]',
+        'usage [command]',
         '',
         'Commands:',
-        '  ./usage upload <dest>  Upload cwd to remote destination',
+        '  usage upload <dest>  Upload cwd to remote destination',
         '',
         'Options:',
         '  --help     Show help  [boolean]',
@@ -1717,10 +1717,10 @@ describe('usage tests', () => {
         )
 
       r.logs[0].split('\n').should.deep.equal([
-        './usage [command]',
+        'usage [command]',
         '',
         'Commands:',
-        '  ./usage upload  upload something',
+        '  usage upload  upload something',
         '',
         'Options:',
         '  --help     Show help  [boolean]',
@@ -1808,10 +1808,10 @@ describe('usage tests', () => {
         )
 
       r.logs[0].split('\n').should.deep.equal([
-        './usage [command]',
+        'usage [command]',
         '',
         'Commands:',
-        '  ./usage copy <src> [dest]  Copy something  [aliases: cp, dupe]',
+        '  usage copy <src> [dest]  Copy something  [aliases: cp, dupe]',
         '',
         'Options:',
         '  --help     Show help  [boolean]',
@@ -1828,10 +1828,10 @@ describe('usage tests', () => {
         )
 
       r.logs[0].split('\n').should.deep.equal([
-        './usage [command]',
+        'usage [command]',
         '',
         'Commands:',
-        '  ./usage copy <src> [dest]  Copy something                  [aliases: cp, dupe]',
+        '  usage copy <src> [dest]  Copy something                    [aliases: cp, dupe]',
         '',
         'Options:',
         '  --help     Show help                                                 [boolean]',
@@ -2588,13 +2588,13 @@ describe('usage tests', () => {
         )
 
       r.logs[0].split('\n').should.deep.equal([
-        './usage [command]',
+        'usage [command]',
         '',
         'Commands:',
-        '  ./usage list [pattern]     List key-value pairs for pattern',
+        '  usage list [pattern]     List key-value pairs for pattern',
         '                                                         [default] [aliases: ls]',
-        '  ./usage get <key>          Get value for key',
-        '  ./usage set <key> [value]  Set value for key',
+        '  usage get <key>          Get value for key',
+        '  usage set <key> [value]  Set value for key',
         '',
         'Options:',
         '  --help     Show help                                                 [boolean]',
@@ -2612,12 +2612,12 @@ describe('usage tests', () => {
         )
 
       r.logs[0].split('\n').should.deep.equal([
-        './usage [command]',
+        'usage [command]',
         '',
         'Commands:',
-        '  ./usage [pattern]          List key-value pairs for pattern          [default]',
-        '  ./usage get <key>          Get value for key',
-        '  ./usage set <key> [value]  Set value for key',
+        '  usage [pattern]          List key-value pairs for pattern            [default]',
+        '  usage get <key>          Get value for key',
+        '  usage set <key> [value]  Set value for key',
         '',
         'Options:',
         '  --help     Show help                                                 [boolean]',
@@ -2640,12 +2640,12 @@ describe('usage tests', () => {
         )
 
       r.logs[0].split('\n').should.deep.equal([
-        './usage [command]',
+        'usage [command]',
         '',
         'Commands:',
-        '  ./usage [pattern]          List key-value pairs for pattern          [default]',
-        '  ./usage get <key>          Get value for key',
-        '  ./usage set <key> [value]  Set value for key',
+        '  usage [pattern]          List key-value pairs for pattern            [default]',
+        '  usage get <key>          Get value for key',
+        '  usage set <key> [value]  Set value for key',
         '',
         'Positionals:',
         '  pattern                                               [string] [default: ".*"]',
@@ -2666,12 +2666,12 @@ describe('usage tests', () => {
         )
 
       r.logs[0].split('\n').should.deep.equal([
-        './usage [command]',
+        'usage [command]',
         '',
         'Commands:',
-        '  ./usage [pattern]          List key-value pairs for pattern          [default]',
-        '  ./usage get <key>          Get value for key',
-        '  ./usage set <key> [value]  Set value for key',
+        '  usage [pattern]          List key-value pairs for pattern            [default]',
+        '  usage get <key>          Get value for key',
+        '  usage set <key> [value]  Set value for key',
         '',
         'Options:',
         '  --help     Show help                                                 [boolean]',

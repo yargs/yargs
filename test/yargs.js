@@ -360,7 +360,7 @@ describe('yargs dsl tests', () => {
         'usage blerg',
         '',
         'Commands:',
-        '  ./usage snuh  snuh command',
+        '  usage snuh  snuh command',
         '',
         'Options:',
         '  --version  Show version number  [boolean]',
@@ -383,10 +383,10 @@ describe('yargs dsl tests', () => {
       })
 
       r.logs[0].split('\n').should.deep.equal([
-        './usage [command]',
+        'usage [command]',
         '',
         'Commands:',
-        '  ./usage blerg  handle blerg things',
+        '  usage blerg  handle blerg things',
         '',
         'Options:',
         '  --version  Show version number  [boolean]',
