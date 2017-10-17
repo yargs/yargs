@@ -517,7 +517,7 @@ describe('Command', () => {
       r.logs.join('\n').split(/\n+/).should.deep.equal([
         './usage [command]',
         'Commands:',
-        '  dream [command] [opts]  Go to sleep and dream',
+        '  ./usage dream [command] [opts]  Go to sleep and dream',
         'Options:',
         '  --help     Show help  [boolean]',
         '  --version  Show version number  [boolean]',
@@ -535,8 +535,8 @@ describe('Command', () => {
       r.logs[0].split(/\n+/).should.deep.equal([
         'command dream [command] [opts]',
         'Commands:',
-        '  of-memory <memory>               Dream about a specific memory',
-        '  within-a-dream [command] [opts]  Dream within a dream',
+        '  ./command of-memory <memory>               Dream about a specific memory',
+        '  ./command within-a-dream [command] [opts]  Dream within a dream',
         'Options:',
         '  --help     Show help  [boolean]',
         '  --version  Show version number  [boolean]',
@@ -556,10 +556,10 @@ describe('Command', () => {
       r.logs.join('\n').split(/\n+/).should.deep.equal([
         './usage [command]',
         'Commands:',
-        '  limbo [opts]                     Get lost in pure subconscious',
-        '  inception [command] [opts]       Enter another dream, where inception is possible',
-        '  within-a-dream [command] [opts]  Dream within a dream',
-        '  dream [command] [opts]           Go to sleep and dream',
+        '  ./usage limbo [opts]                     Get lost in pure subconscious',
+        '  ./usage inception [command] [opts]       Enter another dream, where inception is possible',
+        '  ./usage within-a-dream [command] [opts]  Dream within a dream',
+        '  ./usage dream [command] [opts]           Go to sleep and dream',
         'Options:',
         '  --help     Show help  [boolean]',
         '  --version  Show version number  [boolean]',
@@ -624,7 +624,7 @@ describe('Command', () => {
       r.logs.join('\n').split(/\n+/).should.deep.equal([
         './usage [command]',
         'Commands:',
-        '  nameless  Command name derived from module filename',
+        '  ./usage nameless  Command name derived from module filename',
         'Options:',
         '  --help     Show help  [boolean]',
         '  --version  Show version number  [boolean]',
@@ -679,7 +679,7 @@ describe('Command', () => {
       const expectedCmd = [
         'command cmd <sub>',
         'Commands:',
-        '  sub  Run the subcommand',
+        '  ./command sub  Run the subcommand',
         'Options:',
         '  --help     Show help  [boolean]',
         '  --version  Show version number  [boolean]',
