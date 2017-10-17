@@ -369,7 +369,7 @@ describe('yargs dsl tests', () => {
       })
 
       r.logs[0].split('\n').should.deep.equal([
-        './usage blerg',
+        'usage blerg',
         '',
         'Commands:',
         '  snuh  snuh command',
