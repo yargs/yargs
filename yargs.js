@@ -982,6 +982,11 @@ function Yargs (processArgs, cwd, parentRequire) {
         return argv
       }
 
+      // if there's a handler associated with a
+      // command defer processing to it.
+      const handlerKeys = command.getCommands()
+      const skipDefaultCommand = argv[helpOpt] && (handlerKeys.length > 1 || handlerKeys[0] !== '$0')
+
       if (argv._.length) {
         if (helpOpt) {
           // consider any multi-char helpOpt alias as a valid help command
@@ -996,9 +1001,6 @@ function Yargs (processArgs, cwd, parentRequire) {
             argv[helpOpt] = true
           }
         }
-        // if there's a handler associated with a
-        // command defer processing to it.
-        const handlerKeys = command.getCommands()
         if (handlerKeys.length) {
           let firstUnknownCommand
           for (let i = (commandIndex || 0), cmd; argv._[i] !== undefined; i++) {
@@ -1016,7 +1018,7 @@ function Yargs (processArgs, cwd, parentRequire) {
           }
 
           // run the default command, if defined
-          if (command.hasDefaultCommand() && !argv[helpOpt]) {
+          if (command.hasDefaultCommand() && !skipDefaultCommand) {
             setPlaceholderKeys(argv)
             return command.runCommand(null, self, parsed)
           }
@@ -1034,7 +1036,7 @@ function Yargs (processArgs, cwd, parentRequire) {
           self.showCompletionScript()
           self.exit(0)
         }
-      } else if (command.hasDefaultCommand() && !argv[helpOpt]) {
+      } else if (command.hasDefaultCommand() && !skipDefaultCommand) {
         setPlaceholderKeys(argv)
         return command.runCommand(null, self, parsed)
       }
