@@ -1872,6 +1872,26 @@ describe('usage tests', () => {
         ''
       ])
     })
+
+    it('does not display $0 twice when default commands are enabled', () => {
+      const r = checkUsage(() => yargs('-h')
+        .usage('$0', 'do something', yargs => {
+          yargs
+            .alias('h', 'help')
+        })
+        .wrap(null)
+        .argv
+      )
+
+      r.logs[0].split('\n').should.deep.equal([
+        './usage',
+        '',
+        'Options:',
+        '  --version   Show version number  [boolean]',
+        '  -h, --help  Show help  [boolean]',
+        ''
+      ])
+    })
   })
 
   describe('epilogue', () => {
