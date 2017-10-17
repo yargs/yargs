@@ -984,23 +984,23 @@ function Yargs (processArgs, cwd, parentRequire) {
 
       // if there's a handler associated with a
       // command defer processing to it.
+      if (helpOpt) {
+        // consider any multi-char helpOpt alias as a valid help command
+        // unless all helpOpt aliases are single-char
+        // note that parsed.aliases is a normalized bidirectional map :)
+        const helpCmds = [helpOpt]
+          .concat(aliases[helpOpt] || [])
+          .filter(k => k.length > 1)
+        // check if help should trigger and strip it from _.
+        if (~helpCmds.indexOf(argv._[argv._.length - 1])) {
+          argv._.pop()
+          argv[helpOpt] = true
+        }
+      }
       const handlerKeys = command.getCommands()
       const skipDefaultCommand = argv[helpOpt] && (handlerKeys.length > 1 || handlerKeys[0] !== '$0')
 
       if (argv._.length) {
-        if (helpOpt) {
-          // consider any multi-char helpOpt alias as a valid help command
-          // unless all helpOpt aliases are single-char
-          // note that parsed.aliases is a normalized bidirectional map :)
-          const helpCmds = [helpOpt]
-            .concat(aliases[helpOpt] || [])
-            .filter(k => k.length > 1)
-          // check if help should trigger and strip it from _.
-          if (~helpCmds.indexOf(argv._[argv._.length - 1])) {
-            argv._.pop()
-            argv[helpOpt] = true
-          }
-        }
         if (handlerKeys.length) {
           let firstUnknownCommand
           for (let i = (commandIndex || 0), cmd; argv._[i] !== undefined; i++) {
