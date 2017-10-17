@@ -52,6 +52,7 @@ All notable changes to this project will be documented in this file. See [standa
 ### BREAKING CHANGES
 
 * version() and help() are now enabled by default, and show up in help output; the implicit help command can no longer be enabled/disabled independently from the help command itself (which can now be disabled).
+* parse() now behaves as an alias for .argv, unless a parseCallback is provided.
 
 
 
