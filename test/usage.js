@@ -1884,7 +1884,7 @@ describe('usage tests', () => {
       )
 
       r.logs[0].split('\n').should.deep.equal([
-        './usage',
+        'usage',
         '',
         'Options:',
         '  --version   Show version number  [boolean]',
