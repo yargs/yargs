@@ -861,7 +861,7 @@ function Yargs (processArgs, cwd, parentRequire) {
   self.showCompletionScript = function ($0) {
     argsert('[string]', [$0], arguments.length)
     $0 = $0 || self.$0
-    _logger.log(completion.generateCompletionScript($0))
+    _logger.log(completion.generateCompletionScript($0, completionCommand))
     return self
   }
 
