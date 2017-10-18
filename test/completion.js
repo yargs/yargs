@@ -172,6 +172,13 @@ describe('Completion', () => {
       r.logs[0].should.match(/ndm --get-yargs-completions/)
     })
 
+    it('replaces completion command variable with custom completion command in script', () => {
+      const r = checkUsage(() => yargs([]).completion('flintlock')
+          .showCompletionScript(), ['ndm'])
+
+      r.logs[0].should.match(/ndm flintlock >>/)
+    })
+
     it('if $0 has a .js extension, a ./ prefix is added', () => {
       const r = checkUsage(() => yargs([])
           .showCompletionScript(), ['test.js'])
