@@ -93,7 +93,8 @@ function Yargs (processArgs, cwd, parentRequire) {
 
     const arrayOptions = [
       'array', 'boolean', 'string', 'requiresArg', 'skipValidation',
-      'count', 'normalize', 'number'
+      'count', 'normalize', 'number',
+      'hiddenOptions'
     ]
 
     const objectOptions = [
@@ -647,8 +648,9 @@ function Yargs (processArgs, cwd, parentRequire) {
       }
 
       const desc = opt.describe || opt.description || opt.desc
-      if (!opt.hidden) {
-        self.describe(key, desc)
+      self.describe(key, desc)
+      if (opt.hidden) {
+        options.hiddenOptions.push(key)
       }
 
       if (opt.requiresArg) {
@@ -738,10 +740,10 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
   self.getStrict = () => strict
 
-  self.showHelp = function (level) {
-    argsert('[string|function]', [level], arguments.length)
+  self.showHelp = function (level, opts) {
+    argsert('[string|function] [object]', [level, opts], arguments.length)
     if (!self.parsed) self._parseArgs(processArgs) // run parser, if it has not already been executed.
-    usage.showHelp(level)
+    usage.showHelp(level, opts)
     return self
   }
 

@@ -246,6 +246,7 @@ describe('yargs dsl tests', () => {
         config: {},
         configObjects: [],
         envPrefix: 'YARGS', // preserved as global
+        hiddenOptions: [],
         demandedCommands: {},
         demandedOptions: {},
         local: [
