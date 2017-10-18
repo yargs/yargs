@@ -18,7 +18,7 @@ All notable changes to this project will be documented in this file. See [standa
 * .usage() can now be used to configure a default command ([#975](https://github.com/yargs/yargs/issues/975)) ([7269531](https://github.com/yargs/yargs/commit/7269531))
 * hidden options are now explicitly indicated using "hidden" flag ([#962](https://github.com/yargs/yargs/issues/962)) ([280d0d6](https://github.com/yargs/yargs/commit/280d0d6))
 * introduce .positional() for configuring positional arguments ([#967](https://github.com/yargs/yargs/issues/967)) ([cb16460](https://github.com/yargs/yargs/commit/cb16460))
-* replace /bin/bash with file basename ([#983](https://github.com/yargs/yargs/issues/983)) ([20bb99b](https://github.com/yargs/yargs/commit/20bb99b))
+* replace $0 with file basename ([#983](https://github.com/yargs/yargs/issues/983)) ([20bb99b](https://github.com/yargs/yargs/commit/20bb99b))
 
 
 ### BREAKING CHANGES
