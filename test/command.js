@@ -504,6 +504,21 @@ describe('Command', () => {
       const cmdCommands = y.getCommandInstance().getCommands()
       cmdCommands.should.deep.equal(['foo', 'bar'])
     })
+
+    it('accepts an errorHandler', () => {
+      const module = {
+        command: ['foo <qux>', 'bar'],
+        aliases: ['baz', 'nat'],
+        describe: 'i\'m not feeling very creative at the moment',
+        builder (yargs) { return yargs },
+        errorHandler (error) { console.log(error) },
+        handler (argv) {}
+      }
+
+      const y = yargs([]).command(module)
+      const handlers = y.getCommandInstance().getCommandHandlers()
+      handlers.foo.errorHandler.should.equal(module.errorHandler)
+    })
   })
 
   describe('commandDir', () => {

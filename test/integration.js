@@ -108,6 +108,30 @@ describe('integration tests', () => {
     })
   })
 
+  it('handles errors when simply thrown', function (done) {
+    testCmd('./error-handler-throw.js', [], (code, stdout) => {
+      if (code) {
+        done(new Error(`cmd exited with code ${code}`))
+        return
+      }
+
+      stdout.should.match(/error catched : test/)
+      return done()
+    })
+  })
+
+  it('handles errors when a promise rejects', function (done) {
+    testCmd('./error-handler-reject.js', [], (code, stdout) => {
+      if (code) {
+        done(new Error(`cmd exited with code ${code}`))
+        return
+      }
+
+      stdout.should.match(/error catched : test/)
+      return done()
+    })
+  })
+
   if (process.platform !== 'win32') {
     describe('load root package.json', () => {
       before(function (done) {

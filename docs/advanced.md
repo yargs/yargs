@@ -425,3 +425,18 @@ some of yargs' parsing features:
 
 See the [yargs-parser](https://github.com/yargs/yargs-parser#configuration) module
 for detailed documentation of this feature.
+
+### error Handlers
+
+it is possible to pass an `errorHandler` to commands, to deal with thrown Exceptions or rejected Promises.
+
+```js
+exports.command = 'prune <name> [names..]'
+exports.desc = 'Delete tracked branches gone stale for remotes'
+exports.errorHandler = function(error) {
+  //deal with your error here
+}
+exports.handler = function (argv) {
+  throw new Error("something went wrong");
+}
+```
