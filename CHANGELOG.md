@@ -8,14 +8,13 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### Bug Fixes
 
-* config and normalise can be disabled with false ([#952](https://github.com/yargs/yargs/issues/952)) ([3bb8771](https://github.com/yargs/yargs/commit/3bb8771))
+* config and normalize can be disabled with false ([#952](https://github.com/yargs/yargs/issues/952)) ([3bb8771](https://github.com/yargs/yargs/commit/3bb8771))
 * less eager help command execution ([#972](https://github.com/yargs/yargs/issues/972)) ([8c1d7bf](https://github.com/yargs/yargs/commit/8c1d7bf))
 * the positional argument parse was clobbering global flag arguments ([#984](https://github.com/yargs/yargs/issues/984)) ([7e58453](https://github.com/yargs/yargs/commit/7e58453))
 
 
 ### Features
 
-* **translation:** Update pl-PL translations ([#985](https://github.com/yargs/yargs/issues/985)) ([5a9c986](https://github.com/yargs/yargs/commit/5a9c986))
 * .usage() can now be used to configure a default command ([#975](https://github.com/yargs/yargs/issues/975)) ([7269531](https://github.com/yargs/yargs/commit/7269531))
 * hidden options are now explicitly indicated using "hidden" flag ([#962](https://github.com/yargs/yargs/issues/962)) ([280d0d6](https://github.com/yargs/yargs/commit/280d0d6))
 * introduce .positional() for configuring positional arguments ([#967](https://github.com/yargs/yargs/issues/967)) ([cb16460](https://github.com/yargs/yargs/commit/cb16460))
