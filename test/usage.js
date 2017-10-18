@@ -1509,7 +1509,9 @@ describe('usage tests', () => {
         ''
       ])
       commandHelp.logs[0].split('\n').should.deep.equal([
-        'usage upload <dest>   Upload cwd to remote destination',
+        'usage upload <dest>',
+        '',
+        'Upload cwd to remote destination',
         '',
         'Options:',
         '  --help     Show help  [boolean]',
@@ -1553,7 +1555,9 @@ describe('usage tests', () => {
         ''
       ])
       commandHelp.logs[0].split('\n').should.deep.equal([
-        'usage upload <dest>   Upload cwd',
+        'usage upload <dest>',
+        '',
+        'Upload cwd',
         '',
         'Options:',
         '  --help     Show help               [boolean]',
@@ -1579,7 +1583,9 @@ describe('usage tests', () => {
         )
 
       r.logs[0].split('\n').should.deep.equal([
-        'usage upload   upload something',
+        'usage upload',
+        '',
+        'upload something',
         '',
         'Flags:',
         '  -q  [boolean]',
@@ -1617,7 +1623,9 @@ describe('usage tests', () => {
         )
 
       r.logs[0].split('\n').should.deep.equal([
-        'usage upload   upload something',
+        'usage upload',
+        '',
+        'upload something',
         '',
         'Flags:',
         '  -q  [boolean]',
@@ -1651,7 +1659,9 @@ describe('usage tests', () => {
         )
 
       r.logs[0].split('\n').should.deep.equal([
-        'usage upload   upload something',
+        'usage upload',
+        '',
+        'upload something',
         '',
         'Awesome Flags:',
         '  -i  [boolean]',
@@ -1689,7 +1699,9 @@ describe('usage tests', () => {
         )
 
       r.logs[0].split('\n').should.deep.equal([
-        'usage upload   upload something',
+        'usage upload',
+        '',
+        'upload something',
         '',
         'Awesome Flags:',
         '  -i  [boolean]',
@@ -1774,7 +1786,9 @@ describe('usage tests', () => {
         )
 
       r.logs[0].split('\n').should.deep.equal([
-        'usage one two [next]   level two',
+        'usage one two [next]',
+        '',
+        'level two',
         '',
         'Options:',
         '  --help     Show help  [boolean]',
@@ -1791,7 +1805,9 @@ describe('usage tests', () => {
         )
 
       r.logs[0].split('\n').should.deep.equal([
-        'usage one two [next]   level two',
+        'usage one two [next]',
+        '',
+        'level two',
         '',
         'Options:',
         '  --help     Show help  [boolean]',
@@ -1884,7 +1900,9 @@ describe('usage tests', () => {
       )
 
       r.logs[0].split('\n').should.deep.equal([
-        'usage    do something',
+        'usage',
+        '',
+        'do something',
         '',
         'Options:',
         '  --version   Show version number  [boolean]',
@@ -2588,7 +2606,9 @@ describe('usage tests', () => {
         )
 
       r.logs[0].split('\n').should.deep.equal([
-        'usage [command]',
+        'usage [pattern]',
+        '',
+        'List key-value pairs for pattern',
         '',
         'Commands:',
         '  usage list [pattern]     List key-value pairs for pattern',
@@ -2612,7 +2632,9 @@ describe('usage tests', () => {
         )
 
       r.logs[0].split('\n').should.deep.equal([
-        'usage [command]',
+        'usage [pattern]',
+        '',
+        'List key-value pairs for pattern',
         '',
         'Commands:',
         '  usage [pattern]          List key-value pairs for pattern            [default]',
@@ -2640,7 +2662,9 @@ describe('usage tests', () => {
         )
 
       r.logs[0].split('\n').should.deep.equal([
-        'usage [command]',
+        'usage [pattern]',
+        '',
+        'List key-value pairs for pattern',
         '',
         'Commands:',
         '  usage [pattern]          List key-value pairs for pattern            [default]',
@@ -2666,7 +2690,9 @@ describe('usage tests', () => {
         )
 
       r.logs[0].split('\n').should.deep.equal([
-        'usage [command]',
+        'usage [pattern]',
+        '',
+        'List key-value pairs for pattern',
         '',
         'Commands:',
         '  usage [pattern]          List key-value pairs for pattern            [default]',
@@ -2694,7 +2720,9 @@ describe('usage tests', () => {
       )
 
       r.logs[0].split('\n').should.deep.equal([
-        'usage list [pattern]   List key-value pairs for pattern',
+        'usage list [pattern]',
+        '',
+        'List key-value pairs for pattern',
         '',
         'Positionals:',
         '  pattern  the pattern to list keys for',
@@ -2717,7 +2745,9 @@ describe('usage tests', () => {
       )
 
       r.logs[0].split('\n').should.deep.equal([
-        'usage list [pattern...]   List key-value pairs for pattern',
+        'usage list [pattern...]',
+        '',
+        'List key-value pairs for pattern',
         '',
         'Positionals:',
         '  pattern  the pattern to list keys for                    [array] [default: []]',
@@ -2740,7 +2770,9 @@ describe('usage tests', () => {
       )
 
       r.logs[0].split('\n').should.deep.equal([
-        'usage list <pattern>   List key-value pairs for pattern',
+        'usage list <pattern>',
+        '',
+        'List key-value pairs for pattern',
         '',
         'Positionals:',
         '  pattern  the pattern to list keys for                               [required]',
@@ -2763,7 +2795,9 @@ describe('usage tests', () => {
       )
 
       r.logs[0].split('\n').should.deep.equal([
-        'usage list [pattern|thingy]   List key-value pairs for pattern',
+        'usage list [pattern|thingy]',
+        '',
+        'List key-value pairs for pattern',
         '',
         'Positionals:',
         '  pattern, thingy  the pattern to list keys for',
@@ -2787,7 +2821,9 @@ describe('usage tests', () => {
       )
 
       r.logs[0].split('\n').should.deep.equal([
-        'usage list [pattern]   List key-value pairs for pattern',
+        'usage list [pattern]',
+        '',
+        'List key-value pairs for pattern',
         '',
         'Positionals:',
         '  pattern  the pattern to list keys for                                 [string]',
@@ -2811,7 +2847,9 @@ describe('usage tests', () => {
       )
 
       r.logs[0].split('\n').should.deep.equal([
-        'usage list [pattern]   List key-value pairs for pattern',
+        'usage list [pattern]',
+        '',
+        'List key-value pairs for pattern',
         '',
         'Positionals:',
         '  pattern  the pattern to list keys for                  [choices: "foo", "bar"]',

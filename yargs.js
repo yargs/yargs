@@ -431,7 +431,6 @@ function Yargs (processArgs, cwd, parentRequire) {
   self.usage = function (msg, description, builder, handler) {
     argsert('<string|null|undefined> [string|boolean] [function|object] [function]', [msg, description, builder, handler], arguments.length)
 
-    usage.usage(msg)
     if (description !== undefined) {
       // .usage() can be used as an alias for defining
       // a default command.
@@ -441,6 +440,7 @@ function Yargs (processArgs, cwd, parentRequire) {
         throw new YError('.usage() description must start with $0 if being used as alias for .command()')
       }
     } else {
+      usage.usage(msg)
       return self
     }
   }

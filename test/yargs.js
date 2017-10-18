@@ -357,7 +357,9 @@ describe('yargs dsl tests', () => {
       })
 
       r.logs[0].split('\n').should.deep.equal([
-        'usage blerg   handle blerg things',
+        'usage blerg',
+        '',
+        'handle blerg things',
         '',
         'Commands:',
         '  usage snuh  snuh command',
@@ -1061,7 +1063,9 @@ describe('yargs dsl tests', () => {
         })
 
         output1.split('\n').should.deep.equal([
-          'ndm batman <api-token>   batman command',
+          'ndm batman <api-token>',
+          '',
+          'batman command',
           '',
           'Options:',
           '  --help     Show help  [boolean]',
@@ -1070,7 +1074,9 @@ describe('yargs dsl tests', () => {
         ])
 
         output2.split('\n').should.deep.equal([
-          'ndm robin <egg>   robin command',
+          'ndm robin <egg>',
+          '',
+          'robin command',
           '',
           'Options:',
           '  --help     Show help  [boolean]',
@@ -1100,7 +1106,9 @@ describe('yargs dsl tests', () => {
 
         error1.message.should.match(/Not enough non-option arguments/)
         output1.split('\n').should.deep.equal([
-          'ndm batman <api-token>   batman command',
+          'ndm batman <api-token>',
+          '',
+          'batman command',
           '',
           'Options:',
           '  --help     Show help  [boolean]',
@@ -1111,7 +1119,9 @@ describe('yargs dsl tests', () => {
 
         expect(error2).to.equal(undefined)
         output2.split('\n').should.deep.equal([
-          'ndm robin <egg>   robin command',
+          'ndm robin <egg>',
+          '',
+          'robin command',
           '',
           'Options:',
           '  --help     Show help  [boolean]',
