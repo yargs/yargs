@@ -515,8 +515,9 @@ describe('Command', () => {
       r.should.have.property('errors').with.length(0)
       r.should.have.property('logs')
       r.logs.join('\n').split(/\n+/).should.deep.equal([
+        'usage [command]',
         'Commands:',
-        '  dream [command] [opts]  Go to sleep and dream',
+        '  usage dream [command] [opts]  Go to sleep and dream',
         'Options:',
         '  --help     Show help  [boolean]',
         '  --version  Show version number  [boolean]',
@@ -533,9 +534,10 @@ describe('Command', () => {
       r.should.have.property('logs')
       r.logs[0].split(/\n+/).should.deep.equal([
         'command dream [command] [opts]',
+        'Go to sleep and dream',
         'Commands:',
-        '  of-memory <memory>               Dream about a specific memory',
-        '  within-a-dream [command] [opts]  Dream within a dream',
+        '  command of-memory <memory>               Dream about a specific memory',
+        '  command within-a-dream [command] [opts]  Dream within a dream',
         'Options:',
         '  --help     Show help  [boolean]',
         '  --version  Show version number  [boolean]',
@@ -553,11 +555,12 @@ describe('Command', () => {
       r.should.have.property('errors').with.length(0)
       r.should.have.property('logs')
       r.logs.join('\n').split(/\n+/).should.deep.equal([
+        'usage [command]',
         'Commands:',
-        '  limbo [opts]                     Get lost in pure subconscious',
-        '  inception [command] [opts]       Enter another dream, where inception is possible',
-        '  within-a-dream [command] [opts]  Dream within a dream',
-        '  dream [command] [opts]           Go to sleep and dream',
+        '  usage limbo [opts]                     Get lost in pure subconscious',
+        '  usage inception [command] [opts]       Enter another dream, where inception is possible',
+        '  usage within-a-dream [command] [opts]  Dream within a dream',
+        '  usage dream [command] [opts]           Go to sleep and dream',
         'Options:',
         '  --help     Show help  [boolean]',
         '  --version  Show version number  [boolean]',
@@ -605,6 +608,7 @@ describe('Command', () => {
       r.should.have.property('logs')
       r.logs.join('\n').split(/\n+/).should.deep.equal([
         'command cyclic',
+        'Attempts to (re)apply its own dir',
         'Options:',
         '  --help     Show help  [boolean]',
         '  --version  Show version number  [boolean]',
@@ -620,8 +624,9 @@ describe('Command', () => {
       r.should.have.property('errors').with.length(0)
       r.should.have.property('logs')
       r.logs.join('\n').split(/\n+/).should.deep.equal([
+        'usage [command]',
         'Commands:',
-        '  nameless  Command name derived from module filename',
+        '  usage nameless  Command name derived from module filename',
         'Options:',
         '  --help     Show help  [boolean]',
         '  --version  Show version number  [boolean]',
@@ -675,8 +680,9 @@ describe('Command', () => {
 
       const expectedCmd = [
         'command cmd <sub>',
+        'Try a command',
         'Commands:',
-        '  sub  Run the subcommand',
+        '  command sub  Run the subcommand',
         'Options:',
         '  --help     Show help  [boolean]',
         '  --version  Show version number  [boolean]',
@@ -685,6 +691,7 @@ describe('Command', () => {
 
       const expectedSub = [
         'command cmd sub',
+        'Run the subcommand',
         'Options:',
         '  --help     Show help  [boolean]',
         '  --version  Show version number  [boolean]',
@@ -1368,5 +1375,31 @@ describe('Command', () => {
         argv.optional.should.equal(33)
         argv._.should.eql(['foo', 'bar'])
       })
+  })
+
+  describe('usage', () => {
+    it('allows you to configure a default command', () => {
+      yargs()
+        .usage('$0 <port>', 'default command', (yargs) => {
+          yargs.positional('port', {
+            type: 'string'
+          })
+        })
+        .parse('33', (err, argv) => {
+          expect(err).to.equal(null)
+          argv.port.should.equal('33')
+        })
+    })
+
+    it('throws exception if default command does not have leading $0', () => {
+      expect(() => {
+        yargs()
+          .usage('<port>', 'default command', (yargs) => {
+            yargs.positional('port', {
+              type: 'string'
+            })
+          })
+      }).to.throw(/.*\.usage\(\) description must start with \$0.*/)
+    })
   })
 })

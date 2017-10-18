@@ -428,19 +428,21 @@ function Yargs (processArgs, cwd, parentRequire) {
     return self
   }
 
-  self.usage = function (msg, opts) {
-    argsert('<string|null|undefined|object> [object]', [msg, opts], arguments.length)
+  self.usage = function (msg, description, builder, handler) {
+    argsert('<string|null|undefined> [string|boolean] [function|object] [function]', [msg, description, builder, handler], arguments.length)
 
-    if (!opts && typeof msg === 'object') {
-      opts = msg
-      msg = null
+    if (description !== undefined) {
+      // .usage() can be used as an alias for defining
+      // a default command.
+      if ((msg || '').match(/^\$0( |$)/)) {
+        return self.command(msg, description, builder, handler)
+      } else {
+        throw new YError('.usage() description must start with $0 if being used as alias for .command()')
+      }
+    } else {
+      usage.usage(msg)
+      return self
     }
-
-    usage.usage(msg)
-
-    if (opts) self.options(opts)
-
-    return self
   }
 
   self.epilogue = self.epilog = function (msg) {
@@ -741,6 +743,10 @@ function Yargs (processArgs, cwd, parentRequire) {
   self.showHelp = function (level) {
     argsert('[string|function]', [level], arguments.length)
     if (!self.parsed) self._parseArgs(processArgs) // run parser, if it has not already been executed.
+    if (command.hasDefaultCommand()) {
+      context.resets++ // override the restriction on top-level positoinals.
+      command.runDefaultBuilderOn(self, true)
+    }
     usage.showHelp(level)
     return self
   }
@@ -976,23 +982,25 @@ function Yargs (processArgs, cwd, parentRequire) {
         return argv
       }
 
-      if (argv._.length) {
-        if (helpOpt) {
-          // consider any multi-char helpOpt alias as a valid help command
-          // unless all helpOpt aliases are single-char
-          // note that parsed.aliases is a normalized bidirectional map :)
-          const helpCmds = [helpOpt]
-            .concat(aliases[helpOpt] || [])
-            .filter(k => k.length > 1)
-          // check if help should trigger and strip it from _.
-          if (~helpCmds.indexOf(argv._[argv._.length - 1])) {
-            argv._.pop()
-            argv[helpOpt] = true
-          }
+      // if there's a handler associated with a
+      // command defer processing to it.
+      if (helpOpt) {
+        // consider any multi-char helpOpt alias as a valid help command
+        // unless all helpOpt aliases are single-char
+        // note that parsed.aliases is a normalized bidirectional map :)
+        const helpCmds = [helpOpt]
+          .concat(aliases[helpOpt] || [])
+          .filter(k => k.length > 1)
+        // check if help should trigger and strip it from _.
+        if (~helpCmds.indexOf(argv._[argv._.length - 1])) {
+          argv._.pop()
+          argv[helpOpt] = true
         }
-        // if there's a handler associated with a
-        // command defer processing to it.
-        const handlerKeys = command.getCommands()
+      }
+      const handlerKeys = command.getCommands()
+      const skipDefaultCommand = argv[helpOpt] && (handlerKeys.length > 1 || handlerKeys[0] !== '$0')
+
+      if (argv._.length) {
         if (handlerKeys.length) {
           let firstUnknownCommand
           for (let i = (commandIndex || 0), cmd; argv._[i] !== undefined; i++) {
@@ -1010,7 +1018,7 @@ function Yargs (processArgs, cwd, parentRequire) {
           }
 
           // run the default command, if defined
-          if (command.hasDefaultCommand() && !argv[helpOpt]) {
+          if (command.hasDefaultCommand() && !skipDefaultCommand) {
             setPlaceholderKeys(argv)
             return command.runCommand(null, self, parsed)
           }
@@ -1028,7 +1036,7 @@ function Yargs (processArgs, cwd, parentRequire) {
           self.showCompletionScript()
           self.exit(0)
         }
-      } else if (command.hasDefaultCommand() && !argv[helpOpt]) {
+      } else if (command.hasDefaultCommand() && !skipDefaultCommand) {
         setPlaceholderKeys(argv)
         return command.runCommand(null, self, parsed)
       }
