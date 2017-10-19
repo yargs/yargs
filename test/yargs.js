@@ -338,7 +338,7 @@ describe('yargs dsl tests', () => {
       })
     })
 
-    it("skips executing top-level command if builder's help is executed", () => {
+    it("skips executing root-level command if builder's help is executed", () => {
       const r = checkOutput(() => {
         yargs(['blerg', '-h'])
           .command(
@@ -362,7 +362,7 @@ describe('yargs dsl tests', () => {
         'handle blerg things',
         '',
         'Commands:',
-        '  usage snuh  snuh command',
+        '  usage blerg snuh  snuh command',
         '',
         'Options:',
         '  --version  Show version number  [boolean]',
