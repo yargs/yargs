@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="10.0.1"></a>
+## [10.0.1](https://github.com/yargs/yargs/compare/v10.0.0...v10.0.1) (2017-10-19)
+
+
+### Bug Fixes
+
+* help strings for nested commands were missing parent commands ([#990](https://github.com/yargs/yargs/issues/990)) ([cd1ca15](https://github.com/yargs/yargs/commit/cd1ca15))
+* use correct completion command in generated completion script ([#988](https://github.com/yargs/yargs/issues/988)) ([3c8ac1d](https://github.com/yargs/yargs/commit/3c8ac1d))
+
+
+
 <a name="10.0.0"></a>
 # [10.0.0](https://github.com/yargs/yargs/compare/v9.1.0...v10.0.0) (2017-10-18)
 
