@@ -1095,6 +1095,7 @@ Valid `opt` keys include:
   - `alias`: string or array of strings, see [`alias()`](#alias)
   - `choices`: value or array of values, limit valid option arguments to a predefined set, see [`choices()`](#choices)
   - `coerce`: function, coerce or transform parsed command line values into another value, see [`coerce()`](#coerce)
+  - `hidden`: don't display option in help output.
   - `conflicts`: string or object, require certain keys not to be set, see [`conflicts()`](#conflicts)
   - `default`: value, set a default value for the option, see [`default()`](#default)
   - `desc`/`describe`/`description`: string, the option description for help content, see [`describe()`](#describe)
