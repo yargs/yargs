@@ -1002,6 +1002,7 @@ Valid `opt` keys include:
 - `desc`/`describe`/`description`: string, the option description for help content, see [`describe()`](#describe)
 - `global`: boolean, indicate that this key should not be [reset](#reset) when a command is invoked, see [`global()`](#global)
 - `group`: string, when displaying usage instructions place the option under an alternative group heading, see [`group()`](#group)
+- `hidden`: don't display option in help output.
 - `implies`: string or object, require certain keys to be set, see [`implies()`](#implies)
 - `nargs`: number, specify how many arguments should be consumed for the option, see [`nargs()`](#nargs)
 - `normalize`: boolean, apply `path.normalize()` to the option, see [`normalize()`](#normalize)
@@ -1095,7 +1096,6 @@ Valid `opt` keys include:
   - `alias`: string or array of strings, see [`alias()`](#alias)
   - `choices`: value or array of values, limit valid option arguments to a predefined set, see [`choices()`](#choices)
   - `coerce`: function, coerce or transform parsed command line values into another value, see [`coerce()`](#coerce)
-  - `hidden`: don't display option in help output.
   - `conflicts`: string or object, require certain keys not to be set, see [`conflicts()`](#conflicts)
   - `default`: value, set a default value for the option, see [`default()`](#default)
   - `desc`/`describe`/`description`: string, the option description for help content, see [`describe()`](#describe)
