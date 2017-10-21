@@ -1,6 +1,6 @@
 {
   "name": "yargs",
-  "version": "10.0.2",
+  "version": "10.0.3",
   "description": "yargs the modern, pirate-themed, successor to optimist.",
   "main": "./index.js",
   "files": [
