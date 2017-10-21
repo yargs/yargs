@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="10.0.2"></a>
+## [10.0.2](https://github.com/yargs/yargs/compare/v10.0.1...v10.0.2) (2017-10-21)
+
+
+### Bug Fixes
+
+* fix tiny spacing issue with usage ([#992](https://github.com/yargs/yargs/issues/992)) ([7871327](https://github.com/yargs/yargs/commit/7871327))
+
+
+
 <a name="10.0.1"></a>
 ## [10.0.1](https://github.com/yargs/yargs/compare/v10.0.0...v10.0.1) (2017-10-19)
 
