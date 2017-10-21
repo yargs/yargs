@@ -1,5 +1,10 @@
 # Yargs
 
+_Yargs is developed on evenings and weekends by
+volunteers. Why not grab them dinner or a drink?_
+
+[![Support via Gratipay](https://cdn.rawgit.com/gratipay/gratipay-badge/2.3.0/dist/gratipay.svg)](https://gratipay.com/yargs/)
+
 [![Build Status][travis-image]][travis-url]
 [![Coverage Status][coveralls-image]][coveralls-url]
 [![NPM version][npm-image]][npm-url]
