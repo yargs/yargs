@@ -662,10 +662,10 @@ Examples will be printed out as part of the help message.
 <a name="exitprocess"></a>.exitProcess(enable)
 ----------------------------------
 
-By default, yargs exits the process when the user passes a help flag, uses the
-`.version` functionality, or when validation fails. Calling
-`.exitProcess(false)` disables this behavior, enabling further actions after
-yargs have been validated.
+By default, yargs exits the process when the user passes a help flag, the user
+uses the `.version` functionality, validation fails, or the command handler
+fails. Calling `.exitProcess(false)` disables this behavior, enabling further
+actions after yargs have been validated.
 
 <a name="fail"></a>.fail(fn)
 ---------
