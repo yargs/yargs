@@ -58,6 +58,8 @@ instead of `.argv` and the first parameter won't be ignored.
 
 Tell the parser to interpret `key` as an array. If `.array('foo')` is set,
 `--foo foo bar` will be parsed as `['foo', 'bar']` rather than as `'foo'`.
+Also, if you use the option multiple times all the values will be flattened in one array
+so `--foo foo --foo bar` will be parsed as `['foo', 'bar']`
 
 <a name="boolean"></a>.boolean(key)
 -------------
