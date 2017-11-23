@@ -802,7 +802,7 @@ var yargs = require("yargs")(['--info'])
 --------------
 
 Given the key `x` is set, it is required that the key `y` is set. `y` can either
-be the name of an argument to imply, a number indicating a number indicating the
+be the name of an argument to imply, a number indicating the
 position of an argument or an array of multiple implications to associate with `x`.
 
 Optionally `.implies()` can accept an object specifying multiple implications.
