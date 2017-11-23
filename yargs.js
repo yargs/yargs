@@ -338,9 +338,9 @@ function Yargs (processArgs, cwd, parentRequire) {
     return self
   }
 
-  self.command = function (cmd, description, builder, handler) {
-    argsert('<string|array|object> [string|boolean] [function|object] [function]', [cmd, description, builder, handler], arguments.length)
-    command.addHandler(cmd, description, builder, handler)
+  self.command = function (cmd, description, builder, handler, middlewares) {
+    argsert('<string|array|object> [string|boolean] [function|object] [function] [array]', [cmd, description, builder, handler, middlewares], arguments.length)
+    command.addHandler(cmd, description, builder, handler, middlewares)
     return self
   }
 
