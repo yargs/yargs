@@ -34,6 +34,78 @@ export function completion(
     const current = args.length ? args[args.length - 1] : '';
     const argv = yargs.parse(args, true);
     const parentCommands = yargs.getContext().commands;
+
+    function defaultCompletion(): Arguments | void {
+      const handlers = command.getCommandHandlers();
+      for (let i = 0, ii = args.length; i < ii; ++i) {
+        if (handlers[args[i]] && handlers[args[i]].builder) {
+          const builder = handlers[args[i]].builder;
+          if (isCommandBuilderCallback(builder)) {
+            const y = yargs.reset();
+            builder(y);
+            return y.argv;
+          }
+        }
+      }
+      if (
+        !current.match(/^-/) &&
+        parentCommands[parentCommands.length - 1] !== current
+      ) {
+        usage.getCommands().forEach(usageCommand => {
+          const commandName = parseCommand(usageCommand[0]).cmd;
+          if (args.indexOf(commandName) === -1) {
+            if (!zshShell) {
+              completions.push(commandName);
+            } else {
+              const desc = usageCommand[1] || '';
+              completions.push(commandName.replace(/:/g, '\\:') + ':' + desc);
+            }
+          }
+        });
+      }
+      if (current.match(/^-/) || (current === '' && completions.length === 0)) {
+        const descs = usage.getDescriptions();
+        const options = yargs.getOptions();
+        Object.keys(options.key).forEach(key => {
+          const negable =
+            !!options.configuration['boolean-negation'] &&
+            options.boolean.includes(key);
+          // If the key and its aliases aren't in 'args', add the key to 'completions'
+          let keyAndAliases = [key].concat(aliases[key] || []);
+          if (negable)
+            keyAndAliases = keyAndAliases.concat(
+              keyAndAliases.map(key => `no-${key}`)
+            );
+          function completeOptionKey(key: string) {
+            const notInArgs = keyAndAliases.every(
+              val => args.indexOf(`--${val}`) === -1
+            );
+            if (notInArgs) {
+              const startsByTwoDashes = (s: string) => /^--/.test(s);
+              const isShortOption = (s: string) => /^[^0-9]$/.test(s);
+              const dashes =
+                !startsByTwoDashes(current) && isShortOption(key) ? '-' : '--';
+              if (!zshShell) {
+                completions.push(dashes + key);
+              } else {
+                const desc = descs[key] || '';
+                completions.push(
+                  dashes +
+                    `${key.replace(/:/g, '\\:')}:${desc.replace(
+                      '__yargsString__:',
+                      ''
+                    )}`
+                );
+              }
+            }
+          }
+          completeOptionKey(key);
+          if (negable && !!options.default[key]) completeOptionKey(`no-${key}`);
+        });
+      }
+      done(null, completions);
+    }
+
     // a custom completion function can be provided
     // to completion().
     function runCompletionFunction(argv: Arguments) {
@@ -58,9 +130,19 @@ export function completion(
         }
         // synchronous completion function.
         return done(null, result);
+      } else if (isFallbackCompletionFunction(completionFunction)) {
+        const fallbackCompletionFunction = completionFunction as FallbackCompletionFunction;
+        return fallbackCompletionFunction(
+          current,
+          argv,
+          defaultCompletion,
+          completions => {
+            done(null, completions);
+          }
+        );
       } else {
-        // asynchronous completion function
-        return completionFunction(current, argv, completions => {
+        const asyncCompletionFunction = completionFunction as AsyncCompletionFunction;
+        return asyncCompletionFunction(current, argv, completions => {
           done(null, completions);
         });
       }
@@ -69,75 +151,9 @@ export function completion(
       return isPromise(argv)
         ? argv.then(runCompletionFunction)
         : runCompletionFunction(argv);
+    } else {
+      return defaultCompletion();
     }
-    const handlers = command.getCommandHandlers();
-    for (let i = 0, ii = args.length; i < ii; ++i) {
-      if (handlers[args[i]] && handlers[args[i]].builder) {
-        const builder = handlers[args[i]].builder;
-        if (isCommandBuilderCallback(builder)) {
-          const y = yargs.reset();
-          builder(y);
-          return y.argv;
-        }
-      }
-    }
-    if (
-      !current.match(/^-/) &&
-      parentCommands[parentCommands.length - 1] !== current
-    ) {
-      usage.getCommands().forEach(usageCommand => {
-        const commandName = parseCommand(usageCommand[0]).cmd;
-        if (args.indexOf(commandName) === -1) {
-          if (!zshShell) {
-            completions.push(commandName);
-          } else {
-            const desc = usageCommand[1] || '';
-            completions.push(commandName.replace(/:/g, '\\:') + ':' + desc);
-          }
-        }
-      });
-    }
-    if (current.match(/^-/) || (current === '' && completions.length === 0)) {
-      const descs = usage.getDescriptions();
-      const options = yargs.getOptions();
-      Object.keys(options.key).forEach(key => {
-        const negable =
-          !!options.configuration['boolean-negation'] &&
-          options.boolean.includes(key);
-        // If the key and its aliases aren't in 'args', add the key to 'completions'
-        let keyAndAliases = [key].concat(aliases[key] || []);
-        if (negable)
-          keyAndAliases = keyAndAliases.concat(
-            keyAndAliases.map(key => `no-${key}`)
-          );
-        function completeOptionKey(key: string) {
-          const notInArgs = keyAndAliases.every(
-            val => args.indexOf(`--${val}`) === -1
-          );
-          if (notInArgs) {
-            const startsByTwoDashes = (s: string) => /^--/.test(s);
-            const isShortOption = (s: string) => /^[^0-9]$/.test(s);
-            const dashes =
-              !startsByTwoDashes(current) && isShortOption(key) ? '-' : '--';
-            if (!zshShell) {
-              completions.push(dashes + key);
-            } else {
-              const desc = descs[key] || '';
-              completions.push(
-                dashes +
-                  `${key.replace(/:/g, '\\:')}:${desc.replace(
-                    '__yargsString__:',
-                    ''
-                  )}`
-              );
-            }
-          }
-        }
-        completeOptionKey(key);
-        if (negable && !!options.default[key]) completeOptionKey(`no-${key}`);
-      });
-    }
-    done(null, completions);
   };
 
   // generate the completion script to add to your .bashrc.
@@ -180,7 +196,8 @@ export interface CompletionInstance {
 
 export type CompletionFunction =
   | SyncCompletionFunction
-  | AsyncCompletionFunction;
+  | AsyncCompletionFunction
+  | FallbackCompletionFunction;
 
 interface SyncCompletionFunction {
   (current: string, argv: Arguments): string[] | Promise<string[]>;
@@ -190,8 +207,23 @@ interface AsyncCompletionFunction {
   (current: string, argv: Arguments, done: (completions: string[]) => any): any;
 }
 
+interface FallbackCompletionFunction {
+  (
+    current: string,
+    argv: Arguments,
+    defaultCompletion: () => any,
+    done: (completions: string[]) => any
+  ): any;
+}
+
 function isSyncCompletionFunction(
   completionFunction: CompletionFunction
 ): completionFunction is SyncCompletionFunction {
   return completionFunction.length < 3;
+}
+
+function isFallbackCompletionFunction(
+  completionFunction: CompletionFunction
+): completionFunction is FallbackCompletionFunction {
+  return completionFunction.length > 3;
 }
