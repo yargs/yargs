@@ -371,7 +371,7 @@ describe('validation tests', () => {
 
     it('fails when a required argument of type number is missing', (done) => {
       yargs('-w')
-        .option("w", {type: "number", requiresArg: true})
+        .option('w', {type: 'number', requiresArg: true})
         .fail((msg) => {
           msg.should.equal('Missing argument value: w')
           return done()
@@ -381,7 +381,7 @@ describe('validation tests', () => {
 
     it('fails when a required argument of type string is missing', (done) => {
       yargs('-w')
-        .option("w", {type: "string", requiresArg: true})
+        .option('w', {type: 'string', requiresArg: true})
         .fail((msg) => {
           msg.should.equal('Missing argument value: w')
           return done()
@@ -391,7 +391,7 @@ describe('validation tests', () => {
 
     it('fails when a required argument of type boolean is missing', (done) => {
       yargs('-w')
-        .option("w", {type: "boolean", requiresArg: true})
+        .option('w', {type: 'boolean', requiresArg: true})
         .fail((msg) => {
           msg.should.equal('Missing argument value: w')
           return done()
@@ -401,7 +401,7 @@ describe('validation tests', () => {
 
     it('fails when a required argument of type array is missing', (done) => {
       yargs('-w')
-        .option("w", {type: "array", requiresArg: true})
+        .option('w', {type: 'array', requiresArg: true})
         .fail((msg) => {
           msg.should.equal('Missing argument value: w')
           return done()
