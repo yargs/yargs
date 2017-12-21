@@ -1999,14 +1999,16 @@ describe('yargs dsl tests', () => {
     it('allows using a positional of type string', (done) => {
       yargs('cmd')
         .command('cmd deploy <version>', 'a command', (yargs) => {
-          yargs.positional('version', {
+          yargs
+            .version(false)
+            .positional('version', {
             type: 'string'
           })
         }).parse('cmd deploy 123e123', (err, argv) => {
           if (err) {
             return done(err)
           }
-          argv.version.should.eql(['123e123'])
+          argv.version.should.eql('123e123')
           return done()
         })
     })
