@@ -2002,8 +2002,8 @@ describe('yargs dsl tests', () => {
           yargs
             .version(false)
             .positional('version', {
-            type: 'string'
-          })
+              type: 'string'
+            })
         }).parse('cmd deploy 123e123', (err, argv) => {
           if (err) {
             return done(err)
