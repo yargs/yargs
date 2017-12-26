@@ -425,3 +425,49 @@ some of yargs' parsing features:
 
 See the [yargs-parser](https://github.com/yargs/yargs-parser#configuration) module
 for detailed documentation of this feature.
+
+## Middleware
+
+Sometimes you might want to transform arguments before they reach the command handler.
+For example, you perhaps you want to validate that credentials have been provided and otherwise load credentials from a file.
+
+Middleware is simply a stack of functions, each of which is passed the the current parsed arguments, which it can in turn update by adding values, removing values, or overwriting values.
+
+Diagram:
+
+```
+                        --------------         --------------        ---------
+stdin ----> argv ----> | Middleware 1 | ----> | Middleware 2 | ---> | Command |
+                        --------------         --------------        ---------
+```
+
+### Example Credentials Middleware
+
+In this example, our middleware will check if the `username` and `password` is provided. If not, it will load them from `~/.credentials`, and fill in the `argv.username` and `argv.password` values.
+
+#### Middleware function
+
+```
+const normalizeCredentials = (argv) => {
+  if (!argv.username || !argv.password) {
+    const credentials = JSON.parse(fs.readSync('~/.credentials'))
+    return credentials
+  }
+  return {}
+}
+```
+
+#### yargs parsing configuration
+
+```
+var argv = require('yargs')
+  .usage('Usage: $0 <command> [options]')
+  .command('login', 'Authenticate user', (yargs) =>{
+        return yargs.option('username')
+                    .option('password')
+      } ,(argv) => {
+        authenticateUser(argv.username, argv.password)
+      })
+  .middlewares([normalizeCredentials])
+  .argv;
+```

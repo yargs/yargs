@@ -58,6 +58,8 @@ instead of `.argv` and the first parameter won't be ignored.
 
 Tell the parser to interpret `key` as an array. If `.array('foo')` is set,
 `--foo foo bar` will be parsed as `['foo', 'bar']` rather than as `'foo'`.
+Also, if you use the option multiple times all the values will be flattened in one array
+so `--foo foo --foo bar` will be parsed as `['foo', 'bar']`
 
 <a name="boolean"></a>.boolean(key)
 -------------
@@ -800,7 +802,7 @@ var yargs = require("yargs")(['--info'])
 --------------
 
 Given the key `x` is set, it is required that the key `y` is set. `y` can either
-be the name of an argument to imply, a number indicating a number indicating the
+be the name of an argument to imply, a number indicating the
 position of an argument or an array of multiple implications to associate with `x`.
 
 Optionally `.implies()` can accept an object specifying multiple implications.

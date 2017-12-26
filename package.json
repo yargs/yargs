@@ -12,7 +12,7 @@
     "LICENSE"
   ],
   "dependencies": {
-    "cliui": "^3.2.0",
+    "cliui": "^4.0.0",
     "decamelize": "^1.1.1",
     "find-up": "^2.1.0",
     "get-caller-file": "^1.0.1",
@@ -23,7 +23,7 @@
     "string-width": "^2.0.0",
     "which-module": "^2.0.0",
     "y18n": "^3.2.1",
-    "yargs-parser": "^8.0.0"
+    "yargs-parser": "^8.1.0"
   },
   "devDependencies": {
     "chai": "^3.4.1",
