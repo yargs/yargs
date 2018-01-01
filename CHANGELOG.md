@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="10.1.0"></a>
+# [10.1.0](https://github.com/yargs/yargs/compare/v10.0.3...v10.1.0) (2018-01-01)
+
+
+### Bug Fixes
+
+* 'undefined' should be taken to mean no argument was provided ([#1015](https://github.com/yargs/yargs/issues/1015)) ([c679e90](https://github.com/yargs/yargs/commit/c679e90))
+
+
+### Features
+
+* add missing simple chinese locale strings ([#1004](https://github.com/yargs/yargs/issues/1004)) ([3cc24ec](https://github.com/yargs/yargs/commit/3cc24ec))
+* add Norwegian Nynorsk translations ([#1028](https://github.com/yargs/yargs/issues/1028)) ([a5ac213](https://github.com/yargs/yargs/commit/a5ac213))
+* async command handlers ([#1001](https://github.com/yargs/yargs/issues/1001)) ([241124b](https://github.com/yargs/yargs/commit/241124b))
+* middleware ([#881](https://github.com/yargs/yargs/issues/881)) ([77b8dbc](https://github.com/yargs/yargs/commit/77b8dbc))
+
+
+
 <a name="10.0.3"></a>
 ## [10.0.3](https://github.com/yargs/yargs/compare/v10.0.2...v10.0.3) (2017-10-21)
 
