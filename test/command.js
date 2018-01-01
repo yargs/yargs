@@ -1402,4 +1402,17 @@ describe('Command', () => {
       }).to.throw(/.*\.usage\(\) description must start with \$0.*/)
     })
   })
+
+  // addresses https://github.com/yargs/yargs/issues/510
+  it('fails when the promise returned by the command handler rejects', (done) => {
+    const error = new Error()
+    yargs('foo')
+      .command('foo', 'foo command', noop, (yargs) => Promise.reject(error))
+      .fail((msg, err) => {
+        expect(msg).to.equal(null)
+        expect(err).to.equal(error)
+        done()
+      })
+      .argv
+  })
 })
