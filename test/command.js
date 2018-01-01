@@ -1415,4 +1415,24 @@ describe('Command', () => {
       })
       .argv
   })
+
+  it('succeeds when the promise returned by the command handler resolves', (done) => {
+    const handler = new Promise((resolve, reject) => {
+      setTimeout(() => {
+        return resolve(true)
+      }, 5)
+    })
+    const parsed = yargs('foo hello')
+      .command('foo <pos>', 'foo command', () => {}, (yargs) => handler)
+      .fail((msg, err) => {
+        return done(Error('should not have been called'))
+      })
+      .argv
+
+    handler.then(called => {
+      called.should.equal(true)
+      parsed.pos.should.equal('hello')
+      return done()
+    })
+  })
 })
