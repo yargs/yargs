@@ -1,8 +1,5 @@
 # Yargs
 
-_Yargs is developed on evenings and weekends by
-volunteers. Why not grab them dinner or a drink?_
-
 [![Build Status][travis-image]][travis-url]
 [![Coverage Status][coveralls-image]][coveralls-url]
 [![NPM version][npm-image]][npm-url]
