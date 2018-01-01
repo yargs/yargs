@@ -1996,6 +1996,23 @@ describe('yargs dsl tests', () => {
       argv.heroes.should.eql(['batman', 'Iron Man'])
     })
 
+    it('allows using a positional of type string', (done) => {
+      yargs('cmd')
+        .command('cmd deploy <version>', 'a command', (yargs) => {
+          yargs
+            .version(false)
+            .positional('version', {
+              type: 'string'
+            })
+        }).parse('cmd deploy 123e123', (err, argv) => {
+          if (err) {
+            return done(err)
+          }
+          argv.version.should.eql('123e123')
+          return done()
+        })
+    })
+
     it('allows an implied argument to be specified', (done) => {
       yargs()
         .command('cmd <hero>', 'a command', (yargs) => {
