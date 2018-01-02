@@ -5,7 +5,6 @@ const expect = require('chai').expect
 const checkOutput = require('./helpers/utils').checkOutput
 
 require('chai').should()
-
 const noop = () => {}
 
 describe('Command', () => {
@@ -19,11 +18,11 @@ describe('Command', () => {
         .command('foo <bar> [awesome]', 'my awesome command', yargs => yargs)
       const command = y.getCommandInstance()
       const handlers = command.getCommandHandlers()
-      handlers.foo.demanded.should.include({
+      handlers.foo.demanded.should.deep.include({
         cmd: ['bar'],
         variadic: false
       })
-      handlers.foo.optional.should.include({
+      handlers.foo.optional.should.deep.include({
         cmd: ['awesome'],
         variadic: false
       })
@@ -94,7 +93,7 @@ describe('Command', () => {
         .command(['foo [awesome]', 'wat <yo>'], 'my awesome command')
       const command = y.getCommandInstance()
       const handlers = command.getCommandHandlers()
-      handlers.foo.optional.should.include({
+      handlers.foo.optional.should.deep.include({
         cmd: ['awesome'],
         variadic: false
       })
