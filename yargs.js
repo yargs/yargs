@@ -502,7 +502,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     let obj = {}
     try {
       const pkgJsonPath = findUp.sync('package.json', {
-        cwd: path || require('require-main-filename')(parentRequire || require),
+        cwd: path || require('path').dirname(require('require-main-filename')(parentRequire || require)),
         normalize: false
       })
       obj = JSON.parse(fs.readFileSync(pkgJsonPath))
