@@ -467,7 +467,8 @@ var argv = require('yargs')
                     .option('password')
       } ,(argv) => {
         authenticateUser(argv.username, argv.password)
-      })
-  .middlewares([normalizeCredentials])
+      }, 
+      [normalizeCredentials]
+     )
   .argv;
 ```
