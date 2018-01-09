@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="10.1.1"></a>
+## [10.1.1](https://github.com/yargs/yargs/compare/v10.1.0...v10.1.1) (2018-01-09)
+
+
+### Bug Fixes
+
+* Add `dirname` sanity check on `findUp` ([#1036](https://github.com/yargs/yargs/issues/1036)) ([331d103](https://github.com/yargs/yargs/commit/331d103))
+
+
+
 <a name="10.1.0"></a>
 # [10.1.0](https://github.com/yargs/yargs/compare/v10.0.3...v10.1.0) (2018-01-01)
 
