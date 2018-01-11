@@ -419,6 +419,16 @@ describe('validation tests', () => {
         .argv
     })
 
+    // see: https://github.com/yargs/yargs/issues/1041
+    it('does not fail if required argument is not provided', (done) => {
+      yargs('')
+        .option('w', {type: 'array', requiresArg: true})
+        .parse('', (err, argv, output) => {
+          expect(err).to.equal(null)
+          return done()
+        })
+    })
+
     it('fails without a message if msg is null', (done) => {
       yargs([])
         .demand(1, null)
