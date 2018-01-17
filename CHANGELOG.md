@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="10.1.2"></a>
+## [10.1.2](https://github.com/yargs/yargs/compare/v10.1.1...v10.1.2) (2018-01-17)
+
+
+### Bug Fixes
+
+* requiresArg should only be enforced if argument exists ([#1043](https://github.com/yargs/yargs/issues/1043)) ([fbf41ae](https://github.com/yargs/yargs/commit/fbf41ae))
+
+
+
 <a name="10.1.1"></a>
 ## [10.1.1](https://github.com/yargs/yargs/compare/v10.1.0...v10.1.1) (2018-01-09)
 
