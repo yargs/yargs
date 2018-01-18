@@ -431,7 +431,7 @@ describe('validation tests', () => {
         .option('w', {type: 'number', requiresArg: true})
         .parse('-w', (err, argv, output) => {
           expect(err).to.exist
-          expect(err).to.have.property('message', 'Missing argument value: w')
+          expect(err).to.have.property('message', 'Not enough arguments following: w')
           return done()
         })
     })

@@ -964,6 +964,18 @@ function Yargs (processArgs, cwd, parentRequire) {
 
     options.__ = y18n.__
     options.configuration = pkgUp()['yargs'] || {}
+
+    // numbers are defaulted to `undefined`, which makes it impossible to verify requiresArg
+    // so _unlike_ other types, we will implicitly add them to narg when requiresArg is true
+    const numberTyped = new Set(options.number)
+    options.requiresArg
+      .filter(key => numberTyped.has(key))
+      .forEach(key => {
+        // if narg _and_ requiresArg are configured for an option,
+        // we should probably throw an error somewhere indicating conflicting configuration
+        options.narg[key] = 1
+      })
+
     const parsed = Parser.detailed(args, options)
     let argv = parsed.argv
     if (parseContext) argv = Object.assign({}, argv, parseContext)
