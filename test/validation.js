@@ -369,46 +369,6 @@ describe('validation tests', () => {
         .argv
     })
 
-    it('fails when a required argument of type number is missing', (done) => {
-      yargs('-w')
-        .option('w', {type: 'number', requiresArg: true})
-        .fail((msg) => {
-          msg.should.equal('Missing argument value: w')
-          return done()
-        })
-        .argv
-    })
-
-    it('fails when a required argument of type string is missing', (done) => {
-      yargs('-w')
-        .option('w', {type: 'string', requiresArg: true})
-        .fail((msg) => {
-          msg.should.equal('Missing argument value: w')
-          return done()
-        })
-        .argv
-    })
-
-    it('fails when a required argument of type boolean is missing', (done) => {
-      yargs('-w')
-        .option('w', {type: 'boolean', requiresArg: true})
-        .fail((msg) => {
-          msg.should.equal('Missing argument value: w')
-          return done()
-        })
-        .argv
-    })
-
-    it('fails when a required argument of type array is missing', (done) => {
-      yargs('-w')
-        .option('w', {type: 'array', requiresArg: true})
-        .fail((msg) => {
-          msg.should.equal('Missing argument value: w')
-          return done()
-        })
-        .argv
-    })
-
     it('fails when required arguments are present, but a command is missing', (done) => {
       yargs('-w 10 -m wombat')
         .demand(1, ['w', 'm'])
@@ -417,16 +377,6 @@ describe('validation tests', () => {
           return done()
         })
         .argv
-    })
-
-    // see: https://github.com/yargs/yargs/issues/1041
-    it('does not fail if required argument is not provided', (done) => {
-      yargs('')
-        .option('w', {type: 'array', requiresArg: true})
-        .parse('', (err, argv, output) => {
-          expect(err).to.equal(null)
-          return done()
-        })
     })
 
     it('fails without a message if msg is null', (done) => {
@@ -472,6 +422,69 @@ describe('validation tests', () => {
         })
         .argv
       expect(failureMsg).to.equal('Too many non-option arguments: got 2, maximum of 1')
+    })
+  })
+
+  describe('requiresArg', () => {
+    it('fails when a required argument value of type number is missing', (done) => {
+      yargs()
+        .option('w', {type: 'number', requiresArg: true})
+        .parse('-w', (err, argv, output) => {
+          expect(err).to.exist
+          expect(err).to.have.property('message', 'Missing argument value: w')
+          return done()
+        })
+    })
+
+    it('fails when a required argument value of type string is missing', (done) => {
+      yargs()
+        .option('w', {type: 'string', requiresArg: true})
+        .parse('-w', (err, argv, output) => {
+          expect(err).to.exist
+          expect(err).to.have.property('message', 'Missing argument value: w')
+          return done()
+        })
+    })
+
+    it('fails when a required argument value of type boolean is missing', (done) => {
+      yargs()
+        .option('w', {type: 'boolean', requiresArg: true})
+        .parse('-w', (err, argv, output) => {
+          expect(err).to.exist
+          expect(err).to.have.property('message', 'Missing argument value: w')
+          return done()
+        })
+    })
+
+    it('fails when a required argument value of type array is missing', (done) => {
+      yargs()
+        .option('w', {type: 'array', requiresArg: true})
+        .parse('-w', (err, argv, output) => {
+          expect(err).to.exist
+          expect(err).to.have.property('message', 'Missing argument value: w')
+          return done()
+        })
+    })
+
+    // see: https://github.com/yargs/yargs/issues/1041
+    it('does not fail if argument with required value is not provided', (done) => {
+      yargs()
+        .option('w', {type: 'number', requiresArg: true})
+        .command('woo')
+        .parse('', (err, argv, output) => {
+          expect(err).to.equal(null)
+          return done()
+        })
+    })
+
+    it('does not fail if argument with required value is not provided to subcommand', (done) => {
+      yargs()
+        .option('w', {type: 'number', requiresArg: true})
+        .command('woo')
+        .parse('woo', (err, argv, output) => {
+          expect(err).to.equal(null)
+          return done()
+        })
     })
   })
 
