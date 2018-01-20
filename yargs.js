@@ -50,10 +50,38 @@ function Yargs (processArgs, cwd, parentRequire) {
     )
   }
 
-  // use context object to keep track of resets, subcommand execution, etc
-  // submodules should modify and check the state of context as necessary
-  const context = { resets: -1, commands: [], fullCommands: [], files: [] }
+  // use context object for cross-module state. submodules should check and
+  // modify the context as necessary. useful for keeping track of resets,
+  // subcommand execution, and internal state/configuration of yargs.
+  const context = {
+    commands: [],
+    files: [],
+    fullCommands: [],
+    printTypes: true,
+    resets: -1
+  }
   self.getContext = () => context
+
+  self.yargsOptions = function yargsOptions (opts) {
+    argsert('<object>', [opts], arguments.length)
+
+    const context = self.getContext()
+    // These are the only context properties that can be modified.
+    const whitelist = [
+      'printTypes'
+    ]
+
+    // might need to create list of context props that can't be set like this.
+    Object.keys(opts).forEach(key => {
+      if (context.hasOwnProperty(key) && whitelist.indexOf(key) !== -1) {
+        context[key] = opts[key]
+      } else {
+        throw new YError(`Unrecognized key ${key} -- Recognized keys: ${whitelist.join(', ')}`)
+      }
+    })
+
+    return self
+  }
 
   // puts yargs back into an initial state. any keys
   // that have been set to "global" will not be reset
@@ -61,6 +89,7 @@ function Yargs (processArgs, cwd, parentRequire) {
   let options
   self.resetOptions = self.reset = function resetOptions (aliases) {
     context.resets++
+    context
     aliases = aliases || {}
     options = options || {}
     // put yargs back into an initial state, this
