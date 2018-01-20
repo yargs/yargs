@@ -89,7 +89,7 @@ function Yargs (processArgs, cwd, parentRequire) {
   let options
   self.resetOptions = self.reset = function resetOptions (aliases) {
     context.resets++
-    context
+    context.printTypes = true
     aliases = aliases || {}
     options = options || {}
     // put yargs back into an initial state, this
