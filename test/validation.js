@@ -441,7 +441,7 @@ describe('validation tests', () => {
         .option('w', {type: 'string', requiresArg: true})
         .parse('-w', (err, argv, output) => {
           expect(err).to.exist
-          expect(err).to.have.property('message', 'Missing argument value: w')
+          expect(err).to.have.property('message', 'Not enough arguments following: w')
           return done()
         })
     })
@@ -451,7 +451,7 @@ describe('validation tests', () => {
         .option('w', {type: 'boolean', requiresArg: true})
         .parse('-w', (err, argv, output) => {
           expect(err).to.exist
-          expect(err).to.have.property('message', 'Missing argument value: w')
+          expect(err).to.have.property('message', 'Not enough arguments following: w')
           return done()
         })
     })
@@ -461,7 +461,7 @@ describe('validation tests', () => {
         .option('w', {type: 'array', requiresArg: true})
         .parse('-w', (err, argv, output) => {
           expect(err).to.exist
-          expect(err).to.have.property('message', 'Missing argument value: w')
+          expect(err).to.have.property('message', 'Not enough arguments following: w')
           return done()
         })
     })
