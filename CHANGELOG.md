@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="11.0.0"></a>
+# [11.0.0](https://github.com/yargs/yargs/compare/v10.1.2...v11.0.0) (2018-01-22)
+
+
+### Bug Fixes
+
+* Set implicit nargs=1 when type=number requiresArg=true ([#1050](https://github.com/yargs/yargs/issues/1050)) ([2b56812](https://github.com/yargs/yargs/commit/2b56812))
+
+
+### Features
+
+* requiresArg is now simply an alias for nargs(1) ([#1054](https://github.com/yargs/yargs/issues/1054)) ([a3ddacc](https://github.com/yargs/yargs/commit/a3ddacc))
+
+
+### BREAKING CHANGES
+
+* requiresArg now has significantly different error output, matching nargs.
+
+
+
 <a name="10.1.2"></a>
 ## [10.1.2](https://github.com/yargs/yargs/compare/v10.1.1...v10.1.2) (2018-01-17)
 
