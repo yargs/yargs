@@ -226,7 +226,6 @@ describe('yargs dsl tests', () => {
         defaultDescription: {},
         choices: {},
         coerce: {},
-        requiresArg: [],
         skipValidation: [],
         count: [],
         normalize: [],
