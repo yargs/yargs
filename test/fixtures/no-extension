@@ -1,0 +1,7 @@
+#!/usr/bin/env node
+
+'use strict'
+
+var parser = require('../../yargs.js')(process.argv.slice(2))
+
+console.log(parser.argv)

@@ -503,8 +503,9 @@ function Yargs (processArgs, cwd, parentRequire) {
     try {
       let startDir = rootPath || require('require-main-filename')(parentRequire || require)
 
-      // when called from a test environment that lacks require.main.filename,
-      // such as jest, startDir is already a directory, and should not be shortened
+      // When called in an environment that lacks require.main.filename, such as a jest test runner,
+      // startDir is already process.cwd(), and should not be shortened.
+      // Whether or not it is _actually_ a directory (e.g., extensionless bin) is irrelevant, find-up handles it.
       if (!rootPath && path.extname(startDir)) {
         startDir = path.dirname(startDir)
       }
