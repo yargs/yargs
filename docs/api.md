@@ -61,6 +61,16 @@ Tell the parser to interpret `key` as an array. If `.array('foo')` is set,
 Also, if you use the option multiple times all the values will be flattened in one array
 so `--foo foo --foo bar` will be parsed as `['foo', 'bar']`
 
+When the option is used with a positional, use `--` to tell `yargs` to stop adding values to the array.
+
+For example: `-foo foo bar -- val` will be parsed as
+```javascript
+{
+  foo: ['foo', 'bar'],
+  positional: 'val'
+}
+```
+
 <a name="boolean"></a>.boolean(key)
 -------------
 
