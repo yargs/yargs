@@ -494,16 +494,23 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   const pkgs = {}
-  function pkgUp (path) {
-    const npath = path || '*'
+  function pkgUp (rootPath) {
+    const npath = rootPath || '*'
     if (pkgs[npath]) return pkgs[npath]
     const findUp = require('find-up')
 
     let obj = {}
     try {
+      let startDir = rootPath || require('require-main-filename')(parentRequire || require)
+
+      // when called from a test environment that lacks require.main.filename,
+      // such as jest, startDir is already a directory, and should not be shortened
+      if (!rootPath && path.extname(startDir)) {
+        startDir = path.dirname(startDir)
+      }
+
       const pkgJsonPath = findUp.sync('package.json', {
-        cwd: path || require('path').dirname(require('require-main-filename')(parentRequire || require)),
-        normalize: false
+        cwd: startDir
       })
       obj = JSON.parse(fs.readFileSync(pkgJsonPath))
     } catch (noop) {}

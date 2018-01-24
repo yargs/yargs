@@ -169,6 +169,17 @@ describe('integration tests', () => {
             return done()
           })
         })
+
+        it('reads parser config settings when somebody obscures require.main', (done) => {
+          testCmd('./no-require-main.js', [ '--foo.bar' ], (code, stdout) => {
+            if (code) {
+              return done(new Error(`cmd exited with code ${code}`))
+            }
+
+            stdout.should.match(/foo\.bar/)
+            return done()
+          })
+        })
       })
 
       after(() => {
