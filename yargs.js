@@ -476,17 +476,17 @@ function Yargs (processArgs, cwd, parentRequire) {
     return self
   }
 
-  self.pkgConf = function pkgConf (key, path) {
-    argsert('<string> [string]', [key, path], arguments.length)
+  self.pkgConf = function pkgConf (key, rootPath) {
+    argsert('<string> [string]', [key, rootPath], arguments.length)
     let conf = null
     // prefer cwd to require-main-filename in this method
     // since we're looking for e.g. "nyc" config in nyc consumer
     // rather than "yargs" config in nyc (where nyc is the main filename)
-    const obj = pkgUp(path || cwd)
+    const obj = pkgUp(rootPath || cwd)
 
     // If an object exists in the key, add it to options.configObjects
     if (obj[key] && typeof obj[key] === 'object') {
-      conf = applyExtends(obj[key], path || cwd)
+      conf = applyExtends(obj[key], rootPath || cwd)
       options.configObjects = (options.configObjects || []).concat(conf)
     }
 

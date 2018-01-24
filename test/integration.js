@@ -29,17 +29,17 @@ describe('integration tests', () => {
 
   describe('path returned by "which"', () => {
     it('should match the actual path to the script file', (done) => {
-      which('node', (err, path) => {
+      which('node', (err, resolvedPath) => {
         if (err) return done(err)
-        testArgs(`${path.replace('Program Files (x86)', 'Progra~2')
+        testArgs(`${resolvedPath.replace('Program Files (x86)', 'Progra~2')
                      .replace('Program Files', 'Progra~1')} bin.js`, [], done)
       })
     })
 
     it('should match the actual path to the script file, with arguments', (done) => {
-      which('node', (err, path) => {
+      which('node', (err, resolvedPath) => {
         if (err) return done(err)
-        testArgs(`${path.replace('Program Files (x86)', 'Progra~2')
+        testArgs(`${resolvedPath.replace('Program Files (x86)', 'Progra~2')
                      .replace('Program Files', 'Progra~1')} bin.js`, [ 'q', 'r' ], done)
       })
     })
