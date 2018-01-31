@@ -29,17 +29,17 @@ describe('integration tests', () => {
 
   describe('path returned by "which"', () => {
     it('should match the actual path to the script file', (done) => {
-      which('node', (err, path) => {
+      which('node', (err, resolvedPath) => {
         if (err) return done(err)
-        testArgs(`${path.replace('Program Files (x86)', 'Progra~2')
+        testArgs(`${resolvedPath.replace('Program Files (x86)', 'Progra~2')
                      .replace('Program Files', 'Progra~1')} bin.js`, [], done)
       })
     })
 
     it('should match the actual path to the script file, with arguments', (done) => {
-      which('node', (err, path) => {
+      which('node', (err, resolvedPath) => {
         if (err) return done(err)
-        testArgs(`${path.replace('Program Files (x86)', 'Progra~2')
+        testArgs(`${resolvedPath.replace('Program Files (x86)', 'Progra~2')
                      .replace('Program Files', 'Progra~1')} bin.js`, [ 'q', 'r' ], done)
       })
     })
@@ -169,6 +169,28 @@ describe('integration tests', () => {
             return done()
           })
         })
+
+        it('reads parser config settings when somebody obscures require.main', (done) => {
+          testCmd('./no-require-main.js', [ '--foo.bar' ], (code, stdout) => {
+            if (code) {
+              return done(new Error(`cmd exited with code ${code}`))
+            }
+
+            stdout.should.match(/foo\.bar/)
+            return done()
+          })
+        })
+
+        it('reads parser config settings when entry file has no extension', (done) => {
+          testCmd('./no-extension', [ '--foo.bar' ], (code, stdout) => {
+            if (code) {
+              return done(new Error(`cmd exited with code ${code}`))
+            }
+
+            stdout.should.match(/foo\.bar/)
+            return done()
+          })
+        })
       })
 
       after(() => {
@@ -180,13 +202,11 @@ describe('integration tests', () => {
 })
 
 function testCmd (cmd, args, cb) {
-  const oldDir = process.cwd()
-  process.chdir(path.join(__dirname, '/fixtures'))
-
   const cmds = cmd.split(' ')
 
-  const bin = spawn(cmds[0], cmds.slice(1).concat(args.map(String)))
-  process.chdir(oldDir)
+  const bin = spawn(cmds[0], cmds.slice(1).concat(args.map(String)), {
+    cwd: path.join(__dirname, '/fixtures')
+  })
 
   let stdout = ''
   bin.stdout.setEncoding('utf8')

@@ -1187,7 +1187,7 @@ describe('yargs dsl tests', () => {
   describe('config', () => {
     it('allows a parsing function to be provided as a second argument', () => {
       const argv = yargs('--config ./test/fixtures/config.json')
-        .config('config', path => JSON.parse(fs.readFileSync(path)))
+        .config('config', cfgPath => JSON.parse(fs.readFileSync(cfgPath)))
         .global('config', false)
         .argv
 
