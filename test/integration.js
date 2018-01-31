@@ -202,13 +202,11 @@ describe('integration tests', () => {
 })
 
 function testCmd (cmd, args, cb) {
-  const oldDir = process.cwd()
-  process.chdir(path.join(__dirname, '/fixtures'))
-
   const cmds = cmd.split(' ')
 
-  const bin = spawn(cmds[0], cmds.slice(1).concat(args.map(String)))
-  process.chdir(oldDir)
+  const bin = spawn(cmds[0], cmds.slice(1).concat(args.map(String)), {
+    cwd: path.join(__dirname, '/fixtures')
+  })
 
   let stdout = ''
   bin.stdout.setEncoding('utf8')
