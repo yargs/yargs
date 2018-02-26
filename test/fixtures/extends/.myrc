@@ -1,0 +1,4 @@
+{
+    "extends": "./.myotherrc",
+    "a": 5
+}

@@ -1284,6 +1284,20 @@ describe('yargs dsl tests', () => {
         argv.a.should.equal(2)
         argv.extends.should.equal('batman')
       })
+
+      it('allows files with .*rc extension to be extended', () => {
+        const argv = yargs()
+          .config({
+            extends: './test/fixtures/extends/.myrc',
+            a: 3
+          })
+          .argv
+  
+          argv.a.should.equal(3)
+          argv.b.should.equal(22)
+          argv.c.should.equal(201)
+          argv.z.should.equal(15)
+      })
     })
   })
 
