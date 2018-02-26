@@ -1292,11 +1292,11 @@ describe('yargs dsl tests', () => {
             a: 3
           })
           .argv
-  
-          argv.a.should.equal(3)
-          argv.b.should.equal(22)
-          argv.c.should.equal(201)
-          argv.z.should.equal(15)
+
+        argv.a.should.equal(3)
+        argv.b.should.equal(22)
+        argv.c.should.equal(201)
+        argv.z.should.equal(15)
       })
     })
   })
