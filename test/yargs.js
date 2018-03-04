@@ -129,6 +129,64 @@ describe('yargs dsl tests', () => {
     expect(r.errors).to.deep.equal([])
   })
 
+  describe('yargsOptions', () => {
+    it('should show types in the help message by default', () => {
+      const r = checkOutput(() => yargs('--help')
+        .option('a', {type: 'boolean', describe: 'Set -a'})
+        .option('b', {type: 'array', describe: 'Set -b'})
+        .option('c', {type: 'number', describe: 'Set -c'})
+        .option('d', {type: 'string', describe: 'Set -d'})
+        .wrap(null)
+        .argv
+      )
+      r.logs[0].split('\n').should.deep.equal([
+        'Options:',
+        '  --help     Show help  [boolean]',
+        '  --version  Show version number  [boolean]',
+        '  -a         Set -a  [boolean]',
+        '  -b         Set -b  [array]',
+        '  -c         Set -c  [number]',
+        '  -d         Set -d  [string]',
+        ''
+      ])
+    })
+
+    it('should not print types when printTypes is false', () => {
+      const r = checkOutput(() => yargs('--help')
+        .yargsOptions({
+          printTypes: false
+        })
+        .option('a', {type: 'boolean', describe: 'Set -a'})
+        .option('b', {type: 'array', describe: 'Set -b'})
+        .option('c', {type: 'number', describe: 'Set -c'})
+        .option('d', {type: 'string', describe: 'Set -d'})
+        .wrap(null)
+        .argv
+      )
+      r.logs[0].split('\n').should.deep.equal([
+        'Options:',
+        '  --help     Show help',
+        '  --version  Show version number',
+        '  -a         Set -a',
+        '  -b         Set -b',
+        '  -c         Set -c',
+        '  -d         Set -d',
+        ''
+      ])
+    })
+
+    it('should throw an error when an invalid option is given', () => {
+      expect(() => {
+        yargs('--help')
+          .yargsOptions({
+            nonexistantProperty: 'abc'
+          })
+          .wrap(null)
+          .argv
+      }).to.throw(/Unrecognized key nonexistantProperty/)
+    })
+  })
+
   describe('showHelpOnFail', () => {
     it('should display custom failure message, if string is provided as first argument', () => {
       const r = checkOutput(() => yargs([])

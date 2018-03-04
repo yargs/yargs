@@ -1334,3 +1334,12 @@ Format usage output to wrap at `columns` many columns.
 By default wrap will be set to `Math.min(80, windowWidth)`. Use `.wrap(null)` to
 specify no column limit (no right-align). Use `.wrap(yargs.terminalWidth())` to
 maximize the width of yargs' usage instructions.
+
+<a name="yargsOptions"></a>.yargsOptions(options)
+-------------------------------------------------
+
+Change the internal behaviour of yargs.
+
+`options` is an object. Valid keys include:
+
+- `printTypes`: Boolean indicating if types should be printed in the help message (Default = `true`).
