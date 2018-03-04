@@ -1,5 +1,17 @@
 # Parsing Tricks
 
+---
+### Yargs document pages
+* [Advanced topics](https://github.com/restarian/yargs/blob/brace_document/docs/advanced_topics.md)
+* [Change log](https://github.com/restarian/yargs/blob/brace_document/docs/change_log.md)
+* [Contributing to yargs](https://github.com/restarian/yargs/blob/brace_document/docs/contributing_to_yargs.md)
+* [Examples](https://github.com/restarian/yargs/blob/brace_document/docs/examples.md)
+* [The api](https://github.com/restarian/yargs/blob/brace_document/docs/the_api.md)
+* **Tricks**
+* [Yargs synopsis](https://github.com/restarian/yargs/blob/brace_document/docs/yargs_synopsis.md)
+
+---
+
 <a name="stop"></a>
 Stop Parsing
 ------------

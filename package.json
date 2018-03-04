@@ -41,11 +41,16 @@
     "which": "^1.2.9",
     "yargs-test-extends": "^1.0.1"
   },
+  "optionalDependencies": {
+    "brace_document": "^1.0.2",
+    "brace_document_navlink": "^1.0.2"
+  },
   "scripts": {
     "posttest": "standard",
     "test": "nyc --cache mocha --require ./test/before.js --timeout=8000 --check-leaks",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
-    "release": "standard-version"
+    "release": "standard-version",
+    "make_docs": "brace_document --navlink -r -i docs --force-title --title 'Yargs document pages' --sort depth"
   },
   "repository": {
     "type": "git",

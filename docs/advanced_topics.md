@@ -1,4 +1,16 @@
-# Advanced Topics
+## Advanced Topics
+
+---
+### Yargs document pages
+* **Advanced topics**
+* [Change log](https://github.com/restarian/yargs/blob/brace_document/docs/change_log.md)
+* [Contributing to yargs](https://github.com/restarian/yargs/blob/brace_document/docs/contributing_to_yargs.md)
+* [Examples](https://github.com/restarian/yargs/blob/brace_document/docs/examples.md)
+* [The api](https://github.com/restarian/yargs/blob/brace_document/docs/the_api.md)
+* [Tricks](https://github.com/restarian/yargs/blob/brace_document/docs/tricks.md)
+* [Yargs synopsis](https://github.com/restarian/yargs/blob/brace_document/docs/yargs_synopsis.md)
+
+---
 
 <a name="commands"></a>
 ## Commands

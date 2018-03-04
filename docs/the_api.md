@@ -1,5 +1,16 @@
-API
-=======
+## API
+
+---
+### Yargs document pages
+* [Advanced topics](https://github.com/restarian/yargs/blob/brace_document/docs/advanced_topics.md)
+* [Change log](https://github.com/restarian/yargs/blob/brace_document/docs/change_log.md)
+* [Contributing to yargs](https://github.com/restarian/yargs/blob/brace_document/docs/contributing_to_yargs.md)
+* [Examples](https://github.com/restarian/yargs/blob/brace_document/docs/examples.md)
+* **The api**
+* [Tricks](https://github.com/restarian/yargs/blob/brace_document/docs/tricks.md)
+* [Yargs synopsis](https://github.com/restarian/yargs/blob/brace_document/docs/yargs_synopsis.md)
+
+---
 
 You can run Yargs without any configuration, and it will do its
 best to parse `process.argv`:

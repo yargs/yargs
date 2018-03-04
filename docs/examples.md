@@ -1,4 +1,16 @@
-# Examples
+## Examples
+
+---
+### Yargs document pages
+* [Advanced topics](https://github.com/restarian/yargs/blob/brace_document/docs/advanced_topics.md)
+* [Change log](https://github.com/restarian/yargs/blob/brace_document/docs/change_log.md)
+* [Contributing to yargs](https://github.com/restarian/yargs/blob/brace_document/docs/contributing_to_yargs.md)
+* **Examples**
+* [The api](https://github.com/restarian/yargs/blob/brace_document/docs/the_api.md)
+* [Tricks](https://github.com/restarian/yargs/blob/brace_document/docs/tricks.md)
+* [Yargs synopsis](https://github.com/restarian/yargs/blob/brace_document/docs/yargs_synopsis.md)
+
+---
 
 See the [Example Folder](/example) for more demonstrations of
 Yargs in the wild. We would love fixes to old examples and pull
