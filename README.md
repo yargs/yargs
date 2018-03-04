@@ -1,4 +1,11 @@
-# Yargs
+<p align="center">
+  <img width="250" src="/yargs-logo.png">
+</p>
+<h1 align="center"> Yargs </h1>
+<p align="center">
+  <b >Yargs be a node.js library fer hearties tryin' ter parse optstrings</b>
+</p>
+<br>
 
 [![Build Status][travis-image]][travis-url]
 [![Coverage Status][coveralls-image]][coveralls-url]
@@ -8,13 +15,10 @@
 [![Conventional Commits][conventional-commits-image]][conventional-commits-url]
 [![Slack][slack-image]][slack-url]
 
-_Having problems? want to contribute? join our [community slack](http://devtoolscommunity.herokuapp.com)_.
+## Description :
+Yargs helps you build interactive command line tools, by parsing arguments and generating an elegant user interface. 
 
-> Yargs be a node.js library fer hearties tryin' ter parse optstrings.
-
-<img width="250" src="/yargs-logo.png">
-
-Yargs helps you build interactive command line tools, by parsing arguments and generating an elegant user interface. It gives you:
+It gives you:
 
 * commands and (grouped) options (`my-program.js serve --port=5000`).
 * a dynamically generated help menu based on your arguments.
@@ -30,7 +34,9 @@ Yargs helps you build interactive command line tools, by parsing arguments and g
 npm i yargs --save
 ```
 
-## Simple Example
+## Usage :
+
+### Simple Example
 
 ````javascript
 #!/usr/bin/env node
@@ -51,9 +57,9 @@ $ ./plunder.js --ships 12 --distance 98.7
 Retreat from the xupptumblers!
 ```
 
-## Complex Example
+### Complex Example
 
-```js
+```javascript
 #!/usr/bin/env node
 require('yargs') // eslint-disable-line
   .command('serve [port]', 'start the server', (yargs) => {
@@ -75,7 +81,13 @@ require('yargs') // eslint-disable-line
 
 Run the example above with `--help` to see the help for the application.
 
-## Table of Contents
+## Community :
+
+Having problems? want to contribute? join our [community slack](http://devtoolscommunity.herokuapp.com).
+
+## Documentation :
+
+### Table of Contents
 
 * [Yargs' API](/docs/api.md)
 * [Examples](/docs/examples.md)
