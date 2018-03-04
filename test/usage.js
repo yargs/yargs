@@ -810,6 +810,15 @@ describe('usage tests', () => {
       r.should.have.property('exit').and.equal(true)
     })
 
+    it('fails when an invalid argument is provided with automatic camel case', (done) => {
+      yargs('--foo-bar')
+        .strict()
+        .fail((msg) => {
+          return done()
+        })
+        .argv
+    })
+
     it('should fail given an option argument without a corresponding description', () => {
       const r = checkUsage(() => {
         const opts = {
