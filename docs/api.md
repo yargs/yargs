@@ -812,7 +812,7 @@ var yargs = require("yargs")(['--info'])
 
 Configure the `--show-hidden` option that displays the hidden keys (see [`hide()`](#hide)).
 
-If the first argument is a boolean, it enables/disables this option altogether. I.e. hidden keys will be permanently hidden if first argument is `false`.
+If the first argument is a boolean, it enables/disables this option altogether. i.e. hidden keys will be permanently hidden if first argument is `false`.
 
 If the first argument is a string it changes the key name ("--show-hidden").
 
