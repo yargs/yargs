@@ -93,7 +93,8 @@ function Yargs (processArgs, cwd, parentRequire) {
 
     const arrayOptions = [
       'array', 'boolean', 'string', 'skipValidation',
-      'count', 'normalize', 'number'
+      'count', 'normalize', 'number',
+      'hiddenOptions'
     ]
 
     const objectOptions = [
@@ -657,8 +658,9 @@ function Yargs (processArgs, cwd, parentRequire) {
       }
 
       const desc = opt.describe || opt.description || opt.desc
-      if (!opt.hidden) {
-        self.describe(key, desc)
+      self.describe(key, desc)
+      if (opt.hidden) {
+        self.hide(key)
       }
 
       if (opt.requiresArg) {
@@ -821,6 +823,28 @@ function Yargs (processArgs, cwd, parentRequire) {
     helpOpt = typeof opt === 'string' ? opt : defaultHelpOpt
     self.boolean(helpOpt)
     self.describe(helpOpt, msg || usage.deferY18nLookup('Show help'))
+    return self
+  }
+
+  const defaultShowHiddenOpt = 'show-hidden'
+  options.showHiddenOpt = defaultShowHiddenOpt
+  self.addShowHiddenOpt = self.showHidden = function addShowHiddenOpt (opt, msg) {
+    argsert('[string|boolean] [string]', [opt, msg], arguments.length)
+
+    if (arguments.length === 1) {
+      if (opt === false) return self
+    }
+
+    const showHiddenOpt = typeof opt === 'string' ? opt : defaultShowHiddenOpt
+    self.boolean(showHiddenOpt)
+    self.describe(showHiddenOpt, msg || usage.deferY18nLookup('Show hidden options'))
+    options.showHiddenOpt = showHiddenOpt
+    return self
+  }
+
+  self.hide = function hide (key) {
+    argsert('<string|object>', [key], arguments.length)
+    options.hiddenOptions.push(key)
     return self
   }
 

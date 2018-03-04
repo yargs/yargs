@@ -2887,5 +2887,83 @@ describe('usage tests', () => {
         ''
       ])
     })
+    it('--help should display all options (including hidden ones) with --show-hidden', () => {
+      const r = checkUsage(() => yargs('--help --show-hidden --mama ama')
+          .options({
+            foo: {
+              describe: 'FOO'
+            },
+            bar: {},
+            baz: {
+              describe: 'BAZ',
+              hidden: true
+            }
+          })
+          .argv
+        )
+
+      r.logs[0].split('\n').should.deep.equal([
+        'Options:',
+        '  --help     Show help                                                 [boolean]',
+        '  --version  Show version number                                       [boolean]',
+        '  --foo      FOO',
+        '  --bar',
+        '  --baz      BAZ',
+        ''
+      ])
+    })
+    it('--help should display --custom-show-hidden', () => {
+      const r = checkUsage(() => yargs('--help')
+          .options({
+            foo: {
+              describe: 'FOO'
+            },
+            bar: {},
+            baz: {
+              describe: 'BAZ',
+              hidden: true
+            }
+          })
+          .showHidden('custom-show-hidden')
+          .argv
+        )
+
+      r.logs[0].split('\n').should.deep.equal([
+        'Options:',
+        '  --help                Show help                                      [boolean]',
+        '  --version             Show version number                            [boolean]',
+        '  --foo                 FOO',
+        '  --bar',
+        '  --custom-show-hidden  Show hidden options                            [boolean]',
+        ''
+      ])
+    })
+    it('--help should display all options with --custom-show-hidden', () => {
+      const r = checkUsage(() => yargs('--help --custom-show-hidden')
+          .options({
+            foo: {
+              describe: 'FOO'
+            },
+            bar: {},
+            baz: {
+              describe: 'BAZ',
+              hidden: true
+            }
+          })
+          .showHidden('custom-show-hidden')
+          .argv
+        )
+
+      r.logs[0].split('\n').should.deep.equal([
+        'Options:',
+        '  --help                Show help                                      [boolean]',
+        '  --version             Show version number                            [boolean]',
+        '  --foo                 FOO',
+        '  --bar',
+        '  --baz                 BAZ',
+        '  --custom-show-hidden  Show hidden options                            [boolean]',
+        ''
+      ])
+    })
   })
 })
