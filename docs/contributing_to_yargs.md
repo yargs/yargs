@@ -1,4 +1,16 @@
-# Contributing to Yargs
+## Contributing to Yargs
+
+---
+### Yargs document pages
+* [Advanced topics](https://github.com/restarian/yargs/blob/brace_document/docs/advanced_topics.md)
+* [Change log](https://github.com/restarian/yargs/blob/brace_document/docs/change_log.md)
+* **Contributing to yargs**
+* [Examples](https://github.com/restarian/yargs/blob/brace_document/docs/examples.md)
+* [The api](https://github.com/restarian/yargs/blob/brace_document/docs/the_api.md)
+* [Tricks](https://github.com/restarian/yargs/blob/brace_document/docs/tricks.md)
+* [Yargs synopsis](https://github.com/restarian/yargs/blob/brace_document/docs/yargs_synopsis.md)
+
+---
 
 Me hearties, we would love to have you contribute to yargs!
 

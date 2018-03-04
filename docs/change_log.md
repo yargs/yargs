@@ -1,5 +1,17 @@
 # Change Log
 
+---
+### Yargs document pages
+* [Advanced topics](https://github.com/restarian/yargs/blob/brace_document/docs/advanced_topics.md)
+* **Change log**
+* [Contributing to yargs](https://github.com/restarian/yargs/blob/brace_document/docs/contributing_to_yargs.md)
+* [Examples](https://github.com/restarian/yargs/blob/brace_document/docs/examples.md)
+* [The api](https://github.com/restarian/yargs/blob/brace_document/docs/the_api.md)
+* [Tricks](https://github.com/restarian/yargs/blob/brace_document/docs/tricks.md)
+* [Yargs synopsis](https://github.com/restarian/yargs/blob/brace_document/docs/yargs_synopsis.md)
+
+---
+
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
 <a name="11.0.0"></a>
