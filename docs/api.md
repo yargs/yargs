@@ -66,8 +66,8 @@ When the option is used with a positional, use `--` to tell `yargs` to stop addi
 For example: `--foo foo bar -- val` will be parsed as
 ```javascript
 {
-  foo: ['foo', 'bar'],
-  positional: 'val'
+  _: ['val'],
+  foo: ['foo', 'bar']
 }
 ```
 
