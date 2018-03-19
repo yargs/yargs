@@ -679,8 +679,7 @@ describe('validation tests', () => {
       r.logs.join('\n').split(/\n+/).should.deep.equal([
         'Options:',
         '  --settings  Path to JSON config file',
-        '  --help      Show help  [boolean]',
-        ''
+        '  --help      Show help  [boolean]'
       ])
     })
 
@@ -697,8 +696,7 @@ describe('validation tests', () => {
       r.logs.join('\n').split(/\n+/).should.deep.equal([
         'Options:',
         '  --config  Path to JSON config file',
-        '  --help    Show help  [boolean]',
-        ''
+        '  --help    Show help  [boolean]'
       ])
     })
 
@@ -715,8 +713,7 @@ describe('validation tests', () => {
       r.logs.join('\n').split(/\n+/).should.deep.equal([
         'Options:',
         '  --settings  pork chop sandwiches',
-        '  --help      Show help  [boolean]',
-        ''
+        '  --help      Show help  [boolean]'
       ])
     })
 

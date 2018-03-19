@@ -519,8 +519,7 @@ describe('Command', () => {
         '  usage dream [command] [opts]  Go to sleep and dream',
         'Options:',
         '  --help     Show help  [boolean]',
-        '  --version  Show version number  [boolean]',
-        ''
+        '  --version  Show version number  [boolean]'
       ])
     })
 
@@ -541,8 +540,7 @@ describe('Command', () => {
         '  --help     Show help  [boolean]',
         '  --version  Show version number  [boolean]',
         '  --shared   Is the dream shared with others?  [boolean]',
-        '  --extract  Attempt extraction?  [boolean]',
-        ''
+        '  --extract  Attempt extraction?  [boolean]'
       ])
     })
 
@@ -562,8 +560,7 @@ describe('Command', () => {
         '  usage dream [command] [opts]           Go to sleep and dream',
         'Options:',
         '  --help     Show help  [boolean]',
-        '  --version  Show version number  [boolean]',
-        ''
+        '  --version  Show version number  [boolean]'
       ])
     })
 
@@ -593,8 +590,7 @@ describe('Command', () => {
       r.logs.join('\n').split(/\n+/).should.deep.equal([
         'Options:',
         '  --help     Show help  [boolean]',
-        '  --version  Show version number  [boolean]',
-        ''
+        '  --version  Show version number  [boolean]'
       ])
     })
 
@@ -610,8 +606,7 @@ describe('Command', () => {
         'Attempts to (re)apply its own dir',
         'Options:',
         '  --help     Show help  [boolean]',
-        '  --version  Show version number  [boolean]',
-        ''
+        '  --version  Show version number  [boolean]'
       ])
     })
 
@@ -628,8 +623,7 @@ describe('Command', () => {
         '  usage nameless  Command name derived from module filename',
         'Options:',
         '  --help     Show help  [boolean]',
-        '  --version  Show version number  [boolean]',
-        ''
+        '  --version  Show version number  [boolean]'
       ])
     })
   })
@@ -684,8 +678,7 @@ describe('Command', () => {
         '  command cmd sub  Run the subcommand',
         'Options:',
         '  --help     Show help  [boolean]',
-        '  --version  Show version number  [boolean]',
-        ''
+        '  --version  Show version number  [boolean]'
       ]
 
       const expectedSub = [
@@ -693,8 +686,7 @@ describe('Command', () => {
         'Run the subcommand',
         'Options:',
         '  --help     Show help  [boolean]',
-        '  --version  Show version number  [boolean]',
-        ''
+        '  --version  Show version number  [boolean]'
       ]
 
       // no help is output if help isn't last

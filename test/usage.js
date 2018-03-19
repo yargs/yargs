@@ -769,7 +769,7 @@ describe('usage tests', () => {
           .argv
         )
 
-      r.errors[1].should.equal('Not enough arguments following: bar')
+      r.errors[2].should.equal('Not enough arguments following: bar')
     })
   })
 
@@ -1026,8 +1026,7 @@ describe('usage tests', () => {
         'Options:',
         '  --help     Show help  [boolean]',
         '  --version  Show version number  [boolean]',
-        '  -y  [required]',
-        ''
+        '  -y  [required]'
       ])
     })
 
@@ -1049,8 +1048,7 @@ describe('usage tests', () => {
         'Options:',
         '  --help      Show help  [boolean]',
         '  --version   Show version number  [boolean]',
-        '  --some-opt  Some option  [default: 2]',
-        ''
+        '  --some-opt  Some option  [default: 2]'
       ])
     })
 
@@ -1077,8 +1075,7 @@ describe('usage tests', () => {
           'Options:',
           '  --help, -h  Show help  [boolean]',
           '  --version   Show version number  [boolean]',
-          '  --some-opt  Some option  [required]',
-          ''
+          '  --some-opt  Some option  [required]'
         ])
       })
 
@@ -1107,8 +1104,7 @@ describe('usage tests', () => {
           'Options:',
           '  --help, -h  Show help  [boolean]',
           '  --version   Show version number  [boolean]',
-          '  --some-opt  Some option  [required]',
-          ''
+          '  --some-opt  Some option  [required]'
         ])
       })
     })
@@ -1318,7 +1314,7 @@ describe('usage tests', () => {
         )
 
       // should split example usage onto multiple lines.
-      r.errors[0].split('\n').length.should.equal(11)
+      r.errors[0].split('\n').length.should.equal(10)
 
       // should wrap within appropriate boundaries.
       r.errors[0].split('\n').forEach((line, i) => {
@@ -1378,8 +1374,7 @@ describe('usage tests', () => {
         'Options:',
         '  --version   Show version number                                      [boolean]',
         `  -f, --file  ${noColorAddedDescr}                      [string] [required]`,
-        '  -h, --help  Show help                                                [boolean]',
-        ''
+        '  -h, --help  Show help                                                [boolean]'
       ])
     })
 
@@ -1402,8 +1397,7 @@ describe('usage tests', () => {
         'Options:',
         '  --version   Show version number                                      [boolean]',
         `  -f, --file  ${yellowDescription}                      [string] [required]`,
-        '  -h, --help  Show help                                                [boolean]',
-        ''
+        '  -h, --help  Show help                                                [boolean]'
       ])
     })
   })
@@ -1505,8 +1499,7 @@ describe('usage tests', () => {
         '',
         'Options:',
         '  --help     Show help  [boolean]',
-        '  --version  Show version number  [boolean]',
-        ''
+        '  --version  Show version number  [boolean]'
       ])
       commandHelp.logs[0].split('\n').should.deep.equal([
         'usage upload <dest>',
@@ -1516,8 +1509,7 @@ describe('usage tests', () => {
         'Options:',
         '  --help     Show help  [boolean]',
         '  --version  Show version number  [boolean]',
-        '  --force    Force overwrite of remote directory contents  [boolean]',
-        ''
+        '  --force    Force overwrite of remote directory contents  [boolean]'
       ])
     })
 
@@ -1551,8 +1543,7 @@ describe('usage tests', () => {
         '',
         'Options:',
         '  --help     Show help  [boolean]',
-        '  --version  Show version number  [boolean]',
-        ''
+        '  --version  Show version number  [boolean]'
       ])
       commandHelp.logs[0].split('\n').should.deep.equal([
         'usage upload <dest>',
@@ -1563,8 +1554,7 @@ describe('usage tests', () => {
         '  --help     Show help               [boolean]',
         '  --version  Show version number     [boolean]',
         '  --force    Force overwrite of remote',
-        '             directory contents      [boolean]',
-        ''
+        '             directory contents      [boolean]'
       ])
     })
 
@@ -1594,8 +1584,7 @@ describe('usage tests', () => {
         '  -h  Show help  [boolean]',
         '',
         'Options:',
-        '  --version  Show version number  [boolean]',
-        ''
+        '  --version  Show version number  [boolean]'
       ])
     })
 
@@ -1635,8 +1624,7 @@ describe('usage tests', () => {
         '',
         'Options:',
         '  --version  Show version number  [boolean]',
-        '  -h         Show help  [boolean]',
-        ''
+        '  -h         Show help  [boolean]'
       ])
     })
 
@@ -1669,8 +1657,7 @@ describe('usage tests', () => {
         '',
         'Options:',
         '  --version  Show version number  [boolean]',
-        '  -h         Show help  [boolean]',
-        ''
+        '  -h         Show help  [boolean]'
       ])
     })
 
@@ -1711,8 +1698,7 @@ describe('usage tests', () => {
         '',
         'Options:',
         '  --version  Show version number  [boolean]',
-        '  -h         Show help  [boolean]',
-        ''
+        '  -h         Show help  [boolean]'
       ])
     })
 
@@ -1736,8 +1722,7 @@ describe('usage tests', () => {
         '',
         'Options:',
         '  --help     Show help  [boolean]',
-        '  --version  Show version number  [boolean]',
-        ''
+        '  --version  Show version number  [boolean]'
       ])
     })
 
@@ -1758,8 +1743,7 @@ describe('usage tests', () => {
         '',
         'Options:',
         '  --help     Show help  [boolean]',
-        '  --version  Show version number  [boolean]',
-        ''
+        '  --version  Show version number  [boolean]'
       ])
     })
 
@@ -1773,8 +1757,7 @@ describe('usage tests', () => {
       r.logs[0].split('\n').should.deep.equal([
         'Options:',
         '  --help     Show help  [boolean]',
-        '  --version  Show version number  [boolean]',
-        ''
+        '  --version  Show version number  [boolean]'
       ])
     })
 
@@ -1792,8 +1775,7 @@ describe('usage tests', () => {
         '',
         'Options:',
         '  --help     Show help  [boolean]',
-        '  --version  Show version number  [boolean]',
-        ''
+        '  --version  Show version number  [boolean]'
       ])
     })
 
@@ -1811,8 +1793,7 @@ describe('usage tests', () => {
         '',
         'Options:',
         '  --help     Show help  [boolean]',
-        '  --version  Show version number  [boolean]',
-        ''
+        '  --version  Show version number  [boolean]'
       ])
     })
 
@@ -1831,8 +1812,7 @@ describe('usage tests', () => {
         '',
         'Options:',
         '  --help     Show help  [boolean]',
-        '  --version  Show version number  [boolean]',
-        ''
+        '  --version  Show version number  [boolean]'
       ])
     })
 
@@ -1851,8 +1831,7 @@ describe('usage tests', () => {
         '',
         'Options:',
         '  --help     Show help                                                 [boolean]',
-        '  --version  Show version number                                       [boolean]',
-        ''
+        '  --version  Show version number                                       [boolean]'
       ])
     })
 
@@ -1869,8 +1848,7 @@ describe('usage tests', () => {
         '',
         'Options:',
         '  --help     Show help  [boolean]',
-        '  --version  Show version number  [boolean]',
-        ''
+        '  --version  Show version number  [boolean]'
       ])
     })
 
@@ -1884,8 +1862,7 @@ describe('usage tests', () => {
       r.logs[0].split('\n').should.deep.equal([
         'Options:',
         '  --help     Show help  [boolean]',
-        '  --version  Show version number  [boolean]',
-        ''
+        '  --version  Show version number  [boolean]'
       ])
     })
 
@@ -1906,8 +1883,7 @@ describe('usage tests', () => {
         '',
         'Options:',
         '  --version   Show version number  [boolean]',
-        '  -h, --help  Show help  [boolean]',
-        ''
+        '  -h, --help  Show help  [boolean]'
       ])
     })
   })
@@ -2118,8 +2094,7 @@ describe('usage tests', () => {
         'Options:',
         '  --version  Show version number  [boolean]',
         '  -h         Show help  [boolean]',
-        '  -f, --foo  foo option',
-        ''
+        '  -f, --foo  foo option'
       ])
     })
 
@@ -2136,8 +2111,7 @@ describe('usage tests', () => {
         'Options:',
         '  --version  Show version number  [boolean]',
         '  -h         Show help  [boolean]',
-        '  -f, --foo  [required]',
-        ''
+        '  -f, --foo  [required]'
       ])
     })
 
@@ -2155,8 +2129,7 @@ describe('usage tests', () => {
         'Options:',
         '  --version  Show version number  [boolean]',
         '  -h         Show help  [boolean]',
-        '  -f, --foo  bar  [string]',
-        ''
+        '  -f, --foo  bar  [string]'
       ])
     })
 
@@ -2175,8 +2148,7 @@ describe('usage tests', () => {
         'Options:',
         '  --version  Show version number  [boolean]',
         '  -h         Show help  [boolean]',
-        '  -f, --foo  bar  [number]',
-        ''
+        '  -f, --foo  bar  [number]'
       ])
     })
   })
@@ -2199,8 +2171,7 @@ describe('usage tests', () => {
         'Options:',
         '  --help     Show help  [boolean]',
         '  --version  Show version number  [boolean]',
-        '  --foo, -f  foo option',
-        ''
+        '  --foo, -f  foo option'
       ])
     })
 
@@ -2221,8 +2192,7 @@ describe('usage tests', () => {
         'Options:',
         '  --help     Show help  [boolean]',
         '  --version  Show version number  [boolean]',
-        '  --foo, -f  foo option',
-        ''
+        '  --foo, -f  foo option'
       ])
     })
 
@@ -2240,8 +2210,7 @@ describe('usage tests', () => {
           'Options:',
           '  --help     Show help  [boolean]',
           '  --version  Show version number  [boolean]',
-          '  --foo, -f  foo option',
-          ''
+          '  --foo, -f  foo option'
         ])
         return done()
       }
@@ -2365,8 +2334,7 @@ describe('usage tests', () => {
         '  --help        Show help  [boolean]',
         '  --version     Show version number  [boolean]',
         '  --answer      does this look good?  [choices: "yes", "no", "maybe"]',
-        '  --confidence  percentage of confidence  [choices: 0, 25, 50, 75, 100]',
-        ''
+        '  --confidence  percentage of confidence  [choices: 0, 25, 50, 75, 100]'
       ])
     })
 
@@ -2388,8 +2356,7 @@ describe('usage tests', () => {
       r.logs[0].split('\n').should.deep.equal([
         'Options:',
         '  --help     Show help  [boolean]',
-        '  --version  Show version number  [boolean]',
-        ''
+        '  --version  Show version number  [boolean]'
       ])
     })
   })
@@ -2445,8 +2412,7 @@ describe('usage tests', () => {
         '',
         'Options:',
         '  --help     Show help  [boolean]',
-        '  --version  Show version number  [boolean]',
-        ''
+        '  --version  Show version number  [boolean]'
       ])
     })
 
@@ -2468,8 +2434,7 @@ describe('usage tests', () => {
         '  -h        Show help  [boolean]',
         '',
         'Options:',
-        '  --version  Show version number  [boolean]',
-        ''
+        '  --version  Show version number  [boolean]'
       ])
     })
 
@@ -2485,8 +2450,7 @@ describe('usage tests', () => {
       r.logs[0].split('\n').should.deep.equal([
         'Magic Variable:',
         '  -h, --help  Show help  [boolean]',
-        '  --version   Show version number  [boolean]',
-        ''
+        '  --version   Show version number  [boolean]'
       ])
     })
 
@@ -2503,8 +2467,7 @@ describe('usage tests', () => {
         '',
         'Options:',
         '  --help     Show help  [boolean]',
-        '  --version  Show version number  [boolean]',
-        ''
+        '  --version  Show version number  [boolean]'
       ])
     })
 
@@ -2524,8 +2487,7 @@ describe('usage tests', () => {
         '',
         'Heroes:',
         '  --batman',
-        '  --robin',
-        ''
+        '  --robin'
       ])
     })
 
@@ -2546,8 +2508,7 @@ describe('usage tests', () => {
         '',
         'Options:',
         '  --version  Show version number  [boolean]',
-        '  -h         Show help  [boolean]',
-        ''
+        '  -h         Show help  [boolean]'
       ])
     })
 
@@ -2569,8 +2530,7 @@ describe('usage tests', () => {
         '',
         'Options:',
         '  --help     Show help  [boolean]',
-        '  --version  Show version number  [boolean]',
-        ''
+        '  --version  Show version number  [boolean]'
       ])
     })
   })
@@ -2590,8 +2550,7 @@ describe('usage tests', () => {
         '  --help     Show help                                                 [boolean]',
         '  --version  Show version number                                       [boolean]',
         'Examples:',
-        '  안녕하세요 선생님 안녕 친구야  인사하는 어린이 착한 어린이',
-        ''
+        '  안녕하세요 선생님 안녕 친구야  인사하는 어린이 착한 어린이'
       ])
     })
   })
@@ -2618,8 +2577,7 @@ describe('usage tests', () => {
         '',
         'Options:',
         '  --help     Show help                                                 [boolean]',
-        '  --version  Show version number                                       [boolean]',
-        ''
+        '  --version  Show version number                                       [boolean]'
       ])
     })
 
@@ -2643,8 +2601,7 @@ describe('usage tests', () => {
         '',
         'Options:',
         '  --help     Show help                                                 [boolean]',
-        '  --version  Show version number                                       [boolean]',
-        ''
+        '  --version  Show version number                                       [boolean]'
       ])
     })
 
@@ -2676,8 +2633,7 @@ describe('usage tests', () => {
         '',
         'Options:',
         '  --help     Show help                                                 [boolean]',
-        '  --version  Show version number                                       [boolean]',
-        ''
+        '  --version  Show version number                                       [boolean]'
       ])
     })
 
@@ -2702,8 +2658,7 @@ describe('usage tests', () => {
         'Options:',
         '  --help     Show help                                                 [boolean]',
         '  --version  Show version number                                       [boolean]',
-        '  --uuid                                                              [required]',
-        ''
+        '  --uuid                                                              [required]'
       ])
     })
   })
@@ -2729,8 +2684,7 @@ describe('usage tests', () => {
         '',
         'Options:',
         '  --help     Show help                                                 [boolean]',
-        '  --version  Show version number                                       [boolean]',
-        ''
+        '  --version  Show version number                                       [boolean]'
       ])
     })
 
@@ -2754,8 +2708,7 @@ describe('usage tests', () => {
         '',
         'Options:',
         '  --help     Show help                                                 [boolean]',
-        '  --version  Show version number                                       [boolean]',
-        ''
+        '  --version  Show version number                                       [boolean]'
       ])
     })
 
@@ -2779,8 +2732,7 @@ describe('usage tests', () => {
         '',
         'Options:',
         '  --help     Show help                                                 [boolean]',
-        '  --version  Show version number                                       [boolean]',
-        ''
+        '  --version  Show version number                                       [boolean]'
       ])
     })
 
@@ -2804,8 +2756,7 @@ describe('usage tests', () => {
         '',
         'Options:',
         '  --help     Show help                                                 [boolean]',
-        '  --version  Show version number                                       [boolean]',
-        ''
+        '  --version  Show version number                                       [boolean]'
       ])
     })
 
@@ -2830,8 +2781,7 @@ describe('usage tests', () => {
         '',
         'Options:',
         '  --help     Show help                                                 [boolean]',
-        '  --version  Show version number                                       [boolean]',
-        ''
+        '  --version  Show version number                                       [boolean]'
       ])
     })
 
@@ -2856,8 +2806,7 @@ describe('usage tests', () => {
         '',
         'Options:',
         '  --help     Show help                                                 [boolean]',
-        '  --version  Show version number                                       [boolean]',
-        ''
+        '  --version  Show version number                                       [boolean]'
       ])
     })
   })
@@ -2883,8 +2832,7 @@ describe('usage tests', () => {
         '  --help     Show help                                                 [boolean]',
         '  --version  Show version number                                       [boolean]',
         '  --foo      FOO',
-        '  --bar',
-        ''
+        '  --bar'
       ])
     })
     it('--help should display all options (including hidden ones) with --show-hidden', () => {
@@ -2908,8 +2856,7 @@ describe('usage tests', () => {
         '  --version  Show version number                                       [boolean]',
         '  --foo      FOO',
         '  --bar',
-        '  --baz      BAZ',
-        ''
+        '  --baz      BAZ'
       ])
     })
     it('--help should display --custom-show-hidden', () => {
@@ -2934,8 +2881,7 @@ describe('usage tests', () => {
         '  --version             Show version number                            [boolean]',
         '  --foo                 FOO',
         '  --bar',
-        '  --custom-show-hidden  Show hidden options                            [boolean]',
-        ''
+        '  --custom-show-hidden  Show hidden options                            [boolean]'
       ])
     })
     it('--help should display all options with --custom-show-hidden', () => {
@@ -2961,8 +2907,7 @@ describe('usage tests', () => {
         '  --foo                 FOO',
         '  --bar',
         '  --baz                 BAZ',
-        '  --custom-show-hidden  Show hidden options                            [boolean]',
-        ''
+        '  --custom-show-hidden  Show hidden options                            [boolean]'
       ])
     })
   })
