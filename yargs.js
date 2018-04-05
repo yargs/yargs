@@ -1039,7 +1039,6 @@ function Yargs (processArgs, cwd, parentRequire) {
           for (let i = (commandIndex || 0), cmd; argv._[i] !== undefined; i++) {
             cmd = String(argv._[i])
             if (~handlerKeys.indexOf(cmd) && cmd !== completionCommand) {
-              setPlaceholderKeys(argv)
               // commands are executed using a recursive algorithm that executes
               // the deepest command first; we keep track of the position in the
               // argv._ array that is currently being executed.
@@ -1052,7 +1051,6 @@ function Yargs (processArgs, cwd, parentRequire) {
 
           // run the default command, if defined
           if (command.hasDefaultCommand() && !skipDefaultCommand) {
-            setPlaceholderKeys(argv)
             return command.runCommand(null, self, parsed)
           }
 
@@ -1070,7 +1068,6 @@ function Yargs (processArgs, cwd, parentRequire) {
           self.exit(0)
         }
       } else if (command.hasDefaultCommand() && !skipDefaultCommand) {
-        setPlaceholderKeys(argv)
         return command.runCommand(null, self, parsed)
       }
 
@@ -1089,7 +1086,7 @@ function Yargs (processArgs, cwd, parentRequire) {
 
           self.exit(0)
         })
-        return setPlaceholderKeys(argv)
+        return argv
       }
 
       // Handle 'help' and 'version' options
@@ -1133,7 +1130,7 @@ function Yargs (processArgs, cwd, parentRequire) {
       else throw err
     }
 
-    return setPlaceholderKeys(argv)
+    return argv
   }
 
   self._runValidation = function runValidation (argv, aliases, positionalMap, parseErrors) {
@@ -1157,16 +1154,6 @@ function Yargs (processArgs, cwd, parentRequire) {
       // if we explode looking up locale just noop
       // we'll keep using the default language 'en'.
     }
-  }
-
-  function setPlaceholderKeys (argv) {
-    Object.keys(options.key).forEach((key) => {
-      // don't set placeholder keys for dot
-      // notation options 'foo.bar'.
-      if (~key.indexOf('.')) return
-      if (typeof argv[key] === 'undefined') argv[key] = undefined
-    })
-    return argv
   }
 
   // an app should almost always have --version and --help,
