@@ -602,7 +602,7 @@ Should yargs attempt to detect the os' locale? Defaults to `true`.
 Tell yargs to parse environment variables matching the given prefix and apply
 them to argv as though they were command line arguments.
 
-Use the "__" separator in the environment variable to indicate nested options.
+Use the "\_\_" separator in the environment variable to indicate nested options.
 (e.g. prefix_nested__foo => nested.foo)
 
 If this method is called with no argument or with an empty string or with `true`,
