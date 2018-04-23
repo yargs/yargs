@@ -929,6 +929,35 @@ To submit a new translation for yargs:
 <a name="nargs"></a>.nargs(key, count)
 -----------
 
+.middleware(callbacks)
+------------------------------------
+
+Define global middleware functions to be called first, in list order, for all cli command.  
+
+The `callbacks` parameter can be a function or a list of functions.  
+
+```js
+const mwFunc1 = argv => console.log('I\'m a middleware function');
+const mwFunc2 = argv => console.log('I\'m another middleware function');
+
+yargs
+  .command('myCommand', 'some command', {}, function(argv){
+    console.log('Running myCommand!');
+  })
+  .middleware([mwFunc1, mwFunc2]).argv;
+```
+When calling `myCommand` from the command line, mwFunc1 gets called first, then mwFunc2, and finally the command's handler.  The console output is:
+```
+I'm a middleware function
+I'm another middleware function
+Running myCommand!
+```
+
+
+<a name="middleware"></a>.middleware(callbacks)
+--------------------
+
+
 The number of arguments that should be consumed after a key. This can be a
 useful hint to prevent parsing ambiguity. For example:
 
