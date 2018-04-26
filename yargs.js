@@ -34,7 +34,7 @@ function Yargs (processArgs, cwd, parentRequire) {
 
   self.middleware = function (callback) {
     if (Array.isArray(callback)) {
-      globalMiddleware.push(...callback)
+      globalMiddleware.concat(callback)
     } else if (typeof callback === 'object') {
       globalMiddleware.push(callback)
     }
