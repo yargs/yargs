@@ -11,6 +11,7 @@ const Y18n = require('y18n')
 const objFilter = require('./lib/obj-filter')
 const setBlocking = require('set-blocking')
 const applyExtends = require('./lib/apply-extends')
+const middleware = require('./lib/middleware')
 const YError = require('./lib/yerror')
 
 exports = module.exports = Yargs
@@ -32,14 +33,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     updateFiles: false
   })
 
-  self.middleware = function (callback) {
-    if (Array.isArray(callback)) {
-      globalMiddleware.concat(callback)
-    } else if (typeof callback === 'object') {
-      globalMiddleware.push(callback)
-    }
-    return self
-  }
+  self.middleware = middleware
 
   if (!cwd) cwd = process.cwd()
 
