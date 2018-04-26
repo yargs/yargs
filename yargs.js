@@ -21,7 +21,7 @@ function Yargs (processArgs, cwd, parentRequire) {
   let command = null
   let completion = null
   let groups = {}
-  let globalMiddleware = [];
+  let globalMiddleware = []
   let output = ''
   let preservedGroups = {}
   let usage = null
@@ -32,13 +32,13 @@ function Yargs (processArgs, cwd, parentRequire) {
     updateFiles: false
   })
 
-  self.middleware = function(callback){
-      if(Array.isArray(callback)){
-        globalMiddleware.push(...callback);
-      } else if (typeof callback === 'object'){
-        globalMiddleware.push(callback);
-      }
-      return self;
+  self.middleware = function (callback) {
+    if (Array.isArray(callback)) {
+      globalMiddleware.push(...callback)
+    } else if (typeof callback === 'object') {
+      globalMiddleware.push(callback)
+    }
+    return self
   }
 
   if (!cwd) cwd = process.cwd()
