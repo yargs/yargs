@@ -33,7 +33,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     updateFiles: false
   })
 
-  self.middleware = middleware
+  self.middleware = middleware.bind(this)
 
   if (!cwd) cwd = process.cwd()
 
