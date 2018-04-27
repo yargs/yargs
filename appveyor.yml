@@ -12,7 +12,7 @@ install:
   # Get the latest stable version of Node 0.STABLE.latest
   - ps: Install-Product node $env:nodejs_version
   # Typical npm stuff.
-  - npm -g install npm@latest
+  - npm i npm@5
   - npm install
 
 # Post-install test scripts.
