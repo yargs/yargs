@@ -13,6 +13,22 @@ const setBlocking = require('set-blocking')
 const applyExtends = require('./lib/apply-extends')
 const YError = require('./lib/yerror')
 
+const booleanFactory = require('./lib/api/boolean')
+const arrayFactory = require('./lib/api/array')
+const numberFactory = require('./lib/api/number')
+const normalizeFactory = require('./lib/api/normalize')
+const countFactory = require('./lib/api/count')
+const stringFactory = require('./lib/api/string')
+const skipValidationFactory = require('./lib/api/skip-validation')
+const requiresArgFactory = require('./lib/api/requires-arg')
+const nargsFactory = require('./lib/api/nargs')
+const choicesFactory = require('./lib/api/choices')
+const aliasFactory = require('./lib/api/alias')
+const demandOptionFactory = require('./lib/api/demand-option')
+const coerceFactory = require('./lib/api/coerce')
+const defaultsFactory = require('./lib/api/defaults')
+const describeFactory = require('./lib/api/describe')
+
 exports = module.exports = Yargs
 function Yargs (processArgs, cwd, parentRequire) {
   processArgs = processArgs || [] // handle calling yargs().
@@ -167,108 +183,11 @@ function Yargs (processArgs, cwd, parentRequire) {
     frozen = undefined
   }
 
-  self.boolean = function (keys) {
-    argsert('<array|string>', [keys], arguments.length)
-    populateParserHintArray('boolean', keys)
-    return self
-  }
-
-  self.array = function (keys) {
-    argsert('<array|string>', [keys], arguments.length)
-    populateParserHintArray('array', keys)
-    return self
-  }
-
-  self.number = function (keys) {
-    argsert('<array|string>', [keys], arguments.length)
-    populateParserHintArray('number', keys)
-    return self
-  }
-
-  self.normalize = function (keys) {
-    argsert('<array|string>', [keys], arguments.length)
-    populateParserHintArray('normalize', keys)
-    return self
-  }
-
-  self.count = function (keys) {
-    argsert('<array|string>', [keys], arguments.length)
-    populateParserHintArray('count', keys)
-    return self
-  }
-
-  self.string = function (keys) {
-    argsert('<array|string>', [keys], arguments.length)
-    populateParserHintArray('string', keys)
-    return self
-  }
-
-  self.requiresArg = function (keys) {
-    argsert('<array|string>', [keys], arguments.length)
-    populateParserHintObject(self.nargs, false, 'narg', keys, 1)
-    return self
-  }
-
-  self.skipValidation = function (keys) {
-    argsert('<array|string>', [keys], arguments.length)
-    populateParserHintArray('skipValidation', keys)
-    return self
-  }
-
   function populateParserHintArray (type, keys, value) {
     keys = [].concat(keys)
     keys.forEach((key) => {
       options[type].push(key)
     })
-  }
-
-  self.nargs = function (key, value) {
-    argsert('<string|object|array> [number]', [key, value], arguments.length)
-    populateParserHintObject(self.nargs, false, 'narg', key, value)
-    return self
-  }
-
-  self.choices = function (key, value) {
-    argsert('<object|string|array> [string|array]', [key, value], arguments.length)
-    populateParserHintObject(self.choices, true, 'choices', key, value)
-    return self
-  }
-
-  self.alias = function (key, value) {
-    argsert('<object|string|array> [string|array]', [key, value], arguments.length)
-    populateParserHintObject(self.alias, true, 'alias', key, value)
-    return self
-  }
-
-  // TODO: actually deprecate self.defaults.
-  self.default = self.defaults = function (key, value, defaultDescription) {
-    argsert('<object|string|array> [*] [string]', [key, value, defaultDescription], arguments.length)
-    if (defaultDescription) options.defaultDescription[key] = defaultDescription
-    if (typeof value === 'function') {
-      if (!options.defaultDescription[key]) options.defaultDescription[key] = usage.functionDescription(value)
-      value = value.call()
-    }
-    populateParserHintObject(self.default, false, 'default', key, value)
-    return self
-  }
-
-  self.describe = function (key, desc) {
-    argsert('<object|string|array> [string]', [key, desc], arguments.length)
-    populateParserHintObject(self.describe, false, 'key', key, true)
-    usage.describe(key, desc)
-    return self
-  }
-
-  self.demandOption = function (keys, msg) {
-    argsert('<object|string|array> [string]', [keys, msg], arguments.length)
-    populateParserHintObject(self.demandOption, false, 'demandedOptions', keys, msg)
-    return self
-  }
-
-  self.coerce = function (keys, value) {
-    argsert('<object|string|array> [function]', [keys, value], arguments.length)
-    populateParserHintObject(self.coerce, false, 'coerce', keys, value)
-    return self
   }
 
   function populateParserHintObject (builder, isArray, type, key, value) {
@@ -293,6 +212,24 @@ function Yargs (processArgs, cwd, parentRequire) {
       }
     }
   }
+
+  self.boolean = booleanFactory(options, self, populateParserHintArray)
+  self.array = arrayFactory(options, self, populateParserHintArray)
+  self.number = numberFactory(options, self, populateParserHintArray)
+  self.normalize = normalizeFactory(options, self, populateParserHintArray)
+  self.count = countFactory(options, self, populateParserHintArray)
+  self.string = stringFactory(options, self, populateParserHintArray)
+  self.skipValidation = skipValidationFactory(options, self, populateParserHintArray)
+  self.requiresArg = requiresArgFactory(options, self, populateParserHintObject)
+  self.nargs = nargsFactory(options, self, populateParserHintObject)
+  self.choices = choicesFactory(options, self, populateParserHintObject)
+  self.alias = aliasFactory(options, self, populateParserHintObject)
+  self.demandOption = demandOptionFactory(options, self, populateParserHintObject)
+  self.coerce = coerceFactory(options, self, populateParserHintObject)
+
+  // TODO: actually deprecate self.defaults.
+  self.default = self.defaults = defaultsFactory(options, self, populateParserHintObject, usage)
+  self.describe = describeFactory(options, self, populateParserHintObject, usage)
 
   function deleteFromParserHintObject (optionKey) {
     // delete from all parsing hints:
