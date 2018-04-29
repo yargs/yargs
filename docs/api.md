@@ -934,7 +934,7 @@ To submit a new translation for yargs:
 
 Define global middleware functions to be called first, in list order, for all cli command.  
 
-The `callbacks` parameter can be a function or a list of functions.  
+The `callbacks` parameter can be a function or a list of functions.  Each callback gets passed a reference to argv.
 
 ```js
 const mwFunc1 = argv => console.log('I\'m a middleware function');
