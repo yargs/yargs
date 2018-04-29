@@ -2,9 +2,9 @@
 /* global describe, it, beforeEach, afterEach */
 
 require('chai').should()
-let yargs
 
 describe('choices', () => {
+  let yargs
   beforeEach(() => {
     yargs = require('../../')
   })

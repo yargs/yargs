@@ -11,6 +11,7 @@ describe('number', () => {
 
   afterEach(() => {
     delete require.cache[require.resolve('../../')]
+    yargs = undefined
   })
 
   it('accepts number arguments when a number type is specified', () => {

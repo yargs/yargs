@@ -4,14 +4,15 @@
 require('chai').should()
 const expect = require('chai').expect
 
-let yargs
 describe('skipValidation', () => {
+  let yargs
   beforeEach(() => {
     yargs = require('../../')
   })
 
   afterEach(() => {
     delete require.cache[require.resolve('../../')]
+    yargs = undefined
   })
 
   it('skips validation if an option with skipValidation is present', () => {

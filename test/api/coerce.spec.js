@@ -14,6 +14,7 @@ describe('.coerce()', () => {
 
   afterEach(() => {
     delete require.cache[require.resolve('../../')]
+    yargs = undefined
   })
 
   it('supports string and function args (as option key and coerce function)', () => {

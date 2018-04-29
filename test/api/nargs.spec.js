@@ -11,6 +11,7 @@ describe('narg', () => {
 
   afterEach(() => {
     delete require.cache[require.resolve('../../')]
+    yargs = undefined
   })
 
   it('accepts a key as the first argument and a count as the second', () => {

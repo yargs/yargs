@@ -28,6 +28,10 @@ const demandOptionFactory = require('./lib/api/demand-option')
 const coerceFactory = require('./lib/api/coerce')
 const defaultsFactory = require('./lib/api/defaults')
 const describeFactory = require('./lib/api/describe')
+const configFactory = require('./lib/api/config')
+const commandFactory = require('./lib/api/command')
+const commandDirFactory = require('./lib/api/command-dir')
+const usageFactory = require('./lib/api/usage')
 
 exports = module.exports = Yargs
 function Yargs (processArgs, cwd, parentRequire) {
@@ -246,29 +250,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     delete usage.getDescriptions()[optionKey]
   }
 
-  self.config = function config (key, msg, parseFn) {
-    argsert('[object|string] [string|function] [function]', [key, msg, parseFn], arguments.length)
-    // allow a config object to be provided directly.
-    if (typeof key === 'object') {
-      key = applyExtends(key, cwd)
-      options.configObjects = (options.configObjects || []).concat(key)
-      return self
-    }
-
-    // allow for a custom parsing function.
-    if (typeof msg === 'function') {
-      parseFn = msg
-      msg = null
-    }
-
-    key = key || 'config'
-    self.describe(key, msg || usage.deferY18nLookup('Path to JSON config file'))
-    ;(Array.isArray(key) ? key : [key]).forEach((k) => {
-      options.config[k] = parseFn || true
-    })
-
-    return self
-  }
+  self.config = configFactory(options, self, cwd, usage, applyExtends)
 
   self.example = function (cmd, description) {
     argsert('<string> [string]', [cmd, description], arguments.length)
@@ -276,18 +258,8 @@ function Yargs (processArgs, cwd, parentRequire) {
     return self
   }
 
-  self.command = function (cmd, description, builder, handler, middlewares) {
-    argsert('<string|array|object> [string|boolean] [function|object] [function] [array]', [cmd, description, builder, handler, middlewares], arguments.length)
-    command.addHandler(cmd, description, builder, handler, middlewares)
-    return self
-  }
-
-  self.commandDir = function (dir, opts) {
-    argsert('<string> [object]', [dir, opts], arguments.length)
-    const req = parentRequire || require
-    command.addDirectory(dir, self.getContext(), req, require('get-caller-file')(), opts)
-    return self
-  }
+  self.command = commandFactory(self, command)
+  self.commandDir = commandDirFactory(self, command, parentRequire, require)
 
   // TODO: deprecate self.demand in favor of
   // .demandCommand() .demandOption().
@@ -366,22 +338,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     return self
   }
 
-  self.usage = function (msg, description, builder, handler) {
-    argsert('<string|null|undefined> [string|boolean] [function|object] [function]', [msg, description, builder, handler], arguments.length)
-
-    if (description !== undefined) {
-      // .usage() can be used as an alias for defining
-      // a default command.
-      if ((msg || '').match(/^\$0( |$)/)) {
-        return self.command(msg, description, builder, handler)
-      } else {
-        throw new YError('.usage() description must start with $0 if being used as alias for .command()')
-      }
-    } else {
-      usage.usage(msg)
-      return self
-    }
-  }
+  self.usage = usageFactory(options, self, usage)
 
   self.epilogue = self.epilog = function (msg) {
     argsert('<string>', [msg], arguments.length)

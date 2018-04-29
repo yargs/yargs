@@ -12,6 +12,7 @@ describe('normalize', () => {
 
   afterEach(() => {
     delete require.cache[require.resolve('../../')]
+    yargs = undefined
   })
 
   it('normalizes paths passed as arguments', () => {
