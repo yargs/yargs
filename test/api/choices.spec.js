@@ -1,8 +1,8 @@
 'use strict'
 /* global describe, it, beforeEach, afterEach */
 
-let yargs
 require('chai').should()
+let yargs
 
 describe('choices', () => {
   beforeEach(() => {
@@ -11,6 +11,7 @@ describe('choices', () => {
 
   afterEach(() => {
     delete require.cache[require.resolve('../../')]
+    yargs = undefined
   })
 
   it('accepts an object', () => {

@@ -1,10 +1,10 @@
 'use strict'
 /* global describe, it, beforeEach, afterEach */
 
-let yargs
 const expect = require('chai').expect
 
 describe('number', () => {
+  let yargs
   beforeEach(() => {
     yargs = require('../../')
   })

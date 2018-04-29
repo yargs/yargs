@@ -1,13 +1,13 @@
 'use strict'
 /* global describe, it, beforeEach, afterEach */
 
-let yargs
 require('chai').should()
 const expect = require('chai').expect
 const fs = require('fs')
 const path = require('path')
 
 describe('.coerce()', () => {
+  let yargs
   beforeEach(() => {
     yargs = require('../../')
   })

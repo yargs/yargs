@@ -1,11 +1,11 @@
 'use strict'
 /* global describe, it, beforeEach, afterEach */
 
-let yargs
 require('chai').should()
 const path = require('path')
 
 describe('normalize', () => {
+  let yargs
   beforeEach(() => {
     yargs = require('../../')
   })

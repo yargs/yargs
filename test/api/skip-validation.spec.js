@@ -1,10 +1,10 @@
 'use strict'
 /* global describe, it, beforeEach, afterEach */
 
-let yargs
 require('chai').should()
 const expect = require('chai').expect
 
+let yargs
 describe('skipValidation', () => {
   beforeEach(() => {
     yargs = require('../../')
