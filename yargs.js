@@ -32,6 +32,7 @@ const configFactory = require('./lib/api/config')
 const commandFactory = require('./lib/api/command')
 const commandDirFactory = require('./lib/api/command-dir')
 const usageFactory = require('./lib/api/usage')
+const requireFactory = require('./lib/api/require')
 
 exports = module.exports = Yargs
 function Yargs (processArgs, cwd, parentRequire) {
@@ -263,36 +264,7 @@ function Yargs (processArgs, cwd, parentRequire) {
 
   // TODO: deprecate self.demand in favor of
   // .demandCommand() .demandOption().
-  self.demand = self.required = self.require = function demand (keys, max, msg) {
-    // you can optionally provide a 'max' key,
-    // which will raise an exception if too many '_'
-    // options are provided.
-    if (Array.isArray(max)) {
-      max.forEach((key) => {
-        self.demandOption(key, msg)
-      })
-      max = Infinity
-    } else if (typeof max !== 'number') {
-      msg = max
-      max = Infinity
-    }
-
-    if (typeof keys === 'number') {
-      self.demandCommand(keys, max, msg, msg)
-    } else if (Array.isArray(keys)) {
-      keys.forEach((key) => {
-        self.demandOption(key, msg)
-      })
-    } else {
-      if (typeof msg === 'string') {
-        self.demandOption(keys, msg)
-      } else if (msg === true || typeof msg === 'undefined') {
-        self.demandOption(keys)
-      }
-    }
-
-    return self
-  }
+  self.demand = self.required = self.require = requireFactory(self)
 
   self.demandCommand = function demandCommand (min, max, minMsg, maxMsg) {
     argsert('[number] [number|string] [string|null|undefined] [string|null|undefined]', [min, max, minMsg, maxMsg], arguments.length)
