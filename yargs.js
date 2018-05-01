@@ -14,6 +14,27 @@ const applyExtends = require('./lib/apply-extends')
 const middlewareFactory = require('./lib/middleware')
 const YError = require('./lib/yerror')
 
+const booleanFactory = require('./lib/api/boolean')
+const arrayFactory = require('./lib/api/array')
+const numberFactory = require('./lib/api/number')
+const normalizeFactory = require('./lib/api/normalize')
+const countFactory = require('./lib/api/count')
+const stringFactory = require('./lib/api/string')
+const skipValidationFactory = require('./lib/api/skip-validation')
+const requiresArgFactory = require('./lib/api/requires-arg')
+const nargsFactory = require('./lib/api/nargs')
+const choicesFactory = require('./lib/api/choices')
+const aliasFactory = require('./lib/api/alias')
+const demandOptionFactory = require('./lib/api/demand-option')
+const coerceFactory = require('./lib/api/coerce')
+const defaultsFactory = require('./lib/api/defaults')
+const describeFactory = require('./lib/api/describe')
+const configFactory = require('./lib/api/config')
+const commandFactory = require('./lib/api/command')
+const commandDirFactory = require('./lib/api/command-dir')
+const usageFactory = require('./lib/api/usage')
+const requireFactory = require('./lib/api/require')
+
 exports = module.exports = Yargs
 function Yargs (processArgs, cwd, parentRequire) {
   processArgs = processArgs || [] // handle calling yargs().
@@ -171,108 +192,11 @@ function Yargs (processArgs, cwd, parentRequire) {
     frozen = undefined
   }
 
-  self.boolean = function (keys) {
-    argsert('<array|string>', [keys], arguments.length)
-    populateParserHintArray('boolean', keys)
-    return self
-  }
-
-  self.array = function (keys) {
-    argsert('<array|string>', [keys], arguments.length)
-    populateParserHintArray('array', keys)
-    return self
-  }
-
-  self.number = function (keys) {
-    argsert('<array|string>', [keys], arguments.length)
-    populateParserHintArray('number', keys)
-    return self
-  }
-
-  self.normalize = function (keys) {
-    argsert('<array|string>', [keys], arguments.length)
-    populateParserHintArray('normalize', keys)
-    return self
-  }
-
-  self.count = function (keys) {
-    argsert('<array|string>', [keys], arguments.length)
-    populateParserHintArray('count', keys)
-    return self
-  }
-
-  self.string = function (keys) {
-    argsert('<array|string>', [keys], arguments.length)
-    populateParserHintArray('string', keys)
-    return self
-  }
-
-  self.requiresArg = function (keys) {
-    argsert('<array|string>', [keys], arguments.length)
-    populateParserHintObject(self.nargs, false, 'narg', keys, 1)
-    return self
-  }
-
-  self.skipValidation = function (keys) {
-    argsert('<array|string>', [keys], arguments.length)
-    populateParserHintArray('skipValidation', keys)
-    return self
-  }
-
   function populateParserHintArray (type, keys, value) {
     keys = [].concat(keys)
     keys.forEach((key) => {
       options[type].push(key)
     })
-  }
-
-  self.nargs = function (key, value) {
-    argsert('<string|object|array> [number]', [key, value], arguments.length)
-    populateParserHintObject(self.nargs, false, 'narg', key, value)
-    return self
-  }
-
-  self.choices = function (key, value) {
-    argsert('<object|string|array> [string|array]', [key, value], arguments.length)
-    populateParserHintObject(self.choices, true, 'choices', key, value)
-    return self
-  }
-
-  self.alias = function (key, value) {
-    argsert('<object|string|array> [string|array]', [key, value], arguments.length)
-    populateParserHintObject(self.alias, true, 'alias', key, value)
-    return self
-  }
-
-  // TODO: actually deprecate self.defaults.
-  self.default = self.defaults = function (key, value, defaultDescription) {
-    argsert('<object|string|array> [*] [string]', [key, value, defaultDescription], arguments.length)
-    if (defaultDescription) options.defaultDescription[key] = defaultDescription
-    if (typeof value === 'function') {
-      if (!options.defaultDescription[key]) options.defaultDescription[key] = usage.functionDescription(value)
-      value = value.call()
-    }
-    populateParserHintObject(self.default, false, 'default', key, value)
-    return self
-  }
-
-  self.describe = function (key, desc) {
-    argsert('<object|string|array> [string]', [key, desc], arguments.length)
-    populateParserHintObject(self.describe, false, 'key', key, true)
-    usage.describe(key, desc)
-    return self
-  }
-
-  self.demandOption = function (keys, msg) {
-    argsert('<object|string|array> [string]', [keys, msg], arguments.length)
-    populateParserHintObject(self.demandOption, false, 'demandedOptions', keys, msg)
-    return self
-  }
-
-  self.coerce = function (keys, value) {
-    argsert('<object|string|array> [function]', [keys, value], arguments.length)
-    populateParserHintObject(self.coerce, false, 'coerce', keys, value)
-    return self
   }
 
   function populateParserHintObject (builder, isArray, type, key, value) {
@@ -298,6 +222,24 @@ function Yargs (processArgs, cwd, parentRequire) {
     }
   }
 
+  self.boolean = booleanFactory(options, self, populateParserHintArray)
+  self.array = arrayFactory(options, self, populateParserHintArray)
+  self.number = numberFactory(options, self, populateParserHintArray)
+  self.normalize = normalizeFactory(options, self, populateParserHintArray)
+  self.count = countFactory(options, self, populateParserHintArray)
+  self.string = stringFactory(options, self, populateParserHintArray)
+  self.skipValidation = skipValidationFactory(options, self, populateParserHintArray)
+  self.requiresArg = requiresArgFactory(options, self, populateParserHintObject)
+  self.nargs = nargsFactory(options, self, populateParserHintObject)
+  self.choices = choicesFactory(options, self, populateParserHintObject)
+  self.alias = aliasFactory(options, self, populateParserHintObject)
+  self.demandOption = demandOptionFactory(options, self, populateParserHintObject)
+  self.coerce = coerceFactory(options, self, populateParserHintObject)
+
+  // TODO: actually deprecate self.defaults.
+  self.default = self.defaults = defaultsFactory(options, self, populateParserHintObject, usage)
+  self.describe = describeFactory(options, self, populateParserHintObject, usage)
+
   function deleteFromParserHintObject (optionKey) {
     // delete from all parsing hints:
     // boolean, array, key, alias, etc.
@@ -313,29 +255,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     delete usage.getDescriptions()[optionKey]
   }
 
-  self.config = function config (key, msg, parseFn) {
-    argsert('[object|string] [string|function] [function]', [key, msg, parseFn], arguments.length)
-    // allow a config object to be provided directly.
-    if (typeof key === 'object') {
-      key = applyExtends(key, cwd)
-      options.configObjects = (options.configObjects || []).concat(key)
-      return self
-    }
-
-    // allow for a custom parsing function.
-    if (typeof msg === 'function') {
-      parseFn = msg
-      msg = null
-    }
-
-    key = key || 'config'
-    self.describe(key, msg || usage.deferY18nLookup('Path to JSON config file'))
-    ;(Array.isArray(key) ? key : [key]).forEach((k) => {
-      options.config[k] = parseFn || true
-    })
-
-    return self
-  }
+  self.config = configFactory(options, self, cwd, usage, applyExtends)
 
   self.example = function (cmd, description) {
     argsert('<string> [string]', [cmd, description], arguments.length)
@@ -343,51 +263,12 @@ function Yargs (processArgs, cwd, parentRequire) {
     return self
   }
 
-  self.command = function (cmd, description, builder, handler, middlewares) {
-    argsert('<string|array|object> [string|boolean] [function|object] [function] [array]', [cmd, description, builder, handler, middlewares], arguments.length)
-    command.addHandler(cmd, description, builder, handler, middlewares)
-    return self
-  }
-
-  self.commandDir = function (dir, opts) {
-    argsert('<string> [object]', [dir, opts], arguments.length)
-    const req = parentRequire || require
-    command.addDirectory(dir, self.getContext(), req, require('get-caller-file')(), opts)
-    return self
-  }
+  self.command = commandFactory(self, command)
+  self.commandDir = commandDirFactory(self, command, parentRequire, require)
 
   // TODO: deprecate self.demand in favor of
   // .demandCommand() .demandOption().
-  self.demand = self.required = self.require = function demand (keys, max, msg) {
-    // you can optionally provide a 'max' key,
-    // which will raise an exception if too many '_'
-    // options are provided.
-    if (Array.isArray(max)) {
-      max.forEach((key) => {
-        self.demandOption(key, msg)
-      })
-      max = Infinity
-    } else if (typeof max !== 'number') {
-      msg = max
-      max = Infinity
-    }
-
-    if (typeof keys === 'number') {
-      self.demandCommand(keys, max, msg, msg)
-    } else if (Array.isArray(keys)) {
-      keys.forEach((key) => {
-        self.demandOption(key, msg)
-      })
-    } else {
-      if (typeof msg === 'string') {
-        self.demandOption(keys, msg)
-      } else if (msg === true || typeof msg === 'undefined') {
-        self.demandOption(keys)
-      }
-    }
-
-    return self
-  }
+  self.demand = self.required = self.require = requireFactory(self)
 
   self.demandCommand = function demandCommand (min, max, minMsg, maxMsg) {
     argsert('[number] [number|string] [string|null|undefined] [string|null|undefined]', [min, max, minMsg, maxMsg], arguments.length)
@@ -433,22 +314,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     return self
   }
 
-  self.usage = function (msg, description, builder, handler) {
-    argsert('<string|null|undefined> [string|boolean] [function|object] [function]', [msg, description, builder, handler], arguments.length)
-
-    if (description !== undefined) {
-      // .usage() can be used as an alias for defining
-      // a default command.
-      if ((msg || '').match(/^\$0( |$)/)) {
-        return self.command(msg, description, builder, handler)
-      } else {
-        throw new YError('.usage() description must start with $0 if being used as alias for .command()')
-      }
-    } else {
-      usage.usage(msg)
-      return self
-    }
-  }
+  self.usage = usageFactory(options, self, usage)
 
   self.epilogue = self.epilog = function (msg) {
     argsert('<string>', [msg], arguments.length)
