@@ -11,6 +11,7 @@ const Y18n = require('y18n')
 const objFilter = require('./lib/obj-filter')
 const setBlocking = require('set-blocking')
 const applyExtends = require('./lib/apply-extends')
+const middlewareFactory = require('./lib/middleware')
 const YError = require('./lib/yerror')
 
 exports = module.exports = Yargs
@@ -21,6 +22,7 @@ function Yargs (processArgs, cwd, parentRequire) {
   let command = null
   let completion = null
   let groups = {}
+  let globalMiddleware = []
   let output = ''
   let preservedGroups = {}
   let usage = null
@@ -30,6 +32,8 @@ function Yargs (processArgs, cwd, parentRequire) {
     directory: path.resolve(__dirname, './locales'),
     updateFiles: false
   })
+
+  self.middleware = middlewareFactory(globalMiddleware, self)
 
   if (!cwd) cwd = process.cwd()
 
@@ -117,7 +121,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     // instances of all our helpers -- otherwise just reset.
     usage = usage ? usage.reset(localLookup) : Usage(self, y18n)
     validation = validation ? validation.reset(localLookup) : Validation(self, usage, y18n)
-    command = command ? command.reset() : Command(self, usage, validation)
+    command = command ? command.reset() : Command(self, usage, validation, globalMiddleware)
     if (!completion) completion = Completion(self, usage, command)
 
     completionCommand = null
