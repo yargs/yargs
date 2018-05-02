@@ -26,6 +26,37 @@ describe('Completion', () => {
       r.logs.should.include('foo')
     })
 
+    it('avoids interruption from command recommendations', () => {
+      const r = checkUsage(() =>
+        yargs(['./completion', '--get-yargs-completions', './completion', 'a'])
+          .command('apple', 'fruit')
+          .command('aardvark', 'animal')
+          .recommendCommands()
+          .completion()
+          .argv
+      )
+
+      r.errors.should.deep.equal([])
+      r.logs.should.include('apple')
+      r.logs.should.include('aardvark')
+    })
+
+    it('avoids interruption from default command', () => {
+      const r = checkUsage(() =>
+        yargs(['./usage', '--get-yargs-completions', './usage', ''])
+          .usage('$0 [thing]', 'skipped', subYargs => {
+            subYargs.command('aardwolf', 'is a thing according to google')
+          })
+          .command('aardvark', 'animal')
+          .completion()
+          .argv
+      )
+
+      r.errors.should.deep.equal([])
+      r.logs.should.not.include('aardwolf')
+      r.logs.should.include('aardvark')
+    })
+
     it('avoids repeating already included commands', () => {
       const r = checkUsage(() => yargs(['./completion', '--get-yargs-completions', 'apple'])
           .command('foo', 'bar')
