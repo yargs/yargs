@@ -1239,15 +1239,13 @@ describe('usage tests', () => {
   })
 
   it('should not print usage string if help() is called without arguments', () => {
-    const r = checkUsage(() => yargs([]).usage('foo').help().argv
-  )
+    const r = checkUsage(() => yargs([]).usage('foo').help().argv)
 
     r.logs.length.should.equal(0)
   })
 
   it('should add --help as an option for printing usage text if help() is called without arguments', () => {
-    const r = checkUsage(() => yargs(['--help']).usage('foo').help().argv
-  )
+    const r = checkUsage(() => yargs(['--help']).usage('foo').help().argv)
 
     r.logs.length.should.not.equal(0)
   })
