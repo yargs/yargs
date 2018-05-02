@@ -1034,8 +1034,11 @@ function Yargs (processArgs, cwd, parentRequire) {
           argv[helpOpt] = true
         }
       }
+
       const handlerKeys = command.getCommands()
-      const skipDefaultCommand = (argv[helpOpt] || argv[completion.completionKey]) && (handlerKeys.length > 1 || handlerKeys[0] !== '$0')
+      const requestCompletions = completion.completionKey in argv
+      const skipRecommendation = argv[helpOpt] || requestCompletions
+      const skipDefaultCommand = skipRecommendation && (handlerKeys.length > 1 || handlerKeys[0] !== '$0')
 
       if (argv._.length) {
         if (handlerKeys.length) {
@@ -1062,13 +1065,13 @@ function Yargs (processArgs, cwd, parentRequire) {
 
           // recommend a command if recommendCommands() has
           // been enabled, and no commands were found to execute
-          if (recommendCommands && firstUnknownCommand && !argv[helpOpt] && !argv[completion.completionKey]) {
+          if (recommendCommands && firstUnknownCommand && !skipRecommendation) {
             validation.recommendCommands(firstUnknownCommand, handlerKeys)
           }
         }
 
         // generate a completion script for adding to ~/.bashrc.
-        if (completionCommand && ~argv._.indexOf(completionCommand) && !argv[completion.completionKey]) {
+        if (completionCommand && ~argv._.indexOf(completionCommand) && !requestCompletions) {
           if (exitProcess) setBlocking(true)
           self.showCompletionScript()
           self.exit(0)
@@ -1080,7 +1083,7 @@ function Yargs (processArgs, cwd, parentRequire) {
 
       // we must run completions first, a user might
       // want to complete the --help or --version option.
-      if (completion.completionKey in argv) {
+      if (requestCompletions) {
         if (exitProcess) setBlocking(true)
 
         // we allow for asynchronous completions,
@@ -1128,7 +1131,7 @@ function Yargs (processArgs, cwd, parentRequire) {
 
         // if we're executed via bash completion, don't
         // bother with validation.
-        if (!argv[completion.completionKey]) {
+        if (!requestCompletions) {
           self._runValidation(argv, aliases, {}, parsed.error)
         }
       }
