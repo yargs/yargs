@@ -1035,7 +1035,7 @@ function Yargs (processArgs, cwd, parentRequire) {
         }
       }
       const handlerKeys = command.getCommands()
-      const skipDefaultCommand = argv[helpOpt] && (handlerKeys.length > 1 || handlerKeys[0] !== '$0')
+      const skipDefaultCommand = (argv[helpOpt] || argv[completion.completionKey]) && (handlerKeys.length > 1 || handlerKeys[0] !== '$0')
 
       if (argv._.length) {
         if (handlerKeys.length) {
@@ -1062,7 +1062,7 @@ function Yargs (processArgs, cwd, parentRequire) {
 
           // recommend a command if recommendCommands() has
           // been enabled, and no commands were found to execute
-          if (recommendCommands && firstUnknownCommand && !argv[helpOpt]) {
+          if (recommendCommands && firstUnknownCommand && !argv[helpOpt] && !argv[completion.completionKey]) {
             validation.recommendCommands(firstUnknownCommand, handlerKeys)
           }
         }
