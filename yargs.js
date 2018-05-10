@@ -11,6 +11,7 @@ const Y18n = require('y18n')
 const objFilter = require('./lib/obj-filter')
 const setBlocking = require('set-blocking')
 const applyExtends = require('./lib/apply-extends')
+const middlewareFactory = require('./lib/middleware')
 const YError = require('./lib/yerror')
 
 exports = module.exports = Yargs
@@ -21,7 +22,7 @@ function Yargs (processArgs, cwd, parentRequire) {
   let command = null
   let completion = null
   let groups = {}
-  let globalMiddleware = [];
+  let globalMiddleware = []
   let output = ''
   let preservedGroups = {}
   let usage = null
@@ -32,14 +33,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     updateFiles: false
   })
 
-  self.middleware = function(callback){
-      if(Array.isArray(callback)){
-        globalMiddleware.push(...callback);
-      } else if (typeof callback === 'object'){
-        globalMiddleware.push(callback);
-      }
-      return self;
-  }
+  self.middleware = middlewareFactory(globalMiddleware, self)
 
   if (!cwd) cwd = process.cwd()
 
@@ -535,7 +529,9 @@ function Yargs (processArgs, cwd, parentRequire) {
   let parseContext = null
   self.parse = function parse (args, shortCircuit, _parseFn) {
     argsert('[string|array] [function|boolean|object] [function]', [args, shortCircuit, _parseFn], arguments.length)
-    if (typeof args === 'undefined') args = processArgs
+    if (typeof args === 'undefined') {
+      return self._parseArgs(processArgs)
+    }
 
     // a context object can optionally be provided, this allows
     // additional information to be passed to a command handler.
@@ -1040,8 +1036,11 @@ function Yargs (processArgs, cwd, parentRequire) {
           argv[helpOpt] = true
         }
       }
+
       const handlerKeys = command.getCommands()
-      const skipDefaultCommand = argv[helpOpt] && (handlerKeys.length > 1 || handlerKeys[0] !== '$0')
+      const requestCompletions = completion.completionKey in argv
+      const skipRecommendation = argv[helpOpt] || requestCompletions
+      const skipDefaultCommand = skipRecommendation && (handlerKeys.length > 1 || handlerKeys[0] !== '$0')
 
       if (argv._.length) {
         if (handlerKeys.length) {
@@ -1068,13 +1067,13 @@ function Yargs (processArgs, cwd, parentRequire) {
 
           // recommend a command if recommendCommands() has
           // been enabled, and no commands were found to execute
-          if (recommendCommands && firstUnknownCommand && !argv[helpOpt]) {
+          if (recommendCommands && firstUnknownCommand && !skipRecommendation) {
             validation.recommendCommands(firstUnknownCommand, handlerKeys)
           }
         }
 
         // generate a completion script for adding to ~/.bashrc.
-        if (completionCommand && ~argv._.indexOf(completionCommand) && !argv[completion.completionKey]) {
+        if (completionCommand && ~argv._.indexOf(completionCommand) && !requestCompletions) {
           if (exitProcess) setBlocking(true)
           self.showCompletionScript()
           self.exit(0)
@@ -1086,7 +1085,7 @@ function Yargs (processArgs, cwd, parentRequire) {
 
       // we must run completions first, a user might
       // want to complete the --help or --version option.
-      if (completion.completionKey in argv) {
+      if (requestCompletions) {
         if (exitProcess) setBlocking(true)
 
         // we allow for asynchronous completions,
@@ -1134,7 +1133,7 @@ function Yargs (processArgs, cwd, parentRequire) {
 
         // if we're executed via bash completion, don't
         // bother with validation.
-        if (!argv[completion.completionKey]) {
+        if (!requestCompletions) {
           self._runValidation(argv, aliases, {}, parsed.error)
         }
       }
