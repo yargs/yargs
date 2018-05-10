@@ -32,7 +32,7 @@ describe('integration tests', () => {
       which('node', (err, resolvedPath) => {
         if (err) return done(err)
         testArgs(`${resolvedPath.replace('Program Files (x86)', 'Progra~2')
-                     .replace('Program Files', 'Progra~1')} bin.js`, [], done)
+          .replace('Program Files', 'Progra~1')} bin.js`, [], done)
       })
     })
 
@@ -40,7 +40,7 @@ describe('integration tests', () => {
       which('node', (err, resolvedPath) => {
         if (err) return done(err)
         testArgs(`${resolvedPath.replace('Program Files (x86)', 'Progra~2')
-                     .replace('Program Files', 'Progra~1')} bin.js`, [ 'q', 'r' ], done)
+          .replace('Program Files', 'Progra~1')} bin.js`, [ 'q', 'r' ], done)
       })
     })
   })
