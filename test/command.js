@@ -36,13 +36,13 @@ describe('Command', () => {
           argv.awesome.should.equal('world')
           return done()
         })
-        .argv
+        .parse()
     })
 
     it('populates outer argv with positional arguments', () => {
       const argv = yargs('foo hello world')
         .command('foo <bar> [awesome]')
-        .argv
+        .parse()
 
       argv._.should.include('foo')
       argv.bar.should.equal('hello')
@@ -52,7 +52,7 @@ describe('Command', () => {
     it('populates argv with camel-case variants of arguments when possible', () => {
       const argv = yargs('foo hello world')
         .command('foo <foo-bar> [baz-qux]')
-        .argv
+        .parse()
 
       argv._.should.include('foo')
       argv['foo-bar'].should.equal('hello')
@@ -64,7 +64,7 @@ describe('Command', () => {
     it('populates argv with camel-case variants of variadic args when possible', () => {
       const argv = yargs('foo hello world !')
         .command('foo <foo-bar> [baz-qux..]')
-        .argv
+        .parse()
 
       argv._.should.include('foo')
       argv['foo-bar'].should.equal('hello')
@@ -76,16 +76,16 @@ describe('Command', () => {
     it('populates subcommand\'s inner argv with positional arguments', () => {
       yargs('foo bar hello world')
         .command('foo', 'my awesome command', yargs => yargs.command(
-            'bar <greeting> [recipient]',
-            'subcommands are cool',
-            noop,
-            (argv) => {
-              argv._.should.deep.equal(['foo', 'bar'])
-              argv.greeting.should.equal('hello')
-              argv.recipient.should.equal('world')
-            }
-          ))
-        .argv
+          'bar <greeting> [recipient]',
+          'subcommands are cool',
+          noop,
+          (argv) => {
+            argv._.should.deep.equal(['foo', 'bar'])
+            argv.greeting.should.equal('hello')
+            argv.recipient.should.equal('world')
+          }
+        ))
+        .parse()
     })
 
     it('ignores positional args for aliases', () => {
@@ -98,7 +98,7 @@ describe('Command', () => {
         variadic: false
       })
       handlers.foo.demanded.should.deep.equal([])
-      expect(handlers.wat).to.not.exist
+      expect(handlers.wat).to.equal(undefined)
       command.getCommands().should.deep.equal(['foo', 'wat'])
     })
 
@@ -106,7 +106,7 @@ describe('Command', () => {
       const argv = yargs('foo foo.js --reporter=html')
         .command('foo <file>')
         .default('reporter', 'text')
-        .argv
+        .parse()
       argv.file.should.equal('foo.js')
       argv.reporter.should.equal('html')
     })
@@ -116,7 +116,7 @@ describe('Command', () => {
     it('allows required arguments to be variadic', () => {
       const argv = yargs('foo /root file1 file2 file3')
         .command('foo <root> <files..>')
-        .argv
+        .parse()
 
       argv.root.should.equal('/root')
       argv.files.should.deep.equal(['file1', 'file2', 'file3'])
@@ -125,7 +125,7 @@ describe('Command', () => {
     it('allows optional arguments to be variadic', () => {
       const argv = yargs('foo /root file1 file2 file3')
         .command('foo <root> [files..]')
-        .argv
+        .parse()
 
       argv.root.should.equal('/root')
       argv.files.should.deep.equal(['file1', 'file2', 'file3'])
@@ -138,13 +138,13 @@ describe('Command', () => {
           err.should.match(/Not enough non-option arguments/)
           return done()
         })
-        .argv
+        .parse()
     })
 
     it('does not fail if zero optional arguments are provided', () => {
       const argv = yargs('foo /root')
         .command('foo <root> [files...]')
-        .argv
+        .parse()
 
       argv.root.should.equal('/root')
       argv.files.should.deep.equal([])
@@ -153,7 +153,7 @@ describe('Command', () => {
     it('only allows the last argument to be variadic', () => {
       const argv = yargs('foo /root file1 file2')
         .command('foo <root..> <file>')
-        .argv
+        .parse()
 
       argv.root.should.equal('/root')
       argv.file.should.equal('file1')
@@ -169,7 +169,7 @@ describe('Command', () => {
           err.should.match(/got 1, need at least 2/)
           return done()
         })
-        .argv
+        .parse()
 
       argv.bar.should.equal('hello')
     })
@@ -177,7 +177,7 @@ describe('Command', () => {
     it('does not fail if optional argument is missing', () => {
       const argv = yargs('foo hello')
         .command('foo <bar> [awesome]')
-        .argv
+        .parse()
 
       expect(argv.awesome).to.equal(undefined)
       argv.bar.should.equal('hello')
@@ -508,10 +508,10 @@ describe('Command', () => {
   describe('commandDir', () => {
     it('supports relative dirs', () => {
       const r = checkOutput(() => yargs('--help').wrap(null)
-          .commandDir('fixtures/cmddir')
-          .argv)
-      r.should.have.property('exit').and.be.true
-      r.should.have.property('errors').with.length(0)
+        .commandDir('fixtures/cmddir')
+        .parse())
+      r.exit.should.equal(true)
+      r.errors.length.should.equal(0)
       r.should.have.property('logs')
       r.logs.join('\n').split(/\n+/).should.deep.equal([
         'usage [command]',
@@ -525,11 +525,10 @@ describe('Command', () => {
 
     it('supports nested subcommands', () => {
       const r = checkOutput(() => yargs('dream --help').wrap(null)
-          .commandDir('fixtures/cmddir')
-          .argv, [ './command' ])
-      r.should.have.property('exit').and.be.true
-      r.should.have.property('errors').with.length(0)
-      r.should.have.property('logs')
+        .commandDir('fixtures/cmddir')
+        .parse(), [ './command' ])
+      r.exit.should.equal(true)
+      r.errors.length.should.equal(0)
       r.logs[0].split(/\n+/).should.deep.equal([
         'command dream [command] [opts]',
         'Go to sleep and dream',
@@ -546,11 +545,10 @@ describe('Command', () => {
 
     it('supports a "recurse" boolean option', () => {
       const r = checkOutput(() => yargs('--help').wrap(null)
-          .commandDir('fixtures/cmddir', { recurse: true })
-          .argv)
-      r.should.have.property('exit').and.be.true
-      r.should.have.property('errors').with.length(0)
-      r.should.have.property('logs')
+        .commandDir('fixtures/cmddir', { recurse: true })
+        .parse())
+      r.exit.should.equal(true)
+      r.errors.length.should.equal(0)
       r.logs.join('\n').split(/\n+/).should.deep.equal([
         'usage [command]',
         'Commands:',
@@ -569,24 +567,23 @@ describe('Command', () => {
       let pathToFile
       let filename
       const r = checkOutput(() => yargs('--help').wrap(null)
-          .commandDir('fixtures/cmddir', {
-            visit (_commandObject, _pathToFile, _filename) {
-              commandObject = _commandObject
-              pathToFile = _pathToFile
-              filename = _filename
-              return false // exclude command
-            }
-          })
-          .argv)
+        .commandDir('fixtures/cmddir', {
+          visit (_commandObject, _pathToFile, _filename) {
+            commandObject = _commandObject
+            pathToFile = _pathToFile
+            filename = _filename
+            return false // exclude command
+          }
+        })
+        .parse())
       commandObject.should.have.property('command').and.equal('dream [command] [opts]')
       commandObject.should.have.property('desc').and.equal('Go to sleep and dream')
       commandObject.should.have.property('builder')
       commandObject.should.have.property('handler')
       pathToFile.should.contain(require('path').join('test', 'fixtures', 'cmddir', 'dream.js'))
       filename.should.equal('dream.js')
-      r.should.have.property('exit').and.be.true
-      r.should.have.property('errors').with.length(0)
-      r.should.have.property('logs')
+      r.exit.should.equal(true)
+      r.errors.length.should.equal(0)
       r.logs.join('\n').split(/\n+/).should.deep.equal([
         'Options:',
         '  --help     Show help  [boolean]',
@@ -596,10 +593,10 @@ describe('Command', () => {
 
     it('detects and ignores cyclic dir references', () => {
       const r = checkOutput(() => yargs('cyclic --help').wrap(null)
-          .commandDir('fixtures/cmddir_cyclic')
-          .argv, [ './command' ])
-      r.should.have.property('exit').and.be.true
-      r.should.have.property('errors').with.length(0)
+        .commandDir('fixtures/cmddir_cyclic')
+        .parse(), [ './command' ])
+      r.exit.should.equal(true)
+      r.errors.length.should.equal(0)
       r.should.have.property('logs')
       r.logs.join('\n').split(/\n+/).should.deep.equal([
         'command cyclic',
@@ -612,10 +609,10 @@ describe('Command', () => {
 
     it('derives \'command\' string from filename when not exported', () => {
       const r = checkOutput(() => yargs('--help').wrap(null)
-          .commandDir('fixtures/cmddir_noname')
-          .argv)
-      r.should.have.property('exit').and.be.true
-      r.should.have.property('errors').with.length(0)
+        .commandDir('fixtures/cmddir_noname')
+        .parse())
+      r.exit.should.equal(true)
+      r.errors.length.should.equal(0)
       r.should.have.property('logs')
       r.logs.join('\n').split(/\n+/).should.deep.equal([
         'usage [command]',
@@ -647,29 +644,29 @@ describe('Command', () => {
       }
 
       const helpCmd = checkOutput(() => yargs('help cmd')
-          .wrap(null)
-          .command(cmd)
-          .argv, [ './command' ])
+        .wrap(null)
+        .command(cmd)
+        .parse(), [ './command' ])
 
       const cmdHelp = checkOutput(() => yargs('cmd help')
-          .wrap(null)
-          .command(cmd)
-          .argv, [ './command' ])
+        .wrap(null)
+        .command(cmd)
+        .parse(), [ './command' ])
 
       const helpCmdSub = checkOutput(() => yargs('help cmd sub')
-          .wrap(null)
-          .command(cmd)
-          .argv, [ './command' ])
+        .wrap(null)
+        .command(cmd)
+        .parse(), [ './command' ])
 
       const cmdHelpSub = checkOutput(() => yargs('cmd help sub')
-          .wrap(null)
-          .command(cmd)
-          .argv, [ './command' ])
+        .wrap(null)
+        .command(cmd)
+        .parse(), [ './command' ])
 
       const cmdSubHelp = checkOutput(() => yargs('cmd sub help')
-          .wrap(null)
-          .command(cmd)
-          .argv, [ './command' ])
+        .wrap(null)
+        .command(cmd)
+        .parse(), [ './command' ])
 
       const expectedCmd = [
         'command cmd <sub>',
@@ -709,11 +706,11 @@ describe('Command', () => {
       .env('FUN_DIP')
       .global('stick') // this does not actually need to be global
       .command('eat', 'Adult supervision recommended', yargs => yargs.boolean('powder').exitProcess(false), (argv) => {
-        argv.should.have.property('powder').and.be.true
-        argv.should.have.property('stick').and.equal('yummy')
+        argv.powder.should.equal(true)
+        argv.stick.should.equal('yummy')
       })
       .exitProcess(false)
-      .argv
+      .parse()
   })
 
   // addresses https://github.com/yargs/yargs/issues/514.
@@ -726,7 +723,7 @@ describe('Command', () => {
       .command('bar', 'bar command', (yargs) => {
         output.push('bar')
       })
-      .argv
+      .parse()
 
     output.should.include('bar')
     output.should.not.include('foo')
@@ -774,27 +771,26 @@ describe('Command', () => {
       }, (argv) => {
         argv.should.have.property('someone').and.equal('Pat')
       })
-      .argv
+      .parse()
     argv.should.have.property('someone').and.equal('Pat')
   })
 
   it('allows builder function to parse argv without returning', () => {
     const argv = yargs('yo Jude')
       .command('yo <someone>', 'Send someone a yo', (yargs) => {
-        yargs.argv
+        yargs.parse()
       }, (argv) => {
         argv.should.have.property('someone').and.equal('Jude')
-      })
-      .argv
+      }).parse()
     argv.should.have.property('someone').and.equal('Jude')
   })
 
   it('allows builder function to return parsed argv', () => {
     const argv = yargs('yo Leslie')
-      .command('yo <someone>', 'Send someone a yo', yargs => yargs.argv, (argv) => {
+      .command('yo <someone>', 'Send someone a yo', yargs => yargs.parse(), (argv) => {
         argv.should.have.property('someone').and.equal('Leslie')
       })
-      .argv
+      .parse()
     argv.should.have.property('someone').and.equal('Leslie')
   })
 
@@ -818,16 +814,16 @@ describe('Command', () => {
         commandCalled = true
         argv.should.have.property('someone').and.equal('world')
       })
-      .argv
+      .parse()
     argv.should.have.property('someone').and.equal('world')
-    commandCalled.should.be.true
+    commandCalled.should.equal(true)
   })
 
   describe('positional aliases', () => {
     it('allows an alias to be defined for a required positional argument', () => {
       const argv = yargs('yo bcoe 113993')
         .command('yo <user | email> [ssn]', 'Send someone a yo')
-        .argv
+        .parse()
       argv.user.should.equal('bcoe')
       argv.email.should.equal('bcoe')
       argv.ssn.should.equal(113993)
@@ -839,7 +835,7 @@ describe('Command', () => {
         .command('yo [ssn|sin]', 'Send someone a yo', {}, (_argv) => {
           argv = _argv
         })
-        .argv
+        .parse()
       argv.ssn.should.equal(113993)
       argv.sin.should.equal(113993)
     })
@@ -865,7 +861,7 @@ describe('Command', () => {
           })
           .config('foo')
           .global('foo', false)
-          .argv
+          .parse()
       })
 
       it('loads config for command by default', (done) => {
@@ -875,7 +871,7 @@ describe('Command', () => {
             return done()
           })
           .config('foo')
-          .argv
+          .parse()
       })
     })
 
@@ -888,7 +884,7 @@ describe('Command', () => {
           })
           .implies('foo', 'bar')
           .global('foo', false)
-          .argv
+          .parse()
       })
 
       it('applies conflicts logic for command by default', (done) => {
@@ -899,7 +895,7 @@ describe('Command', () => {
             return done()
           })
           .conflicts('foo', 'bar')
-          .argv
+          .parse()
       })
 
       it('resets conflicts logic for command if global is false', (done) => {
@@ -911,7 +907,7 @@ describe('Command', () => {
           })
           .conflicts('foo', 'bar')
           .global('foo', false)
-          .argv
+          .parse()
       })
 
       it('applies custom checks globally by default', (done) => {
@@ -924,7 +920,7 @@ describe('Command', () => {
             done()
             return true
           })
-          .argv
+          .parse()
       })
 
       it('resets custom check if global is false', () => {
@@ -935,7 +931,7 @@ describe('Command', () => {
             checkCalled = true
             return true
           }, false)
-          .argv
+          .parse()
         checkCalled.should.equal(false)
       })
 
@@ -947,7 +943,7 @@ describe('Command', () => {
             return done()
           })
           .demandOption('bar')
-          .argv
+          .parse()
       })
     })
 
@@ -957,11 +953,11 @@ describe('Command', () => {
         yargs('hi')
           .command('hi', 'The hi command', (innerYargs) => {
             commandCalled = true
-            innerYargs.getStrict().should.be.false
+            innerYargs.getStrict().should.equal(false)
           })
-        yargs.getStrict().should.be.false
-        yargs.argv // parse and run command
-        commandCalled.should.be.true
+        yargs.getStrict().should.equal(false)
+        yargs.parse() // parse and run command
+        commandCalled.should.equal(true)
       })
 
       it('can be enabled just for a command', () => {
@@ -969,11 +965,11 @@ describe('Command', () => {
         yargs('hi')
           .command('hi', 'The hi command', (innerYargs) => {
             commandCalled = true
-            innerYargs.strict().getStrict().should.be.true
+            innerYargs.strict().getStrict().should.equal(true)
           })
-        yargs.getStrict().should.be.false
-        yargs.argv // parse and run command
-        commandCalled.should.be.true
+        yargs.getStrict().should.equal(false)
+        yargs.parse() // parse and run command
+        commandCalled.should.equal(true)
       })
 
       it('applies strict globally by default', () => {
@@ -982,11 +978,11 @@ describe('Command', () => {
           .strict()
           .command('hi', 'The hi command', (innerYargs) => {
             commandCalled = true
-            innerYargs.getStrict().should.be.true
+            innerYargs.getStrict().should.equal(true)
           })
-        yargs.getStrict().should.be.true
-        yargs.argv // parse and run command
-        commandCalled.should.be.true
+        yargs.getStrict().should.equal(true)
+        yargs.parse() // parse and run command
+        commandCalled.should.equal(true)
       })
 
       // address regression introduced in #766, thanks @nexdrew!
@@ -1016,14 +1012,14 @@ describe('Command', () => {
       it('allows a command to override global`', () => {
         let commandCalled = false
         yargs('hi')
-         .strict()
-         .command('hi', 'The hi command', (innerYargs) => {
-           commandCalled = true
-           innerYargs.strict(false).getStrict().should.be.false
-         })
-        yargs.getStrict().should.be.true
-        yargs.argv // parse and run command
-        commandCalled.should.be.true
+          .strict()
+          .command('hi', 'The hi command', (innerYargs) => {
+            commandCalled = true
+            innerYargs.strict(false).getStrict().should.equal(false)
+          })
+        yargs.getStrict().should.equal(true)
+        yargs.parse() // parse and run command
+        commandCalled.should.equal(true)
       })
 
       it('does not fire command if validation fails', (done) => {
@@ -1046,7 +1042,7 @@ describe('Command', () => {
         const argv = yargs('command --foo 1 2')
           .command('command', 'a command')
           .array('foo')
-          .argv
+          .parse()
         argv.foo.should.eql([1, 2])
       })
 
@@ -1055,7 +1051,7 @@ describe('Command', () => {
           .command('command', 'a command')
           .array('foo')
           .global('foo', false)
-          .argv
+          .parse()
         argv.foo.should.eql(1)
       })
 
@@ -1067,7 +1063,7 @@ describe('Command', () => {
             msg.should.match(/Choices: 33, 88/)
             return done()
           })
-          .argv
+          .parse()
       })
     })
 
@@ -1081,7 +1077,7 @@ describe('Command', () => {
             return done()
           })
           .alias('foo', 'bar')
-          .argv
+          .parse()
       })
 
       it('allows global application of alias to be disabled', (done) => {
@@ -1096,7 +1092,7 @@ describe('Command', () => {
             alias: 'bar',
             global: false
           })
-          .argv
+          .parse()
       })
     })
 
@@ -1109,7 +1105,7 @@ describe('Command', () => {
             return done()
           })
           .coerce('foo', arg => arg * 2)
-          .argv
+          .parse()
       })
 
       // addresses https://github.com/yargs/yargs/issues/794
@@ -1136,7 +1132,7 @@ describe('Command', () => {
             return done()
           })
           .default('snuh', 55)
-          .argv
+          .parse()
       })
     })
 
@@ -1206,7 +1202,7 @@ describe('Command', () => {
           argv.foo.should.equal('bar')
           return done()
         })
-        .argv
+        .parse()
     })
 
     it('executes default command if undefined positional arguments and only command', (done) => {
@@ -1216,7 +1212,7 @@ describe('Command', () => {
           argv._.should.contain('baz')
           return done()
         })
-        .argv
+        .parse()
     })
 
     it('executes default command if defined positional arguments and only command', (done) => {
@@ -1226,7 +1222,7 @@ describe('Command', () => {
           argv.target.should.equal('baz')
           return done()
         })
-        .argv
+        .parse()
     })
 
     it('allows $0 as an alias for a default command', (done) => {
@@ -1235,7 +1231,7 @@ describe('Command', () => {
           argv.port.should.equal(9999)
           return done()
         })
-        .argv
+        .parse()
     })
 
     it('does not execute default command if another command is provided', (done) => {
@@ -1246,7 +1242,7 @@ describe('Command', () => {
           argv.foo.should.equal('bar')
           return done()
         })
-        .argv
+        .parse()
     })
 
     it('allows default command to be set as alias', (done) => {
@@ -1257,7 +1253,7 @@ describe('Command', () => {
           argv.foo.should.equal('bar')
           return done()
         })
-        .argv
+        .parse()
     })
 
     it('allows command to be run when alias is default command', (done) => {
@@ -1268,7 +1264,7 @@ describe('Command', () => {
           argv.foo.should.equal('bar')
           return done()
         })
-        .argv
+        .parse()
     })
 
     it('the last default command set should take precedence', (done) => {
@@ -1280,7 +1276,7 @@ describe('Command', () => {
           argv.foo.should.equal('bar')
           return done()
         })
-        .argv
+        .parse()
     })
 
     describe('strict', () => {
@@ -1294,7 +1290,7 @@ describe('Command', () => {
             describe: 'a foo command'
           })
           .strict()
-          .argv
+          .parse()
       })
 
       it('allows default command aliases, when strict mode is enabled', (done) => {
@@ -1309,7 +1305,7 @@ describe('Command', () => {
           .option('foo', {
             describe: 'a foo command'
           })
-          .argv
+          .parse()
       })
     })
   })
@@ -1326,7 +1322,7 @@ describe('Command', () => {
           describe: 'a foo command',
           demand: true
         })
-        .argv
+        .parse()
     })
     called.should.equal(false)
     r.errors.should.match(/Missing required argument/)
@@ -1338,7 +1334,7 @@ describe('Command', () => {
       .command('1', 'numeric command', (yargs) => {
         output.push('1')
       })
-      .argv
+      .parse()
     output.should.include('1')
   })
 
@@ -1404,7 +1400,7 @@ describe('Command', () => {
         expect(err).to.equal(error)
         done()
       })
-      .argv
+      .parse()
   })
 
   it('succeeds when the promise returned by the command handler resolves', (done) => {
@@ -1418,7 +1414,7 @@ describe('Command', () => {
       .fail((msg, err) => {
         return done(Error('should not have been called'))
       })
-      .argv
+      .parse()
 
     handler.then(called => {
       called.should.equal(true)

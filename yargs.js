@@ -529,7 +529,9 @@ function Yargs (processArgs, cwd, parentRequire) {
   let parseContext = null
   self.parse = function parse (args, shortCircuit, _parseFn) {
     argsert('[string|array] [function|boolean|object] [function]', [args, shortCircuit, _parseFn], arguments.length)
-    if (typeof args === 'undefined') args = processArgs
+    if (typeof args === 'undefined') {
+      return self._parseArgs(processArgs)
+    }
 
     // a context object can optionally be provided, this allows
     // additional information to be passed to a command handler.
