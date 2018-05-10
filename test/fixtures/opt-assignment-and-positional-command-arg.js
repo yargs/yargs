@@ -11,4 +11,4 @@ require('../../index')
       console.log(JSON.stringify({ _: argv._, foo: argv.foo, baz: argv.baz }))
     }
   )
-  .argv
+  .parse()

@@ -51,6 +51,6 @@ describe('middleware', () => {
         }
       )
       .exitProcess(false) // defaults to true.
-      .argv
+      .parse()
   })
 })
