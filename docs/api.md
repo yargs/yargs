@@ -954,7 +954,7 @@ Running myCommand!
 ```
 
 
-<a name="middleware"></a>.middleware(callbacks)
+<a name="nargs"></a>.nargs(callbacks)
 --------------------
 
 
