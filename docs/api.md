@@ -926,9 +926,6 @@ To submit a new translation for yargs:
 
 *The [Microsoft Terminology Search](http://www.microsoft.com/Language/en-US/Search.aspx) can be useful for finding the correct terminology in your locale.*
 
-<a name="nargs"></a>.nargs(key, count)
------------
-
 .middleware(callbacks)
 ------------------------------------
 
@@ -953,10 +950,8 @@ I'm another middleware function
 Running myCommand!
 ```
 
-
 <a name="nargs"></a>.nargs(callbacks)
 --------------------
-
 
 The number of arguments that should be consumed after a key. This can be a
 useful hint to prevent parsing ambiguity. For example:
