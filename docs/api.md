@@ -320,7 +320,7 @@ But wait, there's more! You can return an asynchronous promise.
 
 ```js
 var argv = require('yargs')
-  .completion('completion', function(current, argv, done) {
+  .completion('completion', function(current, argv) {
     return new Promise(function (resolve, reject) {
       setTimeout(function () {
         resolve(['apple', 'banana'])
