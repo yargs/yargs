@@ -951,7 +951,7 @@ Running myCommand!
 ```
 
 <a name="nargs"></a>.nargs(key, count)
---------------------
+-----------
 
 The number of arguments that should be consumed after a key. This can be a
 useful hint to prevent parsing ambiguity. For example:
