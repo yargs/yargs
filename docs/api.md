@@ -926,7 +926,7 @@ To submit a new translation for yargs:
 
 *The [Microsoft Terminology Search](http://www.microsoft.com/Language/en-US/Search.aspx) can be useful for finding the correct terminology in your locale.*
 
-.middleware(callbacks)
+<a name="middleware"></a>.middleware(callbacks)
 ------------------------------------
 
 Define global middleware functions to be called first, in list order, for all cli command.  
