@@ -926,10 +926,7 @@ To submit a new translation for yargs:
 
 *The [Microsoft Terminology Search](http://www.microsoft.com/Language/en-US/Search.aspx) can be useful for finding the correct terminology in your locale.*
 
-<a name="nargs"></a>.nargs(key, count)
------------
-
-.middleware(callbacks)
+<a name="middleware"></a>.middleware(callbacks)
 ------------------------------------
 
 Define global middleware functions to be called first, in list order, for all cli command.  
@@ -953,10 +950,8 @@ I'm another middleware function
 Running myCommand!
 ```
 
-
-<a name="middleware"></a>.middleware(callbacks)
---------------------
-
+<a name="nargs"></a>.nargs(key, count)
+-----------
 
 The number of arguments that should be consumed after a key. This can be a
 useful hint to prevent parsing ambiguity. For example:
