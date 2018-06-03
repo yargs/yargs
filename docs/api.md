@@ -813,6 +813,20 @@ var yargs = require("yargs")(['--info'])
   .argv
 ```
 
+<a name="scriptName"></a>.scriptName($0)
+------------------
+
+Set the name of your script ($0). Default is the base filename executed by node (`process.argv[1]`)
+
+Example:
+
+```js
+var yargs = require("yargs")
+  .scriptName("my-script")
+  .help()
+  .argv
+```
+
 <a name="showHidden"></a>.showHidden()
 -----------------------------------------
 .showHidden([option | boolean])
