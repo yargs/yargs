@@ -16,7 +16,7 @@ function addMiddleware (state = initialState, middleware) {
 }
 
 function getMiddleware (state = initialState) {
-  return state.middleware
+  return state
 }
 
 function resetMiddleware (state = initialState) {
@@ -38,7 +38,7 @@ function middlewareReducer (state = initialState, action = {}) {
     case ADD_MIDDLEWARE:
       return addMiddleware(state, action.middleware)
     case RESET_MIDDLEWARE:
-      return resetMiddleware()
+      return resetMiddleware(state)
     default:
       return state
   }
