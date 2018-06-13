@@ -22,7 +22,6 @@ function Yargs (processArgs, cwd, parentRequire) {
   let command = null
   let completion = null
   let groups = {}
-  let globalMiddleware = []
   let output = ''
   let preservedGroups = {}
   let usage = null
@@ -33,7 +32,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     updateFiles: false
   })
 
-  self.middleware = middlewareFactory(globalMiddleware, self)
+  self.middleware = middlewareFactory(self)
 
   if (!cwd) cwd = process.cwd()
 
@@ -126,7 +125,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     // instances of all our helpers -- otherwise just reset.
     usage = usage ? usage.reset(localLookup) : Usage(self, y18n)
     validation = validation ? validation.reset(localLookup) : Validation(self, usage, y18n)
-    command = command ? command.reset() : Command(self, usage, validation, globalMiddleware)
+    command = command ? command.reset() : Command(self, usage, validation)
     if (!completion) completion = Completion(self, usage, command)
 
     completionCommand = null
