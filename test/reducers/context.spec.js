@@ -4,7 +4,7 @@
 require('chai').should()
 const expect = require('chai').expect
 
-describe('middleware reducer', () => {
+describe('context reducer', () => {
   const { getContext, incrementContextResets } = require('../../actions/context')
   const contextReducer = require('../../reducers/context')
   it('should get context', () => {

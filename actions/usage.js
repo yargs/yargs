@@ -1,5 +1,4 @@
 const SET_SHOW_HELP_ON_FAIL = 'SET_SHOW_HELP_ON_FAIL'
-const GET_SHOW_HELP_ON_FAIL = 'GET_SHOW_HELP_ON_FAIL'
 const RESET_USAGE = 'RESET_USAGE'
 const FREEZE_USAGE = 'FREEZE_USAGE'
 const UNFREEZE_USAGE = 'UNFREEZE_USAGE'
@@ -17,12 +16,6 @@ function setFailureOutput (value) {
   return {
     type: SET_FAILURE_OUTPUT,
     value
-  }
-}
-
-function getShowHelpOnFail () {
-  return {
-    type: GET_SHOW_HELP_ON_FAIL
   }
 }
 
@@ -47,13 +40,11 @@ function unfreezeUsage () {
 module.exports = {
   setShowHelpOnFail,
   setFailureOutput,
-  getShowHelpOnFail,
   resetUsage,
   freezeUsage,
   unfreezeUsage,
   SET_SHOW_HELP_ON_FAIL,
   SET_FAILURE_OUTPUT,
-  GET_SHOW_HELP_ON_FAIL,
   RESET_USAGE,
   FREEZE_USAGE,
   UNFREEZE_USAGE
