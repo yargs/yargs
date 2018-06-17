@@ -1,7 +1,8 @@
-const {SET_SHOW_HELP_ON_FAIL, GET_SHOW_HELP_ON_FAIL, RESET_USAGE} = require('../actions/usage')
+const {SET_SHOW_HELP_ON_FAIL, GET_SHOW_HELP_ON_FAIL, RESET_USAGE, FREEZE_USAGE, UNFREEZE_USAGE} = require('../actions/usage')
 const initialState = {
   failMessage: null,
-  showHelpOnFail: true
+  showHelpOnFail: true,
+  frozen: {}
 }
 
 function setShowHelpOnFail (state = initialState, enabled, message) {
@@ -22,7 +23,19 @@ function getShowHelpOnFail (state = initialState) {
 }
 
 function resetUsage (state = initialState) {
-  return Object.assign({}, state, {failMessage: null, showHelpOnFail: true})
+  return Object.assign({}, state, {failMessage: null, showHelpOnFail: true, frozen: {}})
+}
+
+function freezeUsage (state = initialState) {
+  return Object.assign({}, state, {
+    frozen: {
+      failMessage: state.failMessage
+    }
+  })
+}
+
+function unfreezeUsage (state = initialState) {
+  return Object.assign({}, state, state.frozen)
 }
 
 module.exports = function usageReducer (state = initialState, action = {}) {
@@ -33,6 +46,10 @@ module.exports = function usageReducer (state = initialState, action = {}) {
       return getShowHelpOnFail(state)
     case RESET_USAGE:
       return resetUsage(state)
+    case FREEZE_USAGE:
+      return freezeUsage(state)
+    case UNFREEZE_USAGE:
+      return unfreezeUsage(state)
     default:
       return state
   }
