@@ -10,6 +10,12 @@ function setShowHelpOnFail (enabled, message) {
   }
 }
 
+function getShowHelpOnFail () {
+  return {
+    type: GET_SHOW_HELP_ON_FAIL
+  }
+}
+
 function resetUsage () {
   return {
     type: RESET_USAGE
@@ -18,6 +24,7 @@ function resetUsage () {
 
 module.exports = {
   setShowHelpOnFail,
+  getShowHelpOnFail,
   resetUsage,
   SET_SHOW_HELP_ON_FAIL,
   GET_SHOW_HELP_ON_FAIL,
