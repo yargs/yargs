@@ -2,6 +2,7 @@
 node_modules/
 .nyc_output/
 *.swp
+.DS_store
 test.js
 coverage
 package-lock.json
