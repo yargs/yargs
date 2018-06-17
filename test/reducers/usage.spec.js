@@ -56,5 +56,4 @@ describe('usage reducer', () => {
     expect(result.failureOutput).to.equal(false)
     expect(JSON.stringify(result.frozen)).to.equal('{}')
   })
-
 })
