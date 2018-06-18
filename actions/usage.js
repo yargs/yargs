@@ -5,6 +5,8 @@ const UNFREEZE_USAGE = 'UNFREEZE_USAGE'
 const SET_FAILURE_OUTPUT = 'SET_FAILURE_OUTPUT'
 const SET_USAGE_EPILOG = 'SET_USAGE_EPILOG'
 const SET_USAGE_DISABLED = 'SET_USAGE_DISABLED'
+const SET_USAGES = 'SET_USAGES'
+const ADD_USAGES = 'ADD_USAGES'
 
 function setShowHelpOnFail (enabled, message) {
   return {
@@ -35,6 +37,20 @@ function setUsageDisabled (value) {
   }
 }
 
+function setUsages (value) {
+  return {
+    type: SET_USAGES,
+    value
+  }
+}
+
+function addUsages (value) {
+  return {
+    type: ADD_USAGES,
+    value
+  }
+}
+
 function resetUsage () {
   return {
     type: RESET_USAGE
@@ -58,6 +74,8 @@ module.exports = {
   setFailureOutput,
   setUsageEpilog,
   setUsageDisabled,
+  setUsages,
+  addUsages,
   resetUsage,
   freezeUsage,
   unfreezeUsage,
@@ -65,6 +83,8 @@ module.exports = {
   SET_FAILURE_OUTPUT,
   SET_USAGE_EPILOG,
   SET_USAGE_DISABLED,
+  SET_USAGES,
+  ADD_USAGES,
   RESET_USAGE,
   FREEZE_USAGE,
   UNFREEZE_USAGE
