@@ -1,4 +1,14 @@
-const {SET_SHOW_HELP_ON_FAIL, SET_USAGE_EPILOG, SET_USAGE_DISABLED, RESET_USAGE, FREEZE_USAGE, UNFREEZE_USAGE, SET_FAILURE_OUTPUT} = require('../actions/usage')
+const {
+  SET_SHOW_HELP_ON_FAIL,
+  SET_USAGE_EPILOG,
+  SET_USAGE_DISABLED,
+  SET_USAGES,
+  ADD_USAGES,
+  RESET_USAGE,
+  FREEZE_USAGE,
+  UNFREEZE_USAGE,
+  SET_FAILURE_OUTPUT
+} = require('../actions/usage')
 const initialState = {
   failMessage: null,
   showHelpOnFail: true,
@@ -36,6 +46,15 @@ function setUsageDisabled (state = initialState, value) {
   return Object.assign({}, state, { usageDisabled: value })
 }
 
+function setUsages (state = initialState, value) {
+  return Object.assign({}, state, { usages: value.slice() })
+}
+
+function addUsages (state = initialState, value) {
+  console.log('usages: ', state.usages)
+  return Object.assign({}, state, { usages: state.usages.slice().push(value.slice()) })
+}
+
 function resetUsage (state = initialState) {
   return {
     failMessage: null,
@@ -46,8 +65,7 @@ function resetUsage (state = initialState) {
     usages: [],
     examples: [],
     commands: [],
-    frozen:
-      {}
+    frozen: {}
   }
 }
 
@@ -75,6 +93,10 @@ module.exports = function usageReducer (state = initialState, action = {}) {
       return setUsageEpilog(state, action.value)
     case SET_USAGE_DISABLED:
       return setUsageDisabled(state, action.value)
+    case SET_USAGES:
+      return setUsages(state, action.value)
+    case ADD_USAGES:
+      return addUsages(state, action.value)
     case RESET_USAGE:
       return resetUsage(state)
     case FREEZE_USAGE:
