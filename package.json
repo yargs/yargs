@@ -26,6 +26,10 @@
     "yargs-parser": "^10.0.0"
   },
   "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.3",
+    "babel-loader": "^7.1.4",
+    "babel-preset-env": "^1.7.0",
     "chai": "^4.1.2",
     "chalk": "^1.1.3",
     "coveralls": "^3.0.1",
@@ -38,11 +42,14 @@
     "rimraf": "^2.5.0",
     "standard": "^11.0.1",
     "standard-version": "^4.2.0",
+    "webpack": "^4.12.0",
+    "webpack-cli": "^3.0.8",
     "which": "^1.2.9",
     "yargs-test-extends": "^1.0.1"
   },
   "scripts": {
     "pretest": "standard",
+    "build": "webpack --config webpack.config.js",
     "test": "nyc --cache mocha --require ./test/before.js --timeout=8000 --check-leaks",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
     "release": "standard-version"
