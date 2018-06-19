@@ -60,7 +60,7 @@ function resetUsage (state = initialState) {
     epilog: undefined,
     usageDisabled: false,
     usages: [],
-    frozen: {}
+    frozen: state.frozen
   }
 }
 
@@ -69,6 +69,8 @@ function freezeUsage (state = initialState) {
     frozen: {
       failMessage: state.failMessage,
       failureOutput: state.failureOutput,
+      usages: state.usages.slice(),
+      usageDisabled: state.usageDisabled,
       epilog: state.epilog
     }
   })
