@@ -51,8 +51,7 @@ function setUsages (state = initialState, value) {
 }
 
 function addUsages (state = initialState, value) {
-  console.log('usages: ', state.usages)
-  return Object.assign({}, state, { usages: state.usages.slice().push(value.slice()) })
+  return Object.assign({}, state, { usages: [...state.usages, value.slice()] })
 }
 
 function resetUsage (state = initialState) {
