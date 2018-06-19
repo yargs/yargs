@@ -2,14 +2,16 @@ const path = require("path");
 
 module.exports = {
   mode: "production",
-  entry: "./yargs.js",
+  entry: "./index.js",
   output: {
     path: path.resolve(__dirname, "dist"),
     filename: "bundle.js"
   },
+  target: 'node',
   externals: [
     'child_process',
-    'fs'
+    'fs',
+    'spawn-sync'
   ],
   module: {
     rules: [
