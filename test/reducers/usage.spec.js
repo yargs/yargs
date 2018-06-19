@@ -46,7 +46,7 @@ describe('usage reducer', () => {
     expect(result.failMessage).to.equal(null)
     expect(result.showHelpOnFail).to.equal(true)
     expect(result.failureOutput).to.equal(false)
-    expect(JSON.stringify(result.frozen)).to.equal('{}')
+    expect(JSON.stringify(result.frozen)).to.equal('{"test":"test"}')
   })
 
   it('should reset usage', () => {
