@@ -16,8 +16,6 @@ const initialState = {
   epilog: undefined,
   usageDisabled: false,
   usages: [],
-  examples: [],
-  commands: [],
   frozen: {}
 }
 
@@ -47,11 +45,11 @@ function setUsageDisabled (state = initialState, value) {
 }
 
 function setUsages (state = initialState, value) {
-  return Object.assign({}, state, { usages: value.slice() })
+  return Object.assign({}, state, { usages: [...value] })
 }
 
-function addUsages (state = initialState, value) {
-  return Object.assign({}, state, { usages: [...state.usages, value.slice()] })
+function addUsages (state = initialState, msg, description) {
+  return Object.assign({}, state, { usages: [...state.usages, [msg, description]] })
 }
 
 function resetUsage (state = initialState) {
@@ -62,8 +60,6 @@ function resetUsage (state = initialState) {
     epilog: undefined,
     usageDisabled: false,
     usages: [],
-    examples: [],
-    commands: [],
     frozen: {}
   }
 }
@@ -95,7 +91,7 @@ module.exports = function usageReducer (state = initialState, action = {}) {
     case SET_USAGES:
       return setUsages(state, action.value)
     case ADD_USAGES:
-      return addUsages(state, action.value)
+      return addUsages(state, action.msg, action.description)
     case RESET_USAGE:
       return resetUsage(state)
     case FREEZE_USAGE:

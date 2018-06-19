@@ -44,10 +44,11 @@ function setUsages (value) {
   }
 }
 
-function addUsages (value) {
+function addUsages (msg, description = '') {
   return {
     type: ADD_USAGES,
-    value
+    msg,
+    description
   }
 }
 
