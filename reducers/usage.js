@@ -15,8 +15,7 @@ const initialState = {
   failureOutput: false,
   epilog: undefined,
   usageDisabled: false,
-  usages: [],
-  frozen: {}
+  usages: []
 }
 
 function setShowHelpOnFail (state = initialState, enabled, message) {
@@ -68,6 +67,7 @@ function freezeUsage (state = initialState) {
   return Object.assign({}, state, {
     frozen: {
       failMessage: state.failMessage,
+      showHelpOnFail: state.showHelpOnFail,
       failureOutput: state.failureOutput,
       usages: state.usages.slice(),
       usageDisabled: state.usageDisabled,
@@ -77,7 +77,9 @@ function freezeUsage (state = initialState) {
 }
 
 function unfreezeUsage (state = initialState) {
-  return Object.assign({}, state, state.frozen)
+  const nextState = Object.assign({}, state, state.frozen)
+  delete nextState.frozen
+  return nextState
 }
 
 module.exports = function usageReducer (state = initialState, action = {}) {

@@ -5,7 +5,12 @@ require('chai').should()
 const expect = require('chai').expect
 
 describe('usage reducer', () => {
-  const { setShowHelpOnFail, resetUsage } = require('../../actions/usage')
+  const {
+    setShowHelpOnFail,
+    resetUsage,
+    freezeUsage,
+    unfreezeUsage
+  } = require('../../actions/usage')
   const usageReducer = require('../../reducers/usage')
   it('should enable and set help messaging when typeof enabled is string', () => {
     const result = usageReducer({
@@ -49,11 +54,23 @@ describe('usage reducer', () => {
     expect(JSON.stringify(result.frozen)).to.equal('{"test":"test"}')
   })
 
-  it('should reset usage', () => {
+  it('should reset usage from initialState', () => {
     const result = usageReducer(undefined, resetUsage())
     expect(result.failMessage).to.equal(null)
     expect(result.showHelpOnFail).to.equal(true)
     expect(result.failureOutput).to.equal(false)
-    expect(JSON.stringify(result.frozen)).to.equal('{}')
+    expect(result).to.have.property('frozen', undefined)
+  })
+
+  it('preserves frozen state during reset', () => {
+    const initialState = usageReducer(undefined, setShowHelpOnFail('initial'))
+    const frozen = usageReducer(initialState, freezeUsage())
+    const resetted = usageReducer(frozen, resetUsage())
+    const mutated = usageReducer(resetted, setShowHelpOnFail('mutated'))
+    const unfrozen = usageReducer(mutated, unfreezeUsage())
+
+    expect(frozen.frozen).to.deep.equal(initialState)
+    expect(resetted.frozen).to.deep.equal(frozen.frozen)
+    expect(unfrozen).to.deep.equal(initialState)
   })
 })
