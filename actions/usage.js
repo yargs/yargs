@@ -7,8 +7,10 @@ const SET_USAGE_EPILOG = 'SET_USAGE_EPILOG'
 const SET_USAGE_DISABLED = 'SET_USAGE_DISABLED'
 const SET_USAGES = 'SET_USAGES'
 const SET_COMMANDS = 'SET_COMMANDS'
+const SET_EXAMPLES = 'SET_EXAMPLES'
 const ADD_USAGES = 'ADD_USAGES'
 const ADD_COMMAND = 'ADD_COMMAND'
+const ADD_EXAMPLE = 'ADD_EXAMPLE'
 
 function setShowHelpOnFail (enabled, message) {
   return {
@@ -53,6 +55,13 @@ function setCommands (value) {
   }
 }
 
+function setExamples (value) {
+  return {
+    type: SET_EXAMPLES,
+    value
+  }
+}
+
 function addUsages (msg, description = '') {
   return {
     type: ADD_USAGES,
@@ -68,6 +77,14 @@ function addCommand (cmd, description = '', isDefault, aliases) {
     description,
     isDefault,
     aliases
+  }
+}
+
+function addExample (cmd, description = '') {
+  return {
+    type: ADD_EXAMPLE,
+    cmd,
+    description
   }
 }
 
@@ -96,8 +113,10 @@ module.exports = {
   setUsageDisabled,
   setUsages,
   setCommands,
+  setExamples,
   addUsages,
   addCommand,
+  addExample,
   resetUsage,
   freezeUsage,
   unfreezeUsage,
@@ -107,8 +126,10 @@ module.exports = {
   SET_USAGE_DISABLED,
   SET_USAGES,
   SET_COMMANDS,
+  SET_EXAMPLES,
   ADD_USAGES,
   ADD_COMMAND,
+  ADD_EXAMPLE,
   RESET_USAGE,
   FREEZE_USAGE,
   UNFREEZE_USAGE
