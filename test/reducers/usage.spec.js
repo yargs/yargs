@@ -84,10 +84,6 @@ describe('usage reducer', () => {
   it('should add a command to commands', () => {
     const oneCommand = usageReducer(undefined, addCommand('re', 'some description', false, '-p'))
     const twoCommands = usageReducer(oneCommand, addCommand('re other', 'some description for re other', true, '-o'))
-    const {spawnSync} = require('child_process')
-    spawnSync(`echo "${JSON.stringify(twoCommands.commands)}" >> ~/Desktop/some-file.json`, {
-      shell: true
-    })
     expect(twoCommands.commands).to.deep.equal([['re', 'some description', false, '-p'], ['re other', 'some description for re other', true, '-o']])
   })
 })
