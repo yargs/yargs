@@ -7,6 +7,8 @@ const expect = require('chai').expect
 describe('usage reducer', () => {
   const {
     setShowHelpOnFail,
+    setCommands,
+    addCommand,
     resetUsage,
     freezeUsage,
     unfreezeUsage
@@ -72,5 +74,20 @@ describe('usage reducer', () => {
     expect(frozen.frozen).to.deep.equal(initialState)
     expect(resetted.frozen).to.deep.equal(frozen.frozen)
     expect(unfrozen).to.deep.equal(initialState)
+  })
+
+  it('should set commands', () => {
+    const result = usageReducer(undefined, setCommands(['command text']))
+    expect(result.commands).to.deep.equal(['command text'])
+  })
+
+  it('should add a command to commands', () => {
+    const oneCommand = usageReducer(undefined, addCommand('re', 'some description', false, '-p'))
+    const twoCommands = usageReducer(oneCommand, addCommand('re other', 'some description for re other', true, '-o'))
+    const {spawnSync} = require('child_process')
+    spawnSync(`echo "${JSON.stringify(twoCommands.commands)}" >> ~/Desktop/some-file.json`, {
+      shell: true
+    })
+    expect(twoCommands.commands).to.deep.equal([['re', 'some description', false, '-p'], ['re other', 'some description for re other', true, '-o']])
   })
 })
