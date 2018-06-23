@@ -4,8 +4,10 @@ const {
   SET_USAGE_DISABLED,
   SET_USAGES,
   SET_COMMANDS,
+  SET_EXAMPLES,
   ADD_USAGES,
   ADD_COMMAND,
+  ADD_EXAMPLE,
   RESET_USAGE,
   FREEZE_USAGE,
   UNFREEZE_USAGE,
@@ -18,6 +20,7 @@ const initialState = {
   epilog: undefined,
   usageDisabled: false,
   commands: [],
+  examples: [],
   usages: []
 }
 
@@ -54,6 +57,10 @@ function setCommands (state = initialState, value) {
   return Object.assign({}, state, { commands: [...value] })
 }
 
+function setExamples (state = initialState, value) {
+  return Object.assign({}, state, { examples: [...value] })
+}
+
 function addUsages (state = initialState, msg, description) {
   return Object.assign({}, state, { usages: [...state.usages, [msg, description]] })
 }
@@ -69,6 +76,10 @@ function addCommand (state = initialState, cmd, description = '', isDefault, ali
   return Object.assign({}, state, {commands: [...commands, [cmd, description, isDefault, aliases]]})
 }
 
+function addExample (state = initialState, cmd, description) {
+  return Object.assign({}, state, {examples: [...state.examples, [cmd, description]]})
+}
+
 function resetUsage (state = initialState) {
   return {
     failMessage: null,
@@ -78,6 +89,7 @@ function resetUsage (state = initialState) {
     usageDisabled: false,
     usages: [],
     commands: [],
+    examples: [],
     frozen: state.frozen
   }
 }
@@ -90,6 +102,7 @@ function freezeUsage (state = initialState) {
       failureOutput: state.failureOutput,
       usages: state.usages.slice(),
       commands: state.commands.slice(),
+      examples: state.examples.slice(),
       usageDisabled: state.usageDisabled,
       epilog: state.epilog
     }
@@ -114,12 +127,16 @@ module.exports = function usageReducer (state = initialState, action = {}) {
       return setUsageDisabled(state, action.value)
     case SET_USAGES:
       return setUsages(state, action.value)
+    case SET_EXAMPLES:
+      return setExamples(state, action.value)
     case SET_COMMANDS:
       return setCommands(state, action.value)
     case ADD_USAGES:
       return addUsages(state, action.msg, action.description)
     case ADD_COMMAND:
       return addCommand(state, action.cmd, action.description, action.isDefault, action.aliases)
+    case ADD_EXAMPLE:
+      return addExample(state, action.cmd, action.description)
     case RESET_USAGE:
       return resetUsage(state)
     case FREEZE_USAGE:
