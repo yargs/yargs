@@ -8,7 +8,9 @@ describe('usage reducer', () => {
   const {
     setShowHelpOnFail,
     setCommands,
+    setExamples,
     addCommand,
+    addExample,
     resetUsage,
     freezeUsage,
     unfreezeUsage
@@ -85,5 +87,16 @@ describe('usage reducer', () => {
     const oneCommand = usageReducer(undefined, addCommand('re', 'some description', false, '-p'))
     const twoCommands = usageReducer(oneCommand, addCommand('re other', 'some description for re other', true, '-o'))
     expect(twoCommands.commands).to.deep.equal([['re', 'some description', false, '-p'], ['re other', 'some description for re other', true, '-o']])
+  })
+
+  it('should set examples', () => {
+    const result = usageReducer(undefined, setExamples(['example text']))
+    expect(result.examples).to.deep.equal(['example text'])
+  })
+
+  it('should add two examples to examples array', () => {
+    const oneCommand = usageReducer(undefined, addExample('cmd', 'cmd example text'))
+    const twoCommands = usageReducer(oneCommand, addExample('another cmd', 'another cmd example text'))
+    expect(twoCommands.examples).to.deep.equal([['cmd', 'cmd example text'], ['another cmd', 'another cmd example text']])
   })
 })
