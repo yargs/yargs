@@ -21,7 +21,6 @@ describe('Completion', () => {
         .completion()
         .argv
       )
-
       r.logs.should.include('apple')
       r.logs.should.include('foo')
     })

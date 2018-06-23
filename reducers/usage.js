@@ -3,7 +3,9 @@ const {
   SET_USAGE_EPILOG,
   SET_USAGE_DISABLED,
   SET_USAGES,
+  SET_COMMANDS,
   ADD_USAGES,
+  ADD_COMMAND,
   RESET_USAGE,
   FREEZE_USAGE,
   UNFREEZE_USAGE,
@@ -15,6 +17,7 @@ const initialState = {
   failureOutput: false,
   epilog: undefined,
   usageDisabled: false,
+  commands: [],
   usages: []
 }
 
@@ -47,8 +50,23 @@ function setUsages (state = initialState, value) {
   return Object.assign({}, state, { usages: [...value] })
 }
 
+function setCommands (state = initialState, value) {
+  return Object.assign({}, state, { commands: [...value] })
+}
+
 function addUsages (state = initialState, msg, description) {
   return Object.assign({}, state, { usages: [...state.usages, [msg, description]] })
+}
+
+function addCommand (state = initialState, cmd, description = '', isDefault, aliases) {
+  let commands = [...state.commands]
+  // the last default wins, so cancel out any previously set default
+  if (isDefault) {
+    commands = commands.map((cmdArray) => {
+      return [...cmdArray.slice(0, 2), false, ...cmdArray.slice(3)]
+    })
+  }
+  return Object.assign({}, state, {commands: [...commands, [cmd, description, isDefault, aliases]]})
 }
 
 function resetUsage (state = initialState) {
@@ -59,6 +77,7 @@ function resetUsage (state = initialState) {
     epilog: undefined,
     usageDisabled: false,
     usages: [],
+    commands: [],
     frozen: state.frozen
   }
 }
@@ -70,6 +89,7 @@ function freezeUsage (state = initialState) {
       showHelpOnFail: state.showHelpOnFail,
       failureOutput: state.failureOutput,
       usages: state.usages.slice(),
+      commands: state.commands.slice(),
       usageDisabled: state.usageDisabled,
       epilog: state.epilog
     }
@@ -94,8 +114,12 @@ module.exports = function usageReducer (state = initialState, action = {}) {
       return setUsageDisabled(state, action.value)
     case SET_USAGES:
       return setUsages(state, action.value)
+    case SET_COMMANDS:
+      return setCommands(state, action.value)
     case ADD_USAGES:
       return addUsages(state, action.msg, action.description)
+    case ADD_COMMAND:
+      return addCommand(state, action.cmd, action.description, action.isDefault, action.aliases)
     case RESET_USAGE:
       return resetUsage(state)
     case FREEZE_USAGE:
