@@ -99,4 +99,15 @@ describe('usage reducer', () => {
     const twoCommands = usageReducer(oneCommand, addExample('another cmd', 'another cmd example text'))
     expect(twoCommands.examples).to.deep.equal([['cmd', 'cmd example text'], ['another cmd', 'another cmd example text']])
   })
+
+  it.only('should set descriptions', () => {
+    const result = usageReducer(undefined, setExamples('key', 'key description'))
+    expect(result.descriptions).to.deep.equal({'key': 'key description'})
+  })
+
+  it.only('should add two examples to examples array', () => {
+    const oneCommand = usageReducer(undefined, addExample('cmd', 'cmd example text'))
+    const twoCommands = usageReducer(oneCommand, addExample('another cmd', 'another cmd example text'))
+    expect(twoCommands.examples).to.deep.equal([['cmd', 'cmd example text'], ['another cmd', 'another cmd example text']])
+  })
 })

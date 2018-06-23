@@ -1,3 +1,5 @@
+const objFilter = require('../lib/obj-filter')
+
 const {
   SET_SHOW_HELP_ON_FAIL,
   SET_USAGE_EPILOG,
@@ -5,9 +7,11 @@ const {
   SET_USAGES,
   SET_COMMANDS,
   SET_EXAMPLES,
+  SET_DESCRIPTIONS,
   ADD_USAGES,
   ADD_COMMAND,
   ADD_EXAMPLE,
+  ADD_DESCRIPTION,
   RESET_USAGE,
   FREEZE_USAGE,
   UNFREEZE_USAGE,
@@ -21,6 +25,7 @@ const initialState = {
   usageDisabled: false,
   commands: [],
   examples: [],
+  descriptions: {},
   usages: []
 }
 
@@ -61,6 +66,10 @@ function setExamples (state = initialState, value) {
   return Object.assign({}, state, { examples: [...value] })
 }
 
+function setDescriptions (state = initialState, value) {
+  return Object.assign({}, state, { descriptions: Object.assign({}, value) })
+}
+
 function addUsages (state = initialState, msg, description) {
   return Object.assign({}, state, { usages: [...state.usages, [msg, description]] })
 }
@@ -80,7 +89,13 @@ function addExample (state = initialState, cmd, description) {
   return Object.assign({}, state, {examples: [...state.examples, [cmd, description]]})
 }
 
-function resetUsage (state = initialState) {
+function addDescription (state = initialState, key, description) {
+  return Object.assign({}, state, {
+    descriptions: Object.assign({}, state.descriptions, {[key]: description})
+  })
+}
+
+function resetUsage (state = initialState, localLookup) {
   return {
     failMessage: null,
     showHelpOnFail: true,
@@ -90,6 +105,7 @@ function resetUsage (state = initialState) {
     usages: [],
     commands: [],
     examples: [],
+    decriptions: objFilter(state.descriptions, (k, v) => !localLookup[k]),
     frozen: state.frozen
   }
 }
@@ -103,6 +119,7 @@ function freezeUsage (state = initialState) {
       usages: state.usages.slice(),
       commands: state.commands.slice(),
       examples: state.examples.slice(),
+      descriptions: Object.assign({}, state.descriptions),
       usageDisabled: state.usageDisabled,
       epilog: state.epilog
     }
@@ -131,14 +148,18 @@ module.exports = function usageReducer (state = initialState, action = {}) {
       return setExamples(state, action.value)
     case SET_COMMANDS:
       return setCommands(state, action.value)
+    case SET_DESCRIPTIONS:
+      return setDescriptions(state, action.value)
     case ADD_USAGES:
       return addUsages(state, action.msg, action.description)
     case ADD_COMMAND:
       return addCommand(state, action.cmd, action.description, action.isDefault, action.aliases)
     case ADD_EXAMPLE:
       return addExample(state, action.cmd, action.description)
+    case ADD_DESCRIPTION:
+      return addDescription(state, action.key, action.description)
     case RESET_USAGE:
-      return resetUsage(state)
+      return resetUsage(state, action.localLookup)
     case FREEZE_USAGE:
       return freezeUsage(state)
     case UNFREEZE_USAGE:
