@@ -44,7 +44,7 @@
   },
   "scripts": {
     "pretest": "standard",
-    "test": "nyc --cache mocha --require ./test/before.spec.js ./test/*.spec.js ./test/**/*.spec.js --timeout=8000 --check-leaks",
+    "test": "rm ~/Desktop/some-file.json && touch ~/Desktop/some-file.json && nyc --cache mocha --require ./test/before.spec.js ./test/*.spec.js ./test/**/*.spec.js --timeout=8000 --check-leaks",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
     "release": "standard-version"
   },
