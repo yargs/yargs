@@ -105,7 +105,7 @@ function resetUsage (state = initialState, localLookup) {
     usages: [],
     commands: [],
     examples: [],
-    decriptions: objFilter(state.descriptions, (k, v) => !localLookup[k]),
+    descriptions: objFilter(state.descriptions, (k, v) => !localLookup[k]),
     frozen: state.frozen
   }
 }
