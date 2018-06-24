@@ -1,10 +1,6 @@
 const ADD_MIDDLEWARE = 'ADD_MIDDLEWARE'
 const RESET_MIDDLEWARE = 'RESET_MIDDLEWARE'
 
-function getMiddleware () {
-  return {type: GET_MIDDLEWARE}
-}
-
 function addMiddleware (middleware) {
   return {
     type: ADD_MIDDLEWARE,
