@@ -19,6 +19,8 @@
     "os-locale": "^2.0.0",
     "require-directory": "^2.1.1",
     "require-main-filename": "^1.0.1",
+    "rollup": "^0.61.2",
+    "rollup-plugin-babel": "^3.0.5",
     "set-blocking": "^2.0.0",
     "string-width": "^2.0.0",
     "which-module": "^2.0.0",
@@ -26,6 +28,9 @@
     "yargs-parser": "^10.0.0"
   },
   "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-preset-es2015-rollup": "^3.0.0",
+    "babel-register": "^6.26.0",
     "chai": "^4.1.2",
     "chalk": "^1.1.3",
     "coveralls": "^3.0.1",
@@ -42,6 +47,7 @@
     "yargs-test-extends": "^1.0.1"
   },
   "scripts": {
+    "build": "npx rollup --config",
     "pretest": "standard",
     "test": "nyc --cache mocha --require ./test/before.js --timeout=8000 --check-leaks",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
@@ -67,7 +73,8 @@
     "command"
   ],
   "license": "MIT",
-  "engine": {
-    "node": ">=4"
+  "engines": {
+    "node": ">=6.x.x",
+    "npm": ">=5.x.x"
   }
 }
