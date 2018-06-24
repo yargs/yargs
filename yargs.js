@@ -37,6 +37,11 @@ function Yargs (processArgs, cwd, parentRequire) {
 
   if (!cwd) cwd = process.cwd()
 
+  self.scriptName = function scriptName (scriptName) {
+    self.$0 = scriptName
+    return self
+  }
+
   self.$0 = process.argv
     .slice(0, 2)
     .map((x, i) => {
