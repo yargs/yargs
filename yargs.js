@@ -1,13 +1,13 @@
 'use strict'
-const argsert = require('./lib/argsert')
-const fs = require('fs')
+import argsert from './lib/argsert'
+import fs from 'fs'
+import path from 'path'
+const Y18n = require('y18n')
 const Command = require('./lib/command')
 const Completion = require('./lib/completion')
 const Parser = require('yargs-parser')
-const path = require('path')
 const Usage = require('./lib/usage')
 const Validation = require('./lib/validation')
-const Y18n = require('y18n')
 const objFilter = require('./lib/obj-filter')
 const setBlocking = require('set-blocking')
 const applyExtends = require('./lib/apply-extends')
