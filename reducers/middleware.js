@@ -1,5 +1,5 @@
 const {
-  DD_MIDDLEWARE,
+  ADD_MIDDLEWARE,
   RESET_MIDDLEWARE
 } = require('../actions/middleware')
 const initialState = []

@@ -4,11 +4,8 @@
 require('chai').should()
 
 describe('middleware reducer', () => {
-  const { getMiddleware, addMiddleware, resetMiddleware } = require('../../actions/middleware')
+  const { addMiddleware, resetMiddleware } = require('../../actions/middleware')
   const middlewareReducer = require('../../reducers/middleware')
-  it('should get middleware', () => {
-    middlewareReducer([], getMiddleware()).should.have.length(0)
-  })
 
   it('should add middleware', () => {
     middlewareReducer(undefined, addMiddleware(['callback1', 'callback2'])).should.have.length(2)
