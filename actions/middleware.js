@@ -1,8 +1,6 @@
-const GET_MIDDLEWARE = 'GET_MIDDLEWARE'
 const ADD_MIDDLEWARE = 'ADD_MIDDLEWARE'
 const RESET_MIDDLEWARE = 'RESET_MIDDLEWARE'
 
-// action creators
 function getMiddleware () {
   return {type: GET_MIDDLEWARE}
 }
@@ -20,12 +18,9 @@ function resetMiddleware () {
   }
 }
 
-// action types
 module.exports = {
-  getMiddleware,
   addMiddleware,
   resetMiddleware,
-  GET_MIDDLEWARE,
   ADD_MIDDLEWARE,
   RESET_MIDDLEWARE
 }

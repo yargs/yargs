@@ -1,4 +1,7 @@
-const {ADD_MIDDLEWARE, RESET_MIDDLEWARE} = require('../actions/middleware')
+const {
+  DD_MIDDLEWARE,
+  RESET_MIDDLEWARE
+} = require('../actions/middleware')
 const initialState = []
 
 function addMiddleware (state = initialState, middleware) {
