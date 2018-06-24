@@ -94,7 +94,6 @@ var applyExtends = require('./lib/apply-extends');
 var middlewareFactory = require('./lib/middleware');
 var YError$1 = require('./lib/yerror');
 
-exports = module.exports = Yargs;
 function Yargs(processArgs, cwd, parentRequire) {
   processArgs = processArgs || []; // handle calling yargs().
 
@@ -1291,7 +1290,32 @@ function Yargs(processArgs, cwd, parentRequire) {
 
 // rebase an absolute path to a relative one with respect to a base directory
 // exported for tests
-exports.rebase = rebase;
 function rebase(base, dir) {
   return path.relative(base, dir);
 }
+
+function Argv(processArgs, cwd) {
+  var argv = Yargs(processArgs, cwd, require);
+  singletonify(argv);
+  return argv;
+}
+
+/*  Hack an instance of Argv with process.argv into Argv
+so people can do
+require('yargs')(['--beeble=1','-z','zizzle']).argv
+to parse a list of args and
+require('yargs').argv
+to get a parsed version of process.argv.
+*/
+function singletonify(inst) {
+  Object.keys(inst).forEach(function (key) {
+    if (key === 'argv') {
+      Argv.__defineGetter__(key, inst.__lookupGetter__(key));
+    } else {
+      Argv[key] = typeof inst[key] === 'function' ? inst[key].bind(inst) : inst[key];
+    }
+  });
+}
+Argv(process.argv.slice(2));
+
+module.exports = Argv;

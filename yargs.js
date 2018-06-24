@@ -14,7 +14,6 @@ const applyExtends = require('./lib/apply-extends')
 const middlewareFactory = require('./lib/middleware')
 const YError = require('./lib/yerror')
 
-exports = module.exports = Yargs
 function Yargs (processArgs, cwd, parentRequire) {
   processArgs = processArgs || [] // handle calling yargs().
 
@@ -1188,7 +1187,11 @@ function Yargs (processArgs, cwd, parentRequire) {
 
 // rebase an absolute path to a relative one with respect to a base directory
 // exported for tests
-exports.rebase = rebase
 function rebase (base, dir) {
   return path.relative(base, dir)
+}
+
+export {
+  Yargs,
+  rebase
 }
