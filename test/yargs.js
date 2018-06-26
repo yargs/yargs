@@ -40,12 +40,12 @@ describe('yargs dsl tests', () => {
     argv.cat.should.eql(33)
   })
 
-  it('populates argv with placeholder keys for all options', () => {
+  it('do not populates argv with placeholder keys for unset options', () => {
     const argv = yargs([])
       .option('cool', {})
       .parse()
 
-    Object.keys(argv).should.include('cool')
+    Object.keys(argv).should.not.include('cool')
   })
 
   it('accepts an object for implies', () => {
@@ -70,7 +70,6 @@ describe('yargs dsl tests', () => {
     )
 
     r.errors[0].should.match(/really cool key/)
-    r.result.should.have.property('x')
     r.result.should.not.have.property('[object Object]')
   })
 
