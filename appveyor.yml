@@ -3,16 +3,16 @@
 # Test against these versions of Node.js.
 environment:
   matrix:
-    - nodejs_version: "4"
     - nodejs_version: "6"
-    - nodejs_version: "7"
+    - nodejs_version: "8"
+    - nodejs_version: "10"
 
 # Install scripts. (runs after repo cloning)
 install:
   # Get the latest stable version of Node 0.STABLE.latest
   - ps: Install-Product node $env:nodejs_version
   # Typical npm stuff.
-  - npm i npm@5
+  - npm i -g npm@latest
   - npm install
 
 # Post-install test scripts.
@@ -21,6 +21,9 @@ test_script:
   - node --version
   - npm --version
   - cmd: npm t
+
+cache:
+  - node_modules
 
 os:
   - Default Azure

@@ -1,32 +1,28 @@
 'use strict'
 /* global describe, it, beforeEach, afterEach */
 
-const middlewareFactory = require('../lib/middleware')
-let yargs
 require('chai').should()
 
 describe('middleware', () => {
+  const {resetMiddleware} = require('../actions/middleware')
+  const store = require('../lib/store')
+  let yargs
   beforeEach(() => {
     yargs = require('../')
   })
 
   afterEach(() => {
+    store.dispatch(resetMiddleware())
     delete require.cache[require.resolve('../')]
   })
   it('should add a list of callbacks to global middleware', () => {
-    const globalMiddleware = []
-
-    middlewareFactory(globalMiddleware)(['callback1', 'callback2'])
-
-    globalMiddleware.should.have.lengthOf(2)
+    yargs.middleware(['callback1', 'callback2'])
+    store.getState().middleware.should.have.lengthOf(2)
   })
 
   it('should add a single callback to global middleware', () => {
-    const globalMiddleware = []
-
-    middlewareFactory(globalMiddleware)({})
-
-    globalMiddleware.should.have.lengthOf(1)
+    yargs.middleware({})
+    store.getState().middleware.should.have.lengthOf(1)
   })
 
   it('runs all middleware before reaching the handler', function (done) {

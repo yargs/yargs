@@ -17,12 +17,13 @@
     "find-up": "^2.1.0",
     "get-caller-file": "^1.0.1",
     "os-locale": "^2.0.0",
+    "redux": "^4.0.0",
     "require-directory": "^2.1.1",
     "require-main-filename": "^1.0.1",
     "set-blocking": "^2.0.0",
     "string-width": "^2.0.0",
     "which-module": "^2.0.0",
-    "y18n": "^3.2.1",
+    "y18n": "^3.2.1 || ^4.0.0",
     "yargs-parser": "^10.0.0"
   },
   "devDependencies": {
@@ -42,8 +43,8 @@
     "yargs-test-extends": "^1.0.1"
   },
   "scripts": {
-    "posttest": "standard",
-    "test": "nyc --cache mocha --require ./test/before.js --timeout=8000 --check-leaks",
+    "pretest": "standard",
+    "test": "nyc --cache mocha --require ./test/before.js ./test/*.spec.js ./test/**/*.spec.js --timeout=8000 --check-leaks",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
     "release": "standard-version"
   },

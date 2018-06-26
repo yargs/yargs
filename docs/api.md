@@ -320,7 +320,7 @@ But wait, there's more! You can return an asynchronous promise.
 
 ```js
 var argv = require('yargs')
-  .completion('completion', function(current, argv, done) {
+  .completion('completion', function(current, argv) {
     return new Promise(function (resolve, reject) {
       setTimeout(function () {
         resolve(['apple', 'banana'])
@@ -813,6 +813,20 @@ var yargs = require("yargs")(['--info'])
   .argv
 ```
 
+<a name="scriptName"></a>.scriptName($0)
+------------------
+
+Set the name of your script ($0). Default is the base filename executed by node (`process.argv[1]`)
+
+Example:
+
+```js
+var yargs = require("yargs")
+  .scriptName("my-script")
+  .help()
+  .argv
+```
+
 <a name="showHidden"></a>.showHidden()
 -----------------------------------------
 .showHidden([option | boolean])
@@ -926,10 +940,7 @@ To submit a new translation for yargs:
 
 *The [Microsoft Terminology Search](http://www.microsoft.com/Language/en-US/Search.aspx) can be useful for finding the correct terminology in your locale.*
 
-<a name="nargs"></a>.nargs(key, count)
------------
-
-.middleware(callbacks)
+<a name="middleware"></a>.middleware(callbacks)
 ------------------------------------
 
 Define global middleware functions to be called first, in list order, for all cli command.  
@@ -953,10 +964,8 @@ I'm another middleware function
 Running myCommand!
 ```
 
-
-<a name="middleware"></a>.middleware(callbacks)
---------------------
-
+<a name="nargs"></a>.nargs(key, count)
+-----------
 
 The number of arguments that should be consumed after a key. This can be a
 useful hint to prevent parsing ambiguity. For example:
