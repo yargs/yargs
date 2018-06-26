@@ -6,6 +6,10 @@ os:
 
 after_success: npm run coverage
 
+cache:
+  directories:
+    - "node_modules"
+
 node_js:
   - "6"
   - "8"

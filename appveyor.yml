@@ -22,6 +22,9 @@ test_script:
   - npm --version
   - cmd: npm t
 
+cache:
+  - node_modules
+
 os:
   - Default Azure
 
