@@ -2,6 +2,39 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="12.0.0"></a>
+# [12.0.0](https://github.com/yargs/yargs/compare/v11.1.0...v12.0.0) (2018-06-26)
+
+
+### Bug Fixes
+
+* .argv and .parse() now invoke identical code path ([#1126](https://github.com/yargs/yargs/issues/1126)) ([f13ebf4](https://github.com/yargs/yargs/commit/f13ebf4))
+* remove the trailing white spaces from the help output ([#1090](https://github.com/yargs/yargs/issues/1090)) ([3f0746c](https://github.com/yargs/yargs/commit/3f0746c))
+* **completion:** Avoid default command and recommendations during completion ([#1123](https://github.com/yargs/yargs/issues/1123)) ([036e7c5](https://github.com/yargs/yargs/commit/036e7c5))
+
+
+### Chores
+
+* test Node.js 6, 8 and 10 ([#1160](https://github.com/yargs/yargs/issues/1160)) ([84f9d2b](https://github.com/yargs/yargs/commit/84f9d2b))
+* upgrade to version of yargs-parser that does not populate value for unset boolean ([#1104](https://github.com/yargs/yargs/issues/1104)) ([d4705f4](https://github.com/yargs/yargs/commit/d4705f4))
+
+
+### Features
+
+* add support for global middleware, useful for shared tasks like metrics ([#1119](https://github.com/yargs/yargs/issues/1119)) ([9d71ac7](https://github.com/yargs/yargs/commit/9d71ac7))
+* allow setting scriptName $0 ([#1143](https://github.com/yargs/yargs/issues/1143)) ([a2f2eae](https://github.com/yargs/yargs/commit/a2f2eae))
+* remove `setPlaceholderKeys` ([#1105](https://github.com/yargs/yargs/issues/1105)) ([6ee2c82](https://github.com/yargs/yargs/commit/6ee2c82))
+
+
+### BREAKING CHANGES
+
+* Options absent from `argv` (not set via CLI argument) are now absent from the parsed result object rather tahn being set with `undefined`
+* drop Node 6 from testing matrix, such that we'll gradually start drifting away from supporting Node 4.
+* yargs-parser does not populate 'false' when boolean flag is not passed
+* tests that assert against help output will need to be updated
+
+
+
 <a name="11.1.0"></a>
 # [11.1.0](https://github.com/yargs/yargs/compare/v11.0.0...v11.1.0) (2018-03-04)
 
