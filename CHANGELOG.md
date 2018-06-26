@@ -28,7 +28,7 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### BREAKING CHANGES
 
-* Options absent from `argv` (not set via CLI argument) are now absent from the parsed result object rather tahn being set with `undefined`
+* Options absent from `argv` (not set via CLI argument) are now absent from the parsed result object rather than being set with `undefined`
 * drop Node 6 from testing matrix, such that we'll gradually start drifting away from supporting Node 4.
 * yargs-parser does not populate 'false' when boolean flag is not passed
 * tests that assert against help output will need to be updated
