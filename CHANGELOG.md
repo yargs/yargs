@@ -29,7 +29,7 @@ All notable changes to this project will be documented in this file. See [standa
 ### BREAKING CHANGES
 
 * Options absent from `argv` (not set via CLI argument) are now absent from the parsed result object rather than being set with `undefined`
-* drop Node 6 from testing matrix, such that we'll gradually start drifting away from supporting Node 4.
+* drop Node 4 from testing matrix, such that we'll gradually start drifting away from supporting Node 4.
 * yargs-parser does not populate 'false' when boolean flag is not passed
 * tests that assert against help output will need to be updated
 
@@ -686,7 +686,7 @@ All notable changes to this project will be documented in this file. See [standa
 - [#308](https://github.com/bcoe/yargs/pull/308) Yargs now handles environment variables (@nexdrew)
 - [#302](https://github.com/bcoe/yargs/pull/302) Add Indonesian translation (@rilut)
 - [#300](https://github.com/bcoe/yargs/pull/300) Add Turkish translation (@feyzo)
-- [#298](https://github.com/bcoe/yargs/pull/298) Add Norwegian Bokmål translation (@sindresorhus)
+- [#298](https://github.com/bcoe/yargs/pull/298) Add Norwegian Bokmål translation (@sindresorhus)
 - [#297](https://github.com/bcoe/yargs/pull/297) Fix for layout of cjk characters (@disjukr)
 - [#296](https://github.com/bcoe/yargs/pull/296) Add Korean translation (@disjukr)
 
