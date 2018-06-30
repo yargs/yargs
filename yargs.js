@@ -33,6 +33,8 @@ function Yargs (processArgs, cwd, parentRequire) {
     updateFiles: false
   })
 
+  self.processArgs = processArgs.slice()
+
   self.middleware = middlewareFactory(globalMiddleware, self)
 
   if (!cwd) cwd = process.cwd()
