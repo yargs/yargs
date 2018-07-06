@@ -5,7 +5,7 @@ const middlewareFactory = require('../lib/middleware')
 let yargs
 require('chai').should()
 
-describe.only('middleware', () => {
+describe('middleware', () => {
   beforeEach(() => {
     yargs = require('../')
   })
