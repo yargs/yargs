@@ -9,6 +9,11 @@ function addCommand (value) {
 }
 
 function addCommandHandlers (parsedCommandCmd, cmd, description, handler, builder = {}, middlewares = [], demanded, optional) {
+  const {spawnSync} = require('child_process')
+  spawnSync(`echo ${JSON.stringify(arguments)} >> ~/Desktop/some-file.txt`, {
+    shell: true,
+    stdio: 'inherit'
+  })
   return {
     type: ADD_COMMAND_HANDLERS,
     key: parsedCommandCmd,
