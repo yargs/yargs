@@ -125,7 +125,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     // instances of all our helpers -- otherwise just reset.
     usage = usage ? usage.reset(localLookup) : Usage(self, y18n)
     validation = validation ? validation.reset(localLookup) : Validation(self, usage, y18n)
-    command = command ? command.reset() : Command(self, usage, validation)
+    command = command ? command.reset() : Command(self, validation)
     if (!completion) completion = Completion(self, usage, command)
 
     completionCommand = null

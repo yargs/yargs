@@ -1,8 +1,10 @@
 const { combineReducers } = require('redux')
-const middlewareReducer = require('../reducers/middleware')
-const usageReducer = require('../reducers/usage')
+const middlewareReducer = require('./middleware')
+const usageReducer = require('./usage')
+const commandReducer = require('./command')
 
 module.exports = combineReducers({
   middleware: middlewareReducer,
-  usage: usageReducer
+  usage: usageReducer,
+  command: commandReducer
 })
