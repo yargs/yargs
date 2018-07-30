@@ -155,6 +155,23 @@ describe('validation tests', () => {
         })
         .parse()
     })
+
+    // Fixes https://github.com/yargs/yargs/issues/1190
+    it('allows nested keys to specify a nested value', () => {
+      let failCalled = false
+      const argv = yargs(['--obj.bar', '--obj.foo', 'baz'])
+        .implies({
+          'obj.bar': 'obj.foo'
+        })
+        .fail((msg) => {
+          failCalled = true
+        })
+        .parse()
+
+      expect(failCalled).to.equal(false)
+      expect(argv.obj.bar).to.equal(true)
+      expect(argv.obj.foo).to.equal('baz')
+    })
   })
 
   describe('conflicts', () => {
