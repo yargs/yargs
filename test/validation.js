@@ -185,6 +185,17 @@ describe('validation tests', () => {
         .parse()
     })
 
+    // Fixes https://github.com/yargs/yargs/issues/1190
+    it('fails if both arguments are supplied (nested key/values)', (done) => {
+      yargs(['--obj.foo', '--obj.bar'])
+        .conflicts('obj.foo', 'obj.bar')
+        .fail((msg) => {
+          msg.should.equal('Arguments obj.foo and obj.bar are mutually exclusive')
+          done()
+        })
+        .parse()
+    })
+
     it('fails if argument is supplied along with either conflicting argument', (done) => {
       yargs(['-f', '-b'])
         .conflicts('f', ['b', 'c'])
