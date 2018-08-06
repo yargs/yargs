@@ -338,7 +338,7 @@ exports.handler = function (argv) {
 ## Building Configurable CLI Apps
 
 One of the goals of yargs has been to examine practices common in the
-JavaScript CLI community, and to make to make it easy to apply these
+JavaScript CLI community, and to make it easy to apply these
 conventions to your own application.
 
 One useful set of conventions that has emerged is around how applications
