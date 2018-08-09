@@ -864,6 +864,30 @@ describe('validation tests', () => {
         })
         .parse()
     })
+
+    it('fails when a demanded nested argument is missing', (done) => {
+      yargs('--obj')
+        .demandOption('obj.foo')
+        .fail((msg) => {
+          msg.should.equal('Missing required argument: obj.foo')
+          done()
+        })
+        .parse()
+    })
+
+    it('does not fail when a demanded nested argument is provided', () => {
+      let failCalled = false
+      const argv = yargs('--obj.foo')
+        .option('obj.foo', {
+          demandOption: true
+        })
+        .fail((msg) => {
+          failCalled = true
+        })
+        .parse()
+      expect(failCalled).to.equal(false)
+      expect(argv.obj.foo).to.equal(true)
+    })
   })
 
   describe('demandCommand', () => {
