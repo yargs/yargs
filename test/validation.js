@@ -3,7 +3,7 @@
 
 const checkUsage = require('./helpers/utils').checkOutput
 const expect = require('chai').expect
-const yargs = require('../')
+let yargs = require('../')
 
 require('chai').should()
 
@@ -284,6 +284,28 @@ describe('validation tests', () => {
           return done()
         })
         .parse()
+    })
+
+    function loadLocale (locale) {
+      delete require.cache[require.resolve('../')]
+      delete require.cache[require.resolve('os-locale')]
+      yargs = require('../')
+      process.env.LC_ALL = locale
+    }
+
+    it('should use appropriate translation', done => {
+      loadLocale('pirate')
+      try {
+        yargs(['-f', '-b'])
+          .conflicts('f', 'b')
+          .fail(msg => {
+            msg.should.equal('Yon scurvy dogs f and b be as bad as rum and a prudish wench')
+            return done()
+          })
+          .parse()
+      } finally {
+        loadLocale('en_US.UTF-8')
+      }
     })
   })
 
