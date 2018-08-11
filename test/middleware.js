@@ -53,4 +53,31 @@ describe('middleware', () => {
       .exitProcess(false) // defaults to true.
       .parse()
   })
+
+  it('should be able to register middleware regardless of when middleware is called', function (done) {
+    yargs(['mw'])
+      .middleware([
+        function (argv) {
+          argv.mw1 = 'mw1'
+        }
+      ])
+      .command(
+        'mw',
+        'adds func list to middleware',
+        function () {},
+        function (argv) {
+          // we should get the argv filled with data from the middleware
+          argv.mw1.should.equal('mw1')
+          argv.mw2.should.equal('mw2')
+          return done()
+        }
+      )
+      .middleware([
+        function (argv) {
+          argv.mw2 = 'mw2'
+        }
+      ])
+      .exitProcess(false) // defaults to true.
+      .parse()
+  })
 })
