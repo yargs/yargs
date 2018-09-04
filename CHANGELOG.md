@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="12.0.2"></a>
+## [12.0.2](https://github.com/yargs/yargs/compare/v12.0.1...v12.0.2) (2018-09-04)
+
+
+### Bug Fixes
+
+* middleware should work regardless of when method is called  ([664b265](https://github.com/yargs/yargs/commit/664b265)), closes [#1178](https://github.com/yargs/yargs/issues/1178)
+* translation not working when using __ with a single parameter ([#1183](https://github.com/yargs/yargs/issues/1183)) ([f449aea](https://github.com/yargs/yargs/commit/f449aea))
+* upgrade os-locale to version that addresses license issue ([#1195](https://github.com/yargs/yargs/issues/1195)) ([efc0970](https://github.com/yargs/yargs/commit/efc0970))
+
+
+
 <a name="12.0.1"></a>
 ## [12.0.1](https://github.com/yargs/yargs/compare/v12.0.0...v12.0.1) (2018-06-29)
 
