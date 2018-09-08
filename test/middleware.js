@@ -24,7 +24,7 @@ describe('middleware', () => {
   it('should add a single callback to global middleware', () => {
     const globalMiddleware = []
 
-    middlewareFactory(globalMiddleware)({})
+    middlewareFactory(globalMiddleware)(function () {})
 
     globalMiddleware.should.have.lengthOf(1)
   })
