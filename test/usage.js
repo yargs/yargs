@@ -2853,6 +2853,61 @@ describe('usage tests', () => {
         '  --bar'
       ])
     })
+    it('--help should display all options except for hidden ones even in a group', () => {
+      const r = checkUsage(() => yargs('--help')
+        .options({
+          foo: {
+            describe: 'FOO',
+            hidden: true
+          },
+          bar: {},
+          baz: {
+            describe: 'BAZ',
+            group: 'Hidden:',
+            hidden: true
+          }
+        })
+        .parse()
+      )
+
+      r.logs[0].split('\n').should.deep.equal([
+        'Options:',
+        '  --help     Show help                                                 [boolean]',
+        '  --version  Show version number                                       [boolean]',
+        '  --bar'
+      ])
+    })
+    it('--help should display all groups except for ones with only hidden options', () => {
+      const r = checkUsage(() => yargs('--help')
+        .options({
+          foo: {
+            describe: 'FOO',
+            group: 'Hidden:',
+            hidden: true
+          },
+          bar: {},
+          baz: {
+            describe: 'BAZ',
+            group: 'Hidden:',
+            hidden: true
+          },
+          qux: {
+            group: 'Shown:'
+          }
+        })
+        .parse()
+      )
+
+      r.logs[0].split('\n').should.deep.equal([
+        'Shown:',
+        '  --qux',
+        '',
+        'Options:',
+        '  --help     Show help                                                 [boolean]',
+        '  --version  Show version number                                       [boolean]',
+        '  --bar'
+      ])
+    })
     it('--help should display all options (including hidden ones) with --show-hidden', () => {
       const r = checkUsage(() => yargs('--help --show-hidden --mama ama')
         .options({
@@ -2875,6 +2930,41 @@ describe('usage tests', () => {
         '  --foo      FOO',
         '  --bar',
         '  --baz      BAZ'
+      ])
+    })
+    it('--help should display all groups (including ones with only hidden options) with --show-hidden', () => {
+      const r = checkUsage(() => yargs('--help --show-hidden')
+        .options({
+          foo: {
+            describe: 'FOO',
+            group: 'Hidden:',
+            hidden: true
+          },
+          bar: {},
+          baz: {
+            describe: 'BAZ',
+            group: 'Hidden:',
+            hidden: true
+          },
+          qux: {
+            group: 'Shown:'
+          }
+        })
+        .argv
+      )
+
+      r.logs[0].split('\n').should.deep.equal([
+        'Hidden:',
+        '  --foo  FOO',
+        '  --baz  BAZ',
+        '',
+        'Shown:',
+        '  --qux',
+        '',
+        'Options:',
+        '  --help     Show help                                                 [boolean]',
+        '  --version  Show version number                                       [boolean]',
+        '  --bar'
       ])
     })
     it('--help should display --custom-show-hidden', () => {
