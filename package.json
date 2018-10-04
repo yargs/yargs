@@ -5,7 +5,7 @@
   "author": "James Halliday",
   "main": "./index.js",
   "contributors": [
-    {"name": "Yargs Contributors", "url": "https://yargs.js.org/"}
+    {"name": "Yargs Contributors", "url": "https://github.com/yargs/yargs/graphs/contributors"}
   ],
   "files": [
     "index.js",
