@@ -2,10 +2,12 @@
   "name": "yargs",
   "version": "12.0.2",
   "description": "yargs the modern, pirate-themed, successor to optimist.",
-  "author": "James Halliday",
   "main": "./index.js",
   "contributors": [
-    {"name": "Yargs Contributors", "url": "https://github.com/yargs/yargs/graphs/contributors"}
+    {
+      "name": "Yargs Contributors",
+      "url": "https://github.com/yargs/yargs/graphs/contributors"
+    }
   ],
   "files": [
     "index.js",
