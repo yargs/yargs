@@ -13,7 +13,7 @@
   ],
   "dependencies": {
     "cliui": "^4.0.0",
-    "decamelize": "^2.0.0",
+    "decamelize": "^1.2.0",
     "find-up": "^3.0.0",
     "get-caller-file": "^1.0.1",
     "os-locale": "^3.0.0",
