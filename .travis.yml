@@ -15,3 +15,4 @@ cache:
     - "node_modules"
 
 after_success: if [[ "$TRAVIS_OS_NAME" != 'windows' ]]; then npm run coverage; fi
+
