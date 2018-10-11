@@ -1,16 +1,17 @@
 language: node_js
 
+node_js:
+  - "6"
+  - "8"
+  - "10"
+
 os:
   - linux
   - osx
-
-after_success: npm run coverage
+  - windows
 
 cache:
   directories:
     - "node_modules"
 
-node_js:
-  - "6"
-  - "8"
-  - "10"
+after_success: if [[ "$TRAVIS_OS_NAME" != 'windows' ]]; then npm run coverage; fi
