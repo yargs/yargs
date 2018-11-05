@@ -2853,6 +2853,31 @@ describe('usage tests', () => {
         '  --bar'
       ])
     })
+    it('--help should display all options except for hidden ones even with a default', () => {
+      const r = checkUsage(() => yargs('--help')
+        .options({
+          foo: {
+            describe: 'FOO',
+            hidden: true
+          },
+          bar: {},
+          baz: {
+            type: 'number',
+            describe: 'BAZ',
+            default: 1,
+            hidden: true
+          }
+        })
+        .parse()
+      )
+
+      r.logs[0].split('\n').should.deep.equal([
+        'Options:',
+        '  --help     Show help                                                 [boolean]',
+        '  --version  Show version number                                       [boolean]',
+        '  --bar'
+      ])
+    })
     it('--help should display all options except for hidden ones even in a group', () => {
       const r = checkUsage(() => yargs('--help')
         .options({
