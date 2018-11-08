@@ -110,6 +110,31 @@ describe('Command', () => {
       argv.file.should.equal('foo.js')
       argv.reporter.should.equal('html')
     })
+
+    // bug reported by @boneskull during mocha migration.
+    it('does not load config twice when command executed', () => {
+      let parseCount = 0
+      yargs('cmd --config=.foo.json')
+        .command(
+          '$0 [foo..]',
+          'does a thing',
+          yargs =>
+            yargs
+              .option('config', {
+                default: '.foo.json'
+              })
+              .positional('foo', {
+                description: 'bar'
+              })
+              .config('config', filepath => {
+                parseCount++
+                return {}
+              }),
+          argv => {}
+        )
+        .parse()
+      parseCount.should.equal(1)
+    })
   })
 
   describe('variadic', () => {
