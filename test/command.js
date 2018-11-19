@@ -184,6 +184,17 @@ describe('Command', () => {
       argv.file.should.equal('file1')
       argv._.should.include('file2')
     })
+
+    // addresses: https://github.com/yargs/yargs/issues/1246
+    it('allows camel-case, variadic arguments, and strict mode to be combined', () => {
+      const argv = yargs('ls one two three')
+        .command('ls [expandMe...]')
+        .strict()
+        .parse()
+
+      argv.expandMe.should.deep.equal(['one', 'two', 'three'])
+      argv['expand-me'].should.deep.equal(['one', 'two', 'three'])
+    })
   })
 
   describe('missing positional arguments', () => {
