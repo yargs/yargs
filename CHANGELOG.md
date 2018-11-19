@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="12.0.5"></a>
+## [12.0.5](https://github.com/yargs/yargs/compare/v12.0.4...v12.0.5) (2018-11-19)
+
+
+### Bug Fixes
+
+* allows camel-case, variadic arguments, and strict mode to be combined ([#1247](https://github.com/yargs/yargs/issues/1247)) ([eacc035](https://github.com/yargs/yargs/commit/eacc035))
+
+
+
 <a name="12.0.4"></a>
 ## [12.0.4](https://github.com/yargs/yargs/compare/v12.0.3...v12.0.4) (2018-11-10)
 
