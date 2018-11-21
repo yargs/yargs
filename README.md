@@ -58,7 +58,7 @@ if (argv.ships > 3 && argv.distance < 53.5) {
 $ ./plunder.js --ships=4 --distance=22
 Plunder more riffiwobbles!
 
-$ ./plunder.js --ships 12 --distance 98.7
+$ ./plunder.js --ships=12 --distance 98.7
 Retreat from the xupptumblers!
 ```
 
