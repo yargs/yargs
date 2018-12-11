@@ -588,10 +588,10 @@ describe('Command', () => {
       r.logs.join('\n').split(/\n+/).should.deep.equal([
         'usage [command]',
         'Commands:',
-        '  usage limbo [opts]                     Get lost in pure subconscious',
-        '  usage inception [command] [opts]       Enter another dream, where inception is possible',
-        '  usage within-a-dream [command] [opts]  Dream within a dream',
         '  usage dream [command] [opts]           Go to sleep and dream',
+        '  usage inception [command] [opts]       Enter another dream, where inception is possible',
+        '  usage limbo [opts]                     Get lost in pure subconscious',
+        '  usage within-a-dream [command] [opts]  Dream within a dream',
         'Options:',
         '  --help     Show help  [boolean]',
         '  --version  Show version number  [boolean]'
