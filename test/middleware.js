@@ -72,6 +72,32 @@ describe('middleware', () => {
       .parse()
   })
 
+  it('runs the preChecksMiddleware and ensures theres a context object with commands and availableOptions', function (done) {
+    yargs(['mw'])
+      .preChecksMiddleware(function (argv, context) {
+        argv.mw = context.commands[0]
+        argv.other = Array.isArray(context.availableOptions.mw)
+      })
+      .command(
+        'mw',
+        'adds func to middleware',
+        {
+          'mw': {
+            'demand': true,
+            'string': true
+          }
+        },
+        function (argv) {
+          // we should get the argv filled with data from the middleware
+          argv.mw.should.equal('mw')
+          argv.other.should.equal(true)
+          return done()
+        }
+      )
+      .exitProcess(false) // defaults to true.
+      .parse()
+  })
+
   it('runs all middleware before reaching the handler', function (done) {
     yargs(['mw'])
       .middleware([

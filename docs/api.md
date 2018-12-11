@@ -1192,13 +1192,19 @@ Valid `opt` keys include:
 
 Define global middleware functions to be called first and before validation checks are done, in list order, for all cli commands.  The `callbacks` parameter can be a function or a list of functions.  Each callback gets passed a reference to argv.
 
-In the below example a CLI obtains the login and password for `myCommand` to use.  The command requires a login and password to be provided, but implicitly reads it from a config file if not specified by `--username` and `--password`
+The difference between the `preChecksMiddleware` and `middleware` is this middle ware runs before required fields are checked (in addition to valid values within options and commands). This gives a program the opportunity to populate options, commands and other settings before the validation checks are done. A common use case for the preChecksMiddleware is if there is a required parameter or option that can be inferred by the context (e.g., the current path, or maybe a git directory the shell is currently in, or perhaps from previous executions). 
+
+In addition to the execution timing the `preChecksMiddleware` is passed the `argv` parsed object just like `middleware` but its also passed an object containing the commands and available options (and their potential aliases).  This is passed in to all callbacks in the second parameter as an object with the property `commands` that is an array of all the commands that matched the `argv` and a property called `availableOptions` where the keys are options that are available, each key corresponds to an array of aliases for the key.
+
+In the below example a CLI obtains the login and password for `myCommand` to use.  The command requires a login and password to be provided, but implicitly reads it from a config file if not specified by `--username` and `--password`.  This would not be possible with `middleware` callbacks as they are after the option and command requirements are validated (and in this case would error out prior to the middle ware ever running).
 
 ```js
 const fs = require('fs');
 const path = require('fs');
 
-function getLogin(argv) {
+function getLogin(argv, context) {
+  console.log('command was:', context.commands);
+  console.log('available options are:', context.availableOptions);
   // obtain the login from some configuration file if not specified.
   let loginConfig = JSON.parse(fs.readfileSync(path.join(process.env.HOME,'loginConfig.json')).toString('utf8'))
 
@@ -1227,8 +1233,6 @@ yargs
   })
   .preChecksMiddleware([getLogin]).argv;
 ```
-
-The difference between the `preChecksMiddleware` and `middleware` is this middle ware runs before required fields are checked (in addition to valid values within options and commands). This gives a program the opportunity to populate options, commands and other settings before the validation checks are done. A common use case for the preChecksMiddleware is if there is a required parameter or option that can be inferred by the context (e.g., the current path, or maybe a git directory the shell is currently in, or perhaps from previous executions). 
 
 The `preChecksMiddleware` is only available globally and not on a per-command basis. The `preChecksMiddleware` also runs prior to any `middleware` callbacks.
 
