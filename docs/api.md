@@ -1190,7 +1190,7 @@ Valid `opt` keys include:
 <a name="prechecksmiddleware"></a>.preChecksMiddleware(callbacks)
 ------------------------------------
 
-Define global middleware functions to be called first and before validation checks are done, in list order, for all cli commands.  The `callbacks` parameter can be a function or a list of functions.  Each callback gets passed a reference to argv.
+Define global middleware functions to be called first and before validation checks are done, in list order, for all cli commands.  The `callbacks` parameter can be a function or a list of functions.  Each callback gets passed a reference to argv and a context.
 
 The difference between the `preChecksMiddleware` and `middleware` is this middle ware runs before required fields are checked (in addition to valid values within options and commands). This gives a program the opportunity to populate options, commands and other settings before the validation checks are done. A common use case for the preChecksMiddleware is if there is a required parameter or option that can be inferred by the context (e.g., the current path, or maybe a git directory the shell is currently in, or perhaps from previous executions). 
 
@@ -1203,16 +1203,18 @@ const fs = require('fs');
 const path = require('fs');
 
 function getLogin(argv, context) {
-  console.log('command was:', context.commands);
-  console.log('available options are:', context.availableOptions);
-  // obtain the login from some configuration file if not specified.
-  let loginConfig = JSON.parse(fs.readfileSync(path.join(process.env.HOME,'loginConfig.json')).toString('utf8'))
+  // only execute this middleware if a username is needed from 
+  // the command
+  if (context.availableOptions.username) {
+    // obtain the login from some configuration file if not specified.
+    let loginConfig = JSON.parse(fs.readfileSync(path.join(process.env.HOME,'loginConfig.json')).toString('utf8'))
 
-  if (loginConfig.username) {
-    argv.username = loginConfig.username
-  }
-  if (loginConfig.password) {
-    argv.password = loginConfig.password
+    if (loginConfig.username) {
+      argv.username = loginConfig.username
+    }
+    if (loginConfig.password) {
+      argv.password = loginConfig.password
+    }
   }
 }
 
