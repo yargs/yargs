@@ -33,7 +33,8 @@ function Yargs (processArgs, cwd, parentRequire) {
     updateFiles: false
   })
 
-  self.middleware = middlewareFactory(globalMiddleware, self)
+  self.preChecksMiddleware = middlewareFactory(globalMiddleware, self, true)
+  self.middleware = middlewareFactory(globalMiddleware, self, false)
 
   if (!cwd) cwd = process.cwd()
 

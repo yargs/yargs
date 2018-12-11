@@ -964,6 +964,8 @@ I'm another middleware function
 Running myCommand!
 ```
 
+See also <a href="#prechecksmiddleware">.preChecksMiddleware(callbacks)</a>
+
 <a name="nargs"></a>.nargs(key, count)
 -----------
 
@@ -1183,6 +1185,53 @@ Valid `opt` keys include:
       - `'boolean'`: synonymous for `boolean: true`, see [`boolean()`](#boolean)
       - `'number'`: synonymous for `number: true`, see [`number()`](#number)
       - `'string'`: synonymous for `string: true`, see [`string()`](#string)
+
+
+<a name="prechecksmiddleware"></a>.preChecksMiddleware(callbacks)
+------------------------------------
+
+Define global middleware functions to be called first and before validation checks are done, in list order, for all cli commands.  The `callbacks` parameter can be a function or a list of functions.  Each callback gets passed a reference to argv.
+
+In the below example a CLI obtains the login and password for `myCommand` to use.  The command requires a login and password to be provided, but implicitly reads it from a config file if not specified by `--username` and `--password`
+
+```js
+const fs = require('fs');
+const path = require('fs');
+
+function getLogin(argv) {
+  // obtain the login from some configuration file if not specified.
+  let loginConfig = JSON.parse(fs.readfileSync(path.join(process.env.HOME,'loginConfig.json')).toString('utf8'))
+
+  if (loginConfig.username) {
+    argv.username = loginConfig.username
+  }
+  if (loginConfig.password) {
+    argv.password = loginConfig.password
+  }
+}
+
+let myCommandOptions = {
+  'username': {
+    'demand': true,
+    'string': true
+  },
+  'password': {
+    'demand': true,
+    'string': true
+  }
+};
+
+yargs
+  .command('myCommand', 'some command', , function(argv){
+    console.log('Running myCommand with username', argv.username, 'password', argv.password);
+  })
+  .preChecksMiddleware([getLogin]).argv;
+```
+
+The difference between the `preChecksMiddleware` and `middleware` is this middle ware runs before required fields are checked (in addition to valid values within options and commands). This gives a program the opportunity to populate options, commands and other settings before the validation checks are done. A common use case for the preChecksMiddleware is if there is a required parameter or option that can be inferred by the context (e.g., the current path, or maybe a git directory the shell is currently in, or perhaps from previous executions). 
+
+The `preChecksMiddleware` is only available globally and not on a per-command basis. The `preChecksMiddleware` also runs prior to any `middleware` callbacks.
+
 
 .recommendCommands()
 ---------------------------
