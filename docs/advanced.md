@@ -480,6 +480,24 @@ const normalizeCredentials = (argv) => {
 }
 ```
 
+### Example Async Credentials Middleware
+
+This example is exactly the same however it loads the `username` and `password` asynchronously.
+
+#### Middleware function
+
+```
+const { promisify } = require('util') // since node 8.0.0
+const readFile = promisify(require('fs').readFile)
+
+const normalizeCredentials = (argv) => {
+  if (!argv.username || !argv.password) {
+    return readFile('~/.credentials').then(data => JSON.parse(data))
+  }
+  return {}
+}
+```
+
 #### yargs parsing configuration
 
 ```
