@@ -2,6 +2,106 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="12.0.5"></a>
+## [12.0.5](https://github.com/yargs/yargs/compare/v12.0.4...v12.0.5) (2018-11-19)
+
+
+### Bug Fixes
+
+* allows camel-case, variadic arguments, and strict mode to be combined ([#1247](https://github.com/yargs/yargs/issues/1247)) ([eacc035](https://github.com/yargs/yargs/commit/eacc035))
+
+
+
+<a name="12.0.4"></a>
+## [12.0.4](https://github.com/yargs/yargs/compare/v12.0.3...v12.0.4) (2018-11-10)
+
+
+### Bug Fixes
+
+* don't load config when processing positionals ([5d0dc92](https://github.com/yargs/yargs/commit/5d0dc92))
+
+
+
+<a name="12.0.3"></a>
+## [12.0.3](https://github.com/yargs/yargs/compare/v12.0.2...v12.0.3) (2018-10-06)
+
+
+### Bug Fixes
+
+* $0 contains first arg in bundled electron apps ([#1206](https://github.com/yargs/yargs/issues/1206)) ([567820b](https://github.com/yargs/yargs/commit/567820b))
+* accept single function for middleware ([66fd6f7](https://github.com/yargs/yargs/commit/66fd6f7)), closes [#1214](https://github.com/yargs/yargs/issues/1214) [#1214](https://github.com/yargs/yargs/issues/1214)
+* hide `hidden` options from help output even if they are in a group ([#1221](https://github.com/yargs/yargs/issues/1221)) ([da54028](https://github.com/yargs/yargs/commit/da54028))
+* improve Norwegian Bokmål translations ([#1208](https://github.com/yargs/yargs/issues/1208)) ([a458fa4](https://github.com/yargs/yargs/commit/a458fa4))
+* improve Norwegian Nynorsk translations ([#1207](https://github.com/yargs/yargs/issues/1207)) ([d422eb5](https://github.com/yargs/yargs/commit/d422eb5))
+
+
+
+<a name="12.0.2"></a>
+## [12.0.2](https://github.com/yargs/yargs/compare/v12.0.1...v12.0.2) (2018-09-04)
+
+
+### Bug Fixes
+
+* middleware should work regardless of when method is called  ([664b265](https://github.com/yargs/yargs/commit/664b265)), closes [#1178](https://github.com/yargs/yargs/issues/1178)
+* translation not working when using __ with a single parameter ([#1183](https://github.com/yargs/yargs/issues/1183)) ([f449aea](https://github.com/yargs/yargs/commit/f449aea))
+* upgrade os-locale to version that addresses license issue ([#1195](https://github.com/yargs/yargs/issues/1195)) ([efc0970](https://github.com/yargs/yargs/commit/efc0970))
+
+
+
+<a name="12.0.1"></a>
+## [12.0.1](https://github.com/yargs/yargs/compare/v12.0.0...v12.0.1) (2018-06-29)
+
+
+
+<a name="12.0.0"></a>
+# [12.0.0](https://github.com/yargs/yargs/compare/v11.1.0...v12.0.0) (2018-06-26)
+
+
+### Bug Fixes
+
+* .argv and .parse() now invoke identical code path ([#1126](https://github.com/yargs/yargs/issues/1126)) ([f13ebf4](https://github.com/yargs/yargs/commit/f13ebf4))
+* remove the trailing white spaces from the help output ([#1090](https://github.com/yargs/yargs/issues/1090)) ([3f0746c](https://github.com/yargs/yargs/commit/3f0746c))
+* **completion:** Avoid default command and recommendations during completion ([#1123](https://github.com/yargs/yargs/issues/1123)) ([036e7c5](https://github.com/yargs/yargs/commit/036e7c5))
+
+
+### Chores
+
+* test Node.js 6, 8 and 10 ([#1160](https://github.com/yargs/yargs/issues/1160)) ([84f9d2b](https://github.com/yargs/yargs/commit/84f9d2b))
+* upgrade to version of yargs-parser that does not populate value for unset boolean ([#1104](https://github.com/yargs/yargs/issues/1104)) ([d4705f4](https://github.com/yargs/yargs/commit/d4705f4))
+
+
+### Features
+
+* add support for global middleware, useful for shared tasks like metrics ([#1119](https://github.com/yargs/yargs/issues/1119)) ([9d71ac7](https://github.com/yargs/yargs/commit/9d71ac7))
+* allow setting scriptName $0 ([#1143](https://github.com/yargs/yargs/issues/1143)) ([a2f2eae](https://github.com/yargs/yargs/commit/a2f2eae))
+* remove `setPlaceholderKeys` ([#1105](https://github.com/yargs/yargs/issues/1105)) ([6ee2c82](https://github.com/yargs/yargs/commit/6ee2c82))
+
+
+### BREAKING CHANGES
+
+* Options absent from `argv` (not set via CLI argument) are now absent from the parsed result object rather than being set with `undefined`
+* drop Node 4 from testing matrix, such that we'll gradually start drifting away from supporting Node 4.
+* yargs-parser does not populate 'false' when boolean flag is not passed
+* tests that assert against help output will need to be updated
+
+
+
+<a name="11.1.0"></a>
+# [11.1.0](https://github.com/yargs/yargs/compare/v11.0.0...v11.1.0) (2018-03-04)
+
+
+### Bug Fixes
+
+* choose correct config directory when require.main does not exist ([#1056](https://github.com/yargs/yargs/issues/1056)) ([a04678c](https://github.com/yargs/yargs/commit/a04678c))
+
+
+### Features
+
+* allow hidden options to be displayed with --show-hidden ([#1061](https://github.com/yargs/yargs/issues/1061)) ([ea862ae](https://github.com/yargs/yargs/commit/ea862ae))
+* extend *.rc files in addition to json ([#1080](https://github.com/yargs/yargs/issues/1080)) ([11691a6](https://github.com/yargs/yargs/commit/11691a6))
+
+
+
 <a name="11.0.0"></a>
 # [11.0.0](https://github.com/yargs/yargs/compare/v10.1.2...v11.0.0) (2018-01-22)
 
@@ -637,7 +737,7 @@ All notable changes to this project will be documented in this file. See [standa
 - [#308](https://github.com/bcoe/yargs/pull/308) Yargs now handles environment variables (@nexdrew)
 - [#302](https://github.com/bcoe/yargs/pull/302) Add Indonesian translation (@rilut)
 - [#300](https://github.com/bcoe/yargs/pull/300) Add Turkish translation (@feyzo)
-- [#298](https://github.com/bcoe/yargs/pull/298) Add Norwegian Bokmål translation (@sindresorhus)
+- [#298](https://github.com/bcoe/yargs/pull/298) Add Norwegian Bokmål translation (@sindresorhus)
 - [#297](https://github.com/bcoe/yargs/pull/297) Fix for layout of cjk characters (@disjukr)
 - [#296](https://github.com/bcoe/yargs/pull/296) Add Korean translation (@disjukr)
 

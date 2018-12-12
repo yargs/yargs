@@ -3,7 +3,7 @@ var yargs = require('../index');
 var argv = yargs
   .usage('This is my awesome program\n\nUsage: $0 [options]')
   .help('help').alias('help', 'h')
-  .version('1.0.1', 'version').alias('version', 'V')
+  .version('version', '1.0.1').alias('version', 'V')
   .options({
     input: {
       alias: 'i',

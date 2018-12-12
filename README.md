@@ -1,20 +1,23 @@
-# Yargs
+<p align="center">
+  <img width="250" src="/yargs-logo.png">
+</p>
+<h1 align="center"> Yargs </h1>
+<p align="center">
+  <b >Yargs be a node.js library fer hearties tryin' ter parse optstrings</b>
+</p>
+<br>
 
 [![Build Status][travis-image]][travis-url]
 [![Coverage Status][coveralls-image]][coveralls-url]
 [![NPM version][npm-image]][npm-url]
-[![Windows Tests][windows-image]][windows-url]
 [![js-standard-style][standard-image]][standard-url]
 [![Conventional Commits][conventional-commits-image]][conventional-commits-url]
 [![Slack][slack-image]][slack-url]
 
-_Having problems? want to contribute? join our [community slack](http://devtoolscommunity.herokuapp.com)_.
+## Description :
+Yargs helps you build interactive command line tools, by parsing arguments and generating an elegant user interface. 
 
-> Yargs be a node.js library fer hearties tryin' ter parse optstrings.
-
-<img width="250" src="/yargs-logo.png">
-
-Yargs helps you build interactive command line tools, by parsing arguments and generating an elegant user interface. It gives you:
+It gives you:
 
 * commands and (grouped) options (`my-program.js serve --port=5000`).
 * a dynamically generated help menu based on your arguments.
@@ -26,11 +29,19 @@ Yargs helps you build interactive command line tools, by parsing arguments and g
 
 ## Installation
 
+Stable version:
 ```bash
 npm i yargs --save
 ```
 
-## Simple Example
+Bleeding edge version with the most recent features:
+```bash
+npm i yargs@next --save
+```
+
+## Usage :
+
+### Simple Example
 
 ````javascript
 #!/usr/bin/env node
@@ -51,9 +62,9 @@ $ ./plunder.js --ships 12 --distance 98.7
 Retreat from the xupptumblers!
 ```
 
-## Complex Example
+### Complex Example
 
-```js
+```javascript
 #!/usr/bin/env node
 require('yargs') // eslint-disable-line
   .command('serve [port]', 'start the server', (yargs) => {
@@ -75,7 +86,13 @@ require('yargs') // eslint-disable-line
 
 Run the example above with `--help` to see the help for the application.
 
-## Table of Contents
+## Community :
+
+Having problems? want to contribute? join our [community slack](http://devtoolscommunity.herokuapp.com).
+
+## Documentation :
+
+### Table of Contents
 
 * [Yargs' API](/docs/api.md)
 * [Examples](/docs/examples.md)
@@ -97,8 +114,6 @@ Run the example above with `--help` to see the help for the application.
 [coveralls-image]: https://img.shields.io/coveralls/yargs/yargs.svg
 [npm-url]: https://www.npmjs.com/package/yargs
 [npm-image]: https://img.shields.io/npm/v/yargs.svg
-[windows-url]: https://ci.appveyor.com/project/bcoe/yargs-ljwvf
-[windows-image]: https://img.shields.io/appveyor/ci/bcoe/yargs-ljwvf/master.svg?label=Windows%20Tests
 [standard-image]: https://img.shields.io/badge/code%20style-standard-brightgreen.svg
 [standard-url]: http://standardjs.com/
 [conventional-commits-image]: https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg

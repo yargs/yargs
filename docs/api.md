@@ -61,6 +61,16 @@ Tell the parser to interpret `key` as an array. If `.array('foo')` is set,
 Also, if you use the option multiple times all the values will be flattened in one array
 so `--foo foo --foo bar` will be parsed as `['foo', 'bar']`
 
+When the option is used with a positional, use `--` to tell `yargs` to stop adding values to the array.
+
+For example: `--foo foo bar -- val` will be parsed as
+```javascript
+{
+  _: ['val'],
+  foo: ['foo', 'bar']
+}
+```
+
 <a name="boolean"></a>.boolean(key)
 -------------
 
@@ -310,7 +320,7 @@ But wait, there's more! You can return an asynchronous promise.
 
 ```js
 var argv = require('yargs')
-  .completion('completion', function(current, argv, done) {
+  .completion('completion', function(current, argv) {
     return new Promise(function (resolve, reject) {
       setTimeout(function () {
         resolve(['apple', 'banana'])
@@ -576,6 +586,11 @@ Describe a `key` for the generated usage information.
 
 Optionally `.describe()` can take an object that maps keys to descriptions.
 
+<a name="hide"></a>.hide(key)
+--------------------
+
+Hides a `key` from the generated usage information. Unless a `--show-hidden` option is also passed with `--help` (see [`showHidden()`](#showHidden)).
+
 .detectLocale(boolean)
 -----------
 
@@ -587,7 +602,7 @@ Should yargs attempt to detect the os' locale? Defaults to `true`.
 Tell yargs to parse environment variables matching the given prefix and apply
 them to argv as though they were command line arguments.
 
-Use the "__" separator in the environment variable to indicate nested options.
+Use the "\_\_" separator in the environment variable to indicate nested options.
 (e.g. prefix_nested__foo => nested.foo)
 
 If this method is called with no argument or with an empty string or with `true`,
@@ -798,6 +813,43 @@ var yargs = require("yargs")(['--info'])
   .argv
 ```
 
+<a name="scriptName"></a>.scriptName($0)
+------------------
+
+Set the name of your script ($0). Default is the base filename executed by node (`process.argv[1]`)
+
+Example:
+
+```js
+var yargs = require("yargs")
+  .scriptName("my-script")
+  .help()
+  .argv
+```
+
+<a name="showHidden"></a>.showHidden()
+-----------------------------------------
+.showHidden([option | boolean])
+-----------------------------------------
+.showHidden([option, [description]])
+-----------------------------------------
+
+Configure the `--show-hidden` option that displays the hidden keys (see [`hide()`](#hide)).
+
+If the first argument is a boolean, it enables/disables this option altogether. i.e. hidden keys will be permanently hidden if first argument is `false`.
+
+If the first argument is a string it changes the key name ("--show-hidden").
+
+Second argument changes the default description ("Show hidden options")
+
+Example:
+
+```js
+var yargs = require("yargs")(['--help'])
+  .showHidden('show-hidden', 'Show hidden options')
+  .argv
+```
+
 <a name="implies"></a>.implies(x, y)
 --------------
 
@@ -887,6 +939,30 @@ To submit a new translation for yargs:
 2. submit a pull request with the new locale file.
 
 *The [Microsoft Terminology Search](http://www.microsoft.com/Language/en-US/Search.aspx) can be useful for finding the correct terminology in your locale.*
+
+<a name="middleware"></a>.middleware(callbacks)
+------------------------------------
+
+Define global middleware functions to be called first, in list order, for all cli command.  
+
+The `callbacks` parameter can be a function or a list of functions.  Each callback gets passed a reference to argv.
+
+```js
+const mwFunc1 = argv => console.log('I\'m a middleware function');
+const mwFunc2 = argv => console.log('I\'m another middleware function');
+
+yargs
+  .command('myCommand', 'some command', {}, function(argv){
+    console.log('Running myCommand!');
+  })
+  .middleware([mwFunc1, mwFunc2]).argv;
+```
+When calling `myCommand` from the command line, mwFunc1 gets called first, then mwFunc2, and finally the command's handler.  The console output is:
+```
+I'm a middleware function
+I'm another middleware function
+Running myCommand!
+```
 
 <a name="nargs"></a>.nargs(key, count)
 -----------

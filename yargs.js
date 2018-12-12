@@ -11,6 +11,7 @@ const Y18n = require('y18n')
 const objFilter = require('./lib/obj-filter')
 const setBlocking = require('set-blocking')
 const applyExtends = require('./lib/apply-extends')
+const middlewareFactory = require('./lib/middleware')
 const YError = require('./lib/yerror')
 
 exports = module.exports = Yargs
@@ -21,6 +22,7 @@ function Yargs (processArgs, cwd, parentRequire) {
   let command = null
   let completion = null
   let groups = {}
+  let globalMiddleware = []
   let output = ''
   let preservedGroups = {}
   let usage = null
@@ -31,14 +33,25 @@ function Yargs (processArgs, cwd, parentRequire) {
     updateFiles: false
   })
 
+  self.middleware = middlewareFactory(globalMiddleware, self)
+
   if (!cwd) cwd = process.cwd()
 
-  self.$0 = process.argv
-    .slice(0, 2)
+  self.scriptName = function scriptName (scriptName) {
+    self.$0 = scriptName
+    return self
+  }
+
+  // ignore the node bin, specify this in your
+  // bin file with #!/usr/bin/env node
+  if (/\b(node|iojs|electron)(\.exe)?$/.test(process.argv[0])) {
+    self.$0 = process.argv.slice(1, 2)
+  } else {
+    self.$0 = process.argv.slice(0, 1)
+  }
+
+  self.$0 = self.$0
     .map((x, i) => {
-      // ignore the node bin, specify this in your
-      // bin file with #!/usr/bin/env node
-      if (i === 0 && /\b(node|iojs)(\.exe)?$/.test(x)) return
       const b = rebase(cwd, x)
       return x.match(/^(\/|([a-zA-Z]:)?\\)/) && b.length < x.length ? b : x
     })
@@ -93,7 +106,8 @@ function Yargs (processArgs, cwd, parentRequire) {
 
     const arrayOptions = [
       'array', 'boolean', 'string', 'skipValidation',
-      'count', 'normalize', 'number'
+      'count', 'normalize', 'number',
+      'hiddenOptions'
     ]
 
     const objectOptions = [
@@ -116,7 +130,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     // instances of all our helpers -- otherwise just reset.
     usage = usage ? usage.reset(localLookup) : Usage(self, y18n)
     validation = validation ? validation.reset(localLookup) : Validation(self, usage, y18n)
-    command = command ? command.reset() : Command(self, usage, validation)
+    command = command ? command.reset() : Command(self, usage, validation, globalMiddleware)
     if (!completion) completion = Completion(self, usage, command)
 
     completionCommand = null
@@ -524,7 +538,9 @@ function Yargs (processArgs, cwd, parentRequire) {
   let parseContext = null
   self.parse = function parse (args, shortCircuit, _parseFn) {
     argsert('[string|array] [function|boolean|object] [function]', [args, shortCircuit, _parseFn], arguments.length)
-    if (typeof args === 'undefined') args = processArgs
+    if (typeof args === 'undefined') {
+      return self._parseArgs(processArgs)
+    }
 
     // a context object can optionally be provided, this allows
     // additional information to be passed to a command handler.
@@ -657,8 +673,9 @@ function Yargs (processArgs, cwd, parentRequire) {
       }
 
       const desc = opt.describe || opt.description || opt.desc
-      if (!opt.hidden) {
-        self.describe(key, desc)
+      self.describe(key, desc)
+      if (opt.hidden) {
+        self.hide(key)
       }
 
       if (opt.requiresArg) {
@@ -821,6 +838,28 @@ function Yargs (processArgs, cwd, parentRequire) {
     helpOpt = typeof opt === 'string' ? opt : defaultHelpOpt
     self.boolean(helpOpt)
     self.describe(helpOpt, msg || usage.deferY18nLookup('Show help'))
+    return self
+  }
+
+  const defaultShowHiddenOpt = 'show-hidden'
+  options.showHiddenOpt = defaultShowHiddenOpt
+  self.addShowHiddenOpt = self.showHidden = function addShowHiddenOpt (opt, msg) {
+    argsert('[string|boolean] [string]', [opt, msg], arguments.length)
+
+    if (arguments.length === 1) {
+      if (opt === false) return self
+    }
+
+    const showHiddenOpt = typeof opt === 'string' ? opt : defaultShowHiddenOpt
+    self.boolean(showHiddenOpt)
+    self.describe(showHiddenOpt, msg || usage.deferY18nLookup('Show hidden options'))
+    options.showHiddenOpt = showHiddenOpt
+    return self
+  }
+
+  self.hide = function hide (key) {
+    argsert('<string|object>', [key], arguments.length)
+    options.hiddenOptions.push(key)
     return self
   }
 
@@ -1006,8 +1045,11 @@ function Yargs (processArgs, cwd, parentRequire) {
           argv[helpOpt] = true
         }
       }
+
       const handlerKeys = command.getCommands()
-      const skipDefaultCommand = argv[helpOpt] && (handlerKeys.length > 1 || handlerKeys[0] !== '$0')
+      const requestCompletions = completion.completionKey in argv
+      const skipRecommendation = argv[helpOpt] || requestCompletions
+      const skipDefaultCommand = skipRecommendation && (handlerKeys.length > 1 || handlerKeys[0] !== '$0')
 
       if (argv._.length) {
         if (handlerKeys.length) {
@@ -1015,7 +1057,6 @@ function Yargs (processArgs, cwd, parentRequire) {
           for (let i = (commandIndex || 0), cmd; argv._[i] !== undefined; i++) {
             cmd = String(argv._[i])
             if (~handlerKeys.indexOf(cmd) && cmd !== completionCommand) {
-              setPlaceholderKeys(argv)
               // commands are executed using a recursive algorithm that executes
               // the deepest command first; we keep track of the position in the
               // argv._ array that is currently being executed.
@@ -1028,31 +1069,29 @@ function Yargs (processArgs, cwd, parentRequire) {
 
           // run the default command, if defined
           if (command.hasDefaultCommand() && !skipDefaultCommand) {
-            setPlaceholderKeys(argv)
             return command.runCommand(null, self, parsed)
           }
 
           // recommend a command if recommendCommands() has
           // been enabled, and no commands were found to execute
-          if (recommendCommands && firstUnknownCommand && !argv[helpOpt]) {
+          if (recommendCommands && firstUnknownCommand && !skipRecommendation) {
             validation.recommendCommands(firstUnknownCommand, handlerKeys)
           }
         }
 
         // generate a completion script for adding to ~/.bashrc.
-        if (completionCommand && ~argv._.indexOf(completionCommand) && !argv[completion.completionKey]) {
+        if (completionCommand && ~argv._.indexOf(completionCommand) && !requestCompletions) {
           if (exitProcess) setBlocking(true)
           self.showCompletionScript()
           self.exit(0)
         }
       } else if (command.hasDefaultCommand() && !skipDefaultCommand) {
-        setPlaceholderKeys(argv)
         return command.runCommand(null, self, parsed)
       }
 
       // we must run completions first, a user might
       // want to complete the --help or --version option.
-      if (completion.completionKey in argv) {
+      if (requestCompletions) {
         if (exitProcess) setBlocking(true)
 
         // we allow for asynchronous completions,
@@ -1065,7 +1104,7 @@ function Yargs (processArgs, cwd, parentRequire) {
 
           self.exit(0)
         })
-        return setPlaceholderKeys(argv)
+        return argv
       }
 
       // Handle 'help' and 'version' options
@@ -1100,7 +1139,7 @@ function Yargs (processArgs, cwd, parentRequire) {
 
         // if we're executed via bash completion, don't
         // bother with validation.
-        if (!argv[completion.completionKey]) {
+        if (!requestCompletions) {
           self._runValidation(argv, aliases, {}, parsed.error)
         }
       }
@@ -1109,7 +1148,7 @@ function Yargs (processArgs, cwd, parentRequire) {
       else throw err
     }
 
-    return setPlaceholderKeys(argv)
+    return argv
   }
 
   self._runValidation = function runValidation (argv, aliases, positionalMap, parseErrors) {
@@ -1133,16 +1172,6 @@ function Yargs (processArgs, cwd, parentRequire) {
       // if we explode looking up locale just noop
       // we'll keep using the default language 'en'.
     }
-  }
-
-  function setPlaceholderKeys (argv) {
-    Object.keys(options.key).forEach((key) => {
-      // don't set placeholder keys for dot
-      // notation options 'foo.bar'.
-      if (~key.indexOf('.')) return
-      if (typeof argv[key] === 'undefined') argv[key] = undefined
-    })
-    return argv
   }
 
   // an app should almost always have --version and --help,

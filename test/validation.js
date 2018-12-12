@@ -3,7 +3,7 @@
 
 const checkUsage = require('./helpers/utils').checkOutput
 const expect = require('chai').expect
-const yargs = require('../')
+let yargs = require('../')
 
 require('chai').should()
 
@@ -22,7 +22,7 @@ describe('validation tests', () => {
           msg.should.match(/Implications failed/)
           return done()
         })
-        .argv
+        .parse()
     })
 
     it("fails if key implies values in '_', but '_' is not populated", (done) => {
@@ -35,25 +35,25 @@ describe('validation tests', () => {
           msg.should.match(/Implications failed/)
           return done()
         })
-        .argv
+        .parse()
     })
 
     it('fails if either implied argument is not set and displays only failed', (done) => {
       yargs(['-f', '-b'])
-          .implies('f', ['b', 'c'])
-          .fail((msg1) => {
-            yargs(['-f', '-c'])
-                .implies('f', ['b', 'c'])
-                .fail((msg2) => {
-                  msg1.should.match(/f -> c/)
-                  msg1.should.not.match(/f -> b/)
-                  msg2.should.match(/f -> b/)
-                  msg2.should.not.match(/f -> c/)
-                  return done()
-                })
-                .argv
-          })
-          .argv
+        .implies('f', ['b', 'c'])
+        .fail((msg1) => {
+          yargs(['-f', '-c'])
+            .implies('f', ['b', 'c'])
+            .fail((msg2) => {
+              msg1.should.match(/f -> c/)
+              msg1.should.not.match(/f -> b/)
+              msg2.should.match(/f -> b/)
+              msg2.should.not.match(/f -> c/)
+              return done()
+            })
+            .parse()
+        })
+        .parse()
     })
 
     it("fails if --no-foo's implied argument is not set", (done) => {
@@ -65,7 +65,7 @@ describe('validation tests', () => {
           msg.should.match(/Implications failed/)
           return done()
         })
-        .argv
+        .parse()
     })
 
     it('fails if a key is set, along with a key that it implies should not be set', (done) => {
@@ -77,7 +77,7 @@ describe('validation tests', () => {
           msg.should.match(/Implications failed/)
           return done()
         })
-        .argv
+        .parse()
     })
 
     it('fails if implied key (with "no" in the name) is not set', () => {
@@ -85,14 +85,14 @@ describe('validation tests', () => {
       yargs('--bar')
         .implies({
           'bar': 'noFoo' // --bar means --noFoo (or --no-foo with boolean-negation disabled) is required
-                         // note that this has nothing to do with --foo
+          // note that this has nothing to do with --foo
         })
         .fail((msg) => {
           failCalled = true
           msg.should.match(/Implications failed/)
         })
-        .argv
-      failCalled.should.be.true
+        .parse()
+      failCalled.should.equal(true)
     })
 
     it('doesn\'t fail if implied key (with "no" in the name) is set', () => {
@@ -100,16 +100,16 @@ describe('validation tests', () => {
       const argv = yargs('--bar --noFoo')
         .implies({
           'bar': 'noFoo' // --bar means --noFoo (or --no-foo with boolean-negation disabled) is required
-                         // note that this has nothing to do with --foo
+          // note that this has nothing to do with --foo
         })
         .fail((msg) => {
           failCalled = true
         })
-        .argv
-      failCalled.should.be.false
-      expect(argv.bar).to.be.true
-      expect(argv.noFoo).to.be.true
-      expect(argv.foo).to.not.exist
+        .parse()
+      failCalled.should.equal(false)
+      expect(argv.bar).to.equal(true)
+      expect(argv.noFoo).to.equal(true)
+      expect(argv.foo).to.equal(undefined)
     })
 
     it('fails if implied key (with "no" in the name) is given when it should not', () => {
@@ -117,14 +117,14 @@ describe('validation tests', () => {
       yargs('--bar --noFoo')
         .implies({
           'bar': '--no-noFoo' // --bar means --noFoo (or --no-foo with boolean-negation disabled) cannot be given
-                              // note that this has nothing to do with --foo
+          // note that this has nothing to do with --foo
         })
         .fail((msg) => {
           failCalled = true
           msg.should.match(/Implications failed/)
         })
-        .argv
-      failCalled.should.be.true
+        .parse()
+      failCalled.should.equal(true)
     })
 
     it('doesn\'t fail if implied key (with "no" in the name) that should not be given is not set', () => {
@@ -132,16 +132,16 @@ describe('validation tests', () => {
       const argv = yargs('--bar')
         .implies({
           'bar': '--no-noFoo' // --bar means --noFoo (or --no-foo with boolean-negation disabled) cannot be given
-                              // note that this has nothing to do with --foo
+          // note that this has nothing to do with --foo
         })
         .fail((msg) => {
           failCalled = true
         })
-        .argv
-      failCalled.should.be.false
-      expect(argv.bar).to.be.true
-      expect(argv.noFoo).to.not.exist
-      expect(argv.foo).to.not.exist
+        .parse()
+      failCalled.should.equal(false)
+      expect(argv.bar).to.equal(true)
+      expect(argv.noFoo).to.equal(undefined)
+      expect(argv.foo).to.equal(undefined)
     })
 
     it('allows key to be specified with option shorthand', (done) => {
@@ -153,35 +153,35 @@ describe('validation tests', () => {
           msg.should.match(/Implications failed/)
           return done()
         })
-        .argv
+        .parse()
     })
   })
 
   describe('conflicts', () => {
     it('fails if both arguments are supplied', (done) => {
       yargs(['-f', '-b'])
-          .conflicts('f', 'b')
-          .fail((msg) => {
-            msg.should.equal('Arguments f and b are mutually exclusive')
-            return done()
-          })
-          .argv
+        .conflicts('f', 'b')
+        .fail((msg) => {
+          msg.should.equal('Arguments f and b are mutually exclusive')
+          return done()
+        })
+        .parse()
     })
 
     it('fails if argument is supplied along with either conflicting argument', (done) => {
       yargs(['-f', '-b'])
-          .conflicts('f', ['b', 'c'])
-          .fail((msg1) => {
-            yargs(['-f', '-c'])
-                .conflicts('f', ['b', 'c'])
-                .fail((msg2) => {
-                  msg1.should.equal('Arguments f and b are mutually exclusive')
-                  msg2.should.equal('Arguments f and c are mutually exclusive')
-                  return done()
-                })
-                .argv
-          })
-          .argv
+        .conflicts('f', ['b', 'c'])
+        .fail((msg1) => {
+          yargs(['-f', '-c'])
+            .conflicts('f', ['b', 'c'])
+            .fail((msg2) => {
+              msg1.should.equal('Arguments f and b are mutually exclusive')
+              msg2.should.equal('Arguments f and c are mutually exclusive')
+              return done()
+            })
+            .parse()
+        })
+        .parse()
     })
 
     it('should not fail if no conflicting arguments are provided', () => {
@@ -190,7 +190,7 @@ describe('validation tests', () => {
         .fail((msg) => {
           expect.fail()
         })
-        .argv
+        .parse()
     })
 
     it('should not fail if argument with conflict is provided, but not the argument it conflicts with', () => {
@@ -206,23 +206,23 @@ describe('validation tests', () => {
         .fail((msg) => {
           expect.fail()
         })
-        .argv
+        .parse()
     })
 
     it('should not fail if conflicting argument is provided, without argument with conflict', () => {
       yargs(['command', '-b', '-c'])
-          .command('command')
-          .option('f', {
-            describe: 'a foo'
-          })
-          .option('b', {
-            describe: 'a bar'
-          })
-          .conflicts('f', 'b')
-          .fail((msg) => {
-            expect.fail()
-          })
-          .argv
+        .command('command')
+        .option('f', {
+          describe: 'a foo'
+        })
+        .option('b', {
+          describe: 'a bar'
+        })
+        .conflicts('f', 'b')
+        .fail((msg) => {
+          expect.fail()
+        })
+        .parse()
     })
 
     it('allows an object to be provided defining conflicting option pairs', (done) => {
@@ -235,7 +235,7 @@ describe('validation tests', () => {
           msg.should.equal('Arguments s and t are mutually exclusive')
           return done()
         })
-        .argv
+        .parse()
     })
 
     it('takes into account aliases when applying conflicts logic', (done) => {
@@ -249,19 +249,19 @@ describe('validation tests', () => {
           msg.should.equal('Arguments s and t are mutually exclusive')
           return done()
         })
-        .argv
+        .parse()
     })
 
     it('allows key to be specified with option shorthand', (done) => {
       yargs(['-f', '-b'])
-          .option('f', {
-            conflicts: 'b'
-          })
-          .fail((msg) => {
-            msg.should.equal('Arguments f and b are mutually exclusive')
-            return done()
-          })
-          .argv
+        .option('f', {
+          conflicts: 'b'
+        })
+        .fail((msg) => {
+          msg.should.equal('Arguments f and b are mutually exclusive')
+          return done()
+        })
+        .parse()
     })
 
     it('should fail if alias of conflicting argument is provided', (done) => {
@@ -272,7 +272,7 @@ describe('validation tests', () => {
           msg.should.equal('Arguments f and b are mutually exclusive')
           return done()
         })
-        .argv
+        .parse()
     })
 
     it('should fail if alias of argument with conflict is provided', (done) => {
@@ -283,7 +283,29 @@ describe('validation tests', () => {
           msg.should.equal('Arguments f and b are mutually exclusive')
           return done()
         })
-        .argv
+        .parse()
+    })
+
+    function loadLocale (locale) {
+      delete require.cache[require.resolve('../')]
+      delete require.cache[require.resolve('os-locale')]
+      yargs = require('../')
+      process.env.LC_ALL = locale
+    }
+
+    it('should use appropriate translation', done => {
+      loadLocale('pirate')
+      try {
+        yargs(['-f', '-b'])
+          .conflicts('f', 'b')
+          .fail(msg => {
+            msg.should.equal('Yon scurvy dogs f and b be as bad as rum and a prudish wench')
+            return done()
+          })
+          .parse()
+      } finally {
+        loadLocale('en_US.UTF-8')
+      }
     })
   })
 
@@ -295,7 +317,7 @@ describe('validation tests', () => {
           msg.should.equal('Not enough non-option arguments: got 0, need at least 1')
           return done()
         })
-        .argv
+        .parse()
     })
 
     it('fails in strict mode with invalid command', (done) => {
@@ -308,7 +330,7 @@ describe('validation tests', () => {
           msg.should.equal('Unknown argument: koala')
           return done()
         })
-        .argv
+        .parse()
     })
 
     it('does not fail in strict mode when no commands configured', () => {
@@ -318,7 +340,7 @@ describe('validation tests', () => {
         .fail((msg) => {
           expect.fail()
         })
-        .argv
+        .parse()
       argv._[0].should.equal('koala')
     })
 
@@ -366,7 +388,7 @@ describe('validation tests', () => {
           msg.should.equal('Missing required argument: b')
           return done()
         })
-        .argv
+        .parse()
     })
 
     it('fails when required arguments are present, but a command is missing', (done) => {
@@ -376,7 +398,7 @@ describe('validation tests', () => {
           msg.should.equal('Not enough non-option arguments: got 0, need at least 1')
           return done()
         })
-        .argv
+        .parse()
     })
 
     it('fails without a message if msg is null', (done) => {
@@ -386,7 +408,7 @@ describe('validation tests', () => {
           expect(msg).to.equal(null)
           return done()
         })
-        .argv
+        .parse()
     })
 
     // address regression in: https://github.com/yargs/yargs/pull/740
@@ -397,7 +419,7 @@ describe('validation tests', () => {
           expect(msg).to.equal('hey! give me a custom exit message')
           return done()
         })
-        .argv
+        .parse()
     })
 
     it('interprets min relative to command', () => {
@@ -408,7 +430,7 @@ describe('validation tests', () => {
             failureMsg = msg
           })
         })
-        .argv
+        .parse()
       expect(failureMsg).to.equal('Not enough non-option arguments: got 0, need at least 1')
     })
 
@@ -420,7 +442,7 @@ describe('validation tests', () => {
             failureMsg = msg
           })
         })
-        .argv
+        .parse()
       expect(failureMsg).to.equal('Too many non-option arguments: got 2, maximum of 1')
     })
   })
@@ -430,7 +452,7 @@ describe('validation tests', () => {
       yargs()
         .option('w', {type: 'number', requiresArg: true})
         .parse('-w', (err, argv, output) => {
-          expect(err).to.exist
+          expect(err).to.not.equal(undefined)
           expect(err).to.have.property('message', 'Not enough arguments following: w')
           return done()
         })
@@ -440,7 +462,7 @@ describe('validation tests', () => {
       yargs()
         .option('w', {type: 'string', requiresArg: true})
         .parse('-w', (err, argv, output) => {
-          expect(err).to.exist
+          expect(err).to.not.equal(undefined)
           expect(err).to.have.property('message', 'Not enough arguments following: w')
           return done()
         })
@@ -450,7 +472,7 @@ describe('validation tests', () => {
       yargs()
         .option('w', {type: 'boolean', requiresArg: true})
         .parse('-w', (err, argv, output) => {
-          expect(err).to.exist
+          expect(err).to.not.equal(undefined)
           expect(err).to.have.property('message', 'Not enough arguments following: w')
           return done()
         })
@@ -460,7 +482,7 @@ describe('validation tests', () => {
       yargs()
         .option('w', {type: 'array', requiresArg: true})
         .parse('-w', (err, argv, output) => {
-          expect(err).to.exist
+          expect(err).to.not.equal(undefined)
           expect(err).to.have.property('message', 'Not enough arguments following: w')
           return done()
         })
@@ -499,7 +521,7 @@ describe('validation tests', () => {
           ])
           return done()
         })
-        .argv
+        .parse()
     })
 
     it('fails with one valid and one invalid value', (done) => {
@@ -512,7 +534,7 @@ describe('validation tests', () => {
           ])
           return done()
         })
-        .argv
+        .parse()
     })
 
     it('fails with multiple invalid values for same argument', (done) => {
@@ -525,7 +547,7 @@ describe('validation tests', () => {
           ])
           return done()
         })
-        .argv
+        .parse()
     })
 
     it('fails with case-insensitive value', (done) => {
@@ -538,7 +560,7 @@ describe('validation tests', () => {
           ])
           return done()
         })
-        .argv
+        .parse()
     })
 
     it('fails with multiple invalid arguments', (done) => {
@@ -553,7 +575,7 @@ describe('validation tests', () => {
           ])
           return done()
         })
-        .argv
+        .parse()
     })
 
     // addresses: https://github.com/yargs/yargs/issues/849
@@ -575,7 +597,7 @@ describe('validation tests', () => {
         .fail((msg) => {
           expect.fail()
         })
-        .argv
+        .parse()
     })
 
     // addresses: https://github.com/yargs/yargs/issues/849
@@ -596,7 +618,7 @@ describe('validation tests', () => {
           msg.should.equal('Missing required argument: c')
           return done()
         })
-        .argv
+        .parse()
     })
 
     // addresses: https://github.com/yargs/yargs/issues/849
@@ -616,7 +638,7 @@ describe('validation tests', () => {
         .fail((msg) => {
           expect.fail()
         })
-        .argv
+        .parse()
     })
 
     // addresses: https://github.com/yargs/yargs/issues/849
@@ -635,7 +657,7 @@ describe('validation tests', () => {
         .fail((msg) => {
           expect.fail()
         })
-        .argv
+        .parse()
     })
   })
 
@@ -648,7 +670,7 @@ describe('validation tests', () => {
           msg.should.eql('Invalid JSON config file: fake.json')
           return done()
         })
-        .argv
+        .parse()
     })
 
     // see: https://github.com/yargs/yargs/issues/172
@@ -662,72 +684,69 @@ describe('validation tests', () => {
         .fail(() => {
           fail = true
         })
-        .argv
+        .parse()
 
       fail.should.equal(false)
     })
 
     it('should be displayed in the help message', () => {
       const r = checkUsage(() => yargs(['--help'])
-          .config('settings')
-          .help('help')
-          .version(false)
-          .wrap(null)
-          .argv
-        )
+        .config('settings')
+        .help('help')
+        .version(false)
+        .wrap(null)
+        .parse()
+      )
       r.should.have.property('logs').with.length(1)
       r.logs.join('\n').split(/\n+/).should.deep.equal([
         'Options:',
         '  --settings  Path to JSON config file',
-        '  --help      Show help  [boolean]',
-        ''
+        '  --help      Show help  [boolean]'
       ])
     })
 
     it('should be displayed in the help message with its default name', () => {
       const checkUsage = require('./helpers/utils').checkOutput
       const r = checkUsage(() => yargs(['--help'])
-            .config()
-            .help('help')
-            .version(false)
-            .wrap(null)
-            .argv
-          )
+        .config()
+        .help('help')
+        .version(false)
+        .wrap(null)
+        .parse()
+      )
       r.should.have.property('logs').with.length(1)
       r.logs.join('\n').split(/\n+/).should.deep.equal([
         'Options:',
         '  --config  Path to JSON config file',
-        '  --help    Show help  [boolean]',
-        ''
+        '  --help    Show help  [boolean]'
       ])
     })
 
     it('should allow help message to be overridden', () => {
       const checkUsage = require('./helpers/utils').checkOutput
       const r = checkUsage(() => yargs(['--help'])
-          .config('settings', 'pork chop sandwiches')
-          .help('help')
-          .version(false)
-          .wrap(null)
-          .argv
-        )
+        .config('settings', 'pork chop sandwiches')
+        .help('help')
+        .version(false)
+        .wrap(null)
+        .parse()
+      )
       r.should.have.property('logs').with.length(1)
       r.logs.join('\n').split(/\n+/).should.deep.equal([
         'Options:',
         '  --settings  pork chop sandwiches',
-        '  --help      Show help  [boolean]',
-        ''
+        '  --help      Show help  [boolean]'
       ])
     })
 
     it('outputs an error returned by the parsing function', () => {
       const checkUsage = require('./helpers/utils').checkOutput
       const r = checkUsage(() => yargs(['--settings=./package.json'])
-          .config('settings', 'path to config file', configPath => Error('someone set us up the bomb'))
-          .help('help')
-          .wrap(null)
-          .argv
-        )
+        .config('settings', 'path to config file', configPath => Error('someone set us up the bomb'))
+        .help('help')
+        .wrap(null)
+        .parse()
+      )
 
       r.errors.join('\n').split(/\n+/).should.deep.equal([
         'Options:',
@@ -741,12 +760,12 @@ describe('validation tests', () => {
     it('outputs an error if thrown by the parsing function', () => {
       const checkUsage = require('./helpers/utils').checkOutput
       const r = checkUsage(() => yargs(['--settings=./package.json'])
-          .config('settings', 'path to config file', (configPath) => {
-            throw Error('someone set us up the bomb')
-          })
-          .wrap(null)
-          .argv
-        )
+        .config('settings', 'path to config file', (configPath) => {
+          throw Error('someone set us up the bomb')
+        })
+        .wrap(null)
+        .parse()
+      )
 
       r.errors.join('\n').split(/\n+/).should.deep.equal([
         'Options:',
@@ -779,15 +798,15 @@ describe('validation tests', () => {
     it('does not fail when command with subcommands called', () => {
       yargs('one')
         .command('one', 'level one', yargs => yargs
-            .command('twoA', 'level two A')
-            .command('twoB', 'level two B')
-            .strict()
-            .fail((msg) => {
-              expect.fail()
-            }), (argv) => {
-              argv._[0].should.equal('one')
-            })
-        .argv
+          .command('twoA', 'level two A')
+          .command('twoB', 'level two B')
+          .strict()
+          .fail((msg) => {
+            expect.fail()
+          }), (argv) => {
+          argv._[0].should.equal('one')
+        })
+        .parse()
     })
 
     it('does not fail for hidden options', () => {
@@ -797,7 +816,7 @@ describe('validation tests', () => {
         .fail((msg) => {
           expect.fail()
         })
-        .argv
+        .parse()
       args.foo.should.equal(true)
     })
 
@@ -810,7 +829,7 @@ describe('validation tests', () => {
         .fail((msg) => {
           expect.fail()
         })
-        .argv
+        .parse()
       args.cat.should.equal(true)
       args.foo.should.equal(true)
       args.bar.should.equal(true)
@@ -825,7 +844,7 @@ describe('validation tests', () => {
           msg.should.equal('Missing required argument: b')
           return done()
         })
-        .argv
+        .parse()
     })
 
     it('allows demandOption in option shorthand', (done) => {
@@ -837,23 +856,23 @@ describe('validation tests', () => {
           msg.should.equal('Missing required argument: c')
           return done()
         })
-        .argv
+        .parse()
     })
   })
 
   describe('demandCommand', () => {
     it('should return a custom failure message when too many non-hyphenated arguments are found after a demand count', () => {
       const r = checkUsage(() => yargs(['src', 'dest'])
-          .usage('Usage: $0 [x] [y] [z] {OPTIONS} <src> <dest> [extra_files...]')
-          .demandCommand(0, 1, 'src and dest files are both required', 'too many arguments are provided')
-          .wrap(null)
-          .help(false)
-          .version(false)
-          .argv
-        )
+        .usage('Usage: $0 [x] [y] [z] {OPTIONS} <src> <dest> [extra_files...]')
+        .demandCommand(0, 1, 'src and dest files are both required', 'too many arguments are provided')
+        .wrap(null)
+        .help(false)
+        .version(false)
+        .parse()
+      )
       r.should.have.property('result')
       r.should.have.property('logs').with.length(0)
-      r.should.have.property('exit').and.be.ok
+      r.should.have.property('exit').and.to.equal(true)
       r.result.should.have.property('_').and.deep.equal(['src', 'dest'])
       r.errors.join('\n').split(/\n+/).should.deep.equal([
         'Usage: usage [x] [y] [z] {OPTIONS} <src> <dest> [extra_files...]',
@@ -869,7 +888,7 @@ describe('validation tests', () => {
           msg.should.equal('totes got 1 totes expected 2')
           return done()
         })
-        .argv
+        .parse()
     })
 
     // see: https://github.com/yargs/yargs/pull/438
@@ -880,7 +899,7 @@ describe('validation tests', () => {
           msg.should.equal('totes too many, got 3 totes expected 2')
           return done()
         })
-        .argv
+        .parse()
     })
 
     it('defaults to demanding 1 command', (done) => {
@@ -890,7 +909,7 @@ describe('validation tests', () => {
           msg.should.equal('Not enough non-option arguments: got 0, need at least 1')
           return done()
         })
-        .argv
+        .parse()
     })
   })
 })
