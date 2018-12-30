@@ -1024,7 +1024,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     let pkgConfig = pkgUp()['yargs']
     if (pkgConfig) {
       console.warn('Configuring yargs through package.json is deprecated and will be removed in the next major release, please use the JS API instead.')
-      Object.assign(options.configuration, pkgConfig)
+      options.configuration = Object.assign({}, pkgConfig, options.configuration)
     }
 
     const parsed = Parser.detailed(args, options)
