@@ -684,6 +684,11 @@ uses the `.version` functionality, validation fails, or the command handler
 fails. Calling `.exitProcess(false)` disables this behavior, enabling further
 actions after yargs have been validated.
 
+<a name="exit"></a>.exit(code, err)
+---------
+Manually indicate that the program should exit, and provide context about why we
+wanted to exit. Follows the behaviour set by `.exitProcess()`.
+
 <a name="fail"></a>.fail(fn)
 ---------
 
@@ -1138,6 +1143,13 @@ parser.parse(bot.userText, function (err, argv, output) {
 
 ***Note:*** Providing a callback to `parse()` disables the [`exitProcess` setting](#exitprocess) until after the callback is invoked.
 
+<a name="parsed"></a>.parsed
+------------
+If the arguments have not been parsed, this property is `false`.
+
+If the arguments have been parsed, this contain detailed parsed arguments. See
+the documentation in [yargs-parser `.detailed()`][https://github.com/yargs/yargs-parser/blob/master/README.md#requireyargs-parserdetailedargs-opts]
+for details of this object
 
 <a name="pkg-conf"></a>
 .pkgConf(key, [cwd])
