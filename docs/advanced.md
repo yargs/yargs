@@ -5,7 +5,6 @@
 
 Yargs provides a powerful set of tools for composing modular command-driven-applications.
 In this section we cover some of the advanced features available in this API:
-
 ### Default Commands
 
 To specify a default command use the string `*` or `$0`. A default command
@@ -196,6 +195,7 @@ yargs.command(require('my-module'))
   .argv
 ```
 
+
 Or if the module does not export `command` and `describe` (or if you just want to override them):
 
 ```js
@@ -203,6 +203,29 @@ yargs.command('get <source> [proxy]', 'make a get HTTP request', require('my-mod
   .help()
   .argv
 ```
+
+#### Testing a Command Module
+
+If you want to test a command in it's entireness you can test it like this.
+
+```js
+it("returns help output", async function() {
+  // Initialize parser using the command module
+  const parser = yargs.command(require('./my-command-module')).help();
+  
+  // Run the command module with --help as argument
+  const output = await new Promise(function(resolve) {
+    parser.parse("--help", function(err, argv, output) {
+      resolve(output);
+    })
+  });
+  
+  // Verify the output is correct
+  expect(output).toBe(expect.stringContaining("helpful message"));
+});
+```
+
+The example uses [jest](https://github.com/facebook/jest) as a test runner, but the concept is independent from jest.
 
 .commandDir(directory, [opts])
 ------------------------------
