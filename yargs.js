@@ -1023,7 +1023,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     // Deprecated
     let pkgConfig = pkgUp()['yargs']
     if (pkgConfig) {
-      console.warn('Configuring yargs through package.json is deprecated and will be removed in the next major release, please use the JS API instead.')
+      _logger.error('Configuring yargs through package.json is deprecated and will be removed in the next major release, please use the JS API instead.')
       options.configuration = Object.assign({}, pkgConfig, options.configuration)
     }
 
