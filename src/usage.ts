@@ -1,25 +1,50 @@
 'use strict'
 // this file handles outputting usage instructions,
 // failures, etc. keeps logging in one place.
-const stringWidth = require('string-width')
-const objFilter = require('./obj-filter')
-const path = require('path')
-const setBlocking = require('set-blocking')
-const YError = require('./yerror')
+import stringWidth from 'string-width'
+import objFilter from './obj-filter'
+import path from 'path'
+import setBlocking from 'set-blocking'
+import YError from './yerror'
 
-module.exports = function usage (yargs, y18n) {
+export = function usage (yargs, y18n) {
   const __ = y18n.__
-  const self = {}
+  const self = {
+    failFn,
+    showHelpOnFail,
+    fail,
+    usage,
+    getUsage,
+    getUsageDisabled,
+    getPositionalGroupName,
+    example,
+    command,
+    getCommands,
+    describe,
+    getDescriptions,
+    epilog,
+    wrap,
+    deferY18nLookup,
+    help,
+    showHelp,
+    functionDescription,
+    stringifiedValues,
+    version,
+    showVersion,
+    reset,
+    freeze,
+    unfreeze
+  }
 
   // methods for ouputting/building failure message.
   const fails = []
-  self.failFn = function failFn (f) {
+  function failFn (f) {
     fails.push(f)
   }
 
   let failMessage = null
   let showHelpOnFail = true
-  self.showHelpOnFail = function showHelpOnFailFn (enabled, message) {
+  function showHelpOnFail (enabled, message) {
     if (typeof enabled === 'string') {
       message = enabled
       enabled = true
@@ -32,7 +57,7 @@ module.exports = function usage (yargs, y18n) {
   }
 
   let failureOutput = false
-  self.fail = function fail (msg, err) {
+  function fail (msg, err) {
     const logger = yargs._getLoggerInstance()
 
     if (fails.length) {
@@ -70,7 +95,7 @@ module.exports = function usage (yargs, y18n) {
   // methods for ouputting/building help (usage) message.
   let usages = []
   let usageDisabled = false
-  self.usage = (msg, description) => {
+  function usage (msg, description?) {
     if (msg === null) {
       usageDisabled = true
       usages = []
@@ -80,24 +105,24 @@ module.exports = function usage (yargs, y18n) {
     usages.push([msg, description || ''])
     return self
   }
-  self.getUsage = () => {
+  function getUsage () {
     return usages
   }
-  self.getUsageDisabled = () => {
+  function getUsageDisabled () {
     return usageDisabled
   }
 
-  self.getPositionalGroupName = () => {
+  function getPositionalGroupName () {
     return __('Positionals:')
   }
 
   let examples = []
-  self.example = (cmd, description) => {
+  function example (cmd, description) {
     examples.push([cmd, description || ''])
   }
 
   let commands = []
-  self.command = function command (cmd, description, isDefault, aliases) {
+  function command (cmd, description, isDefault, aliases) {
     // the last default wins, so cancel out any previously set default
     if (isDefault) {
       commands = commands.map((cmdArray) => {
@@ -107,10 +132,10 @@ module.exports = function usage (yargs, y18n) {
     }
     commands.push([cmd, description || '', isDefault, aliases])
   }
-  self.getCommands = () => commands
+  function getCommands () {return commands}
 
   let descriptions = {}
-  self.describe = function describe (key, desc) {
+  function describe (key, desc) {
     if (typeof key === 'object') {
       Object.keys(key).forEach((k) => {
         self.describe(k, key[k])
@@ -119,16 +144,16 @@ module.exports = function usage (yargs, y18n) {
       descriptions[key] = desc
     }
   }
-  self.getDescriptions = () => descriptions
+  function getDescriptions () {return descriptions}
 
   let epilog
-  self.epilog = (msg) => {
+  function epilog (msg) {
     epilog = msg
   }
 
   let wrapSet = false
   let wrap
-  self.wrap = (cols) => {
+  function wrap (cols) {
     wrapSet = true
     wrap = cols
   }
@@ -143,10 +168,10 @@ module.exports = function usage (yargs, y18n) {
   }
 
   const deferY18nLookupPrefix = '__yargsString__:'
-  self.deferY18nLookup = str => deferY18nLookupPrefix + str
+  function deferY18nLookup (str) {return deferY18nLookupPrefix + str}
 
   const defaultGroup = 'Options:'
-  self.help = function help () {
+  function help () {
     normalizeAliases()
 
     // handle old demanded API
@@ -351,7 +376,7 @@ module.exports = function usage (yargs, y18n) {
 
   // return the maximum width of a string
   // in the left-hand column of a table.
-  function maxWidth (table, theWrap, modifier) {
+  function maxWidth (table, theWrap, modifier?) {
     let width = 0
 
     // table might be of the form [leftColumn],
@@ -420,19 +445,19 @@ module.exports = function usage (yargs, y18n) {
     return yargs.getOptions().hiddenOptions.indexOf(key) < 0 || yargs.parsed.argv[yargs.getOptions().showHiddenOpt]
   }
 
-  self.showHelp = (level) => {
+  function showHelp (level) {
     const logger = yargs._getLoggerInstance()
     if (!level) level = 'error'
     const emit = typeof level === 'function' ? level : logger[level]
     emit(self.help())
   }
 
-  self.functionDescription = (fn) => {
+  function functionDescription (fn) {
     const description = fn.name ? require('decamelize')(fn.name, '-') : __('generated-value')
     return ['(', description, ')'].join('')
   }
 
-  self.stringifiedValues = function stringifiedValues (values, separator) {
+  function stringifiedValues (values, separator?) {
     let string = ''
     const sep = separator || ', '
     const array = [].concat(values)
@@ -483,17 +508,17 @@ module.exports = function usage (yargs, y18n) {
   }
 
   // logic for displaying application version.
-  let version = null
-  self.version = (ver) => {
-    version = ver
+  let _version = null
+  function version (ver) {
+    _version = ver
   }
 
-  self.showVersion = () => {
+  function showVersion () {
     const logger = yargs._getLoggerInstance()
-    logger.log(version)
+    logger.log(_version)
   }
 
-  self.reset = function reset (localLookup) {
+  function reset (localLookup) {
     // do not reset wrap here
     // do not reset fails here
     failMessage = null
@@ -508,7 +533,7 @@ module.exports = function usage (yargs, y18n) {
   }
 
   let frozen
-  self.freeze = function freeze () {
+  function freeze () {
     frozen = {}
     frozen.failMessage = failMessage
     frozen.failureOutput = failureOutput
@@ -519,7 +544,7 @@ module.exports = function usage (yargs, y18n) {
     frozen.commands = commands
     frozen.descriptions = descriptions
   }
-  self.unfreeze = function unfreeze () {
+  function unfreeze () {
     failMessage = frozen.failMessage
     failureOutput = frozen.failureOutput
     usages = frozen.usages

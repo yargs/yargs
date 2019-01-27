@@ -1,4 +1,4 @@
-module.exports = function (globalMiddleware, context) {
+export = function (globalMiddleware, context) {
   return function (callback) {
     if (Array.isArray(callback)) {
       Array.prototype.push.apply(globalMiddleware, callback)

@@ -1,10 +1,10 @@
 
 'use strict'
-const fs = require('fs')
-const path = require('path')
-const YError = require('./yerror')
+import fs from 'fs'
+import path from 'path'
+import YError from './yerror'
 
-let previouslyVisitedConfigs = []
+let previouslyVisitedConfigs: Array<string> = []
 
 function checkForCircularExtends (cfgPath) {
   if (previouslyVisitedConfigs.indexOf(cfgPath) > -1) {
@@ -22,7 +22,7 @@ function applyExtends (config, cwd) {
   if (config.hasOwnProperty('extends')) {
     if (typeof config.extends !== 'string') return defaultConfig
     const isPath = /\.json|\..*rc$/.test(config.extends)
-    let pathToDefault = null
+    let pathToDefault: string = null!
     if (!isPath) {
       try {
         pathToDefault = require.resolve(config.extends)
@@ -50,4 +50,4 @@ function applyExtends (config, cwd) {
   return Object.assign({}, defaultConfig, config)
 }
 
-module.exports = applyExtends
+export = applyExtends

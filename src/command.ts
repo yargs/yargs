@@ -1,22 +1,35 @@
 'use strict'
 
-const inspect = require('util').inspect
-const path = require('path')
-const Parser = require('yargs-parser')
+import {inspect} from 'util'
+import path from 'path'
+import Parser from 'yargs-parser'
 
 const DEFAULT_MARKER = /(^\*)|(^\$0)/
 
 // handles parsing positional arguments,
 // and populating argv with said positional
 // arguments.
-module.exports = function command (yargs, usage, validation, globalMiddleware) {
-  const self = {}
+export = function command (yargs?, usage?, validation?, globalMiddleware?) {
+  const self = {
+    addHandler,
+    addDirectory,
+    parseCommand,
+    getCommands,
+    getCommandHandlers,
+    hasDefaultCommand,
+    runCommand,
+    runDefaultBuilderOn,
+    cmdToParseOptions,
+    reset,
+    freeze,
+    unfreeze
+  }
   let handlers = {}
   let aliasMap = {}
   let defaultCommand
   globalMiddleware = globalMiddleware || []
-  self.addHandler = function addHandler (cmd, description, builder, handler, middlewares) {
-    let aliases = []
+  function addHandler (cmd, description?, builder?, handler?, middlewares?) {
+    let aliases: Array<string> = []
     handler = handler || (() => {})
     middlewares = middlewares || []
     globalMiddleware.push(...middlewares)
@@ -85,7 +98,7 @@ module.exports = function command (yargs, usage, validation, globalMiddleware) {
     if (isDefault) defaultCommand = handlers[parsedCommand.cmd]
   }
 
-  self.addDirectory = function addDirectory (dir, context, req, callerFile, opts) {
+  function addDirectory (dir, context, req, callerFile, opts) {
     opts = opts || {}
     // disable recursion to support nested directories of subcommands
     if (typeof opts.recurse !== 'boolean') opts.recurse = false
@@ -131,14 +144,18 @@ module.exports = function command (yargs, usage, validation, globalMiddleware) {
     return false
   }
 
-  self.parseCommand = function parseCommand (cmd) {
+  function parseCommand (cmd) {
     const extraSpacesStrippedCommand = cmd.replace(/\s{2,}/g, ' ')
     const splitCommand = extraSpacesStrippedCommand.split(/\s+(?![^[]*]|[^<]*>)/)
     const bregex = /\.*[\][<>]/g
+    interface Option {
+      cmd: string,
+      variadic: boolean
+    }
     const parsedCommand = {
       cmd: (splitCommand.shift()).replace(bregex, ''),
-      demanded: [],
-      optional: []
+      demanded: [] as Array<Option>,
+      optional: [] as Array<Option>
     }
     splitCommand.forEach((cmd, i) => {
       let variadic = false
@@ -159,13 +176,13 @@ module.exports = function command (yargs, usage, validation, globalMiddleware) {
     return parsedCommand
   }
 
-  self.getCommands = () => Object.keys(handlers).concat(Object.keys(aliasMap))
+  function getCommands () {return Object.keys(handlers).concat(Object.keys(aliasMap))}
 
-  self.getCommandHandlers = () => handlers
+  function getCommandHandlers () {return handlers}
 
-  self.hasDefaultCommand = () => !!defaultCommand
+  function hasDefaultCommand () {return !!defaultCommand}
 
-  self.runCommand = function runCommand (command, yargs, parsed, commandIndex) {
+  function runCommand (command, yargs, parsed, commandIndex) {
     let aliases = parsed.aliases
     const commandHandler = handlers[command] || handlers[aliasMap[command]] || defaultCommand
     const currentContext = yargs.getContext()
@@ -266,7 +283,7 @@ module.exports = function command (yargs, usage, validation, globalMiddleware) {
     return `$0 ${pc.join(' ')}`
   }
 
-  self.runDefaultBuilderOn = function (yargs) {
+  function runDefaultBuilderOn (yargs) {
     if (shouldUpdateUsage(yargs)) {
       // build the root-level command string from the default string.
       const commandString = DEFAULT_MARKER.test(defaultCommand.original)
@@ -313,7 +330,7 @@ module.exports = function command (yargs, usage, validation, globalMiddleware) {
     return positionalMap
   }
 
-  function populatePositional (positional, argv, positionalMap, parseOptions) {
+  function populatePositional (positional, argv, positionalMap, parseOptions?) {
     const cmd = positional.cmd[0]
     if (positional.variadic) {
       positionalMap[cmd] = argv._.splice(0).map(String)
@@ -333,7 +350,7 @@ module.exports = function command (yargs, usage, validation, globalMiddleware) {
     options.array = options.array.concat(parseOptions.array)
     delete options.config //  don't load config when processing positionals.
 
-    const unparsed = []
+    const unparsed: Array<string> = []
     Object.keys(positionalMap).forEach((key) => {
       positionalMap[key].map((value) => {
         unparsed.push(`--${key}`)
@@ -367,7 +384,7 @@ module.exports = function command (yargs, usage, validation, globalMiddleware) {
     }
   }
 
-  self.cmdToParseOptions = function (cmdString) {
+  function cmdToParseOptions (cmdString) {
     const parseOptions = {
       array: [],
       default: {},
@@ -404,7 +421,7 @@ module.exports = function command (yargs, usage, validation, globalMiddleware) {
     return parseOptions
   }
 
-  self.reset = () => {
+  function reset () {
     handlers = {}
     aliasMap = {}
     defaultCommand = undefined
@@ -416,13 +433,13 @@ module.exports = function command (yargs, usage, validation, globalMiddleware) {
   // we can apply .parse() multiple times
   // with the same yargs instance.
   let frozen
-  self.freeze = () => {
+  function freeze () {
     frozen = {}
     frozen.handlers = handlers
     frozen.aliasMap = aliasMap
     frozen.defaultCommand = defaultCommand
   }
-  self.unfreeze = () => {
+  function unfreeze () {
     handlers = frozen.handlers
     aliasMap = frozen.aliasMap
     defaultCommand = frozen.defaultCommand

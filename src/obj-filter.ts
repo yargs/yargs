@@ -1,5 +1,5 @@
 'use strict'
-module.exports = function objFilter (original, filter) {
+export = function objFilter (original, filter) {
   const obj = {}
   filter = filter || ((k, v) => true)
   Object.keys(original || {}).forEach((key) => {

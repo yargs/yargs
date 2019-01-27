@@ -1,17 +1,20 @@
 'use strict'
-const fs = require('fs')
-const path = require('path')
+import fs from 'fs'
+import path from 'path'
 
 // add bash completions to your
 //  yargs-powered applications.
-module.exports = function completion (yargs, usage, command) {
+export = function completion (yargs, usage, command) {
   const self = {
-    completionKey: 'get-yargs-completions'
+    completionKey: 'get-yargs-completions',
+    getCompletion,
+    generateCompletionScript,
+    registerFunction
   }
 
   // get a list of completion commands.
   // 'args' is the array of strings from the line to be completed
-  self.getCompletion = function getCompletion (args, done) {
+  function getCompletion (args, done) {
     const completions = []
     const current = args.length ? args[args.length - 1] : ''
     const argv = yargs.parse(args, true)
@@ -78,7 +81,7 @@ module.exports = function completion (yargs, usage, command) {
   }
 
   // generate the completion script to add to your .bashrc.
-  self.generateCompletionScript = function generateCompletionScript ($0, cmd) {
+  function generateCompletionScript ($0, cmd) {
     let script = fs.readFileSync(
       path.resolve(__dirname, '../completion.sh.hbs'),
       'utf-8'
@@ -93,11 +96,17 @@ module.exports = function completion (yargs, usage, command) {
     return script.replace(/{{app_path}}/g, $0)
   }
 
+  interface CompletionFunction {
+    (current, argv, callback): void
+    (current, argv): Promise<unknown>
+    (current, argv): unknown
+  }
+
   // register a function to perform your own custom
   // completions., this function can be either
   // synchrnous or asynchronous.
-  let completionFunction = null
-  self.registerFunction = (fn) => {
+  let completionFunction: CompletionFunction = null!
+  function registerFunction (fn: CompletionFunction) {
     completionFunction = fn
   }
 

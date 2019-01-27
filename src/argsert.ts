@@ -1,10 +1,11 @@
 'use strict'
-const command = require('./command')()
-const YError = require('./yerror')
+import Command from './command'
+const command = Command()
+import YError from './yerror'
 
 const positionName = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth']
 
-module.exports = function argsert (expected, callerArguments, length) {
+export = function argsert (expected, callerArguments, length?) {
   // TODO: should this eventually raise an exception.
   try {
     // preface the argument description with "cmd", so

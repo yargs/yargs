@@ -12,7 +12,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 // gist, which can be found here: https://gist.github.com/andrei-m/982927
 'use strict'
 // Compute the edit distance between the two given strings
-module.exports = function levenshtein (a, b) {
+export = function levenshtein (a, b) {
   if (a.length === 0) return b.length
   if (b.length === 0) return a.length
 

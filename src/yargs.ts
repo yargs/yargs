@@ -1,32 +1,117 @@
 'use strict'
-const argsert = require('./lib/argsert')
-const fs = require('fs')
-const Command = require('./lib/command')
-const Completion = require('./lib/completion')
-const Parser = require('yargs-parser')
-const path = require('path')
-const Usage = require('./lib/usage')
-const Validation = require('./lib/validation')
-const Y18n = require('y18n')
-const objFilter = require('./lib/obj-filter')
-const setBlocking = require('set-blocking')
-const applyExtends = require('./lib/apply-extends')
-const middlewareFactory = require('./lib/middleware')
-const YError = require('./lib/yerror')
+import argsert from './argsert'
+import fs from 'fs'
+import Command from './command'
+import Completion from './completion'
+import Parser from 'yargs-parser'
+import path from 'path'
+import Usage from './usage'
+import Validation from './validation'
+import Y18n from 'y18n'
+import objFilter from './obj-filter'
+import setBlocking from 'set-blocking'
+import applyExtends from './apply-extends'
+import middlewareFactory from './middleware'
+import YError from './yerror'
 
-exports = module.exports = Yargs
+export = Yargs
 function Yargs (processArgs, cwd, parentRequire) {
   processArgs = processArgs || [] // handle calling yargs().
 
-  const self = {}
-  let command = null
-  let completion = null
+  const self = {
+    $0: '',
+    middleware: undefined as any as ReturnType<typeof middlewareFactory>,
+    scriptName,
+    getContext,
+    resetOptions,
+    reset: resetOptions,
+    boolean,
+    array,
+    number,
+    normalize,
+    count,
+    string,
+    requiresArg,
+    skipValidation,
+    nargs,
+    choices,
+    alias,
+    default: defaults,
+    defaults,
+    describe,
+    demandOption,
+    coerce,
+    config,
+    example,
+    command: commandFn,
+    commandDir,
+    demand,
+    required: demand,
+    require: demand,
+    demandCommand,
+    getDemandedOptions,
+    getDemandedCommands,
+    implies,
+    conflicts,
+    usage: usageFn,
+    epilogue,
+    epilog: epilogue,
+    fail,
+    check,
+    global,
+    pkgConf,
+    parse,
+    _getParseContext,
+    _hasParseCallback,
+    option,
+    options: option,
+    getOptions,
+    positional,
+    group,
+    getGroups,
+    env,
+    wrap,
+    strict: strictFn,
+    getStrict,
+    showHelp,
+    version,
+    addHelpOpt,
+    help: addHelpOpt,
+    addShowHiddenOpt,
+    showHidden: addShowHiddenOpt,
+    hide,
+    showHelpOnFail,
+    exitProcess: exitProcessFn,
+    getExitProcess,
+    completion: completionFn,
+    showCompletionScript,
+    getCompletion,
+    locale,
+    updateStrings,
+    updateLocale: updateStrings,
+    detectLocale,
+    getDetectLocale,
+    exit,
+    _getLoggerInstance,
+    _hasOutput,
+    _setHasOutput,
+    recommendCommands,
+    getUsageInstance,
+    getValidationInstance,
+    getCommandInstance,
+    terminalWidth,
+    _parseArgs,
+    _runValidation,
+    parsed: undefined as any as boolean
+  }
+  let command = null as any as ReturnType<typeof Command>
+  let completion = null as any as ReturnType<typeof Completion>
   let groups = {}
   let globalMiddleware = []
   let output = ''
   let preservedGroups = {}
-  let usage = null
-  let validation = null
+  let usage = null as any as ReturnType<typeof Usage>
+  let validation = null as any as ReturnType<typeof Validation>
 
   const y18n = Y18n({
     directory: path.resolve(__dirname, './locales'),
@@ -37,20 +122,21 @@ function Yargs (processArgs, cwd, parentRequire) {
 
   if (!cwd) cwd = process.cwd()
 
-  self.scriptName = function scriptName (scriptName) {
+  function scriptName (scriptName) {
     self.$0 = scriptName
     return self
   }
 
   // ignore the node bin, specify this in your
   // bin file with #!/usr/bin/env node
+  let $0: Array<string>;
   if (/\b(node|iojs|electron)(\.exe)?$/.test(process.argv[0])) {
-    self.$0 = process.argv.slice(1, 2)
+    $0 = process.argv.slice(1, 2)
   } else {
-    self.$0 = process.argv.slice(0, 1)
+    $0 = process.argv.slice(0, 1)
   }
 
-  self.$0 = self.$0
+  self.$0 = $0
     .map((x, i) => {
       const b = rebase(cwd, x)
       return x.match(/^(\/|([a-zA-Z]:)?\\)/) && b.length < x.length ? b : x
@@ -66,22 +152,24 @@ function Yargs (processArgs, cwd, parentRequire) {
   // use context object to keep track of resets, subcommand execution, etc
   // submodules should modify and check the state of context as necessary
   const context = { resets: -1, commands: [], fullCommands: [], files: [] }
-  self.getContext = () => context
+  function getContext () {return context}
 
   // puts yargs back into an initial state. any keys
   // that have been set to "global" will not be reset
   // by this action.
   let options
-  self.resetOptions = self.reset = function resetOptions (aliases) {
+  function resetOptions (aliases?) {
     context.resets++
     aliases = aliases || {}
     options = options || {}
     // put yargs back into an initial state, this
     // logic is used to build a nested command
     // hierarchy.
-    const tmpOptions = {}
-    tmpOptions.local = options.local ? options.local : []
-    tmpOptions.configObjects = options.configObjects ? options.configObjects : []
+    const tmpOptions = {
+      local: options.local ? options.local : [],
+      configObjects: options.configObjects ? options.configObjects : [],
+      envPrefix: undefined as unknown
+    }
 
     // if a key has been explicitly set as local,
     // we should reset it before passing options to command.
@@ -180,81 +268,81 @@ function Yargs (processArgs, cwd, parentRequire) {
     frozen = undefined
   }
 
-  self.boolean = function (keys) {
+  function boolean (keys) {
     argsert('<array|string>', [keys], arguments.length)
     populateParserHintArray('boolean', keys)
     return self
   }
 
-  self.array = function (keys) {
+  function array (keys) {
     argsert('<array|string>', [keys], arguments.length)
     populateParserHintArray('array', keys)
     return self
   }
 
-  self.number = function (keys) {
+  function number (keys) {
     argsert('<array|string>', [keys], arguments.length)
     populateParserHintArray('number', keys)
     return self
   }
 
-  self.normalize = function (keys) {
+  function normalize (keys) {
     argsert('<array|string>', [keys], arguments.length)
     populateParserHintArray('normalize', keys)
     return self
   }
 
-  self.count = function (keys) {
+  function count (keys) {
     argsert('<array|string>', [keys], arguments.length)
     populateParserHintArray('count', keys)
     return self
   }
 
-  self.string = function (keys) {
+  function string (keys) {
     argsert('<array|string>', [keys], arguments.length)
     populateParserHintArray('string', keys)
     return self
   }
 
-  self.requiresArg = function (keys) {
+  function requiresArg (keys) {
     argsert('<array|string>', [keys], arguments.length)
     populateParserHintObject(self.nargs, false, 'narg', keys, 1)
     return self
   }
 
-  self.skipValidation = function (keys) {
+  function skipValidation (keys) {
     argsert('<array|string>', [keys], arguments.length)
     populateParserHintArray('skipValidation', keys)
     return self
   }
 
-  function populateParserHintArray (type, keys, value) {
+  function populateParserHintArray (type, keys, value?) {
     keys = [].concat(keys)
     keys.forEach((key) => {
       options[type].push(key)
     })
   }
 
-  self.nargs = function (key, value) {
+  function nargs (key, value) {
     argsert('<string|object|array> [number]', [key, value], arguments.length)
     populateParserHintObject(self.nargs, false, 'narg', key, value)
     return self
   }
 
-  self.choices = function (key, value) {
+  function choices (key, value) {
     argsert('<object|string|array> [string|array]', [key, value], arguments.length)
     populateParserHintObject(self.choices, true, 'choices', key, value)
     return self
   }
 
-  self.alias = function (key, value) {
+  function alias (key, value) {
     argsert('<object|string|array> [string|array]', [key, value], arguments.length)
     populateParserHintObject(self.alias, true, 'alias', key, value)
     return self
   }
 
   // TODO: actually deprecate self.defaults.
-  self.default = self.defaults = function (key, value, defaultDescription) {
+  function defaults (key, value, defaultDescription) {
     argsert('<object|string|array> [*] [string]', [key, value, defaultDescription], arguments.length)
     if (defaultDescription) options.defaultDescription[key] = defaultDescription
     if (typeof value === 'function') {
@@ -265,20 +353,20 @@ function Yargs (processArgs, cwd, parentRequire) {
     return self
   }
 
-  self.describe = function (key, desc) {
+  function describe (key, desc) {
     argsert('<object|string|array> [string]', [key, desc], arguments.length)
     populateParserHintObject(self.describe, false, 'key', key, true)
     usage.describe(key, desc)
     return self
   }
 
-  self.demandOption = function (keys, msg) {
+  function demandOption (keys, msg?) {
     argsert('<object|string|array> [string]', [keys, msg], arguments.length)
     populateParserHintObject(self.demandOption, false, 'demandedOptions', keys, msg)
     return self
   }
 
-  self.coerce = function (keys, value) {
+  function coerce (keys, value) {
     argsert('<object|string|array> [function]', [keys, value], arguments.length)
     populateParserHintObject(self.coerce, false, 'coerce', keys, value)
     return self
@@ -322,7 +410,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     delete usage.getDescriptions()[optionKey]
   }
 
-  self.config = function config (key, msg, parseFn) {
+  function config (key, msg, parseFn) {
     argsert('[object|string] [string|function] [function]', [key, msg, parseFn], arguments.length)
     // allow a config object to be provided directly.
     if (typeof key === 'object') {
@@ -346,19 +434,19 @@ function Yargs (processArgs, cwd, parentRequire) {
     return self
   }
 
-  self.example = function (cmd, description) {
+  function example (cmd, description) {
     argsert('<string> [string]', [cmd, description], arguments.length)
     usage.example(cmd, description)
     return self
   }
 
-  self.command = function (cmd, description, builder, handler, middlewares) {
+  function commandFn (cmd, description, builder, handler, middlewares?) {
     argsert('<string|array|object> [string|boolean] [function|object] [function] [array]', [cmd, description, builder, handler, middlewares], arguments.length)
     command.addHandler(cmd, description, builder, handler, middlewares)
     return self
   }
 
-  self.commandDir = function (dir, opts) {
+  function commandDir (dir, opts) {
     argsert('<string> [object]', [dir, opts], arguments.length)
     const req = parentRequire || require
     command.addDirectory(dir, self.getContext(), req, require('get-caller-file')(), opts)
@@ -367,7 +455,7 @@ function Yargs (processArgs, cwd, parentRequire) {
 
   // TODO: deprecate self.demand in favor of
   // .demandCommand() .demandOption().
-  self.demand = self.required = self.require = function demand (keys, max, msg) {
+  function demand (keys, max, msg) {
     // you can optionally provide a 'max' key,
     // which will raise an exception if too many '_'
     // options are provided.
@@ -398,7 +486,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     return self
   }
 
-  self.demandCommand = function demandCommand (min, max, minMsg, maxMsg) {
+  function demandCommand (min, max, minMsg, maxMsg) {
     argsert('[number] [number|string] [string|null|undefined] [string|null|undefined]', [min, max, minMsg, maxMsg], arguments.length)
 
     if (typeof min === 'undefined') min = 1
@@ -420,29 +508,29 @@ function Yargs (processArgs, cwd, parentRequire) {
     return self
   }
 
-  self.getDemandedOptions = () => {
+  function getDemandedOptions () {
     argsert([], 0)
     return options.demandedOptions
   }
 
-  self.getDemandedCommands = () => {
+  function getDemandedCommands () {
     argsert([], 0)
     return options.demandedCommands
   }
 
-  self.implies = function (key, value) {
+  function implies (key, value) {
     argsert('<string|object> [number|string|array]', [key, value], arguments.length)
     validation.implies(key, value)
     return self
   }
 
-  self.conflicts = function (key1, key2) {
+  function conflicts (key1, key2) {
     argsert('<string|object> [string|array]', [key1, key2], arguments.length)
     validation.conflicts(key1, key2)
     return self
   }
 
-  self.usage = function (msg, description, builder, handler) {
+  function usageFn (msg, description, builder, handler) {
     argsert('<string|null|undefined> [string|boolean] [function|object] [function]', [msg, description, builder, handler], arguments.length)
 
     if (description !== undefined) {
@@ -459,25 +547,25 @@ function Yargs (processArgs, cwd, parentRequire) {
     }
   }
 
-  self.epilogue = self.epilog = function (msg) {
+  function epilogue (msg) {
     argsert('<string>', [msg], arguments.length)
     usage.epilog(msg)
     return self
   }
 
-  self.fail = function (f) {
+  function fail (f) {
     argsert('<function>', [f], arguments.length)
     usage.failFn(f)
     return self
   }
 
-  self.check = function (f, _global) {
+  function check (f, _global) {
     argsert('<function> [boolean]', [f, _global], arguments.length)
     validation.check(f, _global !== false)
     return self
   }
 
-  self.global = function global (globals, global) {
+  function global (globals, global) {
     argsert('<string|array> [boolean]', [globals, global], arguments.length)
     globals = [].concat(globals)
     if (global !== false) {
@@ -490,7 +578,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     return self
   }
 
-  self.pkgConf = function pkgConf (key, rootPath) {
+  function pkgConf (key, rootPath) {
     argsert('<string> [string]', [key, rootPath], arguments.length)
     let conf = null
     // prefer cwd to require-main-filename in this method
@@ -536,7 +624,7 @@ function Yargs (processArgs, cwd, parentRequire) {
 
   let parseFn = null
   let parseContext = null
-  self.parse = function parse (args, shortCircuit, _parseFn) {
+  function parse (args, shortCircuit, _parseFn) {
     argsert('[string|array] [function|boolean|object] [function]', [args, shortCircuit, _parseFn], arguments.length)
     if (typeof args === 'undefined') {
       return self._parseArgs(processArgs)
@@ -570,11 +658,11 @@ function Yargs (processArgs, cwd, parentRequire) {
     return parsed
   }
 
-  self._getParseContext = () => parseContext || {}
+  function _getParseContext () {return parseContext || {}}
 
-  self._hasParseCallback = () => !!parseFn
+  function _hasParseCallback () {return !!parseFn}
 
-  self.option = self.options = function option (key, opt) {
+  function option (key, opt) {
     argsert('<string|object> [object]', [key, opt], arguments.length)
     if (typeof key === 'object') {
       Object.keys(key).forEach((k) => {
@@ -685,9 +773,9 @@ function Yargs (processArgs, cwd, parentRequire) {
 
     return self
   }
-  self.getOptions = () => options
+  function getOptions () {return options}
 
-  self.positional = function (key, opts) {
+  function positional (key, opts) {
     argsert('<string> <object>', [key, opts], arguments.length)
     if (context.resets === 0) {
       throw new YError(".positional() can only be called in a command's builder function")
@@ -724,7 +812,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     return self.option(key, opts)
   }
 
-  self.group = function group (opts, groupName) {
+  function group (opts, groupName) {
     argsert('<string|array> <string>', [opts, groupName], arguments.length)
     const existing = preservedGroups[groupName] || groups[groupName]
     if (preservedGroups[groupName]) {
@@ -740,32 +828,32 @@ function Yargs (processArgs, cwd, parentRequire) {
     return self
   }
   // combine explicit and preserved groups. explicit groups should be first
-  self.getGroups = () => Object.assign({}, groups, preservedGroups)
+  function getGroups () {return Object.assign({}, groups, preservedGroups)}
 
   // as long as options.envPrefix is not undefined,
   // parser will apply env vars matching prefix to argv
-  self.env = function (prefix) {
+  function env (prefix) {
     argsert('[string|boolean]', [prefix], arguments.length)
     if (prefix === false) options.envPrefix = undefined
     else options.envPrefix = prefix || ''
     return self
   }
 
-  self.wrap = function (cols) {
+  function wrap (cols) {
     argsert('<number|null|undefined>', [cols], arguments.length)
     usage.wrap(cols)
     return self
   }
 
   let strict = false
-  self.strict = function (enabled) {
+  function strictFn (enabled) {
     argsert('[boolean]', [enabled], arguments.length)
     strict = enabled !== false
     return self
   }
-  self.getStrict = () => strict
+  function getStrict () {return strict}
 
-  self.showHelp = function (level) {
+  function showHelp (level) {
     argsert('[string|function]', [level], arguments.length)
     if (!self.parsed) self._parseArgs(processArgs) // run parser, if it has not already been executed.
     if (command.hasDefaultCommand()) {
@@ -777,7 +865,7 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   let versionOpt = null
-  self.version = function version (opt, msg, ver) {
+  function version (opt, msg, ver) {
     const defaultVersionOpt = 'version'
     argsert('[boolean|string] [string] [string]', [opt, msg, ver], arguments.length)
 
@@ -819,7 +907,7 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   let helpOpt = null
-  self.addHelpOpt = self.help = function addHelpOpt (opt, msg) {
+  function addHelpOpt (opt, msg) {
     const defaultHelpOpt = 'help'
     argsert('[string|boolean] [string]', [opt, msg], arguments.length)
 
@@ -843,7 +931,7 @@ function Yargs (processArgs, cwd, parentRequire) {
 
   const defaultShowHiddenOpt = 'show-hidden'
   options.showHiddenOpt = defaultShowHiddenOpt
-  self.addShowHiddenOpt = self.showHidden = function addShowHiddenOpt (opt, msg) {
+  function addShowHiddenOpt (opt, msg) {
     argsert('[string|boolean] [string]', [opt, msg], arguments.length)
 
     if (arguments.length === 1) {
@@ -857,20 +945,20 @@ function Yargs (processArgs, cwd, parentRequire) {
     return self
   }
 
-  self.hide = function hide (key) {
+  function hide (key) {
     argsert('<string|object>', [key], arguments.length)
     options.hiddenOptions.push(key)
     return self
   }
 
-  self.showHelpOnFail = function showHelpOnFail (enabled, message) {
+  function showHelpOnFail (enabled, message) {
     argsert('[boolean|string] [string]', [enabled, message], arguments.length)
     usage.showHelpOnFail(enabled, message)
     return self
   }
 
   var exitProcess = true
-  self.exitProcess = function (enabled) {
+  function exitProcessFn (enabled) {
     argsert('[boolean]', [enabled], arguments.length)
     if (typeof enabled !== 'boolean') {
       enabled = true
@@ -878,10 +966,10 @@ function Yargs (processArgs, cwd, parentRequire) {
     exitProcess = enabled
     return self
   }
-  self.getExitProcess = () => exitProcess
+  function getExitProcess () {return exitProcess}
 
   var completionCommand = null
-  self.completion = function (cmd, desc, fn) {
+  function completionFn (cmd, desc, fn) {
     argsert('[string] [string|boolean|function] [function]', [cmd, desc, fn], arguments.length)
 
     // a function to execute when generating
@@ -905,19 +993,19 @@ function Yargs (processArgs, cwd, parentRequire) {
     return self
   }
 
-  self.showCompletionScript = function ($0) {
+  function showCompletionScript ($0) {
     argsert('[string]', [$0], arguments.length)
     $0 = $0 || self.$0
     _logger.log(completion.generateCompletionScript($0, completionCommand))
     return self
   }
 
-  self.getCompletion = function (args, done) {
+  function getCompletion (args, done) {
     argsert('<array> <function>', [args, done], arguments.length)
     completion.getCompletion(args, done)
   }
 
-  self.locale = function (locale) {
+  function locale (locale) {
     argsert('[string]', [locale], arguments.length)
     if (arguments.length === 0) {
       guessLocale()
@@ -928,7 +1016,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     return self
   }
 
-  self.updateStrings = self.updateLocale = function (obj) {
+  function updateStrings (obj) {
     argsert('<object>', [obj], arguments.length)
     detectLocale = false
     y18n.updateLocale(obj)
@@ -936,18 +1024,18 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   let detectLocale = true
-  self.detectLocale = function (detect) {
+  function detectLocale (detect) {
     argsert('<boolean>', [detect], arguments.length)
     detectLocale = detect
     return self
   }
-  self.getDetectLocale = () => detectLocale
+  function getDetectLocale () {return detectLocale}
 
   var hasOutput = false
   var exitError = null
   // maybe exit, always capture
   // context about why we wanted to exit.
-  self.exit = (code, err) => {
+  function exit (code, err?) {
     hasOutput = true
     exitError = err
     if (exitProcess) process.exit(code)
@@ -973,29 +1061,29 @@ function Yargs (processArgs, cwd, parentRequire) {
       output += args.join(' ')
     }
   }
-  self._getLoggerInstance = () => _logger
+  function _getLoggerInstance () {return _logger}
   // has yargs output an error our help
   // message in the current execution context.
-  self._hasOutput = () => hasOutput
+  function _hasOutput () {return hasOutput}
 
-  self._setHasOutput = () => {
+  function _setHasOutput () {
     hasOutput = true
   }
 
   let recommendCommands
-  self.recommendCommands = function (recommend) {
+  function recommendCommands (recommend) {
     argsert('[boolean]', [recommend], arguments.length)
     recommendCommands = typeof recommend === 'boolean' ? recommend : true
     return self
   }
 
-  self.getUsageInstance = () => usage
+  function getUsageInstance () {return usage}
 
-  self.getValidationInstance = () => validation
+  function getValidationInstance () {return validation}
 
-  self.getCommandInstance = () => command
+  function getCommandInstance () {return command}
 
-  self.terminalWidth = () => {
+  function terminalWidth () {
     argsert([], 0)
     return typeof process.stdout.columns !== 'undefined' ? process.stdout.columns : null
   }
@@ -1005,7 +1093,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     enumerable: true
   })
 
-  self._parseArgs = function parseArgs (args, shortCircuit, _skipValidation, commandIndex) {
+  function _parseArgs (args, shortCircuit, _skipValidation, commandIndex) {
     let skipValidation = !!_skipValidation
     args = args || processArgs
 
@@ -1151,7 +1239,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     return argv
   }
 
-  self._runValidation = function runValidation (argv, aliases, positionalMap, parseErrors) {
+  function _runValidation (argv, aliases, positionalMap, parseErrors) {
     if (parseErrors) throw new YError(parseErrors.message || parseErrors)
     validation.nonOptionCount(argv)
     validation.requiredArguments(argv)
@@ -1184,7 +1272,7 @@ function Yargs (processArgs, cwd, parentRequire) {
 
 // rebase an absolute path to a relative one with respect to a base directory
 // exported for tests
-exports.rebase = rebase
+Yargs.rebase = rebase
 function rebase (base, dir) {
   return path.relative(base, dir)
 }
