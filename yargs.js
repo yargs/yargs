@@ -1162,6 +1162,7 @@ function Yargs (processArgs, cwd, parentRequire) {
       if (err instanceof YError) usage.fail(err.message, err)
       else throw err
     }
+
     return argv
   }
 
