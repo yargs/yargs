@@ -478,6 +478,9 @@ const normalizeCredentials = (argv) => {
   }
   return {}
 }
+
+// Add normalizeCredentials to yargs
+yargs.middleware(normalizeCredentials)
 ```
 
 ### Example Async Credentials Middleware
@@ -496,6 +499,9 @@ const normalizeCredentials = (argv) => {
   }
   return {}
 }
+
+// Add normalizeCredentials to yargs
+yargs.middleware(normalizeCredentials)
 ```
 
 #### yargs parsing configuration
@@ -508,7 +514,7 @@ var argv = require('yargs')
                     .option('password')
       } ,(argv) => {
         authenticateUser(argv.username, argv.password)
-      }, 
+      },
       [normalizeCredentials]
      )
   .argv;
