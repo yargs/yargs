@@ -1147,6 +1147,7 @@ function Yargs (processArgs, cwd, parentRequire) {
         skipValidation = Object.keys(argv).some(key => options.skipValidation.indexOf(key) >= 0 && argv[key] === true)
       }
 
+
       // If the help or version options where used and exitProcess is false,
       // or if explicitly skipped, we won't run validations.
       if (!skipValidation) {
