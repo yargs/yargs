@@ -1,6 +1,7 @@
 'use strict'
 /* global describe, it, beforeEach, afterEach */
 
+const {expect} = require('chai')
 const middlewareFactory = require('../lib/middleware')
 let yargs
 require('chai').should()
@@ -104,5 +105,39 @@ describe('middleware', () => {
       ])
       .exitProcess(false) // defaults to true.
       .parse()
+  })
+
+  // addresses https://github.com/yargs/yargs/issues/1237
+  describe('async', () => {
+    it('fails when the promise returned by the middleware rejects', (done) => {
+      const error = new Error()
+      const handlerErr = new Error('should not have been called')
+      yargs('foo')
+        .command('foo', 'foo command', () => {}, (argv) => done(handlerErr), [ (argv) => Promise.reject(error) ])
+        .fail((msg, err) => {
+          expect(msg).to.equal(null)
+          expect(err).to.equal(error)
+          done()
+        })
+        .parse()
+    })
+
+    it('calls the command handler when all middleware promises resolve', (done) => {
+      const middleware = (key, value) => () => new Promise((resolve, reject) => {
+        setTimeout(() => {
+          return resolve({ [key]: value })
+        }, 5)
+      })
+      yargs('foo hello')
+        .command('foo <pos>', 'foo command', () => {}, (argv) => {
+          argv.hello.should.equal('world')
+          argv.foo.should.equal('bar')
+          done()
+        }, [ middleware('hello', 'world'), middleware('foo', 'bar') ])
+        .fail((msg, err) => {
+          return done(Error('should not have been called'))
+        })
+        .parse()
+    })
   })
 })
