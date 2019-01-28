@@ -204,6 +204,29 @@ yargs.command('get <source> [proxy]', 'make a get HTTP request', require('my-mod
   .argv
 ```
 
+#### Testing a Command Module
+
+If you want to test a command in it's entirety you can test it like this:
+
+```js
+it("returns help output", async () => {
+  // Initialize parser using the command module
+  const parser = yargs.command(require('./my-command-module')).help();
+
+  // Run the command module with --help as argument
+  const output = await new Promise((resolve) => {
+    parser.parse("--help", (err, argv, output) => {
+      resolve(output);
+    })
+  });
+
+  // Verify the output is correct
+  expect(output).toBe(expect.stringContaining("helpful message"));
+});
+```
+
+This example uses [jest](https://github.com/facebook/jest) as a test runner, but the concept is independent of framework.
+
 .commandDir(directory, [opts])
 ------------------------------
 
@@ -455,6 +478,30 @@ const normalizeCredentials = (argv) => {
   }
   return {}
 }
+
+// Add normalizeCredentials to yargs
+yargs.middleware(normalizeCredentials)
+```
+
+### Example Async Credentials Middleware
+
+This example is exactly the same however it loads the `username` and `password` asynchronously.
+
+#### Middleware function
+
+```
+const { promisify } = require('util') // since node 8.0.0
+const readFile = promisify(require('fs').readFile)
+
+const normalizeCredentials = (argv) => {
+  if (!argv.username || !argv.password) {
+    return readFile('~/.credentials').then(data => JSON.parse(data))
+  }
+  return {}
+}
+
+// Add normalizeCredentials to yargs
+yargs.middleware(normalizeCredentials)
 ```
 
 #### yargs parsing configuration
@@ -467,7 +514,7 @@ var argv = require('yargs')
                     .option('password')
       } ,(argv) => {
         authenticateUser(argv.username, argv.password)
-      }, 
+      },
       [normalizeCredentials]
      )
   .argv;

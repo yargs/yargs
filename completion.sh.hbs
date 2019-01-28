@@ -19,10 +19,10 @@ _yargs_completions()
 
     # if no match was found, fall back to filename completion
     if [ ${#COMPREPLY[@]} -eq 0 ]; then
-      COMPREPLY=( $(compgen -f -- "${cur_word}" ) )
+      COMPREPLY=()
     fi
 
     return 0
 }
-complete -F _yargs_completions {{app_name}}
+complete -o default -F _yargs_completions {{app_name}}
 ###-end-{{app_name}}-completions-###

@@ -285,7 +285,7 @@ var argv = require('yargs')
     .demandOption(['f'])
     .help('h')
     .alias('h', 'help')
-    .epilog('copyright 2015')
+    .epilog('copyright 2019')
     .argv;
 
 var fs = require('fs');
@@ -302,25 +302,38 @@ s.on('end', function () {
 ````
 
 ***
-    $ node line_count.js count
+    $ node line_count.js 
     Usage: line_count.js <command> [options]
 
     Commands:
-      count    Count the lines in a file
+      line_count.js count  Count the lines in a file
 
     Options:
-      -f, --file  Load a file        [required]
-      -h, --help  Show help           [boolean]
+      --version   Show version number      [boolean]
+      -f, --file  Load a file             [required]
+      -h, --help  Show help                [boolean]
 
     Examples:
       line_count.js count -f foo.js  count the lines in the given file
 
-    copyright 2015
+    copyright 2019
 
-    Missing required arguments: f
+    Missing required argument: f
+    
+    $ node line_count.js count
+    line_count.js count
+
+    Count the lines in a file
+
+    Options:
+      --version   Show version number      [boolean]
+      -f, --file  Load a file             [required]
+      -h, --help  Show help                [boolean]
+
+    Missing required argument: f
 
     $ node line_count.js count --file line_count.js
-    26
+    25
 
     $ node line_count.js count -f line_count.js
-    26
+    25
