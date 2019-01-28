@@ -1167,7 +1167,7 @@ function Yargs (processArgs, cwd, parentRequire) {
 
   self._runValidation = function runValidation (argv, aliases, positionalMap, parseErrors) {
     if (parseErrors) throw new YError(parseErrors.message)
-    validation.nonOptionCount(argv)
+    validation.nonOptionCount(argv, options)
     validation.requiredArguments(argv)
     if (strict) validation.unknownArguments(argv, aliases, positionalMap)
     validation.customChecks(argv, aliases)
