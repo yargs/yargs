@@ -1153,7 +1153,9 @@ for details of this object
 ------------
 `parserConfiguration()` allows you to configure yargs-parser. 
 
-* `sort-commands` when set to `true` (boolean) will sort the commands added.
+An object of options should be passed in.
+
+* `sort-commands` when set to `true` (boolean) will sort the commands added, the default is `false`.
 
 For additional configuration options, see [yargs-parser's configuration](https://github.com/yargs/yargs-parser#configuration).
 
