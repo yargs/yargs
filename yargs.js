@@ -765,6 +765,14 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
   self.getStrict = () => strict
 
+  let parserConfig = {}
+  self.parserConfiguration = function parserConfiguration (config) {
+    argsert('<object>', [config], arguments.length)
+    parserConfig = config
+    return self
+  }
+  self.getParserConfiguration = () => parserConfig
+
   self.showHelp = function (level) {
     argsert('[string|function]', [level], arguments.length)
     if (!self.parsed) self._parseArgs(processArgs) // run parser, if it has not already been executed.
@@ -1010,7 +1018,14 @@ function Yargs (processArgs, cwd, parentRequire) {
     args = args || processArgs
 
     options.__ = y18n.__
-    options.configuration = pkgUp()['yargs'] || {}
+    options.configuration = self.getParserConfiguration()
+
+    // Deprecated
+    let pkgConfig = pkgUp()['yargs']
+    if (pkgConfig) {
+      console.warn('Configuring yargs through package.json is deprecated and will be removed in the next major release, please use the JS API instead.')
+      options.configuration = Object.assign({}, pkgConfig, options.configuration)
+    }
 
     const parsed = Parser.detailed(args, options)
     let argv = parsed.argv

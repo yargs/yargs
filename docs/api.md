@@ -1149,6 +1149,10 @@ If the arguments have been parsed, this contain detailed parsed arguments. See
 the documentation in [yargs-parser `.detailed()`][https://github.com/yargs/yargs-parser/blob/master/README.md#requireyargs-parserdetailedargs-opts]
 for details of this object
 
+<a name="parserConfiguration"></a>.parserConfiguration(obj)
+------------
+`parserConfiguration()` allows you to configure yargs-parser, see [yargs-parser's configuration](https://github.com/yargs/yargs-parser#configuration).
+
 <a name="pkg-conf"></a>
 .pkgConf(key, [cwd])
 ------------
