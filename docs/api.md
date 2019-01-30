@@ -1151,7 +1151,8 @@ for details of this object
 
 <a name="parserConfiguration"></a>.parserConfiguration(obj)
 ------------
-`parserConfiguration()` allows you to configure yargs-parser, see [yargs-parser's configuration](https://github.com/yargs/yargs-parser#configuration).
+`parserConfiguration()` allows you to configure yargs. See [yargs-parser's configuration](https://github.com/yargs/yargs-parser#configuration) for
+settings specific to `yargs-parser`.
 
 <a name="pkg-conf"></a>
 .pkgConf(key, [cwd])
