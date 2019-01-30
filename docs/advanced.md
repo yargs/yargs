@@ -431,11 +431,10 @@ possible to build plugin architectures similar to [Babel's presets](https://babe
 ## Customizing Yargs' Parser
 
 Not everyone always agrees on how `process.argv` should be interpreted;
-using the `yargs` stanza in your `package.json` you can turn on and off
-some of yargs' parsing features:
+using the [`parserConfiguration()`](/docs/api.md#parserConfiguration) method you can turn on and off some of yargs' parsing features:
 
-```json
-{
+```js
+yargs.parserConfiguration({
   "yargs": {
     "short-option-groups": true,
     "camel-case-expansion": true,
@@ -443,7 +442,7 @@ some of yargs' parsing features:
     "parse-numbers": true,
     "boolean-negation": true
   }
-}
+})
 ```
 
 See the [yargs-parser](https://github.com/yargs/yargs-parser#configuration) module
