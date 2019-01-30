@@ -1151,6 +1151,7 @@ for details of this object
 
 <a name="parserConfiguration"></a>.parserConfiguration(obj)
 ------------
+<<<<<<< HEAD
 `parserConfiguration()` allows you to configure yargs-parser. 
 
 An object of options should be passed in.
