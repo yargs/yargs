@@ -190,4 +190,25 @@ describe('middleware', () => {
         .parse()
     })
   })
+
+  // see: https://github.com/yargs/yargs/issues/1281
+  it("doesn't modify globalMiddleware array when executing middleware", () => {
+    let count = 0
+    yargs('bar')
+      .middleware((argv) => {
+        count++
+      })
+      .command('foo', 'foo command', () => {}, () => {}, [
+        () => {
+          count++
+        }
+      ])
+      .command('bar', 'bar command', () => {}, () => {}, [
+        () => {
+          count++
+        }
+      ])
+      .parse()
+    count.should.equal(2)
+  })
 })

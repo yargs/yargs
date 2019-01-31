@@ -1612,6 +1612,16 @@ describe('yargs dsl tests', () => {
     })
   })
 
+  describe('parserConfiguration', () => {
+    it('overrides the default parser configuration ', () => {
+      const argv = yargs('--foo.bar 1 --no-baz 2')
+        .parserConfiguration({'boolean-negation': false, 'dot-notation': false})
+        .parse()
+      expect(argv['foo.bar']).to.equal(1)
+      argv.noBaz.should.equal(2)
+    })
+  })
+
   describe('skipValidation', () => {
     it('skips validation if an option with skipValidation is present', () => {
       const argv = yargs(['--koala', '--skip'])
