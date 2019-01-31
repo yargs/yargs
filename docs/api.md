@@ -1151,9 +1151,9 @@ for details of this object
 
 <a name="parserConfiguration"></a>.parserConfiguration(obj)
 ------------
-`parserConfiguration()` allows you to configure yargs-parser. 
+`parserConfiguration()` allows you to configure advanced yargs features.
 
-An object of options should be passed in.
+`obj` accepts the following configuration options:
 
 * `sort-commands` when set to `true` (boolean) will sort the commands added, the default is `false`.
 
