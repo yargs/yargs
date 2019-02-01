@@ -945,7 +945,7 @@ To submit a new translation for yargs:
 
 *The [Microsoft Terminology Search](http://www.microsoft.com/Language/en-US/Search.aspx) can be useful for finding the correct terminology in your locale.*
 
-<a name="middleware"></a>.middleware(callbacks)
+<a name="middleware"></a>.middleware(callbacks, [applyBeforeValidation])
 ------------------------------------
 
 Define global middleware functions to be called first, in list order, for all cli command.  
@@ -969,7 +969,36 @@ I'm another middleware function
 Running myCommand!
 ```
 
-See also <a href="#prechecksmiddleware">.preChecksMiddleware(callbacks)</a>
+Middleware can be applied before validation by setting the second parameter to `true`.  This will execute the middleware prior to validation checks, but after parsing.
+
+Each callback is passed a reference to argv and context. The argv can be modified to affect the behavior of the validation and command execution.  The context contains the commands and availableOptions that matched the argv.  This feature is useful if you wish to populate a required option dynamically or based on the context prior to validation checks.
+
+For example, an environment variable could potentially populate a required option:
+
+```js
+var argv = require('yargs')
+  .middleware(function (argv, context) {
+    argv.username = process.env.USERNAME
+    argv.password = process.env.PASSWORD
+  }, true)
+  .command('do-something-logged-in', 'You must be logged in to perform this task'
+    {
+      'username': {
+        'demand': true,
+        'string': true
+      },
+      'password': {
+        'demand': true,
+        'string': true
+      }
+    },
+    function(argv) {
+      console.log('do something with the user login and password', argv.username, argv.password)
+    })
+  )
+  .argv
+
+``` 
 
 <a name="nargs"></a>.nargs(key, count)
 -----------
@@ -1207,58 +1236,6 @@ Valid `opt` keys include:
       - `'boolean'`: synonymous for `boolean: true`, see [`boolean()`](#boolean)
       - `'number'`: synonymous for `number: true`, see [`number()`](#number)
       - `'string'`: synonymous for `string: true`, see [`string()`](#string)
-
-
-<a name="prechecksmiddleware"></a>.preChecksMiddleware(callbacks)
-------------------------------------
-
-Define global middleware functions to be called first and before validation checks are done, in list order, for all cli commands.  The `callbacks` parameter can be a function or a list of functions.  Each callback gets passed a reference to argv and a context.
-
-The difference between the `preChecksMiddleware` and `middleware` is this middleware runs before required fields are checked (in addition to valid values within options and commands). This gives a program the opportunity to populate options, commands and other settings before the validation checks are done. A common use case for the preChecksMiddleware is if there is a required parameter or option that can be inferred by the context (e.g., the current path, or maybe a git directory the shell is currently in, or perhaps from previous executions). 
-
-The `preChecksMiddleware` is passed the `argv` parsed object just like `middleware` but unlike `middleware` it's also passed an object containing the commands and available options (and their potential aliases).  This is passed in to all callbacks as the second parameter with the property `commands` that is an array of all the commands that matched the `argv` and a property called `availableOptions` where the keys in this object are options that are available, and each key is an an array of aliases for that option.
-
-In the below example a CLI obtains the login and password for `myCommand` to use.  The command requires a login and password to be provided, but implicitly reads it from a config file if not specified by `--username` and `--password`.  This would not be possible with `middleware` callbacks as they are after the option and command requirements are validated (and in this case would error out prior to the middle ware ever running).
-
-```js
-const fs = require('fs');
-const path = require('fs');
-
-function getLogin(argv, context) {
-  // only execute this middleware if a username is needed from 
-  // the command
-  if (context.availableOptions.username) {
-    // obtain the login from some configuration file if not specified.
-    let loginConfig = JSON.parse(fs.readfileSync(path.join(process.env.HOME,'loginConfig.json')).toString('utf8'))
-
-    if (loginConfig.username) {
-      argv.username = loginConfig.username
-    }
-    if (loginConfig.password) {
-      argv.password = loginConfig.password
-    }
-  }
-}
-
-let myCommandOptions = {
-  'username': {
-    'demand': true,
-    'string': true
-  },
-  'password': {
-    'demand': true,
-    'string': true
-  }
-};
-
-yargs
-  .command('myCommand', 'some command', , function(argv){
-    console.log('Running myCommand with username', argv.username, 'password', argv.password);
-  })
-  .preChecksMiddleware([getLogin]).argv;
-```
-
-The `preChecksMiddleware` is only available globally and not on a per-command basis. The `preChecksMiddleware` also runs prior to any `middleware` callbacks.
 
 
 .recommendCommands()

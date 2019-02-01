@@ -49,11 +49,11 @@ describe('middleware', () => {
       .parse()
   })
 
-  it('runs the preChecksMiddleware before reaching the handler', function (done) {
+  it('runs the pre-check middlware before reaching the handler', function (done) {
     yargs(['mw'])
-      .preChecksMiddleware(function (argv) {
+      .middleware(function (argv) {
         argv.mw = 'mw'
-      })
+      }, true)
       .command(
         'mw',
         'adds func to middleware',
@@ -73,12 +73,107 @@ describe('middleware', () => {
       .parse()
   })
 
-  it('runs the preChecksMiddleware and ensures theres a context object with commands and availableOptions', function (done) {
+  it('runs the pre-check middleware and ensures theres a context object with commands and availableOptions', function (done) {
     yargs(['mw'])
-      .preChecksMiddleware(function (argv, context) {
+      .middleware(function (argv, context) {
         argv.mw = context.commands[0]
         argv.other = Array.isArray(context.availableOptions.mw)
-      })
+      }, true)
+      .command(
+        'mw',
+        'adds func to middleware',
+        {
+          'mw': {
+            'demand': true,
+            'string': true
+          }
+        },
+        function (argv) {
+          // we should get the argv filled with data from the middleware
+          argv.mw.should.equal('mw')
+          argv.other.should.equal(true)
+          return done()
+        }
+      )
+      .exitProcess(false) // defaults to true.
+      .parse()
+  })
+
+  it('runs the pre-check middlware with an array passed in and ensures theres a context object with commands and availableOptions', function (done) {
+    yargs(['mw'])
+      .middleware([function (argv, context) {
+        argv.mw = context.commands[0]
+        argv.other = Array.isArray(context.availableOptions.mw)
+      }], true)
+      .command(
+        'mw',
+        'adds func to middleware',
+        {
+          'mw': {
+            'demand': true,
+            'string': true
+          }
+        },
+        function (argv) {
+          // we should get the argv filled with data from the middleware
+          argv.mw.should.equal('mw')
+          argv.other.should.equal(true)
+          return done()
+        }
+      )
+      .exitProcess(false) // defaults to true.
+      .parse()
+  })
+
+  it('runs the pre-check middlware ensures if an async function is ran it throws an error', function (done) {
+    try {
+      yargs(['mw'])
+        .middleware([async function (argv, context) {
+          argv.mw = context.commands[0]
+          argv.other = Array.isArray(context.availableOptions.mw)
+        }], true)
+        .command(
+          'mw',
+          'adds func to middleware',
+          {
+            'mw': {
+              'demand': true,
+              'string': true
+            }
+          },
+          function (argv) {
+            // we should get the argv filled with data from the middleware
+            argv.mw.should.equal('mw')
+            argv.other.should.equal(true)
+            return done(new Error('This should not have reached this point.'))
+          }
+        )
+        .exitProcess(false) // defaults to true.
+        .parse()
+    } catch (err) {
+      expect(err.message).to.equal('The passed in middleware with applyBeforeValidation set to true may not be used with async functions.')
+      done()
+    }
+  })
+
+  it('Ensure precheck middleware does not run non-precheck middleware, and vice versa', function (done) {
+    let execPreOnce = false
+    let execPostOnce = false
+    yargs(['mw'])
+      .middleware([function (argv, context) {
+        expect(execPreOnce).to.equal(false)
+        execPreOnce = true
+        expect(argv).to.be.an('object')
+        expect(context).to.be.an('object')
+        argv.mw = context.commands[0]
+        argv.other = Array.isArray(context.availableOptions.mw)
+      }], true)
+      .middleware([function (argv, context) {
+        expect(execPostOnce).to.equal(false)
+        execPostOnce = true
+        expect(argv).to.be.an('object')
+        expect(context).to.be.an('undefined')
+      }])
       .command(
         'mw',
         'adds func to middleware',
