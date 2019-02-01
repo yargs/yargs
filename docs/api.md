@@ -1237,7 +1237,6 @@ Valid `opt` keys include:
       - `'number'`: synonymous for `number: true`, see [`number()`](#number)
       - `'string'`: synonymous for `string: true`, see [`string()`](#string)
 
-
 .recommendCommands()
 ---------------------------
 
