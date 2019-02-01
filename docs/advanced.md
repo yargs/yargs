@@ -519,28 +519,6 @@ var argv = require('yargs')
   .argv;
 ```
 
-#### Global Pre-check Middleware
-
-Middleware can be added (and processed) prior to any validation checks but after parsing so required fields may be implicitly obtained from other methods (such as searching config files, looking for specific files in the current working directory), etc. These can only be set globally at the moment.
-
-
-```
-let options = {
-  "username":{"demand":true, "string":true}, 
-  "password":{"demand":true, "string":true}
-};
-let argv = require('yargs')
-  .usage('Usage: $0 <command> [options]')
-  .command('login', 'Authenticate user', options, (yargs) =>{
-    console.log('logged in!')
-  })
-  .preChecksMiddleware((argv) => {
-    // read the login info from somewhere...
-    argv.username = "usernane";
-    argv.password = "password";
-  })
-```
-
 ### Using the non-singleton interface
 
 To use yargs without running as a singleton, do:
