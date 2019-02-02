@@ -1458,4 +1458,14 @@ describe('Command', () => {
       return done()
     })
   })
+
+  // see: https://github.com/yargs/yargs/issues/1099
+  it('does not coerce number from positional configured as string', () => {
+    const argv = yargs.command('$0 <phone>', '', (yargs) => {
+      yargs.positional('phone', {
+        type: 'string'
+      })
+    }).parse('+5550100')
+    argv.phone.should.equal('+5550100')
+  })
 })
