@@ -2,6 +2,41 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="13.0.0"></a>
+# [13.0.0](https://github.com/yargs/yargs/compare/v12.0.5...v13.0.0) (2019-02-02)
+
+
+### Bug Fixes
+
+* **deps:** Update os-locale to avoid security vulnerability ([#1270](https://github.com/yargs/yargs/issues/1270)) ([27bf739](https://github.com/yargs/yargs/commit/27bf739))
+* **validation:** Use the error as a message when none exists otherwise ([#1268](https://github.com/yargs/yargs/issues/1268)) ([0510fe6](https://github.com/yargs/yargs/commit/0510fe6))
+* better bash path completion ([#1272](https://github.com/yargs/yargs/issues/1272)) ([da75ea2](https://github.com/yargs/yargs/commit/da75ea2))
+* middleware added multiple times due to reference bug ([#1282](https://github.com/yargs/yargs/issues/1282)) ([64af518](https://github.com/yargs/yargs/commit/64af518))
+
+
+### Chores
+
+* drop Node 6 from testing matrix ([#1287](https://github.com/yargs/yargs/issues/1287)) ([ef16792](https://github.com/yargs/yargs/commit/ef16792))
+* update dependencies ([#1284](https://github.com/yargs/yargs/issues/1284)) ([f25de4f](https://github.com/yargs/yargs/commit/f25de4f))
+
+
+### Features
+
+* Add `.parserConfiguration()` method, deprecating package.json config ([#1262](https://github.com/yargs/yargs/issues/1262)) ([3c6869a](https://github.com/yargs/yargs/commit/3c6869a))
+* adds config option for sorting command output ([#1256](https://github.com/yargs/yargs/issues/1256)) ([6916ce9](https://github.com/yargs/yargs/commit/6916ce9))
+* options/positionals with leading '+' and '0' no longer parse as numbers ([#1286](https://github.com/yargs/yargs/issues/1286)) ([e9dc3aa](https://github.com/yargs/yargs/commit/e9dc3aa))
+* support promises in middleware ([f3a4e4f](https://github.com/yargs/yargs/commit/f3a4e4f))
+
+
+### BREAKING CHANGES
+
+* options with leading '+' or '0' now parse as strings
+* dropping Node 6 which hits end of life in April 2019
+* see [yargs-parser@12.0.0 CHANGELOG](https://github.com/yargs/yargs-parser/blob/master/CHANGELOG.md#breaking-changes)
+* we now warn if the yargs stanza package.json is used.
+
+
+
 <a name="12.0.5"></a>
 ## [12.0.5](https://github.com/yargs/yargs/compare/v12.0.4...v12.0.5) (2018-11-19)
 
