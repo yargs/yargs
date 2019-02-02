@@ -1,7 +1,7 @@
 language: node_js
 
 before_install:
-  - if [[ "$TRAVIS_NODE_VERSION" =~ ^v6 ]]; npm i npm -g; fi
+  - if [[ "$TRAVIS_NODE_VERSION" =~ ^v6 ]]; then npm i npm -g; fi
 
 node_js:
   - "6"
