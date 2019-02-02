@@ -1458,4 +1458,11 @@ describe('Command', () => {
       return done()
     })
   })
+
+  // see: https://github.com/yargs/yargs/issues/1099
+  it('does not coerce number from positional with leading "+"', () => {
+    const argv = yargs.command('$0 <phone>', '', (yargs) => {})
+      .parse('+5550100')
+    argv.phone.should.equal('+5550100')
+  })
 })
