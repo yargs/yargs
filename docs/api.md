@@ -971,7 +971,7 @@ Running myCommand!
 
 Middleware can be applied before validation by setting the second parameter to `true`.  This will execute the middleware prior to validation checks, but after parsing.
 
-Each callback is passed a reference to argv and context. The argv can be modified to affect the behavior of the validation and command execution.  The context contains the commands and availableOptions that matched the argv.  This feature is useful if you wish to populate a required option dynamically or based on the context prior to validation checks.
+Each callback is passed a reference to argv. The argv can be modified to affect the behavior of the validation and command execution.  
 
 For example, an environment variable could potentially populate a required option:
 
