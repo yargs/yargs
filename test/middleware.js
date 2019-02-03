@@ -75,9 +75,9 @@ describe('middleware', () => {
 
   it('runs the before-validation middleware and ensures theres a context object with commands and availableOptions', function (done) {
     yargs(['mw'])
-      .middleware(function (argv, context) {
-        argv.mw = context.commands[0]
-        argv.other = Array.isArray(context.availableOptions.mw)
+      .middleware(function (argv) {
+        argv.mw = 'foobar'
+        argv.other = true
       }, true)
       .command(
         'mw',
@@ -90,7 +90,7 @@ describe('middleware', () => {
         },
         function (argv) {
           // we should get the argv filled with data from the middleware
-          argv.mw.should.equal('mw')
+          argv.mw.should.equal('foobar')
           argv.other.should.equal(true)
           return done()
         }
@@ -101,9 +101,9 @@ describe('middleware', () => {
 
   it('runs the before-validation middlware with an array passed in and ensures theres a context object with commands and availableOptions', function (done) {
     yargs(['mw'])
-      .middleware([function (argv, context) {
-        argv.mw = context.commands[0]
-        argv.other = Array.isArray(context.availableOptions.mw)
+      .middleware([function (argv) {
+        argv.mw = 'mw'
+        argv.other = true
       }], true)
       .command(
         'mw',
@@ -128,9 +128,9 @@ describe('middleware', () => {
   it('runs the before-validation middlware ensures if an async function is ran it throws an error', function (done) {
     try {
       yargs(['mw'])
-        .middleware([async function (argv, context) {
-          argv.mw = context.commands[0]
-          argv.other = Array.isArray(context.availableOptions.mw)
+        .middleware([async function (argv) {
+          argv.mw = 'mw'
+          argv.other = true
         }], true)
         .command(
           'mw',
@@ -160,19 +160,17 @@ describe('middleware', () => {
     let execPreOnce = false
     let execPostOnce = false
     yargs(['mw'])
-      .middleware([function (argv, context) {
+      .middleware([function (argv) {
         expect(execPreOnce).to.equal(false)
         execPreOnce = true
         expect(argv).to.be.an('object')
-        expect(context).to.be.an('object')
-        argv.mw = context.commands[0]
-        argv.other = Array.isArray(context.availableOptions.mw)
+        argv.mw = 'mw'
+        argv.other = true
       }], true)
-      .middleware([function (argv, context) {
+      .middleware([function (argv) {
         expect(execPostOnce).to.equal(false)
         execPostOnce = true
         expect(argv).to.be.an('object')
-        expect(context).to.be.an('undefined')
       }])
       .command(
         'mw',
