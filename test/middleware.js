@@ -49,7 +49,7 @@ describe('middleware', () => {
       .parse()
   })
 
-  it('runs the pre-check middlware before reaching the handler', function (done) {
+  it('runs the before-validation middlware before reaching the handler', function (done) {
     yargs(['mw'])
       .middleware(function (argv) {
         argv.mw = 'mw'
@@ -73,7 +73,7 @@ describe('middleware', () => {
       .parse()
   })
 
-  it('runs the pre-check middleware and ensures theres a context object with commands and availableOptions', function (done) {
+  it('runs the before-validation middleware and ensures theres a context object with commands and availableOptions', function (done) {
     yargs(['mw'])
       .middleware(function (argv, context) {
         argv.mw = context.commands[0]
@@ -99,7 +99,7 @@ describe('middleware', () => {
       .parse()
   })
 
-  it('runs the pre-check middlware with an array passed in and ensures theres a context object with commands and availableOptions', function (done) {
+  it('runs the before-validation middlware with an array passed in and ensures theres a context object with commands and availableOptions', function (done) {
     yargs(['mw'])
       .middleware([function (argv, context) {
         argv.mw = context.commands[0]
@@ -125,7 +125,7 @@ describe('middleware', () => {
       .parse()
   })
 
-  it('runs the pre-check middlware ensures if an async function is ran it throws an error', function (done) {
+  it('runs the before-validation middlware ensures if an async function is ran it throws an error', function (done) {
     try {
       yargs(['mw'])
         .middleware([async function (argv, context) {
@@ -156,7 +156,7 @@ describe('middleware', () => {
     }
   })
 
-  it('Ensure precheck middleware does not run non-precheck middleware, and vice versa', function (done) {
+  it('Ensure middleware does not run non-before-validation middleware, and vice versa', function (done) {
     let execPreOnce = false
     let execPostOnce = false
     yargs(['mw'])
