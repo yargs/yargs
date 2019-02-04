@@ -945,7 +945,7 @@ To submit a new translation for yargs:
 
 *The [Microsoft Terminology Search](http://www.microsoft.com/Language/en-US/Search.aspx) can be useful for finding the correct terminology in your locale.*
 
-<a name="middleware"></a>.middleware(callbacks)
+<a name="middleware"></a>.middleware(callbacks, [applyBeforeValidation])
 ------------------------------------
 
 Define global middleware functions to be called first, in list order, for all cli command.  
@@ -968,6 +968,37 @@ I'm a middleware function
 I'm another middleware function
 Running myCommand!
 ```
+
+Middleware can be applied before validation by setting the second parameter to `true`.  This will execute the middleware prior to validation checks, but after parsing.
+
+Each callback is passed a reference to argv. The argv can be modified to affect the behavior of the validation and command execution.  
+
+For example, an environment variable could potentially populate a required option:
+
+```js
+var argv = require('yargs')
+  .middleware(function (argv) {
+    argv.username = process.env.USERNAME
+    argv.password = process.env.PASSWORD
+  }, true)
+  .command('do-something-logged-in', 'You must be logged in to perform this task'
+    {
+      'username': {
+        'demand': true,
+        'string': true
+      },
+      'password': {
+        'demand': true,
+        'string': true
+      }
+    },
+    function(argv) {
+      console.log('do something with the user login and password', argv.username, argv.password)
+    })
+  )
+  .argv
+
+``` 
 
 <a name="nargs"></a>.nargs(key, count)
 -----------
