@@ -977,7 +977,7 @@ For example, an environment variable could potentially populate a required optio
 
 ```js
 var argv = require('yargs')
-  .middleware(function (argv, context) {
+  .middleware(function (argv) {
     argv.username = process.env.USERNAME
     argv.password = process.env.PASSWORD
   }, true)
