@@ -49,6 +49,149 @@ describe('middleware', () => {
       .parse()
   })
 
+  it('runs the before-validation middlware before reaching the handler', function (done) {
+    yargs(['mw'])
+      .middleware(function (argv) {
+        argv.mw = 'mw'
+      }, true)
+      .command(
+        'mw',
+        'adds func to middleware',
+        {
+          'mw': {
+            'demand': true,
+            'string': true
+          }
+        },
+        function (argv) {
+          // we should get the argv filled with data from the middleware
+          argv.mw.should.equal('mw')
+          return done()
+        }
+      )
+      .exitProcess(false) // defaults to true.
+      .parse()
+  })
+
+  it('runs the before-validation middleware and ensures theres a context object with commands and availableOptions', function (done) {
+    yargs(['mw'])
+      .middleware(function (argv) {
+        argv.mw = 'foobar'
+        argv.other = true
+      }, true)
+      .command(
+        'mw',
+        'adds func to middleware',
+        {
+          'mw': {
+            'demand': true,
+            'string': true
+          }
+        },
+        function (argv) {
+          // we should get the argv filled with data from the middleware
+          argv.mw.should.equal('foobar')
+          argv.other.should.equal(true)
+          return done()
+        }
+      )
+      .exitProcess(false) // defaults to true.
+      .parse()
+  })
+
+  it('runs the before-validation middlware with an array passed in and ensures theres a context object with commands and availableOptions', function (done) {
+    yargs(['mw'])
+      .middleware([function (argv) {
+        argv.mw = 'mw'
+        argv.other = true
+      }], true)
+      .command(
+        'mw',
+        'adds func to middleware',
+        {
+          'mw': {
+            'demand': true,
+            'string': true
+          }
+        },
+        function (argv) {
+          // we should get the argv filled with data from the middleware
+          argv.mw.should.equal('mw')
+          argv.other.should.equal(true)
+          return done()
+        }
+      )
+      .exitProcess(false) // defaults to true.
+      .parse()
+  })
+
+  it('runs the before-validation middlware ensures if an async function is ran it throws an error', function (done) {
+    try {
+      yargs(['mw'])
+        .middleware([async function (argv) {
+          argv.mw = 'mw'
+          argv.other = true
+        }], true)
+        .command(
+          'mw',
+          'adds func to middleware',
+          {
+            'mw': {
+              'demand': true,
+              'string': true
+            }
+          },
+          function (argv) {
+            // we should get the argv filled with data from the middleware
+            argv.mw.should.equal('mw')
+            argv.other.should.equal(true)
+            return done(new Error('This should not have reached this point.'))
+          }
+        )
+        .exitProcess(false) // defaults to true.
+        .parse()
+    } catch (err) {
+      expect(err.message).to.equal('The passed in middleware with applyBeforeValidation set to true may not be used with async functions.')
+      done()
+    }
+  })
+
+  it('Ensure middleware does not run non-before-validation middleware, and vice versa', function (done) {
+    let execPreOnce = false
+    let execPostOnce = false
+    yargs(['mw'])
+      .middleware([function (argv) {
+        expect(execPreOnce).to.equal(false)
+        execPreOnce = true
+        expect(argv).to.be.an('object')
+        argv.mw = 'mw'
+        argv.other = true
+      }], true)
+      .middleware([function (argv) {
+        expect(execPostOnce).to.equal(false)
+        execPostOnce = true
+        expect(argv).to.be.an('object')
+      }])
+      .command(
+        'mw',
+        'adds func to middleware',
+        {
+          'mw': {
+            'demand': true,
+            'string': true
+          }
+        },
+        function (argv) {
+          // we should get the argv filled with data from the middleware
+          argv.mw.should.equal('mw')
+          argv.other.should.equal(true)
+          return done()
+        }
+      )
+      .exitProcess(false) // defaults to true.
+      .parse()
+  })
+
   it('runs all middleware before reaching the handler', function (done) {
     yargs(['mw'])
       .middleware([
