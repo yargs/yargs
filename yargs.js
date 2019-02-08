@@ -11,7 +11,7 @@ const Y18n = require('y18n')
 const objFilter = require('./lib/obj-filter')
 const setBlocking = require('set-blocking')
 const applyExtends = require('./lib/apply-extends')
-const middlewareFactory = require('./lib/middleware')
+const {globalMiddlewareFactory} = require('./lib/middleware')
 const YError = require('./lib/yerror')
 
 exports = module.exports = Yargs
@@ -33,7 +33,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     updateFiles: false
   })
 
-  self.middleware = middlewareFactory(globalMiddleware, self)
+  self.middleware = globalMiddlewareFactory(globalMiddleware, self)
 
   if (!cwd) cwd = process.cwd()
 
