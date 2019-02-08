@@ -420,6 +420,11 @@ function Yargs (processArgs, cwd, parentRequire) {
     return self
   }
 
+  self.getAliases = () => {
+    argsert([], 0)
+    return JSON.parse(JSON.stringify(options.alias))
+  }
+
   self.getDemandedOptions = () => {
     argsert([], 0)
     return options.demandedOptions

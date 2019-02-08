@@ -2180,4 +2180,33 @@ describe('yargs dsl tests', () => {
         })
     })
   })
+
+  describe('getAliases', () => {
+    it('returns a list of configured aliases', () => {
+      const aliases = yargs([])
+        .alias({
+          cool: 'cat'
+        })
+        .option('foo', {
+          alias: ['f', 'bar']
+        })
+        .getAliases()
+      aliases.cool.should.include('cat')
+      aliases.foo.should.eql(['f', 'bar'])
+    })
+
+    it('does not alter original alias array when modified', () => {
+      const y = yargs([])
+        .alias({
+          cool: 'cat'
+        })
+        .option('foo', {
+          alias: ['f', 'bar']
+        })
+      const aliases1 = y.getAliases()
+      aliases1.cool.push('howdy')
+      const aliases2 = y.getAliases()
+      aliases1.cool.should.not.eql(aliases2.cool)
+    })
+  })
 })

@@ -208,6 +208,29 @@ describe('middleware', () => {
       .parse()
   })
 
+  it('allows aliases to be accessed from middleware', (done) => {
+    yargs(['mw'])
+      .command(
+        'mw',
+        'adds func to middleware',
+        function (yargs) {
+          yargs
+            .middleware(function (argv, yargs) {
+              expect(typeof yargs.help).to.equal('function')
+              argv.mw = 'mw'
+            })
+        },
+        function (argv) {
+          console.info(argv)
+          argv.mw.should.equal('mw')
+          return done()
+        }
+      )
+      .alias('mw', 'batman')
+      .exitProcess(false)
+      .parse()
+  })
+
   describe('applyBeforeValidation', () => {
     it('runs before validation when "true"', function (done) {
       yargs(['mw'])
