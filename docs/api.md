@@ -962,7 +962,9 @@ yargs
   })
   .middleware([mwFunc1, mwFunc2]).argv;
 ```
+
 When calling `myCommand` from the command line, mwFunc1 gets called first, then mwFunc2, and finally the command's handler.  The console output is:
+
 ```
 I'm a middleware function
 I'm another middleware function
@@ -971,34 +973,32 @@ Running myCommand!
 
 Middleware can be applied before validation by setting the second parameter to `true`.  This will execute the middleware prior to validation checks, but after parsing.
 
-Each callback is passed a reference to argv. The argv can be modified to affect the behavior of the validation and command execution.  
+Middleware is passed two parameters `argv`, the current parsed options object,
+and `yargs` the yargs instance itself, which provides contextual information
+about the current state of parsing.
 
-For example, an environment variable could potentially populate a required option:
+A modified `argv` object will ultimately be what is passed to a command's
+handler function.
 
 ```js
-var argv = require('yargs')
+// populating home directory from an environment variable.
+require('yargs')
   .middleware(function (argv) {
-    argv.username = process.env.USERNAME
-    argv.password = process.env.PASSWORD
+    if (process.env.HOME) argv.home = process.env.HOME
   }, true)
-  .command('do-something-logged-in', 'You must be logged in to perform this task'
+  .command('configure-home', "do something with a user's home directory",
     {
-      'username': {
-        'demand': true,
-        'string': true
-      },
-      'password': {
+      'home': {
         'demand': true,
         'string': true
       }
     },
     function(argv) {
-      console.log('do something with the user login and password', argv.username, argv.password)
-    })
+      console.info(`we know the user's home directory is ${argv.home}`)
+    }
   )
-  .argv
-
-``` 
+  .parse()
+```
 
 <a name="nargs"></a>.nargs(key, count)
 -----------
