@@ -196,10 +196,21 @@ describe('Completion', () => {
   })
 
   describe('generateCompletionScript()', () => {
-    it('replaces application variable with $0 in script', () => {
+    it('replaces application variable with $0 in script (bash)', () => {
+      process.env.SHELL = '/bin/bash'
       const r = checkUsage(() => yargs([])
         .showCompletionScript(), ['ndm'])
 
+      r.logs[0].should.match(/bashrc/)
+      r.logs[0].should.match(/ndm --get-yargs-completions/)
+    })
+
+    it('replaces application variable with $0 in script (zsh)', () => {
+      process.env.SHELL = '/bin/zsh'
+      const r = checkUsage(() => yargs([])
+        .showCompletionScript(), ['ndm'])
+
+      r.logs[0].should.match(/zshrc/)
       r.logs[0].should.match(/ndm --get-yargs-completions/)
     })
 
