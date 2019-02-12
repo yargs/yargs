@@ -208,8 +208,34 @@ describe('middleware', () => {
       .parse()
   })
 
-  describe('applyBeforeValidation', () => {
-    it('runs before validation when "true"', function (done) {
+  it('applies aliases before middleware is called', (done) => {
+    yargs(['mw', '--foo', '99'])
+      .middleware(function (argv) {
+        argv.f.should.equal(99)
+        argv.mw = 'mw'
+      })
+      .command(
+        'mw',
+        'adds func to middleware',
+        function (yargs) {
+          yargs.middleware((argv) => {
+            argv.f.should.equal(99)
+            argv.mw2 = 'mw2'
+          })
+        },
+        function (argv) {
+          argv.mw.should.equal('mw')
+          argv.mw2.should.equal('mw2')
+          return done()
+        }
+      )
+      .alias('foo', 'f')
+      .exitProcess(false)
+      .parse()
+  })
+
+  describe('applyBeforeValidation=true', () => {
+    it('runs before validation', function (done) {
       yargs(['mw'])
         .middleware(function (argv) {
           argv.mw = 'mw'
@@ -232,7 +258,7 @@ describe('middleware', () => {
         .parse()
     })
 
-    it('throws an error if "true" and async function provided', function () {
+    it('throws an error if async function provided', function () {
       expect(() => {
         yargs(['mw'])
           .middleware([async function (argv) {
@@ -275,6 +301,53 @@ describe('middleware', () => {
           }
         )
         .demand('mw')
+        .exitProcess(false)
+        .parse()
+    })
+
+    it('applies aliases before middleware is called, for global middleware', (done) => {
+      yargs(['mw', '--foo', '99'])
+        .middleware(function (argv) {
+          argv.f.should.equal(99)
+          argv.mw = 'mw'
+        }, true)
+        .command(
+          'mw',
+          'adds func to middleware',
+          {
+            'mw': {
+              'demand': true
+            }
+          },
+          function (argv) {
+            argv.mw.should.equal('mw')
+            return done()
+          }
+        )
+        .alias('foo', 'f')
+        .exitProcess(false)
+        .parse()
+    })
+
+    it('applies aliases before middleware is called, when middleware is added in builder', (done) => {
+      yargs(['mw', '--foo', '99'])
+        .command(
+          'mw',
+          'adds func to middleware',
+          function (yargs) {
+            yargs
+              .middleware((argv) => {
+                argv.f.should.equal(99)
+                argv.mw = 'mw'
+              }, true)
+              .demand('mw')
+          },
+          function (argv) {
+            argv.mw.should.equal('mw')
+            return done()
+          }
+        )
+        .alias('foo', 'f')
         .exitProcess(false)
         .parse()
     })
