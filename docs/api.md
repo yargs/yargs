@@ -271,14 +271,14 @@ discussion of the advanced features exposed in the Command API.
 .completion([cmd], [description], [fn])
 ---------------------------------------
 
-Enable bash-completion shortcuts for commands and options.
+Enable bash/zsh-completion shortcuts for commands and options.
 
-`cmd`: When present in `argv._`, will result in the `.bashrc` completion script
-being outputted. To enable bash completions, concat the generated script to your
-`.bashrc` or `.bash_profile`.
+`cmd`: When present in `argv._`, will result in the `.bashrc` or `.zshrc` completion script
+being outputted. To enable bash/zsh completions, concat the generated script to your
+`.bashrc` or `.bash_profile` (or `.zshrc` for zsh).
 
 `description`: Provide a description in your usage instructions for the command
-that generates bash completion scripts.
+that generates the completion scripts.
 
 `fn`: Rather than relying on yargs' default completion functionality, which
 shiver me timbers is pretty awesome, you can provide your own completion
