@@ -14,7 +14,8 @@ describe('Completion', () => {
   })
 
   describe('default completion behavior', () => {
-    it('it returns a list of commands as completion suggestions', () => {
+    it('it returns a list of commands as completion suggestions (bash)', () => {
+      process.env.SHELL = '/bin/bash'
       const r = checkUsage(() => yargs(['./completion', '--get-yargs-completions', ''])
         .command('foo', 'bar')
         .command('apple', 'banana')
@@ -26,7 +27,21 @@ describe('Completion', () => {
       r.logs.should.include('foo')
     })
 
-    it('avoids interruption from command recommendations', () => {
+    it('it returns a list of commands as completion suggestions (zsh)', () => {
+      process.env.SHELL = '/bin/zsh'
+      const r = checkUsage(() => yargs(['./completion', '--get-yargs-completions', ''])
+        .command('foo', 'bar')
+        .command('apple', 'banana')
+        .completion()
+        .argv
+      )
+
+      r.logs.should.include('apple:banana')
+      r.logs.should.include('foo:bar')
+    })
+
+    it('avoids interruption from command recommendations (bash)', () => {
+      process.env.SHELL = '/bin/bash'
       const r = checkUsage(() =>
         yargs(['./completion', '--get-yargs-completions', './completion', 'a'])
           .command('apple', 'fruit')
@@ -41,7 +56,24 @@ describe('Completion', () => {
       r.logs.should.include('aardvark')
     })
 
-    it('avoids interruption from default command', () => {
+    it('avoids interruption from command recommendations (zsh)', () => {
+      process.env.SHELL = '/bin/zsh'
+      const r = checkUsage(() =>
+        yargs(['./completion', '--get-yargs-completions', './completion', 'a'])
+          .command('apple', 'fruit')
+          .command('aardvark', 'animal')
+          .recommendCommands()
+          .completion()
+          .argv
+      )
+
+      r.errors.should.deep.equal([])
+      r.logs.should.include('apple:fruit')
+      r.logs.should.include('aardvark:animal')
+    })
+
+    it('avoids interruption from default command (bash)', () => {
+      process.env.SHELL = '/bin/bash'
       const r = checkUsage(() =>
         yargs(['./usage', '--get-yargs-completions', './usage', ''])
           .usage('$0 [thing]', 'skipped', subYargs => {
@@ -57,7 +89,25 @@ describe('Completion', () => {
       r.logs.should.include('aardvark')
     })
 
+    it('avoids interruption from default command (zsh)', () => {
+      process.env.SHELL = '/bin/zsh'
+      const r = checkUsage(() =>
+        yargs(['./usage', '--get-yargs-completions', './usage', ''])
+          .usage('$0 [thing]', 'skipped', subYargs => {
+            subYargs.command('aardwolf', 'is a thing according to google')
+          })
+          .command('aardvark', 'animal')
+          .completion()
+          .argv
+      )
+
+      r.errors.should.deep.equal([])
+      r.logs.should.not.include('aardwolf')
+      r.logs.should.include('aardvark:animal')
+    })
+
     it('avoids repeating already included commands', () => {
+      process.env.SHELL = '/bin/bash'
       const r = checkUsage(() => yargs(['./completion', '--get-yargs-completions', 'apple'])
         .command('foo', 'bar')
         .command('apple', 'banana')
@@ -96,7 +146,8 @@ describe('Completion', () => {
       r.logs.should.not.include('--foo')
     })
 
-    it('completes options for a command', () => {
+    it('completes options for a command (bash)', () => {
+      process.env.SHELL = '/bin/bash'
       const r = checkUsage(() => yargs(['./completion', '--get-yargs-completions', 'foo', '--b'])
         .command('foo', 'foo command', subYargs => subYargs.options({
           bar: {
@@ -114,7 +165,27 @@ describe('Completion', () => {
       r.logs.should.include('--help')
     })
 
+    it('completes options for a command (zsh)', () => {
+      process.env.SHELL = '/bin/zsh'
+      const r = checkUsage(() => yargs(['./completion', '--get-yargs-completions', 'foo', '--b'])
+        .command('foo', 'foo command', subYargs => subYargs.options({
+          bar: {
+            describe: 'bar option'
+          }
+        })
+          .help(true)
+          .version(false))
+        .completion()
+        .argv
+      )
+
+      r.logs.should.have.length(2)
+      r.logs.should.include('--bar:bar option')
+      r.logs.should.include('--help:__yargsString__:Show help')
+    })
+
     it('completes options for the correct command', () => {
+      process.env.SHELL = '/bin/bash'
       const r = checkUsage(() => yargs(['./completion', '--get-yargs-completions', 'cmd2', '--o'])
         .help(false)
         .version(false)
@@ -141,6 +212,7 @@ describe('Completion', () => {
     })
 
     it('does not complete hidden commands', () => {
+      process.env.SHELL = '/bin/bash'
       const r = checkUsage(() => yargs(['./completion', '--get-yargs-completions', 'cmd'])
         .command('cmd1', 'first command')
         .command('cmd2', false)
@@ -153,6 +225,7 @@ describe('Completion', () => {
     })
 
     it('does not include possitional arguments', function () {
+      process.env.SHELL = '/bin/bash'
       var r = checkUsage(function () {
         return yargs(['./completion', '--get-yargs-completions', 'cmd'])
           .command('cmd1 [arg]', 'first command')
@@ -167,6 +240,7 @@ describe('Completion', () => {
     })
 
     it('works if command has no options', () => {
+      process.env.SHELL = '/bin/bash'
       const r = checkUsage(() => yargs(['./completion', '--get-yargs-completions', 'foo', '--b'])
         .help(false)
         .version(false)
@@ -181,6 +255,7 @@ describe('Completion', () => {
     })
 
     it("returns arguments as completion suggestion, if next contains '-'", () => {
+      process.env.SHELL = '/bin/basg'
       const r = checkUsage(() => yargs(['./usage', '--get-yargs-completions', '-f'])
         .option('foo', {
           describe: 'foo option'
@@ -310,8 +385,9 @@ describe('Completion', () => {
     })
   })
 
-  describe('getCompletion()', () => {
+  describe('getCompletion() - bash', () => {
     it('returns default completion to callback', () => {
+      process.env.SHELL = '/bin/bash'
       const r = checkUsage(() => {
         yargs()
           .command('foo', 'bar')
@@ -329,8 +405,29 @@ describe('Completion', () => {
     })
   })
 
+  describe('getCompletion() - zsh', () => {
+    it('returns default completion to callback', () => {
+      process.env.SHELL = '/bin/zsh'
+      const r = checkUsage(() => {
+        yargs()
+          .command('foo', 'bar')
+          .command('apple', 'banana')
+          .completion()
+          .getCompletion([''], (completions) => {
+            ;(completions || []).forEach((completion) => {
+              console.log(completion)
+            })
+          })
+      })
+
+      r.logs.should.include('apple:banana')
+      r.logs.should.include('foo:bar')
+    })
+  })
+
   // fixes for #177.
-  it('does not apply validation when --get-yargs-completions is passed in', () => {
+  it('does not apply validation when --get-yargs-completions is passed in (bash)', () => {
+    process.env.SHELL = '/bin/bash'
     const r = checkUsage(() => {
       try {
         return yargs(['./completion', '--get-yargs-completions', '--'])
@@ -345,5 +442,22 @@ describe('Completion', () => {
 
     r.errors.length.should.equal(0)
     r.logs.should.include('--foo')
+  })
+  it('does not apply validation when --get-yargs-completions is passed in (zsh)', () => {
+    process.env.SHELL = '/bin/zsh'
+    const r = checkUsage(() => {
+      try {
+        return yargs(['./completion', '--get-yargs-completions', '--'])
+          .option('foo', {'describe': 'bar'})
+          .completion()
+          .strict()
+          .argv
+      } catch (e) {
+        console.log(e.message)
+      }
+    })
+
+    r.errors.length.should.equal(0)
+    r.logs.should.include('--foo:bar')
   })
 })
