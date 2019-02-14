@@ -903,7 +903,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     // register the completion command.
     completionCommand = cmd || 'completion'
     if (!desc && desc !== false) {
-      desc = 'generate bash completion script'
+      desc = 'generate completion script'
     }
     self.command(completionCommand, desc)
 
