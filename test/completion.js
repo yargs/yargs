@@ -181,7 +181,7 @@ describe('Completion', () => {
 
       r.logs.should.have.length(2)
       r.logs.should.include('--bar:bar option')
-      r.logs.should.include('--help:__yargsString__:Show help')
+      r.logs.should.include('--help:Show help')
     })
 
     it('completes options for the correct command', () => {
