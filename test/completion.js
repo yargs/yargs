@@ -181,7 +181,7 @@ describe('Completion', () => {
 
       r.logs.should.have.length(2)
       r.logs.should.include('--bar:bar option')
-      r.logs.should.include('--help:__yargsString__:Show help')
+      r.logs.should.include('--help:Show help')
     })
 
     it('completes options for the correct command', () => {
@@ -459,5 +459,22 @@ describe('Completion', () => {
 
     r.errors.length.should.equal(0)
     r.logs.should.include('--foo:bar')
+  })
+  it('when using subcommands ensure early bailout if full command is typed (zsh)', () => {
+    process.env.SHELL = '/bin/zsh'
+    const r = checkUsage(() => {
+      try {
+        return yargs(['./completion', '--get-yargs-completions', 'dream'])
+          .commandDir('./fixtures/cmddir', { 'recurse': true })
+          .demand(1)
+          .strict()
+          .completion()
+          .argv
+      } catch (e) {
+        console.log(e.message)
+      }
+    })
+    r.errors.length.should.equal(0)
+    r.logs.should.include('of-memory:Dream about a specific memory')
   })
 })
