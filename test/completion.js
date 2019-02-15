@@ -465,7 +465,7 @@ describe('Completion', () => {
     const r = checkUsage(() => {
       try {
         return yargs(['./completion', '--get-yargs-completions', 'dream'])
-          .commandDir('./fixtures/cmddir', {'recurse': true})
+          .commandDir('./fixtures/cmddir', { 'recurse': true })
           .demand(1)
           .strict()
           .completion()
