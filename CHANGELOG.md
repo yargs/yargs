@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+# [13.2.0](https://github.com/yargs/yargs/compare/v13.1.0...v13.2.0) (2019-02-15)
+
+
+### Features
+
+* zsh auto completion ([#1292](https://github.com/yargs/yargs/issues/1292)) ([16c5d25](https://github.com/yargs/yargs/commit/16c5d25)), closes [#1156](https://github.com/yargs/yargs/issues/1156)
+
+
+
 <a name="13.1.0"></a>
 # [13.1.0](https://github.com/yargs/yargs/compare/v13.0.0...v13.1.0) (2019-02-12)
 
