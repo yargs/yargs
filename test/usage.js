@@ -1987,7 +1987,7 @@ describe('usage tests', () => {
         .help('h')
         .default('a', [])
         .default('a2', [3])
-        .default('o', {a: '33'})
+        .default('o', { a: '33' })
         .wrap(null)
         .parse()
       )
@@ -2604,7 +2604,7 @@ describe('usage tests', () => {
         .command(['list [pattern]', 'ls', '*'], 'List key-value pairs for pattern', {}, noop)
         .command('get <key>', 'Get value for key', {}, noop)
         .command('set <key> [value]', 'Set value for key', {}, noop)
-        .parserConfiguration({'sort-commands': true})
+        .parserConfiguration({ 'sort-commands': true })
         .parse()
       )
 
@@ -2683,7 +2683,7 @@ describe('usage tests', () => {
 
     it('should display options that have been configured', () => {
       const r = checkUsage(() => yargs('--help')
-        .command('* [pattern]', 'List key-value pairs for pattern', {uuid: {required: true}}, noop)
+        .command('* [pattern]', 'List key-value pairs for pattern', { uuid: { required: true } }, noop)
         .command('get <key>', 'Get value for key', {}, noop)
         .command('set <key> [value]', 'Set value for key', {}, noop)
         .parse()

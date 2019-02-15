@@ -33,7 +33,7 @@ describe('Argsert', () => {
         argsert('[object]', [].slice.call(arguments))
       }
 
-      foo({foo: 'bar'})
+      foo({ foo: 'bar' })
     })
 
     o.warnings.length.should.equal(0)

@@ -349,7 +349,7 @@ describe('validation tests', () => {
       yargs()
         .command('foo <y>')
         .strict()
-        .parse('foo 99', {x: 33}, (err, argv, output) => {
+        .parse('foo 99', { x: 33 }, (err, argv, output) => {
           expect(err).to.equal(null)
           expect(output).to.equal('')
           argv.y.should.equal(99)
@@ -370,7 +370,7 @@ describe('validation tests', () => {
             })
         })
         .strict()
-        .parse('request get --y=22', {x: 33}, (err, argv, output) => {
+        .parse('request get --y=22', { x: 33 }, (err, argv, output) => {
           expect(err).to.equal(null)
           expect(output).to.equal('')
           argv.y.should.equal(22)
@@ -450,7 +450,7 @@ describe('validation tests', () => {
   describe('requiresArg', () => {
     it('fails when a required argument value of type number is missing', (done) => {
       yargs()
-        .option('w', {type: 'number', requiresArg: true})
+        .option('w', { type: 'number', requiresArg: true })
         .parse('-w', (err, argv, output) => {
           expect(err).to.not.equal(undefined)
           expect(err).to.have.property('message', 'Not enough arguments following: w')
@@ -460,7 +460,7 @@ describe('validation tests', () => {
 
     it('fails when a required argument value of type string is missing', (done) => {
       yargs()
-        .option('w', {type: 'string', requiresArg: true})
+        .option('w', { type: 'string', requiresArg: true })
         .parse('-w', (err, argv, output) => {
           expect(err).to.not.equal(undefined)
           expect(err).to.have.property('message', 'Not enough arguments following: w')
@@ -470,7 +470,7 @@ describe('validation tests', () => {
 
     it('fails when a required argument value of type boolean is missing', (done) => {
       yargs()
-        .option('w', {type: 'boolean', requiresArg: true})
+        .option('w', { type: 'boolean', requiresArg: true })
         .parse('-w', (err, argv, output) => {
           expect(err).to.not.equal(undefined)
           expect(err).to.have.property('message', 'Not enough arguments following: w')
@@ -480,7 +480,7 @@ describe('validation tests', () => {
 
     it('fails when a required argument value of type array is missing', (done) => {
       yargs()
-        .option('w', {type: 'array', requiresArg: true})
+        .option('w', { type: 'array', requiresArg: true })
         .parse('-w', (err, argv, output) => {
           expect(err).to.not.equal(undefined)
           expect(err).to.have.property('message', 'Not enough arguments following: w')
@@ -491,7 +491,7 @@ describe('validation tests', () => {
     // see: https://github.com/yargs/yargs/issues/1041
     it('does not fail if argument with required value is not provided', (done) => {
       yargs()
-        .option('w', {type: 'number', requiresArg: true})
+        .option('w', { type: 'number', requiresArg: true })
         .command('woo')
         .parse('', (err, argv, output) => {
           expect(err).to.equal(null)
@@ -501,7 +501,7 @@ describe('validation tests', () => {
 
     it('does not fail if argument with required value is not provided to subcommand', (done) => {
       yargs()
-        .option('w', {type: 'number', requiresArg: true})
+        .option('w', { type: 'number', requiresArg: true })
         .command('woo')
         .parse('woo', (err, argv, output) => {
           expect(err).to.equal(null)
@@ -812,7 +812,7 @@ describe('validation tests', () => {
     it('does not fail for hidden options', () => {
       const args = yargs('--foo hey')
         .strict()
-        .option('foo', {boolean: true, describe: false})
+        .option('foo', { boolean: true, describe: false })
         .fail((msg) => {
           expect.fail()
         })
@@ -823,7 +823,7 @@ describe('validation tests', () => {
     it('does not fail if an alias is provided, rather than option itself', () => {
       const args = yargs('--cat hey')
         .strict()
-        .option('foo', {boolean: true, describe: false})
+        .option('foo', { boolean: true, describe: false })
         .alias('foo', 'bar')
         .alias('bar', 'cat')
         .fail((msg) => {
