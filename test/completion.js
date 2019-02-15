@@ -121,8 +121,8 @@ describe('Completion', () => {
     it('avoids repeating already included options', () => {
       const r = checkUsage(() => yargs(['./completion', '--get-yargs-completions', './completion', '--foo', '--'])
         .options({
-          foo: {describe: 'foo option'},
-          bar: {describe: 'bar option'}
+          foo: { describe: 'foo option' },
+          bar: { describe: 'bar option' }
         })
         .completion()
         .argv
@@ -135,8 +135,8 @@ describe('Completion', () => {
     it('avoids repeating options whose aliases are already included', () => {
       const r = checkUsage(() => yargs(['./completion', '--get-yargs-completions', './completion', '--f', '--'])
         .options({
-          foo: {describe: 'foo option', alias: 'f'},
-          bar: {describe: 'bar option'}
+          foo: { describe: 'foo option', alias: 'f' },
+          bar: { describe: 'bar option' }
         })
         .completion()
         .argv
@@ -448,7 +448,7 @@ describe('Completion', () => {
     const r = checkUsage(() => {
       try {
         return yargs(['./completion', '--get-yargs-completions', '--'])
-          .option('foo', {'describe': 'bar'})
+          .option('foo', { 'describe': 'bar' })
           .completion()
           .strict()
           .argv

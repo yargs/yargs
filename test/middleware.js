@@ -1,8 +1,8 @@
 'use strict'
 /* global describe, it, beforeEach, afterEach */
 
-const {expect} = require('chai')
-const {globalMiddlewareFactory} = require('../lib/middleware')
+const { expect } = require('chai')
+const { globalMiddlewareFactory } = require('../lib/middleware')
 let yargs
 require('chai').should()
 

@@ -256,7 +256,7 @@ describe('yargs dsl tests', () => {
         string: [],
         alias: {},
         default: {},
-        key: {help: true, version: true},
+        key: { help: true, version: true },
         narg: {},
         defaultDescription: {},
         choices: {},
@@ -337,7 +337,7 @@ describe('yargs dsl tests', () => {
             return done()
           },
           [function (argv) {
-            return {hello: 'world'}
+            return { hello: 'world' }
           }]
         )
         .exitProcess(false) // defaults to true.
@@ -1032,7 +1032,7 @@ describe('yargs dsl tests', () => {
       // see: https://github.com/yargs/yargs/issues/671
       it('does not fail if context object has cyclical reference', () => {
         let argv = null
-        const context = {state: 'grumpy but rich'}
+        const context = { state: 'grumpy but rich' }
         context.res = context
         yargs()
           .command('batman <api-token>', 'batman command', noop, (_argv) => {
@@ -1046,15 +1046,15 @@ describe('yargs dsl tests', () => {
       })
 
       it('allows nested sub-commands to be invoked multiple times', () => {
-        const context = {counter: 0}
+        const context = { counter: 0 }
 
         checkOutput(() => {
           const parser = yargs()
             .commandDir('fixtures/cmddir')
 
-          parser.parse('dream within-a-dream --what', {context}, (_err, argv, _output) => {})
-          parser.parse('dream within-a-dream --what', {context}, (_err, argv, _output) => {})
-          parser.parse('dream within-a-dream --what', {context}, (_err, argv, _output) => {})
+          parser.parse('dream within-a-dream --what', { context }, (_err, argv, _output) => {})
+          parser.parse('dream within-a-dream --what', { context }, (_err, argv, _output) => {})
+          parser.parse('dream within-a-dream --what', { context }, (_err, argv, _output) => {})
         })
 
         context.counter.should.equal(3)
@@ -1249,7 +1249,7 @@ describe('yargs dsl tests', () => {
 
     it('allows to pass a configuration object', () => {
       const argv = yargs
-        .config({foo: 1, bar: 2})
+        .config({ foo: 1, bar: 2 })
         .parse()
 
       argv.foo.should.equal(1)
@@ -1272,7 +1272,7 @@ describe('yargs dsl tests', () => {
 
       it('protects against circular extended configurations', () => {
         expect(() => {
-          yargs.config({extends: './test/fixtures/extends/circular_1.json'})
+          yargs.config({ extends: './test/fixtures/extends/circular_1.json' })
         }).to.throw(YError)
       })
 
@@ -1615,7 +1615,7 @@ describe('yargs dsl tests', () => {
   describe('parserConfiguration', () => {
     it('overrides the default parser configuration ', () => {
       const argv = yargs('--foo.bar 1 --no-baz 2')
-        .parserConfiguration({'boolean-negation': false, 'dot-notation': false})
+        .parserConfiguration({ 'boolean-negation': false, 'dot-notation': false })
         .parse()
       expect(argv['foo.bar']).to.equal(1)
       argv.noBaz.should.equal(2)
