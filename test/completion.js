@@ -242,7 +242,7 @@ describe('Completion', () => {
   })
 
   describe('bash', () => {
-    it('it returns a list of commands as completion suggestions', () => {
+    it('returns a list of commands as completion suggestions', () => {
       process.env.SHELL = '/bin/bash'
       const r = checkUsage(() => yargs(['./completion', '--get-yargs-completions', ''])
         .command('foo', 'bar')
