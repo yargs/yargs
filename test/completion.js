@@ -359,7 +359,7 @@ describe('Completion', () => {
   })
 
   describe('zsh', () => {
-    it('it returns a list of commands as completion suggestions', () => {
+    it('returns a list of commands as completion suggestions', () => {
       process.env.SHELL = '/bin/zsh'
       const r = checkUsage(() => yargs(['./completion', '--get-yargs-completions', ''])
         .command('foo', 'bar')
