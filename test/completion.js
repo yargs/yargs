@@ -470,7 +470,8 @@ describe('Completion', () => {
       r.errors.length.should.equal(0)
       r.logs.should.include('--foo:bar')
     })
-    it('when using subcommands ensure early bailout if full command is typed', () => {
+
+    it('bails out early when full command matches', () => {
       process.env.SHELL = '/bin/zsh'
       const r = checkUsage(() => {
         try {
