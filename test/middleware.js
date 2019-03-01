@@ -261,9 +261,10 @@ describe('middleware', () => {
     it('throws an error if async function provided', function () {
       expect(() => {
         yargs(['mw'])
-          .middleware([async function (argv) {
+          .middleware([function (argv) {
             argv.mw = 'mw'
             argv.other = true
+            return Promise.resolve(argv)
           }], true)
           .command(
             'mw',
