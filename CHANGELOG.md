@@ -36,7 +36,8 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### Chores
 
-* drop Node 6 from testing matrix ([#1287](https://github.com/yargs/yargs/issues/1287)) ([ef16792](https://github.com/yargs/yargs/commit/ef16792))
+* ~drop Node 6 from testing matrix ([#1287](https://github.com/yargs/yargs/issues/1287)) ([ef16792](https://github.com/yargs/yargs/commit/ef16792))~
+  * _opting to not drop Node 6 support until April, [see](https://github.com/nodejs/Release)._
 * update dependencies ([#1284](https://github.com/yargs/yargs/issues/1284)) ([f25de4f](https://github.com/yargs/yargs/commit/f25de4f))
 
 
