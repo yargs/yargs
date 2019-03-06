@@ -258,7 +258,7 @@ describe('middleware', () => {
         .parse()
     })
 
-    it('throws an error if async function provided', function () {
+    it('throws an error if promise returned and applyBeforeValidation enabled', function () {
       expect(() => {
         yargs(['mw'])
           .middleware([function (argv) {
