@@ -929,6 +929,7 @@ Locales currently supported:
 * **ja:** Japanese.
 * **ko:** Korean.
 * **nb:** Norwegian Bokmål.
+* **nl:** Dutch.
 * **pirate:** American Pirate.
 * **pl:** Polish.
 * **pt:** Portuguese.
