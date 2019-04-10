@@ -19,7 +19,7 @@
     "LICENSE"
   ],
   "dependencies": {
-    "cliui": "^4.0.0",
+    "cliui": "^5.0.0",
     "find-up": "^3.0.0",
     "get-caller-file": "^2.0.1",
     "os-locale": "^3.1.0",
