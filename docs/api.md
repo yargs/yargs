@@ -80,6 +80,8 @@ Interpret `key` as a boolean. If a non-flag option follows `key` in
 `key` will default to `false`, unless a `default(key, undefined)` is
 explicitly set.
 
+`key` can be set false explicitly using the `--no-` prefix, [more](/docs/tricks.md#negate).
+
 If `key` is an array, interpret all the elements as booleans.
 
 .check(fn, [global=true])
