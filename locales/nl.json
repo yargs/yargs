@@ -29,7 +29,7 @@
   "Invalid values:": "Ongeldige waarden:",
   "Argument: %s, Given: %s, Choices: %s": "Argument: %s, Gegeven: %s, Keuzes: %s",
   "Argument check failed: %s": "Argumentcontrole mislukt: %s",
-  "Implications failed:": "Mislukte implicaties:",
+  "Implications failed:": "Ontbrekende afhankelijke argumenten:",
   "Not enough arguments following: %s": "Niet genoeg argumenten na: %s",
   "Invalid JSON config file: %s": "Ongeldig JSON-config-bestand: %s",
   "Path to JSON config file": "Pad naar JSON-config-bestand",
