@@ -3,6 +3,7 @@
 
 const checkUsage = require('./helpers/utils').checkOutput
 const expect = require('chai').expect
+const english = require('../locales/en.json')
 let yargs = require('../')
 
 require('chai').should()
@@ -13,13 +14,15 @@ describe('validation tests', () => {
   })
 
   describe('implies', () => {
+    const implicationsFailedPattern = new RegExp(english['Implications failed:'])
+
     it("fails if '_' populated, and implied argument not set", (done) => {
       yargs(['cat'])
         .implies({
           1: 'foo' // 1 arg in _ means --foo is required
         })
         .fail((msg) => {
-          msg.should.match(/Implications failed/)
+          msg.should.match(implicationsFailedPattern)
           return done()
         })
         .parse()
@@ -32,7 +35,7 @@ describe('validation tests', () => {
           'foo': 1 // --foo means 1 arg in _ is required
         })
         .fail((msg) => {
-          msg.should.match(/Implications failed/)
+          msg.should.match(implicationsFailedPattern)
           return done()
         })
         .parse()
@@ -62,7 +65,7 @@ describe('validation tests', () => {
           '--no-bar': 'foo' // when --bar is not given, --foo is required
         })
         .fail((msg) => {
-          msg.should.match(/Implications failed/)
+          msg.should.match(implicationsFailedPattern)
           return done()
         })
         .parse()
@@ -74,7 +77,7 @@ describe('validation tests', () => {
           'bar': '--no-foo' // --bar means --foo cannot be given
         })
         .fail((msg) => {
-          msg.should.match(/Implications failed/)
+          msg.should.match(implicationsFailedPattern)
           return done()
         })
         .parse()
@@ -89,7 +92,7 @@ describe('validation tests', () => {
         })
         .fail((msg) => {
           failCalled = true
-          msg.should.match(/Implications failed/)
+          msg.should.match(implicationsFailedPattern)
         })
         .parse()
       failCalled.should.equal(true)
@@ -121,7 +124,7 @@ describe('validation tests', () => {
         })
         .fail((msg) => {
           failCalled = true
-          msg.should.match(/Implications failed/)
+          msg.should.match(implicationsFailedPattern)
         })
         .parse()
       failCalled.should.equal(true)
@@ -150,7 +153,7 @@ describe('validation tests', () => {
           implies: 'foo'
         })
         .fail((msg) => {
-          msg.should.match(/Implications failed/)
+          msg.should.match(implicationsFailedPattern)
           return done()
         })
         .parse()

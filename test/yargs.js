@@ -5,12 +5,14 @@ const expect = require('chai').expect
 const fs = require('fs')
 const path = require('path')
 const checkOutput = require('./helpers/utils').checkOutput
+const english = require('../locales/en.json')
 let yargs
 const YError = require('../lib/yerror')
 
 require('chai').should()
 
 const noop = () => {}
+const implicationsFailedPattern = new RegExp(english['Implications failed:'])
 
 describe('yargs dsl tests', () => {
   beforeEach(() => {
@@ -56,7 +58,7 @@ describe('yargs dsl tests', () => {
       .parse()
     )
 
-    r.errors[2].should.match(/Implications failed/)
+    r.errors[2].should.match(implicationsFailedPattern)
   })
 
   it('accepts an object for describes', () => {
@@ -79,7 +81,7 @@ describe('yargs dsl tests', () => {
         x: 'y'
       })
       .fail((msg) => {
-        msg.should.match(/Implications failed/)
+        msg.should.match(implicationsFailedPattern)
         return done()
       })
       .parse()
