@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [13.2.4](https://github.com/yargs/yargs/compare/v13.2.3...v13.2.4) (2019-05-13)
+
+
+### Bug Fixes
+
+* **i18n:** rename unclear 'implication failed' to 'missing dependent arguments' ([#1317](https://github.com/yargs/yargs/issues/1317)) ([bf46813](https://github.com/yargs/yargs/commit/bf46813))
+
+
+
 ### [13.2.3](https://github.com/yargs/yargs/compare/v13.2.2...v13.2.3) (2019-05-05)
 
 
