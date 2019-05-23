@@ -2095,6 +2095,118 @@ describe('usage tests', () => {
         r.logs[0].should.include('default: 80 for HTTP and 443 for HTTPS')
       })
     })
+
+    describe('using positional() without default()', () => {
+      it('should output given desc with default value', () => {
+        const r = checkUsage(() => yargs(['url', '-h'])
+          .help('h')
+          .command('url', 'Print a URL', (yargs) => {
+            yargs.positional('port', {
+              describe: 'The port value for URL',
+              defaultDescription: '80 for HTTP and 443 for HTTPS',
+              default: 80
+            })
+          })
+          .wrap(null)
+          .parse()
+        )
+
+        r.logs[0].should.include('default: 80 for HTTP and 443 for HTTPS')
+      })
+
+      it('should output given desc without default value', () => {
+        const r = checkUsage(() => yargs(['url', '-h'])
+          .help('h')
+          .command('url', 'Print a URL', (yargs) => {
+            yargs.positional('port', {
+              describe: 'The port value for URL',
+              defaultDescription: '80 for HTTP and 443 for HTTPS'
+            })
+          })
+          .wrap(null)
+          .parse()
+        )
+
+        r.logs[0].should.include('default: 80 for HTTP and 443 for HTTPS')
+      })
+
+      it('should prefer given desc over function desc', () => {
+        const r = checkUsage(() => yargs(['url', '-h'])
+          .help('h')
+          .command('url', 'Print a URL', (yargs) => {
+            yargs.positional('port', {
+              describe: 'The port value for URL',
+              defaultDescription: '80 for HTTP and 443 for HTTPS',
+              default: function determinePort () {
+                return 80
+              }
+            })
+          })
+          .wrap(null)
+          .parse()
+        )
+
+        r.logs[0].should.include('default: 80 for HTTP and 443 for HTTPS')
+      })
+    })
+
+    describe('using positional() with default()', () => {
+      it('should prefer default() desc when given last', () => {
+        const r = checkUsage(() => yargs(['url', '-h'])
+          .help('h')
+          .command('url', 'Print a URL', (yargs) => {
+            yargs
+              .positional('port', {
+                describe: 'The port value for URL',
+                defaultDescription: 'depends on protocol'
+              })
+              .default('port', null, '80 for HTTP and 443 for HTTPS')
+          })
+          .wrap(null)
+          .parse()
+        )
+
+        r.logs[0].should.include('default: 80 for HTTP and 443 for HTTPS')
+      })
+
+      it('should prefer positional() desc when given last', () => {
+        const r = checkUsage(() => yargs(['url', '-h'])
+          .help('h')
+          .command('url', 'Print a URL', (yargs) => {
+            yargs
+              .default('port', null, '80 for HTTP and 443 for HTTPS')
+              .positional('port', {
+                describe: 'The port value for URL',
+                defaultDescription: 'depends on protocol'
+              })
+          })
+          .wrap(null)
+          .parse()
+        )
+
+        r.logs[0].should.include('default: depends on protocol')
+      })
+
+      it('should prefer positional() desc over default() function', () => {
+        const r = checkUsage(() => yargs(['url', '-h'])
+          .help('h')
+          .command('url', 'Print a URL', (yargs) => {
+            yargs
+              .positional('port', {
+                describe: 'The port value for URL',
+                defaultDescription: '80 for HTTP and 443 for HTTPS'
+              })
+              .default('port', function determinePort () {
+                return 80
+              })
+          })
+          .wrap(null)
+          .parse()
+        )
+
+        r.logs[0].should.include('default: 80 for HTTP and 443 for HTTPS')
+      })
+    })
   })
 
   describe('normalizeAliases', () => {
