@@ -2046,6 +2046,20 @@ describe('yargs dsl tests', () => {
       argv.heroes.should.eql(['batman', 'Iron Man'])
     })
 
+    it('allows a defaultDescription to be set', () => {
+      yargs('cmd')
+        .command('cmd [heroes...]', 'a command', (yargs) => {
+          yargs.positional('heroes', {
+            default: ['batman', 'Iron Man'],
+            defaultDescription: 'batman and Iron Man'
+          })
+        }).parse()
+
+      yargs.getOptions().defaultDescription.should.deep.equal({
+        heroes: 'batman and Iron Man'
+      })
+    })
+
     it('allows an implied argument to be specified', (done) => {
       yargs()
         .command('cmd <hero>', 'a command', (yargs) => {

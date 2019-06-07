@@ -694,8 +694,8 @@ function Yargs (processArgs, cwd, parentRequire) {
     }
 
     // .positional() only supports a subset of the configuration
-    // options availble to .option().
-    const supportedOpts = ['default', 'implies', 'normalize',
+    // options available to .option().
+    const supportedOpts = ['default', 'defaultDescription', 'implies', 'normalize',
       'choices', 'conflicts', 'coerce', 'type', 'describe',
       'desc', 'description', 'alias']
     opts = objFilter(opts, (k, v) => {

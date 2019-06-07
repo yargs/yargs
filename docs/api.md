@@ -1234,6 +1234,7 @@ Valid `opt` keys include:
   - `coerce`: function, coerce or transform parsed command line values into another value, see [`coerce()`](#coerce)
   - `conflicts`: string or object, require certain keys not to be set, see [`conflicts()`](#conflicts)
   - `default`: value, set a default value for the option, see [`default()`](#default)
+  - `defaultDescription`: string, use this description for the default value in help content, see [`default()`](#default)
   - `desc`/`describe`/`description`: string, the option description for help content, see [`describe()`](#describe)
   - `implies`: string or object, require certain keys to be set, see [`implies()`](#implies)
   - `normalize`: boolean, apply `path.normalize()` to the option, see [`normalize()`](#normalize)
