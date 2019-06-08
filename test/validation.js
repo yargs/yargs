@@ -291,7 +291,6 @@ describe('validation tests', () => {
 
     function loadLocale (locale) {
       delete require.cache[require.resolve('../')]
-      delete require.cache[require.resolve('os-locale')]
       yargs = require('../')
       process.env.LC_ALL = locale
     }

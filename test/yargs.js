@@ -638,7 +638,6 @@ describe('yargs dsl tests', () => {
 
     function loadLocale (locale) {
       delete require.cache[require.resolve('../')]
-      delete require.cache[require.resolve('os-locale')]
       yargs = require('../')
       process.env.LC_ALL = locale
     }
@@ -685,17 +684,6 @@ describe('yargs dsl tests', () => {
       yargs.locale().should.equal('pt_BR')
       loadLocale('en_US.UTF-8')
       r.logs.join(' ').should.match(/Exibe ajuda/)
-    })
-
-    it('handles os-locale throwing an exception', () => {
-      // make os-locale throw.
-      require('os-locale')
-      require.cache[require.resolve('os-locale')].exports.sync = () => { throw Error('an error!') }
-
-      delete require.cache[require.resolve('../')]
-      yargs = require('../')
-
-      yargs.locale().should.equal('en')
     })
 
     it('uses locale string for help option default desc on .locale().help()', () => {

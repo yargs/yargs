@@ -1181,8 +1181,9 @@ function Yargs (processArgs, cwd, parentRequire) {
     if (!detectLocale) return
 
     try {
-      const osLocale = require('os-locale')
-      self.locale(osLocale.sync({ spawn: false }))
+      const { env } = process
+      const locale = env.LC_ALL || env.LC_MESSAGES || env.LANG || env.LANGUAGE || 'en_US'
+      self.locale(locale.replace(/[.:].*/, ''))
     } catch (err) {
       // if we explode looking up locale just noop
       // we'll keep using the default language 'en'.
