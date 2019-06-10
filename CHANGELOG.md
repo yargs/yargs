@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [13.3.0](https://www.github.com/yargs/yargs/compare/v13.2.4...v13.3.0) (2019-06-10)
+
+
+### Bug Fixes
+
+* **deps:** yargs-parser update addressing several parsing bugs ([#1357](https://www.github.com/yargs/yargs/issues/1357)) ([e230d5b](https://www.github.com/yargs/yargs/commit/e230d5b))
+
+
+### Features
+
+* **i18n:** swap out os-locale dependency for simple inline implementation ([#1356](https://www.github.com/yargs/yargs/issues/1356)) ([4dfa19b](https://www.github.com/yargs/yargs/commit/4dfa19b))
+* support defaultDescription for positional arguments ([812048c](https://www.github.com/yargs/yargs/commit/812048c))
+
 ### [13.2.4](https://github.com/yargs/yargs/compare/v13.2.3...v13.2.4) (2019-05-13)
 
 
