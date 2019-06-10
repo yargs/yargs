@@ -1,6 +1,6 @@
 {
   "name": "yargs",
-  "version": "13.2.4",
+  "version": "13.3.0",
   "description": "yargs the modern, pirate-themed, successor to optimist.",
   "main": "./index.js",
   "contributors": [
