@@ -1193,7 +1193,7 @@ for details of this object
 
 For additional configuration options, see [yargs-parser's configuration](https://github.com/yargs/yargs-parser#configuration).
 
-_Note: configuraton should be top level keys on the `obj` passed to `parserConfiguration`, not populated under the _configuration_ key, as in `yargs-parser`.
+_Note: configuraton should be top level keys on the `obj` passed to `parserConfiguration`, not populated under the configuration key, as in `yargs-parser`._
 
 <a name="pkg-conf"></a>
 .pkgConf(key, [cwd])
