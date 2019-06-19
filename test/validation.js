@@ -848,6 +848,47 @@ describe('validation tests', () => {
       args.foo.should.equal(true)
       args.bar.should.equal(true)
     })
+
+    it('does not fail on unknown config argument if told not to', () => {
+      yargs('build')
+        .config({
+          sourceDir: '/a/path'
+        })
+        .strict({
+          config: false
+        })
+        .command('build')
+        .fail((msg) => {
+          expect.fail(msg)
+        })
+        .parse()
+    })
+
+    it('does not fail on unknown env argument if told not to', () => {
+      process.env.MY_SCRIPT_SOURCE_DIR = '/a/path'
+      yargs('build')
+        .env('MY_SCRIPT')
+        .strict({
+          env: false
+        })
+        .command('build')
+        .fail((msg) => {
+          expect.fail(msg)
+        })
+        .parse()
+    })
+
+    it('does not fail on unknown argv argument if told not to', () => {
+      yargs('build --sourceDir=/a/path')
+        .strict({
+          argv: false
+        })
+        .command('build')
+        .fail((msg) => {
+          expect.fail(msg)
+        })
+        .parse()
+    })
   })
 
   describe('demandOption', () => {
