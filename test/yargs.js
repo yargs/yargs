@@ -835,6 +835,29 @@ describe('yargs dsl tests', () => {
 
       r.logs[0].should.match(/Commands:[\s\S]*blerg command/)
     })
+
+    it('can be called multiple times with the same behavior', () => {
+      let counter = { foobar: 0 }
+      yargs(['test', 'foobar'])
+        .command(
+          'test <name>',
+          'increases counter',
+          yargs => yargs.positional('name', {
+            aliases: 'n',
+            describe: 'a name',
+            choices: ['foobar'],
+            type: 'string'
+          }),
+          argv => { counter[argv.name]++ }
+        )
+        .fail((msg) => {
+          expect.fail(undefined, undefined, msg)
+        })
+      yargs.parse()
+      yargs.parse()
+      yargs.parse()
+      expect(counter.foobar).to.equal(3)
+    })
   })
 
   // yargs.parse(['foo', '--bar'], function (err, argv, output) {}
