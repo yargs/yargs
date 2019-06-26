@@ -2058,17 +2058,23 @@ describe('yargs dsl tests', () => {
     })
 
     it('allows a defaultDescription to be set', () => {
-      yargs('cmd')
+      const r = checkOutput(() => yargs('cmd --help').wrap(null)
         .command('cmd [heroes...]', 'a command', (yargs) => {
           yargs.positional('heroes', {
             default: ['batman', 'Iron Man'],
             defaultDescription: 'batman and Iron Man'
           })
         }).parse()
-
-      yargs.getOptions().defaultDescription.should.deep.equal({
-        heroes: 'batman and Iron Man'
-      })
+      )
+      r.logs.join('\n').split(/\n+/).should.deep.equal([
+        'usage cmd [heroes...]',
+        'a command',
+        'Positionals:',
+        '  heroes  [array] [default: batman and Iron Man]',
+        'Options:',
+        '  --help     Show help  [boolean]',
+        '  --version  Show version number  [boolean]'
+      ])
     })
 
     it('allows an implied argument to be specified', (done) => {
