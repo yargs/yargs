@@ -55,3 +55,27 @@ This lets you organize arguments into nested objects.
     { _: [],
       foo: { bar: { baz: 33 }, quux: 5 },
       '$0': 'examples/reflect.js' }
+
+<a name="quotes"></a>
+
+Quotes
+------------
+
+When you use string arguments that include dashes (`-`), those will be seen as a separate option by the shell instead of part of the string. The problem is that shells like bash tend to strip quotes. The solution for this is to wrap the string in two sets of quotes.
+
+Use double quotes inside single quotes.
+
+```
+$ node examples/reflect.js --foo '"--hello -x=yes -v"'
+{ _: [], foo: '--hello -x=yes -v',
+  '$0': 'examples/reflect.js' }
+```
+
+Use escaped double quotes inside double quotes.
+
+```
+$ node examples/reflect.js --foo "\"--hello -x=yes -v\""
+{ _: [], foo: '--hello -x=yes -v',
+  '$0': 'examples/reflect.js' }
+```
+
