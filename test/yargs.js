@@ -837,6 +837,17 @@ describe('yargs dsl tests', () => {
     })
   })
 
+  describe('parsed', () => {
+    it('should be false before parsing', () => {
+      yargs.parsed.should.equal(false)
+    })
+
+    it('should not be false after parsing', () => {
+      yargs.parse()
+      yargs.parsed.should.not.equal(false)
+    })
+  })
+
   // yargs.parse(['foo', '--bar'], function (err, argv, output) {}
   context('function passed as second argument to parse', () => {
     it('does not print to stdout', () => {

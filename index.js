@@ -25,8 +25,10 @@ function singletonify (inst) {
   Object.keys(inst).forEach((key) => {
     if (key === 'argv') {
       Argv.__defineGetter__(key, inst.__lookupGetter__(key))
+    } else if (typeof inst[key] === 'function') {
+      Argv[key] = inst[key].bind(inst)
     } else {
-      Argv[key] = typeof inst[key] === 'function' ? inst[key].bind(inst) : inst[key]
+      Argv.__defineGetter__(key, () => inst[key])
     }
   })
 }
