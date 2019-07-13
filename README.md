@@ -5,6 +5,7 @@
 <p align="center">
   <b >Yargs be a node.js library fer hearties tryin' ter parse optstrings</b>
 </p>
+
 <br>
 
 [![Build Status][travis-image]][travis-url]
@@ -102,6 +103,7 @@ Having problems? want to contribute? join our [community slack](http://devtoolsc
   * [Numbers](/docs/tricks.md#numbers)
   * [Arrays](/docs/tricks.md#arrays)
   * [Objects](/docs/tricks.md#objects)
+  * [Quotes](/docs/tricks.md#quotes)
 * [Advanced Topics](/docs/advanced.md)
   * [Composing Your App Using Commands](/docs/advanced.md#commands)
   * [Building Configurable CLI Apps](/docs/advanced.md#configuration)
