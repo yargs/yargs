@@ -20,6 +20,7 @@
   ],
   "dependencies": {
     "cliui": "^5.0.0",
+    "decamelize": "^1.2.0",
     "find-up": "^3.0.0",
     "get-caller-file": "^2.0.1",
     "require-directory": "^2.1.1",
