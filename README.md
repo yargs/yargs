@@ -16,7 +16,7 @@
 [![Slack][slack-image]][slack-url]
 
 ## Description :
-Yargs helps you build interactive command line tools, by parsing arguments and generating an elegant user interface. 
+Yargs helps you build interactive command line tools, by parsing arguments and generating an elegant user interface.
 
 It gives you:
 
@@ -86,6 +86,16 @@ require('yargs') // eslint-disable-line
 ```
 
 Run the example above with `--help` to see the help for the application.
+
+## TypeScript
+
+yargs has type definitions at `@types/yargs`
+
+```
+npm i -D @types/yargs
+```
+
+See usage examples in [docs](/docs/typescript.md)
 
 ## Community :
 
