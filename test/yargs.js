@@ -1292,6 +1292,20 @@ describe('yargs dsl tests', () => {
         argv.z.should.equal(15)
       })
 
+      it('tolerates null prototype config objects', () => {
+        const argv = yargs
+          .config({
+            __proto__: null,
+            a: 2,
+            extends: './test/fixtures/extends/config_1.json'
+          })
+          .parse()
+
+        argv.a.should.equal(2)
+        argv.b.should.equal(22)
+        argv.z.should.equal(15)
+      })
+
       // see: https://www.npmjs.com/package/yargs-test-extends
       it('allows a module to be extended, rather than a JSON file', () => {
         const argv = yargs()
