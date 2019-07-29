@@ -28,7 +28,13 @@ function singletonify (inst) {
     } else if (typeof inst[key] === 'function') {
       Argv[key] = inst[key].bind(inst)
     } else {
-      Argv.__defineGetter__(key, () => inst[key])
+      Argv.__defineGetter__('$0', () => {
+        return inst.$0
+      })
+      Argv.__defineGetter__('parsed', () => {
+        console.warn('In future major releases of yargs, "parsed" will be a private field. Use the return value of ".parse()" or ".argv" instead')
+        return inst.parsed
+      })
     }
   })
 }
