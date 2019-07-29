@@ -144,9 +144,10 @@ function Yargs (processArgs, cwd, parentRequire) {
   self.resetOptions()
 
   // temporary hack: allow "freezing" of reset-able state for parse(msg, cb)
-  let frozen
+  let frozens = []
   function freeze () {
-    frozen = {}
+    let frozen = {}
+    frozens.push(frozen)
     frozen.options = options
     frozen.configObjects = options.configObjects.slice(0)
     frozen.exitProcess = exitProcess
@@ -160,8 +161,11 @@ function Yargs (processArgs, cwd, parentRequire) {
     frozen.exitError = exitError
     frozen.hasOutput = hasOutput
     frozen.parsed = self.parsed
+    frozen.parseFn = parseFn
+    frozen.parseContext = parseContext
   }
   function unfreeze () {
+    let frozen = frozens.pop()
     options = frozen.options
     options.configObjects = frozen.configObjects
     exitProcess = frozen.exitProcess
@@ -175,9 +179,8 @@ function Yargs (processArgs, cwd, parentRequire) {
     command.unfreeze()
     strict = frozen.strict
     completionCommand = frozen.completionCommand
-    parseFn = null
-    parseContext = null
-    frozen = undefined
+    parseFn = frozen.parseFn
+    parseContext = frozen.parseContext
   }
 
   self.boolean = function (keys) {
@@ -538,8 +541,11 @@ function Yargs (processArgs, cwd, parentRequire) {
   let parseContext = null
   self.parse = function parse (args, shortCircuit, _parseFn) {
     argsert('[string|array] [function|boolean|object] [function]', [args, shortCircuit, _parseFn], arguments.length)
+    freeze()
     if (typeof args === 'undefined') {
-      return self._parseArgs(processArgs)
+      const parsed = self._parseArgs(processArgs)
+      unfreeze()
+      return parsed
     }
 
     // a context object can optionally be provided, this allows
@@ -560,7 +566,6 @@ function Yargs (processArgs, cwd, parentRequire) {
     // skipping validation, etc.
     if (!shortCircuit) processArgs = args
 
-    freeze()
     if (parseFn) exitProcess = false
 
     const parsed = self._parseArgs(args, shortCircuit)
