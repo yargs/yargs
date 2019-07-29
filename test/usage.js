@@ -1910,7 +1910,26 @@ describe('usage tests', () => {
     it('should display an epilog message at the end of the usage instructions', () => {
       const r = checkUsage(() => yargs('')
         .epilog('for more info view the manual at http://example.com')
+        .demand('y')
+        .wrap(null)
+        .parse()
+      )
+
+      r.errors.join('\n').split(/\n+/).should.deep.equal([
+        'Options:',
+        '  --help     Show help  [boolean]',
+        '  --version  Show version number  [boolean]',
+        '  -y  [required]',
+        'for more info view the manual at http://example.com',
+        'Missing required argument: y'
+      ])
+    })
+
+    it('supports multiple epilogs', () => {
+      const r = checkUsage(() => yargs('')
+        .epilog('for more info view the manual at http://example.com')
         .epilog('you can also find us on slack at http://devtoolscommunity.herokuapp.com')
+        .epilog('keep up to date by reading our blog at http://yargs.js.org/blog.html')
         .demand('y')
         .wrap(null)
         .parse()
@@ -1923,6 +1942,7 @@ describe('usage tests', () => {
         '  -y  [required]',
         'for more info view the manual at http://example.com',
         'you can also find us on slack at http://devtoolscommunity.herokuapp.com',
+        'keep up to date by reading our blog at http://yargs.js.org/blog.html',
         'Missing required argument: y'
       ])
     })
