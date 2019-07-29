@@ -37,7 +37,8 @@ function Yargs (processArgs, cwd, parentRequire) {
 
   if (!cwd) cwd = process.cwd()
 
-  self.scriptName = function scriptName (scriptName) {
+  self.scriptName = function (scriptName) {
+    self.customScriptName = true
     self.$0 = scriptName
     return self
   }
