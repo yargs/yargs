@@ -545,7 +545,8 @@ function Yargs (processArgs, cwd, parentRequire) {
     if (typeof args === 'undefined') {
       const parsed = self._parseArgs(processArgs)
       unfreeze()
-      return parsed
+      // TODO: remove this compatibility hack when we release yargs@15.x:
+      return (this.parsed = parsed)
     }
 
     // a context object can optionally be provided, this allows
@@ -1028,7 +1029,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     // Deprecated
     let pkgConfig = pkgUp()['yargs']
     if (pkgConfig) {
-      console.warn('Configuring yargs through package.json is deprecated and will be removed in the next major release, please use the JS API instead.')
+      console.warn('Configuring yargs through package.json is deprecated and will be removed in a future major release, please use the JS API instead.')
       options.configuration = Object.assign({}, pkgConfig, options.configuration)
     }
 

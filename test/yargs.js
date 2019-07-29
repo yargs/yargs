@@ -28,7 +28,8 @@ describe('yargs dsl tests', () => {
     process.env._ = '/usr/local/bin/ndm'
     process.execPath = '/usr/local/bin/ndm'
     const argv = yargs([]).parse()
-    argv['$0'].should.eql('ndm')
+    argv['$0'].should.equal('ndm')
+    yargs.$0.should.equal('ndm')
   })
 
   it('accepts an object for aliases', () => {
@@ -862,12 +863,18 @@ describe('yargs dsl tests', () => {
 
   describe('parsed', () => {
     it('should be false before parsing', () => {
+      const warn = global.console.warn
+      global.console.warn = () => {}
       yargs.parsed.should.equal(false)
+      global.console.warn = warn
     })
 
     it('should not be false after parsing', () => {
+      const warn = global.console.warn
+      global.console.warn = () => {}
       yargs.parse()
       yargs.parsed.should.not.equal(false)
+      global.console.warn = warn
     })
   })
 
