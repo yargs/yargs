@@ -92,7 +92,7 @@ Run the example above with `--help` to see the help for the application.
 yargs has type definitions at [@types/yargs][type-definitions].
 
 ```
-npm i --development @types/yargs
+npm i @types/yargs --save-dev
 ```
 
 See usage examples in [docs](/docs/typescript.md)
