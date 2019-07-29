@@ -161,7 +161,7 @@ describe('Completion', () => {
 
     it('allows $0 and cmd to be set', () => {
       const r = checkUsage(() => yargs([])
-        .showCompletionScript('/path/to/my/app', 'show-completions-script'), ['test.js'])
+        .showCompletionScript('/path/to/my/app', 'show-completions-script'))
 
       r.logs[0].should.match(/Installation: \/path\/to\/my\/app show-completions-script/)
     })
