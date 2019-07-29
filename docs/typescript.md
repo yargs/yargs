@@ -1,6 +1,9 @@
 # TypeScript usage examples
 
-Options type inference work pretty well
+The TypeScript definitions take into account yargs' `type` key and the prescense of
+`demandOption`/`default`.
+
+The following `.options()` definition:
 
 ```typescript
 #!/usr/bin/env node
@@ -14,9 +17,10 @@ const argv = yargs.options({
   e: { type: 'count' },
   f: { choices: ['1', '2', '3'] }
 }).argv;
-
 ```
-`argv` will get type
+
+Will result in an `argv` that's typed like so:
+
 ```typescript
 {
   [x: string]: unknown;
@@ -31,7 +35,10 @@ const argv = yargs.options({
 }
 ```
 
-You might want to declare an interface for arguments object
+
+You will likely want to define an interface for your application, describing the form that
+the parsed `argv` will take:
+
 ```typescript
 interface Arguments {
   [x: string]: unknown;
@@ -44,7 +51,7 @@ interface Arguments {
 }
 ```
 
-To improve `choices` option typing you can specify type for choices
+To improve the `choices` option typing you can also specify its types:
 
 ```typescript
 type Difficulty = 'normal' | 'nightmare' | 'hell';
@@ -56,4 +63,4 @@ const argv = yargs.option('difficulty', {
 }).argv;
 ```
 
-`argv` will get  type `'normal' | 'nightmare' | 'hell'`
+`argv` will get  type `'normal' | 'nightmare' | 'hell'`.

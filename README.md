@@ -89,10 +89,10 @@ Run the example above with `--help` to see the help for the application.
 
 ## TypeScript
 
-yargs has type definitions at `@types/yargs`
+yargs has type definitions at [@types/yargs][type-definitions].
 
 ```
-npm i -D @types/yargs
+npm i --development @types/yargs
 ```
 
 See usage examples in [docs](/docs/typescript.md)
@@ -132,3 +132,4 @@ Having problems? want to contribute? join our [community slack](http://devtoolsc
 [conventional-commits-url]: https://conventionalcommits.org/
 [slack-image]: http://devtoolscommunity.herokuapp.com/badge.svg
 [slack-url]: http://devtoolscommunity.herokuapp.com
+[type-definitions]: https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/yargs
