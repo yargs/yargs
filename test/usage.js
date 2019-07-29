@@ -1250,6 +1250,24 @@ describe('usage tests', () => {
       r.errors.should.have.length(0)
       r.exit.should.equal(true)
     })
+
+    it('should not alter the user supplied scriptName', () => {
+      const r = checkUsage(() => yargs(['--help'])
+        .scriptName('./custom')
+        .command('command')
+        .parse()
+      )
+      r.logs.join('\n').split(/\n+/).should.deep.equal([
+        './custom [command]',
+        'Commands:',
+        '  ./custom command',
+        'Options:',
+        '  --help     Show help                                                 [boolean]',
+        '  --version  Show version number                                       [boolean]'
+      ])
+      r.errors.should.have.length(0)
+      r.exit.should.equal(true)
+    })
   })
 
   it('should succeed when rebase', () => {
