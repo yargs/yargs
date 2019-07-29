@@ -1910,6 +1910,7 @@ describe('usage tests', () => {
     it('should display an epilog message at the end of the usage instructions', () => {
       const r = checkUsage(() => yargs('')
         .epilog('for more info view the manual at http://example.com')
+        .epilog('you can also find us on slack at http://devtoolscommunity.herokuapp.com')
         .demand('y')
         .wrap(null)
         .parse()
@@ -1921,6 +1922,7 @@ describe('usage tests', () => {
         '  --version  Show version number  [boolean]',
         '  -y  [required]',
         'for more info view the manual at http://example.com',
+        'you can also find us on slack at http://devtoolscommunity.herokuapp.com',
         'Missing required argument: y'
       ])
     })
