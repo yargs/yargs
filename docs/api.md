@@ -951,7 +951,7 @@ To submit a new translation for yargs:
 <a name="middleware"></a>.middleware(callbacks, [applyBeforeValidation])
 ------------------------------------
 
-Define global middleware functions to be called first, in list order, for all cli command.  
+Define global middleware functions to be called first, in list order, for all cli command.
 
 The `callbacks` parameter can be a function or a list of functions.  Each callback gets passed a reference to argv.
 
@@ -1310,10 +1310,12 @@ Generate a bash completion script. Users of your application can install this
 script in their `.bashrc`, and yargs will provide completion shortcuts for
 commands and options.
 
-.showHelp(consoleLevel='error')
+.showHelp()
 ---------------------------
 
-Print the usage data using the [`console`](https://nodejs.org/api/console.html) function `consoleLevel` for printing.
+Print the usage data to stderr.
+
+Later on, `argv` can be retrieved with `yargs.argv`.
 
 Example:
 
@@ -1323,13 +1325,27 @@ var yargs = require("yargs")
 yargs.showHelp(); //prints to stderr using console.error()
 ```
 
-Or, to print the usage data to `stdout` instead, you can specify the use of `console.log`:
+.showHelp(consoleLevel)
+---------------------------
+
+Print the usage data using the specified [`console`](https://nodejs.org/api/console.html) function for printing.
+
+Example:
 
 ```js
 yargs.showHelp("log"); //prints to stdout using console.log()
 ```
 
-Later on, `argv` can be retrieved with `yargs.argv`.
+.showHelp(printCallback)
+---------------------------
+
+Print the usage data using the specified callback, which accepts a single argument - the string to print.
+
+Example:
+
+```js
+yargs.showHelp(s => myStream.write(s)); //prints to myStream
+```
 
 .showHelpOnFail(enable, [message])
 ----------------------------------
