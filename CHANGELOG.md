@@ -20,15 +20,12 @@ All notable changes to this project will be documented in this file. See [standa
 * do not allow additional positionals in strict mode ([35d777c](https://github.com/yargs/yargs/commit/35d777c))
 * properties accessed on singleton now reflect current state of instance ([#1366](https://github.com/yargs/yargs/issues/1366)) ([409d35b](https://github.com/yargs/yargs/commit/409d35b))
 * tolerate null prototype for config objects with `extends` ([#1376](https://github.com/yargs/yargs/issues/1376)) ([3d26d11](https://github.com/yargs/yargs/commit/3d26d11)), closes [#1372](https://github.com/yargs/yargs/issues/1372)
-
+* yargs.parsed now populated before returning, when yargs.parse() called with no args (#1382) ([e3981fd](https://github.com/yargs/yargs/commit/e3981fd)), closes [#1382](https://github.com/yargs/yargs/issues/1382)
 
 ### Features
 
 * adds support for multiple epilog messages ([#1384](https://github.com/yargs/yargs/issues/1384)) ([07a5554](https://github.com/yargs/yargs/commit/07a5554))
 * allow completionCommand to be set via showCompletionScript ([#1385](https://github.com/yargs/yargs/issues/1385)) ([5562853](https://github.com/yargs/yargs/commit/5562853))
-
-
-* fix! yargs.parsed now populated before returning, when yargs.parse() called with no args (#1382) ([e3981fd](https://github.com/yargs/yargs/commit/e3981fd)), closes [#1382](https://github.com/yargs/yargs/issues/1382)
 
 ## [13.3.0](https://www.github.com/yargs/yargs/compare/v13.2.4...v13.3.0) (2019-06-10)
 
