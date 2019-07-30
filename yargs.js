@@ -908,7 +908,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     }
 
     // register the completion command.
-    completionCommand = cmd || 'completion'
+    completionCommand = cmd || completionCommand || 'completion'
     if (!desc && desc !== false) {
       desc = 'generate completion script'
     }
@@ -920,9 +920,10 @@ function Yargs (processArgs, cwd, parentRequire) {
     return self
   }
 
-  self.showCompletionScript = function ($0) {
-    argsert('[string]', [$0], arguments.length)
+  self.showCompletionScript = function ($0, cmd) {
+    argsert('[string] [string]', [$0, cmd], arguments.length)
     $0 = $0 || self.$0
+    completionCommand = cmd || completionCommand || 'completion'
     _logger.log(completion.generateCompletionScript($0, completionCommand))
     return self
   }
