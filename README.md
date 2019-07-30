@@ -95,7 +95,7 @@ yargs has type definitions at [@types/yargs][type-definitions].
 npm i @types/yargs --save-dev
 ```
 
-See usage examples in [docs](/docs/typescript.md)
+See usage examples in [docs](/docs/typescript.md).
 
 ## Community :
 
