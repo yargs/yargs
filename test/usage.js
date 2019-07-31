@@ -2345,7 +2345,7 @@ describe('usage tests', () => {
       ])
     })
 
-    it('should print the help to stdout when no arguments were specified', () => {
+    it('should print the help using console.error when no arguments were specified', () => {
       const r = checkUsage(() => {
         const y = yargs(['--foo'])
           .options('foo', {

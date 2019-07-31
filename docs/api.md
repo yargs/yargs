@@ -1310,14 +1310,12 @@ Generate a bash completion script. Users of your application can install this
 script in their `.bashrc`, and yargs will provide completion shortcuts for
 commands and options.
 
-.showHelp()
+.showHelp([consoleLevel | printCallback])
 ---------------------------
 
-Print the usage data to stderr.
+Print the usage data.
 
-Later on, `argv` can be retrieved with `yargs.argv`.
-
-Example:
+If no argument is provided, usage data is printed using `console.error`.
 
 ```js
 var yargs = require("yargs")
@@ -1325,27 +1323,19 @@ var yargs = require("yargs")
 yargs.showHelp(); //prints to stderr using console.error()
 ```
 
-.showHelp(consoleLevel)
----------------------------
-
-Print the usage data using the specified [`console`](https://nodejs.org/api/console.html) function for printing.
-
-Example:
+If a string is specified, usage data is printed using the [`console`](https://nodejs.org/api/console.html) function `consoleLevel`.
 
 ```js
 yargs.showHelp("log"); //prints to stdout using console.log()
 ```
 
-.showHelp(printCallback)
----------------------------
-
-Print the usage data using the specified callback, which accepts a single argument - the string to print.
-
-Example:
+If a function is specified, it is called with a single argument - the usage data as a string.
 
 ```js
 yargs.showHelp(s => myStream.write(s)); //prints to myStream
 ```
+
+Later on, `argv` can be retrieved with `yargs.argv`.
 
 .showHelpOnFail(enable, [message])
 ----------------------------------
