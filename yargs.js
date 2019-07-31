@@ -923,8 +923,7 @@ function Yargs (processArgs, cwd, parentRequire) {
   self.showCompletionScript = function ($0, cmd) {
     argsert('[string] [string]', [$0, cmd], arguments.length)
     $0 = $0 || self.$0
-    completionCommand = cmd || completionCommand || 'completion'
-    _logger.log(completion.generateCompletionScript($0, completionCommand))
+    _logger.log(completion.generateCompletionScript($0, cmd || completionCommand || 'completion'))
     return self
   }
 
