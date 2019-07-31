@@ -142,6 +142,8 @@ from the command line, and should return a new value or throw an error. The
 returned value will be used as the value for `key` (or one of its aliases) in
 `argv`.
 
+If the argument `key` is of type `array`, it will invoke the function with one argument that is the array of values received(in `string`).
+
 If the function throws, the error will be treated as a validation
 failure, delegating to either a custom [`.fail()`](#fail) handler or printing
 the error message in the console.
