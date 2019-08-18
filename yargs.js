@@ -592,6 +592,13 @@ function Yargs (processArgs, cwd, parentRequire) {
         opt = {}
       }
 
+      if (helpOpt && (
+        (key === helpOpt) ||
+        (opt.alias && opt.alias.includes(helpOpt))
+      )) {
+        throw new YError(`'${helpOpt}' key already used by help option`)
+      }
+
       options.key[key] = true // track manually set keys.
 
       if (opt.alias) self.alias(key, opt.alias)

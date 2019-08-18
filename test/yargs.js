@@ -1822,6 +1822,122 @@ describe('yargs dsl tests', () => {
     })
   })
 
+  describe('.help() and .option()', () => {
+    it('prevents .option() from reusing the default help key', () => {
+      expect(() => {
+        yargs(['--help', 'test'])
+          .option('help', {
+            type: 'string'
+          })
+          .parse()
+      }).to.throw(/'help' key already used by help option/)
+    })
+
+    it('prevents .option() from reusing the default help key as an alias', () => {
+      expect(() => {
+        yargs(['--help', 'test'])
+          .option('someoption', {
+            alias: ['help'],
+            type: 'string'
+          })
+          .parse()
+      }).to.throw(/'help' key already used by help option/)
+    })
+
+    it('prevents .option() from reusing a custom help key', () => {
+      expect(() => {
+        yargs(['--helpme', 'test'])
+          .help('helpme')
+          .option('helpme', {
+            type: 'string'
+          })
+          .parse()
+      }).to.throw(/'helpme' key already used by help option/)
+    })
+
+    it('prevents .option() from reusing a custom help key as an alias', () => {
+      expect(() => {
+        yargs(['--helpme', 'test'])
+          .help('helpme')
+          .option('someoption', {
+            alias: ['helpme'],
+            type: 'string'
+          })
+          .parse()
+      }).to.throw(/'helpme' key already used by help option/)
+    })
+  })
+
+  describe('.help() and .positional()', () => {
+    it('prevents .positional() from reusing the default help key', () => {
+      let msg
+      checkOutput(() => yargs(['cmd', 'test'])
+        .command('cmd [help]', 'test command', (yargs) => {
+          yargs.positional('help', {
+            type: 'string'
+          })
+        })
+        .fail((_msg) => {
+          msg = _msg
+        })
+        .parse()
+      )
+      expect(msg).to.match(/'help' key already used by help option/)
+    })
+
+    it('prevents .positional() from reusing the default help key as an alias', () => {
+      let msg
+      checkOutput(() => yargs(['cmd', 'test'])
+        .command('cmd [someoption]', 'test command', (yargs) => {
+          yargs.positional('someoption', {
+            alias: ['help'],
+            type: 'string'
+          })
+        })
+        .fail((_msg) => {
+          msg = _msg
+        })
+        .parse()
+      )
+      expect(msg).to.match(/'help' key already used by help option/)
+    })
+
+    it('prevents .positional() from reusing a custom help key', () => {
+      let msg
+      checkOutput(() => yargs(['cmd', 'test'])
+        .help('helpme')
+        .command('cmd [helpme]', 'test command', (yargs) => {
+          yargs.positional('helpme', {
+            type: 'string'
+          })
+        })
+        .fail((_msg) => {
+          msg = _msg
+        })
+        .parse()
+      )
+      expect(msg).to.match(/'helpme' key already used by help option/)
+    })
+
+    it('prevents .positional() from reusing a custom help key as an alias', () => {
+      let msg
+      checkOutput(() => yargs(['cmd', 'test'])
+        .help('helpme')
+        .command('cmd [someoption]', 'test command', (yargs) => {
+          yargs.positional('someoption', {
+            alias: ['helpme'],
+            type: 'string'
+          })
+        })
+        .fail((_msg) => {
+          msg = _msg
+        })
+        .parse()
+      )
+      expect(msg).to.match(/'helpme' key already used by help option/)
+    })
+  })
+
   describe('.help() with .alias()', () => {
     it('uses multi-char (but not single-char) help alias as command', () => {
       const info = checkOutput(() => yargs('info')
