@@ -599,6 +599,13 @@ function Yargs (processArgs, cwd, parentRequire) {
         throw new YError(`'${helpOpt}' key already used by help option`)
       }
 
+      if (versionOpt && (
+        (key === versionOpt) ||
+        (opt.alias && opt.alias.includes(versionOpt))
+      )) {
+        throw new YError(`'${versionOpt}' key already used by version option`)
+      }
+
       options.key[key] = true // track manually set keys.
 
       if (opt.alias) self.alias(key, opt.alias)

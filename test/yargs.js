@@ -1959,6 +1959,122 @@ describe('yargs dsl tests', () => {
     })
   })
 
+  describe('.version() and .option()', () => {
+    it('prevents .option() from reusing the default version key', () => {
+      expect(() => {
+        yargs(['--version', 'test'])
+          .option('version', {
+            type: 'string'
+          })
+          .parse()
+      }).to.throw(/'version' key already used by version option/)
+    })
+
+    it('prevents .option() from reusing the default version key as an alias', () => {
+      expect(() => {
+        yargs(['--version', 'test'])
+          .option('someoption', {
+            alias: ['version'],
+            type: 'string'
+          })
+          .parse()
+      }).to.throw(/'version' key already used by version option/)
+    })
+
+    it('prevents .option() from reusing a custom version key', () => {
+      expect(() => {
+        yargs(['--myversion', 'test'])
+          .version('myversion', '3.1')
+          .option('myversion', {
+            type: 'string'
+          })
+          .parse()
+      }).to.throw(/'myversion' key already used by version option/)
+    })
+
+    it('prevents .option() from reusing a custom version key as an alias', () => {
+      expect(() => {
+        yargs(['--myversion', 'test'])
+          .version('myversion', '3.1')
+          .option('someoption', {
+            alias: ['myversion'],
+            type: 'string'
+          })
+          .parse()
+      }).to.throw(/'myversion' key already used by version option/)
+    })
+  })
+
+  describe('.version() and .positional()', () => {
+    it('prevents .positional() from reusing the default version key', () => {
+      let msg
+      checkOutput(() => yargs(['cmd', 'test'])
+        .command('cmd [version]', 'test command', (yargs) => {
+          yargs.positional('version', {
+            type: 'string'
+          })
+        })
+        .fail((_msg) => {
+          msg = _msg
+        })
+        .parse()
+      )
+      expect(msg).to.match(/'version' key already used by version option/)
+    })
+
+    it('prevents .positional() from reusing the default version key as an alias', () => {
+      let msg
+      checkOutput(() => yargs(['cmd', 'test'])
+        .command('cmd [someoption]', 'test command', (yargs) => {
+          yargs.positional('someoption', {
+            alias: ['version'],
+            type: 'string'
+          })
+        })
+        .fail((_msg) => {
+          msg = _msg
+        })
+        .parse()
+      )
+      expect(msg).to.match(/'version' key already used by version option/)
+    })
+
+    it('prevents .positional() from reusing a custom version key', () => {
+      let msg
+      checkOutput(() => yargs(['cmd', 'test'])
+        .version('myversion', '3.1')
+        .command('cmd [myversion]', 'test command', (yargs) => {
+          yargs.positional('myversion', {
+            type: 'string'
+          })
+        })
+        .fail((_msg) => {
+          msg = _msg
+        })
+        .parse()
+      )
+      expect(msg).to.match(/'myversion' key already used by version option/)
+    })
+
+    it('prevents .positional() from reusing a custom version key as an alias', () => {
+      let msg
+      checkOutput(() => yargs(['cmd', 'test'])
+        .version('myversion', '3.1')
+        .command('cmd [someoption]', 'test command', (yargs) => {
+          yargs.positional('someoption', {
+            alias: ['myversion'],
+            type: 'string'
+          })
+        })
+        .fail((_msg) => {
+          msg = _msg
+        })
+        .parse()
+      )
+      expect(msg).to.match(/'myversion' key already used by version option/)
+    })
+  })
+
   describe('.coerce()', () => {
     it('supports string and function args (as option key and coerce function)', () => {
       const argv = yargs(['--file', path.join(__dirname, 'fixtures', 'package.json')])
