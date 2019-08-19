@@ -435,13 +435,11 @@ using the [`parserConfiguration()`](/docs/api.md#parserConfiguration) method you
 
 ```js
 yargs.parserConfiguration({
-  "yargs": {
-    "short-option-groups": true,
-    "camel-case-expansion": true,
-    "dot-notation": true,
-    "parse-numbers": true,
-    "boolean-negation": true
-  }
+  "short-option-groups": true,
+  "camel-case-expansion": true,
+  "dot-notation": true,
+  "parse-numbers": true,
+  "boolean-negation": true
 })
 ```
 
