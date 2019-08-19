@@ -1111,7 +1111,7 @@ Valid `opt` keys include:
 - `coerce`: function, coerce or transform parsed command line values into another value, see [`coerce()`](#coerce)
 - `config`: boolean, interpret option as a path to a JSON config file, see [`config()`](#config)
 - `configParser`: function, provide a custom config parsing function, see [`config()`](#config)
-- `conflicts`: string or object, require certain keys not to be set, see [`conflicts()`](#conflicts)
+- `conflicts`: string or array of strings, require certain keys not to be set, see [`conflicts()`](#conflicts)
 - `count`: boolean, interpret option as a count of boolean flags, see [`count()`](#count)
 - `default`: value, set a default value for the option, see [`default()`](#default)
 - `defaultDescription`: string, use this description for the default value in help content, see [`default()`](#default)
@@ -1120,7 +1120,7 @@ Valid `opt` keys include:
 - `global`: boolean, indicate that this key should not be [reset](#reset) when a command is invoked, see [`global()`](#global)
 - `group`: string, when displaying usage instructions place the option under an alternative group heading, see [`group()`](#group)
 - `hidden`: don't display option in help output.
-- `implies`: string or object, require certain keys to be set, see [`implies()`](#implies)
+- `implies`: string or array of strings, require certain keys to be set, see [`implies()`](#implies)
 - `nargs`: number, specify how many arguments should be consumed for the option, see [`nargs()`](#nargs)
 - `normalize`: boolean, apply `path.normalize()` to the option, see [`normalize()`](#normalize)
 - `number`: boolean, interpret option as a number, [`number()`](#number)
