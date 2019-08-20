@@ -137,12 +137,10 @@ var argv = require('yargs')
 Provide a synchronous function to coerce or transform the value(s) given on the
 command line for `key`.
 
-The coercion function should accept one argument, representing the parsed value
-from the command line, and should return a new value or throw an error. The
-returned value will be used as the value for `key` (or one of its aliases) in
-`argv`.
-
-If the argument `key` is of type `array`, it will invoke the function with one argument that is the array of values received(in `string`).
+The coercion function should accept one argument, representing the parsed value from
+the command line (an array if multiple values are parsed for the key), and should 
+return a new value or throw an error. The returned value will be used as the value for
+`key` (or one of its aliases) in `argv`.
 
 If the function throws, the error will be treated as a validation
 failure, delegating to either a custom [`.fail()`](#fail) handler or printing
