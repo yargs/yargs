@@ -1118,7 +1118,7 @@ A `parseCallback` can also be provided to `.parse()`. If a callback is given, it
 
 1. `err`: populated if any validation errors raised while parsing.
 2. `argv`: the parsed argv object.
-3. `output`: any text that would have been output to the terminal, had a
+3. `output`: any text that would have been output by yargs to the terminal, had a
   callback not been provided.
 
 ```js
@@ -1137,6 +1137,10 @@ parser.parse(bot.userText, function (err, argv, output) {
 ```
 
 ***Note:*** Providing a callback to `parse()` disables the [`exitProcess` setting](#exitprocess) until after the callback is invoked.
+
+***Note:*** the `output` parameter of a `parse()` callback only contains text output by yargs using its internal logger.
+It *does not* include any text output by user-supplied callback, such as `console.log()` outputs in a
+command handler, for example.
 
 <a name="parsed"></a>.parsed
 ------------
