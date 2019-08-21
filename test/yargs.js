@@ -1866,6 +1866,48 @@ describe('yargs dsl tests', () => {
           .parse()
       }).to.throw(/'helpme' key already used by help option/)
     })
+
+    it('does not prevent .option() from using help key when help is disabled', () => {
+      let argv = yargs(['--help', 'test'])
+        .help(false)
+        .option('help', {
+          type: 'string'
+        })
+        .parse()
+      expect(argv).to.include({ help: 'test' })
+    })
+
+    it('does not prevent .option() from using help key as an alias when help is disabled', () => {
+      let argv = yargs(['--help', 'test'])
+        .help(false)
+        .option('someoption', {
+          alias: ['help'],
+          type: 'string'
+        })
+        .parse()
+      expect(argv).to.include({ someoption: 'test' })
+    })
+
+    it('does not prevent .option() from using help key when help uses another key', () => {
+      let argv = yargs(['--help', 'test'])
+        .help('info')
+        .option('help', {
+          type: 'string'
+        })
+        .parse()
+      expect(argv).to.include({ help: 'test' })
+    })
+
+    it('does not prevent .option() from using help key as an alias when help uses another key', () => {
+      let argv = yargs(['--help', 'test'])
+        .help('info')
+        .option('someoption', {
+          alias: ['help'],
+          type: 'string'
+        })
+        .parse()
+      expect(argv).to.include({ someoption: 'test' })
+    })
   })
 
   describe('.help() and .positional()', () => {
@@ -1874,23 +1916,6 @@ describe('yargs dsl tests', () => {
       checkOutput(() => yargs(['cmd', 'test'])
         .command('cmd [help]', 'test command', (yargs) => {
           yargs.positional('help', {
-            type: 'string'
-          })
-        })
-        .fail((_msg) => {
-          msg = _msg
-        })
-        .parse()
-      )
-      expect(msg).to.match(/'help' key already used by help option/)
-    })
-
-    it('prevents .positional() from reusing the default help key as an alias', () => {
-      let msg
-      checkOutput(() => yargs(['cmd', 'test'])
-        .command('cmd [someoption]', 'test command', (yargs) => {
-          yargs.positional('someoption', {
-            alias: ['help'],
             type: 'string'
           })
         })
@@ -1919,22 +1944,28 @@ describe('yargs dsl tests', () => {
       expect(msg).to.match(/'helpme' key already used by help option/)
     })
 
-    it('prevents .positional() from reusing a custom help key as an alias', () => {
-      let msg
-      checkOutput(() => yargs(['cmd', 'test'])
-        .help('helpme')
-        .command('cmd [someoption]', 'test command', (yargs) => {
-          yargs.positional('someoption', {
-            alias: ['helpme'],
+    it('does not prevent .positional() from using help key when help is disabled', () => {
+      let argv = yargs(['cmd', 'test'])
+        .help(false)
+        .command('cmd [help]', 'test command', (yargs) => {
+          yargs.positional('help', {
             type: 'string'
           })
         })
-        .fail((_msg) => {
-          msg = _msg
+        .parse()
+      expect(argv).to.include({ help: 'test' })
+    })
+
+    it('does not prevent .positional() from using help key when help uses another key', () => {
+      let argv = yargs(['cmd', 'test'])
+        .help('info')
+        .command('cmd [help]', 'test command', (yargs) => {
+          yargs.positional('help', {
+            type: 'string'
+          })
         })
         .parse()
-      )
-      expect(msg).to.match(/'helpme' key already used by help option/)
+      expect(argv).to.include({ help: 'test' })
     })
   })
 
@@ -2003,6 +2034,48 @@ describe('yargs dsl tests', () => {
           .parse()
       }).to.throw(/'myversion' key already used by version option/)
     })
+
+    it('does not prevent .option() from using version key when version is disabled', () => {
+      let argv = yargs(['--version', 'test'])
+        .version(false)
+        .option('version', {
+          type: 'string'
+        })
+        .parse()
+      expect(argv).to.include({ version: 'test' })
+    })
+
+    it('does not prevent .option() from using version key as an alias when version is disabled', () => {
+      let argv = yargs(['--version', 'test'])
+        .version(false)
+        .option('someoption', {
+          alias: ['version'],
+          type: 'string'
+        })
+        .parse()
+      expect(argv).to.include({ someoption: 'test' })
+    })
+
+    it('does not prevent .option() from using version key when version uses another key', () => {
+      let argv = yargs(['--version', 'test'])
+        .version('myversion', '3.1')
+        .option('version', {
+          type: 'string'
+        })
+        .parse()
+      expect(argv).to.include({ version: 'test' })
+    })
+
+    it('does not prevent .option() from using version key as an alias when version uses another key', () => {
+      let argv = yargs(['--version', 'test'])
+        .version('myversion', '3.1')
+        .option('someoption', {
+          alias: ['version'],
+          type: 'string'
+        })
+        .parse()
+      expect(argv).to.include({ someoption: 'test' })
+    })
   })
 
   describe('.version() and .positional()', () => {
@@ -2011,23 +2084,6 @@ describe('yargs dsl tests', () => {
       checkOutput(() => yargs(['cmd', 'test'])
         .command('cmd [version]', 'test command', (yargs) => {
           yargs.positional('version', {
-            type: 'string'
-          })
-        })
-        .fail((_msg) => {
-          msg = _msg
-        })
-        .parse()
-      )
-      expect(msg).to.match(/'version' key already used by version option/)
-    })
-
-    it('prevents .positional() from reusing the default version key as an alias', () => {
-      let msg
-      checkOutput(() => yargs(['cmd', 'test'])
-        .command('cmd [someoption]', 'test command', (yargs) => {
-          yargs.positional('someoption', {
-            alias: ['version'],
             type: 'string'
           })
         })
@@ -2056,22 +2112,28 @@ describe('yargs dsl tests', () => {
       expect(msg).to.match(/'myversion' key already used by version option/)
     })
 
-    it('prevents .positional() from reusing a custom version key as an alias', () => {
-      let msg
-      checkOutput(() => yargs(['cmd', 'test'])
-        .version('myversion', '3.1')
-        .command('cmd [someoption]', 'test command', (yargs) => {
-          yargs.positional('someoption', {
-            alias: ['myversion'],
+    it('does not prevent .positional() from using version key when version is disabled', () => {
+      let argv = yargs(['cmd', 'test'])
+        .version(false)
+        .command('cmd [version]', 'test command', (yargs) => {
+          yargs.positional('version', {
             type: 'string'
           })
         })
-        .fail((_msg) => {
-          msg = _msg
+        .parse()
+      expect(argv).to.include({ version: 'test' })
+    })
+
+    it('does not prevent .positional() from using version key when version uses another key', () => {
+      let argv = yargs(['cmd', 'test'])
+        .version('myversion', '3.1')
+        .command('cmd [version]', 'test command', (yargs) => {
+          yargs.positional('version', {
+            type: 'string'
+          })
         })
         .parse()
-      )
-      expect(msg).to.match(/'myversion' key already used by version option/)
+      expect(argv).to.include({ version: 'test' })
     })
   })
 
