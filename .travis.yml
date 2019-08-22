@@ -6,4 +6,4 @@ node_js:
 os:
   - windows
 
-before_script: npm i npm@latest -g
+before_install: npm i npm@latest -g
