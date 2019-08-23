@@ -330,7 +330,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     argsert('[object|string] [string|function] [function]', [key, msg, parseFn], arguments.length)
     // allow a config object to be provided directly.
     if (typeof key === 'object') {
-      key = applyExtends(key, cwd)
+      key = applyExtends(key, cwd, self.getParserConfiguration()['merge-extends'])
       options.configObjects = (options.configObjects || []).concat(key)
       return self
     }
@@ -504,7 +504,7 @@ function Yargs (processArgs, cwd, parentRequire) {
 
     // If an object exists in the key, add it to options.configObjects
     if (obj[key] && typeof obj[key] === 'object') {
-      conf = applyExtends(obj[key], rootPath || cwd)
+      conf = applyExtends(obj[key], rootPath || cwd, self.getParserConfiguration()['merge-extends'])
       options.configObjects = (options.configObjects || []).concat(conf)
     }
 

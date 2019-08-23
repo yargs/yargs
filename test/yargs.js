@@ -1374,6 +1374,58 @@ describe('yargs dsl tests', () => {
         argv.c.should.equal(201)
         argv.z.should.equal(15)
       })
+
+      it('deep merge objects when extending when configured', () => {
+        const argv = yargs()
+          .parserConfiguration({
+            'merge-extends': true
+          })
+          .config({
+            extends: './test/fixtures/extends/config_deep.json',
+            a: {
+              b: 11,
+              d: [5, 2],
+              f: 'no',
+              g: {
+                h: 122
+              },
+              i: [1, 2]
+            }
+          })
+          .parse()
+
+        argv.a.b.should.equal(11)
+        argv.a.c.should.equal(12)
+        argv.a.d.should.deep.equal([5, 2])
+        argv.a.e.should.equal(1)
+        argv.a.f.should.equal('no')
+        argv.a.g.h.should.equal(122)
+        argv.a.i.should.deep.equal([1, 2])
+        argv.test.yes.should.equal(1)
+      })
+
+      it('do not merge objects by default when extending', () => {
+        const argv = yargs()
+          .config({
+            extends: './test/fixtures/extends/config_deep.json',
+            a: {
+              b: 11,
+              d: [5, 2],
+              f: 'no',
+              g: {
+                h: 122
+              }
+            }
+          })
+          .parse()
+
+        argv.a.b.should.equal(11)
+        argv.a.should.not.have.property('c')
+        argv.a.d.should.deep.equal([5, 2])
+        argv.a.should.not.have.property('e')
+        argv.a.f.should.equal('no')
+        argv.a.g.h.should.equal(122)
+      })
     })
   })
 
