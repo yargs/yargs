@@ -811,7 +811,7 @@ describe('usage tests', () => {
     })
 
     it('fails when an invalid argument is provided with automatic camel case', (done) => {
-      yargs('--foo-bar')
+      return yargs('--foo-bar')
         .strict()
         .fail((msg) => {
           return done()
