@@ -544,10 +544,12 @@ function Yargs (processArgs, cwd, parentRequire) {
     argsert('[string|array] [function|boolean|object] [function]', [args, shortCircuit, _parseFn], arguments.length)
     freeze()
     if (typeof args === 'undefined') {
-      const parsed = self._parseArgs(processArgs)
+      const argv = self._parseArgs(processArgs)
+      const tmpParsed = self.parsed
       unfreeze()
       // TODO: remove this compatibility hack when we release yargs@15.x:
-      return (this.parsed = parsed)
+      self.parsed = tmpParsed
+      return argv
     }
 
     // a context object can optionally be provided, this allows

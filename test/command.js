@@ -1426,36 +1426,66 @@ describe('Command', () => {
     })
   })
 
-  // addresses https://github.com/yargs/yargs/issues/510
-  it('fails when the promise returned by the command handler rejects', (done) => {
-    const error = new Error()
-    yargs('foo')
-      .command('foo', 'foo command', noop, (yargs) => Promise.reject(error))
-      .fail((msg, err) => {
-        expect(msg).to.equal(null)
-        expect(err).to.equal(error)
-        done()
-      })
-      .parse()
-  })
-
-  it('succeeds when the promise returned by the command handler resolves', (done) => {
-    const handler = new Promise((resolve, reject) => {
-      setTimeout(() => {
-        return resolve(true)
-      }, 5)
+  describe('async', () => {
+    // addresses https://github.com/yargs/yargs/issues/510
+    it('fails when the promise returned by the command handler rejects', (done) => {
+      const error = new Error()
+      yargs('foo')
+        .command('foo', 'foo command', noop, (yargs) => Promise.reject(error))
+        .fail((msg, err) => {
+          expect(msg).to.equal(null)
+          expect(err).to.equal(error)
+          done()
+        })
+        .parse()
     })
-    const parsed = yargs('foo hello')
-      .command('foo <pos>', 'foo command', () => {}, (yargs) => handler)
-      .fail((msg, err) => {
-        return done(Error('should not have been called'))
-      })
-      .parse()
 
-    handler.then(called => {
-      called.should.equal(true)
-      parsed.pos.should.equal('hello')
-      return done()
+    it('succeeds when the promise returned by the command handler resolves', (done) => {
+      const handler = new Promise((resolve, reject) => {
+        setTimeout(() => {
+          return resolve(true)
+        }, 5)
+      })
+      const parsed = yargs('foo hello')
+        .command('foo <pos>', 'foo command', () => {}, (yargs) => handler)
+        .fail((msg, err) => {
+          return done(Error('should not have been called'))
+        })
+        .parse()
+
+      handler.then(called => {
+        called.should.equal(true)
+        parsed.pos.should.equal('hello')
+        return done()
+      })
+    })
+
+    // see: https://github.com/yargs/yargs/issues/1144
+    it('displays error and appropriate help message when handler fails', (done) => {
+      // TODO: debug why exception bubbles to unhandledRejection
+      // if we set exitProcess to false; currently we are taking
+      // advantage of this to determine when to call done().
+      let errorLog = ''
+      const check = (err) => {
+        process.removeListener('unhandledRejection', check)
+        err.message.should.include('foo error')
+        errorLog.should.include('foo command')
+        return done()
+      }
+      process.on('unhandledRejection', check)
+      const y = yargs('foo')
+        .command('foo', 'foo command', () => {}, (argv) => {
+          return Promise.reject(Error('foo error'))
+        })
+        .exitProcess(false)
+      // the bug reported in #1144 only happens when
+      // usage.help() is called, this does not occur when
+      // a failure handler is attached. We override the logger
+      // so that we can catch console output:
+      y._getLoggerInstance().error = (out) => {
+        errorLog += out
+      }
+      y.parse()
     })
   })
 
