@@ -1462,30 +1462,33 @@ describe('Command', () => {
 
     // see: https://github.com/yargs/yargs/issues/1144
     it('displays error and appropriate help message when handler fails', (done) => {
-      // TODO: debug why exception bubbles to unhandledRejection
-      // if we set exitProcess to false; currently we are taking
-      // advantage of this to determine when to call done().
-      let errorLog = ''
-      const check = (err) => {
-        process.removeListener('unhandledRejection', check)
-        err.message.should.include('foo error')
-        errorLog.should.include('foo command')
-        return done()
-      }
-      process.on('unhandledRejection', check)
       const y = yargs('foo')
-        .command('foo', 'foo command', () => {}, (argv) => {
+        .command('foo', 'foo command', (yargs) => {
+          yargs.option('bar', {
+            describe: 'bar option'
+          })
+        }, (argv) => {
           return Promise.reject(Error('foo error'))
         })
         .exitProcess(false)
       // the bug reported in #1144 only happens when
       // usage.help() is called, this does not occur when
-      // a failure handler is attached. We override the logger
-      // so that we can catch console output:
+      // console output is suppressed. tldr; we capture
+      // the log output:
+      let errorLog = ''
       y._getLoggerInstance().error = (out) => {
-        errorLog += out
+        if (out) errorLog += `${out}\n`
       }
       y.parse()
+      // the promise returned by the handler rejects immediately,
+      // so we can wait for a small number of ms:
+      setTimeout(() => {
+        // ensure the appropriate help is displayed:
+        errorLog.should.include('bar option')
+        // ensure error was displayed:
+        errorLog.should.include('foo error')
+        return done()
+      }, 5)
     })
   })
 
