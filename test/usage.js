@@ -810,6 +810,75 @@ describe('usage tests', () => {
       r.should.have.property('exit').and.equal(true)
     })
 
+    describe('with hyphens in options', () => {
+      it('fails when an invalid argument is provided', (done) => {
+        return yargs('--foo-bar')
+          .strict()
+          .fail((msg) => {
+            return done()
+          })
+          .argv
+      })
+
+      it('accepts valid options', () => {
+        const r = checkUsage(() => {
+          const opts = {
+            '--foo-bar': { description: 'foo bar option' },
+            '--bar-baz': { description: 'bar baz option' }
+          }
+
+          return yargs('--foo-bar --bar-baz')
+            .options(opts)
+            .strict()
+            .parse()
+        })
+
+        r.result.should.have.property('foo-bar', true)
+        r.result.should.have.property('fooBar', true)
+        r.result.should.have.property('bar-baz', true)
+        r.result.should.have.property('barBaz', true)
+      })
+
+      it('works with aliases', () => {
+        const r = checkUsage(() => {
+          const opts = {
+            '--foo-bar': { description: 'foo bar option', alias: 'f' },
+            '--bar-baz': { description: 'bar baz option', alias: 'b' }
+          }
+
+          return yargs('--foo-bar -b')
+            .options(opts)
+            .strict()
+            .parse()
+        })
+
+        r.result.should.have.property('foo-bar', true)
+        r.result.should.have.property('fooBar', true)
+        r.result.should.have.property('f', true)
+        r.result.should.have.property('bar-baz', true)
+        r.result.should.have.property('barBaz', true)
+        r.result.should.have.property('b', true)
+      })
+
+      it('accepts mixed options with values', () => {
+        const r = checkUsage(() => {
+          const opts = {
+            '--foo-bar': { description: 'foo bar option', demand: true },
+            '--baz': { description: 'baz option', demand: true }
+          }
+
+          return yargs('--foo-bar 150 --baz')
+            .options(opts)
+            .strict()
+            .parse()
+        })
+
+        r.result.should.have.property('foo-bar', 150)
+        r.result.should.have.property('fooBar', 150)
+        r.result.should.have.property('baz', true)
+      })
+    })
+
     it('should fail given an option argument without a corresponding description', () => {
       const r = checkUsage(() => {
         const opts = {
