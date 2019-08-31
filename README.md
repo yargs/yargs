@@ -79,8 +79,7 @@ require('yargs') // eslint-disable-line
     serve(argv.port)
   })
   .option('verbose', {
-    alias: 'v',
-    default: false
+    alias: 'v'
   })
   .argv
 ```
