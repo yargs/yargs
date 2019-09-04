@@ -360,7 +360,7 @@ describe('validation tests', () => {
       expect.fail('no parsing failure')
     })
 
-    it('does not fail in strict mode when no commands configured', () => {
+    it('does not fail in strict mode when no commands configured and positionals demanded', () => {
       const argv = yargs('koala')
         .demand(1)
         .strict()
@@ -369,6 +369,17 @@ describe('validation tests', () => {
         })
         .parse()
       argv._[0].should.equal('koala')
+    })
+
+    it('fails in strict mode when no commands configured and extra positionals', (done) => {
+      yargs('koala')
+        .strict()
+        .fail((msg) => {
+          msg.should.equal('Unknown argument: koala')
+          return done()
+        })
+        .parse()
+      expect.fail('no parsing failure')
     })
 
     // addresses: https://github.com/yargs/yargs/issues/791
