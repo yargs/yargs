@@ -32,7 +32,6 @@ function singletonify (inst) {
         return inst.$0
       })
       Argv.__defineGetter__('parsed', () => {
-        console.warn('In future major releases of yargs, "parsed" will be a private field. Use the return value of ".parse()" or ".argv" instead')
         return inst.parsed
       })
     }
