@@ -2414,7 +2414,27 @@ describe('usage tests', () => {
       ])
     })
 
-    it('should call the correct console.log method', () => {
+    it('should print the help using console.error when no arguments were specified', () => {
+      const r = checkUsage(() => {
+        const y = yargs(['--foo'])
+          .options('foo', {
+            alias: 'f',
+            describe: 'foo option'
+          })
+          .wrap(null)
+
+        y.showHelp()
+      })
+
+      r.errors.join('\n').split(/\n+/).should.deep.equal([
+        'Options:',
+        '  --help     Show help  [boolean]',
+        '  --version  Show version number  [boolean]',
+        '  --foo, -f  foo option'
+      ])
+    })
+
+    it('should call the correct console.log method when specified', () => {
       const r = checkUsage(() => {
         const y = yargs(['--foo'])
           .options('foo', {
@@ -2435,7 +2455,7 @@ describe('usage tests', () => {
       ])
     })
 
-    it('should provide a help string to handler when provided', (done) => {
+    it('should call the callback to print when specified', (done) => {
       const y = yargs(['--foo'])
         .options('foo', {
           alias: 'f',
@@ -2443,8 +2463,8 @@ describe('usage tests', () => {
         })
         .wrap(null)
 
-      y.showHelp(testHandler)
-      function testHandler (msg) {
+      y.showHelp(printCallback)
+      function printCallback (msg) {
         msg.split(/\n+/).should.deep.equal([
           'Options:',
           '  --help     Show help  [boolean]',
