@@ -1375,7 +1375,7 @@ describe('yargs dsl tests', () => {
         argv.z.should.equal(15)
       })
 
-      it('deep merge objects when extending when configured', () => {
+      it('deep merges configs when extending when deep-merge-config=true', () => {
         const argv = yargs()
           .parserConfiguration({ 'deep-merge-config': true })
           .config({
@@ -1395,14 +1395,14 @@ describe('yargs dsl tests', () => {
         argv.a.b.should.equal(11)
         argv.a.c.should.equal(12)
         argv.a.d.should.deep.equal([5, 2])
-        argv.a.e.should.equal(1)
+        argv.a.e.should.eql([1])
         argv.a.f.should.equal('no')
         argv.a.g.h.should.equal(122)
         argv.a.i.should.deep.equal([1, 2])
         argv.test.yes.should.equal(1)
       })
 
-      it('do not merge objects by default when extending', () => {
+      it('does not deep merge objects by default', () => {
         const argv = yargs()
           .config({
             extends: './test/fixtures/extends/config_deep.json',
