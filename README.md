@@ -80,8 +80,8 @@ require('yargs') // eslint-disable-line
   })
   .option('verbose', {
     alias: 'v',
-    type: 'count',
-    description: 'Run with verbose logging. Additition 'v's (-vv, -vvv, etc) to run with even more verbose logging.'
+    type: 'boolean',
+    description: 'Run with verbose logging'
   })
   .argv
 ```
