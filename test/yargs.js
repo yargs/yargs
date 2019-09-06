@@ -1377,7 +1377,7 @@ describe('yargs dsl tests', () => {
 
       it('deep merge objects when extending when configured', () => {
         const argv = yargs()
-          .mergeExtends()
+          .parserConfiguration({ 'deep-merge-config': true })
           .config({
             extends: './test/fixtures/extends/config_deep.json',
             a: {

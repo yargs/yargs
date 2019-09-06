@@ -439,7 +439,8 @@ yargs.parserConfiguration({
   "camel-case-expansion": true,
   "dot-notation": true,
   "parse-numbers": true,
-  "boolean-negation": true
+  "boolean-negation": true,
+  "deep-merge-config": false
 })
 ```
 
