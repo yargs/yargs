@@ -145,6 +145,36 @@ describe('middleware', () => {
         .exitProcess(false)
         .parse()
     })
+
+    it('calls an async middleware only once for nested subcommands', (done) => {
+      let callCount = 0
+      let argv = yargs('cmd subcmd')
+        .command(
+          'cmd',
+          'cmd command',
+          function (yargs) {
+            yargs.command(
+              'subcmd',
+              'subcmd command',
+              function (yargs) {}
+            )
+          }
+        )
+        .middleware(async (argv) => {
+          callCount++
+          return argv
+        })
+        .parse()
+
+      if (!(argv instanceof Promise)) done('argv should be a Promise')
+
+      argv
+        .then(() => {
+          callCount.should.equal(1)
+          done()
+        })
+        .catch(err => done(err))
+    })
   })
 
   // see: https://github.com/yargs/yargs/issues/1281
