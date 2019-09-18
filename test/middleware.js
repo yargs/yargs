@@ -160,10 +160,10 @@ describe('middleware', () => {
             )
           }
         )
-        .middleware(async (argv) => {
+        .middleware((argv) => new Promise((resolve) => {
           callCount++
-          return argv
-        })
+          resolve(argv)
+        }))
         .parse()
 
       if (!(argv instanceof Promise)) done('argv should be a Promise')
