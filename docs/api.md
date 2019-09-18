@@ -1147,7 +1147,7 @@ command handler, for example.
 If the arguments have not been parsed, this property is `false`.
 
 If the arguments have been parsed, this contain detailed parsed arguments. See
-the documentation in [yargs-parser `.detailed()`][https://github.com/yargs/yargs-parser/blob/master/README.md#requireyargs-parserdetailedargs-opts]
+the documentation in [yargs-parser `.detailed()`](https://github.com/yargs/yargs-parser/blob/master/README.md#requireyargs-parserdetailedargs-opts)
 for details of this object
 
 <a name="parserConfiguration"></a>.parserConfiguration(obj)
