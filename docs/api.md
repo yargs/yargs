@@ -904,8 +904,8 @@ Locales currently supported:
 * **ru:** Russian.
 * **th:** Thai.
 * **tr:** Turkish.
-* **zh_CN:** Simplified Chinese.
-* **zh_TW:** Traditional Chinese.
+* **zh_CN:** Chinese (Mainland China).
+* **zh_TW:** Chinese (Taiwan).
 
 To submit a new translation for yargs:
 
