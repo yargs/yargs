@@ -1807,6 +1807,80 @@ describe('usage tests', () => {
       ])
     })
 
+    it('should display global non empty groups for commands', () => {
+      const r = checkUsage(() => yargs(['upload', '-h'])
+        .command('upload', 'upload something', yargs => yargs
+          .option('q', {
+            type: 'boolean'
+          })
+          .wrap(null))
+        .option('i', {
+          type: 'boolean',
+          global: true
+        })
+        .option('j', {
+          type: 'boolean',
+          global: false // not global so not preserved, even though the group is
+        })
+        .group(['i', 'j'], 'Awesome Flags:')
+        .help('h')
+        .wrap(null)
+        .parse()
+      )
+
+      r.logs[0].split('\n').should.deep.equal([
+        'usage upload',
+        '',
+        'upload something',
+        '',
+        'Awesome Flags:',
+        '  -i  [boolean]',
+        '',
+        'Options:',
+        '  --version  Show version number  [boolean]',
+        '  -h         Show help  [boolean]',
+        '  -q  [boolean]'
+      ])
+    })
+
+    it('should display global non empty groups for subcommands', () => {
+      const r = checkUsage(() => yargs(['do', 'upload', '-h'])
+        .command('do', 'do something', yargs => yargs
+          .command('upload', 'upload something', yargs => yargs
+            .option('q', {
+              type: 'boolean'
+            })
+            .wrap(null))
+          .wrap(null))
+        .option('i', {
+          type: 'boolean',
+          global: true
+        })
+        .option('j', {
+          type: 'boolean',
+          global: false // not global so not preserved, even though the group is
+        })
+        .group(['i', 'j'], 'Awesome Flags:')
+        .help('h')
+        .wrap(null)
+        .parse()
+      )
+
+      r.logs[0].split('\n').should.deep.equal([
+        'usage do upload',
+        '',
+        'upload something',
+        '',
+        'Awesome Flags:',
+        '  -i  [boolean]',
+        '',
+        'Options:',
+        '  --version  Show version number  [boolean]',
+        '  -h         Show help  [boolean]',
+        '  -q  [boolean]'
+      ])
+    })
+
     it('should list a module command only once', () => {
       const r = checkUsage(() => yargs('--help')
         .command('upload', 'upload something', {
