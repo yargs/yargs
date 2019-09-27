@@ -94,14 +94,17 @@ function Yargs (processArgs, cwd, parentRequire) {
       })
     })
 
-    // preserve all groups not set to local.
-    preservedGroups = Object.keys(groups).reduce((acc, groupName) => {
-      const keys = groups[groupName].filter(key => !(key in localLookup))
-      if (keys.length > 0) {
-        acc[groupName] = keys
-      }
-      return acc
-    }, {})
+    // add all groups not set to local to preserved groups
+    Object.assign(
+      preservedGroups,
+      Object.keys(groups).reduce((acc, groupName) => {
+        const keys = groups[groupName].filter(key => !(key in localLookup))
+        if (keys.length > 0) {
+          acc[groupName] = keys
+        }
+        return acc
+      }, {})
+    )
     // groups can now be reset
     groups = {}
 
