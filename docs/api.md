@@ -883,6 +883,7 @@ Ye be havin' to set the followin' argument land lubber: option
 
 Locales currently supported:
 
+* **be:** Belarusian.
 * **de:** German.
 * **en:** American English.
 * **es:** Spanish.
@@ -895,6 +896,7 @@ Locales currently supported:
 * **ko:** Korean.
 * **nb:** Norwegian Bokmål.
 * **nl:** Dutch.
+* **nn:** Norwegian Nynorsk.
 * **pirate:** American Pirate.
 * **pl:** Polish.
 * **pt:** Portuguese.
@@ -902,7 +904,8 @@ Locales currently supported:
 * **ru:** Russian.
 * **th:** Thai.
 * **tr:** Turkish.
-* **zh_CN:** Chinese.
+* **zh_CN:** Chinese (Mainland China).
+* **zh_TW:** Chinese (Taiwan).
 
 To submit a new translation for yargs:
 
