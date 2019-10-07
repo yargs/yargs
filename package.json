@@ -1,6 +1,6 @@
 {
   "name": "yargs",
-  "version": "11.0.0",
+  "version": "11.1.1",
   "description": "yargs the modern, pirate-themed, successor to optimist.",
   "main": "./index.js",
   "files": [
@@ -16,7 +16,7 @@
     "decamelize": "^1.1.1",
     "find-up": "^2.1.0",
     "get-caller-file": "^1.0.1",
-    "os-locale": "^2.0.0",
+    "os-locale": "^3.1.0",
     "require-directory": "^2.1.1",
     "require-main-filename": "^1.0.1",
     "set-blocking": "^2.0.0",
