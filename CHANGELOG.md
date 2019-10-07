@@ -18,7 +18,6 @@ All notable changes to this project will be documented in this file. See [standa
 ### Features
 
 * make it possible to merge configurations when extending other config. ([#1411](https://github.com/yargs/yargs/issues/1411)) ([5d7ad98](https://github.com/yargs/yargs/commit/5d7ad98))
-* **deps:** yargs-parser with support for collect-unknown-options ([#1421](https://github.com/yargs/yargs/issues/1421)) ([d388a7c](https://github.com/yargs/yargs/commit/d388a7c))
 
 ## [14.0.0](https://github.com/yargs/yargs/compare/v13.3.0...v14.0.0) (2019-07-30)
 
