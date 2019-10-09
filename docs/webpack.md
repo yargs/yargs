@@ -1,11 +1,21 @@
 # Webpack usage examples
 
-## Setup
+## Install yargs
 
-### Javascript
+Install yargs as a production dependency, as it will _not_ be included in the pack (not yet compatible):
+```bash
+$ npm install --save yargs
+```
+
+## Javascript setup (see below for typescript)
+
+Install dev dependencies:
+```bash
+$ npm install --save-dev webpack webpack-cli
+```
 
 Create `src/index.js`:
-```ts
+```js
 const yargs = require('yargs')
 
 console.log(yargs.parse())
@@ -14,12 +24,13 @@ console.log(yargs.parse())
 Create `webpack.config.js`:
 ```js
 const path = require('path');
-const nodeExternals = require('webpack-node-externals');
 
 module.exports = {
   entry: './src/index.js',
-  externals: [nodeExternals()],
-  mode: 'production',
+  // Keep yargs as an external dependency
+  externals: {
+    'yargs': 'commonjs yargs'
+  },
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'index.js'
@@ -28,12 +39,12 @@ module.exports = {
 }
 ```
 
-Install dependencies (all as dev-dependencies, as prod will not need any dependency):
-```bash
-$ npm install --save-dev webpack webpack-cli webpack-node-externals yargs
-```
+## Typescript setup
 
-### Typescript
+Install dev dependencies:
+```bash
+$ npm install --save-dev ts-loader typescript webpack webpack-cli @types/yargs
+```
 
 Create `src/index.ts`:
 ```ts
@@ -54,12 +65,13 @@ Create `tsconfig.json`:
 Create `webpack.config.js`:
 ```js
 const path = require('path');
-const nodeExternals = require('webpack-node-externals');
 
 module.exports = {
   entry: './src/index.ts',
-  externals: [nodeExternals()],
-  mode: 'production',
+  // Keep yargs as an external dependency
+  externals: {
+    'yargs': 'commonjs yargs'
+  },
   module: {
     rules: [
       {
@@ -81,20 +93,15 @@ module.exports = {
 }
 ```
 
-Install dependencies (all as dev-dependencies, as prod will not need any dependency):
-```bash
-$ npm install --save-dev ts-loader typescript webpack webpack-cli webpack-node-externals @types/yargs yargs
-```
-
 ## Build
 
 ```bash
-$ ./node_modules/.bin/webpack
+$ ./node_modules/.bin/webpack --mode=production
 ```
 
 ## Run
 
 ```bash
 $ node dist/index.js
-{ _: [], '$0': 'dist\\index.js' }
+{ _: [], '$0': 'dist/index.js' }
 ```
