@@ -80,6 +80,70 @@ describe('yargs sync/async tests', () => {
     })
   })
 
+  describe('parseAsync', () => {
+    it('should resolve argv when sync handler returns', (done) => {
+      expectResolves(done, ['cmd'], () => {
+        return yargs(['cmd'])
+          .command('cmd', 'description', () => { }, () => { })
+          .parseAsync()
+      })
+    })
+
+    it('should reject when syntax is incorrect and handler sync', (done) => {
+      expectRejects(done, /Unknown argument: unknown-cmd/, () => {
+        return yargs(['unknown-cmd'])
+          .command('cmd', 'description', () => { }, () => { })
+          .strict()
+          .exitProcess(false)
+          .parseAsync()
+      })
+    })
+
+    it('should reject when sync command handler throws', (done) => {
+      expectRejects(done, /handler error/, () => {
+        return yargs(['cmd'])
+          .command('cmd', 'description', () => { }, () => {
+            throw new Error('handler error')
+          })
+          .exitProcess(false)
+          .parseAsync()
+      })
+    })
+
+    it('should resolve argv when async handler resolves', (done) => {
+      expectResolves(done, ['cmd'], () => {
+        return yargs(['cmd'])
+          .command('cmd', 'description', () => { }, () => Promise(
+            (resolve) => process.nextTick(resolve)
+          ))
+          .parseAsync()
+      })
+    })
+
+    it('should reject when syntax is incorrect and handler async', (done) => {
+      expectRejects(done, /Unknown argument: unknown-cmd/, () => {
+        return yargs(['unknown-cmd'])
+          .command('cmd', 'description', () => { }, () => Promise(
+            (resolve) => process.nextTick(resolve)
+          ))
+          .strict()
+          .exitProcess(false)
+          .parseAsync()
+      })
+    })
+
+    it('should reject when async handler rejects', (done) => {
+      expectRejects(done, /handler error/, () => {
+        return yargs(['cmd'])
+          .command('cmd', 'description', () => { }, () => Promise(
+            (_, reject) => process.nextTick(reject, 'handler error')
+          ))
+          .exitProcess(false)
+          .parseAsync()
+      })
+    })
+  })
+
   describe('parseSync', () => {
     it('should return argv when handler is sync', () => {
       expectReturns(['cmd'], () => {
