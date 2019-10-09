@@ -16,162 +16,174 @@ describe('yargs sync/async tests', () => {
   })
 
   describe('parse', () => {
-    it('should return a value when handler is sync', () => {
-      const argv = yargs(['cmd'])
-        .command('cmd', 'description', () => { }, () => { })
-        .parse()
-      expect(isPromise(argv)).to.equal(false)
-      expect(argv._).to.deep.equal(['cmd'])
-    })
-
-    it('should throw when syntax is incorrect', () => {
-      checkOutput(() => {
-        expect(() => {
-          yargs(['unknown-cmd'])
-            .command('cmd', 'description', () => { }, () => { })
-            .strict()
-            .exitProcess(false)
-            .parse()
-        }).to.throw(/Unknown argument: unknown-cmd/)
+    it('should return argv when sync handler returns', () => {
+      expectReturns(['cmd'], () => {
+        return yargs(['cmd'])
+          .command('cmd', 'description', () => { }, () => { })
+          .parse()
       })
     })
 
-    it('should throw when sync command handler throws', () => {
-      checkOutput(() => {
-        expect(() => {
-          yargs(['cmd'])
-            .command('cmd', 'description', () => { }, () => {
-              throw new Error('handler error')
-            })
-            .exitProcess(false)
-            .parse()
-        }).to.throw(/handler error/)
+    it('should throw when syntax is incorrect and handler sync', () => {
+      expectThrows(/Unknown argument: unknown-cmd/, () => {
+        return yargs(['unknown-cmd'])
+          .command('cmd', 'description', () => { }, () => { })
+          .strict()
+          .exitProcess(false)
+          .parse()
       })
     })
 
-    it('should return a resolved promise when async handler resolves', (done) => {
-      const argvPromise = yargs(['cmd'])
-        .command('cmd', 'description', () => { }, () => Promise(
-          (resolve) => setTimeout(() => resolve(), 50)
-        ))
-        .parse()
-      expect(isPromise(argvPromise)).to.equal(true)
-      argvPromise.then(
-        (argv) => {
-          expect(argv._).to.deep.equal(['cmd'])
-          done()
-        },
-        () => done('the promise should have been resolved')
-      )
-    })
-
-    it('should throw when syntax is incorrect although handler is async', () => {
-      checkOutput(() => {
-        expect(() => {
-          yargs(['unknown-cmd'])
-            .command('cmd', 'description', () => { }, () => Promise(
-              (resolve) => setTimeout(() => resolve(), 50)
-            ))
-            .strict()
-            .exitProcess(false)
-            .parse()
-        }).to.throw(/Unknown argument: unknown-cmd/)
+    it('should throw when sync handler throws', () => {
+      expectThrows(/handler error/, () => {
+        return yargs(['cmd'])
+          .command('cmd', 'description', () => { }, () => {
+            throw new Error('handler error')
+          })
+          .exitProcess(false)
+          .parse()
       })
     })
 
-    it('should return a rejected promise when async handler rejects', (done) => {
-      checkOutput(() => {
-        const argvPromise = yargs(['cmd'])
+    it('should resolve argv when async handler resolves', (done) => {
+      expectResolves(done, ['cmd'], () => {
+        return yargs(['cmd'])
           .command('cmd', 'description', () => { }, () => Promise(
-            (_, reject) => setTimeout(() => reject('handler error'), 50)
+            (resolve) => process.nextTick(resolve)
+          ))
+          .parse()
+      })
+    })
+
+    it('should throw when syntax is incorrect and handler is async', () => {
+      expectThrows(/Unknown argument: unknown-cmd/, () => {
+        return yargs(['unknown-cmd'])
+          .command('cmd', 'description', () => { }, () => Promise(
+            (resolve) => process.nextTick(resolve)
           ))
           .strict()
           .exitProcess(false)
           .parse()
-        expect(isPromise(argvPromise)).to.equal(true)
-        argvPromise.then(
-          () => done('the promise should have been rejected'),
-          (err) => {
-            expect(err.message).to.match(/handler error/)
-            done()
-          }
-        )
+      })
+    })
+
+    it('should reject when async handler rejects', (done) => {
+      expectRejects(done, /handler error/, () => {
+        return yargs(['cmd'])
+          .command('cmd', 'description', () => { }, () => Promise(
+            (_, reject) => process.nextTick(reject, 'handler error')
+          ))
+          .strict()
+          .exitProcess(false)
+          .parse()
       })
     })
   })
 
   describe('parseSync', () => {
-    it('should return a value when handler is sync', () => {
-      const argv = yargs(['cmd'])
-        .command('cmd', 'description', () => { }, () => { })
-        .parseSync()
-      expect(isPromise(argv)).to.equal(false)
-      expect(argv._).to.deep.equal(['cmd'])
+    it('should return argv when handler is sync', () => {
+      expectReturns(['cmd'], () => {
+        return yargs(['cmd'])
+          .command('cmd', 'description', () => { }, () => { })
+          .parseSync()
+      })
     })
 
-    it('should throw when syntax is incorrect', () => {
-      checkOutput(() => {
-        expect(() => {
-          yargs(['unknown-cmd'])
-            .command('cmd', 'description', () => { }, () => { })
-            .strict()
-            .exitProcess(false)
-            .parseSync()
-        }).to.throw(/Unknown argument: unknown-cmd/)
+    it('should throw when syntax is incorrect and handler sync', () => {
+      expectThrows(/Unknown argument: unknown-cmd/, () => {
+        return yargs(['unknown-cmd'])
+          .command('cmd', 'description', () => { }, () => { })
+          .strict()
+          .exitProcess(false)
+          .parseSync()
       })
     })
 
     it('should throw when sync command handler throws', () => {
-      checkOutput(() => {
-        expect(() => {
-          yargs(['cmd'])
-            .command('cmd', 'description', () => { }, () => {
-              throw new Error('handler error')
-            })
-            .exitProcess(false)
-            .parseSync()
-        }).to.throw(/handler error/)
+      expectThrows(/handler error/, () => {
+        return yargs(['cmd'])
+          .command('cmd', 'description', () => { }, () => {
+            throw new Error('handler error')
+          })
+          .exitProcess(false)
+          .parseSync()
       })
     })
 
     it('should throw when async handler resolves', () => {
-      checkOutput(() => {
-        expect(() => {
-          yargs(['cmd'])
-            .command('cmd', 'description', () => { }, () => Promise(
-              (resolve) => setTimeout(() => resolve(), 50)
-            ))
-            .exitProcess(false)
-            .parseSync()
-        }).to.throw(/asynchronous parsing results/)
+      expectThrows(/asynchronous parsing results/, () => {
+        return yargs(['cmd'])
+          .command('cmd', 'description', () => { }, () => Promise(
+            (resolve) => process.nextTick(resolve)
+          ))
+          .exitProcess(false)
+          .parseSync()
       })
     })
 
-    it('should throw when syntax is incorrect although handler is async', () => {
-      checkOutput(() => {
-        expect(() => {
-          yargs(['unknown-cmd'])
-            .command('cmd', 'description', () => { }, () => Promise(
-              (resolve) => setTimeout(() => resolve(), 50)
-            ))
-            .strict()
-            .exitProcess(false)
-            .parseSync()
-        }).to.throw(/Unknown argument: unknown-cmd/)
+    it('should throw when syntax is incorrect and handler is async', () => {
+      expectThrows(/Unknown argument: unknown-cmd/, () => {
+        return yargs(['unknown-cmd'])
+          .command('cmd', 'description', () => { }, () => Promise(
+            (resolve) => process.nextTick(resolve)
+          ))
+          .strict()
+          .exitProcess(false)
+          .parseSync()
       })
     })
 
     it('should throw when async handler rejects', () => {
-      checkOutput(() => {
-        expect(() => {
-          yargs(['cmd'])
-            .command('cmd', 'description', () => { }, () => Promise(
-              (_, reject) => setTimeout(() => reject(), 50)
-            ))
-            .exitProcess(false)
-            .parseSync()
-        }).to.throw(/asynchronous parsing results/)
+      expectThrows(/asynchronous parsing results/, () => {
+        return yargs(['cmd'])
+          .command('cmd', 'description', () => { }, () => Promise(
+            (_, reject) => process.nextTick(reject)
+          ))
+          .exitProcess(false)
+          .parseSync()
       })
     })
   })
 })
+
+function expectReturns (positionals, parse) {
+  checkOutput(() => {
+    const argv = parse()
+    expect(isPromise(argv)).to.equal(false)
+    expect(argv._).to.deep.equal(positionals)
+  })
+}
+
+function expectThrows (message, parse) {
+  checkOutput(() => {
+    expect(parse).to.throw(message)
+  })
+}
+
+function expectResolves (done, positionals, parse) {
+  checkOutput(() => {
+    const argvPromise = parse()
+    expect(isPromise(argvPromise)).to.equal(true)
+    argvPromise.then(
+      (argv) => {
+        expect(argv._).to.deep.equal(positionals)
+        done()
+      },
+      () => done('the promise should have been resolved')
+    )
+  })
+}
+
+function expectRejects (done, message, parse) {
+  checkOutput(() => {
+    const argvPromise = parse()
+    expect(isPromise(argvPromise)).to.equal(true)
+    argvPromise.then(
+      () => done('the promise should have been rejected'),
+      (err) => {
+        expect(err.message).to.match(message)
+        done()
+      }
+    )
+  })
+}
