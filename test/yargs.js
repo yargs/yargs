@@ -110,6 +110,18 @@ describe('yargs dsl tests', () => {
     argv.looks.should.eql('good')
   })
 
+  it('should ignore a missing array choice with an empty default', () => {
+    const argv = yargs(['--looks', '--looks', 'good'])
+      .option('looks', {
+        type: 'array',
+        default: [],
+        choices: ['good', 'bad']
+      })
+      .parse()
+
+    argv.looks.should.deep.eql(['good'])
+  })
+
   it('should allow defaultDescription to be set with .option()', () => {
     const optDefaultDescriptions = yargs([])
       .option('port', {
