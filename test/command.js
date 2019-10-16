@@ -2,7 +2,8 @@
 /* global describe, it, beforeEach */
 const yargs = require('../')
 const expect = require('chai').expect
-const checkOutput = require('./helpers/utils').checkOutput
+const checkOutputAsync = require('./helpers/utils').checkOutputAsync
+const promisifyTest = require('./helpers/utils').promisifyTest
 
 require('chai').should()
 const noop = () => {}
@@ -39,8 +40,8 @@ describe('Command', () => {
         .parse()
     })
 
-    it('populates outer argv with positional arguments', () => {
-      const argv = yargs('foo hello world')
+    it('populates outer argv with positional arguments', async () => {
+      const argv = await yargs('foo hello world')
         .command('foo <bar> [awesome]')
         .parse()
 
@@ -49,8 +50,8 @@ describe('Command', () => {
       argv.awesome.should.equal('world')
     })
 
-    it('populates argv with camel-case variants of arguments when possible', () => {
-      const argv = yargs('foo hello world')
+    it('populates argv with camel-case variants of arguments when possible', async () => {
+      const argv = await yargs('foo hello world')
         .command('foo <foo-bar> [baz-qux]')
         .parse()
 
@@ -61,8 +62,8 @@ describe('Command', () => {
       argv['baz-qux'].should.equal('world')
     })
 
-    it('populates argv with camel-case variants of variadic args when possible', () => {
-      const argv = yargs('foo hello world !')
+    it('populates argv with camel-case variants of variadic args when possible', async () => {
+      const argv = await yargs('foo hello world !')
         .command('foo <foo-bar> [baz-qux..]')
         .parse()
 
@@ -102,8 +103,8 @@ describe('Command', () => {
       command.getCommands().should.deep.equal(['foo', 'wat'])
     })
 
-    it('does not overwrite existing values in argv for keys that are not positional', () => {
-      const argv = yargs('foo foo.js --reporter=html')
+    it('does not overwrite existing values in argv for keys that are not positional', async () => {
+      const argv = await yargs('foo foo.js --reporter=html')
         .command('foo <file>')
         .default('reporter', 'text')
         .parse()
@@ -177,8 +178,8 @@ describe('Command', () => {
   })
 
   describe('variadic', () => {
-    it('allows required arguments to be variadic', () => {
-      const argv = yargs('foo /root file1 file2 file3')
+    it('allows required arguments to be variadic', async () => {
+      const argv = await yargs('foo /root file1 file2 file3')
         .command('foo <root> <files..>')
         .parse()
 
@@ -186,8 +187,8 @@ describe('Command', () => {
       argv.files.should.deep.equal(['file1', 'file2', 'file3'])
     })
 
-    it('allows optional arguments to be variadic', () => {
-      const argv = yargs('foo /root file1 file2 file3')
+    it('allows optional arguments to be variadic', async () => {
+      const argv = await yargs('foo /root file1 file2 file3')
         .command('foo <root> [files..]')
         .parse()
 
@@ -205,8 +206,8 @@ describe('Command', () => {
         .parse()
     })
 
-    it('does not fail if zero optional arguments are provided', () => {
-      const argv = yargs('foo /root')
+    it('does not fail if zero optional arguments are provided', async () => {
+      const argv = await yargs('foo /root')
         .command('foo <root> [files...]')
         .parse()
 
@@ -214,8 +215,8 @@ describe('Command', () => {
       argv.files.should.deep.equal([])
     })
 
-    it('only allows the last argument to be variadic', () => {
-      const argv = yargs('foo /root file1 file2')
+    it('only allows the last argument to be variadic', async () => {
+      const argv = await yargs('foo /root file1 file2')
         .command('foo <root..> <file>')
         .parse()
 
@@ -225,8 +226,8 @@ describe('Command', () => {
     })
 
     // addresses: https://github.com/yargs/yargs/issues/1246
-    it('allows camel-case, variadic arguments, and strict mode to be combined', () => {
-      const argv = yargs('ls one two three')
+    it('allows camel-case, variadic arguments, and strict mode to be combined', async () => {
+      const argv = await yargs('ls one two three')
         .command('ls [expandMe...]')
         .strict()
         .parse()
@@ -237,20 +238,22 @@ describe('Command', () => {
   })
 
   describe('missing positional arguments', () => {
-    it('fails if a required argument is missing', (done) => {
-      const argv = yargs('foo hello')
-        .command('foo <bar> <awesome>')
-        .fail((err) => {
-          err.should.match(/got 1, need at least 2/)
-          return done()
-        })
-        .parse()
+    it('fails if a required argument is missing', async () => {
+      await promisifyTest(async (done) => {
+        const argv = await yargs('foo hello')
+          .command('foo <bar> <awesome>')
+          .fail((err) => {
+            err.should.match(/got 1, need at least 2/)
+            return done()
+          })
+          .parse()
 
-      argv.bar.should.equal('hello')
+        argv.bar.should.equal('hello')
+      })
     })
 
-    it('does not fail if optional argument is missing', () => {
-      const argv = yargs('foo hello')
+    it('does not fail if optional argument is missing', async () => {
+      const argv = await yargs('foo hello')
         .command('foo <bar> [awesome]')
         .parse()
 
@@ -581,8 +584,8 @@ describe('Command', () => {
   })
 
   describe('commandDir', () => {
-    it('supports relative dirs', () => {
-      const r = checkOutput(() => yargs('--help').wrap(null)
+    it('supports relative dirs', async () => {
+      const r = await checkOutputAsync(() => yargs('--help').wrap(null)
         .commandDir('fixtures/cmddir')
         .parse())
       r.exit.should.equal(true)
@@ -598,8 +601,8 @@ describe('Command', () => {
       ])
     })
 
-    it('supports nested subcommands', () => {
-      const r = checkOutput(() => yargs('dream --help').wrap(null)
+    it('supports nested subcommands', async () => {
+      const r = await checkOutputAsync(() => yargs('dream --help').wrap(null)
         .commandDir('fixtures/cmddir')
         .parse(), [ './command' ])
       r.exit.should.equal(true)
@@ -618,8 +621,8 @@ describe('Command', () => {
       ])
     })
 
-    it('supports a "recurse" boolean option', () => {
-      const r = checkOutput(() => yargs('--help').wrap(null)
+    it('supports a "recurse" boolean option', async () => {
+      const r = await checkOutputAsync(() => yargs('--help').wrap(null)
         .commandDir('fixtures/cmddir', { recurse: true })
         .parse())
       r.exit.should.equal(true)
@@ -637,11 +640,11 @@ describe('Command', () => {
       ])
     })
 
-    it('supports a "visit" function option', () => {
+    it('supports a "visit" function option', async () => {
       let commandObject
       let pathToFile
       let filename
-      const r = checkOutput(() => yargs('--help').wrap(null)
+      const r = await checkOutputAsync(() => yargs('--help').wrap(null)
         .commandDir('fixtures/cmddir', {
           visit (_commandObject, _pathToFile, _filename) {
             commandObject = _commandObject
@@ -666,8 +669,8 @@ describe('Command', () => {
       ])
     })
 
-    it('detects and ignores cyclic dir references', () => {
-      const r = checkOutput(() => yargs('cyclic --help').wrap(null)
+    it('detects and ignores cyclic dir references', async () => {
+      const r = await checkOutputAsync(() => yargs('cyclic --help').wrap(null)
         .commandDir('fixtures/cmddir_cyclic')
         .parse(), [ './command' ])
       r.exit.should.equal(true)
@@ -682,8 +685,8 @@ describe('Command', () => {
       ])
     })
 
-    it('derives \'command\' string from filename when not exported', () => {
-      const r = checkOutput(() => yargs('--help').wrap(null)
+    it('derives \'command\' string from filename when not exported', async () => {
+      const r = await checkOutputAsync(() => yargs('--help').wrap(null)
         .commandDir('fixtures/cmddir_noname')
         .parse())
       r.exit.should.equal(true)
@@ -701,7 +704,7 @@ describe('Command', () => {
   })
 
   describe('help command', () => {
-    it('displays command help appropriately', () => {
+    it('displays command help appropriately', async () => {
       const sub = {
         command: 'sub',
         desc: 'Run the subcommand',
@@ -718,27 +721,27 @@ describe('Command', () => {
         handler (argv) {}
       }
 
-      const helpCmd = checkOutput(() => yargs('help cmd')
+      const helpCmd = await checkOutputAsync(() => yargs('help cmd')
         .wrap(null)
         .command(cmd)
         .parse(), [ './command' ])
 
-      const cmdHelp = checkOutput(() => yargs('cmd help')
+      const cmdHelp = await checkOutputAsync(() => yargs('cmd help')
         .wrap(null)
         .command(cmd)
         .parse(), [ './command' ])
 
-      const helpCmdSub = checkOutput(() => yargs('help cmd sub')
+      const helpCmdSub = await checkOutputAsync(() => yargs('help cmd sub')
         .wrap(null)
         .command(cmd)
         .parse(), [ './command' ])
 
-      const cmdHelpSub = checkOutput(() => yargs('cmd help sub')
+      const cmdHelpSub = await checkOutputAsync(() => yargs('cmd help sub')
         .wrap(null)
         .command(cmd)
         .parse(), [ './command' ])
 
-      const cmdSubHelp = checkOutput(() => yargs('cmd sub help')
+      const cmdSubHelp = await checkOutputAsync(() => yargs('cmd sub help')
         .wrap(null)
         .command(cmd)
         .parse(), [ './command' ])
@@ -805,42 +808,44 @@ describe('Command', () => {
   })
 
   // addresses https://github.com/yargs/yargs/issues/558
-  it('handles positional arguments if command is invoked using .parse()', () => {
+  it('handles positional arguments if command is invoked using .parse()', async () => {
     const y = yargs([])
       .command('foo <second>', 'the foo command', {})
-    const argv = y.parse(['foo', 'bar'])
+    const argv = await y.parse(['foo', 'bar'])
     argv.second.should.equal('bar')
   })
 
   // addresses https://github.com/yargs/yargs/issues/710
-  it('invokes command handler repeatedly if parse() is called multiple times', () => {
+  it('invokes command handler repeatedly if parse() is called multiple times', async () => {
     let counter = 0
     const y = yargs([])
       .command('foo', 'the foo command', {}, (argv) => {
         counter++
       })
-    y.parse(['foo'])
-    y.parse(['foo'])
+    await y.parse(['foo'])
+    await y.parse(['foo'])
     counter.should.equal(2)
   })
 
   // addresses: https://github.com/yargs/yargs/issues/776
-  it('allows command handler to be invoked repeatedly when help is enabled', (done) => {
+  it('allows command handler to be invoked repeatedly when help is enabled', async () => {
     let counter = 0
     const y = yargs([])
       .command('foo', 'the foo command', {}, (argv) => {
         counter++
       })
-    y.parse(['foo'], noop)
-    y.parse(['foo'], () => {
-      counter.should.equal(2)
-      return done()
+    await y.parse(['foo'], noop)
+    await new Promise((resolve) => {
+      y.parse(['foo'], () => {
+        counter.should.equal(2)
+        resolve()
+      })
     })
   })
 
   // addresses https://github.com/yargs/yargs/issues/522
-  it('does not require builder function to return', () => {
-    const argv = yargs('yo')
+  it('does not require builder function to return', async () => {
+    const argv = await yargs('yo')
       .command('yo [someone]', 'Send someone a yo', (yargs) => {
         yargs.default('someone', 'Pat')
       }, (argv) => {
@@ -850,8 +855,8 @@ describe('Command', () => {
     argv.should.have.property('someone').and.equal('Pat')
   })
 
-  it('allows builder function to parse argv without returning', () => {
-    const argv = yargs('yo Jude')
+  it('allows builder function to parse argv without returning', async () => {
+    const argv = await yargs('yo Jude')
       .command('yo <someone>', 'Send someone a yo', (yargs) => {
         yargs.parse()
       }, (argv) => {
@@ -860,8 +865,8 @@ describe('Command', () => {
     argv.should.have.property('someone').and.equal('Jude')
   })
 
-  it('allows builder function to return parsed argv', () => {
-    const argv = yargs('yo Leslie')
+  it('allows builder function to return parsed argv', async () => {
+    const argv = await yargs('yo Leslie')
       .command('yo <someone>', 'Send someone a yo', yargs => yargs.parse(), (argv) => {
         argv.should.have.property('someone').and.equal('Leslie')
       })
@@ -882,9 +887,9 @@ describe('Command', () => {
     handlers.foo.demanded.should.have.lengthOf(0)
   })
 
-  it('executes a command via alias', () => {
+  it('executes a command via alias', async () => {
     let commandCalled = false
-    const argv = yargs('hi world')
+    const argv = await yargs('hi world')
       .command(['hello <someone>', 'hi'], 'Say hello', {}, (argv) => {
         commandCalled = true
         argv.should.have.property('someone').and.equal('world')
@@ -895,8 +900,8 @@ describe('Command', () => {
   })
 
   describe('positional aliases', () => {
-    it('allows an alias to be defined for a required positional argument', () => {
-      const argv = yargs('yo bcoe 113993')
+    it('allows an alias to be defined for a required positional argument', async () => {
+      const argv = await yargs('yo bcoe 113993')
         .command('yo <user | email> [ssn]', 'Send someone a yo')
         .parse()
       argv.user.should.equal('bcoe')
@@ -904,9 +909,9 @@ describe('Command', () => {
       argv.ssn.should.equal(113993)
     })
 
-    it('allows an alias to be defined for an optional positional argument', () => {
+    it('allows an alias to be defined for an optional positional argument', async () => {
       let argv
-      yargs('yo 113993')
+      await yargs('yo 113993')
         .command('yo [ssn|sin]', 'Send someone a yo', {}, (_argv) => {
           argv = _argv
         })
@@ -915,10 +920,10 @@ describe('Command', () => {
       argv.sin.should.equal(113993)
     })
 
-    it('allows variadic and positional arguments to be combined', () => {
+    it('allows variadic and positional arguments to be combined', async () => {
       const parser = yargs
         .command('yo <user|email> [ ssns | sins... ]', 'Send someone a yo')
-      const argv = parser.parse('yo bcoe 113993 112888')
+      const argv = await parser.parse('yo bcoe 113993 112888')
       argv.user.should.equal('bcoe')
       argv.email.should.equal('bcoe')
       argv.ssns.should.deep.equal([113993, 112888])
@@ -1113,16 +1118,16 @@ describe('Command', () => {
     })
 
     describe('types', () => {
-      it('applies array type globally', () => {
-        const argv = yargs('command --foo 1 2')
+      it('applies array type globally', async () => {
+        const argv = await yargs('command --foo 1 2')
           .command('command', 'a command')
           .array('foo')
           .parse()
         argv.foo.should.eql([1, 2])
       })
 
-      it('allows global setting to be disabled for array type', () => {
-        const argv = yargs('command --foo 1 2')
+      it('allows global setting to be disabled for array type', async () => {
+        const argv = await yargs('command --foo 1 2')
           .command('command', 'a command')
           .array('foo')
           .global('foo', false)
@@ -1184,17 +1189,19 @@ describe('Command', () => {
       })
 
       // addresses https://github.com/yargs/yargs/issues/794
-      it('should bubble errors thrown by coerce function inside commands', (done) => {
-        yargs
-          .command('foo', 'the foo command', (yargs) => {
-            yargs.coerce('x', (arg) => {
-              throw Error('yikes an error')
+      it('should bubble errors thrown by coerce function inside commands', async () => {
+        await promisifyTest(async (done) => {
+          await yargs
+            .command('foo', 'the foo command', (yargs) => {
+              yargs.coerce('x', (arg) => {
+                throw Error('yikes an error')
+              })
             })
-          })
-          .parse('foo -x 99', (err) => {
-            err.message.should.match(/yikes an error/)
-            return done()
-          })
+            .parse('foo -x 99', (err) => {
+              err.message.should.match(/yikes an error/)
+              return done()
+            })
+        }, true)
       })
     })
 
@@ -1386,10 +1393,10 @@ describe('Command', () => {
   })
 
   // addresses: https://github.com/yargs/yargs/issues/819
-  it('should kick along [demand] configuration to commands', () => {
+  it('should kick along [demand] configuration to commands', async () => {
     let called = false
-    const r = checkOutput(() => {
-      yargs('foo')
+    const r = await checkOutputAsync(async () => {
+      await yargs('foo')
         .command('foo', 'foo command', noop, (argv) => {
           called = true
         })
@@ -1467,73 +1474,78 @@ describe('Command', () => {
 
   describe('async', () => {
     // addresses https://github.com/yargs/yargs/issues/510
-    it('fails when the promise returned by the command handler rejects', (done) => {
-      const error = new Error()
-      yargs('foo')
-        .command('foo', 'foo command', noop, (yargs) => Promise.reject(error))
-        .fail((msg, err) => {
-          expect(msg).to.equal(null)
-          expect(err).to.equal(error)
-          done()
-        })
-        .parse()
+    it('fails when the promise returned by the command handler rejects', async () => {
+      await promisifyTest(async (done) => {
+        const error = new Error()
+        await yargs('foo')
+          .command('foo', 'foo command', noop, (yargs) => Promise.reject(error))
+          .fail((msg, err) => {
+            expect(msg).to.equal(null)
+            expect(err).to.equal(error)
+            done()
+          })
+          .parse()
+      }, true)
     })
 
-    it('succeeds when the promise returned by the command handler resolves', (done) => {
-      const handler = new Promise((resolve, reject) => {
-        setTimeout(() => {
-          return resolve(true)
-        }, 5)
-      })
-      const parsed = yargs('foo hello')
-        .command('foo <pos>', 'foo command', () => {}, (yargs) => handler)
-        .fail((msg, err) => {
-          return done(Error('should not have been called'))
+    it('succeeds when the promise returned by the command handler resolves', async () => {
+      await promisifyTest(async (done) => {
+        const handler = new Promise((resolve, reject) => {
+          setTimeout(() => {
+            return resolve(true)
+          }, 5)
         })
-        .parse()
+        const parsed = await yargs('foo hello')
+          .command('foo <pos>', 'foo command', () => {}, (yargs) => handler)
+          .fail((msg, err) => {
+            return done(Error('should not have been called'))
+          })
+          .parse()
 
-      handler.then(called => {
-        called.should.equal(true)
-        parsed.pos.should.equal('hello')
-        return done()
+        handler.then(called => {
+          called.should.equal(true)
+          parsed.pos.should.equal('hello')
+          return done()
+        })
       })
     })
 
     // see: https://github.com/yargs/yargs/issues/1144
-    it('displays error and appropriate help message when handler fails', (done) => {
-      const y = yargs('foo')
-        .command('foo', 'foo command', (yargs) => {
-          yargs.option('bar', {
-            describe: 'bar option'
+    it('displays error and appropriate help message when handler fails', async () => {
+      await promisifyTest(async (done) => {
+        const y = yargs('foo')
+          .command('foo', 'foo command', (yargs) => {
+            yargs.option('bar', {
+              describe: 'bar option'
+            })
+          }, (argv) => {
+            return Promise.reject(Error('foo error'))
           })
-        }, (argv) => {
-          return Promise.reject(Error('foo error'))
-        })
-        .exitProcess(false)
-      // the bug reported in #1144 only happens when
-      // usage.help() is called, this does not occur when
-      // console output is suppressed. tldr; we capture
-      // the log output:
-      let errorLog = ''
-      y._getLoggerInstance().error = (out) => {
-        if (out) errorLog += `${out}\n`
-      }
-      y.parse()
-      // the promise returned by the handler rejects immediately,
-      // so we can wait for a small number of ms:
-      setTimeout(() => {
-        // ensure the appropriate help is displayed:
-        errorLog.should.include('bar option')
-        // ensure error was displayed:
-        errorLog.should.include('foo error')
-        return done()
-      }, 5)
+          .exitProcess(false)
+        // the bug reported in #1144 only happens when
+        // usage.help() is called, this does not occur when
+        // console output is suppressed. tldr; we capture
+        // the log output:
+        let errorLog = ''
+        y._getLoggerInstance().error = (out) => {
+          if (out) errorLog += `${out}\n`
+        }
+        try {
+          await y.parse()
+        } catch (error) {
+          // ensure the appropriate help is displayed:
+          errorLog.should.include('bar option')
+          // ensure error was displayed:
+          errorLog.should.include('foo error')
+          return done()
+        }
+      })
     })
   })
 
   // see: https://github.com/yargs/yargs/issues/1099
-  it('does not coerce number from positional with leading "+"', () => {
-    const argv = yargs.command('$0 <phone>', '', (yargs) => {})
+  it('does not coerce number from positional with leading "+"', async () => {
+    const argv = await yargs.command('$0 <phone>', '', (yargs) => {})
       .parse('+5550100')
     argv.phone.should.equal('+5550100')
   })
