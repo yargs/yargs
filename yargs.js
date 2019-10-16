@@ -548,15 +548,21 @@ function Yargs (processArgs, cwd, parentRequire) {
 
   let parseFn = null
   let parseContext = null
-  self.parse = function parse (args, shortCircuit, _parseFn) {
+  self.parse = async function parse (args, shortCircuit, _parseFn) {
     argsert('[string|array] [function|boolean|object] [function]', [args, shortCircuit, _parseFn], arguments.length)
     freeze()
     if (typeof args === 'undefined') {
-      const argv = self._parseArgs(processArgs)
+      let err, argv
+      try {
+        argv = await self._parseArgs(processArgs)
+      } catch (error) {
+        err = error
+      }
       const tmpParsed = self.parsed
       unfreeze()
       // TODO: remove this compatibility hack when we release yargs@15.x:
       self.parsed = tmpParsed
+      if (err) throw err
       return argv
     }
 
@@ -580,10 +586,16 @@ function Yargs (processArgs, cwd, parentRequire) {
 
     if (parseFn) exitProcess = false
 
-    const parsed = self._parseArgs(args, shortCircuit)
+    let err, parsed
+    try {
+      parsed = await self._parseArgs(args, shortCircuit)
+    } catch (error) {
+      err = error
+    }
     if (parseFn) parseFn(exitError, parsed, output)
     unfreeze()
 
+    if (err) throw err
     return parsed
   }
 
@@ -790,15 +802,14 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
   self.getParserConfiguration = () => parserConfig
 
-  self.showHelp = function (level) {
+  self.showHelp = async function (level) {
     argsert('[string|function]', [level], arguments.length)
-    if (!self.parsed) self._parseArgs(processArgs) // run parser, if it has not already been executed.
+    if (!self.parsed) await self._parseArgs(processArgs) // run parser, if it has not already been executed.
     if (command.hasDefaultCommand()) {
       context.resets++ // override the restriction on top-level positoinals.
       command.runDefaultBuilderOn(self, true)
     }
     usage.showHelp(level)
-    return self
   }
 
   let versionOpt = null
@@ -937,9 +948,9 @@ function Yargs (processArgs, cwd, parentRequire) {
     return self
   }
 
-  self.getCompletion = function (args, done) {
+  self.getCompletion = async function (args, done) {
     argsert('<array> <function>', [args, done], arguments.length)
-    completion.getCompletion(args, done)
+    await completion.getCompletion(args, done)
   }
 
   self.locale = function (locale) {
@@ -1030,7 +1041,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     enumerable: true
   })
 
-  self._parseArgs = function parseArgs (args, shortCircuit, _calledFromCommand, commandIndex) {
+  self._parseArgs = async function parseArgs (args, shortCircuit, _calledFromCommand, commandIndex) {
     let skipValidation = !!_calledFromCommand
     args = args || processArgs
 
@@ -1092,7 +1103,7 @@ function Yargs (processArgs, cwd, parentRequire) {
               // commands are executed using a recursive algorithm that executes
               // the deepest command first; we keep track of the position in the
               // argv._ array that is currently being executed.
-              const innerArgv = command.runCommand(cmd, self, parsed, i + 1)
+              const innerArgv = await command.runCommand(cmd, self, parsed, i + 1)
               return populateDoubleDash ? innerArgv : self._copyDoubleDash(innerArgv)
             } else if (!firstUnknownCommand && cmd !== completionCommand) {
               firstUnknownCommand = cmd
@@ -1102,14 +1113,14 @@ function Yargs (processArgs, cwd, parentRequire) {
 
           // run the default command, if defined
           if (command.hasDefaultCommand() && !skipDefaultCommand) {
-            const innerArgv = command.runCommand(null, self, parsed)
+            const innerArgv = await command.runCommand(null, self, parsed)
             return populateDoubleDash ? innerArgv : self._copyDoubleDash(innerArgv)
           }
 
           // recommend a command if recommendCommands() has
           // been enabled, and no commands were found to execute
           if (recommendCommands && firstUnknownCommand && !skipRecommendation) {
-            validation.recommendCommands(firstUnknownCommand, handlerKeys)
+            await validation.recommendCommands(firstUnknownCommand, handlerKeys)
           }
         }
 
@@ -1120,7 +1131,7 @@ function Yargs (processArgs, cwd, parentRequire) {
           self.exit(0)
         }
       } else if (command.hasDefaultCommand() && !skipDefaultCommand) {
-        const innerArgv = command.runCommand(null, self, parsed)
+        const innerArgv = await command.runCommand(null, self, parsed)
         return populateDoubleDash ? innerArgv : self._copyDoubleDash(innerArgv)
       }
 
@@ -1132,7 +1143,7 @@ function Yargs (processArgs, cwd, parentRequire) {
         // we allow for asynchronous completions,
         // e.g., loading in a list of commands from an API.
         const completionArgs = args.slice(args.indexOf(`--${completion.completionKey}`) + 1)
-        completion.getCompletion(completionArgs, (completions) => {
+        await completion.getCompletion(completionArgs, (completions) => {
           ;(completions || []).forEach((completion) => {
             _logger.log(completion)
           })
@@ -1145,12 +1156,12 @@ function Yargs (processArgs, cwd, parentRequire) {
       // Handle 'help' and 'version' options
       // if we haven't already output help!
       if (!hasOutput) {
-        Object.keys(argv).forEach((key) => {
+        for (let key of Object.keys(argv)) {
           if (key === helpOpt && argv[key]) {
             if (exitProcess) setBlocking(true)
 
             skipValidation = true
-            self.showHelp('log')
+            await self.showHelp('log')
             self.exit(0)
           } else if (key === versionOpt && argv[key]) {
             if (exitProcess) setBlocking(true)
@@ -1159,7 +1170,7 @@ function Yargs (processArgs, cwd, parentRequire) {
             usage.showVersion()
             self.exit(0)
           }
-        })
+        }
       }
 
       // Check if any of the options to skip validation were provided
@@ -1175,11 +1186,11 @@ function Yargs (processArgs, cwd, parentRequire) {
         // if we're executed via bash completion, don't
         // bother with validation.
         if (!requestCompletions) {
-          self._runValidation(argv, aliases, {}, parsed.error)
+          await self._runValidation(argv, aliases, {}, parsed.error)
         }
       }
     } catch (err) {
-      if (err instanceof YError) usage.fail(err.message, err)
+      if (err instanceof YError) await usage.fail(err.message, err)
       else throw err
     }
 
@@ -1198,13 +1209,13 @@ function Yargs (processArgs, cwd, parentRequire) {
 
   self._runValidation = function runValidation (argv, aliases, positionalMap, parseErrors) {
     if (parseErrors) throw new YError(parseErrors.message)
-    validation.nonOptionCount(argv)
-    validation.requiredArguments(argv)
-    if (strict) validation.unknownArguments(argv, aliases, positionalMap)
-    validation.customChecks(argv, aliases)
-    validation.limitedChoices(argv)
-    validation.implications(argv)
-    validation.conflicting(argv)
+    await validation.nonOptionCount(argv)
+    await validation.requiredArguments(argv)
+    if (strict) await validation.unknownArguments(argv, aliases, positionalMap)
+    await validation.customChecks(argv, aliases)
+    await validation.limitedChoices(argv)
+    await validation.implications(argv)
+    await validation.conflicting(argv)
   }
 
   function guessLocale () {
