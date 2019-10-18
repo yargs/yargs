@@ -202,10 +202,7 @@ describe('Completion', () => {
       r.logs.should.include('success!')
     })
 
-    // TODO: currently does not work as getCompletion calls its done callback after its own promise resolved
-    // so after checkOutputAsync as restored logging to its unmocked state
-    // (getCompletion should no longer have a done callback)
-    it.skip('if a promise is returned, completions can be asynchronous', async () => {
+    it('if a promise is returned, completions can be asynchronous', async () => {
       const r = await checkOutputAsync((cb) =>
         yargs(['--get-yargs-completions'])
           .completion('completion', (current, argv) => new Promise((resolve, reject) => {
@@ -220,10 +217,7 @@ describe('Completion', () => {
       r.logs.should.include('banana')
     })
 
-    // TODO: currently does not work as getCompletion calls its done callback after its own promise resolved
-    // so after checkOutputAsync as restored logging to its unmocked state
-    // (getCompletion should no longer have a done callback)
-    it.skip('if a promise is returned, errors are handled', async () => {
+    it('if a promise is returned, errors are handled', async () => {
       try {
         await checkOutputAsync(() =>
           yargs(['--get-yargs-completions'])
@@ -240,10 +234,7 @@ describe('Completion', () => {
       }
     })
 
-    // TODO: currently does not work as getCompletion calls its done callback after its own promise resolved
-    // so after checkOutputAsync as restored logging to its unmocked state
-    // (getCompletion should no longer have a done callback)
-    it.skip('if a callback parameter is provided, completions can be asynchronous', async () => {
+    it('if a callback parameter is provided, completions can be asynchronous', async () => {
       const r = await checkOutputAsync(() =>
         yargs(['--get-yargs-completions'])
           .completion('completion', (current, argv, completion) => {
@@ -358,17 +349,16 @@ describe('Completion', () => {
     describe('getCompletion()', () => {
       it('returns default completion to callback', async () => {
         process.env.SHELL = '/bin/bash'
-        const r = await checkOutputAsync(() =>
-          yargs()
+        const r = await checkOutputAsync(async () => {
+          const completions = await yargs()
             .command('foo', 'bar')
             .command('apple', 'banana')
             .completion()
-            .getCompletion([''], (completions) => {
+            .getCompletion([''])
               ;(completions || []).forEach((completion) => {
                 console.log(completion)
               })
             })
-        )
 
         r.logs.should.include('apple')
         r.logs.should.include('foo')
@@ -454,17 +444,16 @@ describe('Completion', () => {
     describe('getCompletion()', () => {
       it('returns default completion to callback', async () => {
         process.env.SHELL = '/bin/zsh'
-        const r = await checkOutputAsync(() =>
-          yargs()
+        const r = await checkOutputAsync(async () => {
+          const completions = await yargs()
             .command('foo', 'bar')
             .command('apple', 'banana')
             .completion()
-            .getCompletion([''], (completions) => {
+            .getCompletion([''])
               ;(completions || []).forEach((completion) => {
                 console.log(completion)
               })
             })
-        )
 
         r.logs.should.include('apple:banana')
         r.logs.should.include('foo:bar')

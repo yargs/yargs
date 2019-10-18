@@ -948,9 +948,9 @@ function Yargs (processArgs, cwd, parentRequire) {
     return self
   }
 
-  self.getCompletion = async function (args, done) {
-    argsert('<array> <function>', [args, done], arguments.length)
-    await completion.getCompletion(args, done)
+  self.getCompletion = function (args) {
+    argsert('<array>', [args], arguments.length)
+    return completion.getCompletion(args)
   }
 
   self.locale = function (locale) {
@@ -1143,12 +1143,10 @@ function Yargs (processArgs, cwd, parentRequire) {
         // we allow for asynchronous completions,
         // e.g., loading in a list of commands from an API.
         const completionArgs = args.slice(args.indexOf(`--${completion.completionKey}`) + 1)
-        await completion.getCompletion(completionArgs, (completions) => {
-          ;(completions || []).forEach((completion) => {
-            _logger.log(completion)
-          })
+        const completions = await completion.getCompletion(completionArgs)
 
-          self.exit(0)
+        ;(completions || []).forEach((completion) => {
+          _logger.log(completion)
         })
         return (populateDoubleDash || _calledFromCommand) ? argv : self._copyDoubleDash(argv)
       }
