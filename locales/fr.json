@@ -33,5 +33,6 @@
   "Invalid JSON config file: %s": "Fichier de configuration JSON invalide: %s",
   "Path to JSON config file": "Chemin du fichier de configuration JSON",
   "Show help": "Affiche de l'aide",
-  "Show version number": "Affiche le numéro de version"
+  "Show version number": "Affiche le numéro de version",
+  "Arguments %s and %s are mutually exclusive" : "Les arguments %s et %s sont mutuellement exclusifs"
 }
