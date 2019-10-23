@@ -128,7 +128,6 @@ describe('middleware', () => {
             done()
           })
           .parse()
-          .sould.be.rejected
       )
     })
 
