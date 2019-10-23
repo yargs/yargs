@@ -88,6 +88,10 @@ exports.checkOutputAsync = function checkOutputAsync (f, argv) {
     const _error = console.error
     const _log = console.log
     const _warn = console.warn
+    // setBlocking() should only be called before exiting the process, so as we mock process.exit(),
+    // we should also mock setBlocking() to disable its effects
+    const _stdoutSetBlockingHandler = mockSetBlocking(process.stdout)
+    const _stderrSetBlockingHandler = mockSetBlocking(process.stderr)
 
     process.env = Hash.merge(process.env, { _: 'node' })
     process.argv = argv || ['./usage']
@@ -102,39 +106,65 @@ exports.checkOutputAsync = function checkOutputAsync (f, argv) {
 
     let result
 
+    const EXIT_ERROR_MESSAGE = 'CheckOutputAsyncExit'
     process.exit = () => {
       exit = true
-      done()
+      // throwing ensures no more of f() is executed afterwards, as a regular exit would
+      throw new Error(EXIT_ERROR_MESSAGE)
     }
 
     try {
-      await f()
-      if (!exit) done()
+      result = await f()
+      done()
     } catch (err) {
-      reset()
-      reject(err)
+      if (err.message === EXIT_ERROR_MESSAGE) {
+        done()
+      } else {
+        done(err)
+      }
+    }
+
+    function mockSetBlocking (stream) {
+      let oldHandler
+      if (stream._handle && stream.isTTY && typeof stream._handle.setBlocking === 'function') {
+        oldHandler = stream._handle.setBlocking
+        stream._handle.setBlocking = () => {}
+      }
+      return oldHandler
+    }
+
+    function unmockSetBlocking (stream, oldHandler) {
+      if (oldHandler) {
+        stream._handle.setBlocking = oldHandler
+      }
     }
 
     function reset () {
       process.exit = _exit
       process.env = _env
       process.argv = _argv
+      unmockSetBlocking(process.stdout, _stdoutSetBlockingHandler)
+      unmockSetBlocking(process.stderr, _stderrSetBlockingHandler)
 
       console.error = _error
       console.log = _log
       console.warn = _warn
     }
 
-    function done () {
+    function done (err) {
       reset()
 
-      resolve({
-        errors,
-        logs,
-        warnings,
-        exit,
-        result
-      })
+      if (err) {
+        reject(err)
+      } else {
+        resolve({
+          errors,
+          logs,
+          warnings,
+          exit,
+          result
+        })
+      }
     }
   })
 }

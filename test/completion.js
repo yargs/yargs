@@ -114,15 +114,12 @@ describe('Completion', () => {
       r.logs.should.include('cmd2')
     })
 
-    it.skip('works if command has no options', async () => {
+    it('works if command has no options', async () => {
       process.env.SHELL = '/bin/bash'
       const r = await checkOutputAsync(() => yargs(['./completion', '--get-yargs-completions', 'foo', '--b'])
         .help(false)
         .version(false)
         .command('foo', 'foo command', (subYargs) => {
-          // TODO: currently exits test runner as async builder are not awaited
-          // so this parse calls process.exit after the outer parse is resolved
-          // so after checkOutputAsync reset process.exit to its unmocked value
           return subYargs.completion().parse()
         })
         .completion()
@@ -355,10 +352,10 @@ describe('Completion', () => {
             .command('apple', 'banana')
             .completion()
             .getCompletion([''])
-              ;(completions || []).forEach((completion) => {
-                console.log(completion)
-              })
-            })
+          ;(completions || []).forEach((completion) => {
+            console.log(completion)
+          })
+        })
 
         r.logs.should.include('apple')
         r.logs.should.include('foo')
@@ -450,10 +447,10 @@ describe('Completion', () => {
             .command('apple', 'banana')
             .completion()
             .getCompletion([''])
-              ;(completions || []).forEach((completion) => {
-                console.log(completion)
-              })
-            })
+          ;(completions || []).forEach((completion) => {
+            console.log(completion)
+          })
+        })
 
         r.logs.should.include('apple:banana')
         r.logs.should.include('foo:bar')

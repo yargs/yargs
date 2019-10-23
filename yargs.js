@@ -807,7 +807,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     if (!self.parsed) await self._parseArgs(processArgs) // run parser, if it has not already been executed.
     if (command.hasDefaultCommand()) {
       context.resets++ // override the restriction on top-level positoinals.
-      command.runDefaultBuilderOn(self, true)
+      await command.runDefaultBuilderOn(self, true)
     }
     usage.showHelp(level)
   }

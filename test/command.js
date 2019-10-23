@@ -113,9 +113,9 @@ describe('Command', () => {
     })
 
     // bug reported by @boneskull during mocha migration.
-    it('does not load config twice when command executed', () => {
+    it('does not load config twice when command executed', async () => {
       let parseCount = 0
-      yargs('cmd --config=.foo.json')
+      await yargs('cmd --config=.foo.json')
         .command(
           '$0 [foo..]',
           'does a thing',
