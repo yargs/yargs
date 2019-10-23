@@ -611,17 +611,13 @@ describe('validation tests', () => {
           return done()
         })
         .fail((msg) => {
-          expect.fail()
+          return done(new Error('parsing should not have failed'))
         })
         .parse()
     })
 
     // addresses: https://github.com/yargs/yargs/issues/849
-    // TODO: fix this test which used to throw "silently" after calling done(),
-    // as the command handler is called after the fail callback,
-    // and is now broken, as throwing in the handler leads to a second call to fail()
-    // with a null msg (and you can't null.should).
-    it.skip('fails when demandOption is true and choice is not provided', (done) => {
+    it('fails when demandOption is true and choice is not provided', (done) => {
       yargs('one -a 10 marsupial')
         .command('one', 'level one', (yargs) => {
           yargs
@@ -631,8 +627,6 @@ describe('validation tests', () => {
               }
             })
             .demandOption('c')
-        }, (argv) => {
-          expect.fail()
         })
         .fail((msg) => {
           msg.should.equal('Missing required argument: c')
