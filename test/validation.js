@@ -890,8 +890,7 @@ describe('validation tests', () => {
   })
 
   describe('demandCommand', () => {
-    // TODO: fix this test which should not expect a result after yargs called process.exit!
-    it.skip('should return a custom failure message when too many non-hyphenated arguments are found after a demand count', async () => {
+    it('should return a custom failure message when too many non-hyphenated arguments are found after a demand count', async () => {
       const r = await checkOutputAsync(() => yargs(['src', 'dest'])
         .usage('Usage: $0 [x] [y] [z] {OPTIONS} <src> <dest> [extra_files...]')
         .demandCommand(0, 1, 'src and dest files are both required', 'too many arguments are provided')
@@ -900,10 +899,8 @@ describe('validation tests', () => {
         .version(false)
         .parse()
       )
-      r.should.have.property('result')
       r.should.have.property('logs').with.length(0)
       r.should.have.property('exit').and.to.equal(true)
-      r.result.should.have.property('_').and.deep.equal(['src', 'dest'])
       r.errors.join('\n').split(/\n+/).should.deep.equal([
         'Usage: usage [x] [y] [z] {OPTIONS} <src> <dest> [extra_files...]',
         'too many arguments are provided'
