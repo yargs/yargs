@@ -116,8 +116,7 @@ describe('middleware', () => {
 
   // addresses https://github.com/yargs/yargs/issues/1237
   describe('async', () => {
-    // TODO: fix fail() not being called when the middleware rejects
-    it.skip('fails when the promise returned by the middleware rejects', async () => {
+    it('fails when the promise returned by the middleware rejects', async () => {
       const error = new Error('to be passed to fail')
       const handlerErr = new Error('should not have been called')
       await promisifyTest((done) =>
