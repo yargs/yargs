@@ -2,8 +2,7 @@
 /* global describe, it, beforeEach */
 const yargs = require('../')
 const expect = require('chai').expect
-const checkOutputAsync = require('./helpers/utils').checkOutputAsync
-const promisifyTest = require('./helpers/utils').promisifyTest
+const { checkOutputAsync, promisifyTest } = require('./helpers/utils')
 
 require('chai').should()
 const noop = () => {}
