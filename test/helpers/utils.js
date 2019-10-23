@@ -170,11 +170,10 @@ exports.checkOutputAsync = function checkOutputAsync (f, argv) {
 }
 
 /**
- * Wrapper for tests calling a done() callback, and also needing:
- * - either to be async (mocha does not support both using done() and returning a promise)
- * - or to ignore exceptions already handled in .fail() (by setting ignoreExceptions to true)
+ * Wrapper to continue calling done() callback with async tests,
+ * without having mocha to complain about using both
  */
-exports.promisifyTest = function promisifyTest (test, ignoreExceptions = false) {
+exports.promisifyTest = function promisifyTest (test) {
   return new Promise(async (resolve, reject) => {
     let doneCalled = false
     try {
@@ -184,10 +183,7 @@ exports.promisifyTest = function promisifyTest (test, ignoreExceptions = false) 
         resolve()
       })
     } catch (err) {
-      // The test fails when an exception occurs and:
-      // - either the test was not expecting it (ignoreExceptions == false)
-      // - or it did not handle it properly before (doneCalled == false)
-      if (!ignoreExceptions || !doneCalled) reject(err)
+      if (!doneCalled) reject(err)
     }
   })
 }

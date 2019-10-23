@@ -128,7 +128,8 @@ describe('middleware', () => {
             done()
           })
           .parse()
-      , true)
+          .sould.be.rejected
+      )
     })
 
     it('calls the command handler when all middleware promises resolve', (done) => {
