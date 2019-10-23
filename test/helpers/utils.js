@@ -170,7 +170,7 @@ exports.checkOutputAsync = function checkOutputAsync (f, argv) {
 }
 
 /**
- * Wrapper for calling a done() callback, and also needing:
+ * Wrapper for tests calling a done() callback, and also needing:
  * - either to be async (mocha does not support both using done() and returning a promise)
  * - or to ignore exceptions already handled in .fail() (by setting ignoreExceptions to true)
  */
