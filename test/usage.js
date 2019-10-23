@@ -19,19 +19,13 @@ describe('usage tests', () => {
 
   describe('demand options', () => {
     describe('using .demand()', () => {
-      // TODO: fix this test, which expects yargs to return a value after exiting!
-      // checkUsage() allows this, but this is not a "real life" behavior,
-      // so tests should not depend on this
-      it.skip('should show an error along with the missing arguments on demand fail', async () => {
+      it('should show an error along with the missing arguments on demand fail', async () => {
         const r = await checkOutputAsync(() => yargs('-x 10 -z 20')
           .usage('Usage: $0 -x NUM -y NUM')
           .demand(['x', 'y'])
           .wrap(null)
           .parse()
         )
-        r.result.should.have.property('x', 10)
-        r.result.should.have.property('z', 20)
-        r.result.should.have.property('_').with.length(0)
         r.errors.join('\n').split(/\n+/).should.deep.equal([
           'Usage: usage -x NUM -y NUM',
           'Options:',
@@ -45,8 +39,7 @@ describe('usage tests', () => {
         r.exit.should.equal(true)
       })
 
-      // TODO: fix this test, which expects yargs to return a value after exiting!
-      it.skip('missing argument message given if one command, but an argument not on the list is provided', async () => {
+      it('missing argument message given if one command, but an argument not on the list is provided', async () => {
         const r = await checkOutputAsync(() => yargs('wombat -w 10 -y 10')
           .usage('Usage: $0 -w NUM -m NUM')
           .demand(1, ['w', 'm'])
@@ -54,9 +47,6 @@ describe('usage tests', () => {
           .wrap(null)
           .parse()
         )
-        r.result.should.have.property('w', 10)
-        r.result.should.have.property('y', 10)
-        r.result.should.have.property('_').with.length(1)
         r.errors.join('\n').split(/\n+/).should.deep.equal([
           'Usage: usage -w NUM -m NUM',
           'Options:',
@@ -70,8 +60,7 @@ describe('usage tests', () => {
         r.exit.should.equal(true)
       })
 
-      // TODO: fix this test, which expects yargs to return a value after exiting!
-      it.skip('missing command message if all the required arguments exist, but not enough commands are provided', async () => {
+      it('missing command message if all the required arguments exist, but not enough commands are provided', async () => {
         const r = await checkOutputAsync(() => yargs('-w 10 -y 10')
           .usage('Usage: $0 -w NUM -m NUM')
           .demand(1, ['w', 'm'])
@@ -79,9 +68,6 @@ describe('usage tests', () => {
           .wrap(null)
           .parse()
         )
-        r.result.should.have.property('w', 10)
-        r.result.should.have.property('y', 10)
-        r.result.should.have.property('_').with.length(0)
         r.errors.join('\n').split(/\n+/).should.deep.equal([
           'Usage: usage -w NUM -m NUM',
           'Options:',
@@ -113,17 +99,13 @@ describe('usage tests', () => {
       })
 
       describe('using .require()', () => {
-        // TODO: fix this test, which expects yargs to return a value after exiting!
-        it.skip('should show an error along with the missing arguments on demand fail', async () => {
+        it('should show an error along with the missing arguments on demand fail', async () => {
           const r = await checkOutputAsync(() => yargs('-x 10 -z 20')
             .usage('Usage: $0 -x NUM -y NUM')
             .require(['x', 'y'])
             .wrap(null)
             .parse()
           )
-          r.result.should.have.property('x', 10)
-          r.result.should.have.property('z', 20)
-          r.result.should.have.property('_').with.length(0)
           r.errors.join('\n').split(/\n+/).should.deep.equal([
             'Usage: usage -x NUM -y NUM',
             'Options:',
@@ -136,8 +118,7 @@ describe('usage tests', () => {
           r.logs.should.have.length(0)
           r.exit.should.equal(true)
         })
-        // TODO: fix this test, which expects yargs to return a value after exiting!
-        it.skip('missing argument message given if one command and an argument not on the list are provided', async () => {
+        it('missing argument message given if one command and an argument not on the list are provided', async () => {
           const r = await checkOutputAsync(() => yargs('wombat -w 10 -y 10')
             .usage('Usage: $0 -w NUM -m NUM')
             .required(1, ['w', 'm'])
@@ -145,9 +126,6 @@ describe('usage tests', () => {
             .wrap(null)
             .parse()
           )
-          r.result.should.have.property('w', 10)
-          r.result.should.have.property('y', 10)
-          r.result.should.have.property('_').with.length(1)
           r.errors.join('\n').split(/\n+/).should.deep.equal([
             'Usage: usage -w NUM -m NUM',
             'Options:',
@@ -162,8 +140,7 @@ describe('usage tests', () => {
         })
       })
 
-      // TODO: fix this test, which expects yargs to return a value after exiting!
-      it.skip('missing command message if all the required arguments exist, but not enough commands are provided', async () => {
+      it('missing command message if all the required arguments exist, but not enough commands are provided', async () => {
         const r = await checkOutputAsync(() => yargs('-w 10 -y 10')
           .usage('Usage: $0 -w NUM -m NUM')
           .require(1, ['w', 'm'])
@@ -171,9 +148,6 @@ describe('usage tests', () => {
           .wrap(null)
           .parse()
         )
-        r.result.should.have.property('w', 10)
-        r.result.should.have.property('y', 10)
-        r.result.should.have.property('_').with.length(0)
         r.errors.join('\n').split(/\n+/).should.deep.equal([
           'Usage: usage -w NUM -m NUM',
           'Options:',
@@ -188,16 +162,13 @@ describe('usage tests', () => {
       })
     })
 
-    // TODO: fix this test, which expects yargs to return a value after exiting!
-    it.skip('should show an error along with a custom message on demand fail', async () => {
+    it('should show an error along with a custom message on demand fail', async () => {
       const r = await checkOutputAsync(() => yargs('-z 20')
         .usage('Usage: $0 -x NUM -y NUM')
         .demand(['x', 'y'], 'x and y are both required to multiply all the things')
         .wrap(null)
         .parse()
       )
-      r.result.should.have.property('z', 20)
-      r.result.should.have.property('_').with.length(0)
       r.errors.join('\n').split(/\n+/).should.deep.equal([
         'Usage: usage -x NUM -y NUM',
         'Options:',
@@ -341,8 +312,7 @@ describe('usage tests', () => {
     r.should.have.property('exit', false)
   })
 
-  // TODO: fix this test, which expects yargs to return a value after exiting!
-  it.skip('should display missing arguments when check fails with a thrown exception', async () => {
+  it('should display missing arguments when check fails with a thrown exception', async () => {
     const r = await checkOutputAsync(() => yargs('-x 10 -z 20')
       .usage('Usage: $0 -x NUM -y NUM')
       .wrap(null)
@@ -352,10 +322,6 @@ describe('usage tests', () => {
       })
       .parse()
     )
-    r.should.have.property('result')
-    r.result.should.have.property('x', 10)
-    r.result.should.have.property('z', 20)
-    r.result.should.have.property('_').with.length(0)
     r.errors.join('\n').split(/\n+/).should.deep.equal([
       'Usage: usage -x NUM -y NUM',
       'Options:',
@@ -367,8 +333,7 @@ describe('usage tests', () => {
     r.should.have.property('exit').and.equal(true)
   })
 
-  // TODO: fix this test, which expects yargs to return a value after exiting!
-  it.skip('should display missing arguments when check fails with a return value', async () => {
+  it('should display missing arguments when check fails with a return value', async () => {
     const r = await checkOutputAsync(() => yargs('-x 10 -z 20')
       .usage('Usage: $0 -x NUM -y NUM')
       .wrap(null)
@@ -378,10 +343,6 @@ describe('usage tests', () => {
       })
       .parse()
     )
-    r.should.have.property('result')
-    r.result.should.have.property('x', 10)
-    r.result.should.have.property('z', 20)
-    r.result.should.have.property('_').with.length(0)
     r.should.have.property('logs').with.length(0)
     r.should.have.property('exit').and.equal(true)
     r.should.have.property('errors')
@@ -412,8 +373,7 @@ describe('usage tests', () => {
     r.should.have.property('exit', false)
   })
 
-  // TODO: fix this test, which expects yargs to return a value after exiting!
-  it.skip('should display a failed message when check condition fails', async () => {
+  it('should display a failed message when check condition fails', async () => {
     function checker (argv) {
       return 'x' in argv && 'y' in argv
     }
@@ -423,10 +383,6 @@ describe('usage tests', () => {
       .wrap(null)
       .parse()
     )
-    r.should.have.property('result')
-    r.result.should.have.property('x', 10)
-    r.result.should.have.property('z', 20)
-    r.result.should.have.property('_').with.length(0)
     r.should.have.property('logs').with.length(0)
     r.should.have.property('exit').and.equal(true)
     r.should.have.property('errors')
@@ -562,19 +518,15 @@ describe('usage tests', () => {
     r.result.should.have.property('moo', true)
   })
 
-  // TODO: fix this test, which expects yargs to return a value after exiting!
-  it.skip('should return a failure message when not enough non-hyphenated arguments are found after a demand count', async () => {
+  it('should return a failure message when not enough non-hyphenated arguments are found after a demand count', async () => {
     const r = await checkOutputAsync(() => yargs('1 2 --moo')
       .usage('Usage: $0 [x] [y] [z] {OPTIONS}')
       .demand(3)
       .wrap(null)
       .parse()
     )
-    r.should.have.property('result')
     r.should.have.property('logs').with.length(0)
     r.should.have.property('exit').and.equal(true)
-    r.result.should.have.property('_').and.deep.equal([1, 2])
-    r.result.should.have.property('moo', true)
     r.should.have.property('errors')
     r.errors.join('\n').split(/\n+/).should.deep.equal([
       'Usage: usage [x] [y] [z] {OPTIONS}',
@@ -585,19 +537,15 @@ describe('usage tests', () => {
     ])
   })
 
-  // TODO: fix this test, which expects yargs to return a value after exiting!
-  it.skip('should return a custom failure message when not enough non-hyphenated arguments are found after a demand count', async () => {
+  it('should return a custom failure message when not enough non-hyphenated arguments are found after a demand count', async () => {
     const r = await checkOutputAsync(() => yargs('src --moo')
       .usage('Usage: $0 [x] [y] [z] {OPTIONS} <src> <dest> [extra_files...]')
       .demand(2, 'src and dest files are both required')
       .wrap(null)
       .parse()
     )
-    r.should.have.property('result')
     r.should.have.property('logs').with.length(0)
     r.should.have.property('exit').and.equal(true)
-    r.result.should.have.property('_').and.deep.equal(['src'])
-    r.result.should.have.property('moo', true)
     r.should.have.property('errors')
     r.errors.join('\n').split(/\n+/).should.deep.equal([
       'Usage: usage [x] [y] [z] {OPTIONS} <src> <dest> [extra_files...]',
@@ -667,8 +615,7 @@ describe('usage tests', () => {
 
   describe('required arguments', () => {
     describe('with options object', () => {
-      // TODO: fix this test, which expects yargs to return a value after exiting!
-      it.skip('should show a failure message if a required option is missing', async () => {
+      it('should show a failure message if a required option is missing', async () => {
         const r = await checkOutputAsync(() => {
           const opts = {
             foo: { description: 'foo option', alias: 'f', requiresArg: true },
@@ -681,8 +628,6 @@ describe('usage tests', () => {
             .wrap(null)
             .parse()
         })
-        r.should.have.property('result')
-        r.result.should.have.property('_').with.length(0)
         r.should.have.property('errors')
         r.should.have.property('logs').with.length(0)
         r.should.have.property('exit').and.equal(true)
@@ -697,8 +642,7 @@ describe('usage tests', () => {
         ])
       })
 
-      // TODO: fix this test, which expects yargs to return a value after exiting!
-      it.skip('should show a failure message if more than one required option is missing', async () => {
+      it('should show a failure message if more than one required option is missing', async () => {
         const r = await checkOutputAsync(() => {
           const opts = {
             foo: { description: 'foo option', alias: 'f', requiresArg: true },
@@ -711,8 +655,6 @@ describe('usage tests', () => {
             .wrap(null)
             .parse()
         })
-        r.should.have.property('result')
-        r.result.should.have.property('_').with.length(0)
         r.should.have.property('errors')
         r.should.have.property('logs').with.length(0)
         r.should.have.property('exit').and.equal(true)
@@ -729,8 +671,7 @@ describe('usage tests', () => {
     })
 
     describe('with requiresArg method', () => {
-      // TODO: fix this test, which expects yargs to return a value after exiting!
-      it.skip('should show a failure message if a required option is missing', async () => {
+      it('should show a failure message if a required option is missing', async () => {
         const r = await checkOutputAsync(() => {
           const opts = {
             foo: { description: 'foo option', alias: 'f' },
@@ -744,8 +685,6 @@ describe('usage tests', () => {
             .wrap(null)
             .parse()
         })
-        r.should.have.property('result')
-        r.result.should.have.property('_').with.length(0)
         r.should.have.property('errors')
         r.should.have.property('logs').with.length(0)
         r.should.have.property('exit').and.equal(true)
@@ -776,8 +715,7 @@ describe('usage tests', () => {
   })
 
   describe('with strict() option set', () => {
-    // TODO: fix this test, which expects yargs to return a value after exiting!
-    it.skip('should fail given an option argument that is not demanded', async () => {
+    it('should fail given an option argument that is not demanded', async () => {
       const r = await checkOutputAsync(() => {
         const opts = {
           foo: { demand: 'foo option', alias: 'f' },
@@ -792,13 +730,6 @@ describe('usage tests', () => {
           .parse()
       })
 
-      r.should.have.property('result')
-      r.result.should.have.property('_').with.length(0)
-      r.result.should.have.property('f', 10)
-      r.result.should.have.property('foo', 10)
-      r.result.should.have.property('b', 20)
-      r.result.should.have.property('bar', 20)
-      r.result.should.have.property('baz', 30)
       r.should.have.property('errors')
       r.errors.join('\n').split(/\n+/).should.deep.equal([
         'Usage: usage [options]',
@@ -883,8 +814,7 @@ describe('usage tests', () => {
       })
     })
 
-    // TODO: fix this test, which expects yargs to return a value after exiting!
-    it.skip('should fail given an option argument without a corresponding description', async () => {
+    it('should fail given an option argument without a corresponding description', async () => {
       const r = await checkOutputAsync(() => {
         const opts = {
           foo: { description: 'foo option', alias: 'f' },
@@ -899,13 +829,6 @@ describe('usage tests', () => {
           .parse()
       })
 
-      r.should.have.property('result')
-      r.result.should.have.property('_').with.length(0)
-      r.result.should.have.property('f', 10)
-      r.result.should.have.property('foo', 10)
-      r.result.should.have.property('b', 20)
-      r.result.should.have.property('bar', 20)
-      r.result.should.have.property('baz', 30)
       r.should.have.property('errors')
       r.errors.join('\n').split(/\n+/).should.deep.equal([
         'Usage: usage [options]',
@@ -920,8 +843,7 @@ describe('usage tests', () => {
       r.should.have.property('exit').and.equal(true)
     })
 
-    // TODO: fix this test, which expects yargs to return a value after exiting!
-    it.skip('should fail given multiple option arguments without corresponding descriptions', async () => {
+    it('should fail given multiple option arguments without corresponding descriptions', async () => {
       const r = await checkOutputAsync(() => {
         const opts = {
           foo: { description: 'foo option', alias: 'f' },
@@ -936,14 +858,6 @@ describe('usage tests', () => {
           .parse()
       })
 
-      r.should.have.property('result')
-      r.result.should.have.property('_').with.length(0)
-      r.result.should.have.property('f', 10)
-      r.result.should.have.property('foo', 10)
-      r.result.should.have.property('b', 20)
-      r.result.should.have.property('bar', 20)
-      r.result.should.have.property('baz', 30)
-      r.result.should.have.property('q', 40)
       r.should.have.property('errors')
       r.errors.join('\n').split(/\n+/).should.deep.equal([
         'Usage: usage [options]',
@@ -982,8 +896,7 @@ describe('usage tests', () => {
     })
   })
 
-  // TODO: fix this test, which expects yargs to return a value after exiting!
-  it.skip('should display example on fail', async () => {
+  it('should display example on fail', async () => {
     const r = await checkOutputAsync(() => yargs('')
       .example('$0 something', 'description')
       .example('$0 something else', 'other description')
@@ -991,8 +904,6 @@ describe('usage tests', () => {
       .wrap(null)
       .parse()
     )
-    r.should.have.property('result')
-    r.result.should.have.property('_').with.length(0)
     r.should.have.property('errors')
     r.should.have.property('logs').with.length(0)
     r.should.have.property('exit').and.equal(true)
@@ -1010,8 +921,7 @@ describe('usage tests', () => {
 
   describe('demand option with boolean flag', () => {
     describe('with demand option', () => {
-      // TODO: fix this test, which expects yargs to return a value after exiting!
-      it.skip('should report missing required arguments', async () => {
+      it('should report missing required arguments', async () => {
         const r = await checkOutputAsync(() => yargs('-y 10 -z 20')
           .usage('Usage: $0 -x NUM [-y NUM]')
           .options({
@@ -1021,9 +931,6 @@ describe('usage tests', () => {
           .wrap(null)
           .parse()
         )
-        r.result.should.have.property('y', 10)
-        r.result.should.have.property('z', 20)
-        r.result.should.have.property('_').with.length(0)
         r.errors.join('\n').split(/\n/).should.deep.equal([
           'Usage: usage -x NUM [-y NUM]',
           '',
@@ -1041,8 +948,7 @@ describe('usage tests', () => {
     })
 
     describe('with required option', () => {
-      // TODO: fix this test, which expects yargs to return a value after exiting!
-      it.skip('should report missing required arguments', async () => {
+      it('should report missing required arguments', async () => {
         const r = await checkOutputAsync(() => yargs('-y 10 -z 20')
           .usage('Usage: $0 -x NUM [-y NUM]')
           .options({
@@ -1052,9 +958,6 @@ describe('usage tests', () => {
           .wrap(null)
           .parse()
         )
-        r.result.should.have.property('y', 10)
-        r.result.should.have.property('z', 20)
-        r.result.should.have.property('_').with.length(0)
         r.errors.join('\n').split(/\n/).should.deep.equal([
           'Usage: usage -x NUM [-y NUM]',
           '',
@@ -1089,15 +992,12 @@ describe('usage tests', () => {
   })
 
   describe('help option', () => {
-    // TODO: fix this test, which expects yargs to return a value after exiting!
-    it.skip('should display usage', async () => {
+    it('should display usage', async () => {
       const r = await checkOutputAsync(() => yargs(['--help'])
         .demand(['y'])
         .wrap(null)
         .parse()
       )
-      r.should.have.property('result')
-      r.result.should.have.property('_').with.length(0)
       r.should.have.property('errors')
       r.should.have.property('logs').with.length(1)
       r.should.have.property('exit').and.equal(true)
@@ -1109,8 +1009,7 @@ describe('usage tests', () => {
       ])
     })
 
-    // TODO: fix this test, which expects yargs to return a value after exiting!
-    it.skip('should not show both dashed and camelCase aliases', async () => {
+    it('should not show both dashed and camelCase aliases', async () => {
       const r = await checkOutputAsync(() => yargs(['--help'])
         .usage('Usage: $0 options')
         .describe('some-opt', 'Some option')
@@ -1118,8 +1017,6 @@ describe('usage tests', () => {
         .wrap(null)
         .parse()
       )
-      r.should.have.property('result')
-      r.result.should.have.property('_').with.length(0)
       r.should.have.property('exit').and.equal(true)
       r.should.have.property('errors').with.length(0)
       r.should.have.property('logs')
@@ -1191,15 +1088,12 @@ describe('usage tests', () => {
   })
 
   describe('version option', () => {
-    // TODO: fix this test, which expects yargs to return a value after exiting!
-    it.skip('should display version', async () => {
+    it('should display version', async () => {
       const r = await checkOutputAsync(() => yargs(['--version'])
         .version('version', 'Show version number', '1.0.1')
         .wrap(null)
         .parse()
       )
-      r.should.have.property('result')
-      r.result.should.have.property('_').with.length(0)
       r.should.have.property('errors')
       r.should.have.property('logs').with.length(1)
       r.should.have.property('exit').and.equal(true)
@@ -1264,8 +1158,7 @@ describe('usage tests', () => {
   })
 
   describe('showHelpOnFail', () => {
-    // TODO: fix this test, which expects yargs to return a value after exiting!
-    it.skip('should display user supplied message', async () => {
+    it('should display user supplied message', async () => {
       const opts = {
         foo: { desc: 'foo option', alias: 'f' },
         bar: { desc: 'bar option', alias: 'b' }
@@ -1279,8 +1172,6 @@ describe('usage tests', () => {
         .wrap(null)
         .parse()
       )
-      r.should.have.property('result')
-      r.result.should.have.property('_').with.length(0)
       r.should.have.property('errors')
       r.should.have.property('logs').with.length(0)
       r.should.have.property('exit').and.equal(true)
