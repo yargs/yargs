@@ -98,6 +98,10 @@ npm i @types/yargs --save-dev
 
 See usage examples in [docs](/docs/typescript.md).
 
+## Webpack
+
+See usage examples of yargs with webpack in [docs](/docs/webpack.md).
+
 ## Community :
 
 Having problems? want to contribute? join our [community slack](http://devtoolscommunity.herokuapp.com).
