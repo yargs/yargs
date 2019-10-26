@@ -135,6 +135,45 @@ describe('Command', () => {
         .parse()
       parseCount.should.equal(1)
     })
+
+    // see: https://github.com/yargs/yargs/issues/1457
+    it('handles -- in conjunction with positional arguments', () => {
+      let called = false
+      const argv = yargs('foo hello world series -- apple banana')
+        .command('foo <bar> [awesome...]', 'my awesome command', noop, (argv2) => {
+          argv2.bar.should.eql('hello')
+          argv2.awesome.should.eql(['world', 'series'])
+          argv2['_'].should.eql(['foo', 'apple', 'banana'])
+          called = true
+        })
+        .parse()
+      argv.bar.should.eql('hello')
+      argv.awesome.should.eql(['world', 'series'])
+      argv['_'].should.eql(['foo', 'apple', 'banana'])
+      called.should.equal(true)
+    })
+
+    // see: https://github.com/yargs/yargs/issues/1457
+    it('continues to support populate-- for commands, post #1457', () => {
+      let called = false
+      const argv = yargs('foo hello world series -- apple banana')
+        .command('foo <bar> [awesome...]', 'my awesome command', noop, (argv2) => {
+          argv2.bar.should.eql('hello')
+          argv2.awesome.should.eql(['world', 'series'])
+          argv2['_'].should.eql(['foo'])
+          argv2['--'].should.eql(['apple', 'banana'])
+          called = true
+        })
+        .parserConfiguration({
+          'populate--': true
+        })
+        .parse()
+      argv.bar.should.eql('hello')
+      argv.awesome.should.eql(['world', 'series'])
+      argv['_'].should.eql(['foo'])
+      argv['--'].should.eql(['apple', 'banana'])
+      called.should.equal(true)
+    })
   })
 
   describe('variadic', () => {

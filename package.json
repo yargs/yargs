@@ -48,7 +48,7 @@
     "yargs-test-extends": "^1.0.1"
   },
   "scripts": {
-    "pretest": "standard",
+    "posttest": "standard",
     "test": "nyc --cache mocha --require ./test/before.js --timeout=12000 --check-leaks",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
     "release": "standard-version"
