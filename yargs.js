@@ -1,5 +1,9 @@
 'use strict'
 
+// an async function fails early in Node.js versions prior to 8.
+async function requiresNode8OrGreater () {}
+requiresNode8OrGreater()
+
 const argsert = require('./lib/argsert')
 const fs = require('fs')
 const Command = require('./lib/command')
