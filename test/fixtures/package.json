@@ -3,8 +3,7 @@
   "repository": {
     "type": "svn"
   },
-  "yargs": {
-    "dot-notation": false,
-    "boolean-negation": false
+  "blerg": {
+    "dot-notation": false
   }
 }
