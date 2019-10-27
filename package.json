@@ -32,6 +32,7 @@
     "yargs-parser": "^16.0.0"
   },
   "devDependencies": {
+    "c8": "^6.0.1",
     "chai": "^4.2.0",
     "chalk": "^2.4.2",
     "coveralls": "^3.0.3",
@@ -40,7 +41,6 @@
     "es6-promise": "^4.2.5",
     "hashish": "0.0.4",
     "mocha": "^5.2.0",
-    "nyc": "^14.1.0",
     "rimraf": "^2.6.3",
     "standard": "^12.0.1",
     "standard-version": "^7.0.0",
@@ -48,9 +48,10 @@
     "yargs-test-extends": "^1.0.1"
   },
   "scripts": {
+    "fix": "standard --fix",
     "pretest": "standard",
-    "test": "nyc --cache mocha --require ./test/before.js --timeout=12000 --check-leaks",
-    "coverage": "nyc report --reporter=text-lcov | coveralls",
+    "test": "c8 --reporter=html --reporter=text mocha --require ./test/before.js --timeout=12000 --check-leaks",
+    "coverage": "c8 report --reporter=text-lcov | coveralls",
     "release": "standard-version"
   },
   "repository": {

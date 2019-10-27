@@ -1177,7 +1177,7 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   self._runValidation = function runValidation (argv, aliases, positionalMap, parseErrors) {
-    if (parseErrors) throw new YError(parseErrors.message || parseErrors)
+    if (parseErrors) throw new YError(parseErrors.message)
     validation.nonOptionCount(argv)
     validation.requiredArguments(argv)
     if (strict) validation.unknownArguments(argv, aliases, positionalMap)
@@ -1189,15 +1189,8 @@ function Yargs (processArgs, cwd, parentRequire) {
 
   function guessLocale () {
     if (!detectLocale) return
-
-    try {
-      const { env } = process
-      const locale = env.LC_ALL || env.LC_MESSAGES || env.LANG || env.LANGUAGE || 'en_US'
-      self.locale(locale.replace(/[.:].*/, ''))
-    } catch (err) {
-      // if we explode looking up locale just noop
-      // we'll keep using the default language 'en'.
-    }
+    const locale = process.env.LC_ALL || process.env.LC_MESSAGES || process.env.LANG || process.env.LANGUAGE || 'en_US'
+    self.locale(locale.replace(/[.:].*/, ''))
   }
 
   // an app should almost always have --version and --help,

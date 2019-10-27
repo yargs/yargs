@@ -617,6 +617,12 @@ describe('yargs dsl tests', () => {
   })
 
   describe('locale', () => {
+    function loadLocale (locale) {
+      delete require.cache[require.resolve('../')]
+      yargs = require('../')
+      process.env.LC_ALL = locale
+    }
+
     it('uses english as a default locale', () => {
       ['LANGUAGE', 'LC_ALL', 'LANG', 'LC_MESSAGES'].forEach((e) => {
         delete process.env[e]
@@ -648,12 +654,6 @@ describe('yargs dsl tests', () => {
 
       loadLocale('en_US.UTF-8')
     })
-
-    function loadLocale (locale) {
-      delete require.cache[require.resolve('../')]
-      yargs = require('../')
-      process.env.LC_ALL = locale
-    }
 
     it("allows a locale other than the default 'en' to be specified", () => {
       const r = checkOutput(() => {
