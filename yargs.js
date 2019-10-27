@@ -1,4 +1,5 @@
 'use strict'
+
 const argsert = require('./lib/argsert')
 const fs = require('fs')
 const Command = require('./lib/command')
@@ -603,7 +604,7 @@ function Yargs (processArgs, cwd, parentRequire) {
 
       const demand = opt.demand || opt.required || opt.require
 
-      // deprecated, use 'demandOption' instead
+      // A required option can be specified via "demand: true".
       if (demand) {
         self.demand(key, demand)
       }
@@ -1031,13 +1032,6 @@ function Yargs (processArgs, cwd, parentRequire) {
 
     options.__ = y18n.__
     options.configuration = self.getParserConfiguration()
-
-    // Deprecated
-    let pkgConfig = pkgUp()['yargs']
-    if (pkgConfig) {
-      console.warn('Configuring yargs through package.json is deprecated and will be removed in a future major release, please use the JS API instead.')
-      options.configuration = Object.assign({}, pkgConfig, options.configuration)
-    }
 
     const parsed = Parser.detailed(args, options)
     let argv = parsed.argv

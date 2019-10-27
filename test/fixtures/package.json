@@ -2,9 +2,5 @@
   "version": "9.9.9",
   "repository": {
     "type": "svn"
-  },
-  "yargs": {
-    "dot-notation": false,
-    "boolean-negation": false
   }
 }

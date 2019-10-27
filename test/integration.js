@@ -191,18 +191,6 @@ describe('integration tests', () => {
             return done()
           })
         })
-
-        it('is overridden by yargs.parserConfiguration', (done) => {
-          testCmd('./configured-bin.js', [ '--foo.bar', '--no-baz' ], (code, stdout) => {
-            if (code) {
-              return done(new Error(`cmd exited with code ${code}`))
-            }
-
-            stdout.should.not.match(/foo\.bar/)
-            stdout.should.match(/noBaz/)
-            return done()
-          })
-        })
       })
 
       after(() => {
