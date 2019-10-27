@@ -1678,7 +1678,7 @@ describe('yargs dsl tests', () => {
 
     it('allows an alternative cwd to be specified', () => {
       const argv = yargs('--foo a')
-        .pkgConf('yargs', './test/fixtures')
+        .pkgConf('blerg', './test/fixtures')
         .parse()
 
       argv.foo.should.equal('a')
