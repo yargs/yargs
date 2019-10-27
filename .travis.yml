@@ -15,4 +15,12 @@ cache:
   directories:
     - "node_modules"
 
-after_success: if [[ "$TRAVIS_OS_NAME" != 'windows' ]]; then npm run coverage; fi
+jobs:
+  include:
+    - stage: coverage
+      node_js: "13"
+      os:
+        - linux
+      script:
+        - npm t
+        - npm run coverage
