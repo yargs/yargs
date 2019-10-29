@@ -1,4 +1,9 @@
 'use strict'
+
+// an async function fails early in Node.js versions prior to 8.
+async function requiresNode8OrGreater () {}
+requiresNode8OrGreater()
+
 const argsert = require('./lib/argsert')
 const fs = require('fs')
 const Command = require('./lib/command')
@@ -603,7 +608,7 @@ function Yargs (processArgs, cwd, parentRequire) {
 
       const demand = opt.demand || opt.required || opt.require
 
-      // deprecated, use 'demandOption' instead
+      // A required option can be specified via "demand: true".
       if (demand) {
         self.demand(key, demand)
       }
@@ -1032,13 +1037,6 @@ function Yargs (processArgs, cwd, parentRequire) {
     options.__ = y18n.__
     options.configuration = self.getParserConfiguration()
 
-    // Deprecated
-    let pkgConfig = pkgUp()['yargs']
-    if (pkgConfig) {
-      console.warn('Configuring yargs through package.json is deprecated and will be removed in a future major release, please use the JS API instead.')
-      options.configuration = Object.assign({}, pkgConfig, options.configuration)
-    }
-
     const populateDoubleDash = !!options.configuration['populate--']
     const config = Object.assign({}, options.configuration, {
       'populate--': true
@@ -1046,6 +1044,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     const parsed = Parser.detailed(args, Object.assign({}, options, {
       configuration: config
     }))
+
     let argv = parsed.argv
     if (parseContext) argv = Object.assign({}, argv, parseContext)
     const aliases = parsed.aliases
@@ -1198,7 +1197,7 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   self._runValidation = function runValidation (argv, aliases, positionalMap, parseErrors) {
-    if (parseErrors) throw new YError(parseErrors.message || parseErrors)
+    if (parseErrors) throw new YError(parseErrors.message)
     validation.nonOptionCount(argv)
     validation.requiredArguments(argv)
     if (strict) validation.unknownArguments(argv, aliases, positionalMap)
@@ -1210,15 +1209,8 @@ function Yargs (processArgs, cwd, parentRequire) {
 
   function guessLocale () {
     if (!detectLocale) return
-
-    try {
-      const { env } = process
-      const locale = env.LC_ALL || env.LC_MESSAGES || env.LANG || env.LANGUAGE || 'en_US'
-      self.locale(locale.replace(/[.:].*/, ''))
-    } catch (err) {
-      // if we explode looking up locale just noop
-      // we'll keep using the default language 'en'.
-    }
+    const locale = process.env.LC_ALL || process.env.LC_MESSAGES || process.env.LANG || process.env.LANGUAGE || 'en_US'
+    self.locale(locale.replace(/[.:].*/, ''))
   }
 
   // an app should almost always have --version and --help,

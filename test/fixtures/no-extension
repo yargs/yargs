@@ -4,4 +4,7 @@
 
 var parser = require('../../yargs.js')(process.argv.slice(2))
 
-console.log(parser.argv)
+console.log(parser.parserConfiguration({
+    'dot-notation': false,
+    'boolean-negation': false
+}).argv)
