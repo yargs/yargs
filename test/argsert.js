@@ -83,6 +83,30 @@ describe('Argsert', () => {
     o.warnings[0].should.match(/Too many arguments provided. Expected max 2 but received 3./)
   })
 
+  it('warn with argument position if wrong type is provided for argument', () => {
+    const o = checkOutput(() => {
+      function foo (opts) {
+        argsert('<string> <string> <string>', [].slice.call(arguments))
+      }
+
+      foo('hello', 'ayy', {})
+    })
+
+    o.warnings[0].should.match(/Invalid third argument. Expected string but received obj./)
+  })
+
+  it('warn with generic argument position if wrong type is provided for seventh or greater argument', () => {
+    const o = checkOutput(() => {
+      function foo (opts) {
+        argsert('<string> <string> <string> <string> <string> <string> <string>', [].slice.call(arguments))
+      }
+
+      foo('a', 'b', 'c', 'd', 'e', 'f', 10)
+    })
+
+    o.warnings[0].should.match(/Invalid manyith argument. Expected string but received number./)
+  })
+
   it('configures function to accept 0 parameters, if only arguments object is provided', () => {
     const o = checkOutput(() => {
       function foo (expected) {
