@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [14.2.1](https://github.com/yargs/yargs/compare/v14.2.0...v14.2.1) (2019-10-30)
+
+
+### Bug Fixes
+
+* stop-parse was not being respected by commands ([#1459](https://github.com/yargs/yargs/issues/1459)) ([e78e76e](https://github.com/yargs/yargs/commit/e78e76e3ac0551d4f30c71a05ddb21582960fcef))
+
 ## [14.2.0](https://github.com/yargs/yargs/compare/v14.1.0...v14.2.0) (2019-10-07)
 
 
