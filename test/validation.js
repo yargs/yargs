@@ -848,6 +848,19 @@ describe('validation tests', () => {
       args.foo.should.equal(true)
       args.bar.should.equal(true)
     })
+
+    it('does not fail when unrecognized option is passed after --', () => {
+      const args = yargs('ahoy ben -- --arrr')
+        .strict()
+        .command('ahoy <matey>', 'piratical courtesy')
+        .option('arrr', { boolean: true, describe: false })
+        .fail((msg) => {
+          expect.fail(msg)
+        })
+        .parse()
+      args.matey.should.equal('ben')
+      args._.should.deep.equal(['ahoy', '--arrr'])
+    })
   })
 
   describe('demandOption', () => {
