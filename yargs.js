@@ -1030,14 +1030,21 @@ function Yargs (processArgs, cwd, parentRequire) {
     enumerable: true
   })
 
-  self._parseArgs = function parseArgs (args, shortCircuit, _skipValidation, commandIndex) {
-    let skipValidation = !!_skipValidation
+  self._parseArgs = function parseArgs (args, shortCircuit, _calledFromCommand, commandIndex) {
+    let skipValidation = !!_calledFromCommand
     args = args || processArgs
 
     options.__ = y18n.__
     options.configuration = self.getParserConfiguration()
 
-    const parsed = Parser.detailed(args, options)
+    const populateDoubleDash = !!options.configuration['populate--']
+    const config = Object.assign({}, options.configuration, {
+      'populate--': true
+    })
+    const parsed = Parser.detailed(args, Object.assign({}, options, {
+      configuration: config
+    }))
+
     let argv = parsed.argv
     if (parseContext) argv = Object.assign({}, argv, parseContext)
     const aliases = parsed.aliases
@@ -1052,7 +1059,7 @@ function Yargs (processArgs, cwd, parentRequire) {
       // are two passes through the parser. If completion
       // is being performed short-circuit on the first pass.
       if (shortCircuit) {
-        return argv
+        return (populateDoubleDash || _calledFromCommand) ? argv : self._copyDoubleDash(argv)
       }
 
       // if there's a handler associated with a
@@ -1085,7 +1092,8 @@ function Yargs (processArgs, cwd, parentRequire) {
               // commands are executed using a recursive algorithm that executes
               // the deepest command first; we keep track of the position in the
               // argv._ array that is currently being executed.
-              return command.runCommand(cmd, self, parsed, i + 1)
+              const innerArgv = command.runCommand(cmd, self, parsed, i + 1)
+              return populateDoubleDash ? innerArgv : self._copyDoubleDash(innerArgv)
             } else if (!firstUnknownCommand && cmd !== completionCommand) {
               firstUnknownCommand = cmd
               break
@@ -1094,7 +1102,8 @@ function Yargs (processArgs, cwd, parentRequire) {
 
           // run the default command, if defined
           if (command.hasDefaultCommand() && !skipDefaultCommand) {
-            return command.runCommand(null, self, parsed)
+            const innerArgv = command.runCommand(null, self, parsed)
+            return populateDoubleDash ? innerArgv : self._copyDoubleDash(innerArgv)
           }
 
           // recommend a command if recommendCommands() has
@@ -1111,7 +1120,8 @@ function Yargs (processArgs, cwd, parentRequire) {
           self.exit(0)
         }
       } else if (command.hasDefaultCommand() && !skipDefaultCommand) {
-        return command.runCommand(null, self, parsed)
+        const innerArgv = command.runCommand(null, self, parsed)
+        return populateDoubleDash ? innerArgv : self._copyDoubleDash(innerArgv)
       }
 
       // we must run completions first, a user might
@@ -1129,7 +1139,7 @@ function Yargs (processArgs, cwd, parentRequire) {
 
           self.exit(0)
         })
-        return argv
+        return (populateDoubleDash || _calledFromCommand) ? argv : self._copyDoubleDash(argv)
       }
 
       // Handle 'help' and 'version' options
@@ -1173,6 +1183,16 @@ function Yargs (processArgs, cwd, parentRequire) {
       else throw err
     }
 
+    return (populateDoubleDash || _calledFromCommand) ? argv : self._copyDoubleDash(argv)
+  }
+
+  // to simplify the parsing of positionals in commands,
+  // we temporarily populate '--' rather than _, with arguments
+  // after the '--' directive. After the parse, we copy these back.
+  self._copyDoubleDash = function (argv) {
+    if (!argv._) return argv
+    argv._.push.apply(argv._, argv['--'])
+    delete argv['--']
     return argv
   }
 

@@ -49,7 +49,7 @@
   },
   "scripts": {
     "fix": "standard --fix",
-    "pretest": "standard",
+    "posttest": "standard",
     "test": "c8 --reporter=html --reporter=text mocha --require ./test/before.js --timeout=12000 --check-leaks",
     "coverage": "c8 report --reporter=text-lcov | coveralls",
     "release": "standard-version"
