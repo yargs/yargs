@@ -873,6 +873,127 @@ describe('yargs dsl tests', () => {
     })
   })
 
+  describe('parserConfiguration.detailed', () => {
+    it('returns detailed parse object to .parse() without closure', () => {
+      const parse = yargs
+        .option('y', {
+          default: 99
+        })
+        .option('x', {
+          alias: ['blerg'],
+          default: 33
+        })
+        .parserConfiguration({
+          detailed: true
+        })
+        .parse('-x=2 --foo=bar')
+      parse.argv.x.should.equal(2)
+      parse.argv.foo.should.equal('bar')
+      parse.argv.y.should.equal(99)
+      // includes detailed information about parse, e.g., aliases, defaults.
+      ;(!!parse.defaulted.x).should.equal(false)
+      ;(!!parse.defaulted.y).should.equal(true)
+      parse.aliases.x.should.include('blerg')
+    })
+
+    it('returns detailed parse object to .parse() with closure', (done) => {
+      yargs
+        .option('y', {
+          default: 99
+        })
+        .option('x', {
+          alias: ['blerg'],
+          default: 33
+        })
+        .parserConfiguration({
+          detailed: true
+        })
+        .parse('-x=2 --foo=bar', (_err, parse, _output) => {
+          parse.argv.x.should.equal(2)
+          parse.argv.foo.should.equal('bar')
+          parse.argv.y.should.equal(99)
+          // includes detailed information about parse, e.g., aliases, defaults.
+          ;(!!parse.defaulted.x).should.equal(false)
+          ;(!!parse.defaulted.y).should.equal(true)
+          parse.aliases.x.should.include('blerg')
+          return done()
+        })
+    })
+
+    it('passes detailed parse object to command handler', (done) => {
+      yargs
+        .command('foo [id] [foo]', 'foo command', (yargs) => {
+          yargs
+            .option('apple', {
+              default: 'green'
+            })
+            .positional('id', {
+              default: 'blerg'
+            })
+            .positional('foo', {
+              default: 'bar'
+            })
+            .alias('id', 'identifier')
+        }, (parse) => {
+          parse.argv.id.should.equal('abc123')
+          parse.argv.identifier.should.equal('abc123')
+          parse.argv.foo.should.equal('bar')
+          parse.argv.banana.should.equal('yellow')
+          parse.argv.hello = 'world'
+          // includes detailed information about parse, e.g., aliases, defaults.
+          ;(!!parse.defaulted.id).should.equal(false)
+          ;(!!parse.defaulted.foo).should.equal(true)
+          ;(!!parse.defaulted.banana).should.equal(true)
+          parse.aliases.id.should.include('identifier')
+          return done()
+        }, [(argv) => {
+          return {
+            hello: 'world'
+          }
+        }])
+        .parserConfiguration({
+          detailed: true
+        })
+        .option('banana', {
+          default: 'yellow'
+        })
+        .parse('foo abc123 --apple red')
+    })
+
+    it('returns detailed parse object from invoked command', () => {
+      const parse = yargs
+        .command('foo [id] [foo]', 'foo command', (yargs) => {
+          yargs
+            .option('apple', {
+              default: 'green'
+            })
+            .positional('id', {
+              default: 'blerg'
+            })
+            .positional('foo', {
+              default: 'bar'
+            })
+            .alias('id', 'identifier')
+        })
+        .parserConfiguration({
+          detailed: true
+        })
+        .option('banana', {
+          default: 'yellow'
+        })
+        .parse('foo abc123 --apple red')
+      parse.argv.id.should.equal('abc123')
+      parse.argv.identifier.should.equal('abc123')
+      parse.argv.foo.should.equal('bar')
+      parse.argv.banana.should.equal('yellow')
+      // includes detailed information about parse, e.g., aliases, defaults.
+      ;(!!parse.defaulted.id).should.equal(false)
+      ;(!!parse.defaulted.foo).should.equal(true)
+      ;(!!parse.defaulted.banana).should.equal(true)
+      parse.aliases.id.should.include('identifier')
+    })
+  })
+
   describe('parsed', () => {
     it('should be false before parsing', () => {
       const warn = global.console.warn

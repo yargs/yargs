@@ -549,7 +549,7 @@ function Yargs (processArgs, cwd, parentRequire) {
   let parseFn = null
   let parseContext = null
   self.parse = function parse (args, shortCircuit, _parseFn) {
-    argsert('[string|array] [function|boolean|object] [function]', [args, shortCircuit, _parseFn], arguments.length)
+    argsert('[string|array] [function|boolean|object|undefined] [function|undefined]', [args, shortCircuit, _parseFn], arguments.length)
     freeze()
     if (typeof args === 'undefined') {
       const argv = self._parseArgs(processArgs)
@@ -557,7 +557,7 @@ function Yargs (processArgs, cwd, parentRequire) {
       unfreeze()
       // TODO: remove this compatibility hack when we release yargs@15.x:
       self.parsed = tmpParsed
-      return argv
+      return parserConfig.detailed ? self.parsed : argv
     }
 
     // a context object can optionally be provided, this allows
@@ -580,11 +580,12 @@ function Yargs (processArgs, cwd, parentRequire) {
 
     if (parseFn) exitProcess = false
 
-    const parsed = self._parseArgs(args, shortCircuit)
-    if (parseFn) parseFn(exitError, parsed, output)
+    const argv = self._parseArgs(args, shortCircuit)
+    const tmpParsed = self.parsed
+    if (parseFn) parseFn(exitError, parserConfig.detailed ? tmpParsed : argv, output)
     unfreeze()
 
-    return parsed
+    return parserConfig.detailed ? tmpParsed : argv
   }
 
   self._getParseContext = () => parseContext || {}
