@@ -116,7 +116,7 @@ describe('integration tests', () => {
         // our fixtures directory, so that we can test that the
         // nearest package.json is appropriately loaded.
         cpr('./', './test/fixtures/yargs', {
-          filter: /node_modules|example|test|package\.json/
+          filter: /locales|.git|coverage|docs|node_modules|example|test|package\.json/
         }, () => {
           fs.symlinkSync(process.cwd(), './test/fixtures/yargs-symlink')
           return done()

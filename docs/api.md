@@ -1159,7 +1159,9 @@ for details of this object
 
 `obj` accepts the following configuration options:
 
-* `sort-commands` when set to `true` (boolean) will sort the commands added, the default is `false`.
+* `detailed`: when set to `true` (boolean) [detailed parse results are returned](https://github.com/yargs/yargs-parser#requireyargs-parserdetailedargs-opts).
+  (detailed results contain additional information, such as whether arguments have been defaulted).
+* `sort-commands`: when set to `true` (boolean) will sort the commands added, the default is `false`.
 
 For additional configuration options, see [yargs-parser's configuration](https://github.com/yargs/yargs-parser#configuration).
 
