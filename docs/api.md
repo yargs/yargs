@@ -1147,6 +1147,10 @@ command handler, for example.
 
 <a name="parsed"></a>.parsed
 ------------
+
+_Note: The `.parsed` option has known limitations and is deprecated. Instead
+use `yargs.parserConfiguration({detailed: true})` to get a detailed parse._
+
 If the arguments have not been parsed, this property is `false`.
 
 If the arguments have been parsed, this contain detailed parsed arguments. See
