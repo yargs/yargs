@@ -435,7 +435,7 @@ using the [`parserConfiguration()`](/docs/api.md#parserConfiguration) method you
 
 ```js
 yargs.parserConfiguration({
-  "detiled": true,
+  "detailed": true,
   "short-option-groups": true,
   "camel-case-expansion": true,
   "dot-notation": true,
