@@ -1773,14 +1773,16 @@ describe('yargs dsl tests', () => {
       argv.koala.should.equal(true)
     })
 
-    // Fix this test expecting to check an assertion after calling done()!
-    it.skip('does not skip validation if no option with skipValidation is present', async () => {
-      const argv = await promisifyTest((done) => yargs(['--koala'])
+    it('does not skip validation if no option with skipValidation is present', async () => {
+      let skippedValidation = true
+      const argv = await yargs(['--koala'])
         .demand(1)
-        .fail(msg => done())
+        .fail(msg => {
+          skippedValidation = false
+        })
         .skipValidation(['skip', 'reallySkip'])
         .parse()
-      )
+      skippedValidation.should.equal(false)
       argv.koala.should.equal(true)
     })
 
