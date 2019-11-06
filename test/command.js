@@ -73,7 +73,7 @@ describe('Command', () => {
       argv['baz-qux'].should.deep.equal(['world', '!'])
     })
 
-    it('populates subcommand\'s inner argv with positional arguments', () => {
+    it('populates subcommand\'s inner argv with positional arguments', (done) => {
       yargs('foo bar hello world')
         .command('foo', 'my awesome command', yargs => yargs.command(
           'bar <greeting> [recipient]',
@@ -83,6 +83,7 @@ describe('Command', () => {
             argv._.should.deep.equal(['foo', 'bar'])
             argv.greeting.should.equal('hello')
             argv.recipient.should.equal('world')
+            return done()
           }
         ))
         .parse()
@@ -238,17 +239,16 @@ describe('Command', () => {
 
   describe('missing positional arguments', () => {
     it('fails if a required argument is missing', async () => {
-      await promisifyTest(async (done) => {
-        const argv = await yargs('foo hello')
-          .command('foo <bar> <awesome>')
-          .fail((err) => {
-            err.should.match(/got 1, need at least 2/)
-            return done()
-          })
-          .parse()
+      let failErr
+      const argv = await yargs('foo hello')
+        .command('foo <bar> <awesome>')
+        .fail((err) => {
+          failErr = err
+        })
+        .parse()
 
-        argv.bar.should.equal('hello')
-      })
+      failErr.should.match(/got 1, need at least 2/)
+      argv.bar.should.equal('hello')
     })
 
     it('does not fail if optional argument is missing', async () => {
@@ -776,7 +776,7 @@ describe('Command', () => {
   })
 
   // see: https://github.com/yargs/yargs/pull/553
-  it('preserves top-level envPrefix', () => {
+  it('preserves top-level envPrefix', (done) => {
     process.env.FUN_DIP_STICK = 'yummy'
     process.env.FUN_DIP_POWDER = 'true'
     yargs('eat')
@@ -785,15 +785,16 @@ describe('Command', () => {
       .command('eat', 'Adult supervision recommended', yargs => yargs.boolean('powder').exitProcess(false), (argv) => {
         argv.powder.should.equal(true)
         argv.stick.should.equal('yummy')
+        return done()
       })
       .exitProcess(false)
       .parse()
   })
 
   // addresses https://github.com/yargs/yargs/issues/514.
-  it('respects order of positional arguments when matching commands', () => {
+  it('respects order of positional arguments when matching commands', async () => {
     const output = []
-    yargs('bar foo')
+    await yargs('bar foo')
       .command('foo', 'foo command', (yargs) => {
         output.push('foo')
       })
@@ -856,8 +857,8 @@ describe('Command', () => {
 
   it('allows builder function to parse argv without returning', async () => {
     const argv = await yargs('yo Jude')
-      .command('yo <someone>', 'Send someone a yo', (yargs) => {
-        yargs.parse()
+      .command('yo <someone>', 'Send someone a yo', async (yargs) => {
+        await yargs.parse()
       }, (argv) => {
         argv.should.have.property('someone').and.equal('Jude')
       }).parse()
@@ -1002,9 +1003,9 @@ describe('Command', () => {
           .parse()
       })
 
-      it('resets custom check if global is false', () => {
+      it('resets custom check if global is false', async () => {
         let checkCalled = false
-        yargs('command blerg --foo')
+        await yargs('command blerg --foo')
           .command('command <snuh>', 'a command')
           .check((argv) => {
             checkCalled = true
@@ -1027,7 +1028,7 @@ describe('Command', () => {
     })
 
     describe('strict', () => {
-      it('defaults to false when not called', () => {
+      it('defaults to false when not called', async () => {
         let commandCalled = false
         yargs('hi')
           .command('hi', 'The hi command', (innerYargs) => {
@@ -1035,11 +1036,11 @@ describe('Command', () => {
             innerYargs.getStrict().should.equal(false)
           })
         yargs.getStrict().should.equal(false)
-        yargs.parse() // parse and run command
+        await yargs.parse() // parse and run command
         commandCalled.should.equal(true)
       })
 
-      it('can be enabled just for a command', () => {
+      it('can be enabled just for a command', async () => {
         let commandCalled = false
         yargs('hi')
           .command('hi', 'The hi command', (innerYargs) => {
@@ -1047,11 +1048,11 @@ describe('Command', () => {
             innerYargs.strict().getStrict().should.equal(true)
           })
         yargs.getStrict().should.equal(false)
-        yargs.parse() // parse and run command
+        await yargs.parse() // parse and run command
         commandCalled.should.equal(true)
       })
 
-      it('applies strict globally by default', () => {
+      it('applies strict globally by default', async () => {
         let commandCalled = false
         yargs('hi')
           .strict()
@@ -1060,7 +1061,7 @@ describe('Command', () => {
             innerYargs.getStrict().should.equal(true)
           })
         yargs.getStrict().should.equal(true)
-        yargs.parse() // parse and run command
+        await yargs.parse() // parse and run command
         commandCalled.should.equal(true)
       })
 
@@ -1088,7 +1089,7 @@ describe('Command', () => {
           })
       })
 
-      it('allows a command to override global`', () => {
+      it('allows a command to override global`', async () => {
         let commandCalled = false
         yargs('hi')
           .strict()
@@ -1097,7 +1098,7 @@ describe('Command', () => {
             innerYargs.strict(false).getStrict().should.equal(false)
           })
         yargs.getStrict().should.equal(true)
-        yargs.parse() // parse and run command
+        await yargs.parse() // parse and run command
         commandCalled.should.equal(true)
       })
 
@@ -1410,9 +1411,9 @@ describe('Command', () => {
     r.errors.should.match(/Missing required argument/)
   })
 
-  it('should support numeric commands', () => {
+  it('should support numeric commands', async () => {
     const output = []
-    yargs('1')
+    await yargs('1')
       .command('1', 'numeric command', (yargs) => {
         output.push('1')
       })
@@ -1421,7 +1422,7 @@ describe('Command', () => {
   })
 
   // see: https://github.com/yargs/yargs/issues/853
-  it('should not execute command if it is proceeded by another positional argument', () => {
+  it('should not execute command if it is proceeded by another positional argument', (done) => {
     let commandCalled = false
     yargs()
       .command('foo', 'foo command', noop, () => { commandCalled = true })
@@ -1429,11 +1430,12 @@ describe('Command', () => {
         expect(err).to.equal(null)
         commandCalled.should.equal(false)
         argv._.should.eql(['bar', 'foo'])
+        return done()
       })
   })
 
   // see: https://github.com/yargs/yargs/issues/861 phew! that's an edge-case.
-  it('should allow positional arguments for inner commands in strict mode, when no handler is provided', () => {
+  it('should allow positional arguments for inner commands in strict mode, when no handler is provided', (done) => {
     yargs()
       .command('foo', 'outer command', (yargs) => {
         yargs.command('bar [optional]', 'inner command')
@@ -1443,11 +1445,12 @@ describe('Command', () => {
         expect(err).to.equal(null)
         argv.optional.should.equal(33)
         argv._.should.eql(['foo', 'bar'])
+        return done()
       })
   })
 
   describe('usage', () => {
-    it('allows you to configure a default command', () => {
+    it('allows you to configure a default command', (done) => {
       yargs()
         .usage('$0 <port>', 'default command', (yargs) => {
           yargs.positional('port', {
@@ -1457,6 +1460,7 @@ describe('Command', () => {
         .parse('33', (err, argv) => {
           expect(err).to.equal(null)
           argv.port.should.equal('33')
+          return done()
         })
     })
 
