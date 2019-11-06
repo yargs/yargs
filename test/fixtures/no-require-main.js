@@ -5,9 +5,13 @@
 // for some unknown reason, a test environment has decided to omit require.main
 delete require.main
 
-var parser = require('../../yargs.js')(process.argv.slice(2), undefined, require)
+async function main () {
+  var parser = require('../../yargs.js')(process.argv.slice(2), undefined, require)
 
-console.log(parser.parserConfiguration({
-  'dot-notation': false,
-  'boolean-negation': false
-}).argv)
+  console.log(await parser.parserConfiguration({
+    'dot-notation': false,
+    'boolean-negation': false
+  }).argv)
+}
+
+main()

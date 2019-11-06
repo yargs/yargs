@@ -2,9 +2,13 @@
 
 'use strict'
 
-var parser = require('../../yargs.js')(process.argv.slice(2))
+async function main() {
+    var parser = require('../../yargs.js')(process.argv.slice(2))
 
-console.log(parser.parserConfiguration({
-    'dot-notation': false,
-    'boolean-negation': false
-}).argv)
+    console.log(await parser.parserConfiguration({
+        'dot-notation': false,
+        'boolean-negation': false
+    }).argv)
+}
+
+main()
