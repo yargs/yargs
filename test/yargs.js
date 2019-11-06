@@ -62,8 +62,7 @@ describe('yargs dsl tests', () => {
     r.errors[2].should.match(implicationsFailedPattern)
   })
 
-  // Fix this test expecting a result after yargs called process.exit()!
-  it.skip('accepts an object for describes', async () => {
+  it('accepts an object for describes', async () => {
     const r = await checkOutputAsync(() => yargs([])
       .describe({
         x: 'really cool key'
@@ -74,7 +73,6 @@ describe('yargs dsl tests', () => {
     )
 
     r.errors[0].should.match(/really cool key/)
-    r.result.should.not.have.property('[object Object]')
   })
 
   it('a function can be provided, to execute when a parsing failure occurs', (done) => {
