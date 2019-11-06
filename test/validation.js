@@ -845,8 +845,8 @@ describe('validation tests', () => {
       args.bar.should.equal(true)
     })
 
-    it('does not fail when unrecognized option is passed after --', () => {
-      const args = yargs('ahoy ben -- --arrr')
+    it('does not fail when unrecognized option is passed after --', async () => {
+      const args = await yargs('ahoy ben -- --arrr')
         .strict()
         .command('ahoy <matey>', 'piratical courtesy')
         .option('arrr', { boolean: true, describe: false })

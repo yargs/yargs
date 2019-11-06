@@ -109,8 +109,8 @@ describe('yargs dsl tests', () => {
     argv.looks.should.eql('good')
   })
 
-  it('should ignore a missing array choice with an empty default', () => {
-    const argv = yargs(['--looks', '--looks', 'good'])
+  it('should ignore a missing array choice with an empty default', async () => {
+    const argv = await yargs(['--looks', '--looks', 'good'])
       .option('looks', {
         type: 'array',
         default: [],

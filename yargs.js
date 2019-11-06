@@ -1148,6 +1148,8 @@ function Yargs (processArgs, cwd, parentRequire) {
         ;(completions || []).forEach((completion) => {
           _logger.log(completion)
         })
+
+        self.exit(0)
         return (populateDoubleDash || _calledFromCommand) ? argv : self._copyDoubleDash(argv)
       }
 
@@ -1205,7 +1207,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     return argv
   }
 
-  self._runValidation = function runValidation (argv, aliases, positionalMap, parseErrors) {
+  self._runValidation = async function runValidation (argv, aliases, positionalMap, parseErrors) {
     if (parseErrors) throw new YError(parseErrors.message)
     await validation.nonOptionCount(argv)
     await validation.requiredArguments(argv)

@@ -138,9 +138,9 @@ describe('Command', () => {
     })
 
     // see: https://github.com/yargs/yargs/issues/1457
-    it('handles -- in conjunction with positional arguments', () => {
+    it('handles -- in conjunction with positional arguments', async () => {
       let called = false
-      const argv = yargs('foo hello world series -- apple banana')
+      const argv = await yargs('foo hello world series -- apple banana')
         .command('foo <bar> [awesome...]', 'my awesome command', noop, (argv2) => {
           argv2.bar.should.eql('hello')
           argv2.awesome.should.eql(['world', 'series'])
@@ -155,9 +155,9 @@ describe('Command', () => {
     })
 
     // see: https://github.com/yargs/yargs/issues/1457
-    it('continues to support populate-- for commands, post #1457', () => {
+    it('continues to support populate-- for commands, post #1457', async () => {
       let called = false
-      const argv = yargs('foo hello world series -- apple banana')
+      const argv = await yargs('foo hello world series -- apple banana')
         .command('foo <bar> [awesome...]', 'my awesome command', noop, (argv2) => {
           argv2.bar.should.eql('hello')
           argv2.awesome.should.eql(['world', 'series'])
