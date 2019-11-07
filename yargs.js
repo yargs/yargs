@@ -483,6 +483,12 @@ function Yargs (processArgs, cwd, parentRequire) {
     return self
   }
 
+  self.onFinishCommand = function (f) {
+    argsert('<function>', [f], arguments.length)
+    self._onFinishCommand = f
+    return self
+  }
+
   self.check = function (f, _global) {
     argsert('<function> [boolean]', [f, _global], arguments.length)
     validation.check(f, _global !== false)
