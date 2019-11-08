@@ -74,11 +74,7 @@ For example: `--foo foo bar -- val` will be parsed as
 <a name="boolean"></a>.boolean(key)
 -------------
 
-Interpret `key` as a boolean. If a non-flag option follows `key` in
-`process.argv`, that string won't get set as the value of `key`.
-
-`key` will default to `false`, unless a `default(key, undefined)` is
-explicitly set.
+Interpret `key` as a boolean. If a non-flag option - unless `true` or `false` - follows `key` in `process.argv`, that string won't get set as the value of `key`.
 
 `key` can be set false explicitly using the `--no-` prefix, [more](/docs/tricks.md#negate).
 
