@@ -233,17 +233,17 @@ boolean_single.js:
 ````javascript
 #!/usr/bin/env node
 var argv = require('yargs')
-    .boolean('v')
+    .boolean(['r','v'])
     .argv
 ;
-console.dir(argv.v);
+console.dir([ argv.r, argv.v ]);
 console.dir(argv._);
 ````
 
 ***
 
-    $ ./boolean_single.js -v "me hearties" yo ho
-    true
+    $ ./boolean_single.js -r false -v "me hearties" yo ho
+    [ false, true ]
     [ 'me hearties', 'yo', 'ho' ]
 
 
@@ -262,7 +262,7 @@ console.dir(argv._);
 ***
 
     $ ./boolean_double.js -x -z one two three
-    [ true, false, true ]
+    [ true, undefined, true ]
     [ 'one', 'two', 'three' ]
 
 Yargs is here to help you...
