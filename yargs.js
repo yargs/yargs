@@ -1221,6 +1221,9 @@ function Yargs (processArgs, cwd, parentRequire) {
   return self
 }
 
+// allow consumers to directly use the version of yargs-parser used by yargs
+exports.Parser = Parser
+
 // rebase an absolute path to a relative one with respect to a base directory
 // exported for tests
 exports.rebase = rebase
