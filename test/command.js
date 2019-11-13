@@ -874,6 +874,31 @@ describe('Command', () => {
         .parse()
       argv.should.have.property('someone').and.equal('Leslie')
     })
+
+    it('will be awaited for if returning a promise', async () => {
+      const argv = await yargs('yo')
+        .command('yo [someone]', 'Send someone a yo', async (yargs) => {
+          await new Promise(resolve => setTimeout(resolve, 10))
+          return yargs.default('someone', 'Pat')
+        }, (argv) => {
+          argv.should.have.property('someone').and.equal('Pat')
+        })
+        .parse()
+      argv.should.have.property('someone').and.equal('Pat')
+    })
+
+    it('will be awaited for if using the done callback', async () => {
+      const argv = await yargs('yo')
+        .command('yo [someone]', 'Send someone a yo', (yargs, done) => {
+          setTimeout(() => {
+            done(yargs.default('someone', 'Pat'))
+          }, 10)
+        }, (argv) => {
+          argv.should.have.property('someone').and.equal('Pat')
+        })
+        .parse()
+      argv.should.have.property('someone').and.equal('Pat')
+    })
   })
 
   // addresses https://github.com/yargs/yargs/issues/540

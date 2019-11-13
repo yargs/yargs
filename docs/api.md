@@ -243,8 +243,9 @@ yargs
   .argv
 ```
 
-If the builder function returns a promise, yargs will wait for it to resolve
-before going on.
+Yargs will wait for an async builder function to complete before going on:
+- if it returns a promise
+- or if it accepts a `done` function as its 2nd argument, and calls it
 
 You can also provide a handler function, which will be executed with the
 parsed `argv` object:
