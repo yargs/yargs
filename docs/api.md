@@ -976,6 +976,10 @@ Middleware is passed two parameters `argv`, the current parsed options object,
 and `yargs` the yargs instance itself, which provides contextual information
 about the current state of parsing.
 
+Yargs will wait for an async middleware function to complete before going on:
+- if it returns a promise
+- or if it accepts a `done` function as its 3rd argument, and calls it
+
 A modified `argv` object will ultimately be what is passed to a command's
 handler function.
 

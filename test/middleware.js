@@ -285,11 +285,39 @@ describe('middleware', () => {
         .parse()
     })
 
-    it('runs async before validation', function (done) {
+    it('runs async before validation by returning a promise', function (done) {
       yargs(['mw'])
         .middleware([function (argv) {
-          argv.mw = 'mw'
-          return Promise.resolve(argv)
+          return new Promise(resolve => setTimeout(() => {
+            argv.mw = 'mw'
+            resolve(argv)
+          }, 5))
+        }], true)
+        .command(
+          'mw',
+          'adds func to middleware',
+          {
+            'mw': {
+              'demand': true,
+              'string': true
+            }
+          },
+          function (argv) {
+            argv.mw.should.equal('mw')
+            return done()
+          }
+        )
+        .exitProcess(false)
+        .parse()
+    })
+
+    it('runs async before validation by calling the done callback', function (done) {
+      yargs(['mw'])
+        .middleware([function (argv, yargs, middlewareDone) {
+          setTimeout(() => {
+            argv.mw = 'mw'
+            middlewareDone(argv)
+          }, 5)
         }], true)
         .command(
           'mw',
