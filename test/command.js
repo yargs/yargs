@@ -1520,26 +1520,23 @@ describe('Command', () => {
       })
     })
 
-    it('succeeds when the promise returned by the command handler resolves', async () => {
-      await promisifyTest(async (done) => {
-        const handler = new Promise((resolve, reject) => {
-          setTimeout(() => {
-            return resolve(true)
-          }, 5)
+    it('succeeds after the promise returned by the async command handler resolves', async () => {
+      let called = false
+      let completed = false
+      const parsed = await yargs('foo hello')
+        .command('foo <pos>', 'foo command', () => {}, async (yargs) => {
+          called = true
+          await new Promise(resolve => setTimeout(resolve, 5))
+          completed = true
         })
-        const parsed = await yargs('foo hello')
-          .command('foo <pos>', 'foo command', () => {}, (yargs) => handler)
-          .fail((msg, err) => {
-            return done(Error('should not have been called'))
-          })
-          .parse()
+        .fail((msg, err) => {
+          throw new Error('should not have been called')
+        })
+        .parse()
 
-        handler.then(called => {
-          called.should.equal(true)
-          parsed.pos.should.equal('hello')
-          return done()
-        })
-      })
+      called.should.equal(true)
+      completed.should.equal(true)
+      parsed.pos.should.equal('hello')
     })
 
     // see: https://github.com/yargs/yargs/issues/1144
