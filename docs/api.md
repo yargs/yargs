@@ -326,12 +326,9 @@ But wait, there's more! You can return an asynchronous promise.
 
 ```js
 var argv = await require('yargs')
-  .completion('completion', function(current, argv) {
-    return new Promise(function (resolve, reject) {
-      setTimeout(function () {
-        resolve(['apple', 'banana'])
-      }, 10)
-    })
+  .completion('completion', async function(current, argv) {
+    await new Promise(resolve => setTimeout(resolve, 10))
+    return ['apple', 'banana']
   })
   .argv;
 ```
