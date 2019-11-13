@@ -46,13 +46,15 @@ npm i yargs@next
 
 ````javascript
 #!/usr/bin/env node
-const argv = require('yargs').argv
-
-if (argv.ships > 3 && argv.distance < 53.5) {
-  console.log('Plunder more riffiwobbles!')
-} else {
-  console.log('Retreat from the xupptumblers!')
-}
+(async function main () {
+  const argv = require('yargs').argv
+  
+  if (argv.ships > 3 && argv.distance < 53.5) {
+    console.log('Plunder more riffiwobbles!')
+  } else {
+    console.log('Retreat from the xupptumblers!')
+  }
+}) ()
 ````
 
 ```bash
@@ -112,6 +114,8 @@ Having problems? want to contribute? join our [community slack](http://devtoolsc
 
 * [Yargs' API](/docs/api.md)
 * [Examples](/docs/examples.md)
+  * [Typescript examples](/docs/typescript.md)
+  * [Webpack example](/docs/webpack.md)
 * [Parsing Tricks](/docs/tricks.md)
   * [Stop the Parser](/docs/tricks.md#stop)
   * [Negating Boolean Arguments](/docs/tricks.md#negate)

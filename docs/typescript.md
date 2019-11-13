@@ -9,14 +9,16 @@ The following `.options()` definition:
 #!/usr/bin/env node
 import yargs from 'yargs';
 
-const argv = yargs.options({
-  a: { type: 'boolean', default: false },
-  b: { type: 'string', demandOption: true },
-  c: { type: 'number', alias: 'chill' },
-  d: { type: 'array' },
-  e: { type: 'count' },
-  f: { choices: ['1', '2', '3'] }
-}).argv;
+(async function main () {
+  const argv = await yargs.options({
+    a: { type: 'boolean', default: false },
+    b: { type: 'string', demandOption: true },
+    c: { type: 'number', alias: 'chill' },
+    d: { type: 'array' },
+    e: { type: 'count' },
+    f: { choices: ['1', '2', '3'] }
+  }).argv;
+}) ();
 ```
 
 Will result in an `argv` that's typed like so:
@@ -57,7 +59,7 @@ To improve the `choices` option typing you can also specify its types:
 type Difficulty = 'normal' | 'nightmare' | 'hell';
 const difficulties: ReadonlyArray<Difficulty> = ['normal', 'nightmare', 'hell'];
 
-const argv = yargs.option('difficulty', {
+const argv = await yargs.option('difficulty', {
   choices: difficulties,
   demandOption: true
 }).argv;

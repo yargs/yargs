@@ -11,13 +11,15 @@ plunder.js:
 
 ````javascript
 #!/usr/bin/env node
-var argv = require('yargs').argv;
-
-if (argv.ships > 3 && argv.distance < 53.5) {
-    console.log('Plunder more riffiwobbles!');
-} else {
-    console.log('Retreat from the xupptumblers!');
-}
+(async function main () {
+    var argv = await require('yargs').argv;
+    
+    if (argv.ships > 3 && argv.distance < 53.5) {
+        console.log('Plunder more riffiwobbles!');
+    } else {
+        console.log('Retreat from the xupptumblers!');
+    }
+}) ();
 ````
 
 ***
@@ -35,8 +37,10 @@ short.js:
 
 ````javascript
 #!/usr/bin/env node
-var argv = require('yargs').argv;
-console.log('(%d,%d)', argv.x, argv.y);
+(async function main () {
+    var argv = await require('yargs').argv;
+    console.log('(%d,%d)', argv.x, argv.y);
+}) ();
 ````
 
 ***
@@ -51,14 +55,16 @@ bool.js:
 
 ````javascript
 #!/usr/bin/env node
-var argv = require('yargs').argv;
+(async function main () {
+    var argv = await require('yargs').argv;
 
-if (argv.s) {
-    process.stdout.write(argv.fr ? 'Le perroquet dit: ' : 'The parrot says: ');
-}
-console.log(
-    (argv.fr ? 'couac' : 'squawk') + (argv.p ? '!' : '')
-);
+    if (argv.s) {
+        process.stdout.write(argv.fr ? 'Le perroquet dit: ' : 'The parrot says: ');
+    }
+    console.log(
+        (argv.fr ? 'couac' : 'squawk') + (argv.p ? '!' : '')
+    );
+}) ();
 ````
 
 ***
@@ -79,9 +85,11 @@ nonopt.js:
 
 ````javascript
 #!/usr/bin/env node
-var argv = require('yargs').argv;
-console.log('(%d,%d)', argv.x, argv.y);
-console.log(argv._);
+(async function main () {
+    var argv = await require('yargs').argv;
+    console.log('(%d,%d)', argv.x, argv.y);
+    console.log(argv._);
+}) ();
 ````
 
 ***
@@ -101,20 +109,22 @@ count.js:
 
 ````javascript
 #!/usr/bin/env node
-var argv = require('yargs')
-    .count('verbose')
-    .alias('v', 'verbose')
-    .argv;
+(async function main () {
+    var argv = await require('yargs')
+        .count('verbose')
+        .alias('v', 'verbose')
+        .argv;
 
-VERBOSE_LEVEL = argv.verbose;
+    VERBOSE_LEVEL = argv.verbose;
 
-function WARN()  { VERBOSE_LEVEL >= 0 && console.log.apply(console, arguments); }
-function INFO()  { VERBOSE_LEVEL >= 1 && console.log.apply(console, arguments); }
-function DEBUG() { VERBOSE_LEVEL >= 2 && console.log.apply(console, arguments); }
+    function WARN()  { VERBOSE_LEVEL >= 0 && console.log.apply(console, arguments); }
+    function INFO()  { VERBOSE_LEVEL >= 1 && console.log.apply(console, arguments); }
+    function DEBUG() { VERBOSE_LEVEL >= 2 && console.log.apply(console, arguments); }
 
-WARN("Showing only important stuff");
-INFO("Showing semi-important stuff too");
-DEBUG("Extra chatty mode");
+    WARN("Showing only important stuff");
+    INFO("Showing semi-important stuff too");
+    DEBUG("Extra chatty mode");
+}) ();
 ````
 
 ***
@@ -142,12 +152,14 @@ area.js:
 
 ````javascript
 #!/usr/bin/env node
-var argv = require('yargs')
-    .usage('Usage: $0 -w [num] -h [num]')
-    .demandOption(['w','h'])
-    .argv;
+(async function main () {
+    var argv = await require('yargs')
+        .usage('Usage: $0 -w [num] -h [num]')
+        .demandOption(['w','h'])
+        .argv;
 
-console.log("The area is:", argv.w * argv.h);
+    console.log("The area is:", argv.w * argv.h);
+}) ();
 ````
 
 ***
@@ -171,10 +183,12 @@ demand_count.js:
 
 ````javascript
 #!/usr/bin/env node
-var argv = require('yargs')
-    .demandCommand(2)
-    .argv;
-console.dir(argv);
+(async function main () {
+    var argv = await require('yargs')
+        .demandCommand(2)
+        .argv;
+    console.dir(argv);
+}) ();
 ````
 
 ***
@@ -196,12 +210,14 @@ default_singles.js:
 
 ````javascript
 #!/usr/bin/env node
-var argv = require('yargs')
-    .default('x', 10)
-    .default('y', 10)
-    .argv
-;
-console.log(argv.x + argv.y);
+(async function main () {
+    var argv = await require('yargs')
+        .default('x', 10)
+        .default('y', 10)
+        .argv
+    ;
+    console.log(argv.x + argv.y);
+}) ();
 ````
 
 ***
@@ -213,11 +229,13 @@ default_hash.js:
 
 ````javascript
 #!/usr/bin/env node
-var argv = require('yargs')
-    .default({ x : 10, y : 10 })
-    .argv
-;
-console.log(argv.x + argv.y);
+(async function main () {
+    var argv = await require('yargs')
+        .default({ x : 10, y : 10 })
+        .argv
+    ;
+    console.log(argv.x + argv.y);
+}) ();
 ````
 
 ***
@@ -232,12 +250,14 @@ boolean_single.js:
 
 ````javascript
 #!/usr/bin/env node
-var argv = require('yargs')
-    .boolean(['r','v'])
-    .argv
-;
-console.dir([ argv.r, argv.v ]);
-console.dir(argv._);
+(async function main () {
+    var argv = await require('yargs')
+        .boolean(['r','v'])
+        .argv
+    ;
+    console.dir([ argv.r, argv.v ]);
+    console.dir(argv._);
+}) ();
 ````
 
 ***
@@ -251,12 +271,14 @@ boolean_double.js:
 
 ````javascript
 #!/usr/bin/env node
-var argv = require('yargs')
-    .boolean(['x','y','z'])
-    .argv
-;
-console.dir([ argv.x, argv.y, argv.z ]);
-console.dir(argv._);
+(async function main () {
+    var argv = await require('yargs')
+        .boolean(['x','y','z'])
+        .argv
+    ;
+    console.dir([ argv.x, argv.y, argv.z ]);
+    console.dir(argv._);
+}) ();
 ````
 
 ***
@@ -275,30 +297,32 @@ line_count.js:
 
 ````javascript
 #!/usr/bin/env node
-var argv = require('yargs')
-    .usage('Usage: $0 <command> [options]')
-    .command('count', 'Count the lines in a file')
-    .example('$0 count -f foo.js', 'count the lines in the given file')
-    .alias('f', 'file')
-    .nargs('f', 1)
-    .describe('f', 'Load a file')
-    .demandOption(['f'])
-    .help('h')
-    .alias('h', 'help')
-    .epilog('copyright 2019')
-    .argv;
+(async function main () {
+    var argv = await require('yargs')
+        .usage('Usage: $0 <command> [options]')
+        .command('count', 'Count the lines in a file')
+        .example('$0 count -f foo.js', 'count the lines in the given file')
+        .alias('f', 'file')
+        .nargs('f', 1)
+        .describe('f', 'Load a file')
+        .demandOption(['f'])
+        .help('h')
+        .alias('h', 'help')
+        .epilog('copyright 2019')
+        .argv;
 
-var fs = require('fs');
-var s = fs.createReadStream(argv.file);
+    var fs = require('fs');
+    var s = fs.createReadStream(argv.file);
 
-var lines = 0;
-s.on('data', function (buf) {
-    lines += buf.toString().match(/\n/g).length;
-});
+    var lines = 0;
+    s.on('data', function (buf) {
+        lines += buf.toString().match(/\n/g).length;
+    });
 
-s.on('end', function () {
-    console.log(lines);
-});
+    s.on('end', function () {
+        console.log(lines);
+    });
+}) ();
 ````
 
 ***

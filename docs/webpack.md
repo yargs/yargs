@@ -18,14 +18,18 @@ Create `src/index.js`:
 ```js
 const yargs = require('yargs')
 
-console.log(yargs.parse())
+(async function main () {
+  console.log(await yargs.parse())
+}) ()
 ```
 
 Or for typescript users, `src/index.ts`:
 ```ts
 import * as yargs from 'yargs';
 
-console.log(yargs.parse());
+(async function main () {
+  console.log(await yargs.parse());
+}) ();
 ```
 
 along with its `tsconfig.json`:

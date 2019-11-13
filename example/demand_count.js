@@ -1,5 +1,7 @@
 #!/usr/bin/env node
-var argv = require('yargs')
-    .demand(2)
-    .argv;
-console.dir(argv)
+(async function main () {
+  var argv = await require('yargs')
+      .demand(2)
+      .argv;
+  console.dir(argv)
+}) ();
