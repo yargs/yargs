@@ -53,7 +53,7 @@ If `yargs` is executed in an environment that embeds node and there's no script 
 expects it to be the script name. In order to override this behavior, use `.parse(process.argv.slice(1))`
 instead of `.argv` and the first parameter won't be ignored.
 
-The promise is resolved when the parsing is completed, including async command handlers execution.
+The promise is resolved when the parsing is completed, including async middlewares and async command handlers execution.
 
 <a name="array"></a>.array(key)
 ----------

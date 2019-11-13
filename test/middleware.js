@@ -285,30 +285,28 @@ describe('middleware', () => {
         .parse()
     })
 
-    it('throws an error if promise returned and applyBeforeValidation enabled', async function () {
-      await expect(
-        yargs(['mw'])
-          .middleware([function (argv) {
-            argv.mw = 'mw'
-            argv.other = true
-            return Promise.resolve(argv)
-          }], true)
-          .command(
-            'mw',
-            'adds func to middleware',
-            {
-              'mw': {
-                'demand': true,
-                'string': true
-              }
-            },
-            function (argv) {
-              throw Error('we should not get here')
+    it('runs async before validation', function (done) {
+      yargs(['mw'])
+        .middleware([function (argv) {
+          argv.mw = 'mw'
+          return Promise.resolve(argv)
+        }], true)
+        .command(
+          'mw',
+          'adds func to middleware',
+          {
+            'mw': {
+              'demand': true,
+              'string': true
             }
-          )
-          .exitProcess(false)
-          .parse()
-      ).to.be.rejectedWith('middleware cannot return a promise when applyBeforeValidation is true')
+          },
+          function (argv) {
+            argv.mw.should.equal('mw')
+            return done()
+          }
+        )
+        .exitProcess(false)
+        .parse()
     })
 
     it('runs before validation, when middleware is added in builder', (done) => {
