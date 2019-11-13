@@ -269,8 +269,9 @@ yargs
   .argv
 ```
 
-If the handler function returns a promise, yargs will wait for it to resolve
-before resolving its own parsing promise.
+Yargs will wait for an async handler function to complete before going on:
+- if it returns a promise
+- or if it accepts a `done` function as its 2nd argument, and calls it
 
 Please see [Advanced Topics: Commands](https://github.com/yargs/yargs/blob/master/docs/advanced.md#commands) for a thorough
 discussion of the advanced features exposed in the Command API.

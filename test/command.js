@@ -1503,13 +1503,13 @@ describe('Command', () => {
     })
   })
 
-  describe('async', () => {
+  describe('async command handler', () => {
     // addresses https://github.com/yargs/yargs/issues/510
     it('fails when the promise returned by the command handler rejects', async () => {
       await promisifyTest(async (done) => {
         const error = new Error()
         await yargs('foo')
-          .command('foo', 'foo command', noop, (yargs) => Promise.reject(error))
+          .command('foo', 'foo command', noop, (argv) => Promise.reject(error))
           .fail((msg, err) => {
             expect(msg).to.equal(null)
             expect(err).to.equal(error)
@@ -1524,10 +1524,31 @@ describe('Command', () => {
       let called = false
       let completed = false
       const parsed = await yargs('foo hello')
-        .command('foo <pos>', 'foo command', () => {}, async (yargs) => {
+        .command('foo <pos>', 'foo command', () => {}, async (argv) => {
           called = true
           await new Promise(resolve => setTimeout(resolve, 5))
           completed = true
+        })
+        .fail((msg, err) => {
+          throw new Error('should not have been called')
+        })
+        .parse()
+
+      called.should.equal(true)
+      completed.should.equal(true)
+      parsed.pos.should.equal('hello')
+    })
+
+    it('succeeds after the async command handler calls done', async () => {
+      let called = false
+      let completed = false
+      const parsed = await yargs('foo hello')
+        .command('foo <pos>', 'foo command', () => {}, (argv, done) => {
+          called = true
+          setTimeout(() => {
+            completed = true
+            done()
+          }, 5)
         })
         .fail((msg, err) => {
           throw new Error('should not have been called')
