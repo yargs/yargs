@@ -843,35 +843,37 @@ describe('Command', () => {
     })
   })
 
-  // addresses https://github.com/yargs/yargs/issues/522
-  it('does not require builder function to return', async () => {
-    const argv = await yargs('yo')
-      .command('yo [someone]', 'Send someone a yo', (yargs) => {
-        yargs.default('someone', 'Pat')
-      }, (argv) => {
-        argv.should.have.property('someone').and.equal('Pat')
-      })
-      .parse()
-    argv.should.have.property('someone').and.equal('Pat')
-  })
+  describe('builder function', () => {
+    // addresses https://github.com/yargs/yargs/issues/522
+    it('is not required to return', async () => {
+      const argv = await yargs('yo')
+        .command('yo [someone]', 'Send someone a yo', (yargs) => {
+          yargs.default('someone', 'Pat')
+        }, (argv) => {
+          argv.should.have.property('someone').and.equal('Pat')
+        })
+        .parse()
+      argv.should.have.property('someone').and.equal('Pat')
+    })
 
-  it('allows builder function to parse argv without returning', async () => {
-    const argv = await yargs('yo Jude')
-      .command('yo <someone>', 'Send someone a yo', async (yargs) => {
-        await yargs.parse()
-      }, (argv) => {
-        argv.should.have.property('someone').and.equal('Jude')
-      }).parse()
-    argv.should.have.property('someone').and.equal('Jude')
-  })
+    it('is allowed to parse argv without returning', async () => {
+      const argv = await yargs('yo Jude')
+        .command('yo <someone>', 'Send someone a yo', async (yargs) => {
+          await yargs.parse()
+        }, (argv) => {
+          argv.should.have.property('someone').and.equal('Jude')
+        }).parse()
+      argv.should.have.property('someone').and.equal('Jude')
+    })
 
-  it('allows builder function to return parsed argv', async () => {
-    const argv = await yargs('yo Leslie')
-      .command('yo <someone>', 'Send someone a yo', yargs => yargs.parse(), (argv) => {
-        argv.should.have.property('someone').and.equal('Leslie')
-      })
-      .parse()
-    argv.should.have.property('someone').and.equal('Leslie')
+    it('is allowed to return parsed argv', async () => {
+      const argv = await yargs('yo Leslie')
+        .command('yo <someone>', 'Send someone a yo', yargs => yargs.parse(), (argv) => {
+          argv.should.have.property('someone').and.equal('Leslie')
+        })
+        .parse()
+      argv.should.have.property('someone').and.equal('Leslie')
+    })
   })
 
   // addresses https://github.com/yargs/yargs/issues/540
