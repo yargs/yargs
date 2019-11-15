@@ -1,3 +1,9 @@
+/*
+ * I don't remember why I wrote this file.
+ * I think I was toying around with getting a list of compiler diagnostics as JSON,
+ * so I could do some sort of automatic refactoring based on them.  I dunno...
+ */
+
 import ts, { parseConfigFileTextToJson } from 'typescript';
 import tstoolsService, { TypeScriptService } from '@ts-tools/service';
 import { flatten } from 'lodash';
