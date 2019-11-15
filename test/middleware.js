@@ -440,4 +440,92 @@ describe('middleware', () => {
         .parse()
     })
   })
+
+  describe('middleware chains', () => {
+    let ids
+    const chainedMiddlewareFactory = (id, failing = false) => async (argv) => {
+      await sleep(10)
+      argv.ids = (argv.ids || []).concat([id])
+      if (failing) throw new Error(`middleware ${id} failed`)
+      ids = argv.ids
+    }
+
+    beforeEach(() => {
+      ids = []
+    })
+
+    it('should chain middlewares in the right order', async () => {
+      const argv = await yargs(['cmd'])
+        .middleware(chainedMiddlewareFactory(1), true)
+        .middleware(chainedMiddlewareFactory(3))
+        .middleware(chainedMiddlewareFactory(2), true)
+        .middleware(chainedMiddlewareFactory(4))
+        .command('cmd', 'test command', () => {}, () => {}, [
+          chainedMiddlewareFactory(5),
+          chainedMiddlewareFactory(6)
+        ])
+        .parse()
+      argv.ids.should.eql([1, 2, 3, 4, 5, 6])
+    })
+
+    it.skip('should stop chaining middlewares and fail if a global middleware fails before validation', async () => {
+      let failCalled = false
+      await yargs(['cmd'])
+        .middleware(chainedMiddlewareFactory(1, true), true)
+        .middleware(chainedMiddlewareFactory(3))
+        .middleware(chainedMiddlewareFactory(2), true)
+        .middleware(chainedMiddlewareFactory(4))
+        .command('cmd', 'test command', () => {}, () => {}, [
+          chainedMiddlewareFactory(5),
+          chainedMiddlewareFactory(6)
+        ])
+        .fail((msg, err) => {
+          err.message.should.equal('middleware 1 failed')
+          ids.should.eql([])
+          failCalled = true
+        })
+        .parse()
+      failCalled.should.equal(true)
+    })
+
+    it('should stop chaining middlewares and fail if a global middleware fails after validation', async () => {
+      let failCalled = false
+      await yargs(['cmd'])
+        .middleware(chainedMiddlewareFactory(1), true)
+        .middleware(chainedMiddlewareFactory(3, true))
+        .middleware(chainedMiddlewareFactory(2), true)
+        .middleware(chainedMiddlewareFactory(4))
+        .command('cmd', 'test command', () => {}, () => {}, [
+          chainedMiddlewareFactory(5),
+          chainedMiddlewareFactory(6)
+        ])
+        .fail((msg, err) => {
+          err.message.should.equal('middleware 3 failed')
+          ids.should.eql([1, 2])
+          failCalled = true
+        })
+        .parse()
+      failCalled.should.equal(true)
+    })
+
+    it('should stop chaining middlewares and fail if a command middleware fails', async () => {
+      let failCalled = false
+      await yargs(['cmd'])
+        .middleware(chainedMiddlewareFactory(1), true)
+        .middleware(chainedMiddlewareFactory(3))
+        .middleware(chainedMiddlewareFactory(2), true)
+        .middleware(chainedMiddlewareFactory(4))
+        .command('cmd', 'test command', () => {}, () => {}, [
+          chainedMiddlewareFactory(5, true),
+          chainedMiddlewareFactory(6)
+        ])
+        .fail((msg, err) => {
+          err.message.should.equal('middleware 5 failed')
+          ids.should.eql([1, 2, 3, 4])
+          failCalled = true
+        })
+        .parse()
+      failCalled.should.equal(true)
+    })
+  })
 })
