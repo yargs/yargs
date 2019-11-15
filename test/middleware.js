@@ -4,7 +4,7 @@
 const { expect, use } = require('chai')
 use(require('chai-as-promised'))
 const { globalMiddlewareFactory } = require('../lib/middleware')
-const { promisifyTest } = require('./helpers/utils')
+const { promisifyTest, sleep } = require('./helpers/utils')
 let yargs
 require('chai').should()
 
@@ -132,11 +132,10 @@ describe('middleware', () => {
     })
 
     it('calls the command handler when all middleware promises resolve', (done) => {
-      const middleware = (key, value) => () => new Promise((resolve, reject) => {
-        setTimeout(() => {
-          return resolve({ [key]: value })
-        }, 5)
-      })
+      const middleware = (key, value) => async () => {
+        await sleep(5)
+        return { [key]: value }
+      }
       yargs('foo hello')
         .command('foo <pos>', 'foo command', () => {}, (argv) => {
           argv.hello.should.equal('world')
@@ -287,11 +286,10 @@ describe('middleware', () => {
 
     it('runs async before validation by returning a promise', function (done) {
       yargs(['mw'])
-        .middleware([function (argv) {
-          return new Promise(resolve => setTimeout(() => {
+        .middleware([async function (argv) {
+          await sleep(5)
             argv.mw = 'mw'
-            resolve(argv)
-          }, 5))
+          return argv
         }], true)
         .command(
           'mw',

@@ -1,7 +1,7 @@
 'use strict'
 /* global describe, it, beforeEach, after */
 const checkUsage = require('./helpers/utils').checkOutput
-const checkOutputAsync = require('./helpers/utils').checkOutputAsync
+const { checkOutputAsync, sleep } = require('./helpers/utils')
 const yargs = require('../')
 
 /* polyfill Promise for older Node.js */
@@ -218,11 +218,10 @@ describe('Completion', () => {
       try {
         await checkOutputAsync(() =>
           yargs(['--get-yargs-completions'])
-            .completion('completion', (current, argv) => new Promise((resolve, reject) => {
-              setTimeout(() => {
-                reject(new Error('Test'))
-              }, 10)
-            }))
+            .completion('completion', async (current, argv) => {
+              await sleep(10)
+              throw new Error('Test')
+            })
             .parse()
         )
         throw new Error('an error should have been raised')

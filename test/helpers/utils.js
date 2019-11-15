@@ -187,3 +187,10 @@ exports.promisifyTest = function promisifyTest (test) {
     }
   })
 }
+
+/**
+ * Sleeps timeout ms
+ */
+exports.sleep = function sleep (timeout) {
+  return new Promise(resolve => setTimeout(resolve, timeout))
+}

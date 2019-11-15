@@ -2,7 +2,7 @@
 /* global describe, it, beforeEach */
 const yargs = require('../')
 const expect = require('chai').expect
-const { checkOutputAsync, promisifyTest } = require('./helpers/utils')
+const { checkOutputAsync, promisifyTest, sleep } = require('./helpers/utils')
 
 require('chai').should()
 const noop = () => {}
@@ -878,7 +878,7 @@ describe('Command', () => {
     it('will be awaited for if returning a promise', async () => {
       const argv = await yargs('yo')
         .command('yo [someone]', 'Send someone a yo', async (yargs) => {
-          await new Promise(resolve => setTimeout(resolve, 10))
+          await sleep(10)
           return yargs.default('someone', 'Pat')
         }, (argv) => {
           argv.should.have.property('someone').and.equal('Pat')
@@ -1526,7 +1526,7 @@ describe('Command', () => {
       const parsed = await yargs('foo hello')
         .command('foo <pos>', 'foo command', () => {}, async (argv) => {
           called = true
-          await new Promise(resolve => setTimeout(resolve, 5))
+          await sleep(5)
           completed = true
         })
         .fail((msg, err) => {
