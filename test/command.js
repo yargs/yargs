@@ -875,29 +875,68 @@ describe('Command', () => {
       argv.should.have.property('someone').and.equal('Leslie')
     })
 
-    it('will be awaited for if returning a promise', async () => {
-      const argv = await yargs('yo')
+    it('will be awaited for if returning a resolving promise', async () => {
+      let handlerCalled = false
+      await yargs('yo')
         .command('yo [someone]', 'Send someone a yo', async (yargs) => {
           await sleep(10)
           return yargs.default('someone', 'Pat')
         }, (argv) => {
           argv.should.have.property('someone').and.equal('Pat')
+          handlerCalled = true
         })
         .parse()
-      argv.should.have.property('someone').and.equal('Pat')
+      handlerCalled.should.equal(true)
     })
 
-    it('will be awaited for if using the done callback', async () => {
-      const argv = await yargs('yo')
+    it('will be awaited for if calling an (err, value) callback without error', async () => {
+      let handlerCalled = false
+      await yargs('yo')
         .command('yo [someone]', 'Send someone a yo', (yargs, done) => {
           setTimeout(() => {
-            done(yargs.default('someone', 'Pat'))
+            done(undefined, yargs.default('someone', 'Pat'))
           }, 10)
         }, (argv) => {
           argv.should.have.property('someone').and.equal('Pat')
+          handlerCalled = true
         })
         .parse()
-      argv.should.have.property('someone').and.equal('Pat')
+      handlerCalled.should.equal(true)
+    })
+
+    it('will make parsing fail if returning a rejecting promise', async () => {
+      const failingBuilderErr = new Error('failing builder')
+      try {
+        await yargs('yo')
+          .command('yo [someone]', 'Send someone a yo', async (yargs) => {
+            await sleep(10)
+            throw failingBuilderErr
+          }, (argv) => {
+            throw new Error('handler should not have been called')
+          })
+          .parse()
+        throw new Error('parsing should have failed')
+      } catch (err) {
+        err.should.equal(failingBuilderErr)
+      }
+    })
+
+    it('will make parsing fail if calling an (err, value) callback with an error', async () => {
+      const failingBuilderErr = new Error('failing builder')
+      try {
+        await yargs('yo')
+          .command('yo [someone]', 'Send someone a yo', async (yargs, done) => {
+            setTimeout(() => {
+              done(failingBuilderErr)
+            }, 10)
+          }, (argv) => {
+            throw new Error('handler should not have been called')
+          })
+          .parse()
+        throw new Error('parsing should have failed')
+      } catch (err) {
+        err.should.equal(failingBuilderErr)
+      }
     })
   })
 
@@ -1505,58 +1544,72 @@ describe('Command', () => {
 
   describe('async command handler', () => {
     // addresses https://github.com/yargs/yargs/issues/510
-    it('fails when the promise returned by the command handler rejects', async () => {
-      await promisifyTest(async (done) => {
-        const error = new Error()
-        await yargs('foo')
-          .command('foo', 'foo command', noop, (argv) => Promise.reject(error))
-          .fail((msg, err) => {
-            expect(msg).to.equal(null)
-            expect(err).to.equal(error)
-            done()
-          })
-          .parse()
-          .should.be.rejected
-      })
-    })
-
-    it('succeeds after the promise returned by the async command handler resolves', async () => {
-      let called = false
-      let completed = false
-      const parsed = await yargs('foo hello')
-        .command('foo <pos>', 'foo command', () => {}, async (argv) => {
-          called = true
-          await sleep(5)
-          completed = true
+    it('fails when the promise returned by the async command handler rejects', async () => {
+      const failingHandlerErr = new Error('failing handler')
+      let failCalled = false
+      await yargs('foo')
+        .command('foo', 'foo command', noop, async (argv) => {
+          await sleep(10)
+          throw failingHandlerErr
         })
         .fail((msg, err) => {
-          throw new Error('should not have been called')
+          expect(msg).to.equal(null)
+          expect(err).to.equal(failingHandlerErr)
+          failCalled = true
         })
         .parse()
 
-      called.should.equal(true)
-      completed.should.equal(true)
+      failCalled.should.equal(true)
+    })
+
+    it('fails when the async command handler calls an (err, value) callback with an error', async () => {
+      const failingHandlerErr = new Error('failing handler')
+      let failCalled = false
+      await yargs('foo')
+        .command('foo', 'foo command', noop, (argv, done) => {
+          setTimeout(() => done(failingHandlerErr), 10)
+        })
+        .fail((msg, err) => {
+          expect(msg).to.equal(null)
+          expect(err).to.equal(failingHandlerErr)
+          failCalled = true
+        })
+        .parse()
+
+      failCalled.should.equal(true)
+    })
+
+    it('succeeds after the promise returned by the async command handler resolves', async () => {
+      let handlerCompleted = false
+      const parsed = await yargs('foo hello')
+        .command('foo <pos>', 'foo command', () => {}, async (argv) => {
+          await sleep(5)
+          handlerCompleted = true
+        })
+        .fail((msg, err) => {
+          throw new Error('fail should not have been called')
+        })
+        .parse()
+
+      handlerCompleted.should.equal(true)
       parsed.pos.should.equal('hello')
     })
 
-    it('succeeds after the async command handler calls done', async () => {
-      let called = false
-      let completed = false
+    it('succeeds after the async command handler calls an (err, value) callback without error', async () => {
+      let handlerCompleted = false
       const parsed = await yargs('foo hello')
         .command('foo <pos>', 'foo command', () => {}, (argv, done) => {
-          called = true
           setTimeout(() => {
-            completed = true
+            handlerCompleted = true
             done()
           }, 5)
         })
         .fail((msg, err) => {
-          throw new Error('should not have been called')
+          throw new Error('fail should not have been called')
         })
         .parse()
 
-      called.should.equal(true)
-      completed.should.equal(true)
+      handlerCompleted.should.equal(true)
       parsed.pos.should.equal('hello')
     })
 

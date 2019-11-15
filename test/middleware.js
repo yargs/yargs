@@ -4,7 +4,7 @@
 const { expect, use } = require('chai')
 use(require('chai-as-promised'))
 const { globalMiddlewareFactory } = require('../lib/middleware')
-const { promisifyTest, sleep } = require('./helpers/utils')
+const { sleep } = require('./helpers/utils')
 let yargs
 require('chai').should()
 
@@ -117,18 +117,50 @@ describe('middleware', () => {
   // addresses https://github.com/yargs/yargs/issues/1237
   describe('async', () => {
     it('fails when the promise returned by the middleware rejects', async () => {
-      const error = new Error('to be passed to fail')
-      const handlerErr = new Error('should not have been called')
-      await promisifyTest((done) =>
-        yargs('foo')
-          .command('foo', 'foo command', () => {}, (argv) => done(handlerErr), [ (argv) => Promise.reject(error) ])
-          .fail((msg, err) => {
-            expect(msg).to.equal(null)
-            expect(err).to.equal(error)
-            done()
-          })
-          .parse()
-      )
+      const middlewareFailureErr = new Error('to be passed to fail')
+      const handlerFailureErr = new Error('should not have been called')
+      let failCalled = true
+      await yargs('foo')
+        .command('foo', 'foo command', () => {},
+          (argv) => {
+            throw handlerFailureErr
+          },
+          [async (argv) => {
+            await sleep(10)
+            throw middlewareFailureErr
+          }]
+        )
+        .fail((msg, err) => {
+          expect(msg).to.equal(null)
+          expect(err).to.equal(middlewareFailureErr)
+          failCalled = true
+        })
+        .parse()
+      failCalled.should.equal(true)
+    })
+
+    it('fails when the middleware calls an (err, value) callback with an error', async () => {
+      const middlewareFailureErr = new Error('to be passed to fail')
+      const handlerFailureErr = new Error('should not have been called')
+      let failCalled = true
+      await yargs('foo')
+        .command('foo', 'foo command', () => {},
+          (argv) => {
+            throw handlerFailureErr
+          },
+          [(argv, yargs, done) => {
+            setTimeout(() => {
+              done(middlewareFailureErr)
+            }, 10)
+          }]
+        )
+        .fail((msg, err) => {
+          expect(msg).to.equal(null)
+          expect(err).to.equal(middlewareFailureErr)
+          failCalled = true
+        })
+        .parse()
+      failCalled.should.equal(true)
     })
 
     it('calls the command handler when all middleware promises resolve', (done) => {
@@ -284,11 +316,12 @@ describe('middleware', () => {
         .parse()
     })
 
-    it('runs async before validation by returning a promise', function (done) {
-      yargs(['mw'])
+    it('runs async before validation by returning a promise', async function () {
+      let handlerCalled = false
+      await yargs(['mw'])
         .middleware([async function (argv) {
           await sleep(5)
-            argv.mw = 'mw'
+          argv.mw = 'mw'
           return argv
         }], true)
         .command(
@@ -302,19 +335,21 @@ describe('middleware', () => {
           },
           function (argv) {
             argv.mw.should.equal('mw')
-            return done()
+            handlerCalled = true
           }
         )
         .exitProcess(false)
         .parse()
+      handlerCalled.should.equal(true)
     })
 
-    it('runs async before validation by calling the done callback', function (done) {
-      yargs(['mw'])
-        .middleware([function (argv, yargs, middlewareDone) {
+    it('runs async before validation by calling an (err, value) callback without error', async function () {
+      let handlerCalled = false
+      await yargs(['mw'])
+        .middleware([function (argv, yargs, done) {
           setTimeout(() => {
             argv.mw = 'mw'
-            middlewareDone(argv)
+            done(undefined, argv)
           }, 5)
         }], true)
         .command(
@@ -328,11 +363,12 @@ describe('middleware', () => {
           },
           function (argv) {
             argv.mw.should.equal('mw')
-            return done()
+            handlerCalled = true
           }
         )
         .exitProcess(false)
         .parse()
+      handlerCalled.should.equal(true)
     })
 
     it('runs before validation, when middleware is added in builder', (done) => {

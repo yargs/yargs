@@ -202,11 +202,25 @@ describe('Completion', () => {
     it('if a promise is returned, completions can be asynchronous', async () => {
       const r = await checkOutputAsync((cb) =>
         yargs(['--get-yargs-completions'])
-          .completion('completion', (current, argv) => new Promise((resolve, reject) => {
+          .completion('completion', async (current, argv) => {
+            await sleep(10)
+            return ['apple', 'banana']
+          })
+          .parse()
+      )
+
+      r.logs.should.include('apple')
+      r.logs.should.include('banana')
+    })
+
+    it('if an (err, value) callback is called without error, completions can be asynchronous', async () => {
+      const r = await checkOutputAsync(() =>
+        yargs(['--get-yargs-completions'])
+          .completion('completion', (current, argv, done) => {
             setTimeout(() => {
-              resolve(['apple', 'banana'])
+              done(undefined, ['apple', 'banana'])
             }, 10)
-          }))
+          })
           .parse()
       )
 
@@ -215,34 +229,38 @@ describe('Completion', () => {
     })
 
     it('if a promise is returned, errors are handled', async () => {
+      const failingCompletionError = new Error('failing completion')
       try {
         await checkOutputAsync(() =>
           yargs(['--get-yargs-completions'])
             .completion('completion', async (current, argv) => {
               await sleep(10)
-              throw new Error('Test')
+              throw failingCompletionError
             })
             .parse()
         )
-        throw new Error('an error should have been raised')
+        throw new Error('parsing should have failed')
       } catch (err) {
-        err.message.should.equal('Test')
+        err.should.equal(failingCompletionError)
       }
     })
 
-    it('if a callback parameter is provided, completions can be asynchronous', async () => {
-      const r = await checkOutputAsync(() =>
-        yargs(['--get-yargs-completions'])
-          .completion('completion', (current, argv, completion) => {
-            setTimeout(() => {
-              completion(['apple', 'banana'])
-            }, 10)
-          })
-          .parse()
-      )
-
-      r.logs.should.include('apple')
-      r.logs.should.include('banana')
+    it('if an (err, value) callback is called with an error, errors are handled', async () => {
+      const failingCompletionError = new Error('failing completion')
+      try {
+        await checkOutputAsync(() =>
+          yargs(['--get-yargs-completions'])
+            .completion('completion', async (current, argv, done) => {
+              setTimeout(() => {
+                done(failingCompletionError)
+              }, 10)
+            })
+            .parse()
+        )
+        throw new Error('parsing should have failed')
+      } catch (err) {
+        err.should.equal(failingCompletionError)
+      }
     })
   })
 
