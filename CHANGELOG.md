@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [15.0.1](https://www.github.com/yargs/yargs/compare/v15.0.0...v15.0.1) (2019-11-16)
+
+
+### Bug Fixes
+
+* **deps:** cliui, find-up, and string-width, all drop Node 6 support ([#1479](https://www.github.com/yargs/yargs/issues/1479)) ([6a9ebe2](https://www.github.com/yargs/yargs/commit/6a9ebe2d955e3e979e76c07ffbb1c17fef64cb49))
+
 ## [15.0.0](https://www.github.com/yargs/yargs/compare/v14.2.0...v15.0.0) (2019-11-10)
 
 
