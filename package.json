@@ -19,7 +19,7 @@
     "LICENSE"
   ],
   "dependencies": {
-    "cliui": "^5.0.0",
+    "cliui": "^6.0.0",
     "decamelize": "^1.2.0",
     "find-up": "^3.0.0",
     "get-caller-file": "^2.0.1",
@@ -43,7 +43,6 @@
     "mocha": "^5.2.0",
     "rimraf": "^2.6.3",
     "standard": "^12.0.1",
-    "standard-version": "^7.0.0",
     "which": "^1.3.1",
     "yargs-test-extends": "^1.0.1"
   },
@@ -51,8 +50,7 @@
     "fix": "standard --fix",
     "posttest": "standard",
     "test": "c8 --reporter=html --reporter=text mocha --require ./test/before.js --timeout=12000 --check-leaks",
-    "coverage": "c8 report --reporter=text-lcov | coveralls",
-    "release": "standard-version"
+    "coverage": "c8 report --reporter=text-lcov | coveralls"
   },
   "repository": {
     "type": "git",
