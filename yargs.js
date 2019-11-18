@@ -485,7 +485,7 @@ function Yargs (processArgs, cwd, parentRequire) {
 
   self.onFinishCommand = function (f) {
     argsert('<function>', [f], arguments.length)
-    self._onFinishCommand = f
+    self.handlerFinishCommand = f
     return self
   }
 
