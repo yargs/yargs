@@ -1191,9 +1191,15 @@ function Yargs (processArgs, cwd, parentRequire) {
   // we temporarily populate '--' rather than _, with arguments
   // after the '--' directive. After the parse, we copy these back.
   self._copyDoubleDash = function (argv) {
-    if (!argv._) return argv
+    if (!argv._ || !argv['--']) return argv
     argv._.push.apply(argv._, argv['--'])
-    delete argv['--']
+
+    // TODO(bcoe): refactor command parsing such that this delete is not
+    // necessary: https://github.com/yargs/yargs/issues/1482
+    try {
+      delete argv['--']
+    } catch (_err) {}
+
     return argv
   }
 

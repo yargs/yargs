@@ -2327,4 +2327,20 @@ describe('yargs dsl tests', () => {
         })
     })
   })
+
+  // see: https://github.com/babel/babel/pull/10733
+  it('should not fail if command handler freezes object', () => {
+    const argv = yargs()
+      .command('cmd', 'a command', (yargs) => {
+        yargs.parserConfiguration({ 'populate--': true })
+      }, (argv) => {
+        Object.freeze(argv)
+        argv._.should.eql(['cmd'])
+        argv['--'].should.eql(['foo'])
+      }).parse(['cmd', '--', 'foo'])
+    argv._.should.eql(['cmd', 'foo'])
+    // This should actually not be undefined, once we fix
+    // #1482.
+    argv['--'].should.eql(['foo'])
+  })
 })
