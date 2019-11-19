@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [15.0.2](https://www.github.com/yargs/yargs/compare/v15.0.1...v15.0.2) (2019-11-19)
+
+
+### Bug Fixes
+
+* temporary fix for libraries that call Object.freeze() ([#1483](https://www.github.com/yargs/yargs/issues/1483)) ([99c2dc8](https://www.github.com/yargs/yargs/commit/99c2dc850e67c606644f8b0c0bca1a59c87dcbcd))
+
 ### [15.0.1](https://www.github.com/yargs/yargs/compare/v15.0.0...v15.0.1) (2019-11-16)
 
 
