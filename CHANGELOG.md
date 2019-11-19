@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 14.2.2
+
+### Bug Fixes
+
+* temporary fix for libraries that call Object.freeze() ([#1483](https://www.github.com/yargs/yargs/issues/1483)) ([99c2dc8](https://www.github.com/yargs/yargs/commit/99c2dc850e67c606644f8b0c0bca1a59c87dcbcd))
+
 ### [14.2.1](https://github.com/yargs/yargs/compare/v14.2.0...v14.2.1) (2019-10-30)
 
 
