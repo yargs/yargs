@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-var argv = require('./yargs-symlink/index.js')
+var argv = require('./yargs-symlink/index.js').yargsa(process.argv.slice(2))
   .help('help')
   .version()
   .parserConfiguration({

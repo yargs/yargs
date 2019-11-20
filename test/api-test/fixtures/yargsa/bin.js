@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-var argv = require('../../index')
+var argv = require('../../../../index').yargsa(process.argv.slice(2))
   .help('help')
   .completion()
   .argv

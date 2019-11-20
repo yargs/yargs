@@ -14,6 +14,8 @@ function Argv (processArgs, cwd) {
   return argv
 }
 
+Argv.yargsa = require('./yargsa')
+
 /*  Hack an instance of Argv with process.argv into Argv
     so people can do
     require('yargs')(['--beeble=1','-z','zizzle']).argv

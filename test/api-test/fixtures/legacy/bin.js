@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-var argv = require('../../index')
+var argv = require('../../../../index')
   .help('help')
   .completion()
   .argv
