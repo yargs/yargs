@@ -79,8 +79,8 @@ yargs.command('download <url> [files..]', 'download several files')
 You can use the method [`.positional()`](/docs/api.md#positionalkey-opt) in a command's builder function to describe and configure a positional argument:
 
 ```js
-yargs.command('get <source> [proxy]', 'make a get HTTP request', (yargs) => {
-  yargs.positional('source', {
+yargs.command('get <source> [proxy]', 'make a get HTTP request', (y) => {
+  y.positional('source', {
     describe: 'URL to fetch content from',
     type: 'string',
     default: 'http://www.google.com'
@@ -130,7 +130,7 @@ require('yargs')
     command: 'configure <key> [value]',
     aliases: ['config', 'cfg'],
     desc: 'Set a config variable',
-    builder: (yargs) => yargs.default('value', 'true'),
+    builder: (y) => y.default('value', 'true'),
     handler: (argv) => {
       console.log(`setting ${argv.key} to ${argv.value}`)
     }
@@ -329,8 +329,8 @@ cmds/remote.js:
 ```js
 exports.command = 'remote <command>'
 exports.desc = 'Manage set of tracked repos'
-exports.builder = function (yargs) {
-  return yargs.commandDir('remote_cmds')
+exports.builder = function (y) {
+  return y.commandDir('remote_cmds')
 }
 exports.handler = function (argv) {}
 ```
@@ -507,8 +507,8 @@ yargs.middleware(normalizeCredentials)
 ```
 var argv = require('yargs')
   .usage('Usage: $0 <command> [options]')
-  .command('login', 'Authenticate user', (yargs) =>{
-        return yargs.option('username')
+  .command('login', 'Authenticate user', (y) =>{
+        return y.option('username')
                     .option('password')
       } ,(argv) => {
         authenticateUser(argv.username, argv.password)

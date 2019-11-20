@@ -152,11 +152,11 @@ describe('middleware', () => {
         .command(
           'cmd',
           'cmd command',
-          function (yargs) {
-            yargs.command(
+            function (y) {
+              y.command(
               'subcmd',
               'subcmd command',
-              function (yargs) {}
+                function (y) {}
             )
           }
         )
@@ -204,8 +204,8 @@ describe('middleware', () => {
       .command(
         'mw',
         'adds func to middleware',
-        function (yargs) {
-          yargs.middleware(function (argv) {
+          function (y) {
+            y.middleware(function (argv) {
             argv.mw = 'mw'
           })
         },
@@ -223,9 +223,9 @@ describe('middleware', () => {
       .command(
         'mw',
         'adds func to middleware',
-        function (yargs) {
-          yargs.middleware(function (argv, yargs) {
-            expect(typeof yargs.help).to.equal('function')
+          function (y) {
+            y.middleware(function (argv, y) {
+              expect(typeof y.help).to.equal('function')
             argv.mw = 'mw'
           })
         },
@@ -247,8 +247,8 @@ describe('middleware', () => {
       .command(
         'mw',
         'adds func to middleware',
-        function (yargs) {
-          yargs.middleware((argv) => {
+          function (y) {
+            y.middleware((argv) => {
             argv.f.should.equal(99)
             argv.mw2 = 'mw2'
           })
@@ -319,10 +319,10 @@ describe('middleware', () => {
         .command(
           'mw',
           'adds func to middleware',
-          function (yargs) {
+            function (y) {
             // we know that this middleware is being run in the context of the
             // mw command.
-            yargs.middleware(function (argv) {
+              y.middleware(function (argv) {
               argv.mw = 'mw'
             }, true)
           },
@@ -365,8 +365,8 @@ describe('middleware', () => {
         .command(
           'mw',
           'adds func to middleware',
-          function (yargs) {
-            yargs
+            function (y) {
+              y
               .middleware((argv) => {
                 argv.f.should.equal(99)
                 argv.mw = 'mw'

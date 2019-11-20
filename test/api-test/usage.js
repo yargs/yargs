@@ -487,8 +487,8 @@ describe('usage tests', () => {
           }, (argv) => {
             throw new YError('blah')
           })
-          .fail((message, error, yargs) => {
-            yargs.showHelp()
+            .fail((message, error, y) => {
+              y.showHelp()
           })
           .exitProcess(false)
           .wrap(null)
@@ -530,8 +530,8 @@ describe('usage tests', () => {
                 })
                 .exitProcess(false)
                 .wrap(null)
-                .command('test', 'test', (subYargs) => {
-                  subYargs
+                  .command('test', 'test', (subY) => {
+                    subY
                     .fail((message, error) => {
                       console.log([error.name, error.message])
                     })
@@ -1621,7 +1621,7 @@ describe('usage tests', () => {
     it('allows a command to override global wrap()', () => {
       const uploadCommand = 'upload <dest>'
       const uploadDesc = 'Upload cwd'
-      const uploadBuilder = yargs => yargs
+        const uploadBuilder = y => y
         .option('force', {
           describe: 'Force overwrite of remote directory contents',
           type: 'boolean'
@@ -1665,7 +1665,7 @@ describe('usage tests', () => {
 
     it('resets groups for a command handler, respecting order', () => {
       const r = checkUsage(() => yargs(['upload', '-h'])
-        .command('upload', 'upload something', yargs => yargs
+          .command('upload', 'upload something', y => y
           .option('q', {
             type: 'boolean',
             group: 'Flags:'
@@ -1695,7 +1695,7 @@ describe('usage tests', () => {
 
     it('allows global option to be disabled', () => {
       const r = checkUsage(() => yargs(['upload', '-h'])
-        .command('upload', 'upload something', yargs => yargs
+          .command('upload', 'upload something', y => y
           .option('q', {
             type: 'boolean',
             group: 'Flags:'
@@ -1735,7 +1735,7 @@ describe('usage tests', () => {
 
     it('can add to preserved groups', () => {
       const r = checkUsage(() => yargs(['upload', '-h'])
-        .command('upload', 'upload something', yargs => yargs
+          .command('upload', 'upload something', y => y
           .option('q', {
             type: 'boolean',
             group: 'Awesome Flags:'
@@ -1768,7 +1768,7 @@ describe('usage tests', () => {
 
     it('can bump up preserved groups', () => {
       const r = checkUsage(() => yargs(['upload', '-h'])
-        .command('upload', 'upload something', yargs => yargs
+          .command('upload', 'upload something', y => y
           .group([], 'Awesome Flags:')
           .option('q', {
             type: 'boolean',
@@ -1809,7 +1809,7 @@ describe('usage tests', () => {
 
     it('should display global non empty groups for commands', () => {
       const r = checkUsage(() => yargs(['upload', '-h'])
-        .command('upload', 'upload something', yargs => yargs
+          .command('upload', 'upload something', y => y
           .option('q', {
             type: 'boolean'
           })
@@ -1845,8 +1845,8 @@ describe('usage tests', () => {
 
     it('should display global non empty groups for subcommands', () => {
       const r = checkUsage(() => yargs(['do', 'upload', '-h'])
-        .command('do', 'do something', yargs => yargs
-          .command('upload', 'upload something', yargs => yargs
+          .command('do', 'do something', y => y
+            .command('upload', 'upload something', y => y
             .option('q', {
               type: 'boolean'
             })
@@ -1884,8 +1884,8 @@ describe('usage tests', () => {
     it('should list a module command only once', () => {
       const r = checkUsage(() => yargs('--help')
         .command('upload', 'upload something', {
-          builder (yargs) {
-            return yargs
+            builder (y) {
+              return y
           },
           handler (argv) {}
         })
@@ -1908,8 +1908,8 @@ describe('usage tests', () => {
     it('allows a builder function to override default usage() string', () => {
       const r = checkUsage(() => yargs('upload --help')
         .command('upload', 'upload something', {
-          builder (yargs) {
-            return yargs.usage('Usage: program upload <something> [opts]').demand(1)
+            builder (y) {
+              return y.usage('Usage: program upload <something> [opts]').demand(1)
           },
           handler (argv) {}
         })
@@ -1928,7 +1928,7 @@ describe('usage tests', () => {
 
     it('allows a builder function to disable default usage() with null', () => {
       const r = checkUsage(() => yargs('upload --help')
-        .command('upload', 'upload something', yargs => yargs.usage(null), (argv) => {})
+          .command('upload', 'upload something', y => y.usage(null), (argv) => {})
         .wrap(null)
         .parse()
       )
@@ -1942,7 +1942,7 @@ describe('usage tests', () => {
 
     it('displays given command chain with positional args in default usage for subcommand with builder object', () => {
       const r = checkUsage(() => yargs('one two --help')
-        .command('one <sub>', 'level one, requires subcommand', yargs => yargs.command('two [next]', 'level two', {}, (argv) => {}), (argv) => {})
+          .command('one <sub>', 'level one, requires subcommand', y => y.command('two [next]', 'level two', {}, (argv) => {}), (argv) => {})
         .wrap(null)
         .parse()
       )
@@ -1960,7 +1960,7 @@ describe('usage tests', () => {
 
     it('displays given command chain with positional args in default usage for subcommand with builder function', () => {
       const r = checkUsage(() => yargs('one two --help')
-        .command('one <sub>', 'level one, requires subcommand', yargs => yargs.command('two [next]', 'level two', yargs => yargs, (argv) => {}), (argv) => {})
+          .command('one <sub>', 'level one, requires subcommand', y => y.command('two [next]', 'level two', y => y, (argv) => {}), (argv) => {})
         .wrap(null)
         .parse()
       )
@@ -2016,7 +2016,7 @@ describe('usage tests', () => {
 
     it('allows a builder to add more than one usage with mutiple usage calls', () => {
       const r = checkUsage(() => yargs('upload --help')
-        .command('upload', 'upload something', yargs => yargs.usage('$0 upload [something]').usage('$0 upload [something else]'), (argv) => {})
+          .command('upload', 'upload something', y => y.usage('$0 upload [something]').usage('$0 upload [something else]'), (argv) => {})
         .wrap(null)
         .parse()
       )
@@ -2033,7 +2033,7 @@ describe('usage tests', () => {
 
     it('allows a builder to disable usage with null after mutiple usage calls', () => {
       const r = checkUsage(() => yargs('upload --help')
-        .command('upload', 'upload something', yargs => yargs.usage('$0 upload [something]').usage('$0 upload [something else]').usage(null), (argv) => {})
+          .command('upload', 'upload something', y => y.usage('$0 upload [something]').usage('$0 upload [something else]').usage(null), (argv) => {})
         .wrap(null)
         .parse()
       )
@@ -2047,8 +2047,8 @@ describe('usage tests', () => {
 
     it('does not display $0 twice when default commands are enabled', () => {
       const r = checkUsage(() => yargs('-h')
-        .usage('$0', 'do something', yargs => {
-          yargs
+          .usage('$0', 'do something', y => {
+            y
             .alias('h', 'help')
         })
         .wrap(null)
@@ -2283,8 +2283,8 @@ describe('usage tests', () => {
       it('should output given desc with default value', () => {
         const r = checkUsage(() => yargs(['url', '-h'])
           .help('h')
-          .command('url', 'Print a URL', (yargs) => {
-            yargs.positional('port', {
+            .command('url', 'Print a URL', (y) => {
+              y.positional('port', {
               describe: 'The port value for URL',
               defaultDescription: '80 for HTTP and 443 for HTTPS',
               default: 80
@@ -2300,8 +2300,8 @@ describe('usage tests', () => {
       it('should output given desc without default value', () => {
         const r = checkUsage(() => yargs(['url', '-h'])
           .help('h')
-          .command('url', 'Print a URL', (yargs) => {
-            yargs.positional('port', {
+            .command('url', 'Print a URL', (y) => {
+              y.positional('port', {
               describe: 'The port value for URL',
               defaultDescription: '80 for HTTP and 443 for HTTPS'
             })
@@ -2316,8 +2316,8 @@ describe('usage tests', () => {
       it('should prefer given desc over function desc', () => {
         const r = checkUsage(() => yargs(['url', '-h'])
           .help('h')
-          .command('url', 'Print a URL', (yargs) => {
-            yargs.positional('port', {
+            .command('url', 'Print a URL', (y) => {
+              y.positional('port', {
               describe: 'The port value for URL',
               defaultDescription: '80 for HTTP and 443 for HTTPS',
               default: function determinePort () {
@@ -2337,8 +2337,8 @@ describe('usage tests', () => {
       it('should prefer default() desc when given last', () => {
         const r = checkUsage(() => yargs(['url', '-h'])
           .help('h')
-          .command('url', 'Print a URL', (yargs) => {
-            yargs
+            .command('url', 'Print a URL', (y) => {
+              y
               .positional('port', {
                 describe: 'The port value for URL',
                 defaultDescription: 'depends on protocol'
@@ -2355,8 +2355,8 @@ describe('usage tests', () => {
       it('should prefer positional() desc when given last', () => {
         const r = checkUsage(() => yargs(['url', '-h'])
           .help('h')
-          .command('url', 'Print a URL', (yargs) => {
-            yargs
+            .command('url', 'Print a URL', (y) => {
+              y
               .default('port', null, '80 for HTTP and 443 for HTTPS')
               .positional('port', {
                 describe: 'The port value for URL',
@@ -2373,8 +2373,8 @@ describe('usage tests', () => {
       it('should prefer positional() desc over default() function', () => {
         const r = checkUsage(() => yargs(['url', '-h'])
           .help('h')
-          .command('url', 'Print a URL', (yargs) => {
-            yargs
+            .command('url', 'Print a URL', (y) => {
+              y
               .positional('port', {
                 describe: 'The port value for URL',
                 defaultDescription: '80 for HTTP and 443 for HTTPS'
@@ -2966,8 +2966,8 @@ describe('usage tests', () => {
 
     it('should display positionals that have been configured', () => {
       const r = checkUsage(() => yargs('--help')
-        .command('* [pattern]', 'List key-value pairs for pattern', (yargs) => {
-          yargs.positional('pattern', {
+          .command('* [pattern]', 'List key-value pairs for pattern', (y) => {
+            y.positional('pattern', {
             type: 'string',
             default: '.*'
           })
@@ -3025,8 +3025,8 @@ describe('usage tests', () => {
   describe('positional', () => {
     it('should display help section for positionals', () => {
       const r = checkUsage(() => yargs('--help list')
-        .command('list [pattern]', 'List key-value pairs for pattern', (yargs) => {
-          yargs.positional('pattern', {
+          .command('list [pattern]', 'List key-value pairs for pattern', (y) => {
+            y.positional('pattern', {
             describe: 'the pattern to list keys for'
           })
         })
@@ -3049,8 +3049,8 @@ describe('usage tests', () => {
 
     it('shows that variadic positional arguments are arrays', () => {
       const r = checkUsage(() => yargs('--help list')
-        .command('list [pattern...]', 'List key-value pairs for pattern', (yargs) => {
-          yargs.positional('pattern', {
+          .command('list [pattern...]', 'List key-value pairs for pattern', (y) => {
+            y.positional('pattern', {
             describe: 'the pattern to list keys for'
           })
         })
@@ -3073,8 +3073,8 @@ describe('usage tests', () => {
 
     it('indicates that <foo> positional arguments are required', () => {
       const r = checkUsage(() => yargs('--help list')
-        .command('list <pattern>', 'List key-value pairs for pattern', (yargs) => {
-          yargs.positional('pattern', {
+          .command('list <pattern>', 'List key-value pairs for pattern', (y) => {
+            y.positional('pattern', {
             describe: 'the pattern to list keys for'
           })
         })
@@ -3097,8 +3097,8 @@ describe('usage tests', () => {
 
     it('displays aliases appropriately', () => {
       const r = checkUsage(() => yargs('--help list')
-        .command('list [pattern|thingy]', 'List key-value pairs for pattern', (yargs) => {
-          yargs.positional('pattern', {
+          .command('list [pattern|thingy]', 'List key-value pairs for pattern', (y) => {
+            y.positional('pattern', {
             describe: 'the pattern to list keys for'
           })
         })
@@ -3121,8 +3121,8 @@ describe('usage tests', () => {
 
     it('displays type information', () => {
       const r = checkUsage(() => yargs('--help list')
-        .command('list [pattern]', 'List key-value pairs for pattern', (yargs) => {
-          yargs.positional('pattern', {
+          .command('list [pattern]', 'List key-value pairs for pattern', (y) => {
+            y.positional('pattern', {
             describe: 'the pattern to list keys for',
             type: 'string'
           })
@@ -3146,8 +3146,8 @@ describe('usage tests', () => {
 
     it('displays choices array', () => {
       const r = checkUsage(() => yargs('--help list')
-        .command('list [pattern]', 'List key-value pairs for pattern', (yargs) => {
-          yargs.positional('pattern', {
+          .command('list [pattern]', 'List key-value pairs for pattern', (y) => {
+            y.positional('pattern', {
             describe: 'the pattern to list keys for',
             choices: ['foo', 'bar']
           })

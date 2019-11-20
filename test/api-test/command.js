@@ -15,7 +15,7 @@ describe('Command', () => {
   describe('positional arguments', () => {
     it('parses command string and populates optional and required positional arguments', () => {
       const y = yargs([])
-        .command('foo <bar> [awesome]', 'my awesome command', yargs => yargs)
+          .command('foo <bar> [awesome]', 'my awesome command', y => y)
       const command = y.getCommandInstance()
       const handlers = command.getCommandHandlers()
       handlers.foo.demanded.should.deep.include({
@@ -75,7 +75,7 @@ describe('Command', () => {
 
     it('populates subcommand\'s inner argv with positional arguments', () => {
       yargs('foo bar hello world')
-        .command('foo', 'my awesome command', yargs => yargs.command(
+          .command('foo', 'my awesome command', y => y.command(
           'bar <greeting> [recipient]',
           'subcommands are cool',
           noop,
@@ -118,8 +118,8 @@ describe('Command', () => {
         .command(
           '$0 [foo..]',
           'does a thing',
-          yargs =>
-            yargs
+            y =>
+              y
               .option('config', {
                 default: '.foo.json'
               })
@@ -308,7 +308,7 @@ describe('Command', () => {
     it('accepts function as 3rd argument', () => {
       const cmd = 'foo'
       const desc = 'i\'m not feeling very creative at the moment'
-      const builder = yargs => yargs
+        const builder = y => y
 
       const y = yargs([]).command(cmd, desc, builder)
       const handlers = y.getCommandInstance().getCommandHandlers()
@@ -712,8 +712,8 @@ describe('Command', () => {
       const cmd = {
         command: 'cmd <sub>',
         desc: 'Try a command',
-        builder (yargs) {
-          return yargs.command(sub)
+          builder (y) {
+            return y.command(sub)
         },
         handler (argv) {}
       }
@@ -780,7 +780,7 @@ describe('Command', () => {
     yargs('eat')
       .env('FUN_DIP')
       .global('stick') // this does not actually need to be global
-      .command('eat', 'Adult supervision recommended', yargs => yargs.boolean('powder').exitProcess(false), (argv) => {
+        .command('eat', 'Adult supervision recommended', y => y.boolean('powder').exitProcess(false), (argv) => {
         argv.powder.should.equal(true)
         argv.stick.should.equal('yummy')
       })
@@ -841,8 +841,8 @@ describe('Command', () => {
   // addresses https://github.com/yargs/yargs/issues/522
   it('does not require builder function to return', () => {
     const argv = yargs('yo')
-      .command('yo [someone]', 'Send someone a yo', (yargs) => {
-        yargs.default('someone', 'Pat')
+        .command('yo [someone]', 'Send someone a yo', (y) => {
+          y.default('someone', 'Pat')
       }, (argv) => {
         argv.should.have.property('someone').and.equal('Pat')
       })
@@ -852,8 +852,8 @@ describe('Command', () => {
 
   it('allows builder function to parse argv without returning', () => {
     const argv = yargs('yo Jude')
-      .command('yo <someone>', 'Send someone a yo', (yargs) => {
-        yargs.parse()
+        .command('yo <someone>', 'Send someone a yo', (y) => {
+          y.parse()
       }, (argv) => {
         argv.should.have.property('someone').and.equal('Jude')
       }).parse()
@@ -862,7 +862,7 @@ describe('Command', () => {
 
   it('allows builder function to return parsed argv', () => {
     const argv = yargs('yo Leslie')
-      .command('yo <someone>', 'Send someone a yo', yargs => yargs.parse(), (argv) => {
+        .command('yo <someone>', 'Send someone a yo', y => y.parse(), (argv) => {
         argv.should.have.property('someone').and.equal('Leslie')
       })
       .parse()
@@ -872,7 +872,7 @@ describe('Command', () => {
   // addresses https://github.com/yargs/yargs/issues/540
   it('ignores extra spaces in command string', () => {
     const y = yargs([])
-      .command('foo  [awesome]', 'my awesome command', yargs => yargs)
+        .command('foo  [awesome]', 'my awesome command', y => y)
     const command = y.getCommandInstance()
     const handlers = command.getCommandHandlers()
     handlers.foo.demanded.should.not.include({
@@ -1026,9 +1026,9 @@ describe('Command', () => {
       it('defaults to false when not called', () => {
         let commandCalled = false
         yargs('hi')
-          .command('hi', 'The hi command', (innerYargs) => {
+            .command('hi', 'The hi command', (innerY) => {
             commandCalled = true
-            innerYargs.getStrict().should.equal(false)
+              innerY.getStrict().should.equal(false)
           })
         yargs.getStrict().should.equal(false)
         yargs.parse() // parse and run command
@@ -1038,9 +1038,9 @@ describe('Command', () => {
       it('can be enabled just for a command', () => {
         let commandCalled = false
         yargs('hi')
-          .command('hi', 'The hi command', (innerYargs) => {
+            .command('hi', 'The hi command', (innerY) => {
             commandCalled = true
-            innerYargs.strict().getStrict().should.equal(true)
+              innerY.strict().getStrict().should.equal(true)
           })
         yargs.getStrict().should.equal(false)
         yargs.parse() // parse and run command
@@ -1051,9 +1051,9 @@ describe('Command', () => {
         let commandCalled = false
         yargs('hi')
           .strict()
-          .command('hi', 'The hi command', (innerYargs) => {
+            .command('hi', 'The hi command', (innerY) => {
             commandCalled = true
-            innerYargs.getStrict().should.equal(true)
+              innerY.getStrict().should.equal(true)
           })
         yargs.getStrict().should.equal(true)
         yargs.parse() // parse and run command
@@ -1075,8 +1075,8 @@ describe('Command', () => {
       it('does not fail strict check due to postional command arguments in nested commands', (done) => {
         yargs()
           .strict()
-          .command('hi', 'The hi command', (yargs) => {
-            yargs.command('ben <age>', 'ben command', noop, noop)
+            .command('hi', 'The hi command', (y) => {
+              y.command('ben <age>', 'ben command', noop, noop)
           })
           .parse('hi ben 99', (err, argv, output) => {
             expect(err).to.equal(null)
@@ -1088,9 +1088,9 @@ describe('Command', () => {
         let commandCalled = false
         yargs('hi')
           .strict()
-          .command('hi', 'The hi command', (innerYargs) => {
+            .command('hi', 'The hi command', (innerY) => {
             commandCalled = true
-            innerYargs.strict(false).getStrict().should.equal(false)
+              innerY.strict(false).getStrict().should.equal(false)
           })
         yargs.getStrict().should.equal(true)
         yargs.parse() // parse and run command
@@ -1186,8 +1186,8 @@ describe('Command', () => {
       // addresses https://github.com/yargs/yargs/issues/794
       it('should bubble errors thrown by coerce function inside commands', (done) => {
         yargs
-          .command('foo', 'the foo command', (yargs) => {
-            yargs.coerce('x', (arg) => {
+            .command('foo', 'the foo command', (y) => {
+              y.coerce('x', (arg) => {
               throw Error('yikes an error')
             })
           })
@@ -1428,8 +1428,8 @@ describe('Command', () => {
   // see: https://github.com/yargs/yargs/issues/861 phew! that's an edge-case.
   it('should allow positional arguments for inner commands in strict mode, when no handler is provided', () => {
     yargs()
-      .command('foo', 'outer command', (yargs) => {
-        yargs.command('bar [optional]', 'inner command')
+        .command('foo', 'outer command', (y) => {
+          y.command('bar [optional]', 'inner command')
       })
       .strict()
       .parse('foo bar 33', (err, argv) => {
@@ -1442,8 +1442,8 @@ describe('Command', () => {
   describe('usage', () => {
     it('allows you to configure a default command', () => {
       yargs()
-        .usage('$0 <port>', 'default command', (yargs) => {
-          yargs.positional('port', {
+          .usage('$0 <port>', 'default command', (y) => {
+            y.positional('port', {
             type: 'string'
           })
         })
@@ -1456,8 +1456,8 @@ describe('Command', () => {
     it('throws exception if default command does not have leading $0', () => {
       expect(() => {
         yargs()
-          .usage('<port>', 'default command', (yargs) => {
-            yargs.positional('port', {
+            .usage('<port>', 'default command', (y) => {
+              y.positional('port', {
               type: 'string'
             })
           })
@@ -1502,8 +1502,8 @@ describe('Command', () => {
     // see: https://github.com/yargs/yargs/issues/1144
     it('displays error and appropriate help message when handler fails', (done) => {
       const y = yargs('foo')
-        .command('foo', 'foo command', (yargs) => {
-          yargs.option('bar', {
+          .command('foo', 'foo command', (y) => {
+            y.option('bar', {
             describe: 'bar option'
           })
         }, (argv) => {

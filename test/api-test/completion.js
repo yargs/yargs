@@ -63,15 +63,15 @@ describe('Completion', () => {
       const r = checkUsage(() => yargs(['./completion', '--get-yargs-completions', 'cmd2', '--o'])
         .help(false)
         .version(false)
-        .command('cmd1', 'first command', (subYargs) => {
-          subYargs.options({
+          .command('cmd1', 'first command', (subY) => {
+            subY.options({
             opt1: {
               describe: 'first option'
             }
           })
         })
-        .command('cmd2', 'second command', (subYargs) => {
-          subYargs.options({
+          .command('cmd2', 'second command', (subY) => {
+            subY.options({
             opt2: {
               describe: 'second option'
             }
@@ -118,8 +118,8 @@ describe('Completion', () => {
       const r = checkUsage(() => yargs(['./completion', '--get-yargs-completions', 'foo', '--b'])
         .help(false)
         .version(false)
-        .command('foo', 'foo command', (subYargs) => {
-          return subYargs.completion().parse()
+          .command('foo', 'foo command', (subY) => {
+            return subY.completion().parse()
         })
         .completion()
         .argv
@@ -282,8 +282,8 @@ describe('Completion', () => {
       process.env.SHELL = '/bin/bash'
       const r = checkUsage(() =>
         yargs(['./usage', '--get-yargs-completions', './usage', ''])
-          .usage('$0 [thing]', 'skipped', subYargs => {
-            subYargs.command('aardwolf', 'is a thing according to google')
+            .usage('$0 [thing]', 'skipped', subY => {
+              subY.command('aardwolf', 'is a thing according to google')
           })
           .command('aardvark', 'animal')
           .completion()
@@ -298,7 +298,7 @@ describe('Completion', () => {
     it('completes options for a command', () => {
       process.env.SHELL = '/bin/bash'
       const r = checkUsage(() => yargs(['./completion', '--get-yargs-completions', 'foo', '--b'])
-        .command('foo', 'foo command', subYargs => subYargs.options({
+          .command('foo', 'foo command', subY => subY.options({
           bar: {
             describe: 'bar option'
           }
@@ -399,8 +399,8 @@ describe('Completion', () => {
       process.env.SHELL = '/bin/zsh'
       const r = checkUsage(() =>
         yargs(['./usage', '--get-yargs-completions', './usage', ''])
-          .usage('$0 [thing]', 'skipped', subYargs => {
-            subYargs.command('aardwolf', 'is a thing according to google')
+            .usage('$0 [thing]', 'skipped', subY => {
+              subY.command('aardwolf', 'is a thing according to google')
           })
           .command('aardvark', 'animal')
           .completion()
@@ -415,7 +415,7 @@ describe('Completion', () => {
     it('completes options for a command', () => {
       process.env.SHELL = '/bin/zsh'
       const r = checkUsage(() => yargs(['./completion', '--get-yargs-completions', 'foo', '--b'])
-        .command('foo', 'foo command', subYargs => subYargs.options({
+          .command('foo', 'foo command', subY => subY.options({
           bar: {
             describe: 'bar option'
           }

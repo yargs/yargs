@@ -1,8 +1,8 @@
 module.exports = {
   command: 'within-a-dream [command] [opts]',
   desc: 'Dream within a dream',
-  builder: function (yargs) {
-    return yargs
+  builder: function (y) {
+    return y
       .commandDir('deeper')
       .option('with-kick', {
         desc: 'Plan a kick for controlled wake up?',

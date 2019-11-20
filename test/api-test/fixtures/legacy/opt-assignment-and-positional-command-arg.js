@@ -6,7 +6,7 @@ require('../../index')
   .command(
     'bar <baz>',
     'example',
-    function (yargs) { return yargs },
+    function (y) { return y },
     function (argv) {
       console.log(JSON.stringify({ _: argv._, foo: argv.foo, baz: argv.baz }))
     }

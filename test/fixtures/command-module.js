@@ -2,8 +2,8 @@ exports.command = 'blerg <foo>'
 
 exports.describe = 'handle blerg things'
 
-exports.builder = function (yargs) {
-  return yargs
+exports.builder = function (y) {
+  return y
     .option('banana', {
       default: 'cool'
     })

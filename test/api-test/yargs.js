@@ -412,7 +412,7 @@ describe('yargs dsl tests', () => {
           .command(
             'blerg',
             'handle blerg things',
-            yargs => yargs
+              y => y
               .command('snuh', 'snuh command')
               .help('h')
               .wrap(null),
@@ -441,7 +441,7 @@ describe('yargs dsl tests', () => {
     it('executes top-level help if no handled command is provided', () => {
       const r = checkOutput(() => {
         yargs(['snuh', '-h'])
-          .command('blerg', 'handle blerg things', yargs => yargs
+            .command('blerg', 'handle blerg things', y => y
             .command('snuh', 'snuh command')
             .help('h')
             .parse()
@@ -487,7 +487,7 @@ describe('yargs dsl tests', () => {
 
     it("accepts a module with a 'builder' and 'handler' key", () => {
       const argv = yargs(['blerg', 'bar'])
-        .command('blerg <foo>', 'handle blerg things', require('./fixtures/command'))
+          .command('blerg <foo>', 'handle blerg things', require('../fixtures/command'))
         .parse()
 
       argv.banana.should.equal('cool')
@@ -534,7 +534,7 @@ describe('yargs dsl tests', () => {
       expect(() => {
         yargs.command({
           desc: 'A command with no name',
-          builder (yargs) { return yargs },
+            builder (y) { return y },
           handler (argv) {}
         })
       }).to.throw(/No command name given for module: {(\n )? desc: 'A command with no name',\n {2}builder: \[Function(: builder)?],\n {2}handler: \[Function(: handler)?](\n| )}/)
@@ -855,7 +855,7 @@ describe('yargs dsl tests', () => {
         .command(
           'test <name>',
           'increases counter',
-          yargs => yargs.positional('name', {
+            y => y.positional('name', {
             aliases: 'n',
             describe: 'a name',
             choices: ['foobar'],
@@ -1751,8 +1751,8 @@ describe('yargs dsl tests', () => {
         .parse()
       argv._.should.deep.eql(['--foo.bar', '1', '--no-baz', '2'])
       const argv2 = yargs('foo --foo.bar --cool 1 --no-baz 2')
-        .command('foo', 'my foo command', (yargs) => {
-          yargs.boolean('cool')
+          .command('foo', 'my foo command', (y) => {
+            y.boolean('cool')
         }, () => {})
         .parserConfiguration({ 'unknown-options-as-args': true })
         .parse()
@@ -2030,7 +2030,7 @@ describe('yargs dsl tests', () => {
       let age
       let dates
       yargs('add 30days 2016-06-13 2016-07-18')
-        .command('add <age> [dates..]', 'Testing', yargs => yargs
+          .command('add <age> [dates..]', 'Testing', y => y
           .coerce('age', arg => parseInt(arg, 10) * 86400000)
           .coerce('dates', arg => arg.map(str => new Date(str))), (argv) => {
           age = argv.age
@@ -2048,7 +2048,7 @@ describe('yargs dsl tests', () => {
       let age2
       let dates
       yargs('add 30days 2016-06-13 2016-07-18')
-        .command('add <age-in-days> [dates..]', 'Testing', yargs => yargs
+          .command('add <age-in-days> [dates..]', 'Testing', y => y
           .coerce('age-in-days', arg => parseInt(arg, 10) * 86400000)
           .coerce('dates', arg => arg.map(str => new Date(str))), (argv) => {
           age1 = argv.ageInDays
@@ -2067,7 +2067,7 @@ describe('yargs dsl tests', () => {
       let msg
       let err
       yargs('throw ball')
-        .command('throw <msg>', false, yargs => yargs
+          .command('throw <msg>', false, y => y
           .coerce('msg', (arg) => {
             throw new Error(arg)
           })
@@ -2115,10 +2115,10 @@ describe('yargs dsl tests', () => {
     it('should track commands being executed', () => {
       let context
       yargs('one two')
-        .command('one', 'level one', (yargs) => {
-          context = yargs.getContext()
+          .command('one', 'level one', (y) => {
+            context = y.getContext()
           context.commands.should.deep.equal(['one'])
-          return yargs.command('two', 'level two', (yargs) => {
+            return y.command('two', 'level two', (y) => {
             context.commands.should.deep.equal(['one', 'two'])
           }, (argv) => {
             context.commands.should.deep.equal(['one', 'two'])
@@ -2134,8 +2134,8 @@ describe('yargs dsl tests', () => {
   describe('positional', () => {
     it('defaults array with no arguments to []', () => {
       const args = yargs('cmd')
-        .command('cmd [foo..]', 'run the cmd', (yargs) => {
-          yargs.positional('foo', {
+          .command('cmd [foo..]', 'run the cmd', (y) => {
+            y.positional('foo', {
             describe: 'foo positionals'
           })
         })
@@ -2145,8 +2145,8 @@ describe('yargs dsl tests', () => {
 
     it('populates array with appropriate arguments', () => {
       const args = yargs('cmd /tmp/foo/bar a b')
-        .command('cmd <file> [foo..]', 'run the cmd', (yargs) => {
-          yargs
+          .command('cmd <file> [foo..]', 'run the cmd', (y) => {
+            y
             .positional('file', {
               describe: 'the required bit'
             })
@@ -2161,8 +2161,8 @@ describe('yargs dsl tests', () => {
 
     it('allows a conflicting argument to be specified', (done) => {
       yargs()
-        .command('cmd <hero>', 'a command', (yargs) => {
-          yargs.positional('hero', {
+          .command('cmd <hero>', 'a command', (y) => {
+            y.positional('hero', {
             conflicts: 'conflicting'
           })
         }).parse('cmd batman --conflicting', (err) => {
@@ -2175,8 +2175,8 @@ describe('yargs dsl tests', () => {
 
     it('allows a default to be set', () => {
       const argv = yargs('cmd')
-        .command('cmd [heroes...]', 'a command', (yargs) => {
-          yargs.positional('heroes', {
+          .command('cmd [heroes...]', 'a command', (y) => {
+            y.positional('heroes', {
             default: ['batman', 'Iron Man']
           })
         }).parse()
@@ -2185,8 +2185,8 @@ describe('yargs dsl tests', () => {
 
     it('allows a defaultDescription to be set', () => {
       const r = checkOutput(() => yargs('cmd --help').wrap(null)
-        .command('cmd [heroes...]', 'a command', (yargs) => {
-          yargs.positional('heroes', {
+          .command('cmd [heroes...]', 'a command', (y) => {
+            y.positional('heroes', {
             default: ['batman', 'Iron Man'],
             defaultDescription: 'batman and Iron Man'
           })
@@ -2205,8 +2205,8 @@ describe('yargs dsl tests', () => {
 
     it('allows an implied argument to be specified', (done) => {
       yargs()
-        .command('cmd <hero>', 'a command', (yargs) => {
-          yargs.positional('hero', {
+          .command('cmd <hero>', 'a command', (y) => {
+            y.positional('hero', {
             implies: 'universe'
           })
         }).parse('cmd batman', (err) => {
@@ -2217,8 +2217,8 @@ describe('yargs dsl tests', () => {
 
     it('allows an alias to be provided', () => {
       const argv = yargs('cmd')
-        .command('cmd [heroes...]', 'a command', (yargs) => {
-          yargs.positional('heroes', {
+          .command('cmd [heroes...]', 'a command', (y) => {
+            y.positional('heroes', {
             alias: 'do-gooders',
             default: ['batman', 'robin']
           })
@@ -2230,8 +2230,8 @@ describe('yargs dsl tests', () => {
 
     it('allows normalize to be specified', () => {
       const argv = yargs('cmd /tmp/awesome/../ /tmp/awesome/b/../')
-        .command('cmd <files...>', 'a command', (yargs) => {
-          yargs.positional('files', {
+          .command('cmd <files...>', 'a command', (y) => {
+            y.positional('files', {
             normalize: true
           })
         }).parse()
@@ -2243,8 +2243,8 @@ describe('yargs dsl tests', () => {
 
     it('allows a choices array to be specified', (done) => {
       yargs()
-        .command('cmd <hero>', 'a command', (yargs) => {
-          yargs.positional('hero', {
+          .command('cmd <hero>', 'a command', (y) => {
+            y.positional('hero', {
             choices: ['batman', 'Iron Man', 'robin']
           })
         }).parse('cmd joker', (err) => {
@@ -2257,8 +2257,8 @@ describe('yargs dsl tests', () => {
 
     it('allows a coerce method to be provided', () => {
       const argv = yargs('cmd batman')
-        .command('cmd <hero>', 'a command', (yargs) => {
-          yargs.positional('hero', {
+          .command('cmd <hero>', 'a command', (y) => {
+            y.positional('hero', {
             coerce: function (arg) {
               return arg.toUpperCase()
             },
@@ -2271,8 +2271,8 @@ describe('yargs dsl tests', () => {
 
     it('allows a boolean type to be specified', () => {
       const argv = yargs('cmd false')
-        .command('cmd [run]', 'a command', (yargs) => {
-          yargs.positional('run', {
+          .command('cmd [run]', 'a command', (y) => {
+            y.positional('run', {
             type: 'boolean'
           })
         }).parse()
@@ -2281,8 +2281,8 @@ describe('yargs dsl tests', () => {
 
     it('allows a number type to be specified', () => {
       const argv = yargs('cmd nan')
-        .command('cmd [count]', 'a command', (yargs) => {
-          yargs.positional('count', {
+          .command('cmd [count]', 'a command', (y) => {
+            y.positional('count', {
             type: 'number'
           })
         }).parse()
@@ -2291,8 +2291,8 @@ describe('yargs dsl tests', () => {
 
     it('allows a string type to be specified', () => {
       const argv = yargs('cmd 33')
-        .command('cmd [str]', 'a command', (yargs) => {
-          yargs.positional('str', {
+          .command('cmd [str]', 'a command', (y) => {
+            y.positional('str', {
             type: 'string'
           })
         }).parse()
@@ -2301,9 +2301,9 @@ describe('yargs dsl tests', () => {
 
     it('allows positional arguments for subcommands to be configured', () => {
       const argv = yargs('cmd subcommand 33')
-        .command('cmd', 'a command', (yargs) => {
-          yargs.command('subcommand [str]', 'a subcommand', (yargs) => {
-            yargs.positional('str', {
+          .command('cmd', 'a command', (y) => {
+            y.command('subcommand [str]', 'a subcommand', (y) => {
+              y.positional('str', {
               type: 'string'
             })
           })
@@ -2324,8 +2324,8 @@ describe('yargs dsl tests', () => {
     // see: https://github.com/yargs/yargs-parser/pull/110
     it('does not parse large scientific notation values, when type string', (done) => {
       yargs('cmd')
-        .command('cmd deploy <version>', 'a command', (yargs) => {
-          yargs
+          .command('cmd deploy <version>', 'a command', (y) => {
+            y
             .version(false)
             .positional('version', {
               type: 'string'
@@ -2343,8 +2343,8 @@ describe('yargs dsl tests', () => {
   // see: https://github.com/babel/babel/pull/10733
   it('should not fail if command handler freezes object', () => {
     const argv = yargs()
-      .command('cmd', 'a command', (yargs) => {
-        yargs.parserConfiguration({ 'populate--': true })
+        .command('cmd', 'a command', (y) => {
+          y.parserConfiguration({ 'populate--': true })
       }, (argv) => {
         Object.freeze(argv)
         argv._.should.eql(['cmd'])

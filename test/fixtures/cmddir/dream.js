@@ -1,7 +1,7 @@
 exports.command = 'dream [command] [opts]'
 exports.desc = 'Go to sleep and dream'
-exports.builder = function (yargs) {
-  return yargs
+exports.builder = function (y) {
+  return y
     .commandDir('deep', {
       extensions: ['js', 'json']
     })

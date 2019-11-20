@@ -231,8 +231,8 @@ with a `yargs` instance, and can be used to provide _advanced_ command specific 
 
 ```js
 yargs
-  .command('get', 'make a get HTTP request', function (yargs) {
-    return yargs.option('url', {
+  .command('get', 'make a get HTTP request', function (y) {
+    return y.option('url', {
       alias: 'u',
       default: 'http://yargs.js.org/'
     })
@@ -249,8 +249,8 @@ yargs
   .command(
     'get',
     'make a get HTTP request',
-    function (yargs) {
-      return yargs.option('u', {
+    function (y) {
+      return y.option('u', {
         alias: 'url',
         describe: 'the URL to make an HTTP request to'
       })
@@ -550,7 +550,7 @@ require('yargs')
     command: 'configure <key> [value]',
     aliases: ['config', 'cfg'],
     desc: 'Set a config variable',
-    builder: (yargs) => yargs.default('value', 'true'),
+    builder: (y) => y.default('value', 'true'),
     handler: (argv) => {
       console.log(`setting ${argv.key} to ${argv.value}`)
     }
@@ -698,7 +698,7 @@ occured.
 
 ```js
 var argv = require('yargs')
-  .fail(function (msg, err, yargs) {
+  .fail(function (msg, err, y) {
     if (err) throw err // preserve stack
     console.error('You broke it!')
     console.error(msg)
@@ -749,8 +749,8 @@ var argv = require('yargs')
     default: true,
     global: false
   })
-  .command('foo', 'foo command', function (yargs) {
-    return yargs.option('b', {
+  .command('foo', 'foo command', function (y) {
+    return y.option('b', {
       alias: 'bar'
     })
   })
@@ -1184,8 +1184,8 @@ available on the top-level yargs instance.
 
 ```js
 const argv = require('yargs')('run --help')
-  .command('run <port> <guid>', 'run the server', (yargs) => {
-    yargs.positional('guid', {
+  .command('run <port> <guid>', 'run the server', (y) => {
+    y.positional('guid', {
       describe: 'a unique identifier for the server',
       type: 'string'
     })
@@ -1446,8 +1446,8 @@ to provide configuration for the positional arguments accepted by your program:
 
 ```js
 const argv = require('yargs')
-  .usage('$0 <port>', 'start the application server', (yargs) => {
-    yargs.positional('port', {
+  .usage('$0 <port>', 'start the application server', (y) => {
+    y.positional('port', {
       describe: 'the port that your application should bind to',
       type: 'number'
     })

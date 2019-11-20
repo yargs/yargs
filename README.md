@@ -68,8 +68,8 @@ Retreat from the xupptumblers!
 ```javascript
 #!/usr/bin/env node
 require('yargs') // eslint-disable-line
-  .command('serve [port]', 'start the server', (yargs) => {
-    yargs
+  .command('serve [port]', 'start the server', (y) => {
+    y
       .positional('port', {
         describe: 'port to bind on',
         default: 5000

@@ -1,7 +1,7 @@
 exports.command = 'inception [command] [opts]'
 exports.desc = 'Enter another dream, where inception is possible'
-exports.builder = function (yargs) {
-  return yargs
+exports.builder = function (y) {
+  return y
     .commandDir('deeper_still')
     .option('with-sedation', {
       desc: 'Apply a sedative?',

@@ -376,8 +376,8 @@ describe('validation tests', () => {
     // addresses: https://github.com/yargs/yargs/issues/791
     it('should recognize context variables in strict mode, when running sub-commands', (done) => {
       yargs()
-        .command('request', 'request command', (yargs) => {
-          yargs
+          .command('request', 'request command', (y) => {
+            y
             .command('get', 'sub-command')
             .option('y', {
               describe: 'y inner option'
@@ -439,8 +439,8 @@ describe('validation tests', () => {
     it('interprets min relative to command', () => {
       let failureMsg
       yargs('lint')
-        .command('lint', 'Lint a file', (yargs) => {
-          yargs.demand(1).fail((msg) => {
+          .command('lint', 'Lint a file', (y) => {
+            y.demand(1).fail((msg) => {
             failureMsg = msg
           })
         })
@@ -451,8 +451,8 @@ describe('validation tests', () => {
     it('interprets max relative to command', () => {
       let failureMsg
       yargs('lint one.js two.js')
-        .command('lint', 'Lint a file', (yargs) => {
-          yargs.demand(0, 1).fail((msg) => {
+          .command('lint', 'Lint a file', (y) => {
+            y.demand(0, 1).fail((msg) => {
             failureMsg = msg
           })
         })
@@ -595,8 +595,8 @@ describe('validation tests', () => {
     // addresses: https://github.com/yargs/yargs/issues/849
     it('succeeds when demandOption is true and valid choice is provided', (done) => {
       yargs('one -a 10 marsupial')
-        .command('one', 'level one', (yargs) => {
-          yargs
+          .command('one', 'level one', (y) => {
+            y
             .options({
               'a': {
                 demandOption: true,
@@ -617,8 +617,8 @@ describe('validation tests', () => {
     // addresses: https://github.com/yargs/yargs/issues/849
     it('fails when demandOption is true and choice is not provided', (done) => {
       yargs('one -a 10 marsupial')
-        .command('one', 'level one', (yargs) => {
-          yargs
+          .command('one', 'level one', (y) => {
+            y
             .options({
               'c': {
                 choices: ['1', '2']
@@ -638,8 +638,8 @@ describe('validation tests', () => {
     // addresses: https://github.com/yargs/yargs/issues/849
     it('succeeds when demandOption is false and no choice is provided', () => {
       yargs('one')
-        .command('one', 'level one', (yargs) => {
-          yargs
+          .command('one', 'level one', (y) => {
+            y
             .options({
               'a': {
                 demandOption: false,
@@ -658,8 +658,8 @@ describe('validation tests', () => {
     // addresses: https://github.com/yargs/yargs/issues/849
     it('succeeds when demandOption is not provided and no choice is provided', () => {
       yargs('one')
-        .command('one', 'level one', (yargs) => {
-          yargs
+          .command('one', 'level one', (y) => {
+            y
             .options({
               'a': {
                 choices: [10, 20]
@@ -811,7 +811,7 @@ describe('validation tests', () => {
   describe('strict mode', () => {
     it('does not fail when command with subcommands called', () => {
       yargs('one')
-        .command('one', 'level one', yargs => yargs
+          .command('one', 'level one', y => y
           .command('twoA', 'level two A')
           .command('twoB', 'level two B')
           .strict()
