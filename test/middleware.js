@@ -468,7 +468,7 @@ describe('middleware', () => {
       argv.ids.should.eql([1, 2, 3, 4, 5, 6])
     })
 
-    it.skip('should stop chaining middlewares and fail if a global middleware fails before validation', async () => {
+    it('should stop chaining middlewares and fail if a global middleware fails before validation', async () => {
       let failCalled = false
       await yargs(['cmd'])
         .middleware(chainedMiddlewareFactory(1, true), true)
