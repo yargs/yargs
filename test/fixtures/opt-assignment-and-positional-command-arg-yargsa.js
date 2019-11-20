@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-require('../../../../index').yargsa(process.argv.slice(2))
+require('../../index').yargsa(process.argv.slice(2))
   .option('foo', {
     nargs: 1
   })

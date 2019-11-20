@@ -2,7 +2,6 @@
 /* global describe, it, before, after */
 
 const spawn = require('cross-spawn')
-const path = require('path')
 const which = require('which')
 const rimraf = require('rimraf')
 const cpr = require('cpr')
@@ -10,22 +9,22 @@ const fs = require('fs')
 
 require('chai').should()
 
-module.exports = function (fixturesPath) {
+module.exports = function (apiName) {
   describe('integration tests', () => {
     it('should run as a shell script with no arguments', (done) => {
-      testArgs('./bin.js', [], done)
+      testArgs(`./bin-${apiName}.js`, [], done)
     })
 
     it('should run as a shell script with arguments', (done) => {
-      testArgs('./bin.js', [ 'a', 'b', 'c' ], done)
+      testArgs(`./bin-${apiName}.js`, [ 'a', 'b', 'c' ], done)
     })
 
     it('should run as a node script with no arguments', (done) => {
-      testArgs('node bin.js', [], done)
+      testArgs(`node bin-${apiName}.js`, [], done)
     })
 
     it('should run as a node script with arguments', (done) => {
-      testArgs('node bin.js', [ 'x', 'y', 'z' ], done)
+      testArgs(`node bin-${apiName}.js`, [ 'x', 'y', 'z' ], done)
     })
 
     describe('path returned by "which"', () => {
@@ -33,7 +32,7 @@ module.exports = function (fixturesPath) {
         which('node', (err, resolvedPath) => {
           if (err) return done(err)
           testArgs(`${resolvedPath.replace('Program Files (x86)', 'Progra~2')
-            .replace('Program Files', 'Progra~1')} bin.js`, [], done)
+            .replace('Program Files', 'Progra~1')} bin-${apiName}.js`, [], done)
         })
       })
 
@@ -41,14 +40,14 @@ module.exports = function (fixturesPath) {
         which('node', (err, resolvedPath) => {
           if (err) return done(err)
           testArgs(`${resolvedPath.replace('Program Files (x86)', 'Progra~2')
-            .replace('Program Files', 'Progra~1')} bin.js`, [ 'q', 'r' ], done)
+            .replace('Program Files', 'Progra~1')} bin-${apiName}.js`, [ 'q', 'r' ], done)
         })
       })
     })
 
     // see #177
     it('allows --help to be completed without returning help message', (done) => {
-      testCmd('./bin.js', [ '--get-yargs-completions', '--h' ], (code, stdout) => {
+      testCmd(`./bin-${apiName}.js`, [ '--get-yargs-completions', '--h' ], (code, stdout) => {
         if (code) {
           done(new Error(`cmd exited with code ${code}`))
           return
@@ -67,7 +66,7 @@ module.exports = function (fixturesPath) {
         return this.skip()
       }
 
-      testCmd('./issue-497.js', [ '--help' ], (code, stdout) => {
+      testCmd(`./issue-497-${apiName}.js`, [ '--help' ], (code, stdout) => {
         if (code) {
           done(new Error(`cmd exited with code ${code}`))
           return
@@ -80,7 +79,7 @@ module.exports = function (fixturesPath) {
     })
 
     it('correctly fills positional command args with preceding option', (done) => {
-      testCmd('./opt-assignment-and-positional-command-arg.js', ['--foo', 'fOo', 'bar', 'bAz'], (code, stdout) => {
+      testCmd(`./opt-assignment-and-positional-command-arg-${apiName}.js`, ['--foo', 'fOo', 'bar', 'bAz'], (code, stdout) => {
         if (code) {
           done(new Error(`cmd exited with code ${code}`))
           return
@@ -95,7 +94,7 @@ module.exports = function (fixturesPath) {
     })
 
     it('correctly fills positional command args with = assignment in preceding option', (done) => {
-      testCmd('./opt-assignment-and-positional-command-arg.js', ['--foo=fOo', 'bar', 'bAz'], (code, stdout) => {
+      testCmd(`./opt-assignment-and-positional-command-arg-${apiName}.js`, ['--foo=fOo', 'bar', 'bAz'], (code, stdout) => {
         if (code) {
           done(new Error(`cmd exited with code ${code}`))
           return
@@ -116,17 +115,17 @@ module.exports = function (fixturesPath) {
           // create a symlinked, and a physical copy of yargs in
           // our fixtures directory, so that we can test that the
           // nearest package.json is appropriately loaded.
-          cpr('./', fixturesPath, {
+          cpr('./', './test/fixtures/yargs', {
             filter: /node_modules|example|test|package\.json/
           }, () => {
-            fs.symlinkSync(process.cwd(), path.join(fixturesPath, 'yargs-symlink'))
+            fs.symlinkSync(process.cwd(), './test/fixtures/yargs-symlink')
             return done()
           })
         })
 
         describe('version #', () => {
           it('defaults to appropriate version # when yargs is installed normally', (done) => {
-            testCmd('./normal-bin.js', [ '--version' ], (code, stdout) => {
+            testCmd(`./normal-bin-${apiName}.js`, [ '--version' ], (code, stdout) => {
               if (code) {
                 return done(new Error(`cmd exited with code ${code}`))
               }
@@ -137,7 +136,7 @@ module.exports = function (fixturesPath) {
           })
 
           it('defaults to appropriate version # when yargs is symlinked', (done) => {
-            testCmd('./symlink-bin.js', [ '--version' ], (code, stdout) => {
+            testCmd(`./symlink-bin-${apiName}.js`, [ '--version' ], (code, stdout) => {
               if (code) {
                 return done(new Error(`cmd exited with code ${code}`))
               }
@@ -150,7 +149,7 @@ module.exports = function (fixturesPath) {
 
         describe('parser settings', () => {
           it('reads parser config settings when yargs is installed normally', (done) => {
-            testCmd('./normal-bin.js', [ '--foo.bar' ], (code, stdout) => {
+            testCmd(`./normal-bin-${apiName}.js`, [ '--foo.bar' ], (code, stdout) => {
               if (code) {
                 return done(new Error(`cmd exited with code ${code}`))
               }
@@ -161,7 +160,7 @@ module.exports = function (fixturesPath) {
           })
 
           it('reads parser config settings when yargs is installed as a symlink', (done) => {
-            testCmd('./symlink-bin.js', [ '--foo.bar' ], (code, stdout) => {
+            testCmd(`./symlink-bin-${apiName}.js`, [ '--foo.bar' ], (code, stdout) => {
               if (code) {
                 return done(new Error(`cmd exited with code ${code}`))
               }
@@ -172,7 +171,7 @@ module.exports = function (fixturesPath) {
           })
 
           it('reads parser config settings when somebody obscures require.main', (done) => {
-            testCmd('./no-require-main.js', [ '--foo.bar' ], (code, stdout) => {
+            testCmd(`./no-require-main-${apiName}.js`, [ '--foo.bar' ], (code, stdout) => {
               if (code) {
                 return done(new Error(`cmd exited with code ${code}`))
               }
@@ -183,7 +182,7 @@ module.exports = function (fixturesPath) {
           })
 
           it('reads parser config settings when entry file has no extension', (done) => {
-            testCmd('./no-extension', [ '--foo.bar' ], (code, stdout) => {
+            testCmd(`./no-extension-${apiName}`, [ '--foo.bar' ], (code, stdout) => {
               if (code) {
                 return done(new Error(`cmd exited with code ${code}`))
               }
@@ -195,8 +194,8 @@ module.exports = function (fixturesPath) {
         })
 
         after(() => {
-          rimraf.sync(fixturesPath)
-          fs.unlinkSync(path.join(fixturesPath, 'yargs-symlink'))
+          rimraf.sync('./test/fixtures/yargs')
+          fs.unlinkSync('./test/fixtures/yargs-symlink')
         })
       })
     }
@@ -206,7 +205,7 @@ module.exports = function (fixturesPath) {
     const cmds = cmd.split(' ')
 
     const bin = spawn(cmds[0], cmds.slice(1).concat(args.map(String)), {
-      cwd: fixturesPath
+      cwd: './test/fixtures'
     })
 
     let stdout = ''

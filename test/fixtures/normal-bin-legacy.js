@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-var argv = require('../../../../index.js').yargsa(process.argv.slice(2))
+var argv = require('../../index.js')
   .help('help')
   .version()
   .parserConfiguration({

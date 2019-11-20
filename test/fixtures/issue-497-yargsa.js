@@ -4,12 +4,12 @@
 process.stdout.isTTY = true
 process.stderr.isTTY = true
 
-var yargs = require('../../../../index')
-var y = yargs.command('download <url> <files..>', 'make a get HTTP request')
+var yargsa = require('../../index').yargsa
+var y = yargsa(process.argv.slice(2)).command('download <url> <files..>', 'make a get HTTP request')
   .help()
 
 for (var i = 0; i < 1000; i++) {
-  yargs.option('o' + i, {
+  y.option('o' + i, {
     describe: 'option ' + i
   })
 }

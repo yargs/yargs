@@ -1,9 +1,6 @@
 'use strict'
 /* global describe */
 
-const path = require('path')
-const fixturesRootPath = path.join(__dirname, 'fixtures')
-
 /**
  * API tests common to both API (legacy and yargsa)
  *
@@ -16,7 +13,7 @@ module.exports = function apiTests (apiName, yargsLoadedApi, yargsResolvePath, d
   describe(`${apiName} API`, () => {
     require('./command')(yargsLoadedApi)
     require('./completion')(yargsLoadedApi)
-    require('./integration')(path.join(fixturesRootPath, apiName))
+    require('./integration')(apiName)
     require('./middleware')(yargsLoadedApi, yargsResolvePath)
     require('./parser')(directlyLoadedApi)
     require('./usage')(yargsLoadedApi, directlyLoadedApi)
