@@ -581,6 +581,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     if (parseFn) exitProcess = false
 
     const parsed = self._parseArgs(args, shortCircuit)
+    completion.setParsed(self.parsed)
     if (parseFn) parseFn(exitError, parsed, output)
     unfreeze()
 
