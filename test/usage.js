@@ -1121,6 +1121,51 @@ describe('usage tests', () => {
       ])
     })
 
+    it.only('should use 2 dashes for 1-digit key usage', () => {
+      const r = checkUsage(() => yargs(['--help'])
+        .option('1', {
+          type: 'boolean',
+          description: 'Negative one'
+        })
+        .wrap(null)
+        .parse()
+      )
+      r.should.have.property('result')
+      r.result.should.have.property('_').with.length(0)
+      r.should.have.property('exit').and.equal(true)
+      r.should.have.property('errors').with.length(0)
+      r.should.have.property('logs')
+      r.logs.join('\n').split(/\n+/).should.deep.equal([
+        'Options:',
+        '  --1        Negative one  [boolean]',
+        '  --help     Show help  [boolean]',
+        '  --version  Show version number  [boolean]'
+      ])
+    })
+
+    it.only('should use 2 dashes for 1-digit alias usage', () => {
+      const r = checkUsage(() => yargs(['--help'])
+        .option('negativeone', {
+          alias: '1',
+          type: 'boolean',
+          description: 'Negative one'
+        })
+        .wrap(null)
+        .parse()
+      )
+      r.should.have.property('result')
+      r.result.should.have.property('_').with.length(0)
+      r.should.have.property('exit').and.equal(true)
+      r.should.have.property('errors').with.length(0)
+      r.should.have.property('logs')
+      r.logs.join('\n').split(/\n+/).should.deep.equal([
+        'Options:',
+        '  --help              Show help  [boolean]',
+        '  --version           Show version number  [boolean]',
+        '  --negativeone, --1  Negative one  [boolean]'
+      ])
+    })
+
     describe('when exitProcess is false', () => {
       it('should not validate arguments (required argument)', () => {
         const r = checkUsage(() => yargs(['--help'])
