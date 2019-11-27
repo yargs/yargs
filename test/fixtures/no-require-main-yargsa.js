@@ -5,7 +5,7 @@
 // for some unknown reason, a test environment has decided to omit require.main
 delete require.main
 
-var parser = require('../../yargsa.js')(process.argv.slice(2), undefined, require)
+var parser = require('../../yargsa.js').yargsa(process.argv.slice(2), undefined, require)
 
 console.log(parser.parserConfiguration({
   'dot-notation': false,

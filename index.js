@@ -3,6 +3,7 @@
 // without running as a singleton do:
 // require('yargs/yargs')(process.argv.slice(2))
 const yargs = require('./yargs')
+const { yargsa } = require('./yargsa')
 
 Argv(process.argv.slice(2))
 
@@ -14,7 +15,7 @@ function Argv (processArgs, cwd) {
   return argv
 }
 
-Argv.yargsa = require('./yargsa')
+Argv.yargsa = yargsa
 
 /*  Hack an instance of Argv with process.argv into Argv
     so people can do

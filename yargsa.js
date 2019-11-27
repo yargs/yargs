@@ -19,8 +19,12 @@ const applyExtends = require('./lib/apply-extends')
 const { globalMiddlewareFactory } = require('./lib/middleware')
 const YError = require('./lib/yerror')
 
-exports = module.exports = Yargs
-function Yargs (processArgs, cwd, parentRequire) {
+// reserve Yargsa with an uppercased initial for a future class
+exports = module.exports = {
+  yargsa
+}
+
+function yargsa (processArgs, cwd, parentRequire) {
   processArgs = processArgs || [] // handle calling yargs().
 
   const self = {}
