@@ -1121,7 +1121,7 @@ describe('usage tests', () => {
       ])
     })
 
-    it.only('should use 2 dashes for 1-digit key usage', () => {
+    it('should use 2 dashes for 1-digit key usage', () => {
       const r = checkUsage(() => yargs(['--help'])
         .option('1', {
           type: 'boolean',
@@ -1143,7 +1143,7 @@ describe('usage tests', () => {
       ])
     })
 
-    it.only('should use 2 dashes for 1-digit alias usage', () => {
+    it('should use 2 dashes for 1-digit alias usage', () => {
       const r = checkUsage(() => yargs(['--help'])
         .option('negativeone', {
           alias: '1',
