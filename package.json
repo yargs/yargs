@@ -72,7 +72,7 @@
     "command"
   ],
   "license": "MIT",
-  "engine": {
+  "engines": {
     "node": ">=8"
   }
 }
