@@ -7,7 +7,9 @@ The following `.options()` definition:
 
 ```typescript
 #!/usr/bin/env node
-import yargs from 'yargs';
+import * as yargs from 'yargs';
+// or with the "esModuleInterop" compiler option set to "true":
+// import yargs from 'yargs';
 
 const argv = yargs.options({
   a: { type: 'boolean', default: false },
