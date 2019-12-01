@@ -206,7 +206,7 @@ yargs.command('get <source> [proxy]', 'make a get HTTP request', require('my-mod
 
 #### Testing a Command Module
 
-If you want to test a command in it's entirety you can test it like this:
+If you want to test a command in its entirety you can test it like this:
 
 ```js
 it("returns help output", async () => {
