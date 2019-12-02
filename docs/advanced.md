@@ -18,6 +18,7 @@ const argv = require('yargs')
   .command('$0', 'the default command', () => {}, (argv) => {
     console.log('this command will be run by default')
   })
+  .argv
 ```
 
 The command defined above will be executed if the program
@@ -30,6 +31,7 @@ const argv = require('yargs')
   .command(['serve', '$0'], 'the serve command', () => {}, (argv) => {
     console.log('this command will be run by default')
   })
+  .argv
 ```
 
 The command defined above will be executed if the program
