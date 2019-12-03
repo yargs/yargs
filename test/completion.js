@@ -358,9 +358,24 @@ describe('Completion', () => {
               })
             })
         })
-
         r.logs.should.include('apple')
         r.logs.should.include('foo')
+      })
+      it('returns default completion to callback for options', () => {
+        process.env.SHELL = '/bin/bash'
+        const r = checkUsage(() => {
+          yargs()
+            .option('apple')
+            .option('foo')
+            .completion()
+            .getCompletion(['$0', '-'], (completions) => {
+              ;(completions || []).forEach((completion) => {
+                console.log(completion)
+              })
+            })
+        })
+        r.logs.should.include('--apple')
+        r.logs.should.include('--foo')
       })
     })
   })
