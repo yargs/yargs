@@ -32,6 +32,7 @@ function Yargs (processArgs, cwd, parentRequire) {
   let preservedGroups = {}
   let usage = null
   let validation = null
+  let handlerFinishCommand = null
 
   const y18n = Y18n({
     directory: path.resolve(__dirname, './locales'),
@@ -172,6 +173,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     frozen.parsed = self.parsed
     frozen.parseFn = parseFn
     frozen.parseContext = parseContext
+    frozen.handlerFinishCommand = handlerFinishCommand
   }
   function unfreeze () {
     let frozen = frozens.pop()
@@ -190,6 +192,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     completionCommand = frozen.completionCommand
     parseFn = frozen.parseFn
     parseContext = frozen.parseContext
+    handlerFinishCommand = frozen.handlerFinishCommand
   }
 
   self.boolean = function (keys) {
@@ -482,6 +485,14 @@ function Yargs (processArgs, cwd, parentRequire) {
     usage.failFn(f)
     return self
   }
+
+  self.onFinishCommand = function (f) {
+    argsert('<function>', [f], arguments.length)
+    handlerFinishCommand = f
+    return self
+  }
+
+  self.getHandlerFinishCommand = () => handlerFinishCommand
 
   self.check = function (f, _global) {
     argsert('<function> [boolean]', [f, _global], arguments.length)

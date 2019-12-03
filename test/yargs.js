@@ -2355,4 +2355,40 @@ describe('yargs dsl tests', () => {
     // #1482.
     argv['--'].should.eql(['foo'])
   })
+
+  describe('onFinishCommand', () => {
+    it('use with promise', (done) => {
+      const result = 'noop-result'
+      let calledTimes = 0
+      yargs(['noop']).command('noop', 'a noop command', noop, async () => {
+        return result
+      }).onFinishCommand(async (commandResult) => {
+        commandResult.should.eql(result)
+        calledTimes++
+      })
+        .parse('noop')
+
+      setTimeout(() => {
+        calledTimes.should.eql(1)
+        done()
+      }, 5)
+    })
+
+    it('use without promise', (done) => {
+      const result = 'noop-result'
+      let calledTimes = 0
+      yargs(['noop']).command('noop', 'a noop command', noop, () => {
+        return result
+      }).onFinishCommand((commandResult) => {
+        commandResult.should.eql(result)
+        calledTimes++
+      })
+        .parse('noop')
+
+      setTimeout(() => {
+        calledTimes.should.eql(1)
+        done()
+      }, 5)
+    })
+  })
 })
