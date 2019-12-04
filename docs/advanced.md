@@ -453,7 +453,7 @@ for detailed documentation of this feature.
 ### Example
 ```
 yargs
-    .comand('cmd', ..., async () => {
+    .command('cmd', ..., async () => {
         await this.model.find()
         return Promise.resolve('result value')
     })
