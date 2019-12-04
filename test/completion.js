@@ -94,6 +94,55 @@ describe('Completion', () => {
       r.logs.should.not.include('-1')
     })
 
+    it('completes with no- prefix flags defaulting to true when boolean-negation is set', () => {
+      const r = checkUsage(() => yargs(['./completion', '--get-yargs-completions', './completion', ''])
+        .options({
+          foo: { describe: 'foo flag', type: 'boolean', default: true },
+          bar: { describe: 'bar flag', type: 'boolean' }
+        })
+        .parserConfiguration({ 'boolean-negation': true })
+        .argv
+      )
+
+      r.logs.should.include('--no-foo')
+      r.logs.should.include('--foo')
+      r.logs.should.not.include('--no-bar')
+      r.logs.should.include('--bar')
+    })
+
+    it('avoids repeating flags whose negated counterparts are already included', () => {
+      const r = checkUsage(() => yargs(['./completion', '--get-yargs-completions', './completion', '--no-foo', '--no-bar', ''])
+        .options({
+          foo: { describe: 'foo flag', type: 'boolean', default: true },
+          bar: { describe: 'bar flag', type: 'boolean' },
+          baz: { describe: 'bar flag', type: 'boolean' }
+        })
+        .parserConfiguration({ 'boolean-negation': true })
+        .argv
+      )
+
+      r.logs.should.not.include('--no-foo')
+      r.logs.should.not.include('--foo')
+      r.logs.should.not.include('--no-bar')
+      r.logs.should.not.include('--bar')
+      r.logs.should.include('--baz')
+    })
+
+    it('ignores no- prefix flags when boolean-negation is not set', () => {
+      const r = checkUsage(() => yargs(['./completion', '--get-yargs-completions', './completion', '--no-bar', ''])
+        .options({
+          foo: { describe: 'foo flag', type: 'boolean', default: true },
+          bar: { describe: 'bar flag', type: 'boolean' }
+        })
+        .argv
+      )
+
+      r.logs.should.not.include('--no-foo')
+      r.logs.should.include('--foo')
+      r.logs.should.not.include('--no-bar')
+      r.logs.should.include('--bar')
+    })
+
     it('completes options for the correct command', () => {
       process.env.SHELL = '/bin/bash'
       const r = checkUsage(() => yargs(['./completion', '--get-yargs-completions', 'cmd2', '--o'])
