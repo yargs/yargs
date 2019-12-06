@@ -193,6 +193,7 @@ var argv = require('yargs')
   .argv
 ```
 
+<a name="command"></a>
 .command(cmd, desc, [builder], [handler])
 -----------------------------------------
 .command(cmd, desc, [module])
@@ -1010,9 +1011,9 @@ var argv = require('yargs')
   .argv
 ```
 
-.option(key, [opt])
+<a name="option"></a>.option(key, [opt])
 -----------------
-.options(key, [opt])
+<a name="options"></a>.options(key, [opt])
 ------------------
 
 This method can be used to make yargs aware of options that _could_
@@ -1175,7 +1176,7 @@ from this location.
 ------------
 
 `.positional()` allows you to configure a command's positional arguments
-with an API similar to [`.option()`](#optionkey-opt). `.positional()`
+with an API similar to [`.option()`](#option). `.positional()`
 should be called in a command's builder function, and is not
 available on the top-level yargs instance.
 
@@ -1440,7 +1441,7 @@ Set a usage message to show which commands to use. Inside `message`, the string
 present script similar to how `$0` works in bash or perl.
 
 If the optional `desc`/`builder`/`handler` are provided, `.usage()`
-acts an an alias for [`.command()`](#commandmodule). This allows you to use
+acts an an alias for [`.command()`](#command). This allows you to use
 `.usage()` to configure the [default command](/docs/advanced.md#default-commands) that will be run as an entry-point to your application and allows you
 to provide configuration for the positional arguments accepted by your program:
 
