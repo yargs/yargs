@@ -39,14 +39,25 @@ describe('Command', () => {
         .parse()
     })
 
-    it('populates outer argv with positional arguments', () => {
+    it('populates outer argv with positional arguments when unknown-options-as-args is not set', () => {
       const argv = yargs('foo hello world')
         .command('foo <bar> [awesome]')
         .parse()
 
       argv._.should.include('foo')
-      argv.bar.should.equal('hello')
-      argv.awesome.should.equal('world')
+      argv.should.have.property('bar', 'hello')
+      argv.should.have.property('awesome', 'world')
+    })
+
+    it('populates outer argv with positional arguments when unknown-options-as-args is set', () => {
+      const argv = yargs('foo hello world')
+        .command('foo <bar> [awesome]')
+        .parserConfiguration({ 'unknown-options-as-args': true })
+        .parse()
+
+      argv._.should.include('foo')
+      argv.should.have.property('bar', 'hello')
+      argv.should.have.property('awesome', 'world')
     })
 
     it('populates argv with camel-case variants of arguments when possible', () => {
