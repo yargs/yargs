@@ -14,6 +14,7 @@
 [![js-standard-style][standard-image]][standard-url]
 [![Conventional Commits][conventional-commits-image]][conventional-commits-url]
 [![Slack][slack-image]][slack-url]
+[![run on repl.it](http://repl.it/badge/github/yargs/yargs)](https://repl.it/github/yargs/yargs)
 
 ## Description :
 Yargs helps you build interactive command line tools, by parsing arguments and generating an elegant user interface.

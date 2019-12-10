@@ -1,0 +1,2 @@
+language = "nodejs"
+run = "yarn add yargs-parser && yarn link && yarn link yargs && cd example && node divide -x 2 -y 4"
