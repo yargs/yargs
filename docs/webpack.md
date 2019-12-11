@@ -23,7 +23,7 @@ console.log(yargs.parse())
 
 Or for typescript users, `src/index.ts`:
 ```ts
-import * as yargs from 'yargs';
+import yargs = require('yargs');
 
 console.log(yargs.parse());
 ```
