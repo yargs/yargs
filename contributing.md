@@ -2,6 +2,8 @@
 
 Me hearties, we would love to have you contribute to yargs!
 
+If you are looking to update the website, check out [yargs/yargs.github.io](https://github.com/yargs/yargs.github.io).
+
 ## Contributing
 
 1. Look through the existing issues and see if your idea is something new.
