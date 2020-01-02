@@ -58,6 +58,42 @@ describe('Completion', () => {
       r.logs.should.not.include('--foo')
     })
 
+    it('completes short options with a single dash when the user did not already enter two dashes', () => {
+      const r = checkUsage(() => yargs(['./completion', '--get-yargs-completions', './completion', ''])
+        .options({
+          f: { describe: 'f option', alias: 'foo' }
+        })
+        .argv
+      )
+
+      r.logs.should.include('-f')
+      r.logs.should.not.include('--f')
+    })
+
+    it('completes short options with two dashes when the user already entered two dashes', () => {
+      const r = checkUsage(() => yargs(['./completion', '--get-yargs-completions', './completion', '--'])
+        .options({
+          f: { describe: 'f option', alias: 'foo' }
+        })
+        .argv
+      )
+
+      r.logs.should.include('--f')
+      r.logs.should.not.include('-f')
+    })
+
+    it('completes single digit options with two dashes', () => {
+      const r = checkUsage(() => yargs(['./completion', '--get-yargs-completions', './completion', ''])
+        .options({
+          1: { describe: '1 option', alias: 'one' }
+        })
+        .argv
+      )
+
+      r.logs.should.include('--1')
+      r.logs.should.not.include('-1')
+    })
+
     it('completes options for the correct command', () => {
       process.env.SHELL = '/bin/bash'
       const r = checkUsage(() => yargs(['./completion', '--get-yargs-completions', 'cmd2', '--o'])
@@ -98,7 +134,7 @@ describe('Completion', () => {
       r.logs.should.include('cmd1')
     })
 
-    it('does not include possitional arguments', function () {
+    it('does not include positional arguments', function () {
       process.env.SHELL = '/bin/bash'
       var r = checkUsage(function () {
         return yargs(['./completion', '--get-yargs-completions', 'cmd'])
