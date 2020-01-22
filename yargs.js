@@ -115,7 +115,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     groups = {}
 
     const arrayOptions = [
-      'array', 'boolean', 'string', 'skipValidation',
+      'array', 'boolean', 'string', 'requiresArg', 'skipValidation',
       'count', 'normalize', 'number',
       'hiddenOptions'
     ]
@@ -233,7 +233,7 @@ function Yargs (processArgs, cwd, parentRequire) {
 
   self.requiresArg = function (keys) {
     argsert('<array|string>', [keys], arguments.length)
-    populateParserHintObject(self.nargs, false, 'narg', keys, 1)
+    populateParserHintArray('requiresArg', keys)
     return self
   }
 
@@ -1049,6 +1049,17 @@ function Yargs (processArgs, cwd, parentRequire) {
     options.__ = y18n.__
     options.configuration = self.getParserConfiguration()
 
+    // numbers are defaulted to `undefined`, which makes it impossible to verify requiresArg
+    // so _unlike_ other types, we will implicitly add them to narg when requiresArg is true
+    const numberTyped = new Set(options.number)
+    options.requiresArg
+      .filter(key => numberTyped.has(key))
+      .forEach(key => {
+        // if narg _and_ requiresArg are configured for an option,
+        // we should probably throw an error somewhere indicating conflicting configuration
+        options.narg[key] = 1
+      })
+
     const populateDoubleDash = !!options.configuration['populate--']
     const config = Object.assign({}, options.configuration, {
       'populate--': true
@@ -1217,6 +1228,7 @@ function Yargs (processArgs, cwd, parentRequire) {
   self._runValidation = function runValidation (argv, aliases, positionalMap, parseErrors) {
     if (parseErrors) throw new YError(parseErrors.message)
     validation.nonOptionCount(argv)
+    validation.missingArgumentValue(argv)
     validation.requiredArguments(argv)
     if (strict) validation.unknownArguments(argv, aliases, positionalMap)
     validation.customChecks(argv, aliases)

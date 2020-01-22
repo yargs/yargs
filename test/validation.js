@@ -477,7 +477,7 @@ describe('validation tests', () => {
         .option('w', { type: 'string', requiresArg: true })
         .parse('-w', (err, argv, output) => {
           expect(err).to.not.equal(undefined)
-          expect(err).to.have.property('message', 'Not enough arguments following: w')
+          expect(err).to.have.property('message', 'Missing argument value: w')
           return done()
         })
     })
@@ -487,7 +487,7 @@ describe('validation tests', () => {
         .option('w', { type: 'boolean', requiresArg: true })
         .parse('-w', (err, argv, output) => {
           expect(err).to.not.equal(undefined)
-          expect(err).to.have.property('message', 'Not enough arguments following: w')
+          expect(err).to.have.property('message', 'Missing argument value: w')
           return done()
         })
     })
@@ -497,7 +497,7 @@ describe('validation tests', () => {
         .option('w', { type: 'array', requiresArg: true })
         .parse('-w', (err, argv, output) => {
           expect(err).to.not.equal(undefined)
-          expect(err).to.have.property('message', 'Not enough arguments following: w')
+          expect(err).to.have.property('message', 'Missing argument value: w')
           return done()
         })
     })
@@ -519,6 +519,28 @@ describe('validation tests', () => {
         .command('woo')
         .parse('woo', (err, argv, output) => {
           expect(err).to.equal(null)
+          return done()
+        })
+    })
+
+    it('does not prevent array argument from being parsed completely (#1098)', (done) => {
+      yargs()
+        .option('w', { type: 'array', requiresArg: true })
+        .command('woo')
+        .parse('-w foo bar -- positional', (err, argv, output) => {
+          expect(err).to.equal(null)
+          expect(argv.w).to.have.lengthOf(2)
+          return done()
+        })
+    })
+
+    it('does not prevent array argument from being parsed completely with subcommand (#1098)', (done) => {
+      yargs()
+        .option('w', { type: 'array', requiresArg: true })
+        .command('woo')
+        .parse('woo -w foo bar -- positional', (err, argv, output) => {
+          expect(err).to.equal(null)
+          expect(argv.w).to.have.lengthOf(2)
           return done()
         })
     })

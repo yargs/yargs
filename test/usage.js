@@ -693,7 +693,7 @@ describe('usage tests', () => {
           '  --version  Show version number  [boolean]',
           '  --foo, -f  foo option',
           '  --bar, -b  bar option',
-          'Not enough arguments following: f'
+          'Missing argument value: foo'
         ])
       })
 
@@ -722,7 +722,7 @@ describe('usage tests', () => {
           '  --version  Show version number  [boolean]',
           '  --foo, -f  foo option',
           '  --bar, -b  bar option',
-          'Not enough arguments following: bar'
+          'Missing argument values: foo, bar'
         ])
       })
     })
@@ -754,7 +754,7 @@ describe('usage tests', () => {
           '  --version  Show version number  [boolean]',
           '  --foo, -f  foo option',
           '  --bar, -b  bar option',
-          'Not enough arguments following: f'
+          'Missing argument value: foo'
         ])
       })
     })
@@ -769,7 +769,7 @@ describe('usage tests', () => {
         .parse()
       )
 
-      r.errors[2].should.equal('Not enough arguments following: bar')
+      r.errors[2].should.equal('Missing argument values: foo, bar')
     })
   })
 
