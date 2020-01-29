@@ -3,8 +3,9 @@
 // without running as a singleton do:
 // require('yargs/yargs')(process.argv.slice(2))
 const yargs = require('./yargs')
+const processArgv = require('./lib/process-argv')
 
-Argv(process.argv.slice(2))
+Argv(processArgv.getProcessArgvWithoutBin())
 
 module.exports = Argv
 

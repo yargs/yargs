@@ -1273,7 +1273,8 @@ if (command === 'hello') {
 <a name="scriptName"></a>.scriptName($0)
 ------------------
 
-Set the name of your script ($0). Default is the base filename executed by node (`process.argv[1]`)
+Set the name of your script ($0). Default is the base filename executed by node
+(`process.argv[1]` or `process.argv[0]` for built electron apps)
 
 Example:
 

@@ -15,11 +15,17 @@ const noop = () => {}
 const implicationsFailedPattern = new RegExp(english['Implications failed:'])
 
 describe('yargs dsl tests', () => {
+  const oldProcess = {}
+
   beforeEach(() => {
+    oldProcess.argv = process.argv
+    oldProcess.defaultApp = process.defaultApp
     yargs = require('../')
   })
 
   afterEach(() => {
+    process.argv = oldProcess.argv
+    process.defaultApp = oldProcess.defaultApp
     delete require.cache[require.resolve('../')]
   })
 
@@ -30,6 +36,15 @@ describe('yargs dsl tests', () => {
     const argv = yargs([]).parse()
     argv['$0'].should.equal('ndm')
     yargs.$0.should.equal('ndm')
+  })
+
+  it('should not remove the 1st argument of built electron apps', () => {
+    delete require.cache[require.resolve('../')]
+    process.argv = ['/usr/local/bin/app', '-f', 'toto']
+    process.defaultApp = false
+    yargs = require('../')
+    const argv = yargs.parse()
+    argv['f'].should.equal('toto')
   })
 
   it('accepts an object for aliases', () => {
