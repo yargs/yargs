@@ -3432,7 +3432,7 @@ describe('usage tests', () => {
   })
 
   describe('help message caching', () => {
-    it.only('should display proper usage when an async handler fails', (done) => {
+    it('should display proper usage when an async handler fails', (done) => {
       const y = yargs()
         .command('cmd', 'test command', {}, () => {
           return new Promise((resolve, reject) =>
@@ -3464,7 +3464,7 @@ describe('usage tests', () => {
       )
     })
 
-    it.only('should not display a cached help message for the next parsing', (done) => {
+    it('should not display a cached help message for the next parsing', (done) => {
       const y = yargs()
         .command('cmd', 'test command', {}, () => {
           return new Promise((resolve, reject) =>
