@@ -8,7 +8,7 @@ const yargs = require('../')
 const rebase = require('../yargs').rebase
 const YError = require('../lib/yerror')
 
-require('chai').should()
+const should = require('chai').should()
 
 const noop = () => {}
 
@@ -3428,6 +3428,78 @@ describe('usage tests', () => {
         '  --baz                 BAZ',
         '  --custom-show-hidden  Show hidden options                            [boolean]'
       ])
+    })
+  })
+
+  describe('help message caching', () => {
+    it.only('should display proper usage when an async handler fails', (done) => {
+      const y = yargs()
+        .command('cmd', 'test command', {}, () => {
+          return new Promise((resolve, reject) =>
+            setTimeout(reject, 10)
+          )
+        })
+        .exitProcess(false)
+
+      checkUsage(
+        () => {
+          y.parse('cmd')
+          setTimeout(() => process.exit(1), 100)
+        },
+        undefined,
+        (err, r) => {
+          should.not.exist(err)
+          should.exist(r.errors[0])
+          r.errors[0].split('\n').should.deep.equal([
+            '_mocha cmd',
+            '',
+            'test command',
+            '',
+            'Options:',
+            '  --help     Show help                                                 [boolean]',
+            '  --version  Show version number                                       [boolean]'
+          ])
+          done()
+        }
+      )
+    })
+
+    it.only('should not display a cached help message for the next parsing', (done) => {
+      const y = yargs()
+        .command('cmd', 'test command', {}, () => {
+          return new Promise((resolve, reject) =>
+            setTimeout(resolve, 10)
+          )
+        })
+        .demandCommand(1, 'You need at least one command before moving on')
+        .exitProcess(false)
+
+      checkUsage(
+        () => {
+          y.parse('cmd')
+          setTimeout(() => {
+            y.parse('')
+            setTimeout(() => process.exit(1), 100)
+          }, 100)
+        },
+        undefined,
+        (err, r) => {
+          should.exist(err)
+          err.message.should.equal('You need at least one command before moving on')
+          should.exist(r.errors[0])
+          r.errors[0].split('\n').should.deep.equal([
+            '_mocha <command>',
+            '',
+            'Commands:',
+            '  _mocha cmd  test command',
+            '',
+            'Options:',
+            '  --help     Show help                                                 [boolean]',
+            '  --version  Show version number                                       [boolean]'
+          ])
+          done()
+        }
+      )
     })
   })
 })

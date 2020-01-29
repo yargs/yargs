@@ -34,8 +34,7 @@ exports.checkOutput = function checkOutput (f, argv, cb) {
     }
     process.emit = function emit (ev, value) {
       if (ev === 'uncaughtException') {
-        done()
-        cb(value)
+        cb(value, done())
         return true
       }
 
