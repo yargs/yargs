@@ -18,6 +18,7 @@ const setBlocking = require('set-blocking')
 const applyExtends = require('./lib/apply-extends')
 const { globalMiddlewareFactory } = require('./lib/middleware')
 const YError = require('./lib/yerror')
+const processArgv = require('./lib/process-argv')
 
 exports = module.exports = Yargs
 function Yargs (processArgs, cwd, parentRequire) {
@@ -64,7 +65,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     })
     .join(' ').trim()
 
-  if (process.env._ !== undefined && process.argv[1] === process.env._) {
+  if (process.env._ !== undefined && processArgv.getProcessArgvBin() === process.env._) {
     self.$0 = process.env._.replace(
       `${path.dirname(process.execPath)}/`, ''
     )
