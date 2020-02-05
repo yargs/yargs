@@ -683,6 +683,10 @@ uses the `.version` functionality, validation fails, or the command handler
 fails. Calling `.exitProcess(false)` disables this behavior, enabling further
 actions after yargs have been validated.
 
+***Note:*** `.exitProcess(false)` should not be used when [`.command()`](#command)
+is called with a handler returning a promise, as it would lead to a duplicated
+error message when this promise rejects
+
 <a name="exit"></a>.exit(code, err)
 ---------
 Manually indicate that the program should exit, and provide context about why we
@@ -1141,6 +1145,13 @@ parser.parse(bot.userText, function (err, argv, output) {
 ***Note:*** the `output` parameter of a `parse()` callback only contains text output by yargs using its internal logger.
 It *does not* include any text output by user-supplied callback, such as `console.log()` outputs in a
 command handler, for example.
+
+***Note:*** when using [`command()`](#command) with a handler returning a promise, if this promise is rejected,
+the resulting error and output will not be passed to the `parse()` callback (the error message will be displayed directly)
+
+***Note:*** `parse()` should be called only once when [`command()`](#command) is called with a handler
+returning a promise. If your use case requires `parse()` to be called several times, any asynchronous
+operation performed in a command handler should not result in the handler returning a promise
 
 <a name="parsed"></a>.parsed
 ------------
