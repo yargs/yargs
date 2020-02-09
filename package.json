@@ -23,6 +23,7 @@
     "decamelize": "^1.2.0",
     "find-up": "^4.1.0",
     "get-caller-file": "^2.0.1",
+    "os-locale": "^4.0.0",
     "require-directory": "^2.1.1",
     "require-main-filename": "^2.0.0",
     "set-blocking": "^2.0.0",
