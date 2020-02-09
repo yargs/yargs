@@ -939,4 +939,84 @@ describe('validation tests', () => {
         .parse()
     })
   })
+
+  describe('strictCommands', () => {
+    it('succeeds in parse if command is known', () => {
+      const parsed = yargs('foo -a 10')
+        .strictCommands()
+        .command('foo', 'foo command')
+        .parse()
+      parsed.a.should.equal(10)
+      parsed._.should.eql(['foo'])
+    })
+
+    it('succeeds in parse if top level and inner command are known', () => {
+      const parsed = yargs('foo bar --cool beans')
+        .strictCommands()
+        .command('foo', 'foo command', (yargs) => {
+          yargs.command('bar')
+        })
+        .parse()
+      parsed.cool.should.equal('beans')
+      parsed._.should.eql(['foo', 'bar'])
+    })
+
+    it('fails with error if command is unknown', (done) => {
+      yargs('blerg -a 10')
+        .strictCommands()
+        .command('foo', 'foo command')
+        .fail((msg) => {
+          msg.should.equal('Unknown argument: blerg')
+          return done()
+        })
+        .parse()
+    })
+
+    it('fails with error if inner command is unknown', (done) => {
+      yargs('foo blarg --cool beans')
+        .strictCommands()
+        .command('foo', 'foo command', (yargs) => {
+          yargs.command('bar')
+        })
+        .fail((msg) => {
+          msg.should.equal('Unknown argument: blarg')
+          return done()
+        })
+        .parse()
+    })
+
+    it('enables strict commands if commands used in conjunction with demandCommand', (done) => {
+      yargs('blerg -a 10')
+        .demandCommand()
+        .command('foo', 'foo command')
+        .fail((msg) => {
+          msg.should.equal('Unknown argument: blerg')
+          return done()
+        })
+        .parse()
+    })
+
+    it('does not apply implicit strictCommands to inner commands', () => {
+      const parse = yargs('foo blarg --cool beans')
+        .demandCommand()
+        .command('foo', 'foo command', (yargs) => {
+          yargs.command('bar')
+        })
+        .parse()
+      parse.cool.should.equal('beans')
+      parse._.should.eql(['foo', 'blarg'])
+    })
+
+    it('allows strictCommands to be applied to inner commands', (done) => {
+      yargs('foo blarg')
+        .command('foo', 'foo command', (yargs) => {
+          yargs.command('bar').strictCommands()
+        })
+        .fail((msg) => {
+          msg.should.equal('Unknown argument: blarg')
+          return done()
+        })
+        .parse()
+    })
+  })
 })
