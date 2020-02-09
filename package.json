@@ -32,7 +32,7 @@
     "yargs-parser": "^16.1.0"
   },
   "devDependencies": {
-    "c8": "^6.0.1",
+    "c8": "^7.0.0",
     "chai": "^4.2.0",
     "chalk": "^2.4.2",
     "coveralls": "^3.0.3",
