@@ -4,5 +4,6 @@
   ],
   "pinVersions": false,
   "rebaseStalePrs": true,
-  "gitAuthor": null
+  "gitAuthor": null,
+  "ignoreDeps": ["decamelize"]
 }
