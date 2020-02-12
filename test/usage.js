@@ -3451,7 +3451,7 @@ describe('usage tests', () => {
           should.not.exist(err)
           should.exist(r.errors[0])
           r.errors[0].split('\n').should.deep.equal([
-            '_mocha cmd',
+            'mocha cmd',
             '',
             'test command',
             '',
@@ -3488,10 +3488,10 @@ describe('usage tests', () => {
           err.message.should.equal('You need at least one command before moving on')
           should.exist(r.errors[0])
           r.errors[0].split('\n').should.deep.equal([
-            '_mocha <command>',
+            'mocha <command>',
             '',
             'Commands:',
-            '  _mocha cmd  test command',
+            '  mocha cmd  test command',
             '',
             'Options:',
             '  --help     Show help                                                 [boolean]',
