@@ -313,6 +313,47 @@ describe('usage tests', () => {
     })
   })
 
+  describe('deprecate options', () => {
+    describe('using .option(x, {deprecate: [boolean|string]})', () => {
+      it('{deprecated: true} should show [deprecated]', () => {
+        const r = checkUsage(() => yargs('--help')
+          .option('x', { deprecated: true })
+          .wrap(null)
+          .parse()
+        )
+        r.logs[0].should.include('  -x  [deprecated]')
+      })
+      it('{deprecated: string} should show [deprecated: string]', () => {
+        const r = checkUsage(() => yargs('--help')
+          .option('x', { deprecated: 'string' })
+          .wrap(null)
+          .parse()
+        )
+        r.logs[0].should.include('  -x  [deprecated: string]')
+      })
+    })
+    describe('using .deprecateOption(x, [string])', () => {
+      it('.deprecateOption(x) should show [deprecated]', () => {
+        const r = checkUsage(() => yargs('--help')
+          .option('x')
+          .deprecateOption('x')
+          .wrap(null)
+          .parse()
+        )
+        r.logs[0].should.include('  -x  [deprecated]')
+      })
+      it('.deprecateOption(x, string) should show [deprecated: string]', () => {
+        const r = checkUsage(() => yargs('--help')
+          .option('x')
+          .deprecateOption('x', 'string')
+          .wrap(null)
+          .parse()
+        )
+        r.logs[0].should.include('  -x  [deprecated: string]')
+      })
+    })
+  })
+
   it('should return valid values when check passes', () => {
     const r = checkUsage(() => yargs('-x 10 -y 20')
       .usage('Usage: $0 -x NUM -y NUM')

@@ -301,6 +301,7 @@ describe('yargs dsl tests', () => {
         hiddenOptions: [],
         demandedCommands: {},
         demandedOptions: {},
+        deprecatedOptions: {},
         local: [
           '_',
           'foo',
