@@ -10,6 +10,7 @@
   "required": "requis",
   "default:": "défaut :",
   "choices:": "choix :",
+  "aliases:": "alias :",
   "generated-value": "valeur générée",
   "Not enough non-option arguments: got %s, need at least %s": {
     "one": "Pas assez d'arguments (hors options) : reçu %s, besoin d'au moins %s",
@@ -40,5 +41,8 @@
   "Path to JSON config file": "Chemin du fichier de configuration JSON",
   "Show help": "Affiche de l'aide",
   "Show version number": "Affiche le numéro de version",
-  "Arguments %s and %s are mutually exclusive" : "Les arguments %s et %s sont mutuellement exclusifs"
+  "Did you mean %s?": "Vouliez-vous dire %s ?",
+  "Arguments %s and %s are mutually exclusive" : "Les arguments %s et %s sont mutuellement exclusifs",
+  "Positionals:": "Arguments positionnels :",
+  "command": "commande"
 }
