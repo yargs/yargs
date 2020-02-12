@@ -118,7 +118,7 @@ describe('middleware', () => {
       const error = new Error()
       const handlerErr = new Error('should not have been called')
       yargs('foo')
-        .command('foo', 'foo command', () => {}, (argv) => done(handlerErr), [ (argv) => Promise.reject(error) ])
+        .command('foo', 'foo command', () => {}, (argv) => done(handlerErr), [(argv) => Promise.reject(error)])
         .fail((msg, err) => {
           expect(msg).to.equal(null)
           expect(err).to.equal(error)
@@ -138,7 +138,7 @@ describe('middleware', () => {
           argv.hello.should.equal('world')
           argv.foo.should.equal('bar')
           done()
-        }, [ middleware('hello', 'world'), middleware('foo', 'bar') ])
+        }, [middleware('hello', 'world'), middleware('foo', 'bar')])
         .fail((msg, err) => {
           return done(Error('should not have been called'))
         })
@@ -148,7 +148,7 @@ describe('middleware', () => {
 
     it('calls an async middleware only once for nested subcommands', (done) => {
       let callCount = 0
-      let argv = yargs('cmd subcmd')
+      const argv = yargs('cmd subcmd')
         .command(
           'cmd',
           'cmd command',
@@ -274,9 +274,9 @@ describe('middleware', () => {
           'mw',
           'adds func to middleware',
           {
-            'mw': {
-              'demand': true,
-              'string': true
+            mw: {
+              demand: true,
+              string: true
             }
           },
           function (argv) {
@@ -300,9 +300,9 @@ describe('middleware', () => {
             'mw',
             'adds func to middleware',
             {
-              'mw': {
-                'demand': true,
-                'string': true
+              mw: {
+                demand: true,
+                string: true
               }
             },
             function (argv) {
@@ -346,8 +346,8 @@ describe('middleware', () => {
           'mw',
           'adds func to middleware',
           {
-            'mw': {
-              'demand': true
+            mw: {
+              demand: true
             }
           },
           function (argv) {

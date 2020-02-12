@@ -154,13 +154,13 @@ describe('Command', () => {
         .command('foo <bar> [awesome...]', 'my awesome command', noop, (argv2) => {
           argv2.bar.should.eql('hello')
           argv2.awesome.should.eql(['world', 'series'])
-          argv2['_'].should.eql(['foo', 'apple', 'banana'])
+          argv2._.should.eql(['foo', 'apple', 'banana'])
           called = true
         })
         .parse()
       argv.bar.should.eql('hello')
       argv.awesome.should.eql(['world', 'series'])
-      argv['_'].should.eql(['foo', 'apple', 'banana'])
+      argv._.should.eql(['foo', 'apple', 'banana'])
       called.should.equal(true)
     })
 
@@ -171,7 +171,7 @@ describe('Command', () => {
         .command('foo <bar> [awesome...]', 'my awesome command', noop, (argv2) => {
           argv2.bar.should.eql('hello')
           argv2.awesome.should.eql(['world', 'series'])
-          argv2['_'].should.eql(['foo'])
+          argv2._.should.eql(['foo'])
           argv2['--'].should.eql(['apple', 'banana'])
           called = true
         })
@@ -181,7 +181,7 @@ describe('Command', () => {
         .parse()
       argv.bar.should.eql('hello')
       argv.awesome.should.eql(['world', 'series'])
-      argv['_'].should.eql(['foo'])
+      argv._.should.eql(['foo'])
       argv['--'].should.eql(['apple', 'banana'])
       called.should.equal(true)
     })
@@ -612,7 +612,7 @@ describe('Command', () => {
     it('supports nested subcommands', () => {
       const r = checkOutput(() => yargs('dream --help').wrap(null)
         .commandDir('fixtures/cmddir')
-        .parse(), [ './command' ])
+        .parse(), ['./command'])
       r.exit.should.equal(true)
       r.errors.length.should.equal(0)
       r.logs[0].split(/\n+/).should.deep.equal([
@@ -680,7 +680,7 @@ describe('Command', () => {
     it('detects and ignores cyclic dir references', () => {
       const r = checkOutput(() => yargs('cyclic --help').wrap(null)
         .commandDir('fixtures/cmddir_cyclic')
-        .parse(), [ './command' ])
+        .parse(), ['./command'])
       r.exit.should.equal(true)
       r.errors.length.should.equal(0)
       r.should.have.property('logs')
@@ -732,27 +732,27 @@ describe('Command', () => {
       const helpCmd = checkOutput(() => yargs('help cmd')
         .wrap(null)
         .command(cmd)
-        .parse(), [ './command' ])
+        .parse(), ['./command'])
 
       const cmdHelp = checkOutput(() => yargs('cmd help')
         .wrap(null)
         .command(cmd)
-        .parse(), [ './command' ])
+        .parse(), ['./command'])
 
       const helpCmdSub = checkOutput(() => yargs('help cmd sub')
         .wrap(null)
         .command(cmd)
-        .parse(), [ './command' ])
+        .parse(), ['./command'])
 
       const cmdHelpSub = checkOutput(() => yargs('cmd help sub')
         .wrap(null)
         .command(cmd)
-        .parse(), [ './command' ])
+        .parse(), ['./command'])
 
       const cmdSubHelp = checkOutput(() => yargs('cmd sub help')
         .wrap(null)
         .command(cmd)
-        .parse(), [ './command' ])
+        .parse(), ['./command'])
 
       const expectedCmd = [
         'command cmd <sub>',
