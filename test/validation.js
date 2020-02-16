@@ -966,7 +966,7 @@ describe('validation tests', () => {
         .strictCommands()
         .command('foo', 'foo command')
         .fail((msg) => {
-          msg.should.equal('Unknown argument: blerg')
+          msg.should.equal('Unknown command: blerg')
           return done()
         })
         .parse()
@@ -979,22 +979,29 @@ describe('validation tests', () => {
           yargs.command('bar')
         })
         .fail((msg) => {
-          msg.should.equal('Unknown argument: blarg')
+          msg.should.equal('Unknown command: blarg')
           return done()
         })
         .parse()
     })
 
-    it('enables strict commands if commands used in conjunction with demandCommand', (done) => {
-      yargs('blerg -a 10')
-        .demandCommand()
-        .command('foo', 'foo command')
-        .fail((msg) => {
-          msg.should.equal('Unknown argument: blerg')
-          return done()
-        })
-        .parse()
-    })
+    // TODO(bcoe): consider implementing this behvaior in the next major version of yargs:
+    //
+    // // for the special case of yargs.demandCommand() and yargs.demandCommand(1), if
+    // // yargs has been configured with commands, we automatically enable strictCommands.
+    // if (commandKeys.length && demandedCommands._ && demandedCommands._.min === 1 && demandedCommands._.max === Infinity) {
+    //   yargs.strictCommands()
+    // }
+    // it('enables strict commands if commands used in conjunction with demandCommand', (done) => {
+    //   yargs('blerg -a 10')
+    //     .demandCommand()
+    //     .command('foo', 'foo command')
+    //     .fail((msg) => {
+    //       msg.should.equal('Unknown command: blerg')
+    //       return done()
+    //     })
+    //     .parse()
+    // })
 
     it('does not apply implicit strictCommands to inner commands', () => {
       const parse = yargs('foo blarg --cool beans')
@@ -1013,7 +1020,7 @@ describe('validation tests', () => {
           yargs.command('bar').strictCommands()
         })
         .fail((msg) => {
-          msg.should.equal('Unknown argument: blarg')
+          msg.should.equal('Unknown command: blarg')
           return done()
         })
         .parse()

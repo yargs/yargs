@@ -1408,9 +1408,6 @@ Similar to `.strict()`, except that it only applies to unrecognized commands. A
 user can still provide arbitrary options, but unknown positional commands
 will raise an error.
 
-_Note: if you use `.demandCommand()` or `.demandCommand(1)`, in conjunction
-with defining commands, `.strictCommands()` is enabled automatically.
-
 <a name="string"></a>.string(key)
 ------------
 
