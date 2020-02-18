@@ -32,7 +32,7 @@ describe('validation tests', () => {
       yargs(['--foo'])
         .boolean('foo')
         .implies({
-          'foo': 1 // --foo means 1 arg in _ is required
+          foo: 1 // --foo means 1 arg in _ is required
         })
         .fail((msg) => {
           msg.should.match(implicationsFailedPattern)
@@ -74,7 +74,7 @@ describe('validation tests', () => {
     it('fails if a key is set, along with a key that it implies should not be set', (done) => {
       yargs(['--bar', '--foo'])
         .implies({
-          'bar': '--no-foo' // --bar means --foo cannot be given
+          bar: '--no-foo' // --bar means --foo cannot be given
         })
         .fail((msg) => {
           msg.should.match(implicationsFailedPattern)
@@ -87,7 +87,7 @@ describe('validation tests', () => {
       let failCalled = false
       yargs('--bar')
         .implies({
-          'bar': 'noFoo' // --bar means --noFoo (or --no-foo with boolean-negation disabled) is required
+          bar: 'noFoo' // --bar means --noFoo (or --no-foo with boolean-negation disabled) is required
           // note that this has nothing to do with --foo
         })
         .fail((msg) => {
@@ -102,7 +102,7 @@ describe('validation tests', () => {
       let failCalled = false
       const argv = yargs('--bar --noFoo')
         .implies({
-          'bar': 'noFoo' // --bar means --noFoo (or --no-foo with boolean-negation disabled) is required
+          bar: 'noFoo' // --bar means --noFoo (or --no-foo with boolean-negation disabled) is required
           // note that this has nothing to do with --foo
         })
         .fail((msg) => {
@@ -119,7 +119,7 @@ describe('validation tests', () => {
       let failCalled = false
       yargs('--bar --noFoo')
         .implies({
-          'bar': '--no-noFoo' // --bar means --noFoo (or --no-foo with boolean-negation disabled) cannot be given
+          bar: '--no-noFoo' // --bar means --noFoo (or --no-foo with boolean-negation disabled) cannot be given
           // note that this has nothing to do with --foo
         })
         .fail((msg) => {
@@ -134,7 +134,7 @@ describe('validation tests', () => {
       let failCalled = false
       const argv = yargs('--bar')
         .implies({
-          'bar': '--no-noFoo' // --bar means --noFoo (or --no-foo with boolean-negation disabled) cannot be given
+          bar: '--no-noFoo' // --bar means --noFoo (or --no-foo with boolean-negation disabled) cannot be given
           // note that this has nothing to do with --foo
         })
         .fail((msg) => {
@@ -231,8 +231,8 @@ describe('validation tests', () => {
     it('allows an object to be provided defining conflicting option pairs', (done) => {
       yargs(['-t', '-s'])
         .conflicts({
-          'c': 'a',
-          's': 't'
+          c: 'a',
+          s: 't'
         })
         .fail((msg) => {
           msg.should.equal('Arguments s and t are mutually exclusive')
@@ -244,8 +244,8 @@ describe('validation tests', () => {
     it('takes into account aliases when applying conflicts logic', (done) => {
       yargs(['-t', '-c'])
         .conflicts({
-          'c': 'a',
-          's': 't'
+          c: 'a',
+          s: 't'
         })
         .alias('c', 's')
         .fail((msg) => {
@@ -598,7 +598,7 @@ describe('validation tests', () => {
         .command('one', 'level one', (yargs) => {
           yargs
             .options({
-              'a': {
+              a: {
                 demandOption: true,
                 choices: [10, 20]
               }
@@ -620,7 +620,7 @@ describe('validation tests', () => {
         .command('one', 'level one', (yargs) => {
           yargs
             .options({
-              'c': {
+              c: {
                 choices: ['1', '2']
               }
             })
@@ -641,7 +641,7 @@ describe('validation tests', () => {
         .command('one', 'level one', (yargs) => {
           yargs
             .options({
-              'a': {
+              a: {
                 demandOption: false,
                 choices: [10, 20]
               }
@@ -661,7 +661,7 @@ describe('validation tests', () => {
         .command('one', 'level one', (yargs) => {
           yargs
             .options({
-              'a': {
+              a: {
                 choices: [10, 20]
               }
             })

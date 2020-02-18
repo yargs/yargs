@@ -28,9 +28,9 @@ function Yargs (processArgs, cwd, parentRequire) {
   let command = null
   let completion = null
   let groups = {}
-  let globalMiddleware = []
+  const globalMiddleware = []
   let output = ''
-  let preservedGroups = {}
+  const preservedGroups = {}
   let usage = null
   let validation = null
   let handlerFinishCommand = null
@@ -155,9 +155,9 @@ function Yargs (processArgs, cwd, parentRequire) {
   self.resetOptions()
 
   // temporary hack: allow "freezing" of reset-able state for parse(msg, cb)
-  let frozens = []
+  const frozens = []
   function freeze () {
-    let frozen = {}
+    const frozen = {}
     frozens.push(frozen)
     frozen.options = options
     frozen.configObjects = options.configObjects.slice(0)
@@ -178,7 +178,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     frozen.handlerFinishCommand = handlerFinishCommand
   }
   function unfreeze () {
-    let frozen = frozens.pop()
+    const frozen = frozens.pop()
     options = frozen.options
     options.configObjects = frozen.configObjects
     exitProcess = frozen.exitProcess
