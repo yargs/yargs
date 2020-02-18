@@ -34,7 +34,7 @@ describe('yargs dsl tests', () => {
     process.env._ = '/usr/local/bin/ndm'
     process.execPath = '/usr/local/bin/ndm'
     const argv = yargs([]).parse()
-    argv['$0'].should.equal('ndm')
+    argv.$0.should.equal('ndm')
     yargs.$0.should.equal('ndm')
   })
 
@@ -44,7 +44,7 @@ describe('yargs dsl tests', () => {
     process.defaultApp = false
     yargs = require('../')
     const argv = yargs.parse()
-    argv['f'].should.equal('toto')
+    argv.f.should.equal('toto')
   })
 
   it('accepts an object for aliases', () => {
@@ -865,7 +865,7 @@ describe('yargs dsl tests', () => {
     })
 
     it('can be called multiple times with the same behavior', () => {
-      let counter = { foobar: 0 }
+      const counter = { foobar: 0 }
       yargs(['test', 'foobar'])
         .command(
           'test <name>',

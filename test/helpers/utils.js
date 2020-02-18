@@ -15,7 +15,7 @@ exports.checkOutput = function checkOutput (f, argv, cb) {
 
   process.exit = () => { exit = true }
   process.env = Hash.merge(process.env, { _: 'node' })
-  process.argv = argv || [ './usage' ]
+  process.argv = argv || ['./usage']
 
   const errors = []
   const logs = []
