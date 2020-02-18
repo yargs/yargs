@@ -12,8 +12,14 @@
   "choices:": "vaihtoehdot:",
   "aliases:": "aliakset:",
   "generated-value": "generoitu-arvo",
-  "Not enough non-option arguments: got %s, need at least %s": "Liian vähän argumentteja, jotka eivät ole valintoja: annettu %s, vaaditaan vähintään %s",
-  "Too many non-option arguments: got %s, maximum of %s": "Liikaa argumentteja, jotka eivät ole valintoja: annettu %s, sallitaan enintään %s",
+  "Not enough non-option arguments: got %s, need at least %s": {
+    "one": "Liian vähän argumentteja, jotka eivät ole valintoja: annettu %s, vaaditaan vähintään %s",
+    "other": "Liian vähän argumentteja, jotka eivät ole valintoja: annettu %s, vaaditaan vähintään %s"
+  },
+  "Too many non-option arguments: got %s, maximum of %s": {
+    "one": "Liikaa argumentteja, jotka eivät ole valintoja: annettu %s, sallitaan enintään %s",
+    "other": "Liikaa argumentteja, jotka eivät ole valintoja: annettu %s, sallitaan enintään %s"
+  },
   "Missing argument value: %s": {
     "one": "Argumentin arvo puuttuu: %s",
     "other": "Argumentin arvot puuttuvat: %s"
