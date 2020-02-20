@@ -8,7 +8,7 @@
   "number": "nombre",
   "array": "tableau",
   "required": "requis",
-  "default": "défaut ",
+  "default": "défaut",
   "default:": "défaut :",
   "choices:": "choix :",
   "aliases:": "alias :",
