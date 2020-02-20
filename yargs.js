@@ -28,9 +28,9 @@ function Yargs (processArgs, cwd, parentRequire) {
   let command = null
   let completion = null
   let groups = {}
-  let globalMiddleware = []
+  const globalMiddleware = []
   let output = ''
-  let preservedGroups = {}
+  const preservedGroups = {}
   let usage = null
   let validation = null
   let handlerFinishCommand = null
@@ -156,9 +156,9 @@ function Yargs (processArgs, cwd, parentRequire) {
   self.resetOptions()
 
   // temporary hack: allow "freezing" of reset-able state for parse(msg, cb)
-  let frozens = []
+  const frozens = []
   function freeze () {
-    let frozen = {}
+    const frozen = {}
     frozens.push(frozen)
     frozen.options = options
     frozen.configObjects = options.configObjects.slice(0)
@@ -168,6 +168,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     validation.freeze()
     command.freeze()
     frozen.strict = strict
+    frozen.strictCommands = strictCommands
     frozen.completionCommand = completionCommand
     frozen.output = output
     frozen.exitError = exitError
@@ -178,7 +179,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     frozen.handlerFinishCommand = handlerFinishCommand
   }
   function unfreeze () {
-    let frozen = frozens.pop()
+    const frozen = frozens.pop()
     options = frozen.options
     options.configObjects = frozen.configObjects
     exitProcess = frozen.exitProcess
@@ -191,6 +192,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     validation.unfreeze()
     command.unfreeze()
     strict = frozen.strict
+    strictCommands = frozen.strictCommands
     completionCommand = frozen.completionCommand
     parseFn = frozen.parseFn
     parseContext = frozen.parseContext
@@ -813,6 +815,14 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
   self.getStrict = () => strict
 
+  let strictCommands = false
+  self.strictCommands = function (enabled) {
+    argsert('[boolean]', [enabled], arguments.length)
+    strictCommands = enabled !== false
+    return self
+  }
+  self.getStrictCommands = () => strictCommands
+
   let parserConfig = {}
   self.parserConfiguration = function parserConfiguration (config) {
     argsert('<object>', [config], arguments.length)
@@ -1237,7 +1247,13 @@ function Yargs (processArgs, cwd, parentRequire) {
     if (parseErrors) throw new YError(parseErrors.message)
     validation.nonOptionCount(argv)
     validation.requiredArguments(argv)
-    if (strict) validation.unknownArguments(argv, aliases, positionalMap)
+    let failedStrictCommands = false
+    if (strictCommands) {
+      failedStrictCommands = validation.unknownCommands(argv, aliases, positionalMap)
+    }
+    if (strict && !failedStrictCommands) {
+      validation.unknownArguments(argv, aliases, positionalMap)
+    }
     validation.customChecks(argv, aliases)
     validation.limitedChoices(argv)
     validation.implications(argv)

@@ -12,8 +12,14 @@
   "choices:": "選択してください:",
   "aliases:": "エイリアス:",
   "generated-value": "生成された値",
-  "Not enough non-option arguments: got %s, need at least %s": "オプションではない引数が %s 個では不足しています。少なくとも %s 個の引数が必要です:",
-  "Too many non-option arguments: got %s, maximum of %s": "オプションではない引数が %s 個では多すぎます。最大で %s 個までです:",
+  "Not enough non-option arguments: got %s, need at least %s": {
+    "one": "オプションではない引数が %s 個では不足しています。少なくとも %s 個の引数が必要です:",
+    "other": "オプションではない引数が %s 個では不足しています。少なくとも %s 個の引数が必要です:"
+  },
+  "Too many non-option arguments: got %s, maximum of %s": {
+    "one": "オプションではない引数が %s 個では多すぎます。最大で %s 個までです:",
+    "other": "オプションではない引数が %s 個では多すぎます。最大で %s 個までです:"
+  },
   "Missing argument value: %s": {
     "one": "引数が見つかりません: %s",
     "other": "引数が見つかりません: %s"

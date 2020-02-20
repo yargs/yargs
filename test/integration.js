@@ -16,7 +16,7 @@ describe('integration tests', () => {
   })
 
   it('should run as a shell script with arguments', (done) => {
-    testArgs('./bin.js', [ 'a', 'b', 'c' ], done)
+    testArgs('./bin.js', ['a', 'b', 'c'], done)
   })
 
   it('should run as a node script with no arguments', (done) => {
@@ -24,7 +24,7 @@ describe('integration tests', () => {
   })
 
   it('should run as a node script with arguments', (done) => {
-    testArgs('node bin.js', [ 'x', 'y', 'z' ], done)
+    testArgs('node bin.js', ['x', 'y', 'z'], done)
   })
 
   describe('path returned by "which"', () => {
@@ -40,14 +40,14 @@ describe('integration tests', () => {
       which('node', (err, resolvedPath) => {
         if (err) return done(err)
         testArgs(`${resolvedPath.replace('Program Files (x86)', 'Progra~2')
-          .replace('Program Files', 'Progra~1')} bin.js`, [ 'q', 'r' ], done)
+          .replace('Program Files', 'Progra~1')} bin.js`, ['q', 'r'], done)
       })
     })
   })
 
   // see #177
   it('allows --help to be completed without returning help message', (done) => {
-    testCmd('./bin.js', [ '--get-yargs-completions', '--h' ], (code, stdout) => {
+    testCmd('./bin.js', ['--get-yargs-completions', '--h'], (code, stdout) => {
       if (code) {
         done(new Error(`cmd exited with code ${code}`))
         return
@@ -66,7 +66,7 @@ describe('integration tests', () => {
       return this.skip()
     }
 
-    testCmd('./issue-497.js', [ '--help' ], (code, stdout) => {
+    testCmd('./issue-497.js', ['--help'], (code, stdout) => {
       if (code) {
         done(new Error(`cmd exited with code ${code}`))
         return
@@ -125,7 +125,7 @@ describe('integration tests', () => {
 
       describe('version #', () => {
         it('defaults to appropriate version # when yargs is installed normally', (done) => {
-          testCmd('./normal-bin.js', [ '--version' ], (code, stdout) => {
+          testCmd('./normal-bin.js', ['--version'], (code, stdout) => {
             if (code) {
               return done(new Error(`cmd exited with code ${code}`))
             }
@@ -136,7 +136,7 @@ describe('integration tests', () => {
         })
 
         it('defaults to appropriate version # when yargs is symlinked', (done) => {
-          testCmd('./symlink-bin.js', [ '--version' ], (code, stdout) => {
+          testCmd('./symlink-bin.js', ['--version'], (code, stdout) => {
             if (code) {
               return done(new Error(`cmd exited with code ${code}`))
             }
@@ -149,7 +149,7 @@ describe('integration tests', () => {
 
       describe('parser settings', () => {
         it('reads parser config settings when yargs is installed normally', (done) => {
-          testCmd('./normal-bin.js', [ '--foo.bar' ], (code, stdout) => {
+          testCmd('./normal-bin.js', ['--foo.bar'], (code, stdout) => {
             if (code) {
               return done(new Error(`cmd exited with code ${code}`))
             }
@@ -160,7 +160,7 @@ describe('integration tests', () => {
         })
 
         it('reads parser config settings when yargs is installed as a symlink', (done) => {
-          testCmd('./symlink-bin.js', [ '--foo.bar' ], (code, stdout) => {
+          testCmd('./symlink-bin.js', ['--foo.bar'], (code, stdout) => {
             if (code) {
               return done(new Error(`cmd exited with code ${code}`))
             }
@@ -171,7 +171,7 @@ describe('integration tests', () => {
         })
 
         it('reads parser config settings when somebody obscures require.main', (done) => {
-          testCmd('./no-require-main.js', [ '--foo.bar' ], (code, stdout) => {
+          testCmd('./no-require-main.js', ['--foo.bar'], (code, stdout) => {
             if (code) {
               return done(new Error(`cmd exited with code ${code}`))
             }
@@ -182,7 +182,7 @@ describe('integration tests', () => {
         })
 
         it('reads parser config settings when entry file has no extension', (done) => {
-          testCmd('./no-extension', [ '--foo.bar' ], (code, stdout) => {
+          testCmd('./no-extension', ['--foo.bar'], (code, stdout) => {
             if (code) {
               return done(new Error(`cmd exited with code ${code}`))
             }

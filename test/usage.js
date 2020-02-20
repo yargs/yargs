@@ -1048,8 +1048,8 @@ describe('usage tests', () => {
         const r = checkUsage(() => yargs('-y 10 -z 20')
           .usage('Usage: $0 -x NUM [-y NUM]')
           .options({
-            'x': { description: 'an option', demand: true },
-            'y': { description: 'another option', demand: false }
+            x: { description: 'an option', demand: true },
+            y: { description: 'another option', demand: false }
           })
           .wrap(null)
           .parse()
@@ -1078,8 +1078,8 @@ describe('usage tests', () => {
         const r = checkUsage(() => yargs('-y 10 -z 20')
           .usage('Usage: $0 -x NUM [-y NUM]')
           .options({
-            'x': { description: 'an option', required: true },
-            'y': { description: 'another option', required: false }
+            x: { description: 'an option', required: true },
+            y: { description: 'another option', required: false }
           })
           .wrap(null)
           .parse()
@@ -1107,8 +1107,8 @@ describe('usage tests', () => {
       const r = checkUsage(() => yargs('-w 10')
         .usage('Usage: $0 --width NUM [--height NUM]')
         .options({
-          'width': { description: 'Width', alias: 'w', demand: true },
-          'height': { description: 'Height', alias: 'h', demand: false }
+          width: { description: 'Width', alias: 'w', demand: true },
+          height: { description: 'Height', alias: 'h', demand: false }
         })
         .wrap(null)
         .parse()

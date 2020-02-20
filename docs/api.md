@@ -1439,6 +1439,13 @@ corresponding description, will be reported as an error.
 
 Unrecognized commands will also be reported as errors.
 
+.strictCommands([enabled=true])
+---------
+
+Similar to `.strict()`, except that it only applies to unrecognized commands. A
+user can still provide arbitrary options, but unknown positional commands
+will raise an error.
+
 <a name="string"></a>.string(key)
 ------------
 

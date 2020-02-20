@@ -32,7 +32,7 @@ describe('validation tests', () => {
       yargs(['--foo'])
         .boolean('foo')
         .implies({
-          'foo': 1 // --foo means 1 arg in _ is required
+          foo: 1 // --foo means 1 arg in _ is required
         })
         .fail((msg) => {
           msg.should.match(implicationsFailedPattern)
@@ -74,7 +74,7 @@ describe('validation tests', () => {
     it('fails if a key is set, along with a key that it implies should not be set', (done) => {
       yargs(['--bar', '--foo'])
         .implies({
-          'bar': '--no-foo' // --bar means --foo cannot be given
+          bar: '--no-foo' // --bar means --foo cannot be given
         })
         .fail((msg) => {
           msg.should.match(implicationsFailedPattern)
@@ -87,7 +87,7 @@ describe('validation tests', () => {
       let failCalled = false
       yargs('--bar')
         .implies({
-          'bar': 'noFoo' // --bar means --noFoo (or --no-foo with boolean-negation disabled) is required
+          bar: 'noFoo' // --bar means --noFoo (or --no-foo with boolean-negation disabled) is required
           // note that this has nothing to do with --foo
         })
         .fail((msg) => {
@@ -102,7 +102,7 @@ describe('validation tests', () => {
       let failCalled = false
       const argv = yargs('--bar --noFoo')
         .implies({
-          'bar': 'noFoo' // --bar means --noFoo (or --no-foo with boolean-negation disabled) is required
+          bar: 'noFoo' // --bar means --noFoo (or --no-foo with boolean-negation disabled) is required
           // note that this has nothing to do with --foo
         })
         .fail((msg) => {
@@ -119,7 +119,7 @@ describe('validation tests', () => {
       let failCalled = false
       yargs('--bar --noFoo')
         .implies({
-          'bar': '--no-noFoo' // --bar means --noFoo (or --no-foo with boolean-negation disabled) cannot be given
+          bar: '--no-noFoo' // --bar means --noFoo (or --no-foo with boolean-negation disabled) cannot be given
           // note that this has nothing to do with --foo
         })
         .fail((msg) => {
@@ -134,7 +134,7 @@ describe('validation tests', () => {
       let failCalled = false
       const argv = yargs('--bar')
         .implies({
-          'bar': '--no-noFoo' // --bar means --noFoo (or --no-foo with boolean-negation disabled) cannot be given
+          bar: '--no-noFoo' // --bar means --noFoo (or --no-foo with boolean-negation disabled) cannot be given
           // note that this has nothing to do with --foo
         })
         .fail((msg) => {
@@ -231,8 +231,8 @@ describe('validation tests', () => {
     it('allows an object to be provided defining conflicting option pairs', (done) => {
       yargs(['-t', '-s'])
         .conflicts({
-          'c': 'a',
-          's': 't'
+          c: 'a',
+          s: 't'
         })
         .fail((msg) => {
           msg.should.equal('Arguments s and t are mutually exclusive')
@@ -244,8 +244,8 @@ describe('validation tests', () => {
     it('takes into account aliases when applying conflicts logic', (done) => {
       yargs(['-t', '-c'])
         .conflicts({
-          'c': 'a',
-          's': 't'
+          c: 'a',
+          s: 't'
         })
         .alias('c', 's')
         .fail((msg) => {
@@ -598,7 +598,7 @@ describe('validation tests', () => {
         .command('one', 'level one', (yargs) => {
           yargs
             .options({
-              'a': {
+              a: {
                 demandOption: true,
                 choices: [10, 20]
               }
@@ -620,7 +620,7 @@ describe('validation tests', () => {
         .command('one', 'level one', (yargs) => {
           yargs
             .options({
-              'c': {
+              c: {
                 choices: ['1', '2']
               }
             })
@@ -641,7 +641,7 @@ describe('validation tests', () => {
         .command('one', 'level one', (yargs) => {
           yargs
             .options({
-              'a': {
+              a: {
                 demandOption: false,
                 choices: [10, 20]
               }
@@ -661,7 +661,7 @@ describe('validation tests', () => {
         .command('one', 'level one', (yargs) => {
           yargs
             .options({
-              'a': {
+              a: {
                 choices: [10, 20]
               }
             })
@@ -934,6 +934,93 @@ describe('validation tests', () => {
         .demandCommand()
         .fail((msg) => {
           msg.should.equal('Not enough non-option arguments: got 0, need at least 1')
+          return done()
+        })
+        .parse()
+    })
+  })
+
+  describe('strictCommands', () => {
+    it('succeeds in parse if command is known', () => {
+      const parsed = yargs('foo -a 10')
+        .strictCommands()
+        .command('foo', 'foo command')
+        .parse()
+      parsed.a.should.equal(10)
+      parsed._.should.eql(['foo'])
+    })
+
+    it('succeeds in parse if top level and inner command are known', () => {
+      const parsed = yargs('foo bar --cool beans')
+        .strictCommands()
+        .command('foo', 'foo command', (yargs) => {
+          yargs.command('bar')
+        })
+        .parse()
+      parsed.cool.should.equal('beans')
+      parsed._.should.eql(['foo', 'bar'])
+    })
+
+    it('fails with error if command is unknown', (done) => {
+      yargs('blerg -a 10')
+        .strictCommands()
+        .command('foo', 'foo command')
+        .fail((msg) => {
+          msg.should.equal('Unknown command: blerg')
+          return done()
+        })
+        .parse()
+    })
+
+    it('fails with error if inner command is unknown', (done) => {
+      yargs('foo blarg --cool beans')
+        .strictCommands()
+        .command('foo', 'foo command', (yargs) => {
+          yargs.command('bar')
+        })
+        .fail((msg) => {
+          msg.should.equal('Unknown command: blarg')
+          return done()
+        })
+        .parse()
+    })
+
+    // TODO(bcoe): consider implementing this behvaior in the next major version of yargs:
+    //
+    // // for the special case of yargs.demandCommand() and yargs.demandCommand(1), if
+    // // yargs has been configured with commands, we automatically enable strictCommands.
+    // if (commandKeys.length && demandedCommands._ && demandedCommands._.min === 1 && demandedCommands._.max === Infinity) {
+    //   yargs.strictCommands()
+    // }
+    // it('enables strict commands if commands used in conjunction with demandCommand', (done) => {
+    //   yargs('blerg -a 10')
+    //     .demandCommand()
+    //     .command('foo', 'foo command')
+    //     .fail((msg) => {
+    //       msg.should.equal('Unknown command: blerg')
+    //       return done()
+    //     })
+    //     .parse()
+    // })
+
+    it('does not apply implicit strictCommands to inner commands', () => {
+      const parse = yargs('foo blarg --cool beans')
+        .demandCommand()
+        .command('foo', 'foo command', (yargs) => {
+          yargs.command('bar')
+        })
+        .parse()
+      parse.cool.should.equal('beans')
+      parse._.should.eql(['foo', 'blarg'])
+    })
+
+    it('allows strictCommands to be applied to inner commands', (done) => {
+      yargs('foo blarg')
+        .command('foo', 'foo command', (yargs) => {
+          yargs.command('bar').strictCommands()
+        })
+        .fail((msg) => {
+          msg.should.equal('Unknown command: blarg')
           return done()
         })
         .parse()
