@@ -8,6 +8,7 @@
   "number": "数字",
   "array": "数组",
   "required": "必需",
+  "default": "默认值",
   "default:": "默认值:",
   "choices:": "可选值:",
   "generated-value": "生成的值",
