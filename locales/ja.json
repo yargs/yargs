@@ -8,6 +8,7 @@
   "number": "数値",
   "array": "配列",
   "required": "必須",
+  "default": "デフォルト",
   "default:": "デフォルト:",
   "choices:": "選択してください:",
   "aliases:": "エイリアス:",

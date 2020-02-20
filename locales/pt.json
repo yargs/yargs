@@ -8,6 +8,7 @@
   "number": "número",
   "array": "arranjo",
   "required": "requerido",
+  "default": "padrão",
   "default:": "padrão:",
   "choices:": "escolhas:",
   "generated-value": "valor-gerado",

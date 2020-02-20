@@ -8,6 +8,7 @@
   "number": "getal",
   "array": "lijst",
   "required": "verplicht",
+  "default": "standaard",
   "default:": "standaard:",
   "choices:": "keuzes:",
   "aliases:": "aliassen:",

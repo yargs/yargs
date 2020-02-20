@@ -8,6 +8,7 @@
   "number": "數字",
   "array": "陣列",
   "required": "必須",
+  "default": "預設值",
   "default:": "預設值:",
   "choices:": "可選值:",
   "aliases:": "別名:",

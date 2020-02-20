@@ -8,6 +8,7 @@
   "number": "número",
   "array": "tabla",
   "required": "requerido",
+  "default": "defecto",
   "default:": "defecto:",
   "choices:": "selección:",
   "aliases:": "alias:",

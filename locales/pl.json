@@ -8,6 +8,7 @@
   "number": "liczba",
   "array": "tablica",
   "required": "wymagany",
+  "default": "domyślny",
   "default:": "domyślny:",
   "choices:": "dostępne:",
   "aliases:": "aliasy:",
