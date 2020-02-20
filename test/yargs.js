@@ -15,17 +15,19 @@ const noop = () => {}
 const implicationsFailedPattern = new RegExp(english['Implications failed:'])
 
 describe('yargs dsl tests', () => {
-  const oldProcess = {}
+  const oldProcess = { versions: {} }
 
   beforeEach(() => {
     oldProcess.argv = process.argv
     oldProcess.defaultApp = process.defaultApp
+    oldProcess.versions.electron = process.versions.electron
     yargs = require('../')
   })
 
   afterEach(() => {
     process.argv = oldProcess.argv
     process.defaultApp = oldProcess.defaultApp
+    process.versions.electron = oldProcess.versions.electron
     delete require.cache[require.resolve('../')]
   })
 
@@ -38,13 +40,32 @@ describe('yargs dsl tests', () => {
     yargs.$0.should.equal('ndm')
   })
 
-  it('should not remove the 1st argument of built electron apps', () => {
+  it('should not remove the 1st argument of bundled electron apps', () => {
     delete require.cache[require.resolve('../')]
-    process.argv = ['/usr/local/bin/app', '-f', 'toto']
-    process.defaultApp = false
+    process.argv = ['/usr/local/bin/app', '-f', 'toto', 'tutu']
+    process.versions.electron = '10.0.0-nightly.20200211'
     yargs = require('../')
     const argv = yargs.parse()
+    argv.should.have.property('f')
     argv.f.should.equal('toto')
+    argv._.should.deep.equal(['tutu'])
+  })
+
+  it('should remove the 1st argument of unbundled electron apps', () => {
+    delete require.cache[require.resolve('../')]
+    process.argv = ['/usr/local/bin/electron', 'app.js', '-f', 'toto', 'tutu']
+    process.versions.electron = '10.0.0-nightly.20200211'
+    // Same syntax as in electron
+    Object.defineProperty(process, 'defaultApp', {
+      configurable: false,
+      enumerable: true,
+      value: true
+    })
+    yargs = require('../')
+    const argv = yargs.parse()
+    argv.should.have.property('f')
+    argv.f.should.equal('toto')
+    argv._.should.deep.equal(['tutu'])
   })
 
   it('accepts an object for aliases', () => {
