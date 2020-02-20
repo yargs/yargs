@@ -8,6 +8,7 @@
   "number": "szám",
   "array": "tömb",
   "required": "kötelező",
+  "default": "alapértelmezett",
   "default:": "alapértelmezett:",
   "choices:": "lehetőségek:",
   "aliases:": "aliaszok:",
