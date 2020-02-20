@@ -8,6 +8,7 @@
   "number": "numero",
   "array": "taulukko",
   "required": "pakollinen",
+  "default": "oletusarvo",
   "default:": "oletusarvo:",
   "choices:": "vaihtoehdot:",
   "aliases:": "aliakset:",

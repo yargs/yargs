@@ -8,6 +8,7 @@
   "number": "अंक",
   "array": "सरणी",
   "required": "आवश्यक",
+  "default": "डिफॉल्ट",
   "default:": "डिफॉल्ट:",
   "choices:": "विकल्प:",
   "aliases:": "उपनाम:",

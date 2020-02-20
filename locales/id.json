@@ -9,6 +9,7 @@
   "string": "string",
   "array": "larik",
   "required": "diperlukan",
+  "default": "bawaan",
   "default:": "bawaan:",
   "aliases:": "istilah lain:",
   "choices:": "pilihan:",
