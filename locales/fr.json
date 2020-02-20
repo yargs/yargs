@@ -32,6 +32,10 @@
     "one": "Argument inconnu : %s",
     "other": "Arguments inconnus : %s"
   },
+  "Unknown command: %s": {
+    "one": "Commande inconnue : %s",
+    "other": "Commandes inconnues : %s"
+  },
   "Invalid values:": "Valeurs invalides :",
   "Argument: %s, Given: %s, Choices: %s": "Argument : %s, donné : %s, choix : %s",
   "Argument check failed: %s": "Echec de la vérification de l'argument : %s",
