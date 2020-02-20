@@ -44,5 +44,7 @@
   "Did you mean %s?": "Did you mean %s?",
   "Arguments %s and %s are mutually exclusive" : "Arguments %s and %s are mutually exclusive",
   "Positionals:": "Positionals:",
-  "command": "command"
+  "command": "command",
+  "deprecated": "deprecated",
+  "deprecated: %s": "deprecated: %s"
 }
