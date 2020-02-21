@@ -8,6 +8,7 @@
   "number": "Zahl",
   "array": "array",
   "required": "erforderlich",
+  "default": "Standard",
   "default:": "Standard:",
   "choices:": "Möglichkeiten:",
   "aliases:": "Aliase:",

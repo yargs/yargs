@@ -8,6 +8,7 @@
   "number": "numero",
   "array": "vettore",
   "required": "richiesto",
+  "default": "predefinito",
   "default:": "predefinito:",
   "choices:": "scelte:",
   "aliases:": "alias:",

@@ -8,6 +8,7 @@
   "number": "숫자",
   "array": "배열",
   "required": "필수",
+  "default": "기본",
   "default:": "기본:",
   "choices:": "선택:",
   "aliases:": "별칭:",

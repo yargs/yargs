@@ -8,6 +8,7 @@
   "number": "nummer",
   "array": "matrise",
   "required": "obligatorisk",
+  "default": "standard",
   "default:": "standard:",
   "choices:": "valg:",
   "generated-value": "generert-verdi",

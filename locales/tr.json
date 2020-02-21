@@ -8,6 +8,7 @@
   "number": "numara",
   "array": "array",
   "required": "zorunlu",
+  "default": "varsayılan",
   "default:": "varsayılan:",
   "choices:": "seçimler:",
   "aliases:": "takma adlar:",
