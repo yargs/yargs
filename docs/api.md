@@ -578,6 +578,44 @@ _Note: in `minMsg` and `maxMsg`, every occurrence of `$0` will be replaced
 with the observed value, and every instance of `$1` will be replaced with the
 expected value._
 
+<a name="deprecateOption"></a>.deprecateOption(key, [msg | boolean])
+--------------------
+
+Shows a `[deprecated]` notice in front of the option.
+
+```javascript
+require('yargs')
+  .option('old')
+  .deprecateOption('old')
+  .option('new')
+```
+```bash
+Options:
+  --old                                     [deprecated]
+  --new
+```
+
+You can also specify a message
+
+```javascript
+require('yargs')
+  .option('old')
+  .deprecateOption('old', 'use --new')
+  .option('new')
+```
+```bash
+Options:
+  --old                          [deprecated: use --new]
+  --new
+```
+
+You can also use it within the option constructor
+
+```javascript
+require('yargs')
+  .option('old', { deprecated: true })
+```
+
 <a name="describe"></a>.describe(key, desc)
 --------------------
 
