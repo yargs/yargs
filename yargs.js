@@ -123,7 +123,8 @@ function Yargs (processArgs, cwd, parentRequire) {
 
     const objectOptions = [
       'narg', 'key', 'alias', 'default', 'defaultDescription',
-      'config', 'choices', 'demandedOptions', 'demandedCommands', 'coerce'
+      'config', 'choices', 'demandedOptions', 'demandedCommands', 'coerce',
+      'deprecatedOptions'
     ]
 
     arrayOptions.forEach((k) => {
@@ -448,6 +449,17 @@ function Yargs (processArgs, cwd, parentRequire) {
     return options.demandedCommands
   }
 
+  self.deprecateOption = function deprecateOption (option, message) {
+    argsert('<string> [string|boolean]', [option, message], arguments.length)
+    options.deprecatedOptions[option] = message
+    return self
+  }
+
+  self.getDeprecatedOptions = () => {
+    argsert([], 0)
+    return options.deprecatedOptions
+  }
+
   self.implies = function (key, value) {
     argsert('<string|object> [number|string|array]', [key, value], arguments.length)
     validation.implies(key, value)
@@ -620,6 +632,12 @@ function Yargs (processArgs, cwd, parentRequire) {
       options.key[key] = true // track manually set keys.
 
       if (opt.alias) self.alias(key, opt.alias)
+
+      const deprecate = opt.deprecate || opt.deprecated
+
+      if (deprecate) {
+        self.deprecateOption(key, deprecate)
+      }
 
       const demand = opt.demand || opt.required || opt.require
 
