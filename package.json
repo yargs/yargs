@@ -29,7 +29,7 @@
     "string-width": "^4.2.0",
     "which-module": "^2.0.0",
     "y18n": "^4.0.0",
-    "yargs-parser": "^17.0.0"
+    "yargs-parser": "^17.0.1"
   },
   "devDependencies": {
     "c8": "^7.0.0",
