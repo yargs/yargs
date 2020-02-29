@@ -36,4 +36,4 @@ jobs:
           node-version: 12
       - run: npm install
       - run: npm test
-      - run: c8 report --reporter=text-lcov | coveralls
+      - run: npm run coverage
