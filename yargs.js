@@ -237,7 +237,7 @@ function Yargs (processArgs, cwd, parentRequire) {
 
   self.requiresArg = function (keys) {
     argsert('<array|string>', [keys], arguments.length)
-    populateParserHintObject(self.nargs, false, 'narg', keys, 1)
+    populateParserHintObject(self.nargs, false, 'narg', keys, NaN)
     return self
   }
 
