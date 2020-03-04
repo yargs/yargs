@@ -260,45 +260,75 @@ export function usage (yargs: YargsInstance, y18n: Y18N) {
     if (!groups[defaultGroup]) groups[defaultGroup] = []
     addUngroupedKeys(keys, options.alias, groups, defaultGroup)
 
-    // display 'Options:' table along with any custom tables:
-    Object.keys(groups).forEach((groupName) => {
-      if (!groups[groupName].length) return
+    const isLongSwitch = (sw: string | IndentedText) => /^--/.test(getText(sw))
 
-      // if we've grouped the key 'f', but 'f' aliases 'foobar',
-      // normalizedKeys should contain only 'foobar'.
-      const normalizedKeys = groups[groupName].filter(filterHiddenOptions).map((key) => {
-        if (~aliasKeys.indexOf(key)) return key
-        for (let i = 0, aliasKey; (aliasKey = aliasKeys[i]) !== undefined; i++) {
-          if (~(options.alias[aliasKey] || []).indexOf(key)) return aliasKey
-        }
-        return key
+    // prepare 'Options:' tables display
+    const displayedGroups = Object.keys(groups)
+      .filter(groupName => groups[groupName].length > 0)
+      .map(groupName => {
+        // if we've grouped the key 'f', but 'f' aliases 'foobar',
+        // normalizedKeys should contain only 'foobar'.
+        const normalizedKeys: string[] = groups[groupName].filter(filterHiddenOptions).map((key) => {
+          if (~aliasKeys.indexOf(key)) return key
+          for (let i = 0, aliasKey; (aliasKey = aliasKeys[i]) !== undefined; i++) {
+            if (~(options.alias[aliasKey] || []).indexOf(key)) return aliasKey
+          }
+          return key
+        })
+
+        return { groupName, normalizedKeys }
+      })
+      .filter(({ normalizedKeys }) => normalizedKeys.length > 0)
+      .map(({ groupName, normalizedKeys }) => {
+        // actually generate the switches string --foo, -f, --bar.
+        const switches: Dictionary<string | IndentedText> = normalizedKeys.reduce((acc, key) => {
+          acc[key] = [key].concat(options.alias[key] || [])
+            .map(sw => {
+              // for the special positional group don't
+              // add '--' or '-' prefix.
+              if (groupName === self.getPositionalGroupName()) return sw
+              else {
+                return (
+                  // matches yargs-parser logic in which single-digits
+                  // aliases declared with a boolean type are now valid
+                  /^[0-9]$/.test(sw)
+                    ? ~options.boolean.indexOf(key) ? '-' : '--'
+                    : sw.length > 1 ? '--' : '-'
+                ) + sw
+              }
+            })
+            // place short switches first (see #1403)
+            .sort(
+              (sw1, sw2) => isLongSwitch(sw1) === isLongSwitch(sw2) ? 0 : (isLongSwitch(sw1) ? 1 : -1)
+            )
+            .join(', ')
+
+          return acc
+        }, {} as Dictionary<string>)
+
+        return { groupName, normalizedKeys, switches }
       })
 
-      if (normalizedKeys.length < 1) return
+    // if some options use short switches, indent long-switches only options (see #1403)
+    const shortSwitchesUsed = displayedGroups
+      .filter(({ groupName }) => groupName !== self.getPositionalGroupName())
+      .some(({ normalizedKeys, switches }) => !normalizedKeys.every(key => isLongSwitch(switches[key])))
 
-      ui.div(groupName)
-
-      // actually generate the switches string --foo, -f, --bar.
-      const switches = normalizedKeys.reduce((acc, key) => {
-        acc[key] = [key].concat(options.alias[key] || [])
-          .map(sw => {
-            // for the special positional group don't
-            // add '--' or '-' prefix.
-            if (groupName === self.getPositionalGroupName()) return sw
-            else {
-              return (
-                // matches yargs-parser logic in which single-digits
-                // aliases declared with a boolean type are now valid
-                /^[0-9]$/.test(sw)
-                  ? ~options.boolean.indexOf(key) ? '-' : '--'
-                  : sw.length > 1 ? '--' : '-'
-              ) + sw
+    if (shortSwitchesUsed) {
+      displayedGroups
+        .filter(({ groupName }) => groupName !== self.getPositionalGroupName())
+        .forEach(({ normalizedKeys, switches }) => {
+          normalizedKeys.forEach(key => {
+            if (isLongSwitch(switches[key])) {
+              switches[key] = addIndentation(switches[key], '-x, '.length)
             }
           })
-          .join(', ')
+        })
+    }
 
-        return acc
-      }, {} as Dictionary<string>)
+    // display 'Options:' table along with any custom tables:
+    displayedGroups.forEach(({ groupName, normalizedKeys, switches }) => {
+      ui.div(groupName)
 
       normalizedKeys.forEach((key) => {
         const kswitch = switches[key]
@@ -328,7 +358,7 @@ export function usage (yargs: YargsInstance, y18n: Y18N) {
         ].filter(Boolean).join(' ')
 
         ui.span(
-          { text: kswitch, padding: [0, 2, 0, 2], width: maxWidth(switches, theWrap) + 4 },
+          { text: getText(kswitch), padding: [0, 2, 0, 2 + getIndentation(kswitch)], width: maxWidth(switches, theWrap) + 4 },
           desc
         )
 
@@ -383,18 +413,20 @@ export function usage (yargs: YargsInstance, y18n: Y18N) {
 
   // return the maximum width of a string
   // in the left-hand column of a table.
-  function maxWidth (table: [string, ...any[]][] | Dictionary<string>, theWrap?: number | null, modifier?: string) {
+  function maxWidth (table: [string | IndentedText, ...any[]][] | Dictionary<string | IndentedText>, theWrap?: number | null, modifier?: string) {
     let width = 0
 
     // table might be of the form [leftColumn],
     // or {key: leftColumn}
     if (!Array.isArray(table)) {
-      table = Object.values(table).map<[string]>(v => [v])
+      table = Object.values(table).map<[string | IndentedText]>(v => [v])
     }
 
     table.forEach((v) => {
+      // column might be of the form "text"
+      // or { text: "text", indent: 4 }
       width = Math.max(
-        stringWidth(modifier ? `${modifier} ${v[0]}` : v[0]),
+        stringWidth(modifier ? `${modifier} ${getText(v[0])}` : getText(v[0])) + getIndentation(v[0]),
         width
       )
     })
@@ -628,4 +660,27 @@ export interface FrozenUsageInstance {
   examples: [string, string][]
   commands: [string, string, boolean, string[], boolean][]
   descriptions: Dictionary<string | undefined>
+}
+
+interface IndentedText {
+  text: string
+  indentation: number
+}
+
+function isIndentedText (text: string | IndentedText): text is IndentedText {
+  return typeof text === 'object'
+}
+
+function addIndentation (text: string | IndentedText, indent: number): IndentedText {
+  return isIndentedText(text)
+    ? { text: text.text, indentation: text.indentation + indent }
+    : { text, indentation: indent }
+}
+
+function getIndentation (text: string | IndentedText): number {
+  return isIndentedText(text) ? text.indentation : 0
+}
+
+function getText (text: string | IndentedText): string {
+  return isIndentedText(text) ? text.text : text
 }

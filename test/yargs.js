@@ -470,8 +470,8 @@ describe('yargs dsl tests', () => {
         '  usage blerg snuh  snuh command',
         '',
         'Options:',
-        '  --version  Show version number  [boolean]',
-        '  -h         Show help  [boolean]'
+        '      --version  Show version number  [boolean]',
+        '  -h             Show help  [boolean]'
       ])
     })
 
@@ -495,8 +495,8 @@ describe('yargs dsl tests', () => {
         '  usage blerg  handle blerg things',
         '',
         'Options:',
-        '  --version  Show version number  [boolean]',
-        '  -h         Show help  [boolean]'
+        '      --version  Show version number  [boolean]',
+        '  -h             Show help  [boolean]'
       ])
     })
 
@@ -1981,7 +1981,7 @@ describe('yargs dsl tests', () => {
       )
       info.logs[0].split('\n').should.deep.equal([
         'Options:',
-        '  --version           Show version number  [boolean]',
+        '      --version       Show version number  [boolean]',
         '  -h, --help, --info  Show help  [boolean]'
       ])
       h.result.should.have.property('_').and.deep.equal(['h'])
