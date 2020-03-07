@@ -375,4 +375,4 @@ arguments when duplicates are provided
 
 * requiresArg now has significantly different error output, matching nargs.
 
-[Historical Versions][/docs/CHANGELOG-historical.md]
+[Historical Versions](/docs/CHANGELOG-historical.md)
