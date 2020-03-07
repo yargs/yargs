@@ -583,7 +583,7 @@ describe('yargs dsl tests', () => {
       if (process.stdout.isTTY) {
         yargs.terminalWidth().should.be.gte(0)
       } else {
-        yargs.terminalWidth().should.equal(null)
+        expect(yargs.terminalWidth()).to.equal(null)
       }
     })
   })
