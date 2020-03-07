@@ -235,9 +235,18 @@ function Yargs (processArgs, cwd, parentRequire) {
     return self
   }
 
-  self.requiresArg = function (keys) {
-    argsert('<array|string>', [keys], arguments.length)
-    populateParserHintObject(self.nargs, false, 'narg', keys, 1)
+  self.requiresArg = function (keys, value) {
+    argsert('<array|string|object> [number]', [keys], arguments.length)
+    // If someone configures nargs at the same time as requiresArg,
+    // nargs should take precedent,
+    // see: https://github.com/yargs/yargs/pull/1572
+    // TODO: make this work with aliases, using a check similar to
+    // checkAllAliases() in yargs-parser.
+    if (typeof keys === 'string' && options.narg[keys]) {
+      return self
+    } else {
+      populateParserHintObject(self.requiresArg, false, 'narg', keys, NaN)
+    }
     return self
   }
 

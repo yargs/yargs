@@ -2428,4 +2428,76 @@ describe('yargs dsl tests', () => {
       }, 5)
     })
   })
+
+  // See: https://github.com/yargs/yargs/issues/1098
+  it('should allow array and requires arg to be used in conjunction', () => {
+    const argv = yargs(['-i', 'item1', 'item2', 'item3'])
+      .option('i', {
+        alias: 'items',
+        type: 'array',
+        requiresArg: true
+      })
+      .argv
+    argv.items.should.eql(['item1', 'item2', 'item3'])
+    argv.i.should.eql(['item1', 'item2', 'item3'])
+  })
+
+  // See: https://github.com/yargs/yargs/issues/1570
+  describe('"nargs" with "array"', () => {
+    it('should not consume more than nargs items', () => {
+      const argv = yargs(['-i', 'item1', 'item2', '-i', 'item3', 'item4'])
+        .option('i', {
+          alias: 'items',
+          type: 'array',
+          nargs: 1
+        })
+        .argv
+      argv.items.should.eql(['item1', 'item3'])
+      argv.i.should.eql(['item1', 'item3'])
+      argv._.should.eql(['item2', 'item4'])
+    })
+
+    it('should apply nargs with higher precedence than requiresArg: true', () => {
+      const argv = yargs(['-i', 'item1', 'item2', '-i', 'item3', 'item4'])
+        .option('i', {
+          alias: 'items',
+          type: 'array',
+          nargs: 1,
+          requiresArg: true
+        })
+        .argv
+      argv.items.should.eql(['item1', 'item3'])
+      argv.i.should.eql(['item1', 'item3'])
+      argv._.should.eql(['item2', 'item4'])
+    })
+
+    // TODO: make this work with aliases, using a check similar to
+    // checkAllAliases() in yargs-parser.
+    it('should apply nargs with higher precedence than requiresArg()', () => {
+      const argv = yargs(['-i', 'item1', 'item2', '-i', 'item3', 'item4'])
+        .option('items', {
+          alias: 'i',
+          type: 'array',
+          nargs: 1
+        })
+        .requiresArg(['items'])
+        .argv
+      argv.items.should.eql(['item1', 'item3'])
+      argv.i.should.eql(['item1', 'item3'])
+      argv._.should.eql(['item2', 'item4'])
+    })
+
+    it('should raise error if not enough values follow nargs key', (done) => {
+      yargs
+        .option('i', {
+          alias: 'items',
+          type: 'array',
+          nargs: 1
+        })
+        .parse(['-i'], (err) => {
+          err.message.should.match(/Not enough arguments following: i/)
+          return done()
+        })
+    })
+  })
 })
