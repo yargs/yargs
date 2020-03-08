@@ -48,8 +48,8 @@
   "scripts": {
     "fix": "standard --fix",
     "posttest": "standard",
-    "test": "c8 --reporter=html --reporter=text mocha --require ./test/before.js --timeout=12000 --check-leaks",
-    "coverage": "c8 report --check-coverage check-coverage --lines=100 --branches=96 --statements=100"
+    "test": "c8 mocha --require ./test/before.js --timeout=12000 --check-leaks",
+    "coverage": "c8 report --check-coverage"
   },
   "repository": {
     "type": "git",
