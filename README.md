@@ -11,6 +11,7 @@
 [![Build Status][travis-image]][travis-url]
 [![NPM version][npm-image]][npm-url]
 [![js-standard-style][standard-image]][standard-url]
+[![Coverage][coverage-image]][coverage-url]
 [![Conventional Commits][conventional-commits-image]][conventional-commits-url]
 [![Slack][slack-image]][slack-url]
 
@@ -135,3 +136,5 @@ Having problems? want to contribute? join our [community slack](http://devtoolsc
 [slack-image]: http://devtoolscommunity.herokuapp.com/badge.svg
 [slack-url]: http://devtoolscommunity.herokuapp.com
 [type-definitions]: https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/yargs
+[coverage-badge]: https://img.shields.io/badge/dynamic/json?color=brightgreen&label=coverage&query=branches&suffix=%25&url=https%3A%2F%2Fraw.githubusercontent.com%2Fyargs%2Fyargs%2Fmaster%2F.nycrc&cacheSeconds=3600
+[coverage-url]: https://github.com/yargs/yargs/blob/master/.nycrc
