@@ -9,7 +9,6 @@
 <br>
 
 [![Build Status][travis-image]][travis-url]
-[![Coverage Status][coveralls-image]][coveralls-url]
 [![NPM version][npm-image]][npm-url]
 [![js-standard-style][standard-image]][standard-url]
 [![Conventional Commits][conventional-commits-image]][conventional-commits-url]
@@ -127,8 +126,6 @@ Having problems? want to contribute? join our [community slack](http://devtoolsc
 
 [travis-url]: https://travis-ci.org/yargs/yargs
 [travis-image]: https://img.shields.io/travis/yargs/yargs/master.svg
-[coveralls-url]: https://coveralls.io/github/yargs/yargs
-[coveralls-image]: https://img.shields.io/coveralls/yargs/yargs.svg
 [npm-url]: https://www.npmjs.com/package/yargs
 [npm-image]: https://img.shields.io/npm/v/yargs.svg
 [standard-image]: https://img.shields.io/badge/code%20style-standard-brightgreen.svg
