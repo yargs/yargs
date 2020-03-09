@@ -1,6 +1,6 @@
 {
   "name": "yargs",
-  "version": "15.2.0",
+  "version": "15.3.0",
   "description": "yargs the modern, pirate-themed, successor to optimist.",
   "main": "./index.js",
   "contributors": [
@@ -35,6 +35,7 @@
     "c8": "^7.0.0",
     "chai": "^4.2.0",
     "chalk": "^3.0.0",
+    "coveralls": "^3.0.9",
     "cpr": "^3.0.1",
     "cross-spawn": "^7.0.0",
     "es6-promise": "^4.2.5",
