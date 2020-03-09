@@ -273,24 +273,24 @@ describe('Command', () => {
   describe('API', () => {
     it('accepts string, string as first 2 arguments', () => {
       const cmd = 'foo'
-      const desc = 'i\'m not feeling very creative at the moment'
+      const description = 'i\'m not feeling very creative at the moment'
       const isDefault = false
       const aliases = []
 
-      const y = yargs([]).command(cmd, desc)
+      const y = yargs([]).command(cmd, description)
       const commands = y.getUsageInstance().getCommands()
-      commands[0].should.deep.equal([cmd, desc, isDefault, aliases])
+      commands[0].should.deep.equal({ cmd, description, isDefault, aliases })
     })
 
     it('accepts array, string as first 2 arguments', () => {
       const aliases = ['bar', 'baz']
       const cmd = 'foo <qux>'
-      const desc = 'i\'m not feeling very creative at the moment'
+      const description = 'i\'m not feeling very creative at the moment'
       const isDefault = false
 
-      const y = yargs([]).command([cmd].concat(aliases), desc)
+      const y = yargs([]).command([cmd].concat(aliases), description)
       const usageCommands = y.getUsageInstance().getCommands()
-      usageCommands[0].should.deep.equal([cmd, desc, isDefault, aliases])
+      usageCommands[0].should.deep.equal({ cmd, description, isDefault, aliases })
       const cmdCommands = y.getCommandInstance().getCommands()
       cmdCommands.should.deep.equal(['foo', 'bar', 'baz'])
     })
@@ -388,7 +388,7 @@ describe('Command', () => {
       handlers.foo.builder.should.equal(module.builder)
       handlers.foo.handler.should.equal(module.handler)
       const commands = y.getUsageInstance().getCommands()
-      commands[0].should.deep.equal([module.command, module.describe, isDefault, aliases])
+      commands[0].should.deep.equal({ cmd: module.command, description: module.describe, isDefault, aliases })
     })
 
     it('accepts module (description key, builder function) as 1st argument', () => {
@@ -407,7 +407,7 @@ describe('Command', () => {
       handlers.foo.builder.should.equal(module.builder)
       handlers.foo.handler.should.equal(module.handler)
       const commands = y.getUsageInstance().getCommands()
-      commands[0].should.deep.equal([module.command, module.description, isDefault, aliases])
+      commands[0].should.deep.equal({ cmd: module.command, description: module.description, isDefault, aliases })
     })
 
     it('accepts module (desc key, builder function) as 1st argument', () => {
@@ -426,7 +426,7 @@ describe('Command', () => {
       handlers.foo.builder.should.equal(module.builder)
       handlers.foo.handler.should.equal(module.handler)
       const commands = y.getUsageInstance().getCommands()
-      commands[0].should.deep.equal([module.command, module.desc, isDefault, aliases])
+      commands[0].should.deep.equal({ cmd: module.command, description: module.desc, isDefault, aliases })
     })
 
     it('accepts module (false describe, builder function) as 1st argument', () => {
@@ -482,7 +482,7 @@ describe('Command', () => {
       handlers.foo.builder.should.equal(module.builder)
       handlers.foo.handler.should.equal(module.handler)
       const commands = y.getUsageInstance().getCommands()
-      commands[0].should.deep.equal([module.command, module.describe, isDefault, aliases])
+      commands[0].should.deep.equal({ cmd: module.command, description: module.describe, isDefault, aliases })
     })
 
     it('accepts module (missing handler function) as 1st argument', () => {
@@ -504,7 +504,7 @@ describe('Command', () => {
       handlers.foo.builder.should.equal(module.builder)
       expect(typeof handlers.foo.handler).to.equal('function')
       const commands = y.getUsageInstance().getCommands()
-      commands[0].should.deep.equal([module.command, module.describe, isDefault, aliases])
+      commands[0].should.deep.equal({ cmd: module.command, description: module.describe, isDefault, aliases })
     })
 
     it('accepts module (with command array) as 1st argument', () => {
@@ -522,7 +522,7 @@ describe('Command', () => {
       handlers.foo.builder.should.equal(module.builder)
       handlers.foo.handler.should.equal(module.handler)
       const usageCommands = y.getUsageInstance().getCommands()
-      usageCommands[0].should.deep.equal([module.command[0], module.describe, isDefault, ['bar', 'baz']])
+      usageCommands[0].should.deep.equal({ cmd: module.command[0], description: module.describe, isDefault, aliases: ['bar', 'baz'] })
       const cmdCommands = y.getCommandInstance().getCommands()
       cmdCommands.should.deep.equal(['foo', 'bar', 'baz'])
     })
@@ -543,7 +543,7 @@ describe('Command', () => {
       handlers.foo.builder.should.equal(module.builder)
       handlers.foo.handler.should.equal(module.handler)
       const usageCommands = y.getUsageInstance().getCommands()
-      usageCommands[0].should.deep.equal([module.command, module.describe, isDefault, module.aliases])
+      usageCommands[0].should.deep.equal({ cmd: module.command, description: module.describe, isDefault, aliases: module.aliases })
       const cmdCommands = y.getCommandInstance().getCommands()
       cmdCommands.should.deep.equal(['foo', 'bar', 'baz'])
     })
@@ -564,7 +564,7 @@ describe('Command', () => {
       handlers.foo.builder.should.equal(module.builder)
       handlers.foo.handler.should.equal(module.handler)
       const usageCommands = y.getUsageInstance().getCommands()
-      usageCommands[0].should.deep.equal([module.command[0], module.describe, isDefault, ['bar', 'baz', 'nat']])
+      usageCommands[0].should.deep.equal({ cmd: module.command[0], description: module.describe, isDefault, aliases: ['bar', 'baz', 'nat'] })
       const cmdCommands = y.getCommandInstance().getCommands()
       cmdCommands.should.deep.equal(['foo', 'bar', 'baz', 'nat'])
     })
@@ -585,7 +585,7 @@ describe('Command', () => {
       handlers.foo.builder.should.equal(module.builder)
       handlers.foo.handler.should.equal(module.handler)
       const usageCommands = y.getUsageInstance().getCommands()
-      usageCommands[0].should.deep.equal([module.command, module.describe, isDefault, ['bar']])
+      usageCommands[0].should.deep.equal({ cmd: module.command, description: module.describe, isDefault, aliases: ['bar'] })
       const cmdCommands = y.getCommandInstance().getCommands()
       cmdCommands.should.deep.equal(['foo', 'bar'])
     })
