@@ -1,4 +1,5 @@
 .idea/
+dist/
 node_modules/
 .nyc_output/
 *.swp

@@ -2,7 +2,7 @@
 /* global describe, it */
 
 const { expect } = require('chai')
-const isPromise = require('../lib/is-promise')
+const { isPromise } = require('../dist/is-promise')
 
 describe('isPromise', () => {
   it('returns `false` on non promise value', () => {
