@@ -1,3 +1,8 @@
 {
-  "extends": "./node_modules/gts/"
+  "extends": "./node_modules/gts/",
+  "rules": {
+    "no-process-exit": 0,
+    "no-var": 0,
+    "no-warning-comments": 0
+  }
 }
