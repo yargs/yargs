@@ -2184,4 +2184,35 @@ describe('yargs dsl tests', () => {
         })
     })
   })
+
+  // See: https://github.com/nodejs/node/issues/31951
+  describe('should not pollute the prototype', () => {
+    it('does not pollute, when .parse() is called', function () {
+      yargs.parse(['-f.__proto__.foo', '99', '-x.y.__proto__.bar', '100', '--__proto__', '200'])
+      Object.keys({}.__proto__).length.should.equal(0) // eslint-disable-line
+      expect({}.foo).to.equal(undefined)
+      expect({}.bar).to.equal(undefined)
+    })
+
+    it('does not pollute, when .argv is called', function () {
+      yargs(['-f.__proto__.foo', '99', '-x.y.__proto__.bar', '100', '--__proto__', '200']).argv // eslint-disable-line
+      Object.keys({}.__proto__).length.should.equal(0) // eslint-disable-line
+      expect({}.foo).to.equal(undefined)
+      expect({}.bar).to.equal(undefined)
+    })
+
+    // TODO(bcoe): due to replacement of __proto__ with ___proto___ parser
+    // hints are not properly applied, we should move to an alternate approach
+    // in the future:
+    it('does not pollute, when options are set', function () {
+      yargs
+        .option('__proto__', {
+          describe: 'pollute pollute',
+          nargs: 33
+        })
+        .default('__proto__', { hello: 'world' })
+        .parse(['--foo'])
+        Object.keys({}.__proto__).length.should.equal(0) // eslint-disable-line
+    })
+  })
 })
