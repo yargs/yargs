@@ -13,7 +13,7 @@
     "index.js",
     "yargs.js",
     "build",
-    "lib",
+    "lib/**/*.js",
     "locales",
     "completion.sh.hbs",
     "completion.zsh.hbs",
