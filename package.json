@@ -32,6 +32,7 @@
     "yargs-parser": "^18.1.0"
   },
   "devDependencies": {
+    "@types/node": "^10.0.3",
     "c8": "^7.0.0",
     "chai": "^4.2.0",
     "chalk": "^3.0.0",
@@ -39,29 +40,32 @@
     "cpr": "^3.0.1",
     "cross-spawn": "^7.0.0",
     "es6-promise": "^4.2.5",
+    "eslint": "^6.8.0",
+    "eslint-plugin-node": "^11.0.0",
+    "gts": "^2.0.0-alpha.4",
     "hashish": "0.0.4",
     "mocha": "^7.0.0",
     "rimraf": "^3.0.0",
-    "standard": "^14.0.0",
+    "typescript": "~3.7.0",
     "which": "^2.0.0",
     "yargs-test-extends": "^1.0.1"
   },
   "scripts": {
-    "fix": "standard --fix",
-    "posttest": "standard",
+    "fix": "gts fix",
+    "posttest": "npm run check",
     "test": "c8 mocha --require ./test/before.js --timeout=12000 --check-leaks",
-    "coverage": "c8 report --check-coverage"
+    "coverage": "c8 report --check-coverage",
+    "check": "gts check",
+    "clean": "gts clean",
+    "compile": "rimraf build && tsc -p .",
+    "prepare": "npm run compile",
+    "pretest": "npm run compile"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/yargs/yargs.git"
   },
   "homepage": "https://yargs.js.org/",
-  "standard": {
-    "ignore": [
-      "**/example/**"
-    ]
-  },
   "keywords": [
     "argument",
     "args",
