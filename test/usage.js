@@ -634,11 +634,13 @@ describe('usage tests', () => {
               })
               .exitProcess(false)
               .wrap(null)
-              .check(argv => {
+              .check(() => {
                 throw new Error('foo');
               })
               .parse();
-          } catch (error) {}
+          } catch (error) {
+            // continue regardless of error
+          }
         });
         r.logs.should.deep.equal(['foo']);
         r.should.have.property('exit').and.equal(false);
@@ -655,7 +657,7 @@ describe('usage tests', () => {
                   describe: 'bar command',
                 },
               },
-              argv => {
+              () => {
                 throw new YError('blah');
               }
             )
@@ -684,7 +686,9 @@ describe('usage tests', () => {
                   throw new Error('foo');
                 })
                 .parse();
-            } catch (error) {}
+            } catch (error) {
+              // continue regardless of error
+            }
           });
           r.logs.should.deep.equal(['foo']);
           r.should.have.property('exit').and.equal(false);
@@ -710,12 +714,14 @@ describe('usage tests', () => {
                       })
                       .exitProcess(false);
                   },
-                  argv => {
+                  () => {
                     throw new YError('foo');
                   }
                 )
                 .parse();
-            } catch (error) {}
+            } catch (error) {
+              // continue regardless of error
+            }
           });
           r.logs.should.deep.equal([['YError', 'foo'], 'is triggered last']);
           r.should.have.property('exit').and.equal(false);
@@ -1016,7 +1022,7 @@ describe('usage tests', () => {
       it('fails when an invalid argument is provided', done => {
         return yargs('--foo-bar')
           .strict()
-          .fail(msg => {
+          .fail(() => {
             return done();
           }).argv;
       });
@@ -1808,7 +1814,7 @@ describe('usage tests', () => {
       r.errors[0].split('\n').length.should.equal(10);
 
       // should wrap within appropriate boundaries.
-      r.errors[0].split('\n').forEach((line, i) => {
+      r.errors[0].split('\n').forEach(line => {
         // ignore headings and blank lines.
         if (!line || line.match('Examples:') || line.match('Options:')) return;
 
@@ -1825,7 +1831,7 @@ describe('usage tests', () => {
           .parse()
       );
 
-      r.errors[0].split('\n').forEach((line, i) => {
+      r.errors[0].split('\n').forEach(line => {
         // ignore headings and blank lines.
         if (!line.match('i am a fairly long example')) return;
 
@@ -2021,7 +2027,7 @@ describe('usage tests', () => {
           type: 'boolean',
         },
       };
-      const uploadHandler = argv => {};
+      const uploadHandler = () => {};
 
       const generalHelp = checkUsage(() =>
         yargs('--help')
@@ -2072,7 +2078,7 @@ describe('usage tests', () => {
             type: 'boolean',
           })
           .wrap(46);
-      const uploadHandler = argv => {};
+      const uploadHandler = () => {};
 
       const generalHelp = checkUsage(() =>
         yargs('--help')
@@ -2373,7 +2379,7 @@ describe('usage tests', () => {
             builder(yargs) {
               return yargs;
             },
-            handler(argv) {},
+            handler() {},
           })
           .wrap(null)
           .parse()
@@ -2402,7 +2408,7 @@ describe('usage tests', () => {
                 .usage('Usage: program upload <something> [opts]')
                 .demand(1);
             },
-            handler(argv) {},
+            handler() {},
           })
           .wrap(null)
           .parse()
@@ -2426,7 +2432,7 @@ describe('usage tests', () => {
             'upload',
             'upload something',
             yargs => yargs.usage(null),
-            argv => {}
+            () => {}
           )
           .wrap(null)
           .parse()
@@ -2447,8 +2453,8 @@ describe('usage tests', () => {
           .command(
             'one <sub>',
             'level one, requires subcommand',
-            yargs => yargs.command('two [next]', 'level two', {}, argv => {}),
-            argv => {}
+            yargs => yargs.command('two [next]', 'level two', {}, () => {}),
+            () => {}
           )
           .wrap(null)
           .parse()
@@ -2478,9 +2484,9 @@ describe('usage tests', () => {
                 'two [next]',
                 'level two',
                 yargs => yargs,
-                argv => {}
+                () => {}
               ),
-            argv => {}
+            () => {}
           )
           .wrap(null)
           .parse()
@@ -2553,7 +2559,7 @@ describe('usage tests', () => {
               yargs
                 .usage('$0 upload [something]')
                 .usage('$0 upload [something else]'),
-            argv => {}
+            () => {}
           )
           .wrap(null)
           .parse()
@@ -2582,7 +2588,7 @@ describe('usage tests', () => {
                 .usage('$0 upload [something]')
                 .usage('$0 upload [something else]')
                 .usage(null),
-            argv => {}
+            () => {}
           )
           .wrap(null)
           .parse()
@@ -4180,7 +4186,7 @@ describe('usage tests', () => {
     it('should not display a cached help message for the next parsing', done => {
       const y = yargs()
         .command('cmd', 'test command', {}, () => {
-          return new Promise((resolve, reject) => setTimeout(resolve, 10));
+          return new Promise(resolve => setTimeout(resolve, 10));
         })
         .demandCommand(1, 'You need at least one command before moving on')
         .exitProcess(false);

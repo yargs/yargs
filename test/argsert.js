@@ -17,7 +17,7 @@ describe('Argsert', () => {
 
   it('warn if wrong type is provided for optional argument', () => {
     const o = checkOutput(() => {
-      function foo(opts) {
+      function foo() {
         argsert('[object|number]', [].slice.call(arguments));
       }
 
@@ -31,7 +31,7 @@ describe('Argsert', () => {
 
   it('does not warn if optional argument is valid', () => {
     const o = checkOutput(() => {
-      function foo(opts) {
+      function foo() {
         argsert('[object]', [].slice.call(arguments));
       }
 
@@ -53,7 +53,7 @@ describe('Argsert', () => {
 
   it('warns if required argument is of wrong type', () => {
     const o = checkOutput(() => {
-      function foo(opts) {
+      function foo() {
         argsert('<object>', [].slice.call(arguments));
       }
 
@@ -67,7 +67,7 @@ describe('Argsert', () => {
 
   it('supports a combination of required and optional arguments', () => {
     const o = checkOutput(() => {
-      function foo(opts) {
+      function foo() {
         argsert(
           '<array> <string|object> [string|object]',
           [].slice.call(arguments)
@@ -82,7 +82,7 @@ describe('Argsert', () => {
 
   it('warns if too many arguments are provided', () => {
     const o = checkOutput(() => {
-      function foo(expected) {
+      function foo() {
         argsert('<array> [batman]', [].slice.call(arguments));
       }
 
@@ -96,7 +96,7 @@ describe('Argsert', () => {
 
   it('warn with argument position if wrong type is provided for argument', () => {
     const o = checkOutput(() => {
-      function foo(opts) {
+      function foo() {
         argsert('<string> <string> <string>', [].slice.call(arguments));
       }
 
@@ -110,7 +110,7 @@ describe('Argsert', () => {
 
   it('warn with generic argument position if wrong type is provided for seventh or greater argument', () => {
     const o = checkOutput(() => {
-      function foo(opts) {
+      function foo() {
         argsert(
           '<string> <string> <string> <string> <string> <string> <string>',
           [].slice.call(arguments)
@@ -127,7 +127,7 @@ describe('Argsert', () => {
 
   it('configures function to accept 0 parameters, if only arguments object is provided', () => {
     const o = checkOutput(() => {
-      function foo(expected) {
+      function foo() {
         argsert([].slice.call(arguments));
       }
 
@@ -141,7 +141,7 @@ describe('Argsert', () => {
 
   it('allows for any type if * is provided', () => {
     const o = checkOutput(() => {
-      function foo(opts) {
+      function foo() {
         argsert('<*>', [].slice.call(arguments));
       }
 
@@ -153,7 +153,7 @@ describe('Argsert', () => {
 
   it('should ignore trailing undefined values', () => {
     const o = checkOutput(() => {
-      function foo(opts) {
+      function foo() {
         argsert('<*>', [].slice.call(arguments));
       }
 
@@ -165,7 +165,7 @@ describe('Argsert', () => {
 
   it('should not ignore undefined values that are not trailing', () => {
     const o = checkOutput(() => {
-      function foo(opts) {
+      function foo() {
         argsert('<*>', [].slice.call(arguments));
       }
 
@@ -179,7 +179,7 @@ describe('Argsert', () => {
 
   it('supports null as special type', () => {
     const o = checkOutput(() => {
-      function foo(arg) {
+      function foo() {
         argsert('<null>', [].slice.call(arguments));
       }
       foo(null);

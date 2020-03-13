@@ -144,11 +144,11 @@ describe('Command', () => {
               .positional('foo', {
                 description: 'bar',
               })
-              .config('config', filepath => {
+              .config('config', () => {
                 parseCount++;
                 return {};
               }),
-          argv => {}
+          () => {}
         )
         .parse();
       parseCount.should.equal(1);
@@ -364,7 +364,7 @@ describe('Command', () => {
         builder(yargs) {
           return yargs;
         },
-        handler(argv) {},
+        handler() {},
       };
 
       const y = yargs([]).command(cmd, desc, module);
@@ -381,7 +381,7 @@ describe('Command', () => {
         builder: {
           hello: {default: 'world'},
         },
-        handler(argv) {},
+        handler() {},
       };
 
       const y = yargs([]).command(cmd, desc, module);
@@ -398,7 +398,7 @@ describe('Command', () => {
         builder(yargs) {
           return yargs;
         },
-        handler(argv) {},
+        handler() {},
       };
       const isDefault = false;
       const aliases = [];
@@ -424,7 +424,7 @@ describe('Command', () => {
         builder(yargs) {
           return yargs;
         },
-        handler(argv) {},
+        handler() {},
       };
       const isDefault = false;
       const aliases = [];
@@ -450,7 +450,7 @@ describe('Command', () => {
         builder(yargs) {
           return yargs;
         },
-        handler(argv) {},
+        handler() {},
       };
       const isDefault = false;
       const aliases = [];
@@ -476,7 +476,7 @@ describe('Command', () => {
         builder(yargs) {
           return yargs;
         },
-        handler(argv) {},
+        handler() {},
       };
 
       const y = yargs([]).command(module);
@@ -494,7 +494,7 @@ describe('Command', () => {
         builder(yargs) {
           return yargs;
         },
-        handler(argv) {},
+        handler() {},
       };
 
       const y = yargs([]).command(module);
@@ -515,7 +515,7 @@ describe('Command', () => {
             default: 'world',
           },
         },
-        handler(argv) {},
+        handler() {},
       };
       const isDefault = false;
       const aliases = [];
@@ -568,7 +568,7 @@ describe('Command', () => {
         builder(yargs) {
           return yargs;
         },
-        handler(argv) {},
+        handler() {},
       };
       const isDefault = false;
 
@@ -596,7 +596,7 @@ describe('Command', () => {
         builder(yargs) {
           return yargs;
         },
-        handler(argv) {},
+        handler() {},
       };
       const isDefault = false;
 
@@ -624,7 +624,7 @@ describe('Command', () => {
         builder(yargs) {
           return yargs;
         },
-        handler(argv) {},
+        handler() {},
       };
       const isDefault = false;
 
@@ -652,7 +652,7 @@ describe('Command', () => {
         builder(yargs) {
           return yargs;
         },
-        handler(argv) {},
+        handler() {},
       };
       const isDefault = false;
 
@@ -844,7 +844,7 @@ describe('Command', () => {
         command: 'sub',
         desc: 'Run the subcommand',
         builder: {},
-        handler(argv) {},
+        handler() {},
       };
 
       const cmd = {
@@ -853,7 +853,7 @@ describe('Command', () => {
         builder(yargs) {
           return yargs.command(sub);
         },
-        handler(argv) {},
+        handler() {},
       };
 
       const helpCmd = checkOutput(
@@ -961,10 +961,10 @@ describe('Command', () => {
   it('respects order of positional arguments when matching commands', () => {
     const output = [];
     yargs('bar foo')
-      .command('foo', 'foo command', yargs => {
+      .command('foo', 'foo command', () => {
         output.push('foo');
       })
-      .command('bar', 'bar command', yargs => {
+      .command('bar', 'bar command', () => {
         output.push('bar');
       })
       .parse();
@@ -983,7 +983,7 @@ describe('Command', () => {
   // addresses https://github.com/yargs/yargs/issues/710
   it('invokes command handler repeatedly if parse() is called multiple times', () => {
     let counter = 0;
-    const y = yargs([]).command('foo', 'the foo command', {}, argv => {
+    const y = yargs([]).command('foo', 'the foo command', {}, () => {
       counter++;
     });
     y.parse(['foo']);
@@ -994,7 +994,7 @@ describe('Command', () => {
   // addresses: https://github.com/yargs/yargs/issues/776
   it('allows command handler to be invoked repeatedly when help is enabled', done => {
     let counter = 0;
-    const y = yargs([]).command('foo', 'the foo command', {}, argv => {
+    const y = yargs([]).command('foo', 'the foo command', {}, () => {
       counter++;
     });
     y.parse(['foo'], noop);
@@ -1151,7 +1151,7 @@ describe('Command', () => {
 
       it('applies conflicts logic for command by default', done => {
         yargs('command --foo --bar')
-          .command('command', 'a command', {}, argv => {})
+          .command('command', 'a command', {}, () => {})
           .fail(msg => {
             msg.should.match(/mutually exclusive/);
             return done();
@@ -1189,7 +1189,7 @@ describe('Command', () => {
         let checkCalled = false;
         yargs('command blerg --foo')
           .command('command <snuh>', 'a command')
-          .check(argv => {
+          .check(() => {
             checkCalled = true;
             return true;
           }, false)
@@ -1253,7 +1253,7 @@ describe('Command', () => {
         yargs()
           .strict()
           .command('hi <name>', 'The hi command')
-          .parse('hi ben', (err, argv, output) => {
+          .parse('hi ben', err => {
             expect(err).to.equal(null);
             return done();
           });
@@ -1266,7 +1266,7 @@ describe('Command', () => {
           .command('hi', 'The hi command', yargs => {
             yargs.command('ben <age>', 'ben command', noop, noop);
           })
-          .parse('hi ben 99', (err, argv, output) => {
+          .parse('hi ben 99', err => {
             expect(err).to.equal(null);
             return done();
           });
@@ -1292,10 +1292,10 @@ describe('Command', () => {
         let commandRun = false;
         yargs()
           .strict()
-          .command('hi <name>', 'The hi command', noop, argv => {
+          .command('hi <name>', 'The hi command', noop, () => {
             commandRun = true;
           })
-          .parse('hi ben --hello=world', (err, argv, output) => {
+          .parse('hi ben --hello=world', err => {
             commandRun.should.equal(false);
             err.message.should.equal('Unknown argument: hello');
             return done();
@@ -1378,7 +1378,7 @@ describe('Command', () => {
       it('should bubble errors thrown by coerce function inside commands', done => {
         yargs
           .command('foo', 'the foo command', yargs => {
-            yargs.coerce('x', arg => {
+            yargs.coerce('x', () => {
               throw Error('yikes an error');
             });
           })
@@ -1502,7 +1502,7 @@ describe('Command', () => {
 
     it('does not execute default command if another command is provided', done => {
       yargs('run bcoe --foo bar')
-        .command('*', 'default command', noop, argv => {})
+        .command('*', 'default command', noop, () => {})
         .command('run <name>', 'run command', noop, argv => {
           argv.name.should.equal('bcoe');
           argv.foo.should.equal('bar');
@@ -1581,7 +1581,7 @@ describe('Command', () => {
     let called = false;
     const r = checkOutput(() => {
       yargs('foo')
-        .command('foo', 'foo command', noop, argv => {
+        .command('foo', 'foo command', noop, () => {
           called = true;
         })
         .option('bar', {
@@ -1597,7 +1597,7 @@ describe('Command', () => {
   it('should support numeric commands', () => {
     const output = [];
     yargs('1')
-      .command('1', 'numeric command', yargs => {
+      .command('1', 'numeric command', () => {
         output.push('1');
       })
       .parse();
@@ -1662,7 +1662,7 @@ describe('Command', () => {
     it('fails when the promise returned by the command handler rejects', done => {
       const error = new Error();
       yargs('foo')
-        .command('foo', 'foo command', noop, yargs => Promise.reject(error))
+        .command('foo', 'foo command', noop, () => Promise.reject(error))
         .fail((msg, err) => {
           expect(msg).to.equal(null);
           expect(err).to.equal(error);
@@ -1672,7 +1672,7 @@ describe('Command', () => {
     });
 
     it('succeeds when the promise returned by the command handler resolves', done => {
-      const handler = new Promise((resolve, reject) => {
+      const handler = new Promise(resolve => {
         setTimeout(() => {
           return resolve(true);
         }, 5);
@@ -1682,9 +1682,9 @@ describe('Command', () => {
           'foo <pos>',
           'foo command',
           () => {},
-          yargs => handler
+          () => handler
         )
-        .fail((msg, err) => {
+        .fail(() => {
           return done(Error('should not have been called'));
         })
         .parse();
@@ -1707,7 +1707,7 @@ describe('Command', () => {
               describe: 'bar option',
             });
           },
-          argv => {
+          () => {
             return Promise.reject(Error('foo error'));
           }
         )
@@ -1735,7 +1735,7 @@ describe('Command', () => {
 
   // see: https://github.com/yargs/yargs/issues/1099
   it('does not coerce number from positional with leading "+"', () => {
-    const argv = yargs.command('$0 <phone>', '', yargs => {}).parse('+5550100');
+    const argv = yargs.command('$0 <phone>', '', () => {}).parse('+5550100');
     argv.phone.should.equal('+5550100');
   });
 });

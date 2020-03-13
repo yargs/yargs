@@ -325,7 +325,7 @@ describe('Completion', () => {
         () =>
           yargs(['--get-yargs-completions'])
             .help('h')
-            .completion('completion', (current, argv) => ['cat', 'bat']).argv
+            .completion('completion', () => ['cat', 'bat']).argv
       );
 
       r.logs.should.include('cat');
@@ -348,12 +348,12 @@ describe('Completion', () => {
 
     it('if a promise is returned, completions can be asynchronous', done => {
       checkUsage(
-        cb => {
+        () => {
           yargs(['--get-yargs-completions'])
             .completion(
               'completion',
-              (current, argv) =>
-                new Promise((resolve, reject) => {
+              () =>
+                new Promise(resolve => {
                   setTimeout(() => {
                     resolve(['apple', 'banana']);
                   }, 10);
@@ -377,7 +377,7 @@ describe('Completion', () => {
           yargs(['--get-yargs-completions'])
             .completion(
               'completion',
-              (current, argv) =>
+              () =>
                 new Promise((resolve, reject) => {
                   setTimeout(() => {
                     reject(new Error('Test'));

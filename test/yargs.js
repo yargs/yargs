@@ -386,7 +386,7 @@ describe('yargs dsl tests', () => {
             return done();
           },
           [
-            function(argv) {
+            function() {
               return {hello: 'world'};
             },
           ]
@@ -583,7 +583,7 @@ describe('yargs dsl tests', () => {
           builder(yargs) {
             return yargs;
           },
-          handler(argv) {},
+          handler() {},
         });
       }).to.throw(
         /No command name given for module: {(\n )? desc: 'A command with no name',\n {2}builder: \[Function(: builder)?],\n {2}handler: \[Function(: handler)?](\n| )}/
@@ -951,7 +951,7 @@ describe('yargs dsl tests', () => {
       const r = checkOutput(() => {
         yargs()
           .help('h')
-          .parse('-h', (_err, argv, output) => {});
+          .parse('-h', () => {});
       });
 
       r.logs.length.should.equal(0);
@@ -963,7 +963,7 @@ describe('yargs dsl tests', () => {
       const r = checkOutput(() => {
         yargs()
           .demand('robin')
-          .parse('batman', (_err, argv, output) => {
+          .parse('batman', _err => {
             err = _err;
           });
       });
@@ -977,7 +977,7 @@ describe('yargs dsl tests', () => {
       const r = checkOutput(() => {
         yargs()
           .demand('robin')
-          .parse('batman --foo', (_err, _argv, output) => {
+          .parse('batman --foo', (_err, _argv) => {
             argv = _argv;
           });
       });
@@ -1079,7 +1079,7 @@ describe('yargs dsl tests', () => {
             .command('batman <api-token>', 'batman command', noop, () => {
               handlerCalled = true;
             })
-            .parse('batman --what', (_err, argv, output) => {
+            .parse('batman --what', _err => {
               err = _err;
             });
         });
@@ -1119,7 +1119,7 @@ describe('yargs dsl tests', () => {
             {
               state: 'grumpy but rich',
             },
-            (_err, argv, _output) => {}
+            () => {}
           );
 
         argv.state.should.equal('grumpy but rich');
@@ -1136,7 +1136,7 @@ describe('yargs dsl tests', () => {
           .command('batman <api-token>', 'batman command', noop, _argv => {
             argv = _argv;
           })
-          .parse('batman robin --what', context, (_err, argv, _output) => {});
+          .parse('batman robin --what', context, () => {});
 
         argv.state.should.equal('grumpy but rich');
         argv['api-token'].should.equal('robin');
@@ -1149,21 +1149,9 @@ describe('yargs dsl tests', () => {
         checkOutput(() => {
           const parser = yargs().commandDir('fixtures/cmddir');
 
-          parser.parse(
-            'dream within-a-dream --what',
-            {context},
-            (_err, argv, _output) => {}
-          );
-          parser.parse(
-            'dream within-a-dream --what',
-            {context},
-            (_err, argv, _output) => {}
-          );
-          parser.parse(
-            'dream within-a-dream --what',
-            {context},
-            (_err, argv, _output) => {}
-          );
+          parser.parse('dream within-a-dream --what', {context}, () => {});
+          parser.parse('dream within-a-dream --what', {context}, () => {});
+          parser.parse('dream within-a-dream --what', {context}, () => {});
         });
 
         context.counter.should.equal(3);
@@ -1175,7 +1163,7 @@ describe('yargs dsl tests', () => {
           'batman <api-token>',
           'batman command',
           noop,
-          _argv => {}
+          () => {}
         );
 
         parser.parse(
@@ -1183,7 +1171,7 @@ describe('yargs dsl tests', () => {
           {
             state: 'grumpy but rich',
           },
-          (_err, _argv, _output) => {}
+          () => {}
         );
 
         parser.parse(
@@ -1191,7 +1179,7 @@ describe('yargs dsl tests', () => {
           {
             state: 'the hero we need',
           },
-          (_err, _argv, _output) => {
+          (_err, _argv) => {
             argv = _argv;
           }
         );
@@ -1201,15 +1189,15 @@ describe('yargs dsl tests', () => {
 
       it('populates argv appropriately when parse is called multiple times', () => {
         const parser = yargs()
-          .command('batman <api-token>', 'batman command', noop, _argv => {})
-          .command('robin <egg>', 'robin command', noop, _argv => {});
+          .command('batman <api-token>', 'batman command', noop, () => {})
+          .command('robin <egg>', 'robin command', noop, () => {});
 
         let argv1 = null;
-        parser.parse('batman abc123', (_err, argv, _output) => {
+        parser.parse('batman abc123', (_err, argv) => {
           argv1 = argv;
         });
         let argv2 = null;
-        parser.parse('robin blue', (_err, argv, _output) => {
+        parser.parse('robin blue', (_err, argv) => {
           argv2 = argv;
         });
         expect(argv1.egg).to.equal(undefined);
@@ -1221,8 +1209,8 @@ describe('yargs dsl tests', () => {
 
       it('populates output appropriately when parse is called multiple times', () => {
         const parser = yargs()
-          .command('batman <api-token>', 'batman command', noop, _argv => {})
-          .command('robin <egg>', 'robin command', noop, _argv => {})
+          .command('batman <api-token>', 'batman command', noop, () => {})
+          .command('robin <egg>', 'robin command', noop, () => {})
           .wrap(null);
 
         let output1 = null;
@@ -1261,8 +1249,8 @@ describe('yargs dsl tests', () => {
 
       it('resets errors when parse is called multiple times', () => {
         const parser = yargs()
-          .command('batman <api-token>', 'batman command', noop, _argv => {})
-          .command('robin <egg>', 'robin command', noop, _argv => {})
+          .command('batman <api-token>', 'batman command', noop, () => {})
+          .command('robin <egg>', 'robin command', noop, () => {})
           .wrap(null);
 
         let error1 = null;
@@ -1870,7 +1858,7 @@ describe('yargs dsl tests', () => {
     it('skips validation if an option with skipValidation is present', () => {
       const argv = yargs(['--koala', '--skip'])
         .demand(1)
-        .fail(msg => {
+        .fail(() => {
           expect.fail();
         })
         .skipValidation(['skip', 'reallySkip'])
@@ -1881,7 +1869,7 @@ describe('yargs dsl tests', () => {
     it('does not skip validation if no option with skipValidation is present', done => {
       const argv = yargs(['--koala'])
         .demand(1)
-        .fail(msg => done())
+        .fail(() => done())
         .skipValidation(['skip', 'reallySkip'])
         .parse();
       argv.koala.should.equal(true);
@@ -1890,7 +1878,7 @@ describe('yargs dsl tests', () => {
     it('allows key to be specified with option shorthand', () => {
       const argv = yargs(['--koala', '--skip'])
         .demand(1)
-        .fail(msg => {
+        .fail(() => {
           expect.fail();
         })
         .option('skip', {
@@ -1907,7 +1895,7 @@ describe('yargs dsl tests', () => {
         .option('skip', {
           skipValidation: true,
         })
-        .fail(msg => {
+        .fail(() => {
           skippedValidation = false;
         })
         .parse();
@@ -2275,15 +2263,15 @@ describe('yargs dsl tests', () => {
             return yargs.command(
               'two',
               'level two',
-              yargs => {
+              () => {
                 context.commands.should.deep.equal(['one', 'two']);
               },
-              argv => {
+              () => {
                 context.commands.should.deep.equal(['one', 'two']);
               }
             );
           },
-          argv => {
+          () => {
             context.commands.should.deep.equal(['one']);
           }
         )

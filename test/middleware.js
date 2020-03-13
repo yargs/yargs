@@ -122,8 +122,8 @@ describe('middleware', () => {
           'foo',
           'foo command',
           () => {},
-          argv => done(handlerErr),
-          [argv => Promise.reject(error)]
+          () => done(handlerErr),
+          [() => Promise.reject(error)]
         )
         .fail((msg, err) => {
           expect(msg).to.equal(null);
@@ -135,7 +135,7 @@ describe('middleware', () => {
 
     it('calls the command handler when all middleware promises resolve', done => {
       const middleware = (key, value) => () =>
-        new Promise((resolve, reject) => {
+        new Promise(resolve => {
           setTimeout(() => {
             return resolve({[key]: value});
           }, 5);
@@ -152,7 +152,7 @@ describe('middleware', () => {
           },
           [middleware('hello', 'world'), middleware('foo', 'bar')]
         )
-        .fail((msg, err) => {
+        .fail(() => {
           return done(Error('should not have been called'));
         })
         .exitProcess(false)
@@ -163,7 +163,7 @@ describe('middleware', () => {
       let callCount = 0;
       const argv = yargs('cmd subcmd')
         .command('cmd', 'cmd command', function(yargs) {
-          yargs.command('subcmd', 'subcmd command', function(yargs) {});
+          yargs.command('subcmd', 'subcmd command', function() {});
         })
         .middleware(
           argv =>
@@ -189,7 +189,7 @@ describe('middleware', () => {
   it("doesn't modify globalMiddleware array when executing middleware", () => {
     let count = 0;
     yargs('bar')
-      .middleware(argv => {
+      .middleware(() => {
         count++;
       })
       .command(
@@ -330,7 +330,7 @@ describe('middleware', () => {
                 string: true,
               },
             },
-            function(argv) {
+            function() {
               throw Error('we should not get here');
             }
           )

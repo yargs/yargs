@@ -59,7 +59,7 @@ function Yargs(processArgs, cwd, parentRequire) {
   }
 
   self.$0 = self.$0
-    .map((x, i) => {
+    .map(x => {
       const b = rebase(cwd, x);
       return x.match(/^(\/|([a-zA-Z]:)?\\)/) && b.length < x.length ? b : x;
     })
@@ -149,7 +149,7 @@ function Yargs(processArgs, cwd, parentRequire) {
     });
 
     objectOptions.forEach(k => {
-      tmpOptions[k] = objFilter(options[k], (k, v) => !localLookup[k]);
+      tmpOptions[k] = objFilter(options[k], k => !localLookup[k]);
     });
 
     tmpOptions.envPrefix = options.envPrefix;
@@ -256,7 +256,7 @@ function Yargs(processArgs, cwd, parentRequire) {
     return self;
   };
 
-  self.requiresArg = function(keys, value) {
+  self.requiresArg = function(keys) {
     argsert('<array|string|object> [number]', [keys], arguments.length);
     // If someone configures nargs at the same time as requiresArg,
     // nargs should take precedent,
@@ -277,7 +277,7 @@ function Yargs(processArgs, cwd, parentRequire) {
     return self;
   };
 
-  function populateParserHintArray(type, keys, value) {
+  function populateParserHintArray(type, keys) {
     keys = [].concat(keys);
     keys.forEach(key => {
       options[type].push(key);
@@ -660,7 +660,9 @@ function Yargs(processArgs, cwd, parentRequire) {
         cwd: startDir,
       });
       obj = JSON.parse(fs.readFileSync(pkgJsonPath));
-    } catch (noop) {}
+    } catch (noop) {
+      // continue regardless of error
+    }
 
     pkgs[npath] = obj || {};
     return pkgs[npath];
@@ -1406,7 +1408,9 @@ function Yargs(processArgs, cwd, parentRequire) {
     // necessary: https://github.com/yargs/yargs/issues/1482
     try {
       delete argv['--'];
-    } catch (_err) {}
+    } catch (_err) {
+      // continue regardless of error
+    }
 
     return argv;
   };
@@ -1422,11 +1426,7 @@ function Yargs(processArgs, cwd, parentRequire) {
     validation.requiredArguments(argv);
     let failedStrictCommands = false;
     if (strictCommands) {
-      failedStrictCommands = validation.unknownCommands(
-        argv,
-        aliases,
-        positionalMap
-      );
+      failedStrictCommands = validation.unknownCommands(argv);
     }
     if (strict && !failedStrictCommands) {
       validation.unknownArguments(argv, aliases, positionalMap);

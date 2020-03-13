@@ -107,7 +107,7 @@ describe('validation tests', () => {
           bar: 'noFoo', // --bar means --noFoo (or --no-foo with boolean-negation disabled) is required
           // note that this has nothing to do with --foo
         })
-        .fail(msg => {
+        .fail(() => {
           failCalled = true;
         })
         .parse();
@@ -139,7 +139,7 @@ describe('validation tests', () => {
           bar: '--no-noFoo', // --bar means --noFoo (or --no-foo with boolean-negation disabled) cannot be given
           // note that this has nothing to do with --foo
         })
-        .fail(msg => {
+        .fail(() => {
           failCalled = true;
         })
         .parse();
@@ -192,7 +192,7 @@ describe('validation tests', () => {
     it('should not fail if no conflicting arguments are provided', () => {
       yargs(['-b', '-c'])
         .conflicts('f', ['b', 'c'])
-        .fail(msg => {
+        .fail(() => {
           expect.fail();
         })
         .parse();
@@ -208,7 +208,7 @@ describe('validation tests', () => {
           describe: 'a bar',
         })
         .conflicts('f', 'b')
-        .fail(msg => {
+        .fail(() => {
           expect.fail();
         })
         .parse();
@@ -224,7 +224,7 @@ describe('validation tests', () => {
           describe: 'a bar',
         })
         .conflicts('f', 'b')
-        .fail(msg => {
+        .fail(() => {
           expect.fail();
         })
         .parse();
@@ -357,7 +357,7 @@ describe('validation tests', () => {
       const argv = yargs('koala')
         .demand(1)
         .strict()
-        .fail(msg => {
+        .fail(() => {
           expect.fail();
         })
         .parse();
@@ -475,7 +475,7 @@ describe('validation tests', () => {
     it('fails when a required argument value of type number is missing', done => {
       yargs()
         .option('w', {type: 'number', requiresArg: true})
-        .parse('-w', (err, argv, output) => {
+        .parse('-w', err => {
           expect(err).to.not.equal(undefined);
           expect(err).to.have.property(
             'message',
@@ -488,7 +488,7 @@ describe('validation tests', () => {
     it('fails when a required argument value of type string is missing', done => {
       yargs()
         .option('w', {type: 'string', requiresArg: true})
-        .parse('-w', (err, argv, output) => {
+        .parse('-w', err => {
           expect(err).to.not.equal(undefined);
           expect(err).to.have.property(
             'message',
@@ -501,7 +501,7 @@ describe('validation tests', () => {
     it('fails when a required argument value of type boolean is missing', done => {
       yargs()
         .option('w', {type: 'boolean', requiresArg: true})
-        .parse('-w', (err, argv, output) => {
+        .parse('-w', err => {
           expect(err).to.not.equal(undefined);
           expect(err).to.have.property(
             'message',
@@ -514,7 +514,7 @@ describe('validation tests', () => {
     it('fails when a required argument value of type array is missing', done => {
       yargs()
         .option('w', {type: 'array', requiresArg: true})
-        .parse('-w', (err, argv, output) => {
+        .parse('-w', err => {
           expect(err).to.not.equal(undefined);
           expect(err).to.have.property(
             'message',
@@ -529,7 +529,7 @@ describe('validation tests', () => {
       yargs()
         .option('w', {type: 'number', requiresArg: true})
         .command('woo')
-        .parse('', (err, argv, output) => {
+        .parse('', err => {
           expect(err).to.equal(null);
           return done();
         });
@@ -539,7 +539,7 @@ describe('validation tests', () => {
       yargs()
         .option('w', {type: 'number', requiresArg: true})
         .command('woo')
-        .parse('woo', (err, argv, output) => {
+        .parse('woo', err => {
           expect(err).to.equal(null);
           return done();
         });
@@ -644,7 +644,7 @@ describe('validation tests', () => {
             return done();
           }
         )
-        .fail(msg => {
+        .fail(() => {
           expect.fail();
         })
         .parse();
@@ -665,7 +665,7 @@ describe('validation tests', () => {
               })
               .demandOption('c');
           },
-          argv => {
+          () => {
             expect.fail();
           }
         )
@@ -694,7 +694,7 @@ describe('validation tests', () => {
             argv._[0].should.equal('one');
           }
         )
-        .fail(msg => {
+        .fail(() => {
           expect.fail();
         })
         .parse();
@@ -717,7 +717,7 @@ describe('validation tests', () => {
             argv._[0].should.equal('one');
           }
         )
-        .fail(msg => {
+        .fail(() => {
           expect.fail();
         })
         .parse();
@@ -818,7 +818,7 @@ describe('validation tests', () => {
       const checkUsage = require('./helpers/utils').checkOutput;
       const r = checkUsage(() =>
         yargs(['--settings=./package.json'])
-          .config('settings', 'path to config file', configPath =>
+          .config('settings', 'path to config file', () =>
             Error('someone set us up the bomb')
           )
           .help('help')
@@ -842,7 +842,7 @@ describe('validation tests', () => {
       const checkUsage = require('./helpers/utils').checkOutput;
       const r = checkUsage(() =>
         yargs(['--settings=./package.json'])
-          .config('settings', 'path to config file', configPath => {
+          .config('settings', 'path to config file', () => {
             throw Error('someone set us up the bomb');
           })
           .wrap(null)
@@ -890,7 +890,7 @@ describe('validation tests', () => {
               .command('twoA', 'level two A')
               .command('twoB', 'level two B')
               .strict()
-              .fail(msg => {
+              .fail(() => {
                 expect.fail();
               }),
           argv => {
@@ -904,7 +904,7 @@ describe('validation tests', () => {
       const args = yargs('--foo hey')
         .strict()
         .option('foo', {boolean: true, describe: false})
-        .fail(msg => {
+        .fail(() => {
           expect.fail();
         })
         .parse();
@@ -917,7 +917,7 @@ describe('validation tests', () => {
         .option('foo', {boolean: true, describe: false})
         .alias('foo', 'bar')
         .alias('bar', 'cat')
-        .fail(msg => {
+        .fail(() => {
           expect.fail();
         })
         .parse();
