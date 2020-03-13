@@ -1,11 +1,11 @@
-'use strict'
+'use strict';
 /* global it */
 
-const yargs = require('../yargs')
-const Parser = require('yargs-parser')
+const yargs = require('../yargs');
+const Parser = require('yargs-parser');
 
-require('chai').should()
+require('chai').should();
 
 it('should expose yargs-parser as Parser', () => {
-  yargs.Parser.should.equal(Parser)
-})
+  yargs.Parser.should.equal(Parser);
+});
