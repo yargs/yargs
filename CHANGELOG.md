@@ -7,7 +7,8 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### Bug Fixes
 
-* __proto__ will now be replaced with ___proto___ in parse ([#1591](https://www.github.com/yargs/yargs/issues/1591)) ([2474c38](https://www.github.com/yargs/yargs/commit/2474c3889dcae42ddc031f0ac3872d306bf99e6b))
+* \_\_proto\_\_ will now be replaced with \_\_\_proto\_\_\_ in parse ([#258](https://www.github.com/yargs/yargs-parser/issues/258)), patching a potential 
+prototype pollution vulnerability. This was reported by the Snyk Security Research Team. ([63810ca](https://www.github.com/yargs/yargs-parser/commit/63810ca1ae1a24b08293a4d971e70e058c7a41e2))
 
 ## [15.3.0](https://www.github.com/yargs/yargs/compare/v15.2.0...v15.3.0) (2020-03-08)
 
