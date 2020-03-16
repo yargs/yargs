@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [15.3.1](https://www.github.com/yargs/yargs/compare/v15.3.0...v15.3.1) (2020-03-16)
+
+
+### Bug Fixes
+
+* __proto__ will now be replaced with ___proto___ in parse ([#1591](https://www.github.com/yargs/yargs/issues/1591)) ([2474c38](https://www.github.com/yargs/yargs/commit/2474c3889dcae42ddc031f0ac3872d306bf99e6b))
+
 ## [15.3.0](https://www.github.com/yargs/yargs/compare/v15.2.0...v15.3.0) (2020-03-08)
 
 
