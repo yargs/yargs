@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [15.3.1](https://www.github.com/yargs/yargs/compare/v15.3.0...v15.3.1) (2020-03-16)
+
+
+### Bug Fixes
+
+* \_\_proto\_\_ will now be replaced with \_\_\_proto\_\_\_ in parse ([#258](https://www.github.com/yargs/yargs-parser/issues/258)), patching a potential 
+prototype pollution vulnerability. This was reported by the Snyk Security Research Team. ([63810ca](https://www.github.com/yargs/yargs-parser/commit/63810ca1ae1a24b08293a4d971e70e058c7a41e2))
+
 ## [15.3.0](https://www.github.com/yargs/yargs/compare/v15.2.0...v15.3.0) (2020-03-08)
 
 
