@@ -33,9 +33,11 @@
     "yargs-parser": "^18.1.1"
   },
   "devDependencies": {
+    "@types/chai": "^4.2.11",
+    "@types/mocha": "^7.0.2",
+    "@types/node": "^10.0.3",
     "@typescript-eslint/eslint-plugin": "^2.23.0",
     "@typescript-eslint/parser": "^2.23.0",
-    "@types/node": "^10.0.3",
     "c8": "^7.0.0",
     "chai": "^4.2.0",
     "chalk": "^3.0.0",

@@ -1,8 +1,6 @@
-'use strict'
 /* global describe, it */
-
-const { expect } = require('chai')
-const { isPromise } = require('../build/lib/is-promise')
+import { expect } from 'chai'
+import { isPromise } from '../lib/is-promise'
 
 describe('isPromise', () => {
   it('returns `false` on non promise value', () => {
