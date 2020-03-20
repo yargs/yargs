@@ -136,5 +136,5 @@ Having problems? want to contribute? join our [community slack](http://devtoolsc
 [slack-image]: http://devtoolscommunity.herokuapp.com/badge.svg
 [slack-url]: http://devtoolscommunity.herokuapp.com
 [type-definitions]: https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/yargs
-[coverage-image]: https://img.shields.io/badge/dynamic/json?color=brightgreen&label=coverage&query=branches&suffix=%25&url=https%3A%2F%2Fraw.githubusercontent.com%2Fyargs%2Fyargs%2Fmaster%2F.nycrc&cacheSeconds=3600
+[coverage-image]: https://img.shields.io/nycrc/yargs/yargs
 [coverage-url]: https://github.com/yargs/yargs/blob/master/.nycrc
