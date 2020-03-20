@@ -18,7 +18,7 @@ const setBlocking = require('set-blocking')
 const { applyExtends } = require('./build/lib/apply-extends')
 const { globalMiddlewareFactory } = require('./lib/middleware')
 const { YError } = require('./build/lib/yerror')
-const processArgv = require('./lib/process-argv')
+const processArgv = require('./build/lib/process-argv')
 
 exports = module.exports = Yargs
 function Yargs (processArgs, cwd, parentRequire) {
