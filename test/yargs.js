@@ -7,7 +7,7 @@ const path = require('path')
 const checkOutput = require('./helpers/utils').checkOutput
 const english = require('../locales/en.json')
 let yargs
-const YError = require('../lib/yerror')
+const { YError } = require('../build/lib/yerror')
 
 require('chai').should()
 
