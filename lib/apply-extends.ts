@@ -51,6 +51,7 @@ export function applyExtends (config: Dictionary, cwd: string, mergeExtends: boo
     // maybe the module uses key for some other reason,
     // err on side of caution.
     if (!pathToDefault && !isPath) return config
+    if (!pathToDefault) throw new YError(`Unable to find extended config '${config.extends}' in '${cwd}'.`)
 
     checkForCircularExtends(pathToDefault)
 
