@@ -13,12 +13,12 @@ const path = require('path')
 const Usage = require('./lib/usage')
 const Validation = require('./lib/validation')
 const Y18n = require('y18n')
-const objFilter = require('./lib/obj-filter')
+const { objFilter } = require('./build/lib/obj-filter')
 const setBlocking = require('set-blocking')
-const applyExtends = require('./lib/apply-extends')
+const { applyExtends } = require('./build/lib/apply-extends')
 const { globalMiddlewareFactory } = require('./lib/middleware')
-const YError = require('./lib/yerror')
-const processArgv = require('./lib/process-argv')
+const { YError } = require('./build/lib/yerror')
+const processArgv = require('./build/lib/process-argv')
 
 exports = module.exports = Yargs
 function Yargs (processArgs, cwd, parentRequire) {

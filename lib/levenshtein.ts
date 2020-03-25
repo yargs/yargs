@@ -21,9 +21,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 // levenshtein distance algorithm, pulled from Andrei Mackenzie's MIT licensed.
 // gist, which can be found here: https://gist.github.com/andrei-m/982927
-'use strict'
+
 // Compute the edit distance between the two given strings
-module.exports = function levenshtein (a, b) {
+export function levenshtein (a: string, b: string) {
   if (a.length === 0) return b.length
   if (b.length === 0) return a.length
 

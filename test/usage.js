@@ -6,7 +6,7 @@ const chalk = require('chalk')
 const path = require('path')
 const yargs = require('../')
 const rebase = require('../yargs').rebase
-const YError = require('../lib/yerror')
+const { YError } = require('../build/lib/yerror')
 
 const should = require('chai').should()
 

@@ -3,7 +3,7 @@
 // without running as a singleton do:
 // require('yargs/yargs')(process.argv.slice(2))
 const yargs = require('./yargs')
-const processArgv = require('./lib/process-argv')
+const processArgv = require('./build/lib/process-argv')
 
 Argv(processArgv.getProcessArgvWithoutBin())
 
