@@ -14,9 +14,9 @@ import { isSyncCompletionFunction, isFunctionCommandBuilder } from './type-helpe
 // add bash completions to your
 //  yargs-powered applications.
 export function completion (yargs: YargsInstance, usage: UsageInstance, command: CommandInstance) {
-  const self: Partial<CompletionInstance> = {
+  const self: CompletionInstance = {
     completionKey: 'get-yargs-completions'
-  }
+  } as CompletionInstance
 
   let aliases: Dictionary<string>
   self.setParsed = function setParsed (parsed) {
@@ -137,5 +137,5 @@ export function completion (yargs: YargsInstance, usage: UsageInstance, command:
     completionFunction = fn
   }
 
-  return self as CompletionInstance
+  return self
 }
