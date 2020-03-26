@@ -1,4 +1,4 @@
-import { ElectronProcess } from './types/electron-process'
+import { ElectronProcess } from './types'
 
 function getProcessArgvBinIndex () {
   // The binary name is the first command line argument for:
