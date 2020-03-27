@@ -2545,4 +2545,42 @@ describe('yargs dsl tests', () => {
         Object.keys({}.__proto__).length.should.equal(0) // eslint-disable-line
     })
   })
+
+  describe('parsing --value as a value in -f=--value and --bar=--value', function () {
+    it('should work in the general case', function () {
+      const argv = yargs(['-f=--item1', 'item2', '--bar=--item3', 'item4'])
+        .argv
+      argv.f.should.eql('--item1')
+      argv.bar.should.eql('--item3')
+      argv._.should.eql(['item2', 'item4'])
+    })
+
+    it('should work with array', function () {
+      const argv = yargs(['-f=--item1', 'item2', '--bar=--item3', 'item4'])
+        .array(['f', 'bar'])
+        .argv
+      argv.f.should.eql(['--item1', 'item2'])
+      argv.bar.should.eql(['--item3', 'item4'])
+      argv._.should.eql([])
+    })
+
+    it('should work with nargs', function () {
+      const argv = yargs(['-f=--item1', 'item2', 'item3', '--bar=--item4', 'item5', 'item6'])
+        .option('f', { nargs: 2 })
+        .option('bar', { nargs: 2 })
+        .argv
+      argv.f.should.eql(['--item1', 'item2'])
+      argv.bar.should.eql(['--item4', 'item5'])
+      argv._.should.eql(['item3', 'item6'])
+    })
+
+    it('should work with both array and nargs', function () {
+      const argv = yargs(['-f=--item1', 'item2', '-f', 'item3', 'item4', '--bar=--item5', 'item6', '--bar', 'item7', 'item8'])
+        .option('f', { alias: 'bar', array: true, nargs: 1 })
+        .argv
+      argv.f.should.eql(['--item1', 'item3', '--item5', 'item7'])
+      argv.bar.should.eql(['--item1', 'item3', '--item5', 'item7'])
+      argv._.should.eql(['item2', 'item4', 'item6', 'item8'])
+    })
+  })
 })
