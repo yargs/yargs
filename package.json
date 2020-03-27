@@ -30,7 +30,7 @@
     "string-width": "^4.2.0",
     "which-module": "^2.0.0",
     "y18n": "^4.0.0",
-    "yargs-parser": "^18.1.1"
+    "yargs-parser": "^18.1.2"
   },
   "devDependencies": {
     "@types/chai": "^4.2.11",
