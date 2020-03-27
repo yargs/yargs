@@ -776,6 +776,20 @@ describe('yargs dsl tests', () => {
         r.logs.join(' ').should.match(/COMMANDS!/)
       })
 
+      it('also works on default option group', () => {
+        const r = checkOutput(() => {
+          yargs(['-h'])
+            .help('h')
+            .wrap(null)
+            .updateLocale({
+              'Options:': 'OPTIONS!'
+            })
+            .parse()
+        })
+
+        r.logs.join(' ').should.match(/OPTIONS!/)
+      })
+
       it('allows you to use updateStrings() as an alias for updateLocale()', () => {
         const r = checkOutput(() => {
           yargs(['snuh', '-h'])
