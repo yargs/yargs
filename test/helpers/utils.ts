@@ -1,9 +1,16 @@
 'use strict'
-const Hash = require('hashish')
+import * as Hash from 'hashish'
+import { CheckOutputResult } from '../types'
 
 // capture terminal output, so that we might
 // assert against it.
-exports.checkOutput = function checkOutput (f, argv, cb) {
+export function checkOutput<T> (f: () => T, argv?: string[]): CheckOutputResult<T>
+export function checkOutput<T>(f: () => T, argv: string[] | undefined, cb: (err: Error | null, result: CheckOutputResult<T>) => any): void
+export function checkOutput<T> (
+  f: () => T,
+  argv?: string[],
+  cb?: (err: Error | null, result: CheckOutputResult<T>) => any
+): CheckOutputResult<T> | void {
   let exit = false
   const _exit = process.exit
   const _emit = process.emit
@@ -13,33 +20,33 @@ exports.checkOutput = function checkOutput (f, argv, cb) {
   const _log = console.log
   const _warn = console.warn
 
-  process.exit = () => { exit = true }
+  process.exit = (() => { exit = true }) as NodeJS.Process['exit']
   process.env = Hash.merge(process.env, { _: 'node' })
   process.argv = argv || ['./usage']
 
-  const errors = []
-  const logs = []
-  const warnings = []
+  const errors: any[] = []
+  const logs: any[] = []
+  const warnings: any[] = []
 
   console.error = (msg) => { errors.push(msg) }
   console.log = (msg) => { logs.push(msg) }
   console.warn = (msg) => { warnings.push(msg) }
 
-  let result
+  let result: T
 
   if (typeof cb === 'function') {
-    process.exit = () => {
+    process.exit = (() => {
       exit = true
       cb(null, done())
-    }
-    process.emit = function emit (ev, value) {
+    }) as NodeJS.Process['exit']
+    process.emit = function emit (this: NodeJS.Process, ev: string, value: any) {
       if (ev === 'uncaughtException') {
         cb(value, done())
         return true
       }
 
-      return _emit.apply(this, arguments)
-    }
+      return _emit.apply(this, arguments as any)
+    } as NodeJS.Process['emit']
 
     f()
   } else {
@@ -63,7 +70,7 @@ exports.checkOutput = function checkOutput (f, argv, cb) {
     console.warn = _warn
   }
 
-  function done () {
+  function done (): CheckOutputResult<T> {
     reset()
 
     return {

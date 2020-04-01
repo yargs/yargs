@@ -2,7 +2,7 @@
 /* global describe, it */
 
 const argsert = require('../lib/argsert')
-const checkOutput = require('./helpers/utils').checkOutput
+const checkOutput = require('../build/test/helpers/utils').checkOutput
 
 require('chai').should()
 

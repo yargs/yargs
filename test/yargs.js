@@ -4,7 +4,7 @@
 const expect = require('chai').expect
 const fs = require('fs')
 const path = require('path')
-const checkOutput = require('./helpers/utils').checkOutput
+const checkOutput = require('../build/test/helpers/utils').checkOutput
 const english = require('../locales/en.json')
 let yargs
 const { YError } = require('../build/lib/yerror')

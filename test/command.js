@@ -2,7 +2,7 @@
 /* global describe, it, beforeEach */
 const yargs = require('../')
 const expect = require('chai').expect
-const checkOutput = require('./helpers/utils').checkOutput
+const checkOutput = require('../build/test/helpers/utils').checkOutput
 
 require('chai').should()
 const noop = () => {}

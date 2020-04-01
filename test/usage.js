@@ -1,7 +1,7 @@
 'use strict'
 /* global describe, it, beforeEach */
 
-const checkUsage = require('./helpers/utils').checkOutput
+const checkUsage = require('../build/test/helpers/utils').checkOutput
 const chalk = require('chalk')
 const path = require('path')
 const yargs = require('../')
