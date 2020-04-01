@@ -5,8 +5,11 @@ export function parseCommand (cmd: string) {
   const splitCommand = extraSpacesStrippedCommand.split(/\s+(?![^[]*]|[^<]*>)/)
   const bregex = /\.*[\][<>]/g
 
+  const firstCommand = splitCommand.shift()
+  if (!firstCommand) throw new Error(`No command found in: ${cmd}`)
+
   const parsedCommand: ParsedCommand = {
-    cmd: (splitCommand.shift()).replace(bregex, ''),
+    cmd: firstCommand.replace(bregex, ''),
     demanded: [],
     optional: []
   }
