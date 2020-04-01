@@ -1,24 +1,22 @@
-'use strict'
-
-// hoisted due to circular dependency on command.
-module.exports = argsert
-const { parseCommand } = require('../build/lib/parse-command')
-const { YError } = require('../build/lib/yerror')
+import { YError } from './yerror'
+import { parseCommand } from './parse-command'
+import { ParsedCommand } from './types'
 
 const positionName = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth']
-function argsert (expected, callerArguments, length) {
+export function argsert (callerArguments: any[], length?: number): void
+export function argsert (expected: string, callerArguments: any[], length?: number): void
+export function argsert (arg1: string | any[], arg2?: any[] | number, arg3?: number): void {
+  function parseArgs (): [Pick<ParsedCommand, 'demanded' | 'optional'>, any[], number?] {
+    return typeof arg1 === 'object'
+      ? [{ demanded: [], optional: [] }, arg1, arg2 as number | undefined]
+      : [parseCommand(`cmd ${arg1}`), arg2 as any[], arg3 as number | undefined]
+  }
   // TODO: should this eventually raise an exception.
   try {
     // preface the argument description with "cmd", so
     // that we can run it through yargs' command parser.
     let position = 0
-    let parsed = { demanded: [], optional: [] }
-    if (typeof expected === 'object') {
-      length = callerArguments
-      callerArguments = expected
-    } else {
-      parsed = parseCommand(`cmd ${expected}`)
-    }
+    let [parsed, callerArguments, length] = parseArgs()
     const args = [].slice.call(callerArguments)
 
     while (args.length && args[args.length - 1] === undefined) args.pop()
@@ -54,7 +52,7 @@ function argsert (expected, callerArguments, length) {
   }
 }
 
-function guessType (arg) {
+function guessType (arg: any) {
   if (Array.isArray(arg)) {
     return 'array'
   } else if (arg === null) {
@@ -63,6 +61,6 @@ function guessType (arg) {
   return typeof arg
 }
 
-function argumentTypeError (observedType, allowedTypes, position, optional) {
+function argumentTypeError (observedType: string, allowedTypes: string[], position: number, optional: any) {
   throw new YError(`Invalid ${positionName[position] || 'manyith'} argument. Expected ${allowedTypes.join(' or ')} but received ${observedType}.`)
 }
