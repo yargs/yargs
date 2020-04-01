@@ -5,7 +5,6 @@ import * as path from 'path'
 import { FailureFunction, UsageInstance, YargsInstance, Dictionary, FrozenUsageInstance } from './types'
 import { YError } from './yerror'
 import decamelize = require('decamelize')
-// TODO: remove if no longer needed: /// <reference path='./types/set-blocking.d.ts' />
 import setBlocking = require('set-blocking')
 import stringWidth = require('string-width')
 import Y18N = require('y18n')
