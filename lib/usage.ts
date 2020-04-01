@@ -557,6 +557,7 @@ export function usage (yargs: YargsInstance, y18n: Y18N) {
   }
   self.unfreeze = function unfreeze () {
     const frozen = frozens.pop()
+    if (!frozen) throw new Error('Nothing more to unfreeze')
     ;({
       failMessage,
       failureOutput,
