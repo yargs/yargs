@@ -35,7 +35,7 @@ export function argsert (arg1: string | any[], arg2?: any[] | number, arg3?: num
       const arg = args.shift()
       const observedType = guessType(arg)
       const matchingTypes = demanded.cmd.filter(type => type === observedType || type === '*')
-      if (matchingTypes.length === 0) argumentTypeError(observedType, demanded.cmd, position, false)
+      if (matchingTypes.length === 0) argumentTypeError(observedType, demanded.cmd, position)
       position += 1
     })
 
@@ -44,7 +44,7 @@ export function argsert (arg1: string | any[], arg2?: any[] | number, arg3?: num
       const arg = args.shift()
       const observedType = guessType(arg)
       const matchingTypes = optional.cmd.filter(type => type === observedType || type === '*')
-      if (matchingTypes.length === 0) argumentTypeError(observedType, optional.cmd, position, true)
+      if (matchingTypes.length === 0) argumentTypeError(observedType, optional.cmd, position)
       position += 1
     })
   } catch (err) {
@@ -61,6 +61,6 @@ function guessType (arg: any) {
   return typeof arg
 }
 
-function argumentTypeError (observedType: string, allowedTypes: string[], position: number, optional: any) {
+function argumentTypeError (observedType: string, allowedTypes: string[], position: number) {
   throw new YError(`Invalid ${positionName[position] || 'manyith'} argument. Expected ${allowedTypes.join(' or ')} but received ${observedType}.`)
 }
