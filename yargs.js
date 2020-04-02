@@ -1267,7 +1267,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     validation.requiredArguments(argv)
     let failedStrictCommands = false
     if (strictCommands) {
-      failedStrictCommands = validation.unknownCommands(argv, aliases, positionalMap)
+      failedStrictCommands = validation.unknownCommands(argv)
     }
     if (strict && !failedStrictCommands) {
       validation.unknownArguments(argv, aliases, positionalMap)

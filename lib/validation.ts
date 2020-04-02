@@ -145,7 +145,7 @@ export function validation (yargs: YargsInstance, usage: UsageInstance, y18n: Y1
     }
   }
 
-  self.unknownCommands = function unknownCommands (argv, aliases, positionalMap) {
+  self.unknownCommands = function unknownCommands (argv) {
     const commandKeys = yargs.getCommandInstance().getCommands()
     const unknown: string[] = []
     const currentContext = yargs.getContext()
@@ -375,8 +375,8 @@ export function validation (yargs: YargsInstance, usage: UsageInstance, y18n: Y1
   }
 
   self.reset = function reset (localLookup) {
-    implied = objFilter(implied, (k, v) => !localLookup[k])
-    conflicting = objFilter(conflicting, (k, v) => !localLookup[k])
+    implied = objFilter(implied, k => !localLookup[k])
+    conflicting = objFilter(conflicting, k => !localLookup[k])
     checks = checks.filter(c => c.global)
     return self
   }

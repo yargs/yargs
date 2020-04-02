@@ -25,5 +25,5 @@ export interface ValidationInstance {
   reset (localLookup: Dictionary): ValidationInstance
   unfreeze (): void
   unknownArguments (argv: Arguments, aliases: DetailedArguments['aliases'], positionalMap: Dictionary): void
-  unknownCommands (argv: Arguments, aliases: DetailedArguments['aliases'], positionalMap: Dictionary): boolean
+  unknownCommands (argv: Arguments): boolean
 }
