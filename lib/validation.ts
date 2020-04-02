@@ -1,14 +1,17 @@
-'use strict'
-const { argsert } = require('../build/lib/argsert')
-const { objFilter } = require('../build/lib/obj-filter')
+import { argsert } from './argsert'
+import { levenshtein as distance } from './levenshtein'
+import { objFilter } from './obj-filter'
+import { YargsInstance, UsageInstance, ValidationInstance, Dictionary, CustomCheck, KeyOrPos, FrozenValidationInstance } from './types'
+import { Arguments } from 'yargs-parser'
+import Y18N = require('y18n')
 const specialKeys = ['$0', '--', '_']
 
 // validation-type-stuff, missing params,
 // bad implications, custom checks.
-module.exports = function validation (yargs, usage, y18n) {
+export function validation (yargs: YargsInstance, usage: UsageInstance, y18n: Y18N) {
   const __ = y18n.__
   const __n = y18n.__n
-  const self = {}
+  const self = {} as ValidationInstance
 
   // validate appropriate # of non-option
   // arguments were provided, i.e., '_'.
@@ -22,7 +25,9 @@ module.exports = function validation (yargs, usage, y18n) {
         if (demandedCommands._.minMsg !== undefined) {
           usage.fail(
             // replace $0 with observed, $1 with expected.
-            demandedCommands._.minMsg ? demandedCommands._.minMsg.replace(/\$0/g, _s).replace(/\$1/, demandedCommands._.min) : null
+            demandedCommands._.minMsg
+              ? demandedCommands._.minMsg.replace(/\$0/g, _s.toString()).replace(/\$1/, demandedCommands._.min.toString())
+              : null
           )
         } else {
           usage.fail(
@@ -39,7 +44,9 @@ module.exports = function validation (yargs, usage, y18n) {
         if (demandedCommands._.maxMsg !== undefined) {
           usage.fail(
             // replace $0 with observed, $1 with expected.
-            demandedCommands._.maxMsg ? demandedCommands._.maxMsg.replace(/\$0/g, _s).replace(/\$1/, demandedCommands._.max) : null
+            demandedCommands._.maxMsg
+              ? demandedCommands._.maxMsg.replace(/\$0/g, _s.toString()).replace(/\$1/, demandedCommands._.max.toString())
+              : null
           )
         } else {
           usage.fail(
@@ -75,23 +82,23 @@ module.exports = function validation (yargs, usage, y18n) {
   // make sure all the required arguments are present.
   self.requiredArguments = function requiredArguments (argv) {
     const demandedOptions = yargs.getDemandedOptions()
-    let missing = null
+    let missing: Dictionary<string> | null = null
 
-    Object.keys(demandedOptions).forEach((key) => {
+    for (const key of Object.keys(demandedOptions)) {
       if (!Object.prototype.hasOwnProperty.call(argv, key) || typeof argv[key] === 'undefined') {
         missing = missing || {}
         missing[key] = demandedOptions[key]
       }
-    })
+    }
 
     if (missing) {
-      const customMsgs = []
-      Object.keys(missing).forEach((key) => {
+      const customMsgs: string[] = []
+      for (const key of Object.keys(missing)) {
         const msg = missing[key]
         if (msg && customMsgs.indexOf(msg) < 0) {
           customMsgs.push(msg)
         }
-      })
+      }
 
       const customMsg = customMsgs.length ? `\n${customMsgs.join('\n')}` : ''
 
@@ -107,7 +114,7 @@ module.exports = function validation (yargs, usage, y18n) {
   // check for unknown arguments (strict-mode).
   self.unknownArguments = function unknownArguments (argv, aliases, positionalMap) {
     const commandKeys = yargs.getCommandInstance().getCommands()
-    const unknown = []
+    const unknown: string[] = []
     const currentContext = yargs.getContext()
 
     Object.keys(argv).forEach((key) => {
@@ -140,7 +147,7 @@ module.exports = function validation (yargs, usage, y18n) {
 
   self.unknownCommands = function unknownCommands (argv, aliases, positionalMap) {
     const commandKeys = yargs.getCommandInstance().getCommands()
-    const unknown = []
+    const unknown: string[] = []
     const currentContext = yargs.getContext()
 
     if ((currentContext.commands.length > 0) || (commandKeys.length > 0)) {
@@ -182,7 +189,7 @@ module.exports = function validation (yargs, usage, y18n) {
   // validate arguments limited to enumerated choices
   self.limitedChoices = function limitedChoices (argv) {
     const options = yargs.getOptions()
-    const invalid = {}
+    const invalid: Dictionary<any[]> = {}
 
     if (!Object.keys(options.choices).length) return
 
@@ -216,7 +223,7 @@ module.exports = function validation (yargs, usage, y18n) {
   }
 
   // custom checks, added using the `check` option on yargs.
-  let checks = []
+  let checks: CustomCheck[] = []
   self.check = function check (f, global) {
     checks.push({
       func: f,
@@ -244,8 +251,8 @@ module.exports = function validation (yargs, usage, y18n) {
   }
 
   // check implications, argument foo implies => argument bar.
-  let implied = {}
-  self.implies = function implies (key, value) {
+  let implied: Dictionary<KeyOrPos[]> = {}
+  self.implies = function implies (key: string | Dictionary<KeyOrPos | KeyOrPos[]>, value?: KeyOrPos | KeyOrPos[]) {
     argsert('<string|object> [array|number|string]', [key, value], arguments.length)
 
     if (typeof key === 'object') {
@@ -268,7 +275,7 @@ module.exports = function validation (yargs, usage, y18n) {
     return implied
   }
 
-  function keyExists (argv, val) {
+  function keyExists (argv: Arguments, val: any): any {
     // convert string '1' to number 1
     const num = Number(val)
     val = isNaN(num) ? val : num
@@ -288,7 +295,7 @@ module.exports = function validation (yargs, usage, y18n) {
   }
 
   self.implications = function implications (argv) {
-    const implyFail = []
+    const implyFail: string[] = []
 
     Object.keys(implied).forEach((key) => {
       const origKey = key
@@ -315,8 +322,8 @@ module.exports = function validation (yargs, usage, y18n) {
     }
   }
 
-  let conflicting = {}
-  self.conflicts = function conflicts (key, value) {
+  let conflicting: Dictionary<(string | undefined)[]> = {}
+  self.conflicts = function conflicts (key: string | Dictionary<string | string []>, value?: string | string[]) {
     argsert('<string|object> [array|string]', [key, value], arguments.length)
 
     if (typeof key === 'object') {
@@ -352,7 +359,6 @@ module.exports = function validation (yargs, usage, y18n) {
   }
 
   self.recommendCommands = function recommendCommands (cmd, potentialCommands) {
-    const { levenshtein: distance } = require('../build/lib/levenshtein')
     const threshold = 3 // if it takes more than three edits, let's move on.
     potentialCommands = potentialCommands.sort((a, b) => b.length - a.length)
 
@@ -375,19 +381,22 @@ module.exports = function validation (yargs, usage, y18n) {
     return self
   }
 
-  const frozens = []
+  const frozens: FrozenValidationInstance[] = []
   self.freeze = function freeze () {
-    const frozen = {}
-    frozens.push(frozen)
-    frozen.implied = implied
-    frozen.checks = checks
-    frozen.conflicting = conflicting
+    frozens.push({
+      implied,
+      checks,
+      conflicting
+    })
   }
   self.unfreeze = function unfreeze () {
     const frozen = frozens.pop()
-    implied = frozen.implied
-    checks = frozen.checks
-    conflicting = frozen.conflicting
+    if (!frozen) throw new Error('Nothing more to unfreeze')
+    ;({
+      implied,
+      checks,
+      conflicting
+    } = frozen)
   }
 
   return self

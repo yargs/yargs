@@ -1,8 +1,5 @@
-// Type definitions for y18n 4.0
-// Project: https://github.com/yargs/y18n
-// Definitions by:  Adam Zerella <https://github.com/adamzerella>
-// Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
-// TypeScript Version: 2.2
+// TODO: either update @types/y18n with this or convert y18n to typescript
+// Forked from: https://github.com/DefinitelyTyped/DefinitelyTyped/blob/a9cb5fa/types/y18n/index.d.ts
 
 interface Config {
   /**
@@ -28,7 +25,7 @@ declare class Y18N {
   /**
    * Create an instance of y18n with the config provided
    */
-  constructor(config?: Config)
+  constructor(config?: Config);
 
   /**
    * Print a localized string, %s will be replaced with args.
@@ -37,9 +34,9 @@ declare class Y18N {
 
   /**
    * Print a localized string with appropriate pluralization.
-   * If %d is provided in the string, the count will replace this placeholder.
+   * If %d is provided in the string, the quantity will replace this placeholder.
    */
-  __n(singularString: string, pluralString: string, count: number, arg1?: string, arg2?: string, arg3?: string): string;
+  __n(singular: string, plural: string, quantity: number, ...param: any[]): string;
 
   /**
    * Set the current locale being used.
@@ -57,4 +54,6 @@ declare class Y18N {
   updateLocale(obj: object): void;
 }
 
-export = Y18N;
+declare module 'y18n' {
+  export = Y18N;
+}
