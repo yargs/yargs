@@ -1,6 +1,7 @@
 import * as path from 'path'
 import * as templates from './completion-templates'
 import { isPromise } from './is-promise'
+import { parseCommand } from './parse-command'
 import {
   CommandInstance,
   CompletionFunction,
@@ -72,7 +73,7 @@ export function completion (yargs: YargsInstance, usage: UsageInstance, command:
 
     if (!current.match(/^-/) && parentCommands[parentCommands.length - 1] !== current) {
       usage.getCommands().forEach((usageCommand) => {
-        const commandName = command.parseCommand(usageCommand[0]).cmd
+        const commandName = parseCommand(usageCommand[0]).cmd
         if (args.indexOf(commandName) === -1) {
           if (!zshShell) {
             completions.push(commandName)

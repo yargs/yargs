@@ -1,6 +1,6 @@
 'use strict'
 /* global describe, it, beforeEach, after */
-const checkUsage = require('./helpers/utils').checkOutput
+const checkUsage = require('../build/test/helpers/utils').checkOutput
 const yargs = require('../')
 
 /* polyfill Promise for older Node.js */

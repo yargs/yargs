@@ -1,7 +1,7 @@
 'use strict'
 /* global describe, it, beforeEach */
 
-const checkUsage = require('./helpers/utils').checkOutput
+const checkUsage = require('../build/test/helpers/utils').checkOutput
 const chalk = require('chalk')
 const path = require('path')
 const yargs = require('../')
@@ -627,7 +627,7 @@ describe('usage tests', () => {
 
             }
           })
-          r.logs.should.deep.equal([['YError', 'foo'], 'is triggered last'])
+          r.logs.should.deep.equal(["[ 'YError', 'foo' ]", 'is triggered last'])
           r.should.have.property('exit').and.equal(false)
         })
       })

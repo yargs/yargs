@@ -1,5 +1,7 @@
+import { Positional } from './positional'
+
 export interface ParsedCommand {
   cmd: string
-  demanded: []
-  optional: []
+  demanded: Positional[]
+  optional: Positional[]
 }

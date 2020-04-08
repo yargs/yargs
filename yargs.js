@@ -4,7 +4,7 @@
 async function requiresNode8OrGreater () {}
 requiresNode8OrGreater()
 
-const argsert = require('./lib/argsert')
+const { argsert } = require('./build/lib/argsert')
 const fs = require('fs')
 const Command = require('./lib/command')
 const { completion: Completion } = require('./build/lib/completion')
