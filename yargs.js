@@ -16,7 +16,7 @@ const Y18n = require('y18n')
 const { objFilter } = require('./build/lib/obj-filter')
 const setBlocking = require('set-blocking')
 const { applyExtends } = require('./build/lib/apply-extends')
-const { globalMiddlewareFactory } = require('./lib/middleware')
+const { globalMiddlewareFactory } = require('./build/lib/middleware')
 const { YError } = require('./build/lib/yerror')
 const processArgv = require('./build/lib/process-argv')
 

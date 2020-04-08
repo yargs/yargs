@@ -1,45 +1,44 @@
-'use strict'
+import { argsert } from './argsert'
+import { isPromise } from './is-promise'
+import { YargsInstance } from './yargs-types'
+import { Arguments } from 'yargs-parser'
 
-// hoisted due to circular dependency on command.
-module.exports = {
-  applyMiddleware,
-  commandMiddlewareFactory,
-  globalMiddlewareFactory
-}
-const { isPromise } = require('../build/lib/is-promise')
-const { argsert } = require('../build/lib/argsert')
-
-function globalMiddlewareFactory (globalMiddleware, context) {
-  return function (callback, applyBeforeValidation = false) {
+export function globalMiddlewareFactory<T> (globalMiddleware: (Middleware | Middleware[])[], context: T) {
+  return function (callback: MiddlewareCallback | MiddlewareCallback[], applyBeforeValidation = false) {
     argsert('<array|function> [boolean]', [callback, applyBeforeValidation], arguments.length)
     if (Array.isArray(callback)) {
       for (let i = 0; i < callback.length; i++) {
         if (typeof callback[i] !== 'function') {
           throw Error('middleware must be a function')
         }
-        callback[i].applyBeforeValidation = applyBeforeValidation
+        (callback[i] as Middleware).applyBeforeValidation = applyBeforeValidation
       }
-      Array.prototype.push.apply(globalMiddleware, callback)
+      Array.prototype.push.apply(globalMiddleware, callback as Middleware[])
     } else if (typeof callback === 'function') {
-      callback.applyBeforeValidation = applyBeforeValidation
-      globalMiddleware.push(callback)
+      (callback as Middleware).applyBeforeValidation = applyBeforeValidation
+      globalMiddleware.push(callback as Middleware)
     }
     return context
   }
 }
 
-function commandMiddlewareFactory (commandMiddleware) {
+export function commandMiddlewareFactory (commandMiddleware?: MiddlewareCallback[]): Middleware[] {
   if (!commandMiddleware) return []
   return commandMiddleware.map(middleware => {
-    middleware.applyBeforeValidation = false
+    (middleware as Middleware).applyBeforeValidation = false
     return middleware
-  })
+  }) as Middleware[]
 }
 
-function applyMiddleware (argv, yargs, middlewares, beforeValidation) {
+export function applyMiddleware (
+  argv: Arguments,
+  yargs: YargsInstance,
+  middlewares: Middleware[],
+  beforeValidation: boolean
+) {
   const beforeValidationError = new Error('middleware cannot return a promise when applyBeforeValidation is true')
   return middlewares
-    .reduce((accumulation, middleware) => {
+    .reduce<Arguments | Promise<Arguments>>((accumulation, middleware) => {
       if (middleware.applyBeforeValidation !== beforeValidation) {
         return accumulation
       }
@@ -47,7 +46,7 @@ function applyMiddleware (argv, yargs, middlewares, beforeValidation) {
       if (isPromise(accumulation)) {
         return accumulation
           .then(initialObj =>
-            Promise.all([initialObj, middleware(initialObj, yargs)])
+            Promise.all<Arguments, Partial<Arguments>>([initialObj, middleware(initialObj, yargs)])
           )
           .then(([initialObj, middlewareObj]) =>
             Object.assign(initialObj, middlewareObj)
@@ -61,4 +60,12 @@ function applyMiddleware (argv, yargs, middlewares, beforeValidation) {
           : Object.assign(accumulation, result)
       }
     }, argv)
+}
+
+interface MiddlewareCallback {
+  (argv: Arguments, yargs: YargsInstance): Partial<Arguments> | Promise<Partial<Arguments>>
+}
+
+interface Middleware extends MiddlewareCallback {
+  applyBeforeValidation: boolean
 }
