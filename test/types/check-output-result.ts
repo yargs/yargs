@@ -1,7 +1,7 @@
 export interface CheckOutputResult<T> {
-  errors: any[]
-  logs: any[]
-  warnings: any[]
+  errors: string[]
+  logs: string[]
+  warnings: string[]
   exit: boolean
   result: T
 }

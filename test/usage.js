@@ -627,7 +627,7 @@ describe('usage tests', () => {
 
             }
           })
-          r.logs.should.deep.equal([['YError', 'foo'], 'is triggered last'])
+          r.logs.should.deep.equal(["[ 'YError', 'foo' ]", 'is triggered last'])
           r.should.have.property('exit').and.equal(false)
         })
       })

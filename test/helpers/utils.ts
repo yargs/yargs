@@ -1,6 +1,7 @@
 'use strict'
 import * as Hash from 'hashish'
 import { CheckOutputResult } from '../types'
+import { format } from 'util'
 
 // capture terminal output, so that we might
 // assert against it.
@@ -24,13 +25,13 @@ export function checkOutput<T> (
   process.env = Hash.merge(process.env, { _: 'node' })
   process.argv = argv || ['./usage']
 
-  const errors: any[] = []
-  const logs: any[] = []
-  const warnings: any[] = []
+  const errors: string[] = []
+  const logs: string[] = []
+  const warnings: string[] = []
 
-  console.error = (msg) => { errors.push(msg) }
-  console.log = (msg) => { logs.push(msg) }
-  console.warn = (msg) => { warnings.push(msg) }
+  console.error = (...msg) => { errors.push(format(...msg)) }
+  console.log = (...msg) => { logs.push(format(...msg)) }
+  console.warn = (...msg) => { warnings.push(format(...msg)) }
 
   let result: T
 
