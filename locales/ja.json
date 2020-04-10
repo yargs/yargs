@@ -22,8 +22,8 @@
     "other": "オプションではない引数が %s 個では多すぎます。最大で %s 個までです:"
   },
   "Missing argument value: %s": {
-    "one": "引数が見つかりません: %s",
-    "other": "引数が見つかりません: %s"
+    "one": "引数の値が見つかりません: %s",
+    "other": "引数の値が見つかりません: %s"
   },
   "Missing required argument: %s": {
     "one": "必須の引数が見つかりません: %s",
