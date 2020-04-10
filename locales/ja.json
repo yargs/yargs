@@ -45,5 +45,7 @@
   "Did you mean %s?": "もしかして %s?",
   "Arguments %s and %s are mutually exclusive" : "引数 %s と %s は同時に指定できません",
   "Positionals:": "位置:",
-  "command": "コマンド"
+  "command": "コマンド",
+  "deprecated": "非推奨",
+  "deprecated: %s": "非推奨: %s"
 }
