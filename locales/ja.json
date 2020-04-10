@@ -34,7 +34,7 @@
     "other": "未知の引数です: %s"
   },
   "Invalid values:": "不正な値です:",
-  "Argument: %s, Given: %s, Choices: %s": "引数は %s です。指定できるのは %s つです。選択してください: %s",
+  "Argument: %s, Given: %s, Choices: %s": "引数は %s です。与えられた値: %s, 選択してください: %s",
   "Argument check failed: %s": "引数のチェックに失敗しました: %s",
   "Implications failed:": "オプションの組み合わせで不正が生じました:",
   "Not enough arguments following: %s": "次の引数が不足しています。: %s",
