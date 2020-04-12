@@ -451,7 +451,7 @@ for detailed documentation of this feature.
 
 ## Command finish hook
 ### Example
-```
+```js
 yargs
     .command('cmd', ..., async () => {
         await this.model.find()
@@ -484,7 +484,7 @@ In this example, our middleware will check if the `username` and `password` is p
 
 #### Middleware function
 
-```
+```js
 const normalizeCredentials = (argv) => {
   if (!argv.username || !argv.password) {
     const credentials = JSON.parse(fs.readSync('~/.credentials'))
@@ -503,7 +503,7 @@ This example is exactly the same however it loads the `username` and `password` 
 
 #### Middleware function
 
-```
+```js
 const { promisify } = require('util') // since node 8.0.0
 const readFile = promisify(require('fs').readFile)
 
@@ -520,7 +520,7 @@ yargs.middleware(normalizeCredentials)
 
 #### yargs parsing configuration
 
-```
+```js
 var argv = require('yargs')
   .usage('Usage: $0 <command> [options]')
   .command('login', 'Authenticate user', (yargs) =>{
@@ -537,7 +537,7 @@ var argv = require('yargs')
 ### Using the non-singleton interface
 
 To use yargs without running as a singleton, do:
-```
+```js
 const argv = require('yargs/yargs')(process.argv.slice(2))
 ```
 
