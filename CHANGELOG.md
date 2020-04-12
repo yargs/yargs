@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [15.3.2](https://www.github.com/yargs/yargs/compare/v15.3.1...v15.3.2) (2020-04-12)
+
+
+### Bug Fixes
+
+* **i18n:** Japanese translation phrasing ([#1619](https://www.github.com/yargs/yargs/issues/1619)) ([0894175](https://www.github.com/yargs/yargs/commit/089417550ef5a5b8ce3578dd2a989191300b64cd))
+* **usage:** translate 'options' group only when displaying help ([#1600](https://www.github.com/yargs/yargs/issues/1600)) ([e60b39b](https://www.github.com/yargs/yargs/commit/e60b39b9d3a912c06db43f87c86ba894142b6c1c))
+
 ### [15.3.1](https://www.github.com/yargs/yargs/compare/v15.3.0...v15.3.1) (2020-03-16)
 
 
