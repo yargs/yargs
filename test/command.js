@@ -276,10 +276,11 @@ describe('Command', () => {
       const desc = 'i\'m not feeling very creative at the moment'
       const isDefault = false
       const aliases = []
+      const deprecated = false
 
       const y = yargs([]).command(cmd, desc)
       const commands = y.getUsageInstance().getCommands()
-      commands[0].should.deep.equal([cmd, desc, isDefault, aliases])
+      commands[0].should.deep.equal([cmd, desc, isDefault, aliases, deprecated])
     })
 
     it('accepts array, string as first 2 arguments', () => {
@@ -287,10 +288,11 @@ describe('Command', () => {
       const cmd = 'foo <qux>'
       const desc = 'i\'m not feeling very creative at the moment'
       const isDefault = false
+      const deprecated = false
 
       const y = yargs([]).command([cmd].concat(aliases), desc)
       const usageCommands = y.getUsageInstance().getCommands()
-      usageCommands[0].should.deep.equal([cmd, desc, isDefault, aliases])
+      usageCommands[0].should.deep.equal([cmd, desc, isDefault, aliases, deprecated])
       const cmdCommands = y.getCommandInstance().getCommands()
       cmdCommands.should.deep.equal(['foo', 'bar', 'baz'])
     })
@@ -381,6 +383,7 @@ describe('Command', () => {
       }
       const isDefault = false
       const aliases = []
+      const deprecated = false
 
       const y = yargs([]).command(module)
       const handlers = y.getCommandInstance().getCommandHandlers()
@@ -388,7 +391,7 @@ describe('Command', () => {
       handlers.foo.builder.should.equal(module.builder)
       handlers.foo.handler.should.equal(module.handler)
       const commands = y.getUsageInstance().getCommands()
-      commands[0].should.deep.equal([module.command, module.describe, isDefault, aliases])
+      commands[0].should.deep.equal([module.command, module.describe, isDefault, aliases, deprecated])
     })
 
     it('accepts module (description key, builder function) as 1st argument', () => {
@@ -400,6 +403,7 @@ describe('Command', () => {
       }
       const isDefault = false
       const aliases = []
+      const deprecated = false
 
       const y = yargs([]).command(module)
       const handlers = y.getCommandInstance().getCommandHandlers()
@@ -407,7 +411,7 @@ describe('Command', () => {
       handlers.foo.builder.should.equal(module.builder)
       handlers.foo.handler.should.equal(module.handler)
       const commands = y.getUsageInstance().getCommands()
-      commands[0].should.deep.equal([module.command, module.description, isDefault, aliases])
+      commands[0].should.deep.equal([module.command, module.description, isDefault, aliases, deprecated])
     })
 
     it('accepts module (desc key, builder function) as 1st argument', () => {
@@ -419,6 +423,7 @@ describe('Command', () => {
       }
       const isDefault = false
       const aliases = []
+      const deprecated = false
 
       const y = yargs([]).command(module)
       const handlers = y.getCommandInstance().getCommandHandlers()
@@ -426,7 +431,7 @@ describe('Command', () => {
       handlers.foo.builder.should.equal(module.builder)
       handlers.foo.handler.should.equal(module.handler)
       const commands = y.getUsageInstance().getCommands()
-      commands[0].should.deep.equal([module.command, module.desc, isDefault, aliases])
+      commands[0].should.deep.equal([module.command, module.desc, isDefault, aliases, deprecated])
     })
 
     it('accepts module (false describe, builder function) as 1st argument', () => {
@@ -475,6 +480,7 @@ describe('Command', () => {
       }
       const isDefault = false
       const aliases = []
+      const deprecated = false
 
       const y = yargs([]).command(module)
       const handlers = y.getCommandInstance().getCommandHandlers()
@@ -482,7 +488,7 @@ describe('Command', () => {
       handlers.foo.builder.should.equal(module.builder)
       handlers.foo.handler.should.equal(module.handler)
       const commands = y.getUsageInstance().getCommands()
-      commands[0].should.deep.equal([module.command, module.describe, isDefault, aliases])
+      commands[0].should.deep.equal([module.command, module.describe, isDefault, aliases, deprecated])
     })
 
     it('accepts module (missing handler function) as 1st argument', () => {
@@ -497,6 +503,7 @@ describe('Command', () => {
       }
       const isDefault = false
       const aliases = []
+      const deprecated = false
 
       const y = yargs([]).command(module)
       const handlers = y.getCommandInstance().getCommandHandlers()
@@ -504,7 +511,7 @@ describe('Command', () => {
       handlers.foo.builder.should.equal(module.builder)
       expect(typeof handlers.foo.handler).to.equal('function')
       const commands = y.getUsageInstance().getCommands()
-      commands[0].should.deep.equal([module.command, module.describe, isDefault, aliases])
+      commands[0].should.deep.equal([module.command, module.describe, isDefault, aliases, deprecated])
     })
 
     it('accepts module (with command array) as 1st argument', () => {
@@ -515,6 +522,7 @@ describe('Command', () => {
         handler (argv) {}
       }
       const isDefault = false
+      const deprecated = false
 
       const y = yargs([]).command(module)
       const handlers = y.getCommandInstance().getCommandHandlers()
@@ -522,7 +530,7 @@ describe('Command', () => {
       handlers.foo.builder.should.equal(module.builder)
       handlers.foo.handler.should.equal(module.handler)
       const usageCommands = y.getUsageInstance().getCommands()
-      usageCommands[0].should.deep.equal([module.command[0], module.describe, isDefault, ['bar', 'baz']])
+      usageCommands[0].should.deep.equal([module.command[0], module.describe, isDefault, ['bar', 'baz'], deprecated])
       const cmdCommands = y.getCommandInstance().getCommands()
       cmdCommands.should.deep.equal(['foo', 'bar', 'baz'])
     })
@@ -536,6 +544,7 @@ describe('Command', () => {
         handler (argv) {}
       }
       const isDefault = false
+      const deprecated = false
 
       const y = yargs([]).command(module)
       const handlers = y.getCommandInstance().getCommandHandlers()
@@ -543,7 +552,7 @@ describe('Command', () => {
       handlers.foo.builder.should.equal(module.builder)
       handlers.foo.handler.should.equal(module.handler)
       const usageCommands = y.getUsageInstance().getCommands()
-      usageCommands[0].should.deep.equal([module.command, module.describe, isDefault, module.aliases])
+      usageCommands[0].should.deep.equal([module.command, module.describe, isDefault, module.aliases, deprecated])
       const cmdCommands = y.getCommandInstance().getCommands()
       cmdCommands.should.deep.equal(['foo', 'bar', 'baz'])
     })
@@ -557,6 +566,7 @@ describe('Command', () => {
         handler (argv) {}
       }
       const isDefault = false
+      const deprecated = false
 
       const y = yargs([]).command(module)
       const handlers = y.getCommandInstance().getCommandHandlers()
@@ -564,7 +574,7 @@ describe('Command', () => {
       handlers.foo.builder.should.equal(module.builder)
       handlers.foo.handler.should.equal(module.handler)
       const usageCommands = y.getUsageInstance().getCommands()
-      usageCommands[0].should.deep.equal([module.command[0], module.describe, isDefault, ['bar', 'baz', 'nat']])
+      usageCommands[0].should.deep.equal([module.command[0], module.describe, isDefault, ['bar', 'baz', 'nat'], deprecated])
       const cmdCommands = y.getCommandInstance().getCommands()
       cmdCommands.should.deep.equal(['foo', 'bar', 'baz', 'nat'])
     })
@@ -578,6 +588,7 @@ describe('Command', () => {
         handler (argv) {}
       }
       const isDefault = false
+      const deprecated = false
 
       const y = yargs([]).command(module)
       const handlers = y.getCommandInstance().getCommandHandlers()
@@ -585,9 +596,20 @@ describe('Command', () => {
       handlers.foo.builder.should.equal(module.builder)
       handlers.foo.handler.should.equal(module.handler)
       const usageCommands = y.getUsageInstance().getCommands()
-      usageCommands[0].should.deep.equal([module.command, module.describe, isDefault, ['bar']])
+      usageCommands[0].should.deep.equal([module.command, module.describe, isDefault, ['bar'], deprecated])
       const cmdCommands = y.getCommandInstance().getCommands()
       cmdCommands.should.deep.equal(['foo', 'bar'])
+    })
+
+    it('accepts deprecated as 5th argument', () => {
+      const command = 'command'
+      const description = 'description'
+      const isDefault = false
+      const aliases = []
+      const deprecated = false
+      const y = yargs([]).command(command, description, {}, () => {}, [], deprecated)
+      const usageCommands = y.getUsageInstance().getCommands()
+      usageCommands[0].should.deep.equal([command, description, isDefault, aliases, deprecated])
     })
   })
 
@@ -1392,6 +1414,57 @@ describe('Command', () => {
             describe: 'a foo command'
           })
           .parse()
+      })
+    })
+  })
+
+  describe('deprecated command', () => {
+    describe('using arg', () => {
+      it('shows deprecated notice with boolean', () => {
+        const command = 'command'
+        const description = 'description'
+        const deprecated = true
+        const r = checkOutput(() => {
+          yargs('--help')
+            .command(command, description, {}, () => {}, [], deprecated)
+            .parse()
+        })
+        r.logs.should.match(/\[deprecated\]/)
+      })
+      it('shows deprecated notice with string', () => {
+        const command = 'command'
+        const description = 'description'
+        const deprecated = 'deprecated'
+        const r = checkOutput(() => {
+          yargs('--help')
+            .command(command, description, {}, () => {}, [], deprecated)
+            .parse()
+        })
+        r.logs.should.match(/\[deprecated: deprecated\]/)
+      })
+    })
+    describe('using module', () => {
+      it('shows deprecated notice with boolean', () => {
+        const command = 'command'
+        const description = 'description'
+        const deprecated = true
+        const r = checkOutput(() => {
+          yargs('--help')
+            .command({ command, description, deprecated })
+            .parse()
+        })
+        r.logs.should.match(/\[deprecated\]/)
+      })
+      it('shows deprecated notice with string', () => {
+        const command = 'command'
+        const description = 'description'
+        const deprecated = 'deprecated'
+        const r = checkOutput(() => {
+          yargs('--help')
+            .command({ command, description, deprecated })
+            .parse()
+        })
+        r.logs.should.match(/\[deprecated: deprecated\]/)
       })
     })
   })

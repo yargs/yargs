@@ -169,6 +169,7 @@ simply needs to export:
 * `exports.describe`: string used as the description for the command in help text, use `false` for a hidden command
 * `exports.builder`: object declaring the options the command accepts, or a function accepting and returning a yargs instance
 * `exports.handler`: a function which will be passed the parsed argv.
+* `exports.deprecated`: a boolean (or string) to show deprecation notice.
 
 ```js
 // my-module.js
