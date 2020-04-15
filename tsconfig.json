@@ -6,10 +6,10 @@
     ],
     "outDir": "build",
     "rootDir": ".",
+    "sourceMap": false,
     "target": "es2017"
   },
   "include": [
-    "lib/**/*.ts",
-    "test/**/*.ts"
+    "lib/**/*.ts"
   ]
 }

@@ -64,9 +64,9 @@
     "test": "c8 mocha --require ./test/before.js --timeout=12000 --check-leaks",
     "coverage": "c8 report --check-coverage",
     "check": "standardx && standardx **/*.ts",
-    "compile": "rimraf build && tsc -p .",
+    "compile": "rimraf build && tsc",
     "prepare": "npm run compile",
-    "pretest": "npm run compile"
+    "pretest": "npm run compile -- -p tsconfig.test.json"
   },
   "repository": {
     "type": "git",
