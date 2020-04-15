@@ -347,6 +347,18 @@ describe('validation tests', () => {
       expect.fail('no parsing failure')
     })
 
+    it('fails in strict mode with extra positionals for default command', (done) => {
+      yargs(['jumping', 'fast'])
+        .command('$0 <status>', 'kangaroo handlers')
+        .strict()
+        .fail((msg) => {
+          msg.should.equal('Unknown argument: fast')
+          return done()
+        })
+        .parse()
+      expect.fail('no parsing failure')
+    })
+
     it('does not fail in strict mode when no commands configured', () => {
       const argv = yargs('koala')
         .demand(1)
