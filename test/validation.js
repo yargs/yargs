@@ -320,6 +320,7 @@ describe('validation tests', () => {
           return done()
         })
         .parse()
+      expect.fail('no parsing failure')
     })
 
     it('fails in strict mode with invalid command', (done) => {
@@ -333,6 +334,7 @@ describe('validation tests', () => {
           return done()
         })
         .parse()
+      expect.fail('no parsing failure')
     })
 
     it('fails in strict mode with extra positionals', (done) => {
