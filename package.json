@@ -36,7 +36,6 @@
     "@types/chai": "^4.2.11",
     "@types/mocha": "^7.0.2",
     "@types/node": "^10.0.3",
-    "@types/y18n": "^4.0.0",
     "@types/yargs-parser": "^15.0.0",
     "@typescript-eslint/eslint-plugin": "^2.25.0",
     "@typescript-eslint/parser": "^2.25.0",
@@ -65,9 +64,9 @@
     "test": "c8 mocha --require ./test/before.js --timeout=12000 --check-leaks",
     "coverage": "c8 report --check-coverage",
     "check": "standardx && standardx **/*.ts",
-    "compile": "rimraf build && tsc -p .",
+    "compile": "rimraf build && tsc",
     "prepare": "npm run compile",
-    "pretest": "npm run compile"
+    "pretest": "npm run compile -- -p tsconfig.test.json"
   },
   "repository": {
     "type": "git",
