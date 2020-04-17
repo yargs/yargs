@@ -405,7 +405,7 @@ export function validation (yargs: YargsInstance, usage: UsageInstance, y18n: Y1
 }
 
 /** Instance of the validation module. */
-interface ValidationInstance {
+export interface ValidationInstance {
   check(f: CustomCheck['func'], global: boolean): void
   conflicting(argv: Arguments): void
   conflicts(key: string, value: string | string[]): void
@@ -425,7 +425,12 @@ interface ValidationInstance {
   requiredArguments(argv: Arguments): void
   reset(localLookup: Dictionary): ValidationInstance
   unfreeze(): void
-  unknownArguments(argv: Arguments, aliases: DetailedArguments['aliases'], positionalMap: Dictionary): void
+  unknownArguments(
+    argv: Arguments,
+    aliases: DetailedArguments['aliases'],
+    positionalMap: Dictionary,
+    isDefaultCommand: boolean
+  ): void
   unknownCommands(argv: Arguments): boolean
 }
 
