@@ -6,7 +6,7 @@ import { YError } from '../yerror'
 export interface UsageInstance {
   cacheHelpMessage (): void
   clearCachedHelpMessage (): void
-  command (cmd: string, description: string | undefined, isDefault: boolean, aliases: string[]): void
+  command (cmd: string, description: string | undefined, isDefault: boolean, aliases: string[], deprecated: boolean): void
   deferY18nLookup (str: string): string
   describe (key: string, desc?: string): void
   describe (keys: Dictionary<string>): void
@@ -16,7 +16,7 @@ export interface UsageInstance {
   failFn (f: FailureFunction): void
   freeze (): void
   functionDescription (fn: { name?: string }): string
-  getCommands (): [string, string, boolean, string[]][]
+  getCommands (): [string, string, boolean, string[], boolean][]
   getDescriptions (): Dictionary<string | undefined>
   getPositionalGroupName (): string
   getUsage (): [string, string][]

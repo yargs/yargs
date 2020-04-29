@@ -96,8 +96,8 @@ export function usage (yargs: YargsInstance, y18n: Y18N) {
     examples.push([cmd, description || ''])
   }
 
-  let commands: [string, string, boolean, string[]][] = []
-  self.command = function command (cmd, description, isDefault, aliases) {
+  let commands: [string, string, boolean, string[], boolean][] = []
+  self.command = function command (cmd, description, isDefault, aliases, deprecated = false) {
     // the last default wins, so cancel out any previously set default
     if (isDefault) {
       commands = commands.map((cmdArray) => {
@@ -105,7 +105,7 @@ export function usage (yargs: YargsInstance, y18n: Y18N) {
         return cmdArray
       })
     }
-    commands.push([cmd, description || '', isDefault, aliases])
+    commands.push([cmd, description || '', isDefault, aliases, deprecated])
   }
   self.getCommands = () => commands
 
@@ -223,6 +223,13 @@ export function usage (yargs: YargsInstance, y18n: Y18N) {
         if (command[2]) hints.push(`[${__('default')}]`)
         if (command[3] && command[3].length) {
           hints.push(`[${__('aliases:')} ${command[3].join(', ')}]`)
+        }
+        if (command[4]) {
+          if (typeof command[4] === 'string') {
+            hints.push(`[${__('deprecated: %s', command[4])}]`)
+          } else {
+            hints.push(`[${__('deprecated')}]`)
+          }
         }
         if (hints.length) {
           ui.div({ text: hints.join(' '), padding: [0, 0, 0, 2], align: 'right' })

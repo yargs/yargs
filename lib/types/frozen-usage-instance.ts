@@ -7,6 +7,6 @@ export interface FrozenUsageInstance {
   usageDisabled: boolean
   epilogs: string[]
   examples: [string, string][]
-  commands: [string, string, boolean, string[]][]
+  commands: [string, string, boolean, string[], boolean][]
   descriptions: Dictionary<string | undefined>
 }
