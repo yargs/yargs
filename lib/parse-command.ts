@@ -1,5 +1,3 @@
-import { ParsedCommand } from './types'
-
 export function parseCommand (cmd: string) {
   const extraSpacesStrippedCommand = cmd.replace(/\s{2,}/g, ' ')
   const splitCommand = extraSpacesStrippedCommand.split(/\s+(?![^[]*]|[^<]*>)/)
@@ -30,4 +28,15 @@ export function parseCommand (cmd: string) {
     }
   })
   return parsedCommand
+}
+
+export interface ParsedCommand {
+  cmd: string
+  demanded: Positional[]
+  optional: Positional[]
+}
+
+interface Positional {
+  cmd: string[]
+  variadic: boolean
 }

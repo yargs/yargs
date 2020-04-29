@@ -1,6 +1,5 @@
 import { YError } from './yerror'
-import { parseCommand } from './parse-command'
-import { ParsedCommand } from './types'
+import { parseCommand, ParsedCommand } from './parse-command'
 
 const positionName = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth']
 export function argsert (callerArguments: any[], length?: number): void
