@@ -1,7 +1,7 @@
-import { CommandInstance } from './command'
-import { Dictionary } from './dictionary'
-import { YError } from '../yerror'
+import { CommandInstance } from './command-types'
+import { Dictionary } from './common-types'
 import { Arguments, DetailedArguments, Configuration } from 'yargs-parser'
+import { YError } from './yerror'
 
 /** Instance of the yargs module. */
 export interface YargsInstance {

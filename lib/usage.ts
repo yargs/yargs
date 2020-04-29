@@ -1,9 +1,9 @@
 // this file handles outputting usage instructions,
 // failures, etc. keeps logging in one place.
+import { Dictionary } from './common-types'
 import { objFilter } from './obj-filter'
 import * as path from 'path'
-import { Dictionary } from './types'
-import { YargsInstance } from './types/yargs'
+import { YargsInstance } from './yargs-types'
 import { YError } from './yerror'
 import decamelize = require('decamelize')
 import setBlocking = require('set-blocking')
