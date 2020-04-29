@@ -1,4 +1,4 @@
-import { CommandInstance } from './command-instance'
+import { CommandInstance } from './command'
 import { Context } from './context'
 import { Dictionary } from './dictionary'
 import { LoggerInstance } from './logger-instance'

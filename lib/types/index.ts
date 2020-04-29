@@ -1,6 +1,3 @@
-export * from './command-builder'
-export * from './command-handler'
-export * from './command-instance'
 export * from './completion-function'
 export * from './completion-instance'
 export * from './custom-check'
