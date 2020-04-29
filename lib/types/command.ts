@@ -1,5 +1,5 @@
 import { Dictionary } from './dictionary'
-import { YargsInstance } from './yargs-instance'
+import { YargsInstance } from './yargs'
 
 /** Instance of the command module. */
 export interface CommandInstance {

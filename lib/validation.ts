@@ -1,7 +1,8 @@
 import { argsert } from './argsert'
 import { levenshtein as distance } from './levenshtein'
 import { objFilter } from './obj-filter'
-import { YargsInstance, UsageInstance, ValidationInstance, Dictionary, CustomCheck, KeyOrPos, FrozenValidationInstance } from './types'
+import { UsageInstance, ValidationInstance, Dictionary, CustomCheck, KeyOrPos, FrozenValidationInstance } from './types'
+import { YargsInstance } from './types/yargs'
 import { Arguments } from 'yargs-parser'
 import Y18N = require('y18n')
 const specialKeys = ['$0', '--', '_']

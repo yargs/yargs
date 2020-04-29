@@ -1,11 +1,7 @@
 import { CommandInstance } from './command'
-import { Context } from './context'
 import { Dictionary } from './dictionary'
-import { LoggerInstance } from './logger-instance'
-import { Options } from './options'
-import { ParserConfiguration } from './parser-configuration'
 import { YError } from '../yerror'
-import { Arguments, DetailedArguments } from 'yargs-parser'
+import { Arguments, DetailedArguments, Configuration } from 'yargs-parser'
 
 /** Instance of the yargs module. */
 export interface YargsInstance {
@@ -42,4 +38,34 @@ export interface YargsInstance {
   reset (): YargsInstance
   showHelp (level: string): YargsInstance
   string (key: string): YargsInstance
+}
+
+/** Yargs' context. */
+interface Context {
+  commands: string[]
+}
+
+type LoggerInstance = Pick<Console, 'error' | 'log'>
+
+interface Options {
+  array: string[]
+  alias: Dictionary<string[]>
+  boolean: string[]
+  choices: Dictionary<string[]>
+  configuration: ParserConfiguration
+  count: string[]
+  default: Dictionary
+  defaultDescription: Dictionary<string | undefined>
+  hiddenOptions: string[]
+  /** Manually set keys */
+  key: Dictionary<boolean>
+  normalize: string[]
+  number: string[]
+  showHiddenOpt: string
+  string: string[]
+}
+
+interface ParserConfiguration extends Configuration {
+  /** Should command be sorted in help */
+  'sort-commands': boolean
 }

@@ -2,7 +2,8 @@
 // failures, etc. keeps logging in one place.
 import { objFilter } from './obj-filter'
 import * as path from 'path'
-import { FailureFunction, UsageInstance, YargsInstance, Dictionary, FrozenUsageInstance } from './types'
+import { FailureFunction, UsageInstance, Dictionary, FrozenUsageInstance } from './types'
+import { YargsInstance } from './types/yargs'
 import { YError } from './yerror'
 import decamelize = require('decamelize')
 import setBlocking = require('set-blocking')
