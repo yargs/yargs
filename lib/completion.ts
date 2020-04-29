@@ -6,11 +6,11 @@ import {
   CommandInstance,
   CompletionFunction,
   CompletionInstance,
-  Dictionary,
   UsageInstance,
   YargsInstance
 } from './types'
 import { isSyncCompletionFunction, isFunctionCommandBuilder } from './type-helpers'
+import { DetailedArguments } from 'yargs-parser'
 
 // add bash completions to your
 //  yargs-powered applications.
@@ -19,7 +19,7 @@ export function completion (yargs: YargsInstance, usage: UsageInstance, command:
     completionKey: 'get-yargs-completions'
   } as CompletionInstance
 
-  let aliases: Dictionary<string>
+  let aliases: DetailedArguments['aliases']
   self.setParsed = function setParsed (parsed) {
     aliases = parsed.aliases
   }

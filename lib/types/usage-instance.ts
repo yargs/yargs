@@ -12,7 +12,7 @@ export interface UsageInstance {
   describe (keys: Dictionary<string>): void
   epilog (msg: string): void
   example (cmd: string, description?: string): void
-  fail (msg: string, err: YError): void
+  fail (msg?: string | null, err?: YError | string): void
   failFn (f: FailureFunction): void
   freeze (): void
   functionDescription (fn: { name?: string }): string
