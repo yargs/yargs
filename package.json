@@ -12,7 +12,7 @@
   "files": [
     "index.js",
     "yargs.js",
-    "build",
+    "build/lib",
     "lib/**/*.js",
     "locales",
     "completion.sh.hbs",
@@ -66,7 +66,7 @@
     "check": "standardx && standardx **/*.ts",
     "compile": "rimraf build && tsc",
     "prepare": "npm run compile",
-    "pretest": "npm run compile -- -p tsconfig.test.json"
+    "pretest": "npm run compile"
   },
   "repository": {
     "type": "git",
