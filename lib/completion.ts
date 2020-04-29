@@ -3,14 +3,11 @@ import * as templates from './completion-templates'
 import { isPromise } from './is-promise'
 import { parseCommand } from './parse-command'
 import {
-  CompletionFunction,
-  CompletionInstance,
   UsageInstance,
   YargsInstance
 } from './types'
 import { CommandInstance, isFunctionCommandBuilder } from './types/command'
-import { isSyncCompletionFunction } from './type-helpers'
-import { DetailedArguments } from 'yargs-parser'
+import { Arguments, DetailedArguments } from 'yargs-parser'
 
 // add bash completions to your
 //  yargs-powered applications.
@@ -139,4 +136,27 @@ export function completion (yargs: YargsInstance, usage: UsageInstance, command:
   }
 
   return self
+}
+
+/** Instance of the completion module. */
+interface CompletionInstance {
+  completionKey: string
+  generateCompletionScript($0: string, cmd: string): string
+  getCompletion(args: string[], done: (completions: string[]) => any): any
+  registerFunction(fn: CompletionFunction): void
+  setParsed(parsed: DetailedArguments): void
+}
+
+type CompletionFunction = SyncCompletionFunction | AsyncCompletionFunction
+
+interface SyncCompletionFunction {
+  (current: string, argv: Arguments): string[] | Promise<string[]>
+}
+
+interface AsyncCompletionFunction {
+  (current: string, argv: Arguments, done: (completions: string[]) => any): any
+}
+
+function isSyncCompletionFunction (completionFunction: CompletionFunction): completionFunction is SyncCompletionFunction {
+  return completionFunction.length < 3
 }

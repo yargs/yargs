@@ -1,5 +1,3 @@
-export * from './completion-function'
-export * from './completion-instance'
 export * from './custom-check'
 export * from './context'
 export * from './dictionary'
