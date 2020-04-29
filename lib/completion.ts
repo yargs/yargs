@@ -2,11 +2,9 @@ import * as path from 'path'
 import * as templates from './completion-templates'
 import { isPromise } from './is-promise'
 import { parseCommand } from './parse-command'
-import {
-  UsageInstance
-} from './types'
 import { CommandInstance, isFunctionCommandBuilder } from './types/command'
 import { YargsInstance } from './types/yargs'
+import { UsageInstance } from './usage'
 import { Arguments, DetailedArguments } from 'yargs-parser'
 
 // add bash completions to your

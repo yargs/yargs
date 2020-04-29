@@ -2,7 +2,7 @@
 // failures, etc. keeps logging in one place.
 import { objFilter } from './obj-filter'
 import * as path from 'path'
-import { FailureFunction, UsageInstance, Dictionary, FrozenUsageInstance } from './types'
+import { Dictionary } from './types'
 import { YargsInstance } from './types/yargs'
 import { YError } from './yerror'
 import decamelize = require('decamelize')
@@ -578,4 +578,52 @@ export function usage (yargs: YargsInstance, y18n: Y18N) {
   }
 
   return self
+}
+
+/** Instance of the usage module. */
+export interface UsageInstance {
+  cacheHelpMessage(): void
+  clearCachedHelpMessage(): void
+  command(cmd: string, description: string | undefined, isDefault: boolean, aliases: string[], deprecated: boolean): void
+  deferY18nLookup(str: string): string
+  describe(key: string, desc?: string): void
+  describe(keys: Dictionary<string>): void
+  epilog(msg: string): void
+  example(cmd: string, description?: string): void
+  fail(msg?: string | null, err?: YError | string): void
+  failFn(f: FailureFunction): void
+  freeze(): void
+  functionDescription(fn: { name?: string }): string
+  getCommands(): [string, string, boolean, string[], boolean][]
+  getDescriptions(): Dictionary<string | undefined>
+  getPositionalGroupName(): string
+  getUsage(): [string, string][]
+  getUsageDisabled(): boolean
+  help(): string
+  reset(localLookup: Dictionary<boolean>): UsageInstance
+  showHelp(level: 'error' | 'log'): void
+  showHelp(level: (message: string) => void): void
+  showHelpOnFail(message?: string): UsageInstance
+  showHelpOnFail(enabled: boolean, message: string): UsageInstance
+  showVersion(): void
+  stringifiedValues(values?: any[], separator?: string): string
+  unfreeze(): void
+  usage(msg: string | null, description?: string): UsageInstance
+  version(ver: any): void
+  wrap(cols: number): void
+}
+
+interface FailureFunction {
+  (msg: string | undefined | null, err: YError | string | undefined, usage: UsageInstance): void
+}
+
+export interface FrozenUsageInstance {
+  failMessage: string | undefined | null
+  failureOutput: boolean
+  usages: [string, string][]
+  usageDisabled: boolean
+  epilogs: string[]
+  examples: [string, string][]
+  commands: [string, string, boolean, string[], boolean][]
+  descriptions: Dictionary<string | undefined>
 }

@@ -1,5 +1,2 @@
 export * from './dictionary'
-export * from './failure-function'
-export * from './frozen-usage-instance'
 export * from './parsed-command'
-export * from './usage-instance'
