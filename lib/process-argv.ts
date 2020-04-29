@@ -1,5 +1,3 @@
-import { ElectronProcess } from './types'
-
 function getProcessArgvBinIndex () {
   // The binary name is the first command line argument for:
   // - bundled Electron apps: bin argv1 argv2 ... argvn
@@ -28,4 +26,11 @@ export function getProcessArgvWithoutBin () {
 
 export function getProcessArgvBin () {
   return process.argv[getProcessArgvBinIndex()]
+}
+
+interface ElectronProcess extends NodeJS.Process {
+  defaultApp?: boolean
+  versions: NodeJS.ProcessVersions & {
+    electron: string
+  }
 }

@@ -1,5 +1,4 @@
 export * from './dictionary'
-export * from './electron-process'
 export * from './failure-function'
 export * from './frozen-usage-instance'
 export * from './parsed-command'
