@@ -1,7 +1,7 @@
 
+import { Dictionary } from './common-types'
 import * as fs from 'fs'
 import * as path from 'path'
-import { Dictionary } from './types'
 import { YError } from './yerror'
 
 let previouslyVisitedConfigs: string[] = []

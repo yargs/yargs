@@ -1,4 +1,4 @@
-import { Dictionary } from './types'
+import { Dictionary } from './common-types'
 
 export function objFilter<T = any> (original: Dictionary<T>, filter: (k: string, v: T) => boolean = () => true) {
   const obj: Dictionary<T> = {}

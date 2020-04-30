@@ -1,8 +1,10 @@
 import { argsert } from './argsert'
+import { Dictionary } from './common-types'
 import { levenshtein as distance } from './levenshtein'
 import { objFilter } from './obj-filter'
-import { YargsInstance, UsageInstance, ValidationInstance, Dictionary, CustomCheck, KeyOrPos, FrozenValidationInstance } from './types'
-import { Arguments } from 'yargs-parser'
+import { UsageInstance } from './usage'
+import { YargsInstance } from './yargs-types'
+import { Arguments, DetailedArguments } from 'yargs-parser'
 import Y18N = require('y18n')
 const specialKeys = ['$0', '--', '_']
 
@@ -401,3 +403,41 @@ export function validation (yargs: YargsInstance, usage: UsageInstance, y18n: Y1
 
   return self
 }
+
+/** Instance of the validation module. */
+interface ValidationInstance {
+  check(f: CustomCheck['func'], global: boolean): void
+  conflicting(argv: Arguments): void
+  conflicts(key: string, value: string | string[]): void
+  conflicts(key: Dictionary<string | string[]>): void
+  customChecks(argv: Arguments, aliases: DetailedArguments['aliases']): void
+  freeze(): void
+  getConflicting(): Dictionary<(string | undefined)[]>
+  getImplied(): Dictionary<KeyOrPos[]>
+  implications(argv: Arguments): void
+  implies(key: string, value: KeyOrPos | KeyOrPos[]): void
+  implies(key: Dictionary<KeyOrPos | KeyOrPos[]>): void
+  isValidAndSomeAliasIsNotNew(key: string, aliases: DetailedArguments['aliases']): boolean
+  limitedChoices(argv: Arguments): void
+  nonOptionCount(argv: Arguments): void
+  positionalCount(required: number, observed: number): void
+  recommendCommands(cmd: string, potentialCommands: string[]): void
+  requiredArguments(argv: Arguments): void
+  reset(localLookup: Dictionary): ValidationInstance
+  unfreeze(): void
+  unknownArguments(argv: Arguments, aliases: DetailedArguments['aliases'], positionalMap: Dictionary): void
+  unknownCommands(argv: Arguments): boolean
+}
+
+interface CustomCheck {
+  func: (argv: Arguments, aliases: DetailedArguments['aliases']) => any
+  global: boolean
+}
+
+interface FrozenValidationInstance {
+  implied: Dictionary<KeyOrPos[]>
+  checks: CustomCheck[]
+  conflicting: Dictionary<(string | undefined)[]>
+}
+
+type KeyOrPos = string | number | undefined
