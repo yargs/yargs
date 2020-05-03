@@ -87,11 +87,26 @@ Check that certain conditions are met in the provided arguments.
 
 `fn` is called with two arguments, the parsed `argv` hash and an array of options and their aliases.
 
-If `fn` throws or returns a non-truthy value, show the thrown error, usage information, and
-exit.
+If `fn` throws or returns a non-truthy value, Yargs will show the thrown error
+and usage information. Yargs will then exit, unless
+[`.exitProcess()`](#exitprocess) was used to prevent Yargs from exiting after a
+failed check.
 
 `global` indicates whether `check()` should be enabled both
 at the top-level and for each sub-command.
+
+```js
+const argv = require('yargs')
+  .check((argv, options) => {
+    const filePaths = argv._
+    if (filePaths.length > 1) {
+      throw new Error("Only 0 or 1 files may be passed.")
+    } else {
+      return true // tell Yargs that the arguments passed the check
+    }
+  })
+  .argv
+```
 
 <a name="choices"></a>.choices(key, choices)
 ----------------------
