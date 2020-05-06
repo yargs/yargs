@@ -205,7 +205,7 @@ export function command (
     }
 
     if (!yargs._hasOutput()) {
-      positionalMap = populatePositionals(commandHandler, innerArgv, currentContext, yargs)
+      positionalMap = populatePositionals(commandHandler, innerArgv, currentContext)
     }
 
     const middlewares = globalMiddleware.slice(0).concat(commandHandler.middlewares)
@@ -301,7 +301,7 @@ export function command (
 
   // transcribe all positional arguments "command <foo> <bar> [apple]"
   // onto argv.
-  function populatePositionals (commandHandler: CommandHandler, argv: Arguments, context: Context, yargs) {
+  function populatePositionals (commandHandler: CommandHandler, argv: Arguments, context: Context) {
     argv._ = argv._.slice(context.commands.length) // nuke the current commands
     const demanded = commandHandler.demanded.slice(0)
     const optional = commandHandler.optional.slice(0)
@@ -326,7 +326,7 @@ export function command (
     return positionalMap
   }
 
-  function populatePositional (positional: Positional, argv: Arguments, positionalMap: Dictionary<string[]>, parseOptions) {
+  function populatePositional (positional: Positional, argv: Arguments, positionalMap: Dictionary<string[]>) {
     const cmd = positional.cmd[0]
     if (positional.variadic) {
       positionalMap[cmd] = argv._.splice(0).map(String)
