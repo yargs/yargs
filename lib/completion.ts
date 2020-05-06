@@ -1,4 +1,4 @@
-import { CommandInstance, isFunctionCommandBuilder } from './command-types'
+import { CommandInstance, isFunctionCommandBuilder } from './command'
 import * as templates from './completion-templates'
 import { isPromise } from './is-promise'
 import { parseCommand } from './parse-command'

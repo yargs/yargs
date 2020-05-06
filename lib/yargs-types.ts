@@ -1,4 +1,4 @@
-import { CommandInstance } from './command-types'
+import { CommandInstance } from './command'
 import { Dictionary } from './common-types'
 import { Arguments, DetailedArguments, Configuration } from 'yargs-parser'
 import { YError } from './yerror'
