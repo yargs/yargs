@@ -147,7 +147,8 @@ export function command (
 
   function extractDesc ({ describe, description, desc }: CommandHandlerDefinition) {
     for (const test of [describe, description, desc]) {
-      if (typeof test === 'string' || typeof test === 'boolean') return test
+      if (typeof test === 'string' || test === false) return test
+      if (test === true) throw new Error('a description can either be a string or false, not true')
     }
     return false
   }
