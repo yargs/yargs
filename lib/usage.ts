@@ -1,8 +1,9 @@
 // this file handles outputting usage instructions,
 // failures, etc. keeps logging in one place.
+import { Dictionary } from './common-types'
 import { objFilter } from './obj-filter'
 import * as path from 'path'
-import { FailureFunction, UsageInstance, YargsInstance, Dictionary, FrozenUsageInstance } from './types'
+import { YargsInstance } from './yargs-types'
 import { YError } from './yerror'
 import decamelize = require('decamelize')
 import setBlocking = require('set-blocking')
@@ -96,8 +97,8 @@ export function usage (yargs: YargsInstance, y18n: Y18N) {
     examples.push([cmd, description || ''])
   }
 
-  let commands: [string, string, boolean, string[]][] = []
-  self.command = function command (cmd, description, isDefault, aliases) {
+  let commands: [string, string, boolean, string[], boolean][] = []
+  self.command = function command (cmd, description, isDefault, aliases, deprecated = false) {
     // the last default wins, so cancel out any previously set default
     if (isDefault) {
       commands = commands.map((cmdArray) => {
@@ -105,7 +106,7 @@ export function usage (yargs: YargsInstance, y18n: Y18N) {
         return cmdArray
       })
     }
-    commands.push([cmd, description || '', isDefault, aliases])
+    commands.push([cmd, description || '', isDefault, aliases, deprecated])
   }
   self.getCommands = () => commands
 
@@ -223,6 +224,13 @@ export function usage (yargs: YargsInstance, y18n: Y18N) {
         if (command[2]) hints.push(`[${__('default')}]`)
         if (command[3] && command[3].length) {
           hints.push(`[${__('aliases:')} ${command[3].join(', ')}]`)
+        }
+        if (command[4]) {
+          if (typeof command[4] === 'string') {
+            hints.push(`[${__('deprecated: %s', command[4])}]`)
+          } else {
+            hints.push(`[${__('deprecated')}]`)
+          }
         }
         if (hints.length) {
           ui.div({ text: hints.join(' '), padding: [0, 0, 0, 2], align: 'right' })
@@ -570,4 +578,52 @@ export function usage (yargs: YargsInstance, y18n: Y18N) {
   }
 
   return self
+}
+
+/** Instance of the usage module. */
+export interface UsageInstance {
+  cacheHelpMessage(): void
+  clearCachedHelpMessage(): void
+  command(cmd: string, description: string | undefined, isDefault: boolean, aliases: string[], deprecated: boolean): void
+  deferY18nLookup(str: string): string
+  describe(key: string, desc?: string): void
+  describe(keys: Dictionary<string>): void
+  epilog(msg: string): void
+  example(cmd: string, description?: string): void
+  fail(msg?: string | null, err?: YError | string): void
+  failFn(f: FailureFunction): void
+  freeze(): void
+  functionDescription(fn: { name?: string }): string
+  getCommands(): [string, string, boolean, string[], boolean][]
+  getDescriptions(): Dictionary<string | undefined>
+  getPositionalGroupName(): string
+  getUsage(): [string, string][]
+  getUsageDisabled(): boolean
+  help(): string
+  reset(localLookup: Dictionary<boolean>): UsageInstance
+  showHelp(level: 'error' | 'log'): void
+  showHelp(level: (message: string) => void): void
+  showHelpOnFail(message?: string): UsageInstance
+  showHelpOnFail(enabled: boolean, message: string): UsageInstance
+  showVersion(): void
+  stringifiedValues(values?: any[], separator?: string): string
+  unfreeze(): void
+  usage(msg: string | null, description?: string): UsageInstance
+  version(ver: any): void
+  wrap(cols: number): void
+}
+
+interface FailureFunction {
+  (msg: string | undefined | null, err: YError | string | undefined, usage: UsageInstance): void
+}
+
+export interface FrozenUsageInstance {
+  failMessage: string | undefined | null
+  failureOutput: boolean
+  usages: [string, string][]
+  usageDisabled: boolean
+  epilogs: string[]
+  examples: [string, string][]
+  commands: [string, string, boolean, string[], boolean][]
+  descriptions: Dictionary<string | undefined>
 }

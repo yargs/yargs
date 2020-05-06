@@ -4,14 +4,14 @@
 async function requiresNode8OrGreater () {}
 requiresNode8OrGreater()
 
-const argsert = require('./lib/argsert')
+const { argsert } = require('./build/lib/argsert')
 const fs = require('fs')
 const Command = require('./lib/command')
 const { completion: Completion } = require('./build/lib/completion')
 const Parser = require('yargs-parser')
 const path = require('path')
 const { usage: Usage } = require('./build/lib/usage')
-const Validation = require('./lib/validation')
+const { validation: Validation } = require('./build/lib/validation')
 const Y18n = require('y18n')
 const { objFilter } = require('./build/lib/obj-filter')
 const setBlocking = require('set-blocking')
@@ -389,9 +389,9 @@ function Yargs (processArgs, cwd, parentRequire) {
     return self
   }
 
-  self.command = function (cmd, description, builder, handler, middlewares) {
-    argsert('<string|array|object> [string|boolean] [function|object] [function] [array]', [cmd, description, builder, handler, middlewares], arguments.length)
-    command.addHandler(cmd, description, builder, handler, middlewares)
+  self.command = function (cmd, description, builder, handler, middlewares, deprecated) {
+    argsert('<string|array|object> [string|boolean] [function|object] [function] [array] [boolean|string]', [cmd, description, builder, handler, middlewares, deprecated], arguments.length)
+    command.addHandler(cmd, description, builder, handler, middlewares, deprecated)
     return self
   }
 
@@ -1267,7 +1267,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     validation.requiredArguments(argv)
     let failedStrictCommands = false
     if (strictCommands) {
-      failedStrictCommands = validation.unknownCommands(argv, aliases, positionalMap)
+      failedStrictCommands = validation.unknownCommands(argv)
     }
     if (strict && !failedStrictCommands) {
       validation.unknownArguments(argv, aliases, positionalMap)

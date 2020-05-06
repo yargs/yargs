@@ -1,15 +1,11 @@
-import * as path from 'path'
+import { CommandInstance, isFunctionCommandBuilder } from './command-types'
 import * as templates from './completion-templates'
 import { isPromise } from './is-promise'
-import {
-  CommandInstance,
-  CompletionFunction,
-  CompletionInstance,
-  Dictionary,
-  UsageInstance,
-  YargsInstance
-} from './types'
-import { isSyncCompletionFunction, isFunctionCommandBuilder } from './type-helpers'
+import { parseCommand } from './parse-command'
+import * as path from 'path'
+import { UsageInstance } from './usage'
+import { YargsInstance } from './yargs-types'
+import { Arguments, DetailedArguments } from 'yargs-parser'
 
 // add bash completions to your
 //  yargs-powered applications.
@@ -18,7 +14,7 @@ export function completion (yargs: YargsInstance, usage: UsageInstance, command:
     completionKey: 'get-yargs-completions'
   } as CompletionInstance
 
-  let aliases: Dictionary<string>
+  let aliases: DetailedArguments['aliases']
   self.setParsed = function setParsed (parsed) {
     aliases = parsed.aliases
   }
@@ -72,7 +68,7 @@ export function completion (yargs: YargsInstance, usage: UsageInstance, command:
 
     if (!current.match(/^-/) && parentCommands[parentCommands.length - 1] !== current) {
       usage.getCommands().forEach((usageCommand) => {
-        const commandName = command.parseCommand(usageCommand[0]).cmd
+        const commandName = parseCommand(usageCommand[0]).cmd
         if (args.indexOf(commandName) === -1) {
           if (!zshShell) {
             completions.push(commandName)
@@ -138,4 +134,27 @@ export function completion (yargs: YargsInstance, usage: UsageInstance, command:
   }
 
   return self
+}
+
+/** Instance of the completion module. */
+interface CompletionInstance {
+  completionKey: string
+  generateCompletionScript($0: string, cmd: string): string
+  getCompletion(args: string[], done: (completions: string[]) => any): any
+  registerFunction(fn: CompletionFunction): void
+  setParsed(parsed: DetailedArguments): void
+}
+
+type CompletionFunction = SyncCompletionFunction | AsyncCompletionFunction
+
+interface SyncCompletionFunction {
+  (current: string, argv: Arguments): string[] | Promise<string[]>
+}
+
+interface AsyncCompletionFunction {
+  (current: string, argv: Arguments, done: (completions: string[]) => any): any
+}
+
+function isSyncCompletionFunction (completionFunction: CompletionFunction): completionFunction is SyncCompletionFunction {
+  return completionFunction.length < 3
 }
