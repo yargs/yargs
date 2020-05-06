@@ -342,7 +342,9 @@ export function command (
     // string with explicitly configured parsing hints.
     const options = Object.assign({}, yargs.getOptions())
     options.default = Object.assign(parseOptions.default, options.default)
-    options.alias = Object.assign(parseOptions.alias, options.alias)
+    for (const key of Object.keys(parseOptions.alias)) {
+      options.alias[key] = (options.alias[key] || []).concat(parseOptions.alias[key])
+    }
     options.array = options.array.concat(parseOptions.array)
     delete options.config //  don't load config when processing positionals.
 
@@ -401,9 +403,7 @@ export function command (
         parseOptions.array.push(cmd)
         parseOptions.default[cmd] = []
       }
-      cmds.forEach((c) => {
-        parseOptions.alias[cmd] = c
-      })
+      parseOptions.alias[cmd] = aliases
       parseOptions.demand[cmd] = true
     })
 
@@ -413,9 +413,7 @@ export function command (
         parseOptions.array.push(cmd)
         parseOptions.default[cmd] = []
       }
-      cmds.forEach((c) => {
-        parseOptions.alias[cmd] = c
-      })
+      parseOptions.alias[cmd] = aliases
     })
 
     return parseOptions
