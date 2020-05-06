@@ -442,11 +442,11 @@ flag occurrences rather than `true` or `false`. Default value is thus `0`.
 
 <a name="default"></a>.default(key, value, [description])
 ---------------------------------------------------------
-.defaults(key, value, [description])
+.defaults(key, value, [description]) [DEPRECATED]
 ------------------------------------
 
-**Note:** The `.defaults()` alias is deprecated. It will be
-removed in the next major version.
+**Note:** The `.defaults()` alias is deprecated. It will be removed in the next
+major version. Use `.default()` instead.
 
 Set `argv[key]` to `value` if no option was specified in `process.argv`.
 
