@@ -584,7 +584,7 @@ export function usage (yargs: YargsInstance, y18n: Y18N) {
 export interface UsageInstance {
   cacheHelpMessage(): void
   clearCachedHelpMessage(): void
-  command(cmd: string, description: string | undefined, isDefault: boolean, aliases: string[], deprecated: boolean): void
+  command(cmd: string, description: string | undefined, isDefault: boolean, aliases: string[], deprecated?: boolean): void
   deferY18nLookup(str: string): string
   describe(key: string, desc?: string): void
   describe(keys: Dictionary<string>): void
@@ -608,7 +608,7 @@ export interface UsageInstance {
   showVersion(): void
   stringifiedValues(values?: any[], separator?: string): string
   unfreeze(): void
-  usage(msg: string | null, description?: string): UsageInstance
+  usage(msg: string | null, description?: string | false): UsageInstance
   version(ver: any): void
   wrap(cols: number): void
 }

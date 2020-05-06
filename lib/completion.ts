@@ -1,4 +1,4 @@
-import { CommandInstance, isFunctionCommandBuilder } from './command'
+import { CommandInstance, isCommandBuilderCallback } from './command'
 import * as templates from './completion-templates'
 import { isPromise } from './is-promise'
 import { parseCommand } from './parse-command'
@@ -58,7 +58,7 @@ export function completion (yargs: YargsInstance, usage: UsageInstance, command:
     for (let i = 0, ii = args.length; i < ii; ++i) {
       if (handlers[args[i]] && handlers[args[i]].builder) {
         const builder = handlers[args[i]].builder
-        if (isFunctionCommandBuilder(builder)) {
+        if (isCommandBuilderCallback(builder)) {
           const y = yargs.reset()
           builder(y)
           return y.argv
