@@ -46,7 +46,7 @@ npm i yargs@next
 
 ````javascript
 #!/usr/bin/env node
-const argv = require('yargs').argv
+const {argv} = require('yargs')
 
 if (argv.ships > 3 && argv.distance < 53.5) {
   console.log('Plunder more riffiwobbles!')
