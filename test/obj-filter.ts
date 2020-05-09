@@ -1,9 +1,7 @@
-'use strict'
 /* global describe, it */
-
-const objFilter = require('../lib/obj-filter')
-
-require('chai').should()
+import { objFilter } from '../lib/obj-filter'
+import chai = require('chai')
+chai.should()
 
 describe('ObjFilter', () => {
   it('returns a new reference to the original object if no filter function is given', () => {

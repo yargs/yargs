@@ -4,10 +4,10 @@
 const expect = require('chai').expect
 const fs = require('fs')
 const path = require('path')
-const checkOutput = require('./helpers/utils').checkOutput
+const checkOutput = require('../build/test/helpers/utils').checkOutput
 const english = require('../locales/en.json')
 let yargs
-const YError = require('../lib/yerror')
+const { YError } = require('../build/lib/yerror')
 
 require('chai').should()
 
@@ -580,11 +580,11 @@ describe('yargs dsl tests', () => {
 
   describe('terminalWidth', () => {
     it('returns the maximum width of the terminal', function () {
-      if (!process.stdout.isTTY) {
-        return this.skip()
+      if (process.stdout.isTTY) {
+        yargs.terminalWidth().should.be.gte(0)
+      } else {
+        expect(yargs.terminalWidth()).to.equal(null)
       }
-
-      yargs.terminalWidth().should.be.gte(0)
     })
   })
 
@@ -774,6 +774,20 @@ describe('yargs dsl tests', () => {
         })
 
         r.logs.join(' ').should.match(/COMMANDS!/)
+      })
+
+      it('also works on default option group', () => {
+        const r = checkOutput(() => {
+          yargs(['-h'])
+            .help('h')
+            .wrap(null)
+            .updateLocale({
+              'Options:': 'OPTIONS!'
+            })
+            .parse()
+        })
+
+        r.logs.join(' ').should.match(/OPTIONS!/)
       })
 
       it('allows you to use updateStrings() as an alias for updateLocale()', () => {
@@ -2426,6 +2440,147 @@ describe('yargs dsl tests', () => {
         calledTimes.should.eql(1)
         done()
       }, 5)
+    })
+  })
+
+  // See: https://github.com/yargs/yargs/issues/1098
+  it('should allow array and requires arg to be used in conjunction', () => {
+    const argv = yargs(['-i', 'item1', 'item2', 'item3'])
+      .option('i', {
+        alias: 'items',
+        type: 'array',
+        requiresArg: true
+      })
+      .argv
+    argv.items.should.eql(['item1', 'item2', 'item3'])
+    argv.i.should.eql(['item1', 'item2', 'item3'])
+  })
+
+  // See: https://github.com/yargs/yargs/issues/1570
+  describe('"nargs" with "array"', () => {
+    it('should not consume more than nargs items', () => {
+      const argv = yargs(['-i', 'item1', 'item2', '-i', 'item3', 'item4'])
+        .option('i', {
+          alias: 'items',
+          type: 'array',
+          nargs: 1
+        })
+        .argv
+      argv.items.should.eql(['item1', 'item3'])
+      argv.i.should.eql(['item1', 'item3'])
+      argv._.should.eql(['item2', 'item4'])
+    })
+
+    it('should apply nargs with higher precedence than requiresArg: true', () => {
+      const argv = yargs(['-i', 'item1', 'item2', '-i', 'item3', 'item4'])
+        .option('i', {
+          alias: 'items',
+          type: 'array',
+          nargs: 1,
+          requiresArg: true
+        })
+        .argv
+      argv.items.should.eql(['item1', 'item3'])
+      argv.i.should.eql(['item1', 'item3'])
+      argv._.should.eql(['item2', 'item4'])
+    })
+
+    // TODO: make this work with aliases, using a check similar to
+    // checkAllAliases() in yargs-parser.
+    it('should apply nargs with higher precedence than requiresArg()', () => {
+      const argv = yargs(['-i', 'item1', 'item2', '-i', 'item3', 'item4'])
+        .option('items', {
+          alias: 'i',
+          type: 'array',
+          nargs: 1
+        })
+        .requiresArg(['items'])
+        .argv
+      argv.items.should.eql(['item1', 'item3'])
+      argv.i.should.eql(['item1', 'item3'])
+      argv._.should.eql(['item2', 'item4'])
+    })
+
+    it('should raise error if not enough values follow nargs key', (done) => {
+      yargs
+        .option('i', {
+          alias: 'items',
+          type: 'array',
+          nargs: 1
+        })
+        .parse(['-i'], (err) => {
+          err.message.should.match(/Not enough arguments following: i/)
+          return done()
+        })
+    })
+  })
+
+  // See: https://github.com/nodejs/node/issues/31951
+  describe('should not pollute the prototype', () => {
+    it('does not pollute, when .parse() is called', function () {
+      yargs.parse(['-f.__proto__.foo', '99', '-x.y.__proto__.bar', '100', '--__proto__', '200'])
+      Object.keys({}.__proto__).length.should.equal(0) // eslint-disable-line
+      expect({}.foo).to.equal(undefined)
+      expect({}.bar).to.equal(undefined)
+    })
+
+    it('does not pollute, when .argv is called', function () {
+      yargs(['-f.__proto__.foo', '99', '-x.y.__proto__.bar', '100', '--__proto__', '200']).argv // eslint-disable-line
+      Object.keys({}.__proto__).length.should.equal(0) // eslint-disable-line
+      expect({}.foo).to.equal(undefined)
+      expect({}.bar).to.equal(undefined)
+    })
+
+    // TODO(bcoe): due to replacement of __proto__ with ___proto___ parser
+    // hints are not properly applied, we should move to an alternate approach
+    // in the future:
+    it('does not pollute, when options are set', function () {
+      yargs
+        .option('__proto__', {
+          describe: 'pollute pollute',
+          nargs: 33
+        })
+        .default('__proto__', { hello: 'world' })
+        .parse(['--foo'])
+        Object.keys({}.__proto__).length.should.equal(0) // eslint-disable-line
+    })
+  })
+
+  describe('parsing --value as a value in -f=--value and --bar=--value', function () {
+    it('should work in the general case', function () {
+      const argv = yargs(['-f=--item1', 'item2', '--bar=--item3', 'item4'])
+        .argv
+      argv.f.should.eql('--item1')
+      argv.bar.should.eql('--item3')
+      argv._.should.eql(['item2', 'item4'])
+    })
+
+    it('should work with array', function () {
+      const argv = yargs(['-f=--item1', 'item2', '--bar=--item3', 'item4'])
+        .array(['f', 'bar'])
+        .argv
+      argv.f.should.eql(['--item1', 'item2'])
+      argv.bar.should.eql(['--item3', 'item4'])
+      argv._.should.eql([])
+    })
+
+    it('should work with nargs', function () {
+      const argv = yargs(['-f=--item1', 'item2', 'item3', '--bar=--item4', 'item5', 'item6'])
+        .option('f', { nargs: 2 })
+        .option('bar', { nargs: 2 })
+        .argv
+      argv.f.should.eql(['--item1', 'item2'])
+      argv.bar.should.eql(['--item4', 'item5'])
+      argv._.should.eql(['item3', 'item6'])
+    })
+
+    it('should work with both array and nargs', function () {
+      const argv = yargs(['-f=--item1', 'item2', '-f', 'item3', 'item4', '--bar=--item5', 'item6', '--bar', 'item7', 'item8'])
+        .option('f', { alias: 'bar', array: true, nargs: 1 })
+        .argv
+      argv.f.should.eql(['--item1', 'item3', '--item5', 'item7'])
+      argv.bar.should.eql(['--item1', 'item3', '--item5', 'item7'])
+      argv._.should.eql(['item2', 'item4', 'item6', 'item8'])
     })
   })
 })

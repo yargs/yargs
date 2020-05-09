@@ -9,9 +9,9 @@
 <br>
 
 [![Build Status][travis-image]][travis-url]
-[![Coverage Status][coveralls-image]][coveralls-url]
 [![NPM version][npm-image]][npm-url]
 [![js-standard-style][standard-image]][standard-url]
+[![Coverage][coverage-image]][coverage-url]
 [![Conventional Commits][conventional-commits-image]][conventional-commits-url]
 [![Slack][slack-image]][slack-url]
 
@@ -44,16 +44,16 @@ npm i yargs@next
 
 ### Simple Example
 
-````javascript
+```javascript
 #!/usr/bin/env node
-const argv = require('yargs').argv
+const {argv} = require('yargs')
 
 if (argv.ships > 3 && argv.distance < 53.5) {
   console.log('Plunder more riffiwobbles!')
 } else {
   console.log('Retreat from the xupptumblers!')
 }
-````
+```
 
 ```bash
 $ ./plunder.js --ships=4 --distance=22
@@ -127,8 +127,6 @@ Having problems? want to contribute? join our [community slack](http://devtoolsc
 
 [travis-url]: https://travis-ci.org/yargs/yargs
 [travis-image]: https://img.shields.io/travis/yargs/yargs/master.svg
-[coveralls-url]: https://coveralls.io/github/yargs/yargs
-[coveralls-image]: https://img.shields.io/coveralls/yargs/yargs.svg
 [npm-url]: https://www.npmjs.com/package/yargs
 [npm-image]: https://img.shields.io/npm/v/yargs.svg
 [standard-image]: https://img.shields.io/badge/code%20style-standard-brightgreen.svg
@@ -138,3 +136,5 @@ Having problems? want to contribute? join our [community slack](http://devtoolsc
 [slack-image]: http://devtoolscommunity.herokuapp.com/badge.svg
 [slack-url]: http://devtoolscommunity.herokuapp.com
 [type-definitions]: https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/yargs
+[coverage-image]: https://img.shields.io/nycrc/yargs/yargs
+[coverage-url]: https://github.com/yargs/yargs/blob/master/.nycrc

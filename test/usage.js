@@ -1,12 +1,12 @@
 'use strict'
 /* global describe, it, beforeEach */
 
-const checkUsage = require('./helpers/utils').checkOutput
+const checkUsage = require('../build/test/helpers/utils').checkOutput
 const chalk = require('chalk')
 const path = require('path')
 const yargs = require('../')
 const rebase = require('../yargs').rebase
-const YError = require('../lib/yerror')
+const { YError } = require('../build/lib/yerror')
 
 const should = require('chai').should()
 
@@ -627,7 +627,7 @@ describe('usage tests', () => {
 
             }
           })
-          r.logs.should.deep.equal([['YError', 'foo'], 'is triggered last'])
+          r.logs.should.deep.equal(["[ 'YError', 'foo' ]", 'is triggered last'])
           r.should.have.property('exit').and.equal(false)
         })
       })
@@ -1204,7 +1204,30 @@ describe('usage tests', () => {
       ])
     })
 
-    it('should use 2 dashes for 1-digit key usage', () => {
+    it('should use 2 dashes for general 1-digit usage', () => {
+      const r = checkUsage(() => yargs(['--help'])
+        .option('1', {
+          type: 'string',
+          description: 'First one',
+          default: 'first'
+        })
+        .wrap(null)
+        .parse()
+      )
+      r.should.have.property('result')
+      r.result.should.have.property('_').with.length(0)
+      r.should.have.property('exit').and.equal(true)
+      r.should.have.property('errors').with.length(0)
+      r.should.have.property('logs')
+      r.logs.join('\n').split(/\n+/).should.deep.equal([
+        'Options:',
+        '  --1        First one  [string] [default: "first"]',
+        '  --help     Show help  [boolean]',
+        '  --version  Show version number  [boolean]'
+      ])
+    })
+
+    it('should use single dashes for 1-digit boolean key usage', () => {
       const r = checkUsage(() => yargs(['--help'])
         .option('1', {
           type: 'boolean',
@@ -1220,13 +1243,13 @@ describe('usage tests', () => {
       r.should.have.property('logs')
       r.logs.join('\n').split(/\n+/).should.deep.equal([
         'Options:',
-        '  --1        Negative one  [boolean]',
+        '  -1         Negative one  [boolean]',
         '  --help     Show help  [boolean]',
         '  --version  Show version number  [boolean]'
       ])
     })
 
-    it('should use 2 dashes for 1-digit alias usage', () => {
+    it('should use single dashes for 1-digit boolean alias usage', () => {
       const r = checkUsage(() => yargs(['--help'])
         .option('negativeone', {
           alias: '1',
@@ -1243,9 +1266,32 @@ describe('usage tests', () => {
       r.should.have.property('logs')
       r.logs.join('\n').split(/\n+/).should.deep.equal([
         'Options:',
-        '  --help              Show help  [boolean]',
-        '  --version           Show version number  [boolean]',
-        '  --negativeone, --1  Negative one  [boolean]'
+        '  --help             Show help  [boolean]',
+        '  --version          Show version number  [boolean]',
+        '  --negativeone, -1  Negative one  [boolean]'
+      ])
+    })
+
+    it('should use 2 dashes for multiple-digit alias usage', () => {
+      const r = checkUsage(() => yargs(['--help'])
+        .option('onehundred', {
+          alias: '100',
+          type: 'boolean',
+          description: 'one hundred'
+        })
+        .wrap(null)
+        .parse()
+      )
+      r.should.have.property('result')
+      r.result.should.have.property('_').with.length(0)
+      r.should.have.property('exit').and.equal(true)
+      r.should.have.property('errors').with.length(0)
+      r.should.have.property('logs')
+      r.logs.join('\n').split(/\n+/).should.deep.equal([
+        'Options:',
+        '  --help               Show help  [boolean]',
+        '  --version            Show version number  [boolean]',
+        '  --onehundred, --100  one hundred  [boolean]'
       ])
     })
 

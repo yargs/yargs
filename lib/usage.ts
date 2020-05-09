@@ -1,32 +1,32 @@
-'use strict'
 // this file handles outputting usage instructions,
 // failures, etc. keeps logging in one place.
-const decamelize = require('decamelize')
-const stringWidth = require('string-width')
-const objFilter = require('./obj-filter')
-const path = require('path')
-const setBlocking = require('set-blocking')
-const YError = require('./yerror')
+import { Dictionary } from './common-types'
+import { objFilter } from './obj-filter'
+import * as path from 'path'
+import { YargsInstance } from './yargs-types'
+import { YError } from './yerror'
+import decamelize = require('decamelize')
+import setBlocking = require('set-blocking')
+import stringWidth = require('string-width')
+import Y18N = require('y18n')
 
-module.exports = function usage (yargs, y18n) {
+export function usage (yargs: YargsInstance, y18n: Y18N) {
   const __ = y18n.__
-  const self = {}
+  const self = {} as UsageInstance
 
   // methods for ouputting/building failure message.
-  const fails = []
+  const fails: FailureFunction[] = []
   self.failFn = function failFn (f) {
     fails.push(f)
   }
 
-  let failMessage = null
+  let failMessage: string | undefined | null = null
   let showHelpOnFail = true
-  self.showHelpOnFail = function showHelpOnFailFn (enabled, message) {
-    if (typeof enabled === 'string') {
-      message = enabled
-      enabled = true
-    } else if (typeof enabled === 'undefined') {
-      enabled = true
+  self.showHelpOnFail = function showHelpOnFailFn (arg1: boolean | string = true, arg2?: string) {
+    function parseFunctionArgs (): [boolean, string?] {
+      return typeof arg1 === 'string' ? [true, arg1] : [arg1, arg2]
     }
+    const [enabled, message] = parseFunctionArgs()
     failMessage = message
     showHelpOnFail = enabled
     return self
@@ -69,13 +69,13 @@ module.exports = function usage (yargs, y18n) {
   }
 
   // methods for ouputting/building help (usage) message.
-  let usages = []
+  let usages: [string, string][] = []
   let usageDisabled = false
   self.usage = (msg, description) => {
     if (msg === null) {
       usageDisabled = true
       usages = []
-      return
+      return self
     }
     usageDisabled = false
     usages.push([msg, description || ''])
@@ -92,13 +92,13 @@ module.exports = function usage (yargs, y18n) {
     return __('Positionals:')
   }
 
-  let examples = []
+  let examples: [string, string][] = []
   self.example = (cmd, description) => {
     examples.push([cmd, description || ''])
   }
 
-  let commands = []
-  self.command = function command (cmd, description, isDefault, aliases) {
+  let commands: [string, string, boolean, string[], boolean][] = []
+  self.command = function command (cmd, description, isDefault, aliases, deprecated = false) {
     // the last default wins, so cancel out any previously set default
     if (isDefault) {
       commands = commands.map((cmdArray) => {
@@ -106,29 +106,29 @@ module.exports = function usage (yargs, y18n) {
         return cmdArray
       })
     }
-    commands.push([cmd, description || '', isDefault, aliases])
+    commands.push([cmd, description || '', isDefault, aliases, deprecated])
   }
   self.getCommands = () => commands
 
-  let descriptions = {}
-  self.describe = function describe (key, desc) {
-    if (typeof key === 'object') {
-      Object.keys(key).forEach((k) => {
-        self.describe(k, key[k])
+  let descriptions: Dictionary<string | undefined> = {}
+  self.describe = function describe (keyOrKeys: string | Dictionary<string>, desc?: string) {
+    if (typeof keyOrKeys === 'object') {
+      Object.keys(keyOrKeys).forEach((k) => {
+        self.describe(k, keyOrKeys[k])
       })
     } else {
-      descriptions[key] = desc
+      descriptions[keyOrKeys] = desc
     }
   }
   self.getDescriptions = () => descriptions
 
-  let epilogs = []
+  let epilogs: string[] = []
   self.epilog = (msg) => {
     epilogs.push(msg)
   }
 
   let wrapSet = false
-  let wrap
+  let wrap: number | undefined
   self.wrap = (cols) => {
     wrapSet = true
     wrap = cols
@@ -146,7 +146,6 @@ module.exports = function usage (yargs, y18n) {
   const deferY18nLookupPrefix = '__yargsString__:'
   self.deferY18nLookup = str => deferY18nLookupPrefix + str
 
-  const defaultGroup = __('Options:')
   self.help = function help () {
     if (cachedHelpMessage) return cachedHelpMessage
     normalizeAliases()
@@ -159,7 +158,7 @@ module.exports = function usage (yargs, y18n) {
     const groups = yargs.getGroups()
     const options = yargs.getOptions()
 
-    let keys = []
+    let keys: string[] = []
     keys = keys.concat(Object.keys(descriptions))
     keys = keys.concat(Object.keys(demandedOptions))
     keys = keys.concat(Object.keys(demandedCommands))
@@ -168,7 +167,7 @@ module.exports = function usage (yargs, y18n) {
     keys = Object.keys(keys.reduce((acc, key) => {
       if (key !== '_') acc[key] = true
       return acc
-    }, {}))
+    }, {} as Dictionary<boolean>))
 
     const theWrap = getWrap()
     const ui = require('cliui')({
@@ -226,6 +225,13 @@ module.exports = function usage (yargs, y18n) {
         if (command[3] && command[3].length) {
           hints.push(`[${__('aliases:')} ${command[3].join(', ')}]`)
         }
+        if (command[4]) {
+          if (typeof command[4] === 'string') {
+            hints.push(`[${__('deprecated: %s', command[4])}]`)
+          } else {
+            hints.push(`[${__('deprecated')}]`)
+          }
+        }
         if (hints.length) {
           ui.div({ text: hints.join(' '), padding: [0, 0, 0, 2], align: 'right' })
         } else {
@@ -245,8 +251,9 @@ module.exports = function usage (yargs, y18n) {
 
     // populate 'Options:' group with any keys that have not
     // explicitly had a group set.
+    const defaultGroup = __('Options:')
     if (!groups[defaultGroup]) groups[defaultGroup] = []
-    addUngroupedKeys(keys, options.alias, groups)
+    addUngroupedKeys(keys, options.alias, groups, defaultGroup)
 
     // display 'Options:' table along with any custom tables:
     Object.keys(groups).forEach((groupName) => {
@@ -273,12 +280,20 @@ module.exports = function usage (yargs, y18n) {
             // for the special positional group don't
             // add '--' or '-' prefix.
             if (groupName === self.getPositionalGroupName()) return sw
-            else return (/^[^0-9]$/.test(sw) ? '-' : '--') + sw
+            else {
+              return (
+                // matches yargs-parser logic in which single-digits
+                // aliases declared with a boolean type are now valid
+                /^[0-9]$/.test(sw)
+                  ? ~options.boolean.indexOf(key) ? '-' : '--'
+                  : sw.length > 1 ? '--' : '-'
+              ) + sw
+            }
           })
           .join(', ')
 
         return acc
-      }, {})
+      }, {} as Dictionary<string>)
 
       normalizedKeys.forEach((key) => {
         const kswitch = switches[key]
@@ -294,12 +309,12 @@ module.exports = function usage (yargs, y18n) {
         if (~options.array.indexOf(key)) type = `[${__('array')}]`
         if (~options.number.indexOf(key)) type = `[${__('number')}]`
 
+        const deprecatedExtra = (deprecated: string | boolean) => typeof deprecated === 'string'
+          ? `[${__('deprecated: %s', deprecated)}]`
+          : `[${__('deprecated')}]`
+
         const extra = [
-          (key in deprecatedOptions) ? (
-            typeof deprecatedOptions[key] === 'string'
-              ? `[${__('deprecated: %s', deprecatedOptions[key])}]`
-              : `[${__('deprecated')}]`
-          ) : null,
+          (key in deprecatedOptions) ? deprecatedExtra(deprecatedOptions[key]) : null,
           type,
           (key in demandedOptions) ? `[${__('required')}]` : null,
           options.choices && options.choices[key] ? `[${__('choices:')} ${
@@ -363,13 +378,13 @@ module.exports = function usage (yargs, y18n) {
 
   // return the maximum width of a string
   // in the left-hand column of a table.
-  function maxWidth (table, theWrap, modifier) {
+  function maxWidth (table: [string, ...any[]][] | Dictionary<string>, theWrap?: number, modifier?: string) {
     let width = 0
 
     // table might be of the form [leftColumn],
     // or {key: leftColumn}
     if (!Array.isArray(table)) {
-      table = Object.keys(table).map(key => [table[key]])
+      table = Object.values(table).map<[string]>(v => [v])
     }
 
     table.forEach((v) => {
@@ -381,7 +396,7 @@ module.exports = function usage (yargs, y18n) {
 
     // if we've enabled 'wrap' we should limit
     // the max-width of the left-column.
-    if (theWrap) width = Math.min(width, parseInt(theWrap * 0.5, 10))
+    if (theWrap) width = Math.min(width, parseInt((theWrap * 0.5).toString(), 10))
 
     return width
   }
@@ -412,7 +427,7 @@ module.exports = function usage (yargs, y18n) {
 
   // if yargs is executing an async handler, we take a snapshot of the
   // help message to display on failure:
-  let cachedHelpMessage
+  let cachedHelpMessage: string | undefined
   self.cacheHelpMessage = function () {
     cachedHelpMessage = this.help()
   }
@@ -425,8 +440,8 @@ module.exports = function usage (yargs, y18n) {
 
   // given a set of keys, place any keys that are
   // ungrouped under the 'Options:' grouping.
-  function addUngroupedKeys (keys, aliases, groups) {
-    let groupedKeys = []
+  function addUngroupedKeys (keys: string[], aliases: Dictionary<string[]>, groups: Dictionary<string[]>, defaultGroup: string) {
+    let groupedKeys = [] as string[]
     let toCheck = null
     Object.keys(groups).forEach((group) => {
       groupedKeys = groupedKeys.concat(groups[group])
@@ -441,11 +456,11 @@ module.exports = function usage (yargs, y18n) {
     return groupedKeys
   }
 
-  function filterHiddenOptions (key) {
+  function filterHiddenOptions (key: string) {
     return yargs.getOptions().hiddenOptions.indexOf(key) < 0 || yargs.parsed.argv[yargs.getOptions().showHiddenOpt]
   }
 
-  self.showHelp = (level) => {
+  self.showHelp = (level: 'error' | 'log' | ((message: string) => void)) => {
     const logger = yargs._getLoggerInstance()
     if (!level) level = 'error'
     const emit = typeof level === 'function' ? level : logger[level]
@@ -460,7 +475,7 @@ module.exports = function usage (yargs, y18n) {
   self.stringifiedValues = function stringifiedValues (values, separator) {
     let string = ''
     const sep = separator || ', '
-    const array = [].concat(values)
+    const array = ([] as any[]).concat(values)
 
     if (!values || !array.length) return string
 
@@ -474,7 +489,7 @@ module.exports = function usage (yargs, y18n) {
 
   // format the default-value-string displayed in
   // the right-hand column.
-  function defaultString (value, defaultDescription) {
+  function defaultString (value: any, defaultDescription?: string) {
     let string = `[${__('default:')} `
 
     if (value === undefined && !defaultDescription) return null
@@ -500,6 +515,8 @@ module.exports = function usage (yargs, y18n) {
   // guess the width of the console window, max-width 80.
   function windowWidth () {
     const maxWidth = 80
+    // CI is not a TTY
+    /* c8 ignore next 2 */
     if (typeof process === 'object' && process.stdout && process.stdout.columns) {
       return Math.min(maxWidth, process.stdout.columns)
     } else {
@@ -508,7 +525,7 @@ module.exports = function usage (yargs, y18n) {
   }
 
   // logic for displaying application version.
-  let version = null
+  let version: any = null
   self.version = (ver) => {
     version = ver
   }
@@ -528,34 +545,85 @@ module.exports = function usage (yargs, y18n) {
     epilogs = []
     examples = []
     commands = []
-    descriptions = objFilter(descriptions, (k, v) => !localLookup[k])
+    descriptions = objFilter(descriptions, k => !localLookup[k])
     return self
   }
 
-  const frozens = []
+  const frozens = [] as FrozenUsageInstance[]
   self.freeze = function freeze () {
-    const frozen = {}
-    frozens.push(frozen)
-    frozen.failMessage = failMessage
-    frozen.failureOutput = failureOutput
-    frozen.usages = usages
-    frozen.usageDisabled = usageDisabled
-    frozen.epilogs = epilogs
-    frozen.examples = examples
-    frozen.commands = commands
-    frozen.descriptions = descriptions
+    frozens.push({
+      failMessage,
+      failureOutput,
+      usages,
+      usageDisabled,
+      epilogs,
+      examples,
+      commands,
+      descriptions
+    })
   }
   self.unfreeze = function unfreeze () {
     const frozen = frozens.pop()
-    failMessage = frozen.failMessage
-    failureOutput = frozen.failureOutput
-    usages = frozen.usages
-    usageDisabled = frozen.usageDisabled
-    epilogs = frozen.epilogs
-    examples = frozen.examples
-    commands = frozen.commands
-    descriptions = frozen.descriptions
+    if (!frozen) throw new Error('Nothing more to unfreeze')
+    ;({
+      failMessage,
+      failureOutput,
+      usages,
+      usageDisabled,
+      epilogs,
+      examples,
+      commands,
+      descriptions
+    } = frozen)
   }
 
   return self
+}
+
+/** Instance of the usage module. */
+export interface UsageInstance {
+  cacheHelpMessage(): void
+  clearCachedHelpMessage(): void
+  command(cmd: string, description: string | undefined, isDefault: boolean, aliases: string[], deprecated: boolean): void
+  deferY18nLookup(str: string): string
+  describe(key: string, desc?: string): void
+  describe(keys: Dictionary<string>): void
+  epilog(msg: string): void
+  example(cmd: string, description?: string): void
+  fail(msg?: string | null, err?: YError | string): void
+  failFn(f: FailureFunction): void
+  freeze(): void
+  functionDescription(fn: { name?: string }): string
+  getCommands(): [string, string, boolean, string[], boolean][]
+  getDescriptions(): Dictionary<string | undefined>
+  getPositionalGroupName(): string
+  getUsage(): [string, string][]
+  getUsageDisabled(): boolean
+  help(): string
+  reset(localLookup: Dictionary<boolean>): UsageInstance
+  showHelp(level: 'error' | 'log'): void
+  showHelp(level: (message: string) => void): void
+  showHelpOnFail(message?: string): UsageInstance
+  showHelpOnFail(enabled: boolean, message: string): UsageInstance
+  showVersion(): void
+  stringifiedValues(values?: any[], separator?: string): string
+  unfreeze(): void
+  usage(msg: string | null, description?: string): UsageInstance
+  version(ver: any): void
+  wrap(cols: number): void
+}
+
+interface FailureFunction {
+  (msg: string | undefined | null, err: YError | string | undefined, usage: UsageInstance): void
+}
+
+export interface FrozenUsageInstance {
+  failMessage: string | undefined | null
+  failureOutput: boolean
+  usages: [string, string][]
+  usageDisabled: boolean
+  epilogs: string[]
+  examples: [string, string][]
+  commands: [string, string, boolean, string[], boolean][]
+  descriptions: Dictionary<string | undefined>
 }

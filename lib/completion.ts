@@ -1,14 +1,20 @@
-'use strict'
-const path = require('path')
+import { CommandInstance, isFunctionCommandBuilder } from './command-types'
+import * as templates from './completion-templates'
+import { isPromise } from './is-promise'
+import { parseCommand } from './parse-command'
+import * as path from 'path'
+import { UsageInstance } from './usage'
+import { YargsInstance } from './yargs-types'
+import { Arguments, DetailedArguments } from 'yargs-parser'
 
 // add bash completions to your
 //  yargs-powered applications.
-module.exports = function completion (yargs, usage, command) {
-  const self = {
+export function completion (yargs: YargsInstance, usage: UsageInstance, command: CommandInstance) {
+  const self: CompletionInstance = {
     completionKey: 'get-yargs-completions'
-  }
+  } as CompletionInstance
 
-  let aliases
+  let aliases: DetailedArguments['aliases']
   self.setParsed = function setParsed (parsed) {
     aliases = parsed.aliases
   }
@@ -18,7 +24,7 @@ module.exports = function completion (yargs, usage, command) {
   // get a list of completion commands.
   // 'args' is the array of strings from the line to be completed
   self.getCompletion = function getCompletion (args, done) {
-    const completions = []
+    const completions: string[] = []
     const current = args.length ? args[args.length - 1] : ''
     const argv = yargs.parse(args, true)
     const parentCommands = yargs.getContext().commands
@@ -26,11 +32,11 @@ module.exports = function completion (yargs, usage, command) {
     // a custom completion function can be provided
     // to completion().
     if (completionFunction) {
-      if (completionFunction.length < 3) {
+      if (isSyncCompletionFunction(completionFunction)) {
         const result = completionFunction(current, argv)
 
         // promise based completion function.
-        if (typeof result.then === 'function') {
+        if (isPromise(result)) {
           return result.then((list) => {
             process.nextTick(() => { done(list) })
           }).catch((err) => {
@@ -52,7 +58,7 @@ module.exports = function completion (yargs, usage, command) {
     for (let i = 0, ii = args.length; i < ii; ++i) {
       if (handlers[args[i]] && handlers[args[i]].builder) {
         const builder = handlers[args[i]].builder
-        if (typeof builder === 'function') {
+        if (isFunctionCommandBuilder(builder)) {
           const y = yargs.reset()
           builder(y)
           return y.argv
@@ -62,7 +68,7 @@ module.exports = function completion (yargs, usage, command) {
 
     if (!current.match(/^-/) && parentCommands[parentCommands.length - 1] !== current) {
       usage.getCommands().forEach((usageCommand) => {
-        const commandName = command.parseCommand(usageCommand[0]).cmd
+        const commandName = parseCommand(usageCommand[0]).cmd
         if (args.indexOf(commandName) === -1) {
           if (!zshShell) {
             completions.push(commandName)
@@ -83,11 +89,11 @@ module.exports = function completion (yargs, usage, command) {
         let keyAndAliases = [key].concat(aliases[key] || [])
         if (negable) keyAndAliases = keyAndAliases.concat(keyAndAliases.map(key => `no-${key}`))
 
-        function completeOptionKey (key) {
+        function completeOptionKey (key: string) {
           const notInArgs = keyAndAliases.every(val => args.indexOf(`--${val}`) === -1)
           if (notInArgs) {
-            const startsByTwoDashes = s => /^--/.test(s)
-            const isShortOption = s => /^[^0-9]$/.test(s)
+            const startsByTwoDashes = (s: string) => /^--/.test(s)
+            const isShortOption = (s: string) => /^[^0-9]$/.test(s)
             const dashes = !startsByTwoDashes(current) && isShortOption(key) ? '-' : '--'
             if (!zshShell) {
               completions.push(dashes + key)
@@ -108,7 +114,6 @@ module.exports = function completion (yargs, usage, command) {
 
   // generate the completion script to add to your .bashrc.
   self.generateCompletionScript = function generateCompletionScript ($0, cmd) {
-    const templates = require('./completion-templates')
     let script = zshShell ? templates.completionZshTemplate : templates.completionShTemplate
     const name = path.basename($0)
 
@@ -123,10 +128,33 @@ module.exports = function completion (yargs, usage, command) {
   // register a function to perform your own custom
   // completions., this function can be either
   // synchrnous or asynchronous.
-  let completionFunction = null
+  let completionFunction: CompletionFunction | null = null
   self.registerFunction = (fn) => {
     completionFunction = fn
   }
 
   return self
+}
+
+/** Instance of the completion module. */
+interface CompletionInstance {
+  completionKey: string
+  generateCompletionScript($0: string, cmd: string): string
+  getCompletion(args: string[], done: (completions: string[]) => any): any
+  registerFunction(fn: CompletionFunction): void
+  setParsed(parsed: DetailedArguments): void
+}
+
+type CompletionFunction = SyncCompletionFunction | AsyncCompletionFunction
+
+interface SyncCompletionFunction {
+  (current: string, argv: Arguments): string[] | Promise<string[]>
+}
+
+interface AsyncCompletionFunction {
+  (current: string, argv: Arguments, done: (completions: string[]) => any): any
+}
+
+function isSyncCompletionFunction (completionFunction: CompletionFunction): completionFunction is SyncCompletionFunction {
+  return completionFunction.length < 3
 }

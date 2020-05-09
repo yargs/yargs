@@ -4,21 +4,21 @@
 async function requiresNode8OrGreater () {}
 requiresNode8OrGreater()
 
-const argsert = require('./lib/argsert')
+const { argsert } = require('./build/lib/argsert')
 const fs = require('fs')
 const Command = require('./lib/command')
-const Completion = require('./lib/completion')
+const { completion: Completion } = require('./build/lib/completion')
 const Parser = require('yargs-parser')
 const path = require('path')
-const Usage = require('./lib/usage')
-const Validation = require('./lib/validation')
+const { usage: Usage } = require('./build/lib/usage')
+const { validation: Validation } = require('./build/lib/validation')
 const Y18n = require('y18n')
-const objFilter = require('./lib/obj-filter')
+const { objFilter } = require('./build/lib/obj-filter')
 const setBlocking = require('set-blocking')
-const applyExtends = require('./lib/apply-extends')
-const { globalMiddlewareFactory } = require('./lib/middleware')
-const YError = require('./lib/yerror')
-const processArgv = require('./lib/process-argv')
+const { applyExtends } = require('./build/lib/apply-extends')
+const { globalMiddlewareFactory } = require('./build/lib/middleware')
+const { YError } = require('./build/lib/yerror')
+const processArgv = require('./build/lib/process-argv')
 
 exports = module.exports = Yargs
 function Yargs (processArgs, cwd, parentRequire) {
@@ -235,9 +235,18 @@ function Yargs (processArgs, cwd, parentRequire) {
     return self
   }
 
-  self.requiresArg = function (keys) {
-    argsert('<array|string>', [keys], arguments.length)
-    populateParserHintObject(self.nargs, false, 'narg', keys, 1)
+  self.requiresArg = function (keys, value) {
+    argsert('<array|string|object> [number]', [keys], arguments.length)
+    // If someone configures nargs at the same time as requiresArg,
+    // nargs should take precedent,
+    // see: https://github.com/yargs/yargs/pull/1572
+    // TODO: make this work with aliases, using a check similar to
+    // checkAllAliases() in yargs-parser.
+    if (typeof keys === 'string' && options.narg[keys]) {
+      return self
+    } else {
+      populateParserHintObject(self.requiresArg, false, 'narg', keys, NaN)
+    }
     return self
   }
 
@@ -250,6 +259,7 @@ function Yargs (processArgs, cwd, parentRequire) {
   function populateParserHintArray (type, keys, value) {
     keys = [].concat(keys)
     keys.forEach((key) => {
+      key = sanitizeKey(key)
       options[type].push(key)
     })
   }
@@ -305,8 +315,8 @@ function Yargs (processArgs, cwd, parentRequire) {
 
   function populateParserHintObject (builder, isArray, type, key, value) {
     if (Array.isArray(key)) {
+      const temp = Object.create(null)
       // an array of keys with one value ['x', 'y', 'z'], function parse () {}
-      const temp = {}
       key.forEach((k) => {
         temp[k] = value
       })
@@ -317,6 +327,7 @@ function Yargs (processArgs, cwd, parentRequire) {
         builder(k, key[k])
       })
     } else {
+      key = sanitizeKey(key)
       // a single key value pair 'x', parse() {}
       if (isArray) {
         options[type][key] = (options[type][key] || []).concat(value)
@@ -324,6 +335,13 @@ function Yargs (processArgs, cwd, parentRequire) {
         options[type][key] = value
       }
     }
+  }
+
+  // TODO(bcoe): in future major versions move more objects towards
+  // Object.create(null):
+  function sanitizeKey (key) {
+    if (key === '__proto__') return '___proto___'
+    return key
   }
 
   function deleteFromParserHintObject (optionKey) {
@@ -371,9 +389,9 @@ function Yargs (processArgs, cwd, parentRequire) {
     return self
   }
 
-  self.command = function (cmd, description, builder, handler, middlewares) {
-    argsert('<string|array|object> [string|boolean] [function|object] [function] [array]', [cmd, description, builder, handler, middlewares], arguments.length)
-    command.addHandler(cmd, description, builder, handler, middlewares)
+  self.command = function (cmd, description, builder, handler, middlewares, deprecated) {
+    argsert('<string|array|object> [string|boolean] [function|object] [function] [array] [boolean|string]', [cmd, description, builder, handler, middlewares, deprecated], arguments.length)
+    command.addHandler(cmd, description, builder, handler, middlewares, deprecated)
     return self
   }
 
@@ -1249,7 +1267,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     validation.requiredArguments(argv)
     let failedStrictCommands = false
     if (strictCommands) {
-      failedStrictCommands = validation.unknownCommands(argv, aliases, positionalMap)
+      failedStrictCommands = validation.unknownCommands(argv)
     }
     if (strict && !failedStrictCommands) {
       validation.unknownArguments(argv, aliases, positionalMap)

@@ -11,24 +11,26 @@ function getProcessArgvBinIndex () {
 function isBundledElectronApp () {
   // process.defaultApp is either set by electron in an electron unbundled app, or undefined
   // see https://github.com/electron/electron/blob/master/docs/api/process.md#processdefaultapp-readonly
-  return isElectronApp() && !process.defaultApp
+  return isElectronApp() && !(process as ElectronProcess).defaultApp
 }
 
 function isElectronApp () {
   // process.versions.electron is either set by electron, or undefined
   // see https://github.com/electron/electron/blob/master/docs/api/process.md#processversionselectron-readonly
-  return !!process.versions.electron
+  return !!(process as ElectronProcess).versions.electron
 }
 
-function getProcessArgvWithoutBin () {
+export function getProcessArgvWithoutBin () {
   return process.argv.slice(getProcessArgvBinIndex() + 1)
 }
 
-function getProcessArgvBin () {
+export function getProcessArgvBin () {
   return process.argv[getProcessArgvBinIndex()]
 }
 
-module.exports = {
-  getProcessArgvBin,
-  getProcessArgvWithoutBin
+interface ElectronProcess extends NodeJS.Process {
+  defaultApp?: boolean
+  versions: NodeJS.ProcessVersions & {
+    electron: string
+  }
 }
