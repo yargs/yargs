@@ -9,7 +9,7 @@ With yargs, the options be just a hash!
 
 plunder.js:
 
-````javascript
+```javascript
 #!/usr/bin/env node
 var argv = require('yargs').argv;
 
@@ -18,7 +18,7 @@ if (argv.ships > 3 && argv.distance < 53.5) {
 } else {
     console.log('Retreat from the xupptumblers!');
 }
-````
+```
 
 ***
 
@@ -33,11 +33,11 @@ But don't walk the plank just yet! There be more! You can do short options:
 
 short.js:
 
-````javascript
+```javascript
 #!/usr/bin/env node
 var argv = require('yargs').argv;
 console.log('(%d,%d)', argv.x, argv.y);
-````
+```
 
 ***
 
@@ -49,7 +49,7 @@ And booleans, both long, short, and even grouped:
 
 bool.js:
 
-````javascript
+```javascript
 #!/usr/bin/env node
 var argv = require('yargs').argv;
 
@@ -59,7 +59,7 @@ if (argv.s) {
 console.log(
     (argv.fr ? 'couac' : 'squawk') + (argv.p ? '!' : '')
 );
-````
+```
 
 ***
 
@@ -77,12 +77,12 @@ And non-hyphenated options too! Just use `argv._`!
 
 nonopt.js:
 
-````javascript
+```javascript
 #!/usr/bin/env node
 var argv = require('yargs').argv;
 console.log('(%d,%d)', argv.x, argv.y);
 console.log(argv._);
-````
+```
 
 ***
 
@@ -99,7 +99,7 @@ Yargs even counts your booleans!
 
 count.js:
 
-````javascript
+```javascript
 #!/usr/bin/env node
 var argv = require('yargs')
     .count('verbose')
@@ -115,7 +115,7 @@ function DEBUG() { VERBOSE_LEVEL >= 2 && console.log.apply(console, arguments); 
 WARN("Showing only important stuff");
 INFO("Showing semi-important stuff too");
 DEBUG("Extra chatty mode");
-````
+```
 
 ***
     $ node count.js
@@ -140,7 +140,7 @@ Tell users how to use your options and make demands.
 
 area.js:
 
-````javascript
+```javascript
 #!/usr/bin/env node
 var argv = require('yargs')
     .usage('Usage: $0 -w [num] -h [num]')
@@ -148,7 +148,7 @@ var argv = require('yargs')
     .argv;
 
 console.log("The area is:", argv.w * argv.h);
-````
+```
 
 ***
 
@@ -169,13 +169,13 @@ After your demands have been met, demand more! Ask for non-hyphenated arguments!
 
 demand_count.js:
 
-````javascript
+```javascript
 #!/usr/bin/env node
 var argv = require('yargs')
     .demandCommand(2)
     .argv;
 console.dir(argv);
-````
+```
 
 ***
 
@@ -194,7 +194,7 @@ EVEN MORE SHIVER ME TIMBERS!
 
 default_singles.js:
 
-````javascript
+```javascript
 #!/usr/bin/env node
 var argv = require('yargs')
     .default('x', 10)
@@ -202,7 +202,7 @@ var argv = require('yargs')
     .argv
 ;
 console.log(argv.x + argv.y);
-````
+```
 
 ***
 
@@ -211,14 +211,14 @@ console.log(argv.x + argv.y);
 
 default_hash.js:
 
-````javascript
+```javascript
 #!/usr/bin/env node
 var argv = require('yargs')
     .default({ x : 10, y : 10 })
     .argv
 ;
 console.log(argv.x + argv.y);
-````
+```
 
 ***
 
@@ -230,7 +230,7 @@ And if you really want to get all descriptive about it...
 
 boolean_single.js:
 
-````javascript
+```javascript
 #!/usr/bin/env node
 var argv = require('yargs')
     .boolean(['r','v'])
@@ -238,7 +238,7 @@ var argv = require('yargs')
 ;
 console.dir([ argv.r, argv.v ]);
 console.dir(argv._);
-````
+```
 
 ***
 
@@ -249,7 +249,7 @@ console.dir(argv._);
 
 boolean_double.js:
 
-````javascript
+```javascript
 #!/usr/bin/env node
 var argv = require('yargs')
     .boolean(['x','y','z'])
@@ -257,7 +257,7 @@ var argv = require('yargs')
 ;
 console.dir([ argv.x, argv.y, argv.z ]);
 console.dir(argv._);
-````
+```
 
 ***
 
@@ -273,7 +273,7 @@ out how to format a handy help string automatically.
 
 line_count.js:
 
-````javascript
+```javascript
 #!/usr/bin/env node
 var argv = require('yargs')
     .usage('Usage: $0 <command> [options]')
@@ -299,7 +299,7 @@ s.on('data', function (buf) {
 s.on('end', function () {
     console.log(lines);
 });
-````
+```
 
 ***
     $ node line_count.js 

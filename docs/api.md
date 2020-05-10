@@ -4,21 +4,21 @@ API
 You can run Yargs without any configuration, and it will do its
 best to parse `process.argv`:
 
-````javascript
+```javascript
 require('yargs').argv
-````
+```
 
 You can also pass in the `process.argv` yourself:
 
-````javascript
+```javascript
 require('yargs')([ '-x', '1', '-y', '2' ]).argv
-````
+```
 
 or use `.parse()` to do the same thing:
 
-````javascript
+```javascript
 require('yargs').parse([ '-x', '1', '-y', '2' ])
-````
+```
 
 Calling `.parse()` with no arguments is equivalent to calling `yargs.argv`:
 
@@ -1079,7 +1079,7 @@ customization, like `.alias()`, `.demandOption()` etc. for that option.
 
 For example:
 
-````javascript
+```javascript
 var argv = require('yargs')
     .option('f', {
         alias: 'file',
@@ -1090,11 +1090,11 @@ var argv = require('yargs')
     })
     .argv
 ;
-````
+```
 
 is the same as
 
-````javascript
+```javascript
 var argv = require('yargs')
     .alias('f', 'file')
     .demandOption('f')
@@ -1103,11 +1103,11 @@ var argv = require('yargs')
     .string('f')
     .argv
 ;
-````
+```
 
 Optionally `.options()` can take an object that maps keys to `opt` parameters.
 
-````javascript
+```javascript
 var argv = require('yargs')
     .options({
       'f': {
@@ -1120,7 +1120,7 @@ var argv = require('yargs')
     })
     .argv
 ;
-````
+```
 
 Valid `opt` keys include:
 
@@ -1393,7 +1393,7 @@ message is output after the error message.
 
 line_count.js:
 
-````javascript
+```javascript
 #!/usr/bin/env node
 var argv = require('yargs')
     .usage('Count the lines in a file.\nUsage: $0 -f <file>')
@@ -1406,7 +1406,7 @@ var argv = require('yargs')
     .argv;
 
 // etc.
-````
+```
 
 ***
 

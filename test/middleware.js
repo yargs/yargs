@@ -2,7 +2,7 @@
 /* global describe, it, beforeEach, afterEach */
 
 const { expect } = require('chai')
-const { globalMiddlewareFactory } = require('../lib/middleware')
+const { globalMiddlewareFactory } = require('../build/lib/middleware')
 let yargs
 require('chai').should()
 
