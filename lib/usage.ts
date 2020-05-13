@@ -3,7 +3,7 @@
 import { Dictionary, assertNotUndefined } from './common-types'
 import { objFilter } from './obj-filter'
 import * as path from 'path'
-import { YargsInstance } from './yargs-types'
+import { YargsInstance } from './yargs'
 import { YError } from './yerror'
 import decamelize = require('decamelize')
 import setBlocking = require('set-blocking')

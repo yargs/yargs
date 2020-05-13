@@ -3,7 +3,7 @@ import { Dictionary, assertNotUndefined } from './common-types'
 import { levenshtein as distance } from './levenshtein'
 import { objFilter } from './obj-filter'
 import { UsageInstance } from './usage'
-import { YargsInstance } from './yargs-types'
+import { YargsInstance } from './yargs'
 import { Arguments, DetailedArguments } from 'yargs-parser'
 import Y18N = require('y18n')
 const specialKeys = ['$0', '--', '_']

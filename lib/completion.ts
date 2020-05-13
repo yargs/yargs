@@ -4,7 +4,7 @@ import { isPromise } from './is-promise'
 import { parseCommand } from './parse-command'
 import * as path from 'path'
 import { UsageInstance } from './usage'
-import { YargsInstance } from './yargs-types'
+import { YargsInstance } from './yargs'
 import { Arguments, DetailedArguments } from 'yargs-parser'
 
 // add bash completions to your
