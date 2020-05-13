@@ -17,7 +17,13 @@ export interface YargsInstance {
   _hasParseCallback (): boolean
   // TODO: to be precised once yargs is tsified
   _parseArgs (args: null, shortCircuit: null, _calledFromCommand: boolean, commandIndex: number): Arguments
-  _runValidation (argv: Arguments, aliases: Dictionary<string[]>, positionalMap: Dictionary<string[]>, parseErrors: Error | null): void
+  _runValidation (
+    argv: Arguments,
+    aliases: Dictionary<string[]>,
+    positionalMap: Dictionary<string[]>,
+    parseErrors: Error | null,
+    isDefaultCommand: boolean
+  ): void
   _setHasOutput (): void
   array (key: string): YargsInstance
   boolean (key: string): YargsInstance
