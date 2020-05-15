@@ -16,21 +16,21 @@ API reference
 You can run Yargs without any configuration, and it will do its
 best to parse `process.argv`:
 
-````javascript
+```javascript
 require('yargs').argv
-````
+```
 
 You can also pass in the `process.argv` yourself:
 
-````javascript
+```javascript
 require('yargs')([ '-x', '1', '-y', '2' ]).argv
-````
+```
 
 or use `.parse()` to do the same thing:
 
-````javascript
+```javascript
 require('yargs').parse([ '-x', '1', '-y', '2' ])
-````
+```
 
 Calling `.parse()` with no arguments is equivalent to calling `yargs.argv`:
 
@@ -99,11 +99,26 @@ Check that certain conditions are met in the provided arguments.
 
 `fn` is called with two arguments, the parsed `argv` hash and an array of options and their aliases.
 
-If `fn` throws or returns a non-truthy value, show the thrown error, usage information, and
-exit.
+If `fn` throws or returns a non-truthy value, Yargs will show the thrown error
+and usage information. Yargs will then exit, unless
+[`.exitProcess()`](#exitprocess) was used to prevent Yargs from exiting after a
+failed check.
 
 `global` indicates whether `check()` should be enabled both
 at the top-level and for each sub-command.
+
+```js
+const argv = require('yargs')
+  .check((argv, options) => {
+    const filePaths = argv._
+    if (filePaths.length > 1) {
+      throw new Error("Only 0 or 1 files may be passed.")
+    } else {
+      return true // tell Yargs that the arguments passed the check
+    }
+  })
+  .argv
+```
 
 <a name="choices"></a>.choices(key, choices)
 ----------------------
@@ -1076,7 +1091,7 @@ customization, like `.alias()`, `.demandOption()` etc. for that option.
 
 For example:
 
-````javascript
+```javascript
 var argv = require('yargs')
     .option('f', {
         alias: 'file',
@@ -1087,11 +1102,11 @@ var argv = require('yargs')
     })
     .argv
 ;
-````
+```
 
 is the same as
 
-````javascript
+```javascript
 var argv = require('yargs')
     .alias('f', 'file')
     .demandOption('f')
@@ -1100,11 +1115,11 @@ var argv = require('yargs')
     .string('f')
     .argv
 ;
-````
+```
 
 Optionally `.options()` can take an object that maps keys to `opt` parameters.
 
-````javascript
+```javascript
 var argv = require('yargs')
     .options({
       'f': {
@@ -1117,7 +1132,7 @@ var argv = require('yargs')
     })
     .argv
 ;
-````
+```
 
 Valid `opt` keys include:
 
@@ -1390,7 +1405,7 @@ message is output after the error message.
 
 line_count.js:
 
-````javascript
+```javascript
 #!/usr/bin/env node
 var argv = require('yargs')
     .usage('Count the lines in a file.\nUsage: $0 -f <file>')
@@ -1403,7 +1418,7 @@ var argv = require('yargs')
     .argv;
 
 // etc.
-````
+```
 
 ***
 
