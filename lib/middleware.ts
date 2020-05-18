@@ -3,7 +3,7 @@ import { isPromise } from './is-promise'
 import { YargsInstance } from './yargs-types'
 import { Arguments } from 'yargs-parser'
 
-export function globalMiddlewareFactory<T> (globalMiddleware: (Middleware | Middleware[])[], context: T) {
+export function globalMiddlewareFactory<T> (globalMiddleware: Middleware[], context: T) {
   return function (callback: MiddlewareCallback | MiddlewareCallback[], applyBeforeValidation = false) {
     argsert('<array|function> [boolean]', [callback, applyBeforeValidation], arguments.length)
     if (Array.isArray(callback)) {
@@ -66,6 +66,6 @@ interface MiddlewareCallback {
   (argv: Arguments, yargs: YargsInstance): Partial<Arguments> | Promise<Partial<Arguments>>
 }
 
-interface Middleware extends MiddlewareCallback {
+export interface Middleware extends MiddlewareCallback {
   applyBeforeValidation: boolean
 }
