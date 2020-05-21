@@ -6,7 +6,7 @@ requiresNode8OrGreater()
 
 const { argsert } = require('./build/lib/argsert')
 const fs = require('fs')
-const Command = require('./lib/command')
+const { command: Command } = require('./build/lib/command')
 const { completion: Completion } = require('./build/lib/completion')
 const Parser = require('yargs-parser')
 const path = require('path')
