@@ -484,7 +484,7 @@ describe('yargs dsl tests', function () {
           builder: function (yargs) { return yargs },
           handler: function (argv) {}
         })
-      }).to.throw(/No command name given for module: { desc: 'A command with no name',\n {2}builder: \[Function(: builder)?],\n {2}handler: \[Function(: handler)?] }/)
+      }).to.throw(/No command name given for module: {(\s+)desc: 'A command with no name',\n {2}builder: \[Function(: builder)?],\n {2}handler: \[Function(: handler)?]\s}/)
     })
   })
 
