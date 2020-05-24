@@ -1,5 +1,5 @@
 import { argsert } from './argsert'
-import { Dictionary } from './common-types'
+import { Dictionary, assertNotUndefined } from './common-types'
 import { levenshtein as distance } from './levenshtein'
 import { objFilter } from './obj-filter'
 import { UsageInstance } from './usage'
@@ -393,7 +393,7 @@ export function validation (yargs: YargsInstance, usage: UsageInstance, y18n: Y1
   }
   self.unfreeze = function unfreeze () {
     const frozen = frozens.pop()
-    if (!frozen) throw new Error('Nothing more to unfreeze')
+    assertNotUndefined(frozen)
     ;({
       implied,
       checks,

@@ -1,5 +1,17 @@
-API
-=======
+Additional documentation
+===
+
+This document is the Yargs API reference. There are more documentation files in
+[`docs` in the Yargs source tree](https://github.com/yargs/yargs/tree/master/docs):
+
+- [Examples](https://github.com/yargs/yargs/blob/master/docs/examples.md)
+- [Advanced Topics](https://github.com/yargs/yargs/blob/master/docs/advanced.md)
+- [TypeScript usage examples](https://github.com/yargs/yargs/blob/master/docs/typescript.md)
+- [Webpack usage examples](https://github.com/yargs/yargs/blob/master/docs/webpack.md)
+- [Parsing Tricks](https://github.com/yargs/yargs/blob/master/docs/tricks.md)
+
+API reference
+===
 
 You can run Yargs without any configuration, and it will do its
 best to parse `process.argv`:

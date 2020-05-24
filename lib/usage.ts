@@ -1,6 +1,6 @@
 // this file handles outputting usage instructions,
 // failures, etc. keeps logging in one place.
-import { Dictionary } from './common-types'
+import { Dictionary, assertNotUndefined } from './common-types'
 import { objFilter } from './obj-filter'
 import * as path from 'path'
 import { YargsInstance } from './yargs-types'
@@ -564,7 +564,7 @@ export function usage (yargs: YargsInstance, y18n: Y18N) {
   }
   self.unfreeze = function unfreeze () {
     const frozen = frozens.pop()
-    if (!frozen) throw new Error('Nothing more to unfreeze')
+    assertNotUndefined(frozen)
     ;({
       failMessage,
       failureOutput,
@@ -584,7 +584,7 @@ export function usage (yargs: YargsInstance, y18n: Y18N) {
 export interface UsageInstance {
   cacheHelpMessage(): void
   clearCachedHelpMessage(): void
-  command(cmd: string, description: string | undefined, isDefault: boolean, aliases: string[], deprecated: boolean): void
+  command(cmd: string, description: string | undefined, isDefault: boolean, aliases: string[], deprecated?: boolean): void
   deferY18nLookup(str: string): string
   describe(key: string, desc?: string): void
   describe(keys: Dictionary<string>): void
@@ -608,7 +608,7 @@ export interface UsageInstance {
   showVersion(): void
   stringifiedValues(values?: any[], separator?: string): string
   unfreeze(): void
-  usage(msg: string | null, description?: string): UsageInstance
+  usage(msg: string | null, description?: string | false): UsageInstance
   version(ver: any): void
   wrap(cols: number): void
 }
