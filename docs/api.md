@@ -1206,8 +1206,8 @@ parser.parse(bot.userText, function (err, argv, output) {
 ```
 
 ***Note:*** Providing a callback to `parse()` prevents Yargs from exiting
-automatically while the callback is running, as if the [`exitProcess`
-setting](#exitprocess) were set to `false`.
+automatically while there is still work in the event loop, as if the
+[`exitProcess` setting](#exitprocess) were set to `false`.
 
 ***Note:*** the `output` parameter of a `parse()` callback only contains text output by yargs using its internal logger.
 It *does not* include any text output by user-supplied callback, such as `console.log()` outputs in a
