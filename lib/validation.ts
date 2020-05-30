@@ -162,8 +162,8 @@ export function validation (yargs: YargsInstance, usage: UsageInstance, y18n: Y1
 
     if (unknown.length > 0) {
       usage.fail(__n(
-        commandKeys.length > 0 ? 'Unknown command: %s' : 'Unknown argument: %s',
-        commandKeys.length > 0 ? 'Unknown commands: %s' : 'Unknown arguments: %s',
+        'Unknown command: %s',
+        'Unknown commands: %s',
         unknown.length,
         unknown.join(', ')
       ))
