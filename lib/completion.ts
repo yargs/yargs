@@ -1,16 +1,11 @@
-import * as path from 'path'
+import { CommandInstance, isCommandBuilderCallback } from './command'
 import * as templates from './completion-templates'
 import { isPromise } from './is-promise'
 import { parseCommand } from './parse-command'
-import {
-  CommandInstance,
-  CompletionFunction,
-  CompletionInstance,
-  UsageInstance,
-  YargsInstance
-} from './types'
-import { isSyncCompletionFunction, isFunctionCommandBuilder } from './type-helpers'
-import { DetailedArguments } from 'yargs-parser'
+import * as path from 'path'
+import { UsageInstance } from './usage'
+import { YargsInstance } from './yargs-types'
+import { Arguments, DetailedArguments } from 'yargs-parser'
 
 // add bash completions to your
 //  yargs-powered applications.
@@ -63,7 +58,7 @@ export function completion (yargs: YargsInstance, usage: UsageInstance, command:
     for (let i = 0, ii = args.length; i < ii; ++i) {
       if (handlers[args[i]] && handlers[args[i]].builder) {
         const builder = handlers[args[i]].builder
-        if (isFunctionCommandBuilder(builder)) {
+        if (isCommandBuilderCallback(builder)) {
           const y = yargs.reset()
           builder(y)
           return y.argv
@@ -139,4 +134,27 @@ export function completion (yargs: YargsInstance, usage: UsageInstance, command:
   }
 
   return self
+}
+
+/** Instance of the completion module. */
+interface CompletionInstance {
+  completionKey: string
+  generateCompletionScript($0: string, cmd: string): string
+  getCompletion(args: string[], done: (completions: string[]) => any): any
+  registerFunction(fn: CompletionFunction): void
+  setParsed(parsed: DetailedArguments): void
+}
+
+type CompletionFunction = SyncCompletionFunction | AsyncCompletionFunction
+
+interface SyncCompletionFunction {
+  (current: string, argv: Arguments): string[] | Promise<string[]>
+}
+
+interface AsyncCompletionFunction {
+  (current: string, argv: Arguments, done: (completions: string[]) => any): any
+}
+
+function isSyncCompletionFunction (completionFunction: CompletionFunction): completionFunction is SyncCompletionFunction {
+  return completionFunction.length < 3
 }

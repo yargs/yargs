@@ -1,4 +1,4 @@
-import { ParsedCommand } from './types'
+import { NotEmptyArray } from './common-types'
 
 export function parseCommand (cmd: string) {
   const extraSpacesStrippedCommand = cmd.replace(/\s{2,}/g, ' ')
@@ -19,15 +19,26 @@ export function parseCommand (cmd: string) {
     if (/\.+[\]>]/.test(cmd) && i === splitCommand.length - 1) variadic = true
     if (/^\[/.test(cmd)) {
       parsedCommand.optional.push({
-        cmd: cmd.replace(bregex, '').split('|'),
+        cmd: cmd.replace(bregex, '').split('|') as NotEmptyArray<string>,
         variadic
       })
     } else {
       parsedCommand.demanded.push({
-        cmd: cmd.replace(bregex, '').split('|'),
+        cmd: cmd.replace(bregex, '').split('|') as NotEmptyArray<string>,
         variadic
       })
     }
   })
   return parsedCommand
+}
+
+export interface ParsedCommand {
+  cmd: string
+  demanded: Positional[]
+  optional: Positional[]
+}
+
+export interface Positional {
+  cmd: NotEmptyArray<string>
+  variadic: boolean
 }

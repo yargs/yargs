@@ -1,42 +1,60 @@
-'use strict'
-
-const inspect = require('util').inspect
-const { isPromise } = require('../build/lib/is-promise')
-const { applyMiddleware, commandMiddlewareFactory } = require('./middleware')
-const { parseCommand } = require('../build/lib/parse-command')
-const path = require('path')
-const Parser = require('yargs-parser')
+import { Dictionary, assertNotUndefined, assertNotTrue } from './common-types'
+import { isPromise } from './is-promise'
+import { applyMiddleware, commandMiddlewareFactory, Middleware } from './middleware'
+import { parseCommand, Positional } from './parse-command'
+import * as path from 'path'
+import { RequireDirectoryOptions } from 'require-directory'
+import { UsageInstance } from './usage'
+import { inspect } from 'util'
+import { ValidationInstance } from './validation'
+import { YargsInstance, isYargsInstance, Options, OptionDefinition } from './yargs-types'
+import { DetailedArguments, Arguments } from 'yargs-parser'
+import { Context } from 'vm'
+import requireDirectory = require('require-directory')
+import whichModule = require('which-module')
+import Parser = require('yargs-parser')
 
 const DEFAULT_MARKER = /(^\*)|(^\$0)/
 
 // handles parsing positional arguments,
 // and populating argv with said positional
 // arguments.
-module.exports = function command (yargs, usage, validation, globalMiddleware) {
-  const self = {}
-  let handlers = {}
-  let aliasMap = {}
-  let defaultCommand
-  globalMiddleware = globalMiddleware || []
+export function command (
+  yargs: YargsInstance,
+  usage: UsageInstance,
+  validation: ValidationInstance,
+  globalMiddleware: Middleware[] = []
+) {
+  const self: CommandInstance = {} as CommandInstance
+  let handlers: Dictionary<CommandHandler> = {}
+  let aliasMap: Dictionary<string> = {}
+  let defaultCommand: CommandHandler | undefined
 
-  self.addHandler = function addHandler (cmd, description, builder, handler, commandMiddleware) {
-    let aliases = []
+  self.addHandler = function addHandler (
+    cmd: string | string[] | CommandHandlerDefinition,
+    description?: string | false,
+    builder?: CommandBuilder | CommandBuilderDefinition,
+    handler?: CommandHandlerCallback,
+    commandMiddleware?: Middleware[],
+    deprecated?: boolean
+  ) {
+    let aliases: string[] = []
     const middlewares = commandMiddlewareFactory(commandMiddleware)
-    handler = handler || (() => {})
+    handler = handler || (() => { })
 
     if (Array.isArray(cmd)) {
       aliases = cmd.slice(1)
       cmd = cmd[0]
-    } else if (typeof cmd === 'object') {
+    } else if (isCommandHandlerDefinition(cmd)) {
       let command = (Array.isArray(cmd.command) || typeof cmd.command === 'string') ? cmd.command : moduleName(cmd)
-      if (cmd.aliases) command = [].concat(command).concat(cmd.aliases)
-      self.addHandler(command, extractDesc(cmd), cmd.builder, cmd.handler, cmd.middlewares)
+      if (cmd.aliases) command = ([] as string[]).concat(command).concat(cmd.aliases)
+      self.addHandler(command, extractDesc(cmd), cmd.builder, cmd.handler, cmd.middlewares, cmd.deprecated)
       return
     }
 
     // allow a module to be provided instead of separate builder and handler
-    if (typeof builder === 'object' && builder.builder && typeof builder.handler === 'function') {
-      self.addHandler([cmd].concat(aliases), description, builder.builder, builder.handler, builder.middlewares)
+    if (isCommandBuilderDefinition(builder)) {
+      self.addHandler([cmd].concat(aliases), description, builder.builder, builder.handler, builder.middlewares, builder.deprecated)
       return
     }
 
@@ -72,15 +90,16 @@ module.exports = function command (yargs, usage, validation, globalMiddleware) {
     })
 
     if (description !== false) {
-      usage.command(cmd, description, isDefault, aliases)
+      usage.command(cmd, description, isDefault, aliases, deprecated)
     }
 
     handlers[parsedCommand.cmd] = {
       original: cmd,
-      description: description,
+      description,
       handler,
       builder: builder || {},
       middlewares,
+      deprecated,
       demanded: parsedCommand.demanded,
       optional: parsedCommand.optional
     }
@@ -95,7 +114,7 @@ module.exports = function command (yargs, usage, validation, globalMiddleware) {
     // exclude 'json', 'coffee' from require-directory defaults
     if (!Array.isArray(opts.extensions)) opts.extensions = ['js']
     // allow consumer to define their own visitor function
-    const parentVisit = typeof opts.visit === 'function' ? opts.visit : o => o
+    const parentVisit = typeof opts.visit === 'function' ? opts.visit : (o: any) => o
     // call addHandler via visitor function
     opts.visit = function visit (obj, joined, filename) {
       const visited = parentVisit(obj, joined, filename)
@@ -110,26 +129,26 @@ module.exports = function command (yargs, usage, validation, globalMiddleware) {
       }
       return visited
     }
-    require('require-directory')({ require: req, filename: callerFile }, dir, opts)
+    requireDirectory({ require: req, filename: callerFile } as NodeModule, dir, opts)
   }
 
   // lookup module object from require()d command and derive name
   // if module was not require()d and no name given, throw error
-  function moduleName (obj) {
-    const mod = require('which-module')(obj)
+  function moduleName (obj: CommandHandlerDefinition) {
+    const mod = whichModule(obj)
     if (!mod) throw new Error(`No command name given for module: ${inspect(obj)}`)
     return commandFromFilename(mod.filename)
   }
 
   // derive command name from filename
-  function commandFromFilename (filename) {
+  function commandFromFilename (filename: string) {
     return path.basename(filename, path.extname(filename))
   }
 
-  function extractDesc (obj) {
-    for (let keys = ['describe', 'description', 'desc'], i = 0, l = keys.length, test; i < l; i++) {
-      test = obj[keys[i]]
-      if (typeof test === 'string' || typeof test === 'boolean') return test
+  function extractDesc ({ describe, description, desc }: CommandHandlerDefinition) {
+    for (const test of [describe, description, desc]) {
+      if (typeof test === 'string' || test === false) return test
+      assertNotTrue(test)
     }
     return false
   }
@@ -148,20 +167,18 @@ module.exports = function command (yargs, usage, validation, globalMiddleware) {
     const parentCommands = currentContext.commands.slice()
 
     // what does yargs look like after the builder is run?
-    let innerArgv = parsed.argv
-    let innerYargs = null
-    let positionalMap = {}
+    let innerArgv: Arguments | Promise<Arguments> = parsed.argv
+    let positionalMap: Dictionary<string[]> = {}
     if (command) {
       currentContext.commands.push(command)
       currentContext.fullCommands.push(commandHandler.original)
     }
-    if (typeof commandHandler.builder === 'function') {
+    const builder = commandHandler.builder
+    if (isCommandBuilderCallback(builder)) {
       // a function can be provided, which builds
       // up a yargs chain and possibly returns it.
-      innerYargs = commandHandler.builder(yargs.reset(parsed.aliases))
-      if (!innerYargs || (typeof innerYargs._parseArgs !== 'function')) {
-        innerYargs = yargs
-      }
+      const builderOutput = builder(yargs.reset(parsed.aliases))
+      const innerYargs = isYargsInstance(builderOutput) ? builderOutput : yargs
       if (shouldUpdateUsage(innerYargs)) {
         innerYargs.getUsageInstance().usage(
           usageFromParentCommandsCommandHandler(parentCommands, commandHandler),
@@ -170,10 +187,10 @@ module.exports = function command (yargs, usage, validation, globalMiddleware) {
       }
       innerArgv = innerYargs._parseArgs(null, null, true, commandIndex)
       aliases = innerYargs.parsed.aliases
-    } else if (typeof commandHandler.builder === 'object') {
+    } else if (isCommandBuilderOptionDefinitions(builder)) {
       // as a short hand, an object can instead be provided, specifying
       // the options that a command takes.
-      innerYargs = yargs.reset(parsed.aliases)
+      const innerYargs = yargs.reset(parsed.aliases)
       if (shouldUpdateUsage(innerYargs)) {
         innerYargs.getUsageInstance().usage(
           usageFromParentCommandsCommandHandler(parentCommands, commandHandler),
@@ -181,14 +198,14 @@ module.exports = function command (yargs, usage, validation, globalMiddleware) {
         )
       }
       Object.keys(commandHandler.builder).forEach((key) => {
-        innerYargs.option(key, commandHandler.builder[key])
+        innerYargs.option(key, builder[key])
       })
       innerArgv = innerYargs._parseArgs(null, null, true, commandIndex)
       aliases = innerYargs.parsed.aliases
     }
 
     if (!yargs._hasOutput()) {
-      positionalMap = populatePositionals(commandHandler, innerArgv, currentContext, yargs)
+      positionalMap = populatePositionals(commandHandler, innerArgv, currentContext)
     }
 
     const middlewares = globalMiddleware.slice(0).concat(commandHandler.middlewares)
@@ -196,7 +213,7 @@ module.exports = function command (yargs, usage, validation, globalMiddleware) {
 
     // we apply validation post-hoc, so that custom
     // checks get passed populated positional arguments.
-    if (!yargs._hasOutput()) yargs._runValidation(innerArgv, aliases, positionalMap, yargs.parsed.error)
+    if (!yargs._hasOutput()) yargs._runValidation(innerArgv, aliases, positionalMap, yargs.parsed.error, !command)
 
     if (commandHandler.handler && !yargs._hasOutput()) {
       yargs._setHasOutput()
@@ -226,7 +243,7 @@ module.exports = function command (yargs, usage, validation, globalMiddleware) {
             try {
               yargs.getUsageInstance().fail(null, error)
             } catch (err) {
-            // fail's throwing would cause an unhandled rejection.
+              // fail's throwing would cause an unhandled rejection.
             }
           })
           .then(() => {
@@ -249,12 +266,12 @@ module.exports = function command (yargs, usage, validation, globalMiddleware) {
     return innerArgv
   }
 
-  function shouldUpdateUsage (yargs) {
+  function shouldUpdateUsage (yargs: YargsInstance) {
     return !yargs.getUsageInstance().getUsageDisabled() &&
       yargs.getUsageInstance().getUsage().length === 0
   }
 
-  function usageFromParentCommandsCommandHandler (parentCommands, commandHandler) {
+  function usageFromParentCommandsCommandHandler (parentCommands: string[], commandHandler: CommandHandler) {
     const c = DEFAULT_MARKER.test(commandHandler.original) ? commandHandler.original.replace(DEFAULT_MARKER, '').trim() : commandHandler.original
     const pc = parentCommands.filter((c) => { return !DEFAULT_MARKER.test(c) })
     pc.push(c)
@@ -262,6 +279,7 @@ module.exports = function command (yargs, usage, validation, globalMiddleware) {
   }
 
   self.runDefaultBuilderOn = function (yargs) {
+    assertNotUndefined(defaultCommand)
     if (shouldUpdateUsage(yargs)) {
       // build the root-level command string from the default string.
       const commandString = DEFAULT_MARKER.test(defaultCommand.original)
@@ -272,7 +290,7 @@ module.exports = function command (yargs, usage, validation, globalMiddleware) {
       )
     }
     const builder = defaultCommand.builder
-    if (typeof builder === 'function') {
+    if (isCommandBuilderCallback(builder)) {
       builder(yargs)
     } else {
       Object.keys(builder).forEach((key) => {
@@ -283,21 +301,21 @@ module.exports = function command (yargs, usage, validation, globalMiddleware) {
 
   // transcribe all positional arguments "command <foo> <bar> [apple]"
   // onto argv.
-  function populatePositionals (commandHandler, argv, context, yargs) {
+  function populatePositionals (commandHandler: CommandHandler, argv: Arguments, context: Context) {
     argv._ = argv._.slice(context.commands.length) // nuke the current commands
     const demanded = commandHandler.demanded.slice(0)
     const optional = commandHandler.optional.slice(0)
-    const positionalMap = {}
+    const positionalMap: Dictionary<string[]> = {}
 
     validation.positionalCount(demanded.length, argv._.length)
 
     while (demanded.length) {
-      const demand = demanded.shift()
+      const demand = demanded.shift()!
       populatePositional(demand, argv, positionalMap)
     }
 
     while (optional.length) {
-      const maybe = optional.shift()
+      const maybe = optional.shift()!
       populatePositional(maybe, argv, positionalMap)
     }
 
@@ -308,7 +326,7 @@ module.exports = function command (yargs, usage, validation, globalMiddleware) {
     return positionalMap
   }
 
-  function populatePositional (positional, argv, positionalMap, parseOptions) {
+  function populatePositional (positional: Positional, argv: Arguments, positionalMap: Dictionary<string[]>) {
     const cmd = positional.cmd[0]
     if (positional.variadic) {
       positionalMap[cmd] = argv._.splice(0).map(String)
@@ -319,16 +337,18 @@ module.exports = function command (yargs, usage, validation, globalMiddleware) {
 
   // we run yargs-parser against the positional arguments
   // applying the same parsing logic used for flags.
-  function postProcessPositionals (argv, positionalMap, parseOptions) {
+  function postProcessPositionals (argv: Arguments, positionalMap: Dictionary<string[]>, parseOptions: Positionals) {
     // combine the parsing hints we've inferred from the command
     // string with explicitly configured parsing hints.
     const options = Object.assign({}, yargs.getOptions())
     options.default = Object.assign(parseOptions.default, options.default)
-    options.alias = Object.assign(parseOptions.alias, options.alias)
+    for (const key of Object.keys(parseOptions.alias)) {
+      options.alias[key] = (options.alias[key] || []).concat(parseOptions.alias[key])
+    }
     options.array = options.array.concat(parseOptions.array)
     delete options.config //  don't load config when processing positionals.
 
-    const unparsed = []
+    const unparsed: string[] = []
     Object.keys(positionalMap).forEach((key) => {
       positionalMap[key].map((value) => {
         if (options.configuration['unknown-options-as-args']) options.key[key] = true
@@ -354,7 +374,7 @@ module.exports = function command (yargs, usage, validation, globalMiddleware) {
       // flag arguments that were already parsed).
       const positionalKeys = Object.keys(positionalMap)
       Object.keys(positionalMap).forEach((key) => {
-        [].push.apply(positionalKeys, parsed.aliases[key])
+        positionalKeys.push(...parsed.aliases[key])
       })
 
       Object.keys(parsed.argv).forEach((key) => {
@@ -369,7 +389,7 @@ module.exports = function command (yargs, usage, validation, globalMiddleware) {
   }
 
   self.cmdToParseOptions = function (cmdString) {
-    const parseOptions = {
+    const parseOptions: Positionals = {
       array: [],
       default: {},
       alias: {},
@@ -378,28 +398,22 @@ module.exports = function command (yargs, usage, validation, globalMiddleware) {
 
     const parsed = parseCommand(cmdString)
     parsed.demanded.forEach((d) => {
-      const cmds = d.cmd.slice(0)
-      const cmd = cmds.shift()
+      const [cmd, ...aliases] = d.cmd
       if (d.variadic) {
         parseOptions.array.push(cmd)
         parseOptions.default[cmd] = []
       }
-      cmds.forEach((c) => {
-        parseOptions.alias[cmd] = c
-      })
+      parseOptions.alias[cmd] = aliases
       parseOptions.demand[cmd] = true
     })
 
     parsed.optional.forEach((o) => {
-      const cmds = o.cmd.slice(0)
-      const cmd = cmds.shift()
+      const [cmd, ...aliases] = o.cmd
       if (o.variadic) {
         parseOptions.array.push(cmd)
         parseOptions.default[cmd] = []
       }
-      cmds.forEach((c) => {
-        parseOptions.alias[cmd] = c
-      })
+      parseOptions.alias[cmd] = aliases
     })
 
     return parseOptions
@@ -416,20 +430,119 @@ module.exports = function command (yargs, usage, validation, globalMiddleware) {
   // the state of commands such that
   // we can apply .parse() multiple times
   // with the same yargs instance.
-  const frozens = []
+  const frozens: FrozenCommandInstance[] = []
   self.freeze = () => {
-    const frozen = {}
-    frozens.push(frozen)
-    frozen.handlers = handlers
-    frozen.aliasMap = aliasMap
-    frozen.defaultCommand = defaultCommand
+    frozens.push({
+      handlers,
+      aliasMap,
+      defaultCommand
+    })
   }
   self.unfreeze = () => {
     const frozen = frozens.pop()
-    handlers = frozen.handlers
-    aliasMap = frozen.aliasMap
-    defaultCommand = frozen.defaultCommand
+    assertNotUndefined(frozen)
+    ;({
+      handlers,
+      aliasMap,
+      defaultCommand
+    } = frozen)
   }
 
   return self
+}
+
+/** Instance of the command module. */
+export interface CommandInstance {
+  addDirectory(
+    dir: string,
+    context: Context,
+    req: NodeRequireFunction,
+    callerFile: string,
+    opts?: RequireDirectoryOptions<any>
+  ): void
+  addHandler (handler: CommandHandlerDefinition): void
+  addHandler (
+    cmd: string | string[],
+    description: CommandHandler['description'],
+    builder?: CommandBuilderDefinition | CommandBuilder,
+    handler?: CommandHandlerCallback,
+    commandMiddleware?: Middleware[],
+    deprecated?: boolean
+  ): void
+  cmdToParseOptions (cmdString: string): Positionals
+  freeze(): void
+  getCommandHandlers (): Dictionary<CommandHandler>
+  getCommands (): string[]
+  hasDefaultCommand (): boolean
+  reset (): CommandInstance
+  runCommand (command: string, yargs: YargsInstance, parsed: DetailedArguments, commandIndex: number): void
+  runDefaultBuilderOn (yargs: YargsInstance): void
+  unfreeze(): void
+}
+
+export interface CommandHandlerDefinition extends Partial<Pick<CommandHandler,
+  'deprecated' | 'description' | 'handler' | 'middlewares'
+>> {
+  aliases?: string[]
+  builder?: CommandBuilder | CommandBuilderDefinition
+  command?: string | string[]
+  desc?: CommandHandler['description']
+  describe?: CommandHandler['description']
+}
+
+export function isCommandHandlerDefinition (cmd: string | string[] | CommandHandlerDefinition): cmd is CommandHandlerDefinition {
+  return typeof cmd === 'object'
+}
+
+export interface CommandBuilderDefinition {
+  builder?: CommandBuilder
+  deprecated?: boolean
+  handler: CommandHandlerCallback
+  middlewares?: Middleware[]
+}
+
+export function isCommandBuilderDefinition (builder?: CommandBuilder | CommandBuilderDefinition): builder is CommandBuilderDefinition {
+  return typeof builder === 'object' &&
+    !!(builder as CommandBuilderDefinition).builder &&
+    typeof (builder as CommandBuilderDefinition).handler === 'function'
+}
+
+export interface CommandHandlerCallback {
+  (argv: Arguments): any
+}
+
+export interface CommandHandler {
+  builder: CommandBuilder
+  demanded: Positional[]
+  deprecated?: boolean
+  description?: string | false
+  handler: CommandHandlerCallback
+  middlewares: Middleware[]
+  optional: Positional[]
+  original: string
+}
+
+// To be completed later with other CommandBuilder flavours
+export type CommandBuilder = CommandBuilderCallback | Dictionary<OptionDefinition>
+
+interface CommandBuilderCallback {
+  (y: YargsInstance): YargsInstance | void
+}
+
+export function isCommandBuilderCallback (builder: CommandBuilder): builder is CommandBuilderCallback {
+  return typeof builder === 'function'
+}
+
+function isCommandBuilderOptionDefinitions (builder: CommandBuilder): builder is Dictionary<OptionDefinition> {
+  return typeof builder === 'object'
+}
+
+interface Positionals extends Pick<Options, 'alias' | 'array' | 'default'> {
+  demand: Dictionary<boolean>
+}
+
+type FrozenCommandInstance = {
+  handlers: Dictionary<CommandHandler>
+  aliasMap: Dictionary<string>
+  defaultCommand: CommandHandler | undefined
 }

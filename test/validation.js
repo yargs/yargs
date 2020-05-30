@@ -320,6 +320,7 @@ describe('validation tests', () => {
           return done()
         })
         .parse()
+      expect.fail('no parsing failure')
     })
 
     it('fails in strict mode with invalid command', (done) => {
@@ -333,11 +334,24 @@ describe('validation tests', () => {
           return done()
         })
         .parse()
+      expect.fail('no parsing failure')
     })
 
     it('fails in strict mode with extra positionals', (done) => {
       yargs(['kangaroo', 'jumping', 'fast'])
         .command('kangaroo <status>', 'kangaroo handlers')
+        .strict()
+        .fail((msg) => {
+          msg.should.equal('Unknown argument: fast')
+          return done()
+        })
+        .parse()
+      expect.fail('no parsing failure')
+    })
+
+    it('fails in strict mode with extra positionals for default command', (done) => {
+      yargs(['jumping', 'fast'])
+        .command('$0 <status>', 'kangaroo handlers')
         .strict()
         .fail((msg) => {
           msg.should.equal('Unknown argument: fast')
