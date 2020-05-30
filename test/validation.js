@@ -986,6 +986,16 @@ describe('validation tests', () => {
         .parse()
     })
 
+    it('fails with error if positional argument is unknown', (done) => {
+      yargs('blerg -a 10')
+        .strictCommands()
+        .fail((msg) => {
+          msg.should.equal('Unknown argument: blerg')
+          return done()
+        })
+        .parse()
+    })
+
     it('fails with error if inner command is unknown', (done) => {
       yargs('foo blarg --cool beans')
         .strictCommands()
@@ -994,6 +1004,41 @@ describe('validation tests', () => {
         })
         .fail((msg) => {
           msg.should.equal('Unknown command: blarg')
+          return done()
+        })
+        .parse()
+    })
+
+    it('fails with error if multiple inner commands are unknown', (done) => {
+      yargs('foo blarg blarg2 --cool beans')
+        .strictCommands()
+        .command('foo', 'foo command', (yargs) => {
+          yargs.command('bar')
+        })
+        .fail((msg) => {
+          msg.should.equal('Unknown commands: blarg, blarg2')
+          return done()
+        })
+        .parse()
+    })
+
+    it('fails with error if inner positional argument is unknown', (done) => {
+      yargs('foo blarg --cool beans')
+        .strictCommands()
+        .command('foo', 'foo command')
+        .fail((msg) => {
+          msg.should.equal('Unknown argument: blarg')
+          return done()
+        })
+        .parse()
+    })
+
+    it('fails with error if multiple inner positional arguments are unknown', (done) => {
+      yargs('foo blarg blarg2 --cool beans')
+        .strictCommands()
+        .command('foo', 'foo command')
+        .fail((msg) => {
+          msg.should.equal('Unknown arguments: blarg, blarg2')
           return done()
         })
         .parse()
