@@ -230,28 +230,18 @@ Apply command modules from a directory relative to the module calling this metho
 
 `opts` is an options object (optional). The following options are valid:
 
-- `recurse`: boolean, default `false`
+`recurse`: Look for command modules in all subdirectories and apply them as a flattened 
+(non-hierarchical) list.
 
-    Look for command modules in all subdirectories and apply them as a flattened
-    (non-hierarchical) list.
+`extensions`: The types of files to look for when requiring command modules.
 
-- `extensions`: array of strings, default `['js']`
+`visit`: A synchronous function called for each command module encountered. Accepts 
+`commandObject`, `pathToFile`, and `filename` as arguments. Returns `commandObject` 
+to include the command; any falsy value to exclude/skip it.
 
-    The types of files to look for when requiring command modules.
+`include`: Whitelist certain modules. See [`require-directory` whitelisting](https://www.npmjs.com/package/require-directory#whitelisting) for details.
 
-- `visit`: function
-
-    A synchronous function called for each command module encountered. Accepts
-    `commandObject`, `pathToFile`, and `filename` as arguments. Returns
-    `commandObject` to include the command; any falsy value to exclude/skip it.
-
-- `include`: RegExp or function
-
-    Whitelist certain modules. See [`require-directory` whitelisting](https://www.npmjs.com/package/require-directory#whitelisting) for details.
-
-- `exclude`: RegExp or function
-
-    Blacklist certain modules. See [`require-directory` blacklisting](https://www.npmjs.com/package/require-directory#blacklisting) for details.
+`exclude`: Blacklist certain modules. See [`require-directory` blacklisting](https://www.npmjs.com/package/require-directory#blacklisting) for details.
 
 <a name="command"></a>
 .command(cmd, desc, [builder], [handler])
