@@ -6,7 +6,7 @@ requiresNode8OrGreater()
 
 const { argsert } = require('./build/lib/argsert')
 const fs = require('fs')
-const Command = require('./lib/command')
+const { command: Command } = require('./build/lib/command')
 const { completion: Completion } = require('./build/lib/completion')
 const Parser = require('yargs-parser')
 const path = require('path')
@@ -16,7 +16,7 @@ const Y18n = require('y18n')
 const { objFilter } = require('./build/lib/obj-filter')
 const setBlocking = require('set-blocking')
 const { applyExtends } = require('./build/lib/apply-extends')
-const { globalMiddlewareFactory } = require('./lib/middleware')
+const { globalMiddlewareFactory } = require('./build/lib/middleware')
 const { YError } = require('./build/lib/yerror')
 const processArgv = require('./build/lib/process-argv')
 
@@ -1261,7 +1261,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     return argv
   }
 
-  self._runValidation = function runValidation (argv, aliases, positionalMap, parseErrors) {
+  self._runValidation = function runValidation (argv, aliases, positionalMap, parseErrors, isDefaultCommand = false) {
     if (parseErrors) throw new YError(parseErrors.message)
     validation.nonOptionCount(argv)
     validation.requiredArguments(argv)
@@ -1270,7 +1270,7 @@ function Yargs (processArgs, cwd, parentRequire) {
       failedStrictCommands = validation.unknownCommands(argv)
     }
     if (strict && !failedStrictCommands) {
-      validation.unknownArguments(argv, aliases, positionalMap)
+      validation.unknownArguments(argv, aliases, positionalMap, isDefaultCommand)
     }
     validation.customChecks(argv, aliases)
     validation.limitedChoices(argv)

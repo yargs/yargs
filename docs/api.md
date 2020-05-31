@@ -1,5 +1,17 @@
-API
-=======
+Additional documentation
+===
+
+This document is the Yargs API reference. There are more documentation files in
+[`docs` in the Yargs source tree](https://github.com/yargs/yargs/tree/master/docs):
+
+- [Examples](https://github.com/yargs/yargs/blob/master/docs/examples.md)
+- [Advanced Topics](https://github.com/yargs/yargs/blob/master/docs/advanced.md)
+- [TypeScript usage examples](https://github.com/yargs/yargs/blob/master/docs/typescript.md)
+- [Webpack usage examples](https://github.com/yargs/yargs/blob/master/docs/webpack.md)
+- [Parsing Tricks](https://github.com/yargs/yargs/blob/master/docs/tricks.md)
+
+API reference
+===
 
 You can run Yargs without any configuration, and it will do its
 best to parse `process.argv`:
@@ -87,11 +99,26 @@ Check that certain conditions are met in the provided arguments.
 
 `fn` is called with two arguments, the parsed `argv` hash and an array of options and their aliases.
 
-If `fn` throws or returns a non-truthy value, show the thrown error, usage information, and
-exit.
+If `fn` throws or returns a non-truthy value, Yargs will show the thrown error
+and usage information. Yargs will then exit, unless
+[`.exitProcess()`](#exitprocess) was used to prevent Yargs from exiting after a
+failed check.
 
 `global` indicates whether `check()` should be enabled both
 at the top-level and for each sub-command.
+
+```js
+const argv = require('yargs')
+  .check((argv, options) => {
+    const filePaths = argv._
+    if (filePaths.length > 1) {
+      throw new Error("Only 0 or 1 files may be passed.")
+    } else {
+      return true // tell Yargs that the arguments passed the check
+    }
+  })
+  .argv
+```
 
 <a name="choices"></a>.choices(key, choices)
 ----------------------
@@ -1211,7 +1238,9 @@ parser.parse(bot.userText, function (err, argv, output) {
 })
 ```
 
-***Note:*** Providing a callback to `parse()` disables the [`exitProcess` setting](#exitprocess) until after the callback is invoked.
+***Note:*** Providing a callback to `parse()` prevents Yargs from exiting
+automatically while there is still work in the event loop, as if the
+[`exitProcess` setting](#exitprocess) were set to `false`.
 
 ***Note:*** the `output` parameter of a `parse()` callback only contains text output by yargs using its internal logger.
 It *does not* include any text output by user-supplied callback, such as `console.log()` outputs in a

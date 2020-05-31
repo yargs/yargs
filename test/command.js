@@ -948,6 +948,35 @@ describe('Command', () => {
       argv.sin.should.equal(113993)
     })
 
+    it('allows several aliases to be defined for a required positional argument', () => {
+      const argv = yargs('yo bcoe 113993')
+        .command('yo <user | email | id> [ssn]', 'Send someone a yo',
+          yargs => yargs.alias('user', 'somethingElse')
+        )
+        .parse()
+      argv.user.should.equal('bcoe')
+      argv.email.should.equal('bcoe')
+      argv.id.should.equal('bcoe')
+      argv.somethingElse.should.equal('bcoe')
+      argv.ssn.should.equal(113993)
+    })
+
+    it('allows several aliases to be defined for an optional positional argument', () => {
+      let argv
+      yargs('yo 113993')
+        .command('yo [ssn|sin|id]', 'Send someone a yo',
+          yargs => yargs.alias('ssn', 'somethingElse'),
+          (_argv) => {
+            argv = _argv
+          }
+        )
+        .parse()
+      argv.ssn.should.equal(113993)
+      argv.sin.should.equal(113993)
+      argv.id.should.equal(113993)
+      argv.somethingElse.should.equal(113993)
+    })
+
     it('allows variadic and positional arguments to be combined', () => {
       const parser = yargs
         .command('yo <user|email> [ ssns | sins... ]', 'Send someone a yo')
