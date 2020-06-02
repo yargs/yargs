@@ -32,7 +32,7 @@ function mergeDeep (config1: Dictionary, config2: Dictionary) {
   return target
 }
 
-export function applyExtends (config: Dictionary, cwd: string, mergeExtends: boolean) {
+export function applyExtends (config: Dictionary, cwd: string, mergeExtends?: boolean) {
   let defaultConfig = {}
 
   if (Object.prototype.hasOwnProperty.call(config, 'extends')) {

@@ -137,7 +137,7 @@ export function completion (yargs: YargsInstance, usage: UsageInstance, command:
 }
 
 /** Instance of the completion module. */
-interface CompletionInstance {
+export interface CompletionInstance {
   completionKey: string
   generateCompletionScript($0: string, cmd: string): string
   getCompletion(args: string[], done: (completions: string[]) => any): any
@@ -145,7 +145,7 @@ interface CompletionInstance {
   setParsed(parsed: DetailedArguments): void
 }
 
-type CompletionFunction = SyncCompletionFunction | AsyncCompletionFunction
+export type CompletionFunction = SyncCompletionFunction | AsyncCompletionFunction
 
 interface SyncCompletionFunction {
   (current: string, argv: Arguments): string[] | Promise<string[]>

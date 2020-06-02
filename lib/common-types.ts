@@ -1,7 +1,23 @@
 import { notStrictEqual } from 'assert'
 
+/**
+ * An object whose all properties have the same type.
+ */
 export type Dictionary<T = any> = { [key: string]: T }
 
+/**
+ * Returns the keys of T that match Dictionary<U> and are not arrays.
+ */
+export type DictionaryKeyof<T, U = any> = Exclude<KeyOf<T, Dictionary<U>>, KeyOf<T, any[]>>
+
+/**
+ * Returns the keys of T that match U.
+ */
+export type KeyOf<T, U> = Exclude<{ [K in keyof T]: T[K] extends U ? K : never }[keyof T], undefined>
+
+/**
+ * An array whose first element is not undefined.
+ */
 export type NotEmptyArray<T = any> = [T, ...T[]]
 
 /**
@@ -22,4 +38,11 @@ export function assertNotStrictEqual<N, T> (actual: T|N, expected: N, message ?:
  */
 export function assertSingleKey (actual: string | string[] | Dictionary): asserts actual is string {
   notStrictEqual(typeof actual, 'object')
+}
+
+/**
+ * Typing wrapper around Object.keys()
+ */
+export function objectKeys<T> (object: T) {
+  return Object.keys(object) as (keyof T)[]
 }

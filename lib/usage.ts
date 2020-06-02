@@ -5,10 +5,11 @@ import { objFilter } from './obj-filter'
 import * as path from 'path'
 import { YargsInstance } from './yargs'
 import { YError } from './yerror'
+import { Y18N } from 'y18n'
+import { DetailedArguments } from 'yargs-parser'
 import decamelize = require('decamelize')
 import setBlocking = require('set-blocking')
 import stringWidth = require('string-width')
-import Y18N = require('y18n')
 
 export function usage (yargs: YargsInstance, y18n: Y18N) {
   const __ = y18n.__
@@ -128,7 +129,7 @@ export function usage (yargs: YargsInstance, y18n: Y18N) {
   }
 
   let wrapSet = false
-  let wrap: number | undefined
+  let wrap: number | null | undefined
   self.wrap = (cols) => {
     wrapSet = true
     wrap = cols
@@ -245,9 +246,9 @@ export function usage (yargs: YargsInstance, y18n: Y18N) {
     // perform some cleanup on the keys array, making it
     // only include top-level keys not their aliases.
     const aliasKeys = (Object.keys(options.alias) || [])
-      .concat(Object.keys(yargs.parsed.newAliases) || [])
+      .concat(Object.keys((yargs.parsed as DetailedArguments).newAliases) || [])
 
-    keys = keys.filter(key => !yargs.parsed.newAliases[key] && aliasKeys.every(alias => (options.alias[alias] || []).indexOf(key) === -1))
+    keys = keys.filter(key => !(yargs.parsed as DetailedArguments).newAliases[key] && aliasKeys.every(alias => (options.alias[alias] || []).indexOf(key) === -1))
 
     // populate 'Options:' group with any keys that have not
     // explicitly had a group set.
@@ -309,7 +310,7 @@ export function usage (yargs: YargsInstance, y18n: Y18N) {
         if (~options.array.indexOf(key)) type = `[${__('array')}]`
         if (~options.number.indexOf(key)) type = `[${__('number')}]`
 
-        const deprecatedExtra = (deprecated: string | boolean) => typeof deprecated === 'string'
+        const deprecatedExtra = (deprecated?: string | boolean) => typeof deprecated === 'string'
           ? `[${__('deprecated: %s', deprecated)}]`
           : `[${__('deprecated')}]`
 
@@ -378,7 +379,7 @@ export function usage (yargs: YargsInstance, y18n: Y18N) {
 
   // return the maximum width of a string
   // in the left-hand column of a table.
-  function maxWidth (table: [string, ...any[]][] | Dictionary<string>, theWrap?: number, modifier?: string) {
+  function maxWidth (table: [string, ...any[]][] | Dictionary<string>, theWrap?: number | null, modifier?: string) {
     let width = 0
 
     // table might be of the form [leftColumn],
@@ -457,7 +458,7 @@ export function usage (yargs: YargsInstance, y18n: Y18N) {
   }
 
   function filterHiddenOptions (key: string) {
-    return yargs.getOptions().hiddenOptions.indexOf(key) < 0 || yargs.parsed.argv[yargs.getOptions().showHiddenOpt]
+    return yargs.getOptions().hiddenOptions.indexOf(key) < 0 || (yargs.parsed as DetailedArguments).argv[yargs.getOptions().showHiddenOpt]
   }
 
   self.showHelp = (level: 'error' | 'log' | ((message: string) => void)) => {
@@ -601,19 +602,17 @@ export interface UsageInstance {
   getUsageDisabled(): boolean
   help(): string
   reset(localLookup: Dictionary<boolean>): UsageInstance
-  showHelp(level: 'error' | 'log'): void
-  showHelp(level: (message: string) => void): void
-  showHelpOnFail(message?: string): UsageInstance
-  showHelpOnFail(enabled: boolean, message: string): UsageInstance
+  showHelp(level: 'error' | 'log' | ((message: string) => void)): void
+  showHelpOnFail (enabled?: boolean | string, message?: string): UsageInstance
   showVersion(): void
   stringifiedValues(values?: any[], separator?: string): string
   unfreeze(): void
   usage(msg: string | null, description?: string | false): UsageInstance
   version(ver: any): void
-  wrap(cols: number): void
+  wrap(cols: number | null | undefined): void
 }
 
-interface FailureFunction {
+export interface FailureFunction {
   (msg: string | undefined | null, err: YError | string | undefined, usage: UsageInstance): void
 }
 

@@ -31,7 +31,7 @@ export function commandMiddlewareFactory (commandMiddleware?: MiddlewareCallback
 }
 
 export function applyMiddleware (
-  argv: Arguments,
+  argv: Arguments | Promise<Arguments>,
   yargs: YargsInstance,
   middlewares: Middleware[],
   beforeValidation: boolean
@@ -52,7 +52,7 @@ export function applyMiddleware (
             Object.assign(initialObj, middlewareObj)
           )
       } else {
-        const result = middleware(argv, yargs)
+        const result = middleware(accumulation, yargs)
         if (beforeValidation && isPromise(result)) throw beforeValidationError
 
         return isPromise(result)
@@ -62,7 +62,7 @@ export function applyMiddleware (
     }, argv)
 }
 
-interface MiddlewareCallback {
+export interface MiddlewareCallback {
   (argv: Arguments, yargs: YargsInstance): Partial<Arguments> | Promise<Partial<Arguments>>
 }
 

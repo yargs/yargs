@@ -1,8 +1,11 @@
-import { Dictionary } from './common-types'
+import { objectKeys } from './common-types'
 
-export function objFilter<T = any> (original: Dictionary<T>, filter: (k: string, v: T) => boolean = () => true) {
-  const obj: Dictionary<T> = {}
-  Object.keys(original || {}).forEach((key) => {
+export function objFilter<T extends object> (
+  original = {} as T,
+  filter: (k: keyof T, v: T[keyof T]) => boolean = () => true
+) {
+  const obj = {} as T
+  objectKeys(original).forEach((key) => {
     if (filter(key, original[key])) {
       obj[key] = original[key]
     }
