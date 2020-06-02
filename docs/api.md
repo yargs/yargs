@@ -220,6 +220,29 @@ var argv = require('yargs')
   .argv
 ```
 
+<a name="commandDir"></a>
+.commandDir(directory, [opts])
+------------------------------
+
+Apply command modules from a directory relative to the module calling this method.
+
+`directory` is a relative directory path as a string (required).
+
+`opts` is an options object (optional). The following options are valid:
+
+`recurse`: Look for command modules in all subdirectories and apply them as a flattened 
+(non-hierarchical) list.
+
+`extensions`: The types of files to look for when requiring command modules.
+
+`visit`: A synchronous function called for each command module encountered. Accepts 
+`commandObject`, `pathToFile`, and `filename` as arguments. Returns `commandObject` 
+to include the command; any falsy value to exclude/skip it.
+
+`include`: Whitelist certain modules. See [`require-directory` whitelisting](https://www.npmjs.com/package/require-directory#whitelisting) for details.
+
+`exclude`: Blacklist certain modules. See [`require-directory` blacklisting](https://www.npmjs.com/package/require-directory#blacklisting) for details.
+
 <a name="command"></a>
 .command(cmd, desc, [builder], [handler])
 -----------------------------------------
