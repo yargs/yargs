@@ -1,4 +1,4 @@
-import { Dictionary, assertNotUndefined, assertNotTrue } from './common-types'
+import { Dictionary, assertNotStrictEqual } from './common-types'
 import { isPromise } from './is-promise'
 import { applyMiddleware, commandMiddlewareFactory, Middleware } from './middleware'
 import { parseCommand, Positional } from './parse-command'
@@ -148,7 +148,7 @@ export function command (
   function extractDesc ({ describe, description, desc }: CommandHandlerDefinition) {
     for (const test of [describe, description, desc]) {
       if (typeof test === 'string' || test === false) return test
-      assertNotTrue(test)
+      assertNotStrictEqual(test, true as true)
     }
     return false
   }
@@ -279,7 +279,7 @@ export function command (
   }
 
   self.runDefaultBuilderOn = function (yargs) {
-    assertNotUndefined(defaultCommand)
+    assertNotStrictEqual(defaultCommand, undefined)
     if (shouldUpdateUsage(yargs)) {
       // build the root-level command string from the default string.
       const commandString = DEFAULT_MARKER.test(defaultCommand.original)
@@ -440,7 +440,7 @@ export function command (
   }
   self.unfreeze = () => {
     const frozen = frozens.pop()
-    assertNotUndefined(frozen)
+    assertNotStrictEqual(frozen, undefined)
     ;({
       handlers,
       aliasMap,

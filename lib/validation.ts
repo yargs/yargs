@@ -1,5 +1,5 @@
 import { argsert } from './argsert'
-import { Dictionary, assertNotUndefined } from './common-types'
+import { Dictionary, assertNotStrictEqual } from './common-types'
 import { levenshtein as distance } from './levenshtein'
 import { objFilter } from './obj-filter'
 import { UsageInstance } from './usage'
@@ -269,6 +269,7 @@ export function validation (yargs: YargsInstance, usage: UsageInstance, y18n: Y1
       if (Array.isArray(value)) {
         value.forEach((i) => self.implies(key, i))
       } else {
+        assertNotStrictEqual(value, undefined)
         implied[key].push(value)
       }
     }
@@ -393,7 +394,7 @@ export function validation (yargs: YargsInstance, usage: UsageInstance, y18n: Y1
   }
   self.unfreeze = function unfreeze () {
     const frozen = frozens.pop()
-    assertNotUndefined(frozen)
+    assertNotStrictEqual(frozen, undefined)
     ;({
       implied,
       checks,

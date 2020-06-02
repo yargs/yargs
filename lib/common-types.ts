@@ -4,10 +4,22 @@ export type Dictionary<T = any> = { [key: string]: T }
 
 export type NotEmptyArray<T = any> = [T, ...T[]]
 
-export function assertNotTrue<T = any> (actual: T | true): asserts actual is T {
-  notStrictEqual(actual, true)
+/**
+ * Returns the type of a Dictionary or array values.
+ */
+export type ValueOf<T> = T extends (infer U)[] ? U : T[keyof T];
+
+/**
+ * Typing wraper around assert.notStrictEqual()
+ */
+export function assertNotStrictEqual<N, T> (actual: T|N, expected: N, message ?: string | Error)
+: asserts actual is Exclude<T, N> {
+  notStrictEqual(actual, expected, message)
 }
 
-export function assertNotUndefined<T = any> (actual: T | undefined): asserts actual is T {
-  notStrictEqual(actual, undefined)
+/**
+ * Asserts actual is neither a Dictionary nor an array.
+ */
+export function assertSingleKey (actual: string | string[] | Dictionary): asserts actual is string {
+  notStrictEqual(typeof actual, 'object')
 }

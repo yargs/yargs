@@ -1,6 +1,6 @@
 // this file handles outputting usage instructions,
 // failures, etc. keeps logging in one place.
-import { Dictionary, assertNotUndefined } from './common-types'
+import { Dictionary, assertNotStrictEqual } from './common-types'
 import { objFilter } from './obj-filter'
 import * as path from 'path'
 import { YargsInstance } from './yargs'
@@ -564,7 +564,7 @@ export function usage (yargs: YargsInstance, y18n: Y18N) {
   }
   self.unfreeze = function unfreeze () {
     const frozen = frozens.pop()
-    assertNotUndefined(frozen)
+    assertNotStrictEqual(frozen, undefined)
     ;({
       failMessage,
       failureOutput,
