@@ -112,8 +112,12 @@ export function usage (yargs: YargsInstance, y18n: Y18N) {
   self.getCommands = () => commands
 
   let descriptions: Dictionary<string | undefined> = {}
-  self.describe = function describe (keyOrKeys: string | Dictionary<string>, desc?: string) {
-    if (typeof keyOrKeys === 'object') {
+  self.describe = function describe (keyOrKeys: string | string[] | Dictionary<string>, desc?: string) {
+    if (Array.isArray(keyOrKeys)) {
+      keyOrKeys.forEach((k) => {
+        self.describe(k, desc)
+      })
+    } else if (typeof keyOrKeys === 'object') {
       Object.keys(keyOrKeys).forEach((k) => {
         self.describe(k, keyOrKeys[k])
       })
@@ -587,8 +591,7 @@ export interface UsageInstance {
   clearCachedHelpMessage(): void
   command(cmd: string, description: string | undefined, isDefault: boolean, aliases: string[], deprecated?: boolean): void
   deferY18nLookup(str: string): string
-  describe(key: string, desc?: string): void
-  describe(keys: Dictionary<string>): void
+  describe(keys: string | string[] | Dictionary<string>, desc?: string): void
   epilog(msg: string): void
   example(cmd: string, description?: string): void
   fail(msg?: string | null, err?: YError | string): void

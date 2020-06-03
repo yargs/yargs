@@ -3631,4 +3631,19 @@ describe('usage tests', () => {
       )
     })
   })
+
+  it('should allow setting the same description for several keys', () => {
+    const r = checkUsage(() => yargs('--help')
+      .describe(['big', 'small'], 'Packet size')
+      .parse()
+    )
+
+    r.logs[0].split('\n').should.deep.equal([
+      'Options:',
+      '  --help     Show help                                                 [boolean]',
+      '  --version  Show version number                                       [boolean]',
+      '  --big      Packet size',
+      '  --small    Packet size'
+    ])
+  })
 })
