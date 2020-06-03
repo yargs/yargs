@@ -404,6 +404,8 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
     // delete from all parsing hints:
     // boolean, array, key, alias, etc.
     objectKeys(options).forEach((hintKey: keyof Options) => {
+      // configObjects is not a parsing hint array
+      if (((key): key is 'configObjects' => key === 'configObjects')(hintKey)) return
       const hint = options[hintKey]
       if (Array.isArray(hint)) {
         if (~hint.indexOf(optionKey)) hint.splice(hint.indexOf(optionKey), 1)
