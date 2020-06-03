@@ -424,7 +424,7 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
   ) {
     argsert('[object|string] [string|function] [function]', [key, msg, parseFn], arguments.length)
     // allow a config object to be provided directly.
-    if (typeof key === 'object') {
+    if ((typeof key === 'object') && !Array.isArray(key)) {
       key = applyExtends(key, cwd, self.getParserConfiguration()['deep-merge-config'])
       options.configObjects = (options.configObjects || []).concat(key)
       return self
