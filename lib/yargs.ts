@@ -1276,6 +1276,7 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
 
         // we allow for asynchronous completions,
         // e.g., loading in a list of commands from an API.
+        args = ([] as string[]).concat(args)
         const completionArgs = args.slice(args.indexOf(`--${completion!.completionKey}`) + 1)
         completion!.getCompletion(completionArgs, (completions) => {
           ;(completions || []).forEach((completion) => {
