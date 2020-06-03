@@ -1030,7 +1030,7 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
   }
 
   self.hide = function hide (key) {
-    argsert('<string|object>', [key], arguments.length)
+    argsert('<string>', [key], arguments.length)
     options.hiddenOptions.push(key)
     return self
   }
