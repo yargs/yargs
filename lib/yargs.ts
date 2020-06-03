@@ -1,5 +1,5 @@
 import { CommandInstance, CommandHandler, CommandBuilderDefinition, CommandBuilder, CommandHandlerCallback, FinishCommandHandler, command as Command } from './command'
-import { Dictionary, assertNotStrictEqual, KeyOf, DictionaryKeyof, ValueOf, objectKeys } from './common-types'
+import { Dictionary, assertNotStrictEqual, KeyOf, DictionaryKeyof, ValueOf, objectKeys, assertSingleKey } from './common-types'
 import { Arguments, DetailedArguments, Configuration as ParserConfiguration, Options as ParserOptions, ConfigCallback, CoerceCallback } from 'yargs-parser'
 import { YError } from './yerror'
 import { UsageInstance, FailureFunction, usage as Usage } from './usage'
@@ -298,8 +298,12 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
     defaultDescription?: string
   ) {
     argsert('<object|string|array> [*] [string]', [key, value, defaultDescription], arguments.length)
-    if (defaultDescription) options.defaultDescription[key] = defaultDescription
+    if (defaultDescription) {
+      assertSingleKey(key)
+      options.defaultDescription[key] = defaultDescription
+    }
     if (typeof value === 'function') {
+      assertSingleKey(key)
       if (!options.defaultDescription[key]) options.defaultDescription[key] = usage.functionDescription(value)
       value = value.call()
     }
@@ -469,6 +473,7 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
     // options are provided.
     if (Array.isArray(max)) {
       max.forEach((key) => {
+        assertNotStrictEqual(msg, true as true)
         demandOption(key, msg)
       })
       max = Infinity
@@ -478,9 +483,11 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
     }
 
     if (typeof keys === 'number') {
+      assertNotStrictEqual(msg, true as true)
       self.demandCommand(keys, max, msg, msg)
     } else if (Array.isArray(keys)) {
       keys.forEach((key) => {
+        assertNotStrictEqual(msg, true as true)
         demandOption(key, msg)
       })
     } else {
@@ -564,6 +571,7 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
     argsert('<string|null|undefined> [string|boolean] [function|object] [function]', [msg, description, builder, handler], arguments.length)
 
     if (description !== undefined) {
+      assertNotStrictEqual(msg, null)
       // .usage() can be used as an alias for defining
       // a default command.
       if ((msg || '').match(/^\$0( |$)/)) {
@@ -652,6 +660,7 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
       const pkgJsonPath = findUp.sync('package.json', {
         cwd: startDir
       })
+      assertNotStrictEqual(pkgJsonPath, undefined)
       obj = JSON.parse(fs.readFileSync(pkgJsonPath).toString())
     } catch (noop) {}
 
