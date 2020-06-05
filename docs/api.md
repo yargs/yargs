@@ -39,11 +39,12 @@ require('yargs').parse()
 ```
 
 When passing in the arguments yourself, note that Yargs expects the passed array
-to contain only the arguments after the program name, while Node’s
-[`process.argv`](https://nodejs.org/api/process.html#process_process_argv) array
+to contain only the arguments after the program name, while `process.argv`
+usually starts with extra elements. For example, [Node’s
+`process.argv`](https://nodejs.org/api/process.html#process_process_argv) array
 starts with two extra elements:`process.execPath` and the path to the JavaScript
-file being executed. So if you’re getting your arguments from `process.argv`,
-pass `process.argv.slice(2)` to Yargs.
+file being executed. So if you’re getting your arguments from `process.argv` in
+Node, pass `process.argv.slice(2)` to Yargs.
 
 The rest of these methods below come in just before the terminating `.argv` or
 terminating `.parse()`.
