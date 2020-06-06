@@ -20,7 +20,7 @@ best to parse `process.argv`:
 require('yargs').argv
 ```
 
-You can also pass in the `process.argv` yourself:
+You can also pass in the arguments yourself:
 
 ```javascript
 require('yargs')([ '-x', '1', '-y', '2' ]).argv
@@ -38,7 +38,16 @@ Calling `.parse()` with no arguments is equivalent to calling `yargs.argv`:
 require('yargs').parse()
 ```
 
-The rest of these methods below come in just before the terminating `.argv`.
+When passing in the arguments yourself, note that Yargs expects the passed array
+to contain only the arguments after the program name, while `process.argv`
+usually starts with extra elements. For example, [Node’s
+`process.argv`](https://nodejs.org/api/process.html#process_process_argv) array
+starts with two extra elements:`process.execPath` and the path to the JavaScript
+file being executed. So if you’re getting your arguments from `process.argv` in
+Node, pass `process.argv.slice(2)` to Yargs.
+
+The rest of these methods below come in just before the terminating `.argv` or
+terminating `.parse()`.
 
 <a name="alias"></a>.alias(key, alias)
 ------------------
