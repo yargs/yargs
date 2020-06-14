@@ -909,7 +909,7 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
   // parser will apply env vars matching prefix to argv
   self.env = function (prefix) {
     argsert('[string|boolean]', [prefix], arguments.length)
-    if (prefix === false) options.envPrefix = undefined
+    if (prefix === false) delete options.envPrefix
     else options.envPrefix = prefix || ''
     return self
   }
@@ -1599,10 +1599,12 @@ export interface Options extends ParserOptions {
   __: Y18N['__']
   alias: Dictionary<string[]>
   array: string[]
+  boolean: string[]
   choices: Dictionary<string[]>
   config: Dictionary<ConfigCallback | boolean>
   configObjects: Dictionary[]
   configuration: Configuration
+  count: string[]
   defaultDescription: Dictionary<string | undefined>
   demandedCommands: Dictionary<{
     min: number,
@@ -1616,8 +1618,11 @@ export interface Options extends ParserOptions {
   /** Manually set keys */
   key: Dictionary<boolean | string>
   local: string[]
+  normalize: string[]
+  number: string[]
   showHiddenOpt: string
   skipValidation: string[]
+  string: string[]
 }
 
 export interface Configuration extends Partial<ParserConfiguration> {

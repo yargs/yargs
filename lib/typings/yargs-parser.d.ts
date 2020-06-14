@@ -60,6 +60,8 @@ declare namespace yargsParser {
         'unknown-options-as-args': boolean;
     }
 
+    type ArrayOption = string | { key: string; string?: boolean, boolean?: boolean, number?: boolean, integer?: boolean };
+
     interface Options {
         /** An object representing the set of aliases for a key: `{ alias: { foo: ['f']} }`. */
         alias: { [key: string]: string | string[] };
@@ -68,32 +70,38 @@ declare namespace yargsParser {
          * Indicate that keys should be parsed as an array and coerced to booleans / numbers:
          * { array: [ { key: 'foo', boolean: true }, {key: 'bar', number: true} ] }`.
          */
-        array: string[] | Array<{ key: string; boolean?: boolean, number?: boolean }>;
+        array: ArrayOption | ArrayOption[];
         /** Arguments should be parsed as booleans: `{ boolean: ['x', 'y'] }`. */
-        boolean: string[];
+        boolean: string | string[];
+        /** Indicate a key that represents a path to a configuration file (this file will be loaded and parsed). */
+        config: string | string[] | { [key: string]: boolean | ConfigCallback };
+        /** configuration objects to parse, their properties will be set as arguments */
+        configObjects: Array<{ [key: string]: any }>;
+        /** Provide configuration options to the yargs-parser. */
+        configuration: Partial<Configuration>;
         /**
          * Provide a custom synchronous function that returns a coerced value from the argument provided (or throws an error), e.g.
          * `{ coerce: { foo: function (arg) { return modifiedArg } } }`.
          */
         coerce: { [key: string]: CoerceCallback };
-        /** Indicate a key that represents a path to a configuration file (this file will be loaded and parsed). */
-        config: string | string[] | { [key: string]: ConfigCallback | boolean };
-        /** Provide configuration options to the yargs-parser. */
-        configuration: Partial<Configuration>;
         /** Indicate a key that should be used as a counter, e.g., `-vvv = {v: 3}`. */
-        count: string[];
+        count: string | string[];
         /** Provide default values for keys: `{ default: { x: 33, y: 'hello world!' } }`. */
         default: { [key: string]: any };
         /** Environment variables (`process.env`) with the prefix provided should be parsed. */
-        envPrefix?: string;
+        envPrefix: string;
         /** Specify that a key requires n arguments: `{ narg: {x: 2} }`. */
         narg: { [key: string]: number };
         /** `path.normalize()` will be applied to values set to this key. */
-        normalize: string[];
-        /** Keys should be treated as numbers. */
-        number: string[];
+        normalize: string | string[];
         /** Keys should be treated as strings (even if they resemble a number `-x 33`). */
-        string: string[];
+        string: string | string[];
+        /** Keys should be treated as numbers. */
+        number: string | string[];
+        /** i18n handler, defaults to util.format */
+        __: (format: any, ...param: any[]) => string;
+        /** alias lookup table defaults */
+        key: { [key: string]: any };
     }
 
     interface CoerceCallback {
@@ -105,8 +113,8 @@ declare namespace yargsParser {
     }
 
     interface Parser {
-        (argv: string | string[], opts?: Partial<Options>): Arguments;
-        detailed(argv: string | string[], opts?: Partial<Options>): DetailedArguments;
+        (args: string | any[], opts?: Partial<Options>): Arguments;
+        detailed(args: string | any[], opts?: Partial<Options>): DetailedArguments;
     }
 }
 
