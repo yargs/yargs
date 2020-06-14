@@ -38,13 +38,13 @@ export function applyMiddleware (
 ) {
   const beforeValidationError = new Error('middleware cannot return a promise when applyBeforeValidation is true')
   return middlewares
-    .reduce<Arguments | Promise<Arguments>>((accumulation, middleware) => {
+    .reduce<Arguments | Promise<Arguments>>((acc, middleware) => {
       if (middleware.applyBeforeValidation !== beforeValidation) {
-        return accumulation
+        return acc
       }
 
-      if (isPromise(accumulation)) {
-        return accumulation
+      if (isPromise(acc)) {
+        return acc
           .then(initialObj =>
             Promise.all<Arguments, Partial<Arguments>>([initialObj, middleware(initialObj, yargs)])
           )
@@ -52,12 +52,12 @@ export function applyMiddleware (
             Object.assign(initialObj, middlewareObj)
           )
       } else {
-        const result = middleware(accumulation, yargs)
+        const result = middleware(acc, yargs)
         if (beforeValidation && isPromise(result)) throw beforeValidationError
 
         return isPromise(result)
-          ? result.then(middlewareObj => Object.assign(accumulation, middlewareObj))
-          : Object.assign(accumulation, result)
+          ? result.then(middlewareObj => Object.assign(acc, middlewareObj))
+          : Object.assign(acc, result)
       }
     }, argv)
 }
