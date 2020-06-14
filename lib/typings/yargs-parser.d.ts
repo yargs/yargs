@@ -6,8 +6,6 @@ declare namespace yargsParser {
     interface Arguments {
         /** Non-option arguments */
         _: string[];
-        /** The script name or node command */
-        $0: string;
         /** All remaining options */
         [argName: string]: any;
     }

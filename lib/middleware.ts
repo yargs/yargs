@@ -1,7 +1,6 @@
 import { argsert } from './argsert'
 import { isPromise } from './is-promise'
-import { YargsInstance } from './yargs'
-import { Arguments } from 'yargs-parser'
+import { YargsInstance, Arguments } from './yargs'
 
 export function globalMiddlewareFactory<T> (globalMiddleware: Middleware[], context: T) {
   return function (callback: MiddlewareCallback | MiddlewareCallback[], applyBeforeValidation = false) {

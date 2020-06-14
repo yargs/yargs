@@ -1,6 +1,13 @@
 import { CommandInstance, CommandHandler, CommandBuilderDefinition, CommandBuilder, CommandHandlerCallback, FinishCommandHandler, command as Command } from './command'
 import { Dictionary, assertNotStrictEqual, KeyOf, DictionaryKeyof, ValueOf, objectKeys, assertSingleKey } from './common-types'
-import { Arguments, DetailedArguments, Configuration as ParserConfiguration, Options as ParserOptions, ConfigCallback, CoerceCallback } from 'yargs-parser'
+import {
+  Arguments as ParserArguments,
+  DetailedArguments as ParserDetailedArguments,
+  Configuration as ParserConfiguration,
+  Options as ParserOptions,
+  ConfigCallback,
+  CoerceCallback
+} from 'yargs-parser'
 import { YError } from './yerror'
 import { UsageInstance, FailureFunction, usage as Usage } from './usage'
 import { argsert } from './argsert'
@@ -1188,9 +1195,9 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
     })
     const parsed = Parser.detailed(args, Object.assign({}, options, {
       configuration: config
-    }))
+    })) as DetailedArguments
 
-    let argv = parsed.argv
+    let argv = parsed.argv as Arguments
     if (parseContext) argv = Object.assign({}, argv, parseContext)
     const aliases = parsed.aliases
 
@@ -1691,4 +1698,13 @@ interface FrozenYargsInstance {
 
 interface ParseCallback {
   (err: YError | string | undefined | null, argv: Arguments | Promise<Arguments>, output: string): void
+}
+
+export interface Arguments extends ParserArguments {
+  /** The script name or node command */
+  $0: string
+}
+
+export interface DetailedArguments extends ParserDetailedArguments {
+  argv: Arguments
 }

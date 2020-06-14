@@ -7,8 +7,7 @@ import { RequireDirectoryOptions } from 'require-directory'
 import { UsageInstance } from './usage'
 import { inspect } from 'util'
 import { ValidationInstance } from './validation'
-import { YargsInstance, isYargsInstance, Options, OptionDefinition, Context, Configuration } from './yargs'
-import { DetailedArguments, Arguments } from 'yargs-parser'
+import { YargsInstance, isYargsInstance, Options, OptionDefinition, Context, Configuration, Arguments, DetailedArguments } from './yargs'
 import requireDirectory = require('require-directory')
 import whichModule = require('which-module')
 import Parser = require('yargs-parser')
