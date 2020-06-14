@@ -1,4 +1,4 @@
-// TODO: either update @types/y18n with this or convert y18n to typescript
+// TODO: either update @types/yargs-parser with this or convert yargs-parser to typescript
 // Forked from: https://github.com/DefinitelyTyped/DefinitelyTyped/blob/699b8159a6f571a14ef6d1d07b956cf78c8e729c/types/yargs-parser/index.d.ts
 
 /* eslint no-redeclare: "off" */
