@@ -288,13 +288,13 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
 
   self.choices = function (key: string | string[] | Dictionary<string | string[]>, value?: string | string[]) {
     argsert('<object|string|array> [string|array]', [key, value], arguments.length)
-    populateParserHintArrayDictionnary(self.choices, 'choices', key, value)
+    populateParserHintArrayDictionary(self.choices, 'choices', key, value)
     return self
   }
 
   self.alias = function (key: string | string[] | Dictionary<string | string[]>, value?: string | string[]) {
     argsert('<object|string|array> [string|array]', [key, value], arguments.length)
-    populateParserHintArrayDictionnary(self.alias, 'alias', key, value)
+    populateParserHintArrayDictionary(self.alias, 'alias', key, value)
     return self
   }
 
@@ -356,12 +356,12 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
     key: K | K[] | { [key in K]: V },
     value?: V
   ) {
-    populateParserHintDictionnary<T, K, V>(builder, type, key, value, (type, key, value) => {
+    populateParserHintDictionary<T, K, V>(builder, type, key, value, (type, key, value) => {
       options[type][key] = value as ValueOf<Options[T]>
     })
   }
 
-  function populateParserHintArrayDictionnary<
+  function populateParserHintArrayDictionary<
     T extends DictionaryKeyof<Options, any[]>,
     K extends keyof Options[T] & string = keyof Options[T] & string,
     V extends ValueOf<ValueOf<Options[T]>> | ValueOf<ValueOf<Options[T]>>[] = ValueOf<ValueOf<Options[T]>> | ValueOf<ValueOf<Options[T]>>[]
@@ -371,12 +371,12 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
     key: K | K[] | { [key in K]: V },
     value?: V
   ) {
-    populateParserHintDictionnary<T, K, V>(builder, type, key, value, (type, key, value) => {
+    populateParserHintDictionary<T, K, V>(builder, type, key, value, (type, key, value) => {
       options[type][key] = (options[type][key] || [] as Options[T][keyof Options[T]]).concat(value)
     })
   }
 
-  function populateParserHintDictionnary<T extends keyof Options, K extends keyof Options[T], V> (
+  function populateParserHintDictionary<T extends keyof Options, K extends keyof Options[T], V> (
     builder: (key: K, value: V, ...otherArgs: any[]) => YargsInstance,
     type: T,
     key: K | K[] | { [key in K]: V },
