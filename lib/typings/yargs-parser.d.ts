@@ -36,8 +36,12 @@ declare namespace yargsParser {
         'duplicate-arguments-array': boolean;
         /** Should array arguments be coerced into a single array when duplicated. Default is `true` */
         'flatten-duplicate-arrays': boolean;
+        /** Should arrays consume more than one positional argument following their flag? Default is `true` */
+        'greedy-arrays': boolean;
         /** Should parsing stop at the first text argument? This is similar to how e.g. ssh parses its command line. Default is `false` */
         'halt-at-non-option': boolean;
+        /** Should nargs consume dash options as well as positional arguments? Default is `false` */
+        'nargs-eats-options': boolean;
         /** The prefix to use for negated boolean variables. Default is `'no-'` */
         'negation-prefix': string;
         /** Should keys that look like numbers be treated as such? Default is `true` */
