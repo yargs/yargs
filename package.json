@@ -15,8 +15,6 @@
     "build",
     "lib/**/*.js",
     "locales",
-    "completion.sh.hbs",
-    "completion.zsh.hbs",
     "LICENSE"
   ],
   "dependencies": {
