@@ -26,7 +26,7 @@ export type NotEmptyArray<T = any> = [T, ...T[]]
 export type ValueOf<T> = T extends (infer U)[] ? U : T[keyof T];
 
 /**
- * Typing wraper around assert.notStrictEqual()
+ * Typing wrapper around assert.notStrictEqual()
  */
 export function assertNotStrictEqual<N, T> (actual: T|N, expected: N, message ?: string | Error)
 : asserts actual is Exclude<T, N> {
