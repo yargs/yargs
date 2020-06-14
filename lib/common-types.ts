@@ -1,4 +1,4 @@
-import { notStrictEqual } from 'assert'
+import { notStrictEqual, strictEqual } from 'assert'
 
 /**
  * An object whose all properties have the same type.
@@ -34,10 +34,10 @@ export function assertNotStrictEqual<N, T> (actual: T|N, expected: N, message ?:
 }
 
 /**
- * Asserts actual is neither a Dictionary nor an array.
+ * Asserts actual is a single key, not a key array or a key map.
  */
 export function assertSingleKey (actual: string | string[] | Dictionary): asserts actual is string {
-  notStrictEqual(typeof actual, 'object')
+  strictEqual(typeof actual, 'string')
 }
 
 /**
