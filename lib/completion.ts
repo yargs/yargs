@@ -4,8 +4,9 @@ import { isPromise } from './is-promise'
 import { parseCommand } from './parse-command'
 import * as path from 'path'
 import { UsageInstance } from './usage'
-import { YargsInstance } from './yargs-types'
+import { YargsInstance } from './yargs'
 import { Arguments, DetailedArguments } from 'yargs-parser'
+import { assertNotStrictEqual } from './common-types'
 
 // add bash completions to your
 //  yargs-powered applications.
@@ -31,7 +32,9 @@ export function completion (yargs: YargsInstance, usage: UsageInstance, command:
 
     // a custom completion function can be provided
     // to completion().
-    if (completionFunction) {
+    function runCompletionFunction (argv: Arguments) {
+      assertNotStrictEqual(completionFunction, null)
+
       if (isSyncCompletionFunction(completionFunction)) {
         const result = completionFunction(current, argv)
 
@@ -52,6 +55,10 @@ export function completion (yargs: YargsInstance, usage: UsageInstance, command:
           done(completions)
         })
       }
+    }
+
+    if (completionFunction) {
+      return isPromise(argv) ? argv.then(runCompletionFunction) : runCompletionFunction(argv)
     }
 
     const handlers = command.getCommandHandlers()
@@ -137,7 +144,7 @@ export function completion (yargs: YargsInstance, usage: UsageInstance, command:
 }
 
 /** Instance of the completion module. */
-interface CompletionInstance {
+export interface CompletionInstance {
   completionKey: string
   generateCompletionScript($0: string, cmd: string): string
   getCompletion(args: string[], done: (completions: string[]) => any): any
@@ -145,7 +152,7 @@ interface CompletionInstance {
   setParsed(parsed: DetailedArguments): void
 }
 
-type CompletionFunction = SyncCompletionFunction | AsyncCompletionFunction
+export type CompletionFunction = SyncCompletionFunction | AsyncCompletionFunction
 
 interface SyncCompletionFunction {
   (current: string, argv: Arguments): string[] | Promise<string[]>

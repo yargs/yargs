@@ -1,11 +1,11 @@
 import { argsert } from './argsert'
-import { Dictionary, assertNotUndefined } from './common-types'
+import { Dictionary, assertNotStrictEqual } from './common-types'
 import { levenshtein as distance } from './levenshtein'
 import { objFilter } from './obj-filter'
 import { UsageInstance } from './usage'
-import { YargsInstance } from './yargs-types'
-import { Arguments, DetailedArguments } from 'yargs-parser'
-import Y18N = require('y18n')
+import { YargsInstance, Arguments } from './yargs'
+import { DetailedArguments } from 'yargs-parser'
+import { Y18N } from 'y18n'
 const specialKeys = ['$0', '--', '_']
 
 // validation-type-stuff, missing params,
@@ -84,7 +84,7 @@ export function validation (yargs: YargsInstance, usage: UsageInstance, y18n: Y1
   // make sure all the required arguments are present.
   self.requiredArguments = function requiredArguments (argv) {
     const demandedOptions = yargs.getDemandedOptions()
-    let missing: Dictionary<string> | null = null
+    let missing: Dictionary<string | undefined> | null = null
 
     for (const key of Object.keys(demandedOptions)) {
       if (!Object.prototype.hasOwnProperty.call(argv, key) || typeof argv[key] === 'undefined') {
@@ -179,7 +179,7 @@ export function validation (yargs: YargsInstance, usage: UsageInstance, y18n: Y1
     if (!Object.prototype.hasOwnProperty.call(aliases, key)) {
       return false
     }
-    const newAliases = yargs.parsed.newAliases
+    const newAliases = (yargs.parsed as DetailedArguments).newAliases
     for (const a of [key, ...aliases[key]]) {
       if (!Object.prototype.hasOwnProperty.call(newAliases, a) || !newAliases[key]) {
         return true
@@ -254,7 +254,7 @@ export function validation (yargs: YargsInstance, usage: UsageInstance, y18n: Y1
 
   // check implications, argument foo implies => argument bar.
   let implied: Dictionary<KeyOrPos[]> = {}
-  self.implies = function implies (key: string | Dictionary<KeyOrPos | KeyOrPos[]>, value?: KeyOrPos | KeyOrPos[]) {
+  self.implies = function implies (key, value) {
     argsert('<string|object> [array|number|string]', [key, value], arguments.length)
 
     if (typeof key === 'object') {
@@ -269,6 +269,7 @@ export function validation (yargs: YargsInstance, usage: UsageInstance, y18n: Y1
       if (Array.isArray(value)) {
         value.forEach((i) => self.implies(key, i))
       } else {
+        assertNotStrictEqual(value, undefined)
         implied[key].push(value)
       }
     }
@@ -325,7 +326,7 @@ export function validation (yargs: YargsInstance, usage: UsageInstance, y18n: Y1
   }
 
   let conflicting: Dictionary<(string | undefined)[]> = {}
-  self.conflicts = function conflicts (key: string | Dictionary<string | string []>, value?: string | string[]) {
+  self.conflicts = function conflicts (key, value) {
     argsert('<string|object> [array|string]', [key, value], arguments.length)
 
     if (typeof key === 'object') {
@@ -393,7 +394,7 @@ export function validation (yargs: YargsInstance, usage: UsageInstance, y18n: Y1
   }
   self.unfreeze = function unfreeze () {
     const frozen = frozens.pop()
-    assertNotUndefined(frozen)
+    assertNotStrictEqual(frozen, undefined)
     ;({
       implied,
       checks,
@@ -408,15 +409,13 @@ export function validation (yargs: YargsInstance, usage: UsageInstance, y18n: Y1
 export interface ValidationInstance {
   check(f: CustomCheck['func'], global: boolean): void
   conflicting(argv: Arguments): void
-  conflicts(key: string, value: string | string[]): void
-  conflicts(key: Dictionary<string | string[]>): void
+  conflicts(key: string | Dictionary<string | string[]>, value?: string | string[]): void
   customChecks(argv: Arguments, aliases: DetailedArguments['aliases']): void
   freeze(): void
   getConflicting(): Dictionary<(string | undefined)[]>
   getImplied(): Dictionary<KeyOrPos[]>
   implications(argv: Arguments): void
-  implies(key: string, value: KeyOrPos | KeyOrPos[]): void
-  implies(key: Dictionary<KeyOrPos | KeyOrPos[]>): void
+  implies(key: string | Dictionary<KeyOrPos | KeyOrPos[]>, value?: KeyOrPos | KeyOrPos[]): void
   isValidAndSomeAliasIsNotNew(key: string, aliases: DetailedArguments['aliases']): boolean
   limitedChoices(argv: Arguments): void
   nonOptionCount(argv: Arguments): void
@@ -445,4 +444,4 @@ interface FrozenValidationInstance {
   conflicting: Dictionary<(string | undefined)[]>
 }
 
-type KeyOrPos = string | number | undefined
+export type KeyOrPos = string | number

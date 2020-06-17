@@ -1,7 +1,6 @@
 import { argsert } from './argsert'
 import { isPromise } from './is-promise'
-import { YargsInstance } from './yargs-types'
-import { Arguments } from 'yargs-parser'
+import { YargsInstance, Arguments } from './yargs'
 
 export function globalMiddlewareFactory<T> (globalMiddleware: Middleware[], context: T) {
   return function (callback: MiddlewareCallback | MiddlewareCallback[], applyBeforeValidation = false) {
@@ -31,20 +30,20 @@ export function commandMiddlewareFactory (commandMiddleware?: MiddlewareCallback
 }
 
 export function applyMiddleware (
-  argv: Arguments,
+  argv: Arguments | Promise<Arguments>,
   yargs: YargsInstance,
   middlewares: Middleware[],
   beforeValidation: boolean
 ) {
   const beforeValidationError = new Error('middleware cannot return a promise when applyBeforeValidation is true')
   return middlewares
-    .reduce<Arguments | Promise<Arguments>>((accumulation, middleware) => {
+    .reduce<Arguments | Promise<Arguments>>((acc, middleware) => {
       if (middleware.applyBeforeValidation !== beforeValidation) {
-        return accumulation
+        return acc
       }
 
-      if (isPromise(accumulation)) {
-        return accumulation
+      if (isPromise(acc)) {
+        return acc
           .then(initialObj =>
             Promise.all<Arguments, Partial<Arguments>>([initialObj, middleware(initialObj, yargs)])
           )
@@ -52,17 +51,17 @@ export function applyMiddleware (
             Object.assign(initialObj, middlewareObj)
           )
       } else {
-        const result = middleware(argv, yargs)
+        const result = middleware(acc, yargs)
         if (beforeValidation && isPromise(result)) throw beforeValidationError
 
         return isPromise(result)
-          ? result.then(middlewareObj => Object.assign(accumulation, middlewareObj))
-          : Object.assign(accumulation, result)
+          ? result.then(middlewareObj => Object.assign(acc, middlewareObj))
+          : Object.assign(acc, result)
       }
     }, argv)
 }
 
-interface MiddlewareCallback {
+export interface MiddlewareCallback {
   (argv: Arguments, yargs: YargsInstance): Partial<Arguments> | Promise<Partial<Arguments>>
 }
 

@@ -1,4 +1,4 @@
-import { Dictionary, assertNotUndefined, assertNotTrue } from './common-types'
+import { Dictionary, assertNotStrictEqual } from './common-types'
 import { isPromise } from './is-promise'
 import { applyMiddleware, commandMiddlewareFactory, Middleware } from './middleware'
 import { parseCommand, Positional } from './parse-command'
@@ -7,9 +7,7 @@ import { RequireDirectoryOptions } from 'require-directory'
 import { UsageInstance } from './usage'
 import { inspect } from 'util'
 import { ValidationInstance } from './validation'
-import { YargsInstance, isYargsInstance, Options, OptionDefinition } from './yargs-types'
-import { DetailedArguments, Arguments } from 'yargs-parser'
-import { Context } from 'vm'
+import { YargsInstance, isYargsInstance, Options, OptionDefinition, Context, Configuration, Arguments, DetailedArguments } from './yargs'
 import requireDirectory = require('require-directory')
 import whichModule = require('which-module')
 import Parser = require('yargs-parser')
@@ -148,7 +146,7 @@ export function command (
   function extractDesc ({ describe, description, desc }: CommandHandlerDefinition) {
     for (const test of [describe, description, desc]) {
       if (typeof test === 'string' || test === false) return test
-      assertNotTrue(test)
+      assertNotStrictEqual(test, true as true)
     }
     return false
   }
@@ -161,7 +159,7 @@ export function command (
 
   self.runCommand = function runCommand (command, yargs, parsed, commandIndex) {
     let aliases = parsed.aliases
-    const commandHandler = handlers[command] || handlers[aliasMap[command]] || defaultCommand
+    const commandHandler = handlers[command!] || handlers[aliasMap[command!]] || defaultCommand
     const currentContext = yargs.getContext()
     let numFiles = currentContext.files.length
     const parentCommands = currentContext.commands.slice()
@@ -186,7 +184,7 @@ export function command (
         )
       }
       innerArgv = innerYargs._parseArgs(null, null, true, commandIndex)
-      aliases = innerYargs.parsed.aliases
+      aliases = (innerYargs.parsed as DetailedArguments).aliases
     } else if (isCommandBuilderOptionDefinitions(builder)) {
       // as a short hand, an object can instead be provided, specifying
       // the options that a command takes.
@@ -201,11 +199,11 @@ export function command (
         innerYargs.option(key, builder[key])
       })
       innerArgv = innerYargs._parseArgs(null, null, true, commandIndex)
-      aliases = innerYargs.parsed.aliases
+      aliases = (innerYargs.parsed as DetailedArguments).aliases
     }
 
     if (!yargs._hasOutput()) {
-      positionalMap = populatePositionals(commandHandler, innerArgv, currentContext)
+      positionalMap = populatePositionals(commandHandler, innerArgv as Arguments, currentContext)
     }
 
     const middlewares = globalMiddleware.slice(0).concat(commandHandler.middlewares)
@@ -213,7 +211,14 @@ export function command (
 
     // we apply validation post-hoc, so that custom
     // checks get passed populated positional arguments.
-    if (!yargs._hasOutput()) yargs._runValidation(innerArgv, aliases, positionalMap, yargs.parsed.error, !command)
+    if (!yargs._hasOutput()) {
+      yargs._runValidation(
+      innerArgv as Arguments,
+      aliases,
+      positionalMap,
+      (yargs.parsed as DetailedArguments).error,
+      !command)
+    }
 
     if (commandHandler.handler && !yargs._hasOutput()) {
       yargs._setHasOutput()
@@ -279,7 +284,7 @@ export function command (
   }
 
   self.runDefaultBuilderOn = function (yargs) {
-    assertNotUndefined(defaultCommand)
+    assertNotStrictEqual(defaultCommand, undefined)
     if (shouldUpdateUsage(yargs)) {
       // build the root-level command string from the default string.
       const commandString = DEFAULT_MARKER.test(defaultCommand.original)
@@ -360,7 +365,7 @@ export function command (
     // short-circuit parse.
     if (!unparsed.length) return
 
-    const config = Object.assign({}, options.configuration, {
+    const config: Configuration = Object.assign({}, options.configuration, {
       'populate--': true
     })
     const parsed = Parser.detailed(unparsed, Object.assign({}, options, {
@@ -440,7 +445,7 @@ export function command (
   }
   self.unfreeze = () => {
     const frozen = frozens.pop()
-    assertNotUndefined(frozen)
+    assertNotStrictEqual(frozen, undefined)
     ;({
       handlers,
       aliasMap,
@@ -475,7 +480,7 @@ export interface CommandInstance {
   getCommands (): string[]
   hasDefaultCommand (): boolean
   reset (): CommandInstance
-  runCommand (command: string, yargs: YargsInstance, parsed: DetailedArguments, commandIndex: number): void
+  runCommand (command: string | null, yargs: YargsInstance, parsed: DetailedArguments, commandIndex?: number): Arguments | Promise<Arguments>
   runDefaultBuilderOn (yargs: YargsInstance): void
   unfreeze(): void
 }
@@ -545,4 +550,8 @@ type FrozenCommandInstance = {
   handlers: Dictionary<CommandHandler>
   aliasMap: Dictionary<string>
   defaultCommand: CommandHandler | undefined
+}
+
+export interface FinishCommandHandler {
+  (handlerResult: any): any
 }
