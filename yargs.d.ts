@@ -1,4 +1,5 @@
-import { DetailedArguments, Configuration } from 'yargs-parser';
+import { YargsInstance, RebaseFunction } from './build/lib/yargs'
+import { Parser, DetailedArguments, Configuration } from 'yargs-parser';
 
 declare namespace yargs {
   type BuilderCallback<T, R> = ((args: Argv<T>) => PromiseLike<Argv<R>>) | ((args: Argv<T>) => Argv<R>) | ((args: Argv<T>) => void);
@@ -756,10 +757,10 @@ declare namespace yargs {
   type PositionalOptionsType = "boolean" | "number" | "string";
 }
 
-declare function yargs(
-  processArgs?: ReadonlyArray<string>,
-  cwd?: string,
-  parentRequire?: NodeRequire,
-): yargs.Argv;
+declare interface yargs {
+  (processArgs?: string | string[], cwd?: string, parentRequire?: NodeRequire): YargsInstance
+  rebase: RebaseFunction
+  Parser: Parser
+}
 
 export = yargs;
