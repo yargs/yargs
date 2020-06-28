@@ -457,6 +457,11 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
     return self
   }
 
+  self.examples = function (examples: [string, string][]) {
+    argsert('<array>', [examples], arguments.length)
+    return examples.reduce((_self, example) => _self.example(...example), self);
+  }
+
   self.command = function (cmd, description, builder, handler, middlewares, deprecated) {
     argsert('<string|array|object> [string|boolean] [function|object] [function] [array] [boolean|string]', [cmd, description, builder, handler, middlewares, deprecated], arguments.length)
     command.addHandler(cmd, description, builder, handler, middlewares, deprecated)
