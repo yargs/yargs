@@ -1084,6 +1084,33 @@ describe('usage tests', () => {
     ])
   })
 
+  it('should display examples on fail when passing multiple examples at once', () => {
+    const r = checkUsage(() => yargs('')
+      .examples([
+        ['$0 something', 'description'],
+        ['$0 something else', 'other description']
+      ])
+      .demand(['y'])
+      .wrap(null)
+      .parse()
+    )
+    r.should.have.property('result')
+    r.result.should.have.property('_').with.length(0)
+    r.should.have.property('errors')
+    r.should.have.property('logs').with.length(0)
+    r.should.have.property('exit').and.equal(true)
+    r.errors.join('\n').split(/\n+/).should.deep.equal([
+      'Options:',
+      '  --help     Show help  [boolean]',
+      '  --version  Show version number  [boolean]',
+      '  -y  [required]',
+      'Examples:',
+      '  usage something       description',
+      '  usage something else  other description',
+      'Missing required argument: y'
+    ])
+  })
+
   describe('demand option with boolean flag', () => {
     describe('with demand option', () => {
       it('should report missing required arguments', () => {
