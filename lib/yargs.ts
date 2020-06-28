@@ -1496,6 +1496,7 @@ export interface YargsInstance {
   epilog: YargsInstance['epilogue']
   epilogue (msg: string): YargsInstance
   example (cmd: string, description?: string): YargsInstance
+  examples (examples: [string, string?][]): YargsInstance
   exit (code: number, err?: YError | string): void
   exitProcess (enabled: boolean): YargsInstance
   fail (f: FailureFunction): YargsInstance
