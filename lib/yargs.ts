@@ -459,7 +459,7 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
 
   self.examples = function (examples: [string, string][]) {
     argsert('<array>', [examples], arguments.length)
-    return examples.reduce((_self, example) => _self.example(...example), self);
+    return examples.reduce((_self, example) => _self.example(...example), self)
   }
 
   self.command = function (cmd, description, builder, handler, middlewares, deprecated) {
