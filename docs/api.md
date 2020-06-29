@@ -766,7 +766,7 @@ var argv = require('yargs')
 
 .example(cmd, desc)
 -------------------
-.example(exampleArray)
+.example([[cmd1, desc1], [cmd2, desc2], ...])
 -------------------
 
 Give some example invocations of your program. Inside `cmd`, the string
