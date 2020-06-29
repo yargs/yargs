@@ -30,7 +30,7 @@ import setBlocking = require('set-blocking')
 import findUp = require('find-up')
 import requireMainFilename = require('require-main-filename')
 
-export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(), parentRequire = require) {
+export function Yargs(processArgs: string | string[] = [], cwd = process.cwd(), parentRequire = require) {
   const self = {} as YargsInstance
   let command: CommandInstance
   let completion: CompletionInstance | null = null
@@ -86,7 +86,7 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
   // that have been set to "global" will not be reset
   // by this action.
   let options: Options
-  self.resetOptions = self.reset = function resetOptions (aliases = {}) {
+  self.resetOptions = self.reset = function resetOptions(aliases = {}) {
     context.resets++
     options = options || {}
     // put yargs back into an initial state, this
@@ -101,9 +101,9 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
     const localLookup: Dictionary<boolean> = {}
     tmpOptions.local.forEach((l) => {
       localLookup[l] = true
-      ;(aliases[l] || []).forEach((a) => {
-        localLookup[a] = true
-      })
+        ; (aliases[l] || []).forEach((a) => {
+          localLookup[a] = true
+        })
     })
 
     // add all groups not set to local to preserved groups
@@ -162,7 +162,7 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
 
   // temporary hack: allow "freezing" of reset-able state for parse(msg, cb)
   const frozens: FrozenYargsInstance[] = []
-  function freeze () {
+  function freeze() {
     frozens.push({
       options,
       configObjects: options.configObjects.slice(0),
@@ -183,26 +183,26 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
     validation.freeze()
     command.freeze()
   }
-  function unfreeze () {
+  function unfreeze() {
     const frozen = frozens.pop()
     assertNotStrictEqual(frozen, undefined)
     let configObjects: Dictionary[]
-    ;({
-      options,
-      configObjects,
-      exitProcess,
-      groups,
-      output,
-      exitError,
-      hasOutput,
-      parsed: self.parsed,
-      strict,
-      strictCommands,
-      completionCommand,
-      parseFn,
-      parseContext,
-      handlerFinishCommand
-    } = frozen)
+      ; ({
+        options,
+        configObjects,
+        exitProcess,
+        groups,
+        output,
+        exitError,
+        hasOutput,
+        parsed: self.parsed,
+        strict,
+        strictCommands,
+        completionCommand,
+        parseFn,
+        parseContext,
+        handlerFinishCommand
+      } = frozen)
     options.configObjects = configObjects
     usage.unfreeze()
     validation.unfreeze()
@@ -269,7 +269,7 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
     return self
   }
 
-  function populateParserHintArray<T extends KeyOf<Options, string[]>> (
+  function populateParserHintArray<T extends KeyOf<Options, string[]>>(
     type: T,
     keys: string | string[]
   ) {
@@ -325,12 +325,12 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
     return self
   }
 
-  function setKey (key: string | string[] | Dictionary<string | boolean>, set?: boolean | string) {
+  function setKey(key: string | string[] | Dictionary<string | boolean>, set?: boolean | string) {
     populateParserHintSingleValueDictionary(setKey, 'key', key, set)
     return self
   }
 
-  function demandOption (keys: string | string[] | Dictionary<string | undefined>, msg?: string) {
+  function demandOption(keys: string | string[] | Dictionary<string | undefined>, msg?: string) {
     argsert('<object|string|array> [string]', [keys, msg], arguments.length)
     populateParserHintSingleValueDictionary(self.demandOption, 'demandedOptions', keys, msg)
     return self
@@ -350,7 +350,7 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
     T extends Exclude<DictionaryKeyof<Options>, DictionaryKeyof<Options, any[]>> | 'default',
     K extends keyof Options[T] & string = keyof Options[T] & string,
     V extends ValueOf<Options[T]> = ValueOf<Options[T]>
-  > (
+  >(
     builder: (key: K, value: V, ...otherArgs: any[]) => YargsInstance,
     type: T,
     key: K | K[] | { [key in K]: V },
@@ -365,7 +365,7 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
     T extends DictionaryKeyof<Options, any[]>,
     K extends keyof Options[T] & string = keyof Options[T] & string,
     V extends ValueOf<ValueOf<Options[T]>> | ValueOf<ValueOf<Options[T]>>[] = ValueOf<ValueOf<Options[T]>> | ValueOf<ValueOf<Options[T]>>[]
-  > (
+  >(
     builder: (key: K, value: V, ...otherArgs: any[]) => YargsInstance,
     type: T,
     key: K | K[] | { [key in K]: V },
@@ -376,7 +376,7 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
     })
   }
 
-  function populateParserHintDictionary<T extends keyof Options, K extends keyof Options[T], V> (
+  function populateParserHintDictionary<T extends keyof Options, K extends keyof Options[T], V>(
     builder: (key: K, value: V, ...otherArgs: any[]) => YargsInstance,
     type: T,
     key: K | K[] | { [key in K]: V },
@@ -400,14 +400,14 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
 
   // TODO(bcoe): in future major versions move more objects towards
   // Object.create(null):
-  function sanitizeKey<K extends any> (key: K): K;
-  function sanitizeKey (key: '__proto__'): '___proto___';
-  function sanitizeKey (key: any) {
+  function sanitizeKey<K extends any>(key: K): K;
+  function sanitizeKey(key: '__proto__'): '___proto___';
+  function sanitizeKey(key: any) {
     if (key === '__proto__') return '___proto___'
     return key
   }
 
-  function deleteFromParserHintObject (optionKey: string) {
+  function deleteFromParserHintObject(optionKey: string) {
     // delete from all parsing hints:
     // boolean, array, key, alias, etc.
     objectKeys(options).forEach((hintKey: keyof Options) => {
@@ -424,7 +424,7 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
     delete usage.getDescriptions()[optionKey]
   }
 
-  self.config = function config (
+  self.config = function config(
     key: string | string[] | Dictionary = 'config',
     msg?: string | ConfigCallback,
     parseFn?: ConfigCallback
@@ -444,22 +444,23 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
     }
 
     self.describe(key, msg || usage.deferY18nLookup('Path to JSON config file'))
-    ;(Array.isArray(key) ? key : [key]).forEach((k) => {
-      options.config[k] = parseFn || true
-    })
+      ; (Array.isArray(key) ? key : [key]).forEach((k) => {
+        options.config[k] = parseFn || true
+      })
 
     return self
   }
 
-  self.example = function (cmd, description) {
-    argsert('<string> [string]', [cmd, description], arguments.length)
-    usage.example(cmd, description)
-    return self
-  }
+  self.example = function (cmd: string | [string, string?][], description) {
+    argsert('<string|array> [string]', [cmd, description], arguments.length)
 
-  self.examples = function (examples: [string, string][]) {
-    argsert('<array>', [examples], arguments.length)
-    return examples.reduce((_self, example) => _self.example(...example), self)
+    if (Array.isArray(cmd)) {
+      cmd.forEach((exampleParams) => self.example(...exampleParams))
+    } else {
+      usage.example(cmd, description)
+    }
+
+    return self
   }
 
   self.command = function (cmd, description, builder, handler, middlewares, deprecated) {
@@ -477,7 +478,7 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
 
   // TODO: deprecate self.demand in favor of
   // .demandCommand() .demandOption().
-  self.demand = self.required = self.require = function demand (
+  self.demand = self.required = self.require = function demand(
     keys: string | string[] | Dictionary<string | undefined> | number,
     max?: number | string[] | string | true,
     msg?: string | true
@@ -515,7 +516,7 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
     return self
   }
 
-  self.demandCommand = function demandCommand (
+  self.demandCommand = function demandCommand(
     min: number = 1,
     max?: number | string,
     minMsg?: string | null,
@@ -550,7 +551,7 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
     return options.demandedCommands
   }
 
-  self.deprecateOption = function deprecateOption (option, message) {
+  self.deprecateOption = function deprecateOption(option, message) {
     argsert('<string> [string|boolean]', [option, message], arguments.length)
     options.deprecatedOptions[option] = message
     return self
@@ -625,7 +626,7 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
     return self
   }
 
-  self.global = function global (globals, global) {
+  self.global = function global(globals, global) {
     argsert('<string|array> [boolean]', [globals, global], arguments.length)
     globals = ([] as string[]).concat(globals)
     if (global !== false) {
@@ -638,7 +639,7 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
     return self
   }
 
-  self.pkgConf = function pkgConf (key, rootPath) {
+  self.pkgConf = function pkgConf(key, rootPath) {
     argsert('<string> [string]', [key, rootPath], arguments.length)
     let conf = null
     // prefer cwd to require-main-filename in this method
@@ -656,7 +657,7 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
   }
 
   const pkgs: Dictionary = {}
-  function pkgUp (rootPath?: string) {
+  function pkgUp(rootPath?: string) {
     const npath = rootPath || '*'
     if (pkgs[npath]) return pkgs[npath]
 
@@ -676,7 +677,7 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
       })
       assertNotStrictEqual(pkgJsonPath, undefined)
       obj = JSON.parse(fs.readFileSync(pkgJsonPath).toString())
-    } catch (noop) {}
+    } catch (noop) { }
 
     pkgs[npath] = obj || {}
     return pkgs[npath]
@@ -684,7 +685,7 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
 
   let parseFn: ParseCallback | null = null
   let parseContext: object | null = null
-  self.parse = function parse (
+  self.parse = function parse(
     args?: string | string[],
     shortCircuit?: object | ParseCallback | boolean,
     _parseFn?: ParseCallback
@@ -732,7 +733,7 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
 
   self._hasParseCallback = () => !!parseFn
 
-  self.option = self.options = function option (
+  self.option = self.options = function option(
     key: string | Dictionary<OptionDefinition>,
     opt?: OptionDefinition
   ) {
@@ -892,7 +893,7 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
     return self.option(key, opts)
   }
 
-  self.group = function group (opts, groupName) {
+  self.group = function group(opts, groupName) {
     argsert('<string|array> <string>', [opts, groupName], arguments.length)
     const existing = preservedGroups[groupName] || groups[groupName]
     if (preservedGroups[groupName]) {
@@ -942,7 +943,7 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
   self.getStrictCommands = () => strictCommands
 
   let parserConfig: Configuration = {}
-  self.parserConfiguration = function parserConfiguration (config) {
+  self.parserConfiguration = function parserConfiguration(config) {
     argsert('<object>', [config], arguments.length)
     parserConfig = config
     return self
@@ -961,7 +962,7 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
   }
 
   let versionOpt: string | null = null
-  self.version = function version (opt?: string | false, msg?: string, ver?: string) {
+  self.version = function version(opt?: string | false, msg?: string, ver?: string) {
     const defaultVersionOpt = 'version'
     argsert('[boolean|string] [string] [string]', [opt, msg, ver], arguments.length)
 
@@ -996,14 +997,14 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
     return self
   }
 
-  function guessVersion () {
+  function guessVersion() {
     const obj = pkgUp()
 
     return obj.version || 'unknown'
   }
 
   let helpOpt: string | null = null
-  self.addHelpOpt = self.help = function addHelpOpt (opt?: string | false, msg?: string) {
+  self.addHelpOpt = self.help = function addHelpOpt(opt?: string | false, msg?: string) {
     const defaultHelpOpt = 'help'
     argsert('[string|boolean] [string]', [opt, msg], arguments.length)
 
@@ -1027,7 +1028,7 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
 
   const defaultShowHiddenOpt = 'show-hidden'
   options!.showHiddenOpt = defaultShowHiddenOpt
-  self.addShowHiddenOpt = self.showHidden = function addShowHiddenOpt (opt?: string | false, msg?: string) {
+  self.addShowHiddenOpt = self.showHidden = function addShowHiddenOpt(opt?: string | false, msg?: string) {
     argsert('[string|boolean] [string]', [opt, msg], arguments.length)
 
     if (arguments.length === 1) {
@@ -1041,13 +1042,13 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
     return self
   }
 
-  self.hide = function hide (key) {
+  self.hide = function hide(key) {
     argsert('<string>', [key], arguments.length)
     options.hiddenOptions.push(key)
     return self
   }
 
-  self.showHelpOnFail = function showHelpOnFail (enabled?: string | boolean, message?: string) {
+  self.showHelpOnFail = function showHelpOnFail(enabled?: string | boolean, message?: string) {
     argsert('[boolean|string] [string]', [enabled, message], arguments.length)
     usage.showHelpOnFail(enabled, message)
     return self
@@ -1137,13 +1138,13 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
   // we use a custom logger that buffers output,
   // so that we can print to non-CLIs, e.g., chat-bots.
   const _logger = {
-    log (...args: any[]) {
+    log(...args: any[]) {
       if (!self._hasParseCallback()) console.log(...args)
       hasOutput = true
       if (output.length) output += '\n'
       output += args.join(' ')
     },
-    error (...args: any[]) {
+    error(...args: any[]) {
       if (!self._hasParseCallback()) console.error(...args)
       hasOutput = true
       if (output.length) output += '\n'
@@ -1182,8 +1183,8 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
     enumerable: true
   })
 
-  self._parseArgs = function parseArgs (
-    args: string | string [] | null,
+  self._parseArgs = function parseArgs(
+    args: string | string[] | null,
     shortCircuit?: boolean | null,
     _calledFromCommand?: boolean,
     commandIndex?: number
@@ -1291,7 +1292,7 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
         args = ([] as string[]).concat(args)
         const completionArgs = args.slice(args.indexOf(`--${completion!.completionKey}`) + 1)
         completion!.getCompletion(completionArgs, (completions) => {
-          ;(completions || []).forEach((completion) => {
+          ; (completions || []).forEach((completion) => {
             _logger.log(completion)
           })
 
@@ -1355,12 +1356,12 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
     // necessary: https://github.com/yargs/yargs/issues/1482
     try {
       delete argv['--']
-    } catch (_err) {}
+    } catch (_err) { }
 
     return argv
   }
 
-  self._runValidation = function runValidation (argv, aliases, positionalMap, parseErrors, isDefaultCommand = false) {
+  self._runValidation = function runValidation(argv, aliases, positionalMap, parseErrors, isDefaultCommand = false) {
     if (parseErrors) throw new YError(parseErrors.message)
     validation.nonOptionCount(argv)
     validation.requiredArguments(argv)
@@ -1377,7 +1378,7 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
     validation.conflicting(argv)
   }
 
-  function guessLocale () {
+  function guessLocale() {
     if (!detectLocale) return
     const locale = process.env.LC_ALL || process.env.LC_MESSAGES || process.env.LANG || process.env.LANGUAGE || 'en_US'
     self.locale(locale.replace(/[.:].*/, ''))
@@ -1393,7 +1394,7 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
 
 // rebase an absolute path to a relative one with respect to a base directory
 // exported for tests
-export function rebase (base: string, dir: string) {
+export function rebase(base: string, dir: string) {
   return path.relative(base, dir)
 }
 
@@ -1403,23 +1404,23 @@ export interface YargsInstance {
   argv: Arguments
   customScriptName: boolean
   parsed: DetailedArguments | false
-  _copyDoubleDash<T extends Arguments | Promise<Arguments>> (argv: T): T
-  _getLoggerInstance (): LoggerInstance
+  _copyDoubleDash<T extends Arguments | Promise<Arguments>>(argv: T): T
+  _getLoggerInstance(): LoggerInstance
   _getParseContext(): Object
-  _hasOutput (): boolean
-  _hasParseCallback (): boolean
+  _hasOutput(): boolean
+  _hasParseCallback(): boolean
   _parseArgs: {
     (args: null, shortCircuit: null, _calledFromCommand: boolean, commandIndex?: number): Arguments | Promise<Arguments>
     (args: string | string[], shortCircuit?: boolean): Arguments | Promise<Arguments>
   }
-  _runValidation (
+  _runValidation(
     argv: Arguments,
     aliases: Dictionary<string[]>,
     positionalMap: Dictionary<string[]>,
     parseErrors: Error | null,
     isDefaultCommand?: boolean
   ): void
-  _setHasOutput (): void
+  _setHasOutput(): void
   addHelpOpt: {
     (opt?: string | false): YargsInstance
     (opt?: string, msg?: string): YargsInstance
@@ -1432,8 +1433,8 @@ export interface YargsInstance {
     (keys: string | string[], aliases: string | string[]): YargsInstance
     (keyAliases: Dictionary<string | string[]>): YargsInstance
   }
-  array (keys: string | string[]): YargsInstance
-  boolean (keys: string | string[]): YargsInstance
+  array(keys: string | string[]): YargsInstance
+  boolean(keys: string | string[]): YargsInstance
   check(f: (argv: Arguments, aliases: Dictionary<string[]>) => any, _global?: boolean): YargsInstance
   choices: {
     (keys: string | string[], choices: string | string[]): YargsInstance
@@ -1443,15 +1444,15 @@ export interface YargsInstance {
     (keys: string | string[], coerceCallback: CoerceCallback): YargsInstance
     (keyCoerceCallbacks: Dictionary<CoerceCallback>): YargsInstance
   }
-  command (
+  command(
     cmd: string | string[],
     description: CommandHandler['description'],
-    builder ?: CommandBuilderDefinition | CommandBuilder,
-    handler ?: CommandHandlerCallback,
-    commandMiddleware ?: Middleware[],
-    deprecated ?: boolean
+    builder?: CommandBuilderDefinition | CommandBuilder,
+    handler?: CommandHandlerCallback,
+    commandMiddleware?: Middleware[],
+    deprecated?: boolean
   ): YargsInstance
-  commandDir (dir: string, opts?: RequireDirectoryOptions<any>): YargsInstance
+  commandDir(dir: string, opts?: RequireDirectoryOptions<any>): YargsInstance
   completion: {
     (cmd?: string, fn?: CompletionFunction): YargsInstance
     (cmd?: string, desc?: string | false, fn?: CompletionFunction): YargsInstance
@@ -1465,7 +1466,7 @@ export interface YargsInstance {
     (key: string, conflictsWith: string | string[]): YargsInstance
     (keyConflicts: Dictionary<string | string[]>): YargsInstance
   }
-  count (keys: string | string[]): YargsInstance
+  count(keys: string | string[]): YargsInstance
   default: {
     (key: string, value: any, defaultDescription?: string): YargsInstance
     (keys: string[], value: Exclude<any, Function>): YargsInstance
@@ -1479,47 +1480,46 @@ export interface YargsInstance {
     (keyMsgs: Dictionary<string | undefined>): YargsInstance
     (keyMsgs: Dictionary<string | undefined>, max: string[], msg?: string): YargsInstance
   }
-  demandCommand (): YargsInstance
-  demandCommand (min: number, minMsg?: string): YargsInstance
-  demandCommand (min: number, max: number, minMsg?: string | null, maxMsg?: string | null): YargsInstance
+  demandCommand(): YargsInstance
+  demandCommand(min: number, minMsg?: string): YargsInstance
+  demandCommand(min: number, max: number, minMsg?: string | null, maxMsg?: string | null): YargsInstance
   demandOption: {
     (keys: string | string[], msg?: string): YargsInstance
     (keyMsgs: Dictionary<string | undefined>): YargsInstance
   }
-  deprecateOption (option: string, message?: string | boolean): YargsInstance
+  deprecateOption(option: string, message?: string | boolean): YargsInstance
   describe: {
     (keys: string | string[], description?: string): YargsInstance
     (keyDescriptions: Dictionary<string>): YargsInstance
   }
-  detectLocale (detect: boolean): YargsInstance
-  env (prefix?: string | false): YargsInstance
+  detectLocale(detect: boolean): YargsInstance
+  env(prefix?: string | false): YargsInstance
   epilog: YargsInstance['epilogue']
-  epilogue (msg: string): YargsInstance
-  example (cmd: string, description?: string): YargsInstance
-  examples (examples: [string, string?][]): YargsInstance
-  exit (code: number, err?: YError | string): void
-  exitProcess (enabled: boolean): YargsInstance
-  fail (f: FailureFunction): YargsInstance
-  getCommandInstance (): CommandInstance
+  epilogue(msg: string): YargsInstance
+  example(cmd: string | [string, string?][], description?: string): YargsInstance
+  exit(code: number, err?: YError | string): void
+  exitProcess(enabled: boolean): YargsInstance
+  fail(f: FailureFunction): YargsInstance
+  getCommandInstance(): CommandInstance
   getCompletion(args: string[], done: (completions: string[]) => any): void
-  getContext (): Context
-  getDemandedCommands (): Options['demandedCommands']
-  getDemandedOptions (): Options['demandedOptions']
-  getDeprecatedOptions (): Options['deprecatedOptions']
+  getContext(): Context
+  getDemandedCommands(): Options['demandedCommands']
+  getDemandedOptions(): Options['demandedOptions']
+  getDeprecatedOptions(): Options['deprecatedOptions']
   getDetectLocale(): boolean
-  getExitProcess (): boolean
-  getGroups (): Dictionary<string[]>
-  getHandlerFinishCommand (): FinishCommandHandler | null
-  getOptions (): Options
-  getParserConfiguration (): Configuration
-  getStrict (): boolean
-  getStrictCommands (): boolean
-  getUsageInstance (): UsageInstance
-  getValidationInstance (): ValidationInstance
-  global (keys: string | string[], global?: boolean): YargsInstance
-  group (keys: string| string[], groupName: string): YargsInstance
+  getExitProcess(): boolean
+  getGroups(): Dictionary<string[]>
+  getHandlerFinishCommand(): FinishCommandHandler | null
+  getOptions(): Options
+  getParserConfiguration(): Configuration
+  getStrict(): boolean
+  getStrictCommands(): boolean
+  getUsageInstance(): UsageInstance
+  getValidationInstance(): ValidationInstance
+  global(keys: string | string[], global?: boolean): YargsInstance
+  group(keys: string | string[], groupName: string): YargsInstance
   help: YargsInstance['addHelpOpt']
-  hide (key: string): YargsInstance
+  hide(key: string): YargsInstance
   implies: {
     (key: string, implication: KeyOrPos | KeyOrPos[]): YargsInstance
     (keyImplications: Dictionary<KeyOrPos | KeyOrPos[]>): YargsInstance
@@ -1528,14 +1528,14 @@ export interface YargsInstance {
     (): string
     (locale: string): YargsInstance
   }
-  middleware (callback: MiddlewareCallback | MiddlewareCallback[], applyBeforeValidation?: boolean): YargsInstance
+  middleware(callback: MiddlewareCallback | MiddlewareCallback[], applyBeforeValidation?: boolean): YargsInstance
   nargs: {
     (keys: string | string[], nargs: number): YargsInstance
     (keyNargs: Dictionary<number>): YargsInstance
   }
-  normalize (keys: string | string[]): YargsInstance
-  number (keys: string | string[]): YargsInstance
-  onFinishCommand (f: FinishCommandHandler): YargsInstance
+  normalize(keys: string | string[]): YargsInstance
+  number(keys: string | string[]): YargsInstance
+  onFinishCommand(f: FinishCommandHandler): YargsInstance
   option: {
     (key: string, optionDefinition: OptionDefinition): YargsInstance
     (keyOptionDefinitions: Dictionary<OptionDefinition>): YargsInstance
@@ -1547,29 +1547,29 @@ export interface YargsInstance {
     (args: string | string[], parseCallback: ParseCallback): Arguments | Promise<Arguments>
     (args: string | string[], shortCircuit: boolean): Arguments | Promise<Arguments>
   }
-  parserConfiguration (config: Configuration): YargsInstance
-  pkgConf (key: string, rootPath?: string): YargsInstance
-  positional (key: string, positionalDefinition: PositionalDefinition): YargsInstance
-  recommendCommands (recommend: boolean): YargsInstance
+  parserConfiguration(config: Configuration): YargsInstance
+  pkgConf(key: string, rootPath?: string): YargsInstance
+  positional(key: string, positionalDefinition: PositionalDefinition): YargsInstance
+  recommendCommands(recommend: boolean): YargsInstance
   require: YargsInstance['demand']
   required: YargsInstance['demand']
-  requiresArg (keys: string | string[] | Dictionary): YargsInstance
-  reset (aliases?: DetailedArguments['aliases']): YargsInstance
-  resetOptions (aliases?: DetailedArguments['aliases']): YargsInstance
-  scriptName (scriptName: string): YargsInstance
+  requiresArg(keys: string | string[] | Dictionary): YargsInstance
+  reset(aliases?: DetailedArguments['aliases']): YargsInstance
+  resetOptions(aliases?: DetailedArguments['aliases']): YargsInstance
+  scriptName(scriptName: string): YargsInstance
   showCompletionScript($0?: string, cmd?: string): YargsInstance
-  showHelp (level: 'error' | 'log' | ((message: string) => void)): YargsInstance
+  showHelp(level: 'error' | 'log' | ((message: string) => void)): YargsInstance
   showHelpOnFail: {
     (message?: string): YargsInstance
     (enabled: boolean, message: string): YargsInstance
   }
   showHidden: YargsInstance['addShowHiddenOpt']
-  skipValidation (keys: string | string[]): YargsInstance
-  strict (enable?: boolean): YargsInstance
-  strictCommands (enable?: boolean): YargsInstance
-  string (key: string | string []): YargsInstance
-  terminalWidth (): number | null
-  updateStrings (obj: Dictionary<string>): YargsInstance
+  skipValidation(keys: string | string[]): YargsInstance
+  strict(enable?: boolean): YargsInstance
+  strictCommands(enable?: boolean): YargsInstance
+  string(key: string | string[]): YargsInstance
+  terminalWidth(): number | null
+  updateStrings(obj: Dictionary<string>): YargsInstance
   updateLocale: YargsInstance['updateStrings']
   usage: {
     (msg: string | null): YargsInstance
@@ -1585,10 +1585,10 @@ export interface YargsInstance {
     (key?: string, ver?: string): YargsInstance
     (key?: string, msg?: string, ver?: string): YargsInstance
   }
-  wrap (cols: number | null | undefined): YargsInstance
+  wrap(cols: number | null | undefined): YargsInstance
 }
 
-export function isYargsInstance (y: YargsInstance | void): y is YargsInstance {
+export function isYargsInstance(y: YargsInstance | void): y is YargsInstance {
   return !!y && (typeof y._parseArgs === 'function')
 }
 
@@ -1686,7 +1686,7 @@ interface PositionalDefinition extends Pick<OptionDefinition,
   'description' |
   'implies' |
   'normalize'
-> {
+  > {
   type?: 'boolean' | 'number' | 'string'
 }
 

@@ -1086,7 +1086,7 @@ describe('usage tests', () => {
 
   it('should display examples on fail when passing multiple examples at once', () => {
     const r = checkUsage(() => yargs('')
-      .examples([
+      .example([
         ['$0 something', 'description'],
         ['$0 something else', 'other description']
       ])
