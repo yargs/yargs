@@ -766,11 +766,22 @@ var argv = require('yargs')
 
 .example(cmd, desc)
 -------------------
+.example(exampleArray)
+-------------------
 
 Give some example invocations of your program. Inside `cmd`, the string
 `$0` will get interpolated to the current script name or node command for the
 present script similar to how `$0` works in bash or perl.
 Examples will be printed out as part of the help message.
+
+If you want to add multiple examples at once, just pass an array of examples, e.g
+```js
+require('yargs')
+  .example([
+    ['$0 --config "~/config.json"', 'Use custom config'],
+    ['$0 --safe', 'Start in safe mode']
+  ]);
+```
 
 <a name="exitprocess"></a>.exitProcess(enable)
 ----------------------------------
