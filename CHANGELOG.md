@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [15.4.0](https://www.github.com/yargs/yargs/compare/v15.3.1...v15.4.0) (2020-06-30)
+
+
+### Features
+
+* adds deprecation option for commands ([027a636](https://www.github.com/yargs/yargs/commit/027a6365b737e13116811a8ef43670196e1fa00a))
+* support array of examples ([#1682](https://www.github.com/yargs/yargs/issues/1682)) ([225ab82](https://www.github.com/yargs/yargs/commit/225ab8271938bed3a48d23175f3d580ce8cd1306))
+
+
+### Bug Fixes
+
+* **docs:** describe usage of `.check()` in more detail ([932cd11](https://www.github.com/yargs/yargs/commit/932cd1177e93f5cc99edfe57a4028e30717bf8fb))
+* **i18n:** Japanese translation phrasing ([#1619](https://www.github.com/yargs/yargs/issues/1619)) ([0894175](https://www.github.com/yargs/yargs/commit/089417550ef5a5b8ce3578dd2a989191300b64cd))
+* **strict mode:** report default command unknown arguments ([#1626](https://www.github.com/yargs/yargs/issues/1626)) ([69f29a9](https://www.github.com/yargs/yargs/commit/69f29a9cd429d4bb99481238305390107ac75b02))
+* **usage:** translate 'options' group only when displaying help ([#1600](https://www.github.com/yargs/yargs/issues/1600)) ([e60b39b](https://www.github.com/yargs/yargs/commit/e60b39b9d3a912c06db43f87c86ba894142b6c1c))
+
+
+### Reverts
+
+* Revert "chore(deps): update dependency eslint to v7 (#1656)" (#1673) ([34949f8](https://www.github.com/yargs/yargs/commit/34949f89ee7cdf88f7b315659df4b5f62f714842)), closes [#1656](https://www.github.com/yargs/yargs/issues/1656) [#1673](https://www.github.com/yargs/yargs/issues/1673)
+
 ### [15.3.1](https://www.github.com/yargs/yargs/compare/v15.3.0...v15.3.1) (2020-03-16)
 
 
