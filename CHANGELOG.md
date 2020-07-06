@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [16.0.0](https://www.github.com/yargs/yargs/compare/v15.4.0...v16.0.0) (2020-07-06)
+
+
+### ⚠ BREAKING CHANGES
+
+* drop support for EOL Node 8 (#1686)
+
+### Features
+
+* drop support for EOL Node 8 ([#1686](https://www.github.com/yargs/yargs/issues/1686)) ([863937f](https://www.github.com/yargs/yargs/commit/863937f23c3102f804cdea78ee3097e28c7c289f))
+
 ## [15.4.0](https://www.github.com/yargs/yargs/compare/v15.3.1...v15.4.0) (2020-06-30)
 
 
