@@ -125,6 +125,12 @@ Having problems? want to contribute? join our [community slack](http://devtoolsc
   * [Customizing Yargs' Parser](/docs/advanced.md#customizing)
 * [Contributing](/contributing.md)
 
+## Supported Node.js Versions
+
+Libraries in this ecosystem make a best effort to track
+[Node.js' release schedule](https://nodejs.org/en/about/releases/). Here's [a
+post on why we think this is important](https://medium.com/the-node-js-collection/maintainers-should-consider-following-node-js-release-schedule-ab08ed4de71a).
+
 [travis-url]: https://travis-ci.org/yargs/yargs
 [travis-image]: https://img.shields.io/travis/yargs/yargs/master.svg
 [npm-url]: https://www.npmjs.com/package/yargs
