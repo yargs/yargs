@@ -1,5 +1,31 @@
+/*
+* MIT License
+*
+* Copyright (c) 2016 Martin Poelstra, Mizunashi Mana, Jeffery Grajkowski,
+* Jeff Kenney, Jimi (Dimitris) Charalampidis, Steffen Viken Valvåg,
+* Emily Marigold Klassen, ExE Boss, and Aankhen.
+*
+* Permission is hereby granted, free of charge, to any person obtaining a copy
+* of this software and associated documentation files (the "Software"), to deal
+* in the Software without restriction, including without limitation the rights
+* to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the Software is
+* furnished to do so, subject to the following conditions:
+*
+* The above copyright notice and this permission notice shall be included in all
+* copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+* AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+* OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+* SOFTWARE.
+*/
+
 import { YargsInstance, RebaseFunction } from './build/lib/yargs'
-import { Parser, DetailedArguments, Configuration } from 'yargs-parser';
+import { Parser, DetailedArguments, Configuration } from 'yargs-parser/build/lib/yargs-parser-types'
 
 declare namespace yargs {
   type BuilderCallback<T, R> = ((args: YargsInstance<T>) => PromiseLike<YargsInstance<R>>) | ((args: YargsInstance<T>) => YargsInstance<R>) | ((args: YargsInstance<T>) => void);
@@ -654,7 +680,7 @@ declare namespace yargs {
     skipValidation?: boolean;
     /** boolean, interpret option as a string, see `string()` */
     string?: boolean;
-    type?: "array" | "count" | PositionalOptionsType;
+    type?: 'array' | 'count' | PositionalOptionsType;
   }
 
   interface PositionalOptions {
@@ -702,7 +728,7 @@ declare namespace yargs {
 
   type InferredOptionType<O extends Options | PositionalOptions> =
     O extends { default: infer D } ? D :
-    O extends { type: "count" } ? number :
+    O extends { type: 'count' } ? number :
     O extends { count: true } ? number :
     O extends { required: string | true } ? RequiredOptionType<O> :
     O extends { require: string | true } ? RequiredOptionType<O> :
@@ -711,18 +737,18 @@ declare namespace yargs {
     RequiredOptionType<O> | undefined;
 
   type RequiredOptionType<O extends Options | PositionalOptions> =
-    O extends { type: "array", string: true } ? string[] :
-    O extends { type: "array", number: true } ? number[] :
-    O extends { type: "array", normalize: true } ? string[] :
-    O extends { type: "string", array: true } ? string[] :
-    O extends { type: "number", array: true } ? number[] :
+    O extends { type: 'array', string: true } ? string[] :
+    O extends { type: 'array', number: true } ? number[] :
+    O extends { type: 'array', normalize: true } ? string[] :
+    O extends { type: 'string', array: true } ? string[] :
+    O extends { type: 'number', array: true } ? number[] :
     O extends { string: true, array: true } ? string[] :
     O extends { number: true, array: true } ? number[] :
     O extends { normalize: true, array: true } ? string[] :
-    O extends { type: "array" } ? Array<string | number> :
-    O extends { type: "boolean" } ? boolean :
-    O extends { type: "number" } ? number :
-    O extends { type: "string" } ? string :
+    O extends { type: 'array' } ? Array<string | number> :
+    O extends { type: 'boolean' } ? boolean :
+    O extends { type: 'number' } ? number :
+    O extends { type: 'string' } ? string :
     O extends { array: true } ? Array<string | number> :
     O extends { boolean: true } ? boolean :
     O extends { number: true } ? number :
@@ -754,7 +780,7 @@ declare namespace yargs {
   type PromiseCompletionFunction = (current: string, argv: any) => Promise<string[]>;
   type MiddlewareFunction<T = {}> = (args: Arguments<T>) => void;
   type Choices = ReadonlyArray<string | number | true | undefined>;
-  type PositionalOptionsType = "boolean" | "number" | "string";
+  type PositionalOptionsType = 'boolean' | 'number' | 'string';
 
   // Aliases for old @types/yargs names
   type Argv = YargsInstance;

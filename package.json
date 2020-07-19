@@ -28,7 +28,7 @@
     "string-width": "^4.2.0",
     "which-module": "^2.0.0",
     "y18n": "^4.0.0",
-    "yargs-parser": "^18.1.2"
+    "yargs-parser": "^19.0.0-beta.1"
   },
   "devDependencies": {
     "@types/chai": "^4.2.11",
@@ -56,11 +56,11 @@
     "yargs-test-extends": "^1.0.1"
   },
   "scripts": {
-    "fix": "standardx --fix  && standardx --fix **/*.ts",
+    "fix": "standardx --fix ./*.ts  && standardx --fix **/*.ts",
     "posttest": "npm run check",
     "test": "c8 mocha --require ./test/before.js --timeout=12000 --check-leaks",
     "coverage": "c8 report --check-coverage",
-    "check": "standardx && standardx **/*.ts",
+    "check": "standardx ./*.ts && standardx **/*.ts",
     "compile": "rimraf build && tsc",
     "prepare": "npm run compile",
     "pretest": "npm run compile -- -p tsconfig.test.json"

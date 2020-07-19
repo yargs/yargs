@@ -324,7 +324,7 @@ export function command (
       populatePositional(maybe, argv, positionalMap)
     }
 
-    argv._ = context.commands.concat(argv._)
+    argv._ = context.commands.concat(argv._.map(a => '' + a))
 
     postProcessPositionals(argv, positionalMap, self.cmdToParseOptions(commandHandler.original))
 

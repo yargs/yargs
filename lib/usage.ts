@@ -6,7 +6,7 @@ import * as path from 'path'
 import { YargsInstance } from './yargs'
 import { YError } from './yerror'
 import { Y18N } from 'y18n'
-import { DetailedArguments } from 'yargs-parser'
+import { DetailedArguments } from 'yargs-parser/build/lib/yargs-parser-types'
 import decamelize = require('decamelize')
 import setBlocking = require('set-blocking')
 import stringWidth = require('string-width')
