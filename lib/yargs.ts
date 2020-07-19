@@ -7,7 +7,7 @@ import {
   Options as ParserOptions,
   ConfigCallback,
   CoerceCallback
-} from 'yargs-parser'
+} from 'yargs-parser/build/lib/yargs-parser-types'
 import { YError } from './yerror'
 import { UsageInstance, FailureFunction, usage as Usage } from './usage'
 import { argsert } from './argsert'
@@ -1230,7 +1230,7 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
           .concat(aliases[helpOpt] || [])
           .filter(k => k.length > 1)
         // check if help should trigger and strip it from _.
-        if (~helpCmds.indexOf(argv._[argv._.length - 1])) {
+        if (~helpCmds.indexOf('' + argv._[argv._.length - 1])) {
           argv._.pop()
           argv[helpOpt] = true
         }

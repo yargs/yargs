@@ -5,7 +5,7 @@ import { parseCommand } from './parse-command'
 import * as path from 'path'
 import { UsageInstance } from './usage'
 import { YargsInstance } from './yargs'
-import { Arguments, DetailedArguments } from 'yargs-parser'
+import { Arguments, DetailedArguments } from 'yargs-parser/build/lib/yargs-parser-types'
 import { assertNotStrictEqual } from './common-types'
 
 // add bash completions to your
