@@ -12,6 +12,7 @@
   "files": [
     "index.js",
     "yargs.js",
+    "yargs.d.ts",
     "build",
     "locales",
     "LICENSE"

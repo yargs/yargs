@@ -1394,9 +1394,11 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
 
 // rebase an absolute path to a relative one with respect to a base directory
 // exported for tests
-export function rebase (base: string, dir: string) {
-  return path.relative(base, dir)
+export interface RebaseFunction {
+  (base: string, dir: string): string
 }
+
+export const rebase: RebaseFunction = (base, dir) => path.relative(base, dir)
 
 /** Instance of the yargs module. */
 export interface YargsInstance {
