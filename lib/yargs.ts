@@ -451,9 +451,15 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
     return self
   }
 
-  self.example = function (cmd, description) {
-    argsert('<string> [string]', [cmd, description], arguments.length)
-    usage.example(cmd, description)
+  self.example = function (cmd: string | [string, string?][], description?: string) {
+    argsert('<string|array> [string]', [cmd, description], arguments.length)
+
+    if (Array.isArray(cmd)) {
+      cmd.forEach((exampleParams) => self.example(...exampleParams))
+    } else {
+      usage.example(cmd, description)
+    }
+
     return self
   }
 
@@ -1492,7 +1498,7 @@ export interface YargsInstance {
   env (prefix?: string | false): YargsInstance
   epilog: YargsInstance['epilogue']
   epilogue (msg: string): YargsInstance
-  example (cmd: string, description?: string): YargsInstance
+  example (cmd: string | [string, string?][], description?: string): YargsInstance
   exit (code: number, err?: YError | string): void
   exitProcess (enabled: boolean): YargsInstance
   fail (f: FailureFunction): YargsInstance

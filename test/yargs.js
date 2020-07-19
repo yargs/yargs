@@ -2583,4 +2583,13 @@ describe('yargs dsl tests', () => {
       argv._.should.eql(['item2', 'item4', 'item6', 'item8'])
     })
   })
+
+  it('throws error for unsupported Node.js versions', () => {
+    process.env.YARGS_MIN_NODE_VERSION = '55'
+    delete require.cache[require.resolve('../yargs')]
+    expect(() => {
+      require('../yargs')
+    }).to.throw(/yargs supports a minimum Node.js version of 55/)
+    delete process.env.YARGS_MIN_NODE_VERSION
+  })
 })
