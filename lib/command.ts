@@ -435,7 +435,7 @@ export function command<R> (
   // the state of commands such that
   // we can apply .parse() multiple times
   // with the same yargs instance.
-  const frozens: isCommandBFrozenCommandInstanceuilderOptionDefinitions<R>[] = []
+  const frozens: FrozenCommandInstance<R>[] = []
   self.freeze = () => {
     frozens.push({
       handlers,
@@ -546,7 +546,7 @@ interface Positionals extends Pick<Options, 'alias' | 'array' | 'default'> {
   demand: Dictionary<boolean>
 }
 
-type isCommandBFrozenCommandInstanceuilderOptionDefinitions<R> = {
+type FrozenCommandInstance<R> = {
   handlers: Dictionary<CommandHandler<R>>
   aliasMap: Dictionary<string>
   defaultCommand: CommandHandler<R> | undefined
