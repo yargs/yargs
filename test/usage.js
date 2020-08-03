@@ -1101,8 +1101,8 @@ describe('usage tests', () => {
     r.should.have.property('exit').and.equal(true)
     r.errors.join('\n').split(/\n+/).should.deep.equal([
       'Options:',
-      '  --help     Show help  [boolean]',
-      '  --version  Show version number  [boolean]',
+      '      --help     Show help  [boolean]',
+      '      --version  Show version number  [boolean]',
       '  -y  [required]',
       'Examples:',
       '  usage something       description',
