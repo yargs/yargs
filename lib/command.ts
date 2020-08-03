@@ -17,23 +17,23 @@ const DEFAULT_MARKER = /(^\*)|(^\$0)/
 // handles parsing positional arguments,
 // and populating argv with said positional
 // arguments.
-export function command<T> (
-  yargs: YargsInstance<T>,
+export function command<R> (
+  yargs: YargsInstance<R>,
   usage: UsageInstance,
   validation: ValidationInstance,
-  globalMiddleware: Middleware<T>[] = []
+  globalMiddleware: Middleware<R>[] = []
 ) {
-  const self: CommandInstance<T> = {} as CommandInstance<T>
-  let handlers: Dictionary<CommandHandler<T>> = {}
+  const self: CommandInstance<R> = {} as CommandInstance<R>
+  let handlers: Dictionary<CommandHandler<R>> = {}
   let aliasMap: Dictionary<string> = {}
-  let defaultCommand: CommandHandler<T> | undefined
+  let defaultCommand: CommandHandler<R> | undefined
 
   self.addHandler = function addHandler (
-    cmd: string | string[] | CommandHandlerDefinition<T>,
+    cmd: string | string[] | CommandHandlerDefinition<R>,
     description?: string | false,
-    builder?: CommandBuilder<T> | CommandBuilderDefinition<T>,
+    builder?: CommandBuilder<R> | CommandBuilderDefinition<R>,
     handler?: CommandHandlerCallback,
-    commandMiddleware?: Middleware<T>[],
+    commandMiddleware?: Middleware<R>[],
     deprecated?: boolean
   ) {
     let aliases: string[] = []
@@ -43,7 +43,7 @@ export function command<T> (
     if (Array.isArray(cmd)) {
       aliases = cmd.slice(1)
       cmd = cmd[0]
-    } else if (isCommandHandlerDefinition<T>(cmd)) {
+    } else if (isCommandHandlerDefinition<R>(cmd)) {
       let command = (Array.isArray(cmd.command) || typeof cmd.command === 'string') ? cmd.command : moduleName(cmd)
       if (cmd.aliases) command = ([] as string[]).concat(command).concat(cmd.aliases)
       self.addHandler(command, extractDesc(cmd), cmd.builder, cmd.handler, cmd.middlewares, cmd.deprecated)
@@ -51,7 +51,7 @@ export function command<T> (
     }
 
     // allow a module to be provided instead of separate builder and handler
-    if (isCommandBuilderDefinition<T>(builder)) {
+    if (isCommandBuilderDefinition<R>(builder)) {
       self.addHandler([cmd].concat(aliases), description, builder.builder, builder.handler, builder.middlewares, builder.deprecated)
       return
     }
@@ -132,7 +132,7 @@ export function command<T> (
 
   // lookup module object from require()d command and derive name
   // if module was not require()d and no name given, throw error
-  function moduleName (obj: CommandHandlerDefinition<T>) {
+  function moduleName (obj: CommandHandlerDefinition<R>) {
     const mod = whichModule(obj)
     if (!mod) throw new Error(`No command name given for module: ${inspect(obj)}`)
     return commandFromFilename(mod.filename)
@@ -143,7 +143,7 @@ export function command<T> (
     return path.basename(filename, path.extname(filename))
   }
 
-  function extractDesc ({ describe, description, desc }: CommandHandlerDefinition<T>) {
+  function extractDesc ({ describe, description, desc }: CommandHandlerDefinition<R>) {
     for (const test of [describe, description, desc]) {
       if (typeof test === 'string' || test === false) return test
       assertNotStrictEqual(test, true as true)
@@ -172,7 +172,7 @@ export function command<T> (
       currentContext.fullCommands.push(commandHandler.original)
     }
     const builder = commandHandler.builder
-    if (isCommandBuilderCallback<T>(builder)) {
+    if (isCommandBuilderCallback<R>(builder)) {
       // a function can be provided, which builds
       // up a yargs chain and possibly returns it.
       const builderOutput = builder(yargs.reset(parsed.aliases))
@@ -185,7 +185,7 @@ export function command<T> (
       }
       innerArgv = innerYargs._parseArgs(null, null, true, commandIndex)
       aliases = (innerYargs.parsed as DetailedArguments).aliases
-    } else if (isCommandBuilderOptionDefinitions<T>(builder)) {
+    } else if (isCommandBuilderOptionDefinitions<R>(builder)) {
       // as a short hand, an object can instead be provided, specifying
       // the options that a command takes.
       const innerYargs = yargs.reset(parsed.aliases)
@@ -271,12 +271,12 @@ export function command<T> (
     return innerArgv
   }
 
-  function shouldUpdateUsage (yargs: YargsInstance<T>) {
+  function shouldUpdateUsage (yargs: YargsInstance<R>) {
     return !yargs.getUsageInstance().getUsageDisabled() &&
       yargs.getUsageInstance().getUsage().length === 0
   }
 
-  function usageFromParentCommandsCommandHandler (parentCommands: string[], commandHandler: CommandHandler<T>) {
+  function usageFromParentCommandsCommandHandler (parentCommands: string[], commandHandler: CommandHandler<R>) {
     const c = DEFAULT_MARKER.test(commandHandler.original) ? commandHandler.original.replace(DEFAULT_MARKER, '').trim() : commandHandler.original
     const pc = parentCommands.filter((c) => { return !DEFAULT_MARKER.test(c) })
     pc.push(c)
@@ -295,7 +295,7 @@ export function command<T> (
       )
     }
     const builder = defaultCommand.builder
-    if (isCommandBuilderCallback<T>(builder)) {
+    if (isCommandBuilderCallback<R>(builder)) {
       builder(yargs)
     } else {
       Object.keys(builder).forEach((key) => {
@@ -306,7 +306,7 @@ export function command<T> (
 
   // transcribe all positional arguments "command <foo> <bar> [apple]"
   // onto argv.
-  function populatePositionals (commandHandler: CommandHandler<T>, argv: Arguments, context: Context) {
+  function populatePositionals (commandHandler: CommandHandler<R>, argv: Arguments, context: Context) {
     argv._ = argv._.slice(context.commands.length) // nuke the current commands
     const demanded = commandHandler.demanded.slice(0)
     const optional = commandHandler.optional.slice(0)
@@ -435,7 +435,7 @@ export function command<T> (
   // the state of commands such that
   // we can apply .parse() multiple times
   // with the same yargs instance.
-  const frozens: isCommandBFrozenCommandInstanceuilderOptionDefinitions<T>[] = []
+  const frozens: isCommandBFrozenCommandInstanceuilderOptionDefinitions<R>[] = []
   self.freeze = () => {
     frozens.push({
       handlers,
@@ -457,7 +457,7 @@ export function command<T> (
 }
 
 /** Instance of the command module. */
-export interface CommandInstance<T> {
+export interface CommandInstance<R> {
   addDirectory(
     dir: string,
     context: Context,
@@ -465,80 +465,80 @@ export interface CommandInstance<T> {
     callerFile: string,
     opts?: RequireDirectoryOptions<any>
   ): void
-  addHandler (handler: CommandHandlerDefinition<T>): void
+  addHandler (handler: CommandHandlerDefinition<R>): void
   addHandler (
     cmd: string | string[],
-    description: CommandHandler<T>['description'],
-    builder?: CommandBuilderDefinition<T> | CommandBuilder<T>,
+    description: CommandHandler<R>['description'],
+    builder?: CommandBuilderDefinition<R> | CommandBuilder<R>,
     handler?: CommandHandlerCallback,
-    commandMiddleware?: Middleware<T>[],
+    commandMiddleware?: Middleware<R>[],
     deprecated?: boolean
   ): void
   cmdToParseOptions (cmdString: string): Positionals
   freeze(): void
-  getCommandHandlers (): Dictionary<CommandHandler<T>>
+  getCommandHandlers (): Dictionary<CommandHandler<R>>
   getCommands (): string[]
   hasDefaultCommand (): boolean
-  reset (): CommandInstance<T>
-  runCommand (command: string | null, yargs: YargsInstance<T>, parsed: DetailedArguments, commandIndex?: number): Arguments | Promise<Arguments>
-  runDefaultBuilderOn (yargs: YargsInstance<T>): void
+  reset (): CommandInstance<R>
+  runCommand (command: string | null, yargs: YargsInstance<R>, parsed: DetailedArguments, commandIndex?: number): Arguments | Promise<Arguments>
+  runDefaultBuilderOn (yargs: YargsInstance<R>): void
   unfreeze(): void
 }
 
-export interface CommandHandlerDefinition<T> extends Partial<Pick<CommandHandler<T>,
+export interface CommandHandlerDefinition<R> extends Partial<Pick<CommandHandler<R>,
   'deprecated' | 'description' | 'handler' | 'middlewares'
 >> {
   aliases?: string[]
-  builder?: CommandBuilder<T> | CommandBuilderDefinition<T>
+  builder?: CommandBuilder<R> | CommandBuilderDefinition<R>
   command?: string | string[]
-  desc?: CommandHandler<T>['description']
-  describe?: CommandHandler<T>['description']
+  desc?: CommandHandler<R>['description']
+  describe?: CommandHandler<R>['description']
 }
 
-export function isCommandHandlerDefinition<T> (cmd: string | string[] | CommandHandlerDefinition<T>): cmd is CommandHandlerDefinition<T> {
+export function isCommandHandlerDefinition<R> (cmd: string | string[] | CommandHandlerDefinition<R>): cmd is CommandHandlerDefinition<R> {
   return typeof cmd === 'object'
 }
 
-export interface CommandBuilderDefinition<T> {
-  builder?: CommandBuilder<T>
+export interface CommandBuilderDefinition<R> {
+  builder?: CommandBuilder<R>
   deprecated?: boolean
   handler: CommandHandlerCallback
-  middlewares?: Middleware<T>[]
+  middlewares?: Middleware<R>[]
 }
 
-export function isCommandBuilderDefinition<T> (builder?: CommandBuilder<T> | CommandBuilderDefinition<T>): builder is CommandBuilderDefinition<T> {
+export function isCommandBuilderDefinition<R> (builder?: CommandBuilder<R> | CommandBuilderDefinition<R>): builder is CommandBuilderDefinition<R> {
   return typeof builder === 'object' &&
-    !!(builder as CommandBuilderDefinition<T>).builder &&
-    typeof (builder as CommandBuilderDefinition<T>).handler === 'function'
+    !!(builder as CommandBuilderDefinition<R>).builder &&
+    typeof (builder as CommandBuilderDefinition<R>).handler === 'function'
 }
 
 export interface CommandHandlerCallback {
   (argv: Arguments): any
 }
 
-export interface CommandHandler<T> {
-  builder: CommandBuilder<T>
+export interface CommandHandler<R> {
+  builder: CommandBuilder<R>
   demanded: Positional[]
   deprecated?: boolean
   description?: string | false
   handler: CommandHandlerCallback
-  middlewares: Middleware<T>[]
+  middlewares: Middleware<R>[]
   optional: Positional[]
   original: string
 }
 
-// To be completed later with other CommandBuilder<T> flavours
-export type CommandBuilder<T> = CommandBuilderCallback<T> | Dictionary<OptionDefinition>
+// To be completed later with other CommandBuilder<R> flavours
+export type CommandBuilder<R> = CommandBuilderCallback<R> | Dictionary<OptionDefinition>
 
-interface CommandBuilderCallback<T> {
-  (y: YargsInstance<T>): YargsInstance<T> | void
+interface CommandBuilderCallback<R> {
+  (y: YargsInstance<R>): YargsInstance<R> | void
 }
 
-export function isCommandBuilderCallback<T> (builder: CommandBuilder<T>): builder is CommandBuilderCallback<T> {
+export function isCommandBuilderCallback<R> (builder: CommandBuilder<R>): builder is CommandBuilderCallback<R> {
   return typeof builder === 'function'
 }
 
-function isCommandBuilderOptionDefinitions<T> (builder: CommandBuilder<T>): builder is Dictionary<OptionDefinition> {
+function isCommandBuilderOptionDefinitions<R> (builder: CommandBuilder<R>): builder is Dictionary<OptionDefinition> {
   return typeof builder === 'object'
 }
 
@@ -546,10 +546,10 @@ interface Positionals extends Pick<Options, 'alias' | 'array' | 'default'> {
   demand: Dictionary<boolean>
 }
 
-type isCommandBFrozenCommandInstanceuilderOptionDefinitions<T> = {
-  handlers: Dictionary<CommandHandler<T>>
+type isCommandBFrozenCommandInstanceuilderOptionDefinitions<R> = {
+  handlers: Dictionary<CommandHandler<R>>
   aliasMap: Dictionary<string>
-  defaultCommand: CommandHandler<T> | undefined
+  defaultCommand: CommandHandler<R> | undefined
 }
 
 export interface FinishCommandHandler {

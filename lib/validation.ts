@@ -10,7 +10,7 @@ const specialKeys = ['$0', '--', '_']
 
 // validation-type-stuff, missing params,
 // bad implications, custom checks.
-export function validation<T> (yargs: YargsInstance<T>, usage: UsageInstance, y18n: Y18N) {
+export function validation<R> (yargs: YargsInstance<R>, usage: UsageInstance, y18n: Y18N) {
   const __ = y18n.__
   const __n = y18n.__n
   const self = {} as ValidationInstance

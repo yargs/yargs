@@ -11,7 +11,7 @@ import decamelize = require('decamelize')
 import setBlocking = require('set-blocking')
 import stringWidth = require('string-width')
 
-export function usage<T> (yargs: YargsInstance<T>, y18n: Y18N) {
+export function usage<R> (yargs: YargsInstance<R>, y18n: Y18N) {
   const __ = y18n.__
   const self = {} as UsageInstance
 

@@ -28,7 +28,7 @@ import { YargsInstance, RebaseFunction } from './build/lib/yargs'
 import { Parser, DetailedArguments, Configuration } from 'yargs-parser/build/lib/yargs-parser-types'
 
 declare namespace yargs {
-  type BuilderCallback<T, R> = ((args: YargsInstance<T>) => PromiseLike<YargsInstance<R>>) | ((args: YargsInstance<T>) => YargsInstance<R>) | ((args: YargsInstance<T>) => void);
+  type BuilderCallback<R1, R2> = ((args: YargsInstance<R1>) => PromiseLike<YargsInstance<R2>>) | ((args: YargsInstance<R1>) => YargsInstance<R2>) | ((args: YargsInstance<R1>) => void);
 
   type ParserConfigurationOptions = Configuration & {
     /** Sort commands alphabetically. Default is `false` */
@@ -43,7 +43,7 @@ declare namespace yargs {
    * For the return type / `argv` property, we create a mapped type over
    * `Arguments<T>` to simplify the inferred type signature in client code.
    */
-  interface YargsInstance<T = {}> {
+  interface YargsInstance<R = {}> {
 
     /**
      * Set key names as equivalent such that updates to a key will propagate to aliases and vice-versa.
@@ -52,10 +52,10 @@ declare namespace yargs {
      * Each key of this object should be the canonical version of the option, and each value should be a string or an array of strings.
      */
     // Aliases for previously declared options can inherit the types of those options.
-    alias<K1 extends keyof T, K2 extends string>(shortName: K1, longName: K2 | ReadonlyArray<K2>): YargsInstance<T & { [key in K2]: T[K1] }>;
-    alias<K1 extends keyof T, K2 extends string>(shortName: K2, longName: K1 | ReadonlyArray<K1>): YargsInstance<T & { [key in K2]: T[K1] }>;
-    alias(shortName: string | ReadonlyArray<string>, longName: string | ReadonlyArray<string>): YargsInstance<T>;
-    alias(aliases: { [shortName: string]: string | ReadonlyArray<string> }): YargsInstance<T>;
+    alias<K1 extends keyof R, K2 extends string>(shortName: K1, longName: K2 | ReadonlyArray<K2>): YargsInstance<R & { [key in K2]: R[K1] }>;
+    alias<K1 extends keyof R, K2 extends string>(shortName: K2, longName: K1 | ReadonlyArray<K1>): YargsInstance<R & { [key in K2]: R[K1] }>;
+    alias(shortName: string | ReadonlyArray<string>, longName: string | ReadonlyArray<string>): YargsInstance<R>;
+    alias(aliases: { [shortName: string]: string | ReadonlyArray<string> }): YargsInstance<R>;
 
     /**
      * Get the arguments as a plain old object.
@@ -68,7 +68,7 @@ declare namespace yargs {
      * it will ignore the first parameter since it expects it to be the script name. In order to override
      * this behavior, use `.parse(process.argv.slice(1))` instead of .argv and the first parameter won't be ignored.
      */
-    argv: { [key in keyof Arguments<T>]: Arguments<T>[key] };
+    argv: { [key in keyof Arguments<R>]: Arguments<R>[key] };
 
     /**
      * Tell the parser to interpret `key` as an array.
@@ -77,8 +77,8 @@ declare namespace yargs {
      *
      * When the option is used with a positional, use `--` to tell `yargs` to stop adding values to the array.
      */
-    array<K extends keyof T>(key: K | ReadonlyArray<K>): YargsInstance<Omit<T, K> & { [key in K]: ToArray<T[key]> }>;
-    array<K extends string>(key: K | ReadonlyArray<K>): YargsInstance<T & { [key in K]: Array<string | number> | undefined }>;
+    array<K extends keyof R>(key: K | ReadonlyArray<K>): YargsInstance<Omit<R, K> & { [key in K]: ToArray<R[key]> }>;
+    array<K extends string>(key: K | ReadonlyArray<K>): YargsInstance<R & { [key in K]: Array<string | number> | undefined }>;
 
     /**
      * Interpret `key` as a boolean. If a non-flag option follows `key` in `process.argv`, that string won't get set as the value of `key`.
@@ -87,8 +87,8 @@ declare namespace yargs {
      *
      * If `key` is an array, interpret all the elements as booleans.
      */
-    boolean<K extends keyof T>(key: K | ReadonlyArray<K>): YargsInstance<Omit<T, K> & { [key in K]: boolean | undefined }>;
-    boolean<K extends string>(key: K | ReadonlyArray<K>): YargsInstance<T & { [key in K]: boolean | undefined }>;
+    boolean<K extends keyof R>(key: K | ReadonlyArray<K>): YargsInstance<Omit<R, K> & { [key in K]: boolean | undefined }>;
+    boolean<K extends string>(key: K | ReadonlyArray<K>): YargsInstance<R & { [key in K]: boolean | undefined }>;
 
     /**
      * Check that certain conditions are met in the provided arguments.
@@ -96,7 +96,7 @@ declare namespace yargs {
      * If `func` throws or returns a non-truthy value, show the thrown error, usage information, and exit.
      * @param global Indicates whether `check()` should be enabled both at the top-level and for each sub-command.
      */
-    check(func: (argv: Arguments<T>, aliases: { [alias: string]: string }) => any, global?: boolean): YargsInstance<T>;
+    check(func: (argv: Arguments<R>, aliases: { [alias: string]: string }) => any, global?: boolean): YargsInstance<R>;
 
     /**
      * Limit valid values for key to a predefined set of choices, given as an array or as an individual value.
@@ -107,9 +107,9 @@ declare namespace yargs {
      *
      * Choices can also be specified as choices in the object given to `option()`.
      */
-    choices<K extends keyof T, C extends ReadonlyArray<any>>(key: K, values: C): YargsInstance<Omit<T, K> & { [key in K]: C[number] | undefined }>;
-    choices<K extends string, C extends ReadonlyArray<any>>(key: K, values: C): YargsInstance<T & { [key in K]: C[number] | undefined }>;
-    choices<C extends { [key: string]: ReadonlyArray<any> }>(choices: C): YargsInstance<Omit<T, keyof C> & { [key in keyof C]: C[key][number] | undefined }>;
+    choices<K extends keyof R, C extends ReadonlyArray<any>>(key: K, values: C): YargsInstance<Omit<R, K> & { [key in K]: C[number] | undefined }>;
+    choices<K extends string, C extends ReadonlyArray<any>>(key: K, values: C): YargsInstance<R & { [key in K]: C[number] | undefined }>;
+    choices<C extends { [key: string]: ReadonlyArray<any> }>(choices: C): YargsInstance<Omit<R, keyof C> & { [key in keyof C]: C[key][number] | undefined }>;
 
     /**
      * Provide a synchronous function to coerce or transform the value(s) given on the command line for `key`.
@@ -127,9 +127,9 @@ declare namespace yargs {
      *
      * If you are using dot-notion or arrays, .e.g., `user.email` and `user.password`, coercion will be applied to the final object that has been parsed
      */
-    coerce<K extends keyof T, V>(key: K | ReadonlyArray<K>, func: (arg: any) => V): YargsInstance<Omit<T, K> & { [key in K]: V | undefined }>;
-    coerce<K extends string, V>(key: K | ReadonlyArray<K>, func: (arg: any) => V): YargsInstance<T & { [key in K]: V | undefined }>;
-    coerce<O extends { [key: string]: (arg: any) => any }>(opts: O): YargsInstance<Omit<T, keyof O> & { [key in keyof O]: ReturnType<O[key]> | undefined }>;
+    coerce<K extends keyof R, V>(key: K | ReadonlyArray<K>, func: (arg: any) => V): YargsInstance<Omit<R, K> & { [key in K]: V | undefined }>;
+    coerce<K extends string, V>(key: K | ReadonlyArray<K>, func: (arg: any) => V): YargsInstance<R & { [key in K]: V | undefined }>;
+    coerce<O extends { [key: string]: (arg: any) => any }>(opts: O): YargsInstance<Omit<R, keyof O> & { [key in keyof O]: ReturnType<O[key]> | undefined }>;
 
     /**
      * Define the commands exposed by your application.
@@ -142,17 +142,17 @@ declare namespace yargs {
      * Note that when `void` is returned, the handler `argv` object type will not include command-specific arguments.
      * @param [handler] Function, which will be executed with the parsed `argv` object.
      */
-    command<U = T>(command: string | ReadonlyArray<string>, description: string, builder?: BuilderCallback<T, U>, handler?: (args: Arguments<U>) => void): YargsInstance<U>;
-    command<O extends { [key: string]: Options }>(command: string | ReadonlyArray<string>, description: string, builder?: O, handler?: (args: Arguments<InferredOptionTypes<O>>) => void): YargsInstance<T>;
-    command<U>(command: string | ReadonlyArray<string>, description: string, module: CommandModule<T, U>): YargsInstance<U>;
-    command<U = T>(command: string | ReadonlyArray<string>, showInHelp: false, builder?: BuilderCallback<T, U>, handler?: (args: Arguments<U>) => void): YargsInstance<T>;
-    command<O extends { [key: string]: Options }>(command: string | ReadonlyArray<string>, showInHelp: false, builder?: O, handler?: (args: Arguments<InferredOptionTypes<O>>) => void): YargsInstance<T>;
-    command<U>(command: string | ReadonlyArray<string>, showInHelp: false, module: CommandModule<T, U>): YargsInstance<U>;
-    command<U>(module: CommandModule<T, U>): YargsInstance<U>;
+    command<U = R>(command: string | ReadonlyArray<string>, description: string, builder?: BuilderCallback<R, U>, handler?: (args: Arguments<U>) => void): YargsInstance<U>;
+    command<O extends { [key: string]: Options }>(command: string | ReadonlyArray<string>, description: string, builder?: O, handler?: (args: Arguments<InferredOptionTypes<O>>) => void): YargsInstance<R>;
+    command<U>(command: string | ReadonlyArray<string>, description: string, module: CommandModule<R, U>): YargsInstance<U>;
+    command<U = R>(command: string | ReadonlyArray<string>, showInHelp: false, builder?: BuilderCallback<R, U>, handler?: (args: Arguments<U>) => void): YargsInstance<R>;
+    command<O extends { [key: string]: Options }>(command: string | ReadonlyArray<string>, showInHelp: false, builder?: O, handler?: (args: Arguments<InferredOptionTypes<O>>) => void): YargsInstance<R>;
+    command<U>(command: string | ReadonlyArray<string>, showInHelp: false, module: CommandModule<R, U>): YargsInstance<U>;
+    command<U>(module: CommandModule<R, U>): YargsInstance<U>;
 
     // Advanced API
     /** Apply command modules from a directory relative to the module calling this method. */
-    commandDir(dir: string, opts?: RequireDirectoryOptions): YargsInstance<T>;
+    commandDir(dir: string, opts?: RequireDirectoryOptions): YargsInstance<R>;
 
     /**
      * Enable bash/zsh-completion shortcuts for commands and options.
@@ -164,13 +164,13 @@ declare namespace yargs {
      * @param [description] Provide a description in your usage instructions for the command that generates the completion scripts.
      * @param [func] Rather than relying on yargs' default completion functionality, which shiver me timbers is pretty awesome, you can provide your own completion method.
      */
-    completion(): YargsInstance<T>;
-    completion(cmd: string, func?: AsyncCompletionFunction): YargsInstance<T>;
-    completion(cmd: string, func?: SyncCompletionFunction): YargsInstance<T>;
-    completion(cmd: string, func?: PromiseCompletionFunction): YargsInstance<T>;
-    completion(cmd: string, description?: string | false, func?: AsyncCompletionFunction): YargsInstance<T>;
-    completion(cmd: string, description?: string | false, func?: SyncCompletionFunction): YargsInstance<T>;
-    completion(cmd: string, description?: string | false, func?: PromiseCompletionFunction): YargsInstance<T>;
+    completion(): YargsInstance<R>;
+    completion(cmd: string, func?: AsyncCompletionFunction): YargsInstance<R>;
+    completion(cmd: string, func?: SyncCompletionFunction): YargsInstance<R>;
+    completion(cmd: string, func?: PromiseCompletionFunction): YargsInstance<R>;
+    completion(cmd: string, description?: string | false, func?: AsyncCompletionFunction): YargsInstance<R>;
+    completion(cmd: string, description?: string | false, func?: SyncCompletionFunction): YargsInstance<R>;
+    completion(cmd: string, description?: string | false, func?: PromiseCompletionFunction): YargsInstance<R>;
 
     /**
      * Tells the parser that if the option specified by `key` is passed in, it should be interpreted as a path to a JSON config file.
@@ -182,24 +182,24 @@ declare namespace yargs {
      * @param [description] Provided to customize the config (`key`) option in the usage string.
      * @param [explicitConfigurationObject] An explicit configuration `object`
      */
-    config(): YargsInstance<T>;
-    config(key: string | ReadonlyArray<string>, description?: string, parseFn?: (configPath: string) => object): YargsInstance<T>;
-    config(key: string | ReadonlyArray<string>, parseFn: (configPath: string) => object): YargsInstance<T>;
-    config(explicitConfigurationObject: object): YargsInstance<T>;
+    config(): YargsInstance<R>;
+    config(key: string | ReadonlyArray<string>, description?: string, parseFn?: (configPath: string) => object): YargsInstance<R>;
+    config(key: string | ReadonlyArray<string>, parseFn: (configPath: string) => object): YargsInstance<R>;
+    config(explicitConfigurationObject: object): YargsInstance<R>;
 
     /**
      * Given the key `x` is set, the key `y` must not be set. `y` can either be a single string or an array of argument names that `x` conflicts with.
      *
      * Optionally `.conflicts()` can accept an object specifying multiple conflicting keys.
      */
-    conflicts(key: string, value: string | ReadonlyArray<string>): YargsInstance<T>;
-    conflicts(conflicts: { [key: string]: string | ReadonlyArray<string> }): YargsInstance<T>;
+    conflicts(key: string, value: string | ReadonlyArray<string>): YargsInstance<R>;
+    conflicts(conflicts: { [key: string]: string | ReadonlyArray<string> }): YargsInstance<R>;
 
     /**
      * Interpret `key` as a boolean flag, but set its parsed value to the number of flag occurrences rather than `true` or `false`. Default value is thus `0`.
      */
-    count<K extends keyof T>(key: K | ReadonlyArray<K>): YargsInstance<Omit<T, K> & { [key in K]: number }>;
-    count<K extends string>(key: K | ReadonlyArray<K>): YargsInstance<T & { [key in K]: number }>;
+    count<K extends keyof R>(key: K | ReadonlyArray<K>): YargsInstance<Omit<R, K> & { [key in K]: number }>;
+    count<K extends string>(key: K | ReadonlyArray<K>): YargsInstance<R & { [key in K]: number }>;
 
     /**
      * Set `argv[key]` to `value` if no option was specified in `process.argv`.
@@ -210,20 +210,20 @@ declare namespace yargs {
      *
      * Optionally, `description` can also be provided and will take precedence over displaying the value in the usage instructions.
      */
-    default<K extends keyof T, V>(key: K, value: V, description?: string): YargsInstance<Omit<T, K> & { [key in K]: V }>;
-    default<K extends string, V>(key: K, value: V, description?: string): YargsInstance<T & { [key in K]: V }>;
-    default<D extends { [key: string]: any }>(defaults: D, description?: string): YargsInstance<Omit<T, keyof D> & D>;
+    default<K extends keyof R, V>(key: K, value: V, description?: string): YargsInstance<Omit<R, K> & { [key in K]: V }>;
+    default<K extends string, V>(key: K, value: V, description?: string): YargsInstance<R & { [key in K]: V }>;
+    default<D extends { [key: string]: any }>(defaults: D, description?: string): YargsInstance<Omit<R, keyof D> & D>;
 
     /**
      * @deprecated since version 6.6.0
      * Use '.demandCommand()' or '.demandOption()' instead
      */
-    demand<K extends keyof T>(key: K | ReadonlyArray<K>, msg?: string | true): YargsInstance<Defined<T, K>>;
-    demand<K extends string>(key: K | ReadonlyArray<K>, msg?: string | true): YargsInstance<T & { [key in K]: unknown }>;
-    demand(key: string | ReadonlyArray<string>, required?: boolean): YargsInstance<T>;
-    demand(positionals: number, msg: string): YargsInstance<T>;
-    demand(positionals: number, required?: boolean): YargsInstance<T>;
-    demand(positionals: number, max: number, msg?: string): YargsInstance<T>;
+    demand<K extends keyof R>(key: K | ReadonlyArray<K>, msg?: string | true): YargsInstance<Defined<R, K>>;
+    demand<K extends string>(key: K | ReadonlyArray<K>, msg?: string | true): YargsInstance<R & { [key in K]: unknown }>;
+    demand(key: string | ReadonlyArray<string>, required?: boolean): YargsInstance<R>;
+    demand(positionals: number, msg: string): YargsInstance<R>;
+    demand(positionals: number, required?: boolean): YargsInstance<R>;
+    demand(positionals: number, max: number, msg?: string): YargsInstance<R>;
 
     /**
      * @param key If is a string, show the usage information and exit if key wasn't specified in `process.argv`.
@@ -231,28 +231,28 @@ declare namespace yargs {
      * @param msg If string is given, it will be printed when the argument is missing, instead of the standard error message.
      * @param demand Controls whether the option is demanded; this is useful when using .options() to specify command line parameters.
      */
-    demandOption<K extends keyof T>(key: K | ReadonlyArray<K>, msg?: string | true): YargsInstance<Defined<T, K>>;
-    demandOption<K extends string>(key: K | ReadonlyArray<K>, msg?: string | true): YargsInstance<T & { [key in K]: unknown }>;
-    demandOption(key: string | ReadonlyArray<string>, demand?: boolean): YargsInstance<T>;
+    demandOption<K extends keyof R>(key: K | ReadonlyArray<K>, msg?: string | true): YargsInstance<Defined<R, K>>;
+    demandOption<K extends string>(key: K | ReadonlyArray<K>, msg?: string | true): YargsInstance<R & { [key in K]: unknown }>;
+    demandOption(key: string | ReadonlyArray<string>, demand?: boolean): YargsInstance<R>;
 
     /**
      * Demand in context of commands.
      * You can demand a minimum and a maximum number a user can have within your program, as well as provide corresponding error messages if either of the demands is not met.
      */
-    demandCommand(): YargsInstance<T>;
-    demandCommand(min: number, minMsg?: string): YargsInstance<T>;
-    demandCommand(min: number, max?: number, minMsg?: string, maxMsg?: string): YargsInstance<T>;
+    demandCommand(): YargsInstance<R>;
+    demandCommand(min: number, minMsg?: string): YargsInstance<R>;
+    demandCommand(min: number, max?: number, minMsg?: string, maxMsg?: string): YargsInstance<R>;
 
     /**
      * Describe a `key` for the generated usage information.
      *
      * Optionally `.describe()` can take an object that maps keys to descriptions.
      */
-    describe(key: string | ReadonlyArray<string>, description: string): YargsInstance<T>;
-    describe(descriptions: { [key: string]: string }): YargsInstance<T>;
+    describe(key: string | ReadonlyArray<string>, description: string): YargsInstance<R>;
+    describe(descriptions: { [key: string]: string }): YargsInstance<R>;
 
     /** Should yargs attempt to detect the os' locale? Defaults to `true`. */
-    detectLocale(detect: boolean): YargsInstance<T>;
+    detectLocale(detect: boolean): YargsInstance<R>;
 
     /**
      * Tell yargs to parse environment variables matching the given prefix and apply them to argv as though they were command line arguments.
@@ -269,21 +269,21 @@ declare namespace yargs {
      *
      * Env var parsing is disabled by default, but you can also explicitly disable it by calling `.env(false)`, e.g. if you need to undo previous configuration.
      */
-    env(): YargsInstance<T>;
-    env(prefix: string): YargsInstance<T>;
-    env(enable: boolean): YargsInstance<T>;
+    env(): YargsInstance<R>;
+    env(prefix: string): YargsInstance<R>;
+    env(enable: boolean): YargsInstance<R>;
 
     /** A message to print at the end of the usage instructions */
-    epilog(msg: string): YargsInstance<T>;
+    epilog(msg: string): YargsInstance<R>;
     /** A message to print at the end of the usage instructions */
-    epilogue(msg: string): YargsInstance<T>;
+    epilogue(msg: string): YargsInstance<R>;
 
     /**
      * Give some example invocations of your program.
      * Inside `cmd`, the string `$0` will get interpolated to the current script name or node command for the present script similar to how `$0` works in bash or perl.
      * Examples will be printed out as part of the help message.
      */
-    example(command: string, description: string): YargsInstance<T>;
+    example(command: string, description: string): YargsInstance<R>;
 
     /** Manually indicate that the program should exit, and provide context about why we wanted to exit. Follows the behavior set by `.exitProcess().` */
     exit(code: number, err: Error): void;
@@ -292,33 +292,33 @@ declare namespace yargs {
      * By default, yargs exits the process when the user passes a help flag, the user uses the `.version` functionality, validation fails, or the command handler fails.
      * Calling `.exitProcess(false)` disables this behavior, enabling further actions after yargs have been validated.
      */
-    exitProcess(enabled: boolean): YargsInstance<T>;
+    exitProcess(enabled: boolean): YargsInstance<R>;
 
     /**
      * Method to execute when a failure occurs, rather than printing the failure message.
      * @param func Is called with the failure message that would have been printed, the Error instance originally thrown and yargs state when the failure occurred.
      */
-    fail(func: (msg: string, err: Error, yargs: YargsInstance<T>) => any): YargsInstance<T>;
+    fail(func: (msg: string, err: Error, yargs: YargsInstance<R>) => any): YargsInstance<R>;
 
     /**
      * Allows to programmatically get completion choices for any line.
      * @param args An array of the words in the command line to complete.
      * @param done The callback to be called with the resulting completions.
      */
-    getCompletion(args: ReadonlyArray<string>, done: (completions: ReadonlyArray<string>) => void): YargsInstance<T>;
+    getCompletion(args: ReadonlyArray<string>, done: (completions: ReadonlyArray<string>) => void): YargsInstance<R>;
 
     /**
      * Indicate that an option (or group of options) should not be reset when a command is executed
      *
      * Options default to being global.
      */
-    global(key: string | ReadonlyArray<string>): YargsInstance<T>;
+    global(key: string | ReadonlyArray<string>): YargsInstance<R>;
 
     /** Given a key, or an array of keys, places options under an alternative heading when displaying usage instructions */
-    group(key: string | ReadonlyArray<string>, groupName: string): YargsInstance<T>;
+    group(key: string | ReadonlyArray<string>, groupName: string): YargsInstance<R>;
 
     /** Hides a key from the generated usage information. Unless a `--show-hidden` option is also passed with `--help` (see `showHidden()`). */
-    hide(key: string): YargsInstance<T>;
+    hide(key: string): YargsInstance<R>;
 
     /**
      * Configure an (e.g. `--help`) and implicit command that displays the usage string and exits the process.
@@ -332,10 +332,10 @@ declare namespace yargs {
      * @param [description] Customizes the description of the help option in the usage string.
      * @param [enableExplicit] If `false` is provided, it will disable --help.
      */
-    help(): YargsInstance<T>;
-    help(enableExplicit: boolean): YargsInstance<T>;
-    help(option: string, enableExplicit: boolean): YargsInstance<T>;
-    help(option: string, description?: string, enableExplicit?: boolean): YargsInstance<T>;
+    help(): YargsInstance<R>;
+    help(enableExplicit: boolean): YargsInstance<R>;
+    help(option: string, enableExplicit: boolean): YargsInstance<R>;
+    help(option: string, description?: string, enableExplicit?: boolean): YargsInstance<R>;
 
     /**
      * Given the key `x` is set, it is required that the key `y` is set.
@@ -343,8 +343,8 @@ declare namespace yargs {
      *
      * Optionally `.implies()` can accept an object specifying multiple implications.
      */
-    implies(key: string, value: string | ReadonlyArray<string>): YargsInstance<T>;
-    implies(implies: { [key: string]: string | ReadonlyArray<string> }): YargsInstance<T>;
+    implies(key: string, value: string | ReadonlyArray<string>): YargsInstance<R>;
+    implies(implies: { [key: string]: string | ReadonlyArray<string> }): YargsInstance<R>;
 
     /**
      * Return the locale that yargs is currently using.
@@ -356,26 +356,26 @@ declare namespace yargs {
      * Override the auto-detected locale from the user's operating system with a static locale.
      * Note that the OS locale can be modified by setting/exporting the `LC_ALL` environment variable.
      */
-    locale(loc: string): YargsInstance<T>;
+    locale(loc: string): YargsInstance<R>;
 
     /**
      * Define global middleware functions to be called first, in list order, for all cli command.
      * @param callbacks Can be a function or a list of functions. Each callback gets passed a reference to argv.
      * @param [applyBeforeValidation] Set to `true` to apply middleware before validation. This will execute the middleware prior to validation checks, but after parsing.
      */
-    middleware(callbacks: MiddlewareFunction<T> | ReadonlyArray<MiddlewareFunction<T>>, applyBeforeValidation?: boolean): YargsInstance<T>;
+    middleware(callbacks: MiddlewareFunction<R> | ReadonlyArray<MiddlewareFunction<R>>, applyBeforeValidation?: boolean): YargsInstance<R>;
 
     /**
      * The number of arguments that should be consumed after a key. This can be a useful hint to prevent parsing ambiguity.
      *
      * Optionally `.nargs()` can take an object of `key`/`narg` pairs.
      */
-    nargs(key: string, count: number): YargsInstance<T>;
-    nargs(nargs: { [key: string]: number }): YargsInstance<T>;
+    nargs(key: string, count: number): YargsInstance<R>;
+    nargs(nargs: { [key: string]: number }): YargsInstance<R>;
 
     /** The key provided represents a path and should have `path.normalize()` applied. */
-    normalize<K extends keyof T>(key: K | ReadonlyArray<K>): YargsInstance<Omit<T, K> & { [key in K]: ToString<T[key]> }>;
-    normalize<K extends string>(key: K | ReadonlyArray<K>): YargsInstance<T & { [key in K]: string | undefined }>;
+    normalize<K extends keyof R>(key: K | ReadonlyArray<K>): YargsInstance<Omit<R, K> & { [key in K]: ToString<R[key]> }>;
+    normalize<K extends string>(key: K | ReadonlyArray<K>): YargsInstance<R & { [key in K]: string | undefined }>;
 
     /**
      * Tell the parser to always interpret key as a number.
@@ -388,30 +388,30 @@ declare namespace yargs {
      *
      * Note that decimals, hexadecimals, and scientific notation are all accepted.
      */
-    number<K extends keyof T>(key: K | ReadonlyArray<K>): YargsInstance<Omit<T, K> & { [key in K]: ToNumber<T[key]> }>;
-    number<K extends string>(key: K | ReadonlyArray<K>): YargsInstance<T & { [key in K]: number | undefined }>;
+    number<K extends keyof R>(key: K | ReadonlyArray<K>): YargsInstance<Omit<R, K> & { [key in K]: ToNumber<R[key]> }>;
+    number<K extends string>(key: K | ReadonlyArray<K>): YargsInstance<R & { [key in K]: number | undefined }>;
 
     /**
      * Method to execute when a command finishes successfully.
      * @param func Is called with the successful result of the command that finished.
      */
-    onFinishCommand(func: (result: any) => void): YargsInstance<T>;
+    onFinishCommand(func: (result: any) => void): YargsInstance<R>;
 
     /**
      * This method can be used to make yargs aware of options that could exist.
      * You can also pass an opt object which can hold further customization, like `.alias()`, `.demandOption()` etc. for that option.
      */
-    option<K extends keyof T, O extends Options>(key: K, options: O): YargsInstance<Omit<T, K> & { [key in K]: InferredOptionType<O> }>;
-    option<K extends string, O extends Options>(key: K, options: O): YargsInstance<T & { [key in K]: InferredOptionType<O> }>;
-    option<O extends { [key: string]: Options }>(options: O): YargsInstance<Omit<T, keyof O> & InferredOptionTypes<O>>;
+    option<K extends keyof R, O extends Options>(key: K, options: O): YargsInstance<Omit<R, K> & { [key in K]: InferredOptionType<O> }>;
+    option<K extends string, O extends Options>(key: K, options: O): YargsInstance<R & { [key in K]: InferredOptionType<O> }>;
+    option<O extends { [key: string]: Options }>(options: O): YargsInstance<Omit<R, keyof O> & InferredOptionTypes<O>>;
 
     /**
      * This method can be used to make yargs aware of options that could exist.
      * You can also pass an opt object which can hold further customization, like `.alias()`, `.demandOption()` etc. for that option.
      */
-    options<K extends keyof T, O extends Options>(key: K, options: O): YargsInstance<Omit<T, K> & { [key in K]: InferredOptionType<O> }>;
-    options<K extends string, O extends Options>(key: K, options: O): YargsInstance<T & { [key in K]: InferredOptionType<O> }>;
-    options<O extends { [key: string]: Options }>(options: O): YargsInstance<Omit<T, keyof O> & InferredOptionTypes<O>>;
+    options<K extends keyof R, O extends Options>(key: K, options: O): YargsInstance<Omit<R, K> & { [key in K]: InferredOptionType<O> }>;
+    options<K extends string, O extends Options>(key: K, options: O): YargsInstance<R & { [key in K]: InferredOptionType<O> }>;
+    options<O extends { [key: string]: Options }>(options: O): YargsInstance<Omit<R, keyof O> & InferredOptionTypes<O>>;
 
     /**
      * Parse `args` instead of `process.argv`. Returns the `argv` object. `args` may either be a pre-processed argv array, or a raw argument string.
@@ -419,8 +419,8 @@ declare namespace yargs {
      * Note: Providing a callback to parse() disables the `exitProcess` setting until after the callback is invoked.
      * @param [context]  Provides a useful mechanism for passing state information to commands
      */
-    parse(): { [key in keyof Arguments<T>]: Arguments<T>[key] };
-    parse(arg: string | ReadonlyArray<string>, context?: object, parseCallback?: ParseCallback<T>): { [key in keyof Arguments<T>]: Arguments<T>[key] };
+    parse(): { [key in keyof Arguments<R>]: Arguments<R>[key] };
+    parse(arg: string | ReadonlyArray<string>, context?: object, parseCallback?: ParseCallback<R>): { [key in keyof Arguments<R>]: Arguments<R>[key] };
 
     /**
      * If the arguments have not been parsed, this property is `false`.
@@ -430,64 +430,64 @@ declare namespace yargs {
     parsed: DetailedArguments | false;
 
     /** Allows to configure advanced yargs features. */
-    parserConfiguration(configuration: Partial<ParserConfigurationOptions>): YargsInstance<T>;
+    parserConfiguration(configuration: Partial<ParserConfigurationOptions>): YargsInstance<R>;
 
     /**
      * Similar to `config()`, indicates that yargs should interpret the object from the specified key in package.json as a configuration object.
      * @param [cwd] If provided, the package.json will be read from this location
      */
-    pkgConf(key: string | ReadonlyArray<string>, cwd?: string): YargsInstance<T>;
+    pkgConf(key: string | ReadonlyArray<string>, cwd?: string): YargsInstance<R>;
 
     /**
      * Allows you to configure a command's positional arguments with an API similar to `.option()`.
      * `.positional()` should be called in a command's builder function, and is not available on the top-level yargs instance. If so, it will throw an error.
      */
-    positional<K extends keyof T, O extends PositionalOptions>(key: K, opt: O): YargsInstance<Omit<T, K> & { [key in K]: InferredOptionType<O> }>;
-    positional<K extends string, O extends PositionalOptions>(key: K, opt: O): YargsInstance<T & { [key in K]: InferredOptionType<O> }>;
+    positional<K extends keyof R, O extends PositionalOptions>(key: K, opt: O): YargsInstance<Omit<R, K> & { [key in K]: InferredOptionType<O> }>;
+    positional<K extends string, O extends PositionalOptions>(key: K, opt: O): YargsInstance<R & { [key in K]: InferredOptionType<O> }>;
 
     /** Should yargs provide suggestions regarding similar commands if no matching command is found? */
-    recommendCommands(): YargsInstance<T>;
+    recommendCommands(): YargsInstance<R>;
 
     /**
      * @deprecated since version 6.6.0
      * Use '.demandCommand()' or '.demandOption()' instead
      */
-    require<K extends keyof T>(key: K | ReadonlyArray<K>, msg?: string | true): YargsInstance<Defined<T, K>>;
-    require(key: string, msg: string): YargsInstance<T>;
-    require(key: string, required: boolean): YargsInstance<T>;
-    require(keys: ReadonlyArray<number>, msg: string): YargsInstance<T>;
-    require(keys: ReadonlyArray<number>, required: boolean): YargsInstance<T>;
-    require(positionals: number, required: boolean): YargsInstance<T>;
-    require(positionals: number, msg: string): YargsInstance<T>;
+    require<K extends keyof R>(key: K | ReadonlyArray<K>, msg?: string | true): YargsInstance<Defined<R, K>>;
+    require(key: string, msg: string): YargsInstance<R>;
+    require(key: string, required: boolean): YargsInstance<R>;
+    require(keys: ReadonlyArray<number>, msg: string): YargsInstance<R>;
+    require(keys: ReadonlyArray<number>, required: boolean): YargsInstance<R>;
+    require(positionals: number, required: boolean): YargsInstance<R>;
+    require(positionals: number, msg: string): YargsInstance<R>;
 
     /**
      * @deprecated since version 6.6.0
      * Use '.demandCommand()' or '.demandOption()' instead
      */
-    required<K extends keyof T>(key: K | ReadonlyArray<K>, msg?: string | true): YargsInstance<Defined<T, K>>;
-    required(key: string, msg: string): YargsInstance<T>;
-    required(key: string, required: boolean): YargsInstance<T>;
-    required(keys: ReadonlyArray<number>, msg: string): YargsInstance<T>;
-    required(keys: ReadonlyArray<number>, required: boolean): YargsInstance<T>;
-    required(positionals: number, required: boolean): YargsInstance<T>;
-    required(positionals: number, msg: string): YargsInstance<T>;
+    required<K extends keyof R>(key: K | ReadonlyArray<K>, msg?: string | true): YargsInstance<Defined<R, K>>;
+    required(key: string, msg: string): YargsInstance<R>;
+    required(key: string, required: boolean): YargsInstance<R>;
+    required(keys: ReadonlyArray<number>, msg: string): YargsInstance<R>;
+    required(keys: ReadonlyArray<number>, required: boolean): YargsInstance<R>;
+    required(positionals: number, required: boolean): YargsInstance<R>;
+    required(positionals: number, msg: string): YargsInstance<R>;
 
-    requiresArg(key: string | ReadonlyArray<string>): YargsInstance<T>;
+    requiresArg(key: string | ReadonlyArray<string>): YargsInstance<R>;
 
     /**
      * @deprecated since version 6.6.0
      * Use '.global()' instead
      */
-    reset(): YargsInstance<T>;
+    reset(): YargsInstance<R>;
 
     /** Set the name of your script ($0). Default is the base filename executed by node (`process.argv[1]`) */
-    scriptName($0: string): YargsInstance<T>;
+    scriptName($0: string): YargsInstance<R>;
 
     /**
      * Generate a bash completion script.
      * Users of your application can install this script in their `.bashrc`, and yargs will provide completion shortcuts for commands and options.
      */
-    showCompletionScript(): YargsInstance<T>;
+    showCompletionScript(): YargsInstance<R>;
 
     /**
      * Configure the `--show-hidden` option that displays the hidden keys (see `hide()`).
@@ -495,20 +495,20 @@ declare namespace yargs {
      * If `string` it changes the key name ("--show-hidden").
      * @param description Changes the default description ("Show hidden options")
      */
-    showHidden(option?: string | boolean): YargsInstance<T>;
-    showHidden(option: string, description?: string): YargsInstance<T>;
+    showHidden(option?: string | boolean): YargsInstance<R>;
+    showHidden(option: string, description?: string): YargsInstance<R>;
 
     /**
      * Print the usage data using the console function consoleLevel for printing.
      * @param [consoleLevel='error']
      */
-    showHelp(consoleLevel?: string): YargsInstance<T>;
+    showHelp(consoleLevel?: string): YargsInstance<R>;
 
     /**
      * Provide the usage data as a string.
      * @param printCallback a function with a single argument.
      */
-    showHelp(printCallback: (s: string) => void): YargsInstance<T>;
+    showHelp(printCallback: (s: string) => void): YargsInstance<R>;
 
     /**
      * By default, yargs outputs a usage string if any error is detected.
@@ -516,18 +516,18 @@ declare namespace yargs {
      * @param enable If `false`, the usage string is not output.
      * @param [message] Message that is output after the error message.
      */
-    showHelpOnFail(enable: boolean, message?: string): YargsInstance<T>;
+    showHelpOnFail(enable: boolean, message?: string): YargsInstance<R>;
 
     /** Specifies either a single option key (string), or an array of options. If any of the options is present, yargs validation is skipped. */
-    skipValidation(key: string | ReadonlyArray<string>): YargsInstance<T>;
+    skipValidation(key: string | ReadonlyArray<string>): YargsInstance<R>;
 
     /**
      * Any command-line argument given that is not demanded, or does not have a corresponding description, will be reported as an error.
      *
      * Unrecognized commands will also be reported as errors.
      */
-    strict(): YargsInstance<T>;
-    strict(enabled: boolean): YargsInstance<T>;
+    strict(): YargsInstance<R>;
+    strict(enabled: boolean): YargsInstance<R>;
 
     /**
      * Tell the parser logic not to interpret `key` as a number or boolean. This can be useful if you need to preserve leading zeros in an input.
@@ -536,20 +536,20 @@ declare namespace yargs {
      *
      * `.string('_')` will result in non-hyphenated arguments being interpreted as strings, regardless of whether they resemble numbers.
      */
-    string<K extends keyof T>(key: K | ReadonlyArray<K>): YargsInstance<Omit<T, K> & { [key in K]: ToString<T[key]> }>;
-    string<K extends string>(key: K | ReadonlyArray<K>): YargsInstance<T & { [key in K]: string | undefined }>;
+    string<K extends keyof R>(key: K | ReadonlyArray<K>): YargsInstance<Omit<R, K> & { [key in K]: ToString<R[key]> }>;
+    string<K extends string>(key: K | ReadonlyArray<K>): YargsInstance<R & { [key in K]: string | undefined }>;
 
     // Intended to be used with '.wrap()'
     terminalWidth(): number;
 
-    updateLocale(obj: { [key: string]: string }): YargsInstance<T>;
+    updateLocale(obj: { [key: string]: string }): YargsInstance<R>;
 
     /**
      * Override the default strings used by yargs with the key/value pairs provided in obj
      *
      * If you explicitly specify a locale(), you should do so before calling `updateStrings()`.
      */
-    updateStrings(obj: { [key: string]: string }): YargsInstance<T>;
+    updateStrings(obj: { [key: string]: string }): YargsInstance<R>;
 
     /**
      * Set a usage message to show which commands to use.
@@ -559,11 +559,11 @@ declare namespace yargs {
      * This allows you to use `.usage()` to configure the default command that will be run as an entry-point to your application
      * and allows you to provide configuration for the positional arguments accepted by your program:
      */
-    usage(message: string): YargsInstance<T>;
-    usage<U>(command: string | ReadonlyArray<string>, description: string, builder?: (args: YargsInstance<T>) => YargsInstance<U>, handler?: (args: Arguments<U>) => void): YargsInstance<T>;
-    usage<U>(command: string | ReadonlyArray<string>, showInHelp: boolean, builder?: (args: YargsInstance<T>) => YargsInstance<U>, handler?: (args: Arguments<U>) => void): YargsInstance<T>;
-    usage<O extends { [key: string]: Options }>(command: string | ReadonlyArray<string>, description: string, builder?: O, handler?: (args: Arguments<InferredOptionTypes<O>>) => void): YargsInstance<T>;
-    usage<O extends { [key: string]: Options }>(command: string | ReadonlyArray<string>, showInHelp: boolean, builder?: O, handler?: (args: Arguments<InferredOptionTypes<O>>) => void): YargsInstance<T>;
+    usage(message: string): YargsInstance<R>;
+    usage<U>(command: string | ReadonlyArray<string>, description: string, builder?: (args: YargsInstance<R>) => YargsInstance<U>, handler?: (args: Arguments<U>) => void): YargsInstance<R>;
+    usage<U>(command: string | ReadonlyArray<string>, showInHelp: boolean, builder?: (args: YargsInstance<R>) => YargsInstance<U>, handler?: (args: Arguments<U>) => void): YargsInstance<R>;
+    usage<O extends { [key: string]: Options }>(command: string | ReadonlyArray<string>, description: string, builder?: O, handler?: (args: Arguments<InferredOptionTypes<O>>) => void): YargsInstance<R>;
+    usage<O extends { [key: string]: Options }>(command: string | ReadonlyArray<string>, showInHelp: boolean, builder?: O, handler?: (args: Arguments<InferredOptionTypes<O>>) => void): YargsInstance<R>;
 
     /**
      * Add an option (e.g. `--version`) that displays the version number (given by the version parameter) and exits the process.
@@ -573,11 +573,11 @@ declare namespace yargs {
      *
      * If the boolean argument `false` is provided, it will disable `--version`.
      */
-    version(): YargsInstance<T>;
-    version(version: string): YargsInstance<T>;
-    version(enable: boolean): YargsInstance<T>;
-    version(optionKey: string, version: string): YargsInstance<T>;
-    version(optionKey: string, description: string, version: string): YargsInstance<T>;
+    version(): YargsInstance<R>;
+    version(version: string): YargsInstance<R>;
+    version(enable: boolean): YargsInstance<R>;
+    version(optionKey: string, version: string): YargsInstance<R>;
+    version(optionKey: string, description: string, version: string): YargsInstance<R>;
 
     /**
      * Format usage output to wrap at columns many columns.
@@ -585,10 +585,10 @@ declare namespace yargs {
      * By default wrap will be set to `Math.min(80, windowWidth)`. Use `.wrap(null)` to specify no column limit (no right-align).
      * Use `.wrap(yargs.terminalWidth())` to maximize the width of yargs' usage instructions.
      */
-    wrap(columns: number | null): YargsInstance<T>;
+    wrap(columns: number | null): YargsInstance<R>;
   }
 
-  type Arguments<T = {}> = T & {
+  type Arguments<R = {}> = R & {
     /** Non-option arguments */
     _: string[];
     /** The script name or node command */
@@ -760,25 +760,25 @@ declare namespace yargs {
 
   type InferredOptionTypes<O extends { [key: string]: Options }> = { [key in keyof O]: InferredOptionType<O[key]> };
 
-  interface CommandModule<T = {}, U = {}> {
+  interface CommandModule<R1 = {}, R2 = {}> {
     /** array of strings (or a single string) representing aliases of `exports.command`, positional args defined in an alias are ignored */
     aliases?: ReadonlyArray<string> | string;
     /** object declaring the options the command accepts, or a function accepting and returning a yargs instance */
-    builder?: CommandBuilder<T, U>;
+    builder?: CommandBuilder<R1, R2>;
     /** string (or array of strings) that executes this command when given on the command line, first string may contain positional args */
     command?: ReadonlyArray<string> | string;
     /** string used as the description for the command in help text, use `false` for a hidden command */
     describe?: string | false;
     /** a function which will be passed the parsed argv. */
-    handler: (args: Arguments<U>) => void;
+    handler: (args: Arguments<R2>) => void;
   }
 
-  type ParseCallback<T = {}> = (err: Error | undefined, argv: Arguments<T>, output: string) => void;
-  type CommandBuilder<T = {}, U = {}> = { [key: string]: Options } | ((args: YargsInstance<T>) => YargsInstance<U>) | ((args: YargsInstance<T>) => PromiseLike<YargsInstance<U>>);
+  type ParseCallback<R = {}> = (err: Error | undefined, argv: Arguments<R>, output: string) => void;
+  type CommandBuilder<R1 = {}, R2 = {}> = { [key: string]: Options } | ((args: YargsInstance<R1>) => YargsInstance<R2>) | ((args: YargsInstance<R1>) => PromiseLike<YargsInstance<R2>>);
   type SyncCompletionFunction = (current: string, argv: any) => string[];
   type AsyncCompletionFunction = (current: string, argv: any, done: (completion: ReadonlyArray<string>) => void) => void;
   type PromiseCompletionFunction = (current: string, argv: any) => Promise<string[]>;
-  type MiddlewareFunction<T = {}> = (args: Arguments<T>) => void;
+  type MiddlewareFunction<R = {}> = (args: Arguments<R>) => void;
   type Choices = ReadonlyArray<string | number | true | undefined>;
   type PositionalOptionsType = 'boolean' | 'number' | 'string';
 
@@ -786,8 +786,8 @@ declare namespace yargs {
   type Argv = YargsInstance;
 }
 
-declare interface yargs<T = {}> {
-  (processArgs?: string | string[], cwd?: string, parentRequire?: NodeRequire): YargsInstance<T>
+declare interface yargs<R = {}> {
+  (processArgs?: string | string[], cwd?: string, parentRequire?: NodeRequire): YargsInstance<R>
   rebase: RebaseFunction
   Parser: Parser
 }

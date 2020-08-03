@@ -30,12 +30,12 @@ import setBlocking = require('set-blocking')
 import findUp = require('find-up')
 import requireMainFilename = require('require-main-filename')
 
-export function Yargs<T = {}> (processArgs: string | string[] = [], cwd = process.cwd(), parentRequire = require) {
-  const self = {} as YargsInstance<T>
-  let command: CommandInstance<T>
+export function Yargs<R = {}> (processArgs: string | string[] = [], cwd = process.cwd(), parentRequire = require) {
+  const self = {} as YargsInstance<R>
+  let command: CommandInstance<R>
   let completion: CompletionInstance | null = null
   let groups: Dictionary<string[]> = {}
-  const globalMiddleware: Middleware<T>[] = []
+  const globalMiddleware: Middleware<R>[] = []
   let output = ''
   const preservedGroups: Dictionary<string[]> = {}
   let usage: UsageInstance
@@ -288,17 +288,13 @@ export function Yargs<T = {}> (processArgs: string | string[] = [], cwd = proces
 
   self.choices = function (key: string | string[] | Dictionary<string | string[]>, value?: string | string[]) {
     argsert('<object|string|array> [string|array]', [key, value], arguments.length)
-    populateParserHintDictionary(self.choices, 'choices', key, value, (type, key, value) => {
-      options.choices[key] = (options.choices[key] || []).concat(value!)
-    })
+    populateParserHintArrayDictionary(self.choices, 'choices', key, value)
     return self
   }
 
   self.alias = function (key: string | string[] | Dictionary<string | string[]>, value?: string | string[]) {
     argsert('<object|string|array> [string|array]', [key, value], arguments.length)
-    populateParserHintDictionary(self.alias, 'alias', key, value, (type, key, value) => {
-      options.alias[key] = (options.alias[key] || []).concat(value!)
-    })
+    populateParserHintArrayDictionary(self.alias, 'alias', key, value)
     return self
   }
 
@@ -355,7 +351,7 @@ export function Yargs<T = {}> (processArgs: string | string[] = [], cwd = proces
     K extends keyof Options[T] & string = keyof Options[T] & string,
     V extends ValueOf<Options[T]> = ValueOf<Options[T]>
   > (
-    builder: (key: K, value: V, ...otherArgs: any[]) => YargsInstance<T>,
+    builder: (key: K, value: V, ...otherArgs: any[]) => YargsInstance<R>,
     type: T,
     key: K | K[] | { [key in K]: V },
     value?: V
@@ -365,8 +361,23 @@ export function Yargs<T = {}> (processArgs: string | string[] = [], cwd = proces
     })
   }
 
+  function populateParserHintArrayDictionary<
+    T extends DictionaryKeyof<Options, any[]>,
+    K extends keyof Options[T] & string = keyof Options[T] & string,
+    V extends ValueOf<ValueOf<Options[T]>> | ValueOf<ValueOf<Options[T]>>[] = ValueOf<ValueOf<Options[T]>> | ValueOf<ValueOf<Options[T]>>[]
+  > (
+    builder: (key: K, value: V, ...otherArgs: any[]) => YargsInstance<R>,
+    type: T,
+    key: K | K[] | { [key in K]: V },
+    value?: V
+  ) {
+    populateParserHintDictionary<T, K, V>(builder, type, key, value, (type, key, value) => {
+      options[type][key] = (options[type][key] || [] as Options[T][keyof Options[T]]).concat(value)
+    })
+  }
+
   function populateParserHintDictionary<T extends keyof Options, K extends keyof Options[T], V> (
-    builder: (key: K, value: V, ...otherArgs: any[]) => YargsInstance<T>,
+    builder: (key: K, value: V, ...otherArgs: any[]) => YargsInstance<R>,
     type: T,
     key: K | K[] | { [key in K]: V },
     value: V | undefined,
@@ -568,8 +579,8 @@ export function Yargs<T = {}> (processArgs: string | string[] = [], cwd = proces
 
   self.usage = function (
     msg: string | null,
-    description?: CommandHandler<T>['description'],
-    builder?: CommandBuilderDefinition<T> | CommandBuilder<T>,
+    description?: CommandHandler<R>['description'],
+    builder?: CommandBuilderDefinition<R> | CommandBuilder<R>,
     handler?: CommandHandlerCallback
   ) {
     argsert('<string|null|undefined> [string|boolean] [function|object] [function]', [msg, description, builder, handler], arguments.length)
@@ -1390,7 +1401,7 @@ export interface RebaseFunction {
 export const rebase: RebaseFunction = (base, dir) => path.relative(base, dir)
 
 /** Instance of the yargs module. */
-export interface YargsInstance<T> {
+export interface YargsInstance<R> {
   $0: string
   argv: Arguments
   customScriptName: boolean
@@ -1413,85 +1424,85 @@ export interface YargsInstance<T> {
   ): void
   _setHasOutput (): void
   addHelpOpt: {
-    (opt?: string | false): YargsInstance<T>
-    (opt?: string, msg?: string): YargsInstance<T>
+    (opt?: string | false): YargsInstance<R>
+    (opt?: string, msg?: string): YargsInstance<R>
   }
   addShowHiddenOpt: {
-    (opt?: string | false): YargsInstance<T>
-    (opt?: string, msg?: string): YargsInstance<T>
+    (opt?: string | false): YargsInstance<R>
+    (opt?: string, msg?: string): YargsInstance<R>
   }
   alias: {
-    (keys: string | string[], aliases: string | string[]): YargsInstance<T>
-    (keyAliases: Dictionary<string | string[]>): YargsInstance<T>
+    (keys: string | string[], aliases: string | string[]): YargsInstance<R>
+    (keyAliases: Dictionary<string | string[]>): YargsInstance<R>
   }
-  array (keys: string | string[]): YargsInstance<T>
-  boolean (keys: string | string[]): YargsInstance<T>
-  check(f: (argv: Arguments, aliases: Dictionary<string[]>) => any, _global?: boolean): YargsInstance<T>
+  array (keys: string | string[]): YargsInstance<R>
+  boolean (keys: string | string[]): YargsInstance<R>
+  check(f: (argv: Arguments, aliases: Dictionary<string[]>) => any, _global?: boolean): YargsInstance<R>
   choices: {
-    (keys: string | string[], choices: string | string[]): YargsInstance<T>
-    (keyChoices: Dictionary<string | string[]>): YargsInstance<T>
+    (keys: string | string[], choices: string | string[]): YargsInstance<R>
+    (keyChoices: Dictionary<string | string[]>): YargsInstance<R>
   }
   coerce: {
-    (keys: string | string[], coerceCallback: CoerceCallback): YargsInstance<T>
-    (keyCoerceCallbacks: Dictionary<CoerceCallback>): YargsInstance<T>
+    (keys: string | string[], coerceCallback: CoerceCallback): YargsInstance<R>
+    (keyCoerceCallbacks: Dictionary<CoerceCallback>): YargsInstance<R>
   }
   command (
     cmd: string | string[],
-    description: CommandHandler<T>['description'],
-    builder ?: CommandBuilderDefinition<T> | CommandBuilder<T>,
+    description: CommandHandler<R>['description'],
+    builder ?: CommandBuilderDefinition<R> | CommandBuilder<R>,
     handler ?: CommandHandlerCallback,
-    commandMiddleware ?: Middleware<T>[],
+    commandMiddleware ?: Middleware<R>[],
     deprecated ?: boolean
-  ): YargsInstance<T>
-  commandDir (dir: string, opts?: RequireDirectoryOptions<any>): YargsInstance<T>
+  ): YargsInstance<R>
+  commandDir (dir: string, opts?: RequireDirectoryOptions<any>): YargsInstance<R>
   completion: {
-    (cmd?: string, fn?: CompletionFunction): YargsInstance<T>
-    (cmd?: string, desc?: string | false, fn?: CompletionFunction): YargsInstance<T>
+    (cmd?: string, fn?: CompletionFunction): YargsInstance<R>
+    (cmd?: string, desc?: string | false, fn?: CompletionFunction): YargsInstance<R>
   }
   config: {
-    (config: Dictionary): YargsInstance<T>
-    (keys?: string | string[], configCallback?: ConfigCallback): YargsInstance<T>
-    (keys?: string | string[], msg?: string, configCallback?: ConfigCallback): YargsInstance<T>
+    (config: Dictionary): YargsInstance<R>
+    (keys?: string | string[], configCallback?: ConfigCallback): YargsInstance<R>
+    (keys?: string | string[], msg?: string, configCallback?: ConfigCallback): YargsInstance<R>
   }
   conflicts: {
-    (key: string, conflictsWith: string | string[]): YargsInstance<T>
-    (keyConflicts: Dictionary<string | string[]>): YargsInstance<T>
+    (key: string, conflictsWith: string | string[]): YargsInstance<R>
+    (keyConflicts: Dictionary<string | string[]>): YargsInstance<R>
   }
-  count (keys: string | string[]): YargsInstance<T>
+  count (keys: string | string[]): YargsInstance<R>
   default: {
-    (key: string, value: any, defaultDescription?: string): YargsInstance<T>
-    (keys: string[], value: Exclude<any, Function>): YargsInstance<T>
-    (keys: Dictionary<any>): YargsInstance<T>
+    (key: string, value: any, defaultDescription?: string): YargsInstance<R>
+    (keys: string[], value: Exclude<any, Function>): YargsInstance<R>
+    (keys: Dictionary<any>): YargsInstance<R>
   }
-  defaults: YargsInstance<T>['default']
+  defaults: YargsInstance<R>['default']
   demand: {
-    (min: number, max?: number | string, msg?: string): YargsInstance<T>
-    (keys: string | string[], msg?: string | true): YargsInstance<T>
-    (keys: string | string[], max: string[], msg?: string | true): YargsInstance<T>
-    (keyMsgs: Dictionary<string | undefined>): YargsInstance<T>
-    (keyMsgs: Dictionary<string | undefined>, max: string[], msg?: string): YargsInstance<T>
+    (min: number, max?: number | string, msg?: string): YargsInstance<R>
+    (keys: string | string[], msg?: string | true): YargsInstance<R>
+    (keys: string | string[], max: string[], msg?: string | true): YargsInstance<R>
+    (keyMsgs: Dictionary<string | undefined>): YargsInstance<R>
+    (keyMsgs: Dictionary<string | undefined>, max: string[], msg?: string): YargsInstance<R>
   }
-  demandCommand (): YargsInstance<T>
-  demandCommand (min: number, minMsg?: string): YargsInstance<T>
-  demandCommand (min: number, max: number, minMsg?: string | null, maxMsg?: string | null): YargsInstance<T>
+  demandCommand (): YargsInstance<R>
+  demandCommand (min: number, minMsg?: string): YargsInstance<R>
+  demandCommand (min: number, max: number, minMsg?: string | null, maxMsg?: string | null): YargsInstance<R>
   demandOption: {
-    (keys: string | string[], msg?: string): YargsInstance<T>
-    (keyMsgs: Dictionary<string | undefined>): YargsInstance<T>
+    (keys: string | string[], msg?: string): YargsInstance<R>
+    (keyMsgs: Dictionary<string | undefined>): YargsInstance<R>
   }
-  deprecateOption (option: string, message?: string | boolean): YargsInstance<T>
+  deprecateOption (option: string, message?: string | boolean): YargsInstance<R>
   describe: {
-    (keys: string | string[], description?: string): YargsInstance<T>
-    (keyDescriptions: Dictionary<string>): YargsInstance<T>
+    (keys: string | string[], description?: string): YargsInstance<R>
+    (keyDescriptions: Dictionary<string>): YargsInstance<R>
   }
-  detectLocale (detect: boolean): YargsInstance<T>
-  env (prefix?: string | false): YargsInstance<T>
-  epilog: YargsInstance<T>['epilogue']
-  epilogue (msg: string): YargsInstance<T>
-  example (cmd: string | [string, string?][], description?: string): YargsInstance<T>
+  detectLocale (detect: boolean): YargsInstance<R>
+  env (prefix?: string | false): YargsInstance<R>
+  epilog: YargsInstance<R>['epilogue']
+  epilogue (msg: string): YargsInstance<R>
+  example (cmd: string | [string, string?][], description?: string): YargsInstance<R>
   exit (code: number, err?: YError | string): void
-  exitProcess (enabled: boolean): YargsInstance<T>
-  fail (f: FailureFunction): YargsInstance<T>
-  getCommandInstance (): CommandInstance<T>
+  exitProcess (enabled: boolean): YargsInstance<R>
+  fail (f: FailureFunction): YargsInstance<R>
+  getCommandInstance (): CommandInstance<R>
   getCompletion(args: string[], done: (completions: string[]) => any): void
   getContext (): Context
   getDemandedCommands (): Options['demandedCommands']
@@ -1507,79 +1518,79 @@ export interface YargsInstance<T> {
   getStrictCommands (): boolean
   getUsageInstance (): UsageInstance
   getValidationInstance (): ValidationInstance
-  global (keys: string | string[], global?: boolean): YargsInstance<T>
-  group (keys: string| string[], groupName: string): YargsInstance<T>
-  help: YargsInstance<T>['addHelpOpt']
-  hide (key: string): YargsInstance<T>
+  global (keys: string | string[], global?: boolean): YargsInstance<R>
+  group (keys: string| string[], groupName: string): YargsInstance<R>
+  help: YargsInstance<R>['addHelpOpt']
+  hide (key: string): YargsInstance<R>
   implies: {
-    (key: string, implication: KeyOrPos | KeyOrPos[]): YargsInstance<T>
-    (keyImplications: Dictionary<KeyOrPos | KeyOrPos[]>): YargsInstance<T>
+    (key: string, implication: KeyOrPos | KeyOrPos[]): YargsInstance<R>
+    (keyImplications: Dictionary<KeyOrPos | KeyOrPos[]>): YargsInstance<R>
   }
   locale: {
     (): string
-    (locale: string): YargsInstance<T>
+    (locale: string): YargsInstance<R>
   }
-  middleware (callback: MiddlewareCallback<T> | MiddlewareCallback<T>[], applyBeforeValidation?: boolean): YargsInstance<T>
+  middleware (callback: MiddlewareCallback<R> | MiddlewareCallback<R>[], applyBeforeValidation?: boolean): YargsInstance<R>
   nargs: {
-    (keys: string | string[], nargs: number): YargsInstance<T>
-    (keyNargs: Dictionary<number>): YargsInstance<T>
+    (keys: string | string[], nargs: number): YargsInstance<R>
+    (keyNargs: Dictionary<number>): YargsInstance<R>
   }
-  normalize (keys: string | string[]): YargsInstance<T>
-  number (keys: string | string[]): YargsInstance<T>
-  onFinishCommand (f: FinishCommandHandler): YargsInstance<T>
+  normalize (keys: string | string[]): YargsInstance<R>
+  number (keys: string | string[]): YargsInstance<R>
+  onFinishCommand (f: FinishCommandHandler): YargsInstance<R>
   option: {
-    (key: string, optionDefinition: OptionDefinition): YargsInstance<T>
-    (keyOptionDefinitions: Dictionary<OptionDefinition>): YargsInstance<T>
+    (key: string, optionDefinition: OptionDefinition): YargsInstance<R>
+    (keyOptionDefinitions: Dictionary<OptionDefinition>): YargsInstance<R>
   }
-  options: YargsInstance<T>['option']
+  options: YargsInstance<R>['option']
   parse: {
     (): Arguments | Promise<Arguments>
     (args: string | string[], context: object, parseCallback?: ParseCallback): Arguments | Promise<Arguments>
     (args: string | string[], parseCallback: ParseCallback): Arguments | Promise<Arguments>
     (args: string | string[], shortCircuit: boolean): Arguments | Promise<Arguments>
   }
-  parserConfiguration (config: Configuration): YargsInstance<T>
-  pkgConf (key: string, rootPath?: string): YargsInstance<T>
-  positional (key: string, positionalDefinition: PositionalDefinition): YargsInstance<T>
-  recommendCommands (recommend: boolean): YargsInstance<T>
-  require: YargsInstance<T>['demand']
-  required: YargsInstance<T>['demand']
-  requiresArg (keys: string | string[] | Dictionary): YargsInstance<T>
-  reset (aliases?: DetailedArguments['aliases']): YargsInstance<T>
-  resetOptions (aliases?: DetailedArguments['aliases']): YargsInstance<T>
-  scriptName (scriptName: string): YargsInstance<T>
-  showCompletionScript($0?: string, cmd?: string): YargsInstance<T>
-  showHelp (level: 'error' | 'log' | ((message: string) => void)): YargsInstance<T>
+  parserConfiguration (config: Configuration): YargsInstance<R>
+  pkgConf (key: string, rootPath?: string): YargsInstance<R>
+  positional (key: string, positionalDefinition: PositionalDefinition): YargsInstance<R>
+  recommendCommands (recommend: boolean): YargsInstance<R>
+  require: YargsInstance<R>['demand']
+  required: YargsInstance<R>['demand']
+  requiresArg (keys: string | string[] | Dictionary): YargsInstance<R>
+  reset (aliases?: DetailedArguments['aliases']): YargsInstance<R>
+  resetOptions (aliases?: DetailedArguments['aliases']): YargsInstance<R>
+  scriptName (scriptName: string): YargsInstance<R>
+  showCompletionScript($0?: string, cmd?: string): YargsInstance<R>
+  showHelp (level: 'error' | 'log' | ((message: string) => void)): YargsInstance<R>
   showHelpOnFail: {
-    (message?: string): YargsInstance<T>
-    (enabled: boolean, message: string): YargsInstance<T>
+    (message?: string): YargsInstance<R>
+    (enabled: boolean, message: string): YargsInstance<R>
   }
-  showHidden: YargsInstance<T>['addShowHiddenOpt']
-  skipValidation (keys: string | string[]): YargsInstance<T>
-  strict (enable?: boolean): YargsInstance<T>
-  strictCommands (enable?: boolean): YargsInstance<T>
-  string (key: string | string []): YargsInstance<T>
+  showHidden: YargsInstance<R>['addShowHiddenOpt']
+  skipValidation (keys: string | string[]): YargsInstance<R>
+  strict (enable?: boolean): YargsInstance<R>
+  strictCommands (enable?: boolean): YargsInstance<R>
+  string (key: string | string []): YargsInstance<R>
   terminalWidth (): number | null
-  updateStrings (obj: Dictionary<string>): YargsInstance<T>
-  updateLocale: YargsInstance<T>['updateStrings']
+  updateStrings (obj: Dictionary<string>): YargsInstance<R>
+  updateLocale: YargsInstance<R>['updateStrings']
   usage: {
-    (msg: string | null): YargsInstance<T>
+    (msg: string | null): YargsInstance<R>
     (
       msg: string,
-      description: CommandHandler<T>['description'],
-      builder?: CommandBuilderDefinition<T> | CommandBuilder<T>,
+      description: CommandHandler<R>['description'],
+      builder?: CommandBuilderDefinition<R> | CommandBuilder<R>,
       handler?: CommandHandlerCallback
-    ): YargsInstance<T>
+    ): YargsInstance<R>
   }
   version: {
-    (ver?: string | false): YargsInstance<T>
-    (key?: string, ver?: string): YargsInstance<T>
-    (key?: string, msg?: string, ver?: string): YargsInstance<T>
+    (ver?: string | false): YargsInstance<R>
+    (key?: string, ver?: string): YargsInstance<R>
+    (key?: string, msg?: string, ver?: string): YargsInstance<R>
   }
-  wrap (cols: number | null | undefined): YargsInstance<T>
+  wrap (cols: number | null | undefined): YargsInstance<R>
 }
 
-export function isYargsInstance<T> (y: YargsInstance<T> | void): y is YargsInstance<T> {
+export function isYargsInstance<R> (y: YargsInstance<R> | void): y is YargsInstance<R> {
   return !!y && (typeof y._parseArgs === 'function')
 }
 

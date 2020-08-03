@@ -2,37 +2,37 @@ import { argsert } from './argsert'
 import { isPromise } from './is-promise'
 import { YargsInstance, Arguments } from './yargs'
 
-export function globalMiddlewareFactory<C, T> (globalMiddleware: Middleware<T>[], context: C) {
-  return function (callback: MiddlewareCallback<T> | MiddlewareCallback<T>[], applyBeforeValidation = false) {
+export function globalMiddlewareFactory<C, R> (globalMiddleware: Middleware<R>[], context: C) {
+  return function (callback: MiddlewareCallback<R> | MiddlewareCallback<R>[], applyBeforeValidation = false) {
     argsert('<array|function> [boolean]', [callback, applyBeforeValidation], arguments.length)
     if (Array.isArray(callback)) {
       for (let i = 0; i < callback.length; i++) {
         if (typeof callback[i] !== 'function') {
           throw Error('middleware must be a function')
         }
-        (callback[i] as Middleware<T>).applyBeforeValidation = applyBeforeValidation
+        (callback[i] as Middleware<R>).applyBeforeValidation = applyBeforeValidation
       }
-      Array.prototype.push.apply(globalMiddleware, callback as Middleware<T>[])
+      Array.prototype.push.apply(globalMiddleware, callback as Middleware<R>[])
     } else if (typeof callback === 'function') {
-      (callback as Middleware<T>).applyBeforeValidation = applyBeforeValidation
-      globalMiddleware.push(callback as Middleware<T>)
+      (callback as Middleware<R>).applyBeforeValidation = applyBeforeValidation
+      globalMiddleware.push(callback as Middleware<R>)
     }
     return context
   }
 }
 
-export function commandMiddlewareFactory<T> (commandMiddleware?: MiddlewareCallback<T>[]): Middleware<T>[] {
+export function commandMiddlewareFactory<R> (commandMiddleware?: MiddlewareCallback<R>[]): Middleware<R>[] {
   if (!commandMiddleware) return []
   return commandMiddleware.map(middleware => {
-    (middleware as Middleware<T>).applyBeforeValidation = false
+    (middleware as Middleware<R>).applyBeforeValidation = false
     return middleware
-  }) as Middleware<T>[]
+  }) as Middleware<R>[]
 }
 
-export function applyMiddleware<T> (
+export function applyMiddleware<R> (
   argv: Arguments | Promise<Arguments>,
-  yargs: YargsInstance<T>,
-  middlewares: Middleware<T>[],
+  yargs: YargsInstance<R>,
+  middlewares: Middleware<R>[],
   beforeValidation: boolean
 ) {
   const beforeValidationError = new Error('middleware cannot return a promise when applyBeforeValidation is true')
@@ -61,10 +61,10 @@ export function applyMiddleware<T> (
     }, argv)
 }
 
-export interface MiddlewareCallback<T> {
-  (argv: Arguments, yargs: YargsInstance<T>): Partial<Arguments> | Promise<Partial<Arguments>>
+export interface MiddlewareCallback<R> {
+  (argv: Arguments, yargs: YargsInstance<R>): Partial<Arguments> | Promise<Partial<Arguments>>
 }
 
-export interface Middleware<T> extends MiddlewareCallback<T> {
+export interface Middleware<R> extends MiddlewareCallback<R> {
   applyBeforeValidation: boolean
 }

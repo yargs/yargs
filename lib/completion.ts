@@ -10,7 +10,7 @@ import { assertNotStrictEqual } from './common-types'
 
 // add bash completions to your
 //  yargs-powered applications.
-export function completion<T> (yargs: YargsInstance<T>, usage: UsageInstance, command: CommandInstance<T>) {
+export function completion<R> (yargs: YargsInstance<R>, usage: UsageInstance, command: CommandInstance<R>) {
   const self: CompletionInstance = {
     completionKey: 'get-yargs-completions'
   } as CompletionInstance
