@@ -786,8 +786,8 @@ declare namespace yargs {
   type Argv = YargsInstance;
 }
 
-declare interface yargs {
-  (processArgs?: string | string[], cwd?: string, parentRequire?: NodeRequire): YargsInstance
+declare interface yargs<T = {}> {
+  (processArgs?: string | string[], cwd?: string, parentRequire?: NodeRequire): YargsInstance<T>
   rebase: RebaseFunction
   Parser: Parser
 }
