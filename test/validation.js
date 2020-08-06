@@ -337,6 +337,18 @@ describe('validation tests', () => {
       expect.fail('no parsing failure')
     })
 
+    it('fails in strict mode with invalid options', (done) => {
+      yargs(['foo', 'file1', 'file2', '-o', 'out'])
+        .command('foo')
+        .strict()
+        .fail((msg) => {
+          msg.should.equal('Unknown argument: o')
+          return done()
+        })
+        .parse()
+      expect.fail('no parsing failure')
+    })
+
     it('fails in strict mode with extra positionals', (done) => {
       yargs(['kangaroo', 'jumping', 'fast'])
         .command('kangaroo <status>', 'kangaroo handlers')
