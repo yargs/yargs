@@ -1,12 +1,13 @@
-import { CommandInstance, isCommandBuilderCallback } from './command'
-import * as templates from './completion-templates'
-import { isPromise } from './is-promise'
-import { parseCommand } from './parse-command'
 import * as path from 'path'
-import { UsageInstance } from './usage'
-import { YargsInstance } from './yargs'
-import { Arguments, DetailedArguments } from 'yargs-parser/build/lib/yargs-parser-types'
-import { assertNotStrictEqual } from './common-types'
+
+import { CommandInstance, isCommandBuilderCallback } from './command.js'
+import * as templates from './completion-templates.js'
+import { isPromise } from './utils/is-promise.js'
+import { parseCommand } from './parse-command.js'
+import { UsageInstance } from './usage.js'
+import { YargsInstance } from './yargs-factory.js'
+import { Arguments, DetailedArguments } from 'yargs-parser/build/lib/yargs-parser-types.js'
+import { assertNotStrictEqual } from './common-types.js'
 
 // add bash completions to your
 //  yargs-powered applications.

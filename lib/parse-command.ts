@@ -1,4 +1,4 @@
-import { NotEmptyArray } from './common-types'
+import { NotEmptyArray } from './common-types.js'
 
 export function parseCommand (cmd: string) {
   const extraSpacesStrippedCommand = cmd.replace(/\s{2,}/g, ' ')

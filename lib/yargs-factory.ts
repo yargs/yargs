@@ -1,5 +1,5 @@
-import { CommandInstance, CommandHandler, CommandBuilderDefinition, CommandBuilder, CommandHandlerCallback, FinishCommandHandler, command as Command, CommandHandlerDefinition } from './command'
-import { Dictionary, assertNotStrictEqual, KeyOf, DictionaryKeyof, ValueOf, objectKeys, assertSingleKey } from './common-types'
+import { CommandInstance, CommandHandler, CommandBuilderDefinition, CommandBuilder, CommandHandlerCallback, FinishCommandHandler, command as Command, CommandHandlerDefinition } from './command.js'
+import { Dictionary, assertNotStrictEqual, KeyOf, DictionaryKeyof, ValueOf, objectKeys, assertSingleKey, RequireDirectoryOptions, YargsMixin, RequireType } from './common-types.js'
 import {
   Arguments as ParserArguments,
   DetailedArguments as ParserDetailedArguments,
@@ -7,30 +7,30 @@ import {
   Options as ParserOptions,
   ConfigCallback,
   CoerceCallback
-} from 'yargs-parser/build/lib/yargs-parser-types'
-import { YError } from './yerror'
-import { UsageInstance, FailureFunction, usage as Usage } from './usage'
-import { argsert } from './argsert'
-import * as fs from 'fs'
+} from 'yargs-parser/build/lib/yargs-parser-types.js'
+import { YError } from './yerror.js'
+import { UsageInstance, FailureFunction, usage as Usage } from './usage.js'
+import { argsert } from './argsert.js'
+import { completion as Completion, CompletionInstance, CompletionFunction } from './completion.js'
+import { validation as Validation, ValidationInstance, KeyOrPos } from './validation.js'
+import { objFilter } from './utils/obj-filter.js'
+import { applyExtends } from './utils/apply-extends.js'
+import { globalMiddlewareFactory, MiddlewareCallback, Middleware } from './middleware.js'
+import * as processArgv from './utils/process-argv.js'
+import { isPromise } from './utils/is-promise.js'
+import setBlocking from './utils/set-blocking.js'
+import requireMainFilename from './utils/require-main-filename.js'
 
-import { completion as Completion, CompletionInstance, CompletionFunction } from './completion'
+import * as fs from 'fs'
 import * as path from 'path'
 
-import { validation as Validation, ValidationInstance, KeyOrPos } from './validation'
-import { Y18N } from 'y18n'
-import { objFilter } from './obj-filter'
-import { applyExtends } from './apply-extends'
-import { globalMiddlewareFactory, MiddlewareCallback, Middleware } from './middleware'
-import * as processArgv from './process-argv'
-import { RequireDirectoryOptions } from 'require-directory'
-import { isPromise } from './is-promise'
-import Parser = require('yargs-parser')
-import y18nFactory = require('y18n')
-import setBlocking = require('set-blocking')
-import findUp = require('find-up')
-import requireMainFilename = require('require-main-filename')
+let mixin: YargsMixin
+export function YargsFactory (_mixin: YargsMixin) {
+  mixin = _mixin
+  return Yargs
+}
 
-export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(), parentRequire = require) {
+function Yargs (processArgs: string | string[] = [], cwd = process.cwd(), parentRequire?: RequireType) {
   const self = {} as YargsInstance
   let command: CommandInstance
   let completion: CompletionInstance | null = null
@@ -42,7 +42,7 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
   let validation: ValidationInstance
   let handlerFinishCommand: FinishCommandHandler | null = null
 
-  const y18n = y18nFactory({
+  const y18n = mixin.y18nFactory({
     directory: path.resolve(__dirname, '../../locales'),
     updateFiles: false
   })
@@ -133,7 +133,7 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
     ]
 
     arrayOptions.forEach(k => {
-      tmpOptions[k] = (options[k] || []).filter(k => !localLookup[k])
+      tmpOptions[k] = (options[k] || []).filter((k: string) => !localLookup[k])
     })
 
     objectOptions.forEach(<K extends DictionaryKeyof<Options>>(k: K) => {
@@ -145,9 +145,9 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
 
     // if this is the first time being executed, create
     // instances of all our helpers -- otherwise just reset.
-    usage = usage ? usage.reset(localLookup) : Usage(self, y18n)
+    usage = usage ? usage.reset(localLookup) : Usage(self, y18n, mixin)
     validation = validation ? validation.reset(localLookup) : Validation(self, usage, y18n)
-    command = command ? command.reset() : Command(self, usage, validation, globalMiddleware)
+    command = command ? command.reset() : Command(self, usage, validation, globalMiddleware, mixin)
     if (!completion) completion = Completion(self, usage, command)
 
     completionCommand = null
@@ -478,8 +478,8 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
 
   self.commandDir = function (dir, opts) {
     argsert('<string> [object]', [dir, opts], arguments.length)
-    const req = parentRequire || require
-    command.addDirectory(dir, self.getContext(), req, require('get-caller-file')(), opts)
+    const req = parentRequire || mixin.require
+    command.addDirectory(dir, self.getContext(), req, mixin.require('get-caller-file')(), opts)
     return self
   }
 
@@ -670,7 +670,7 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
 
     let obj = {}
     try {
-      let startDir = rootPath || requireMainFilename(parentRequire)
+      let startDir = rootPath || requireMainFilename(parentRequire || mixin.require)
 
       // When called in an environment that lacks require.main.filename, such as a jest test runner,
       // startDir is already process.cwd(), and should not be shortened.
@@ -679,7 +679,7 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
         startDir = path.dirname(startDir)
       }
 
-      const pkgJsonPath = findUp.sync('package.json', {
+      const pkgJsonPath = mixin.findUp.sync('package.json', {
         cwd: startDir
       })
       assertNotStrictEqual(pkgJsonPath, undefined)
@@ -1206,7 +1206,7 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
     const config = Object.assign({}, options.configuration, {
       'populate--': true
     })
-    const parsed = Parser.detailed(args, Object.assign({}, options, {
+    const parsed = mixin.Parser.detailed(args, Object.assign({}, options, {
       configuration: config
     })) as DetailedArguments
 
@@ -1398,7 +1398,6 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
 
   return self
 }
-
 // rebase an absolute path to a relative one with respect to a base directory
 // exported for tests
 export interface RebaseFunction {
@@ -1462,7 +1461,7 @@ export interface YargsInstance {
     commandMiddleware ?: Middleware[],
     deprecated ?: boolean
   ): YargsInstance
-  commandDir (dir: string, opts?: RequireDirectoryOptions<any>): YargsInstance
+  commandDir (dir: string, opts?: RequireDirectoryOptions): YargsInstance
   completion: {
     (cmd?: string, fn?: CompletionFunction): YargsInstance
     (cmd?: string, desc?: string | false, fn?: CompletionFunction): YargsInstance
@@ -1612,7 +1611,7 @@ export interface Context {
 type LoggerInstance = Pick<Console, 'error' | 'log'>
 
 export interface Options extends ParserOptions {
-  __: Y18N['__']
+  __: (format: any, ...param: any[]) => string
   alias: Dictionary<string[]>
   array: string[]
   boolean: string[]

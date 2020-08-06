@@ -46,3 +46,40 @@ export function assertSingleKey (actual: string | string[] | Dictionary): assert
 export function objectKeys<T> (object: T) {
   return Object.keys(object) as (keyof T)[]
 }
+
+export interface RequireDirectoryOptions {
+  extensions?: ReadonlyArray<string>;
+  visit?: (commandObject: any, pathToFile: string, filename?: string) => any;
+  recurse?: boolean;
+}
+
+// Dependencies that might vary between CJS, ESM, and Deno are isolated:
+export interface YargsMixin {
+  Parser: ({
+    camelcase: Function;
+    detailed: Function;
+    decamelize: Function;
+  }),
+  y18nFactory: Function,
+  findUp: ({
+    sync: Function
+  }),
+  requireDirectory: Function
+  stringWidth: Function;
+  require: RequireType;
+}
+
+export interface RequireType {
+  (path: string): Function;
+  main: MainType;
+}
+
+export interface MainType {
+  filename: string;
+  children: MainType[];
+}
+
+export interface Y18N {
+  __(str: string, ...args: string[]): string;
+  __n(str: string, ...args: (string|number)[]): string;
+}

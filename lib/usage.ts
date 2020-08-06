@@ -1,17 +1,15 @@
 // this file handles outputting usage instructions,
 // failures, etc. keeps logging in one place.
-import { Dictionary, assertNotStrictEqual } from './common-types'
-import { objFilter } from './obj-filter'
-import * as path from 'path'
-import { YargsInstance } from './yargs'
-import { YError } from './yerror'
-import { Y18N } from 'y18n'
-import { DetailedArguments } from 'yargs-parser/build/lib/yargs-parser-types'
-import decamelize = require('decamelize')
-import setBlocking = require('set-blocking')
-import stringWidth = require('string-width')
+import { Dictionary, assertNotStrictEqual, YargsMixin, Y18N } from './common-types.js'
+import { objFilter } from './utils/obj-filter'
+import { YargsInstance } from './yargs-factory.js'
+import { YError } from './yerror.js'
+import { DetailedArguments } from 'yargs-parser/build/lib/yargs-parser-types.js'
+import setBlocking from './utils/set-blocking.js'
 
-export function usage (yargs: YargsInstance, y18n: Y18N) {
+import * as path from 'path'
+
+export function usage (yargs: YargsInstance, y18n: Y18N, mixin: YargsMixin) {
   const __ = y18n.__
   const self = {} as UsageInstance
 
@@ -426,7 +424,7 @@ export function usage (yargs: YargsInstance, y18n: Y18N) {
       // column might be of the form "text"
       // or { text: "text", indent: 4 }
       width = Math.max(
-        stringWidth(modifier ? `${modifier} ${getText(v[0])}` : getText(v[0])) + getIndentation(v[0]),
+        mixin.stringWidth(modifier ? `${modifier} ${getText(v[0])}` : getText(v[0])) + getIndentation(v[0]),
         width
       )
     })
@@ -505,7 +503,7 @@ export function usage (yargs: YargsInstance, y18n: Y18N) {
   }
 
   self.functionDescription = (fn) => {
-    const description = fn.name ? decamelize(fn.name, '-') : __('generated-value')
+    const description = fn.name ? mixin.Parser.decamelize(fn.name, '-') : __('generated-value')
     return ['(', description, ')'].join('')
   }
 

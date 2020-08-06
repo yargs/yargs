@@ -1,7 +1,7 @@
 'use strict'
 /* global describe, it, beforeEach */
 
-const checkUsage = require('../build/test/helpers/utils').checkOutput
+const checkUsage = require('./helpers/utils.cjs').checkOutput
 const expect = require('chai').expect
 const english = require('../locales/en.json')
 let yargs = require('../')
@@ -734,7 +734,7 @@ describe('validation tests', () => {
     })
 
     it('should be displayed in the help message with its default name', () => {
-      const checkUsage = require('../build/test/helpers/utils').checkOutput
+      const checkUsage = require('./helpers/utils.cjs').checkOutput
       const r = checkUsage(() => yargs(['--help'])
         .config()
         .help('help')
@@ -751,7 +751,7 @@ describe('validation tests', () => {
     })
 
     it('should allow help message to be overridden', () => {
-      const checkUsage = require('../build/test/helpers/utils').checkOutput
+      const checkUsage = require('./helpers/utils.cjs').checkOutput
       const r = checkUsage(() => yargs(['--help'])
         .config('settings', 'pork chop sandwiches')
         .help('help')
@@ -768,7 +768,7 @@ describe('validation tests', () => {
     })
 
     it('outputs an error returned by the parsing function', () => {
-      const checkUsage = require('../build/test/helpers/utils').checkOutput
+      const checkUsage = require('./helpers/utils.cjs').checkOutput
       const r = checkUsage(() => yargs(['--settings=./package.json'])
         .config('settings', 'path to config file', configPath => Error('someone set us up the bomb'))
         .help('help')
@@ -786,7 +786,7 @@ describe('validation tests', () => {
     })
 
     it('outputs an error if thrown by the parsing function', () => {
-      const checkUsage = require('../build/test/helpers/utils').checkOutput
+      const checkUsage = require('./helpers/utils.cjs').checkOutput
       const r = checkUsage(() => yargs(['--settings=./package.json'])
         .config('settings', 'path to config file', (configPath) => {
           throw Error('someone set us up the bomb')

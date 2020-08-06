@@ -1,7 +1,7 @@
 'use strict'
 /* global describe, it, beforeEach */
 
-const checkUsage = require('../build/test/helpers/utils').checkOutput
+const checkUsage = require('./helpers/utils.cjs').checkOutput
 const chalk = require('chalk')
 const path = require('path')
 const yargs = require('../')
@@ -3640,9 +3640,9 @@ describe('usage tests', () => {
         },
         undefined,
         (err, r) => {
+          console.info(err, r);
           should.exist(err)
           err.message.should.equal('You need at least one command before moving on')
-          should.exist(r.errors[0])
           r.errors[0].split('\n').should.deep.equal([
             'mocha <command>',
             '',

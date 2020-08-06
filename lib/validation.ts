@@ -1,11 +1,11 @@
-import { argsert } from './argsert'
-import { Dictionary, assertNotStrictEqual } from './common-types'
-import { levenshtein as distance } from './levenshtein'
-import { objFilter } from './obj-filter'
-import { UsageInstance } from './usage'
-import { YargsInstance, Arguments } from './yargs'
-import { DetailedArguments } from 'yargs-parser/build/lib/yargs-parser-types'
-import { Y18N } from 'y18n'
+import { argsert } from './argsert.js'
+import { Dictionary, assertNotStrictEqual, Y18N } from './common-types.js'
+import { levenshtein as distance } from './utils/levenshtein.js'
+import { objFilter } from './utils/obj-filter.js'
+import { UsageInstance } from './usage.js'
+import { YargsInstance, Arguments } from './yargs-factory.js'
+import { DetailedArguments } from 'yargs-parser/build/lib/yargs-parser-types.js'
+
 const specialKeys = ['$0', '--', '_']
 
 // validation-type-stuff, missing params,

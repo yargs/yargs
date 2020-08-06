@@ -1,16 +1,14 @@
-import { Dictionary, assertNotStrictEqual } from './common-types'
-import { isPromise } from './is-promise'
-import { applyMiddleware, commandMiddlewareFactory, Middleware } from './middleware'
-import { parseCommand, Positional } from './parse-command'
 import * as path from 'path'
-import { RequireDirectoryOptions } from 'require-directory'
-import { UsageInstance } from './usage'
 import { inspect } from 'util'
-import { ValidationInstance } from './validation'
-import { YargsInstance, isYargsInstance, Options, OptionDefinition, Context, Configuration, Arguments, DetailedArguments } from './yargs'
-import requireDirectory = require('require-directory')
-import whichModule = require('which-module')
-import Parser = require('yargs-parser')
+
+import { Dictionary, assertNotStrictEqual, RequireDirectoryOptions, YargsMixin } from './common-types.js'
+import { isPromise } from './utils/is-promise.js'
+import { applyMiddleware, commandMiddlewareFactory, Middleware } from './middleware.js'
+import { parseCommand, Positional } from './parse-command.js'
+import { UsageInstance } from './usage.js'
+import { ValidationInstance } from './validation.js'
+import { YargsInstance, isYargsInstance, Options, OptionDefinition, Context, Configuration, Arguments, DetailedArguments } from './yargs-factory.js'
+import whichModule from './utils/which-module.js'
 
 const DEFAULT_MARKER = /(^\*)|(^\$0)/
 
@@ -21,7 +19,8 @@ export function command (
   yargs: YargsInstance,
   usage: UsageInstance,
   validation: ValidationInstance,
-  globalMiddleware: Middleware[] = []
+  globalMiddleware: Middleware[] = [],
+  mixin: YargsMixin
 ) {
   const self: CommandInstance = {} as CommandInstance
   let handlers: Dictionary<CommandHandler> = {}
@@ -127,7 +126,7 @@ export function command (
       }
       return visited
     }
-    requireDirectory({ require: req, filename: callerFile } as NodeModule, dir, opts)
+    mixin.requireDirectory({ require: req, filename: callerFile }, dir, opts)
   }
 
   // lookup module object from require()d command and derive name
@@ -368,7 +367,7 @@ export function command (
     const config: Configuration = Object.assign({}, options.configuration, {
       'populate--': true
     })
-    const parsed = Parser.detailed(unparsed, Object.assign({}, options, {
+    const parsed = mixin.Parser.detailed(unparsed, Object.assign({}, options, {
       configuration: config
     }))
 
@@ -463,7 +462,7 @@ export interface CommandInstance {
     context: Context,
     req: NodeRequireFunction,
     callerFile: string,
-    opts?: RequireDirectoryOptions<any>
+    opts?: RequireDirectoryOptions
   ): void
   addHandler (
     cmd: string | string[] | CommandHandlerDefinition,

@@ -1,6 +1,6 @@
 /* global describe, it */
-import { expect } from 'chai'
-import { parseCommand } from '../lib/parse-command'
+const { expect } = require('chai')
+const { parseCommand } = require('../build/lib/parse-command')
 
 describe('parseCommand', () => {
   it('should throw if no command is specified', () => {

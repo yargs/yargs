@@ -1,4 +1,4 @@
-import { objectKeys } from './common-types'
+import { objectKeys } from '../common-types.js'
 
 export function objFilter<T extends object> (
   original = {} as T,

@@ -4,10 +4,10 @@
 const expect = require('chai').expect
 const fs = require('fs')
 const path = require('path')
-const checkOutput = require('../build/test/helpers/utils').checkOutput
+const checkOutput = require('./helpers/utils.cjs').checkOutput
 const english = require('../locales/en.json')
 let yargs
-const { YError } = require('../build/lib/yerror')
+// const { YError } = require('../build/lib/yerror')
 
 require('chai').should()
 
@@ -21,14 +21,14 @@ describe('yargs dsl tests', () => {
     oldProcess.argv = process.argv
     oldProcess.defaultApp = process.defaultApp
     oldProcess.versions.electron = process.versions.electron
-    yargs = require('../')
+    yargs = require('../index.cjs')
   })
 
   afterEach(() => {
     process.argv = oldProcess.argv
     process.defaultApp = oldProcess.defaultApp
     process.versions.electron = oldProcess.versions.electron
-    delete require.cache[require.resolve('../')]
+    delete require.cache[require.resolve('../index.cjs')]
   })
 
   it('should use bin name for $0, eliminating path', () => {
@@ -44,7 +44,7 @@ describe('yargs dsl tests', () => {
     delete require.cache[require.resolve('../')]
     process.argv = ['/usr/local/bin/app', '-f', 'toto', 'tutu']
     process.versions.electron = '10.0.0-nightly.20200211'
-    yargs = require('../')
+    yargs = require('../index.cjs')
     const argv = yargs.parse()
     argv.should.have.property('f')
     argv.f.should.equal('toto')
@@ -61,7 +61,7 @@ describe('yargs dsl tests', () => {
       enumerable: true,
       value: true
     })
-    yargs = require('../')
+    yargs = require('../index.cjs')
     const argv = yargs.parse()
     argv.should.have.property('f')
     argv.f.should.equal('toto')
@@ -94,6 +94,7 @@ describe('yargs dsl tests', () => {
       })
       .parse()
     )
+    console.info(r.errors[2], implicationsFailedPattern)
 
     r.errors[2].should.match(implicationsFailedPattern)
   })
@@ -656,7 +657,7 @@ describe('yargs dsl tests', () => {
   describe('locale', () => {
     function loadLocale (locale) {
       delete require.cache[require.resolve('../')]
-      yargs = require('../')
+      yargs = require('../index.cjs')
       process.env.LC_ALL = locale
     }
 
@@ -2145,7 +2146,7 @@ describe('yargs dsl tests', () => {
   describe('yargs context', () => {
     beforeEach(() => {
       delete require.cache[require.resolve('../')]
-      yargs = require('../')
+      yargs = require('../index.cjs')
     })
 
     it('should begin with initial state', () => {

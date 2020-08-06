@@ -1,13 +1,13 @@
 /* global describe, it */
-import { argsert } from '../lib/argsert'
-import { checkOutput } from './helpers/utils'
-import { should } from 'chai'
+const { argsert } = require('../build/lib/argsert')
+const { checkOutput } = require('./helpers/utils.cjs')
+const { should } = require('chai')
 
 should()
 
 describe('Argsert', () => {
   it('does not warn if optional argument is not provided', () => {
-    const o = checkOutput(function (...args: any[]) {
+    const o = checkOutput(function (...args) {
       argsert('[object]', [].slice.call(args))
     })
 
@@ -16,7 +16,7 @@ describe('Argsert', () => {
 
   it('warn if wrong type is provided for optional argument', () => {
     const o = checkOutput(() => {
-      function foo (...args: any[]) {
+      function foo (...args) {
         argsert('[object|number]', [].slice.call(args))
       }
 
@@ -28,7 +28,7 @@ describe('Argsert', () => {
 
   it('does not warn if optional argument is valid', () => {
     const o = checkOutput(() => {
-      function foo (...args: any[]) {
+      function foo (...args) {
         argsert('[object]', [].slice.call(args))
       }
 
@@ -39,7 +39,7 @@ describe('Argsert', () => {
   })
 
   it('warns if required argument is not provided', () => {
-    const o = checkOutput(function (...args: any[]) {
+    const o = checkOutput(function (...args) {
       argsert('<object>', [].slice.call(args))
     })
 
@@ -48,7 +48,7 @@ describe('Argsert', () => {
 
   it('warns if required argument is of wrong type', () => {
     const o = checkOutput(() => {
-      function foo (...args: any[]) {
+      function foo (...args) {
         argsert('<object>', [].slice.call(args))
       }
 
@@ -60,7 +60,7 @@ describe('Argsert', () => {
 
   it('supports a combination of required and optional arguments', () => {
     const o = checkOutput(() => {
-      function foo (...args: any[]) {
+      function foo (...args) {
         argsert('<array> <string|object> [string|object]', [].slice.call(args))
       }
 
@@ -72,7 +72,7 @@ describe('Argsert', () => {
 
   it('warns if too many arguments are provided', () => {
     const o = checkOutput(() => {
-      function foo (...args: any[]) {
+      function foo (...args) {
         argsert('<array> [batman]', [].slice.call(args))
       }
 
@@ -84,7 +84,7 @@ describe('Argsert', () => {
 
   it('warn with argument position if wrong type is provided for argument', () => {
     const o = checkOutput(() => {
-      function foo (...args: any[]) {
+      function foo (...args) {
         argsert('<string> <string> <string>', [].slice.call(args))
       }
 
@@ -96,7 +96,7 @@ describe('Argsert', () => {
 
   it('warn with generic argument position if wrong type is provided for seventh or greater argument', () => {
     const o = checkOutput(() => {
-      function foo (...args: any[]) {
+      function foo (...args) {
         argsert('<string> <string> <string> <string> <string> <string> <string>', [].slice.call(args))
       }
 
@@ -108,7 +108,7 @@ describe('Argsert', () => {
 
   it('configures function to accept 0 parameters, if only arguments object is provided', () => {
     const o = checkOutput(() => {
-      function foo (...args: any[]) {
+      function foo (...args) {
         argsert([].slice.call(args))
       }
 
@@ -120,7 +120,7 @@ describe('Argsert', () => {
 
   it('allows for any type if * is provided', () => {
     const o = checkOutput(() => {
-      function foo (...args: any[]) {
+      function foo (...args) {
         argsert('<*>', [].slice.call(args))
       }
 
@@ -132,7 +132,7 @@ describe('Argsert', () => {
 
   it('should ignore trailing undefined values', () => {
     const o = checkOutput(() => {
-      function foo (...args: any[]) {
+      function foo (...args) {
         argsert('<*>', [].slice.call(args))
       }
 
@@ -144,7 +144,7 @@ describe('Argsert', () => {
 
   it('should not ignore undefined values that are not trailing', () => {
     const o = checkOutput(() => {
-      function foo (...args: any[]) {
+      function foo (...args) {
         argsert('<*>', [].slice.call(args))
       }
 
@@ -156,7 +156,7 @@ describe('Argsert', () => {
 
   it('supports null as special type', () => {
     const o = checkOutput(() => {
-      function foo (...args: any[]) {
+      function foo (...args) {
         argsert('<null>', [].slice.call(args))
       }
       foo(null)
