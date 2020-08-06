@@ -1,4 +1,4 @@
-import { CommandInstance, CommandHandler, CommandBuilderDefinition, CommandBuilder, CommandHandlerCallback, FinishCommandHandler, command as Command } from './command'
+import { CommandInstance, CommandHandler, CommandBuilderDefinition, CommandBuilder, CommandHandlerCallback, FinishCommandHandler, command as Command, CommandHandlerDefinition } from './command'
 import { Dictionary, assertNotStrictEqual, KeyOf, DictionaryKeyof, ValueOf, objectKeys, assertSingleKey } from './common-types'
 import {
   Arguments as ParserArguments,
@@ -463,7 +463,14 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
     return self
   }
 
-  self.command = function (cmd, description, builder, handler, middlewares, deprecated) {
+  self.command = function (
+    cmd: string | string[] | CommandHandlerDefinition,
+    description?: CommandHandler['description'],
+    builder?: CommandBuilderDefinition | CommandBuilder,
+    handler?: CommandHandlerCallback,
+    middlewares?: Middleware[],
+    deprecated?: boolean
+  ) {
     argsert('<string|array|object> [string|boolean] [function|object] [function] [array] [boolean|string]', [cmd, description, builder, handler, middlewares, deprecated], arguments.length)
     command.addHandler(cmd, description, builder, handler, middlewares, deprecated)
     return self
@@ -1446,6 +1453,7 @@ export interface YargsInstance {
     (keys: string | string[], coerceCallback: CoerceCallback): YargsInstance
     (keyCoerceCallbacks: Dictionary<CoerceCallback>): YargsInstance
   }
+  command (handler: CommandHandlerDefinition): YargsInstance
   command (
     cmd: string | string[],
     description: CommandHandler['description'],

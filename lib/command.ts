@@ -465,10 +465,9 @@ export interface CommandInstance {
     callerFile: string,
     opts?: RequireDirectoryOptions<any>
   ): void
-  addHandler (handler: CommandHandlerDefinition): void
   addHandler (
-    cmd: string | string[],
-    description: CommandHandler['description'],
+    cmd: string | string[] | CommandHandlerDefinition,
+    description?: CommandHandler['description'],
     builder?: CommandBuilderDefinition | CommandBuilder,
     handler?: CommandHandlerCallback,
     commandMiddleware?: Middleware[],
