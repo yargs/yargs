@@ -1,4 +1,4 @@
-import ts from '@wessberg/rollup-plugin-ts'
+const ts = require('@wessberg/rollup-plugin-ts')
 
 const output = {
   format: 'cjs',
@@ -8,8 +8,8 @@ const output = {
 
 if (process.env.NODE_ENV === 'test') output.sourcemap = true
 
-export default {
-  input: './yargs.ts',
+module.exports = {
+  input: './lib/cjs.ts',
   output,
   plugins: [
     ts({ /* options */ })

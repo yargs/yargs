@@ -4,10 +4,16 @@
   "description": "yargs the modern, pirate-themed, successor to optimist.",
   "main": "./index.cjs",
   "exports": {
-    "import": "./esm.js",
-    "require": "./index.cjs"
+    ".": {
+      "import": "./index.mjs",
+      "require": "./index.cjs"
+    },
+    "./yargs": {
+      "require": "./build/index.cjs"
+    }
   },
   "type": "module",
+  "module": "./build/index.mjs",
   "contributors": [
     {
       "name": "Yargs Contributors",
@@ -16,14 +22,14 @@
   ],
   "files": [
     "index.cjs",
-    "yargs.d.ts",
     "build",
     "locales",
-    "LICENSE"
+    "LICENSE",
+    "!*.d.ts"
   ],
   "dependencies": {
     "cliui": "^6.0.0",
-    "find-up": "^4.1.0",
+    "escalade": "^3.0.2",
     "require-directory": "^2.1.1",
     "string-width": "^4.2.0",
     "y18n": "^4.0.0",
@@ -61,13 +67,14 @@
     "check": "standardx './*.ts' && standardx '**/*.ts'",
     "fix": "standardx --fix './*.ts'  && standardx --fix '**/*.ts'",
     "posttest": "npm run check",
-    "test": "c8 mocha --require ./test/before.cjs test/yargs.cjs --timeout=12000 --check-leaks",
+    "test": "c8 mocha ./test/*.cjs --require ./test/before.cjs --timeout=12000 --check-leaks",
+    "test:esm": "c8 mocha ./test/esm/*.mjs --check-leaks",
     "coverage": "c8 report --check-coverage",
     "prepare": "npm run compile",
     "pretest": "npm run compile -- -p tsconfig.test.json && cross-env NODE_ENV=test npm run build:cjs",
     "compile": "rimraf build && tsc",
     "postcompile": "npm run build:cjs",
-    "build:cjs": "rollup -c",
+    "build:cjs": "rollup -c rollup.config.cjs",
     "postbuild:cjs": "rimraf ./build/index.cjs.d.ts"
   },
   "repository": {
@@ -78,6 +85,8 @@
   "standardx": {
     "ignore": [
       "build",
+      "index.cjs",
+      "yargs.cjs",
       "**/example/**"
     ]
   },

@@ -1,7 +1,7 @@
 // this file handles outputting usage instructions,
 // failures, etc. keeps logging in one place.
 import { Dictionary, assertNotStrictEqual, YargsMixin, Y18N } from './common-types.js'
-import { objFilter } from './utils/obj-filter'
+import { objFilter } from './utils/obj-filter.js'
 import { YargsInstance } from './yargs-factory.js'
 import { YError } from './yerror.js'
 import { DetailedArguments } from 'yargs-parser/build/lib/yargs-parser-types.js'

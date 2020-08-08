@@ -1,5 +1,5 @@
 /* global describe, it */
-const { objFilter } = require('../build/lib/utils/obj-filter.js')
+const { objFilter } = require('../build/index.cjs')
 const { expect } = require('chai')
 
 describe('ObjFilter', () => {

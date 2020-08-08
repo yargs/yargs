@@ -2,14 +2,14 @@
 // classic singleton yargs API, to use yargs
 // without running as a singleton do:
 // require('yargs/yargs')(process.argv.slice(2))
-const yargs = require('./build/index.cjs')
+const Yargs = require('./build/index.cjs')
 
-Argv(yargs.processArgv.getProcessArgvWithoutBin())
+Argv(Yargs.processArgv.getProcessArgvWithoutBin())
 
 module.exports = Argv
 
 function Argv (processArgs, cwd) {
-  const argv = yargs(processArgs, cwd, require)
+  const argv = Yargs(processArgs, cwd, require)
   singletonify(argv)
   return argv
 }

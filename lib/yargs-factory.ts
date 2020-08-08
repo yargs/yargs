@@ -1,3 +1,8 @@
+// Platform agnostic entrypoint for yargs, i.e., this factory is used to
+// create an instance of yargs for CJS, ESM, Deno.
+//
+// Works by accepting a mixin which shims methods that contain platform
+// specific logic.
 import { CommandInstance, CommandHandler, CommandBuilderDefinition, CommandBuilder, CommandHandlerCallback, FinishCommandHandler, command as Command, CommandHandlerDefinition } from './command.js'
 import { Dictionary, assertNotStrictEqual, KeyOf, DictionaryKeyof, ValueOf, objectKeys, assertSingleKey, RequireDirectoryOptions, YargsMixin, RequireType } from './common-types.js'
 import {
@@ -42,10 +47,7 @@ function Yargs (processArgs: string | string[] = [], cwd = process.cwd(), parent
   let validation: ValidationInstance
   let handlerFinishCommand: FinishCommandHandler | null = null
 
-  const y18n = mixin.y18nFactory({
-    directory: path.resolve(__dirname, '../../locales'),
-    updateFiles: false
-  })
+  const y18n = mixin.y18n
 
   self.middleware = globalMiddlewareFactory(globalMiddleware, self)
 
@@ -679,8 +681,12 @@ function Yargs (processArgs: string | string[] = [], cwd = process.cwd(), parent
         startDir = path.dirname(startDir)
       }
 
-      const pkgJsonPath = mixin.findUp.sync('package.json', {
-        cwd: startDir
+      const pkgJsonPath = mixin.findUp(startDir, (dir: string[], names: string[]) => {
+        if (names.includes('package.json')) {
+          return 'package.json'
+        } else {
+          return undefined
+        }
       })
       assertNotStrictEqual(pkgJsonPath, undefined)
       obj = JSON.parse(fs.readFileSync(pkgJsonPath).toString())

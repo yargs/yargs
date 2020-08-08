@@ -1,5 +1,5 @@
 /* global describe, it */
-const { argsert } = require('../build/lib/argsert')
+const { argsert } = require('../build/index.cjs')
 const { checkOutput } = require('./helpers/utils.cjs')
 const { should } = require('chai')
 

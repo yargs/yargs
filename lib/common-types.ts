@@ -60,10 +60,8 @@ export interface YargsMixin {
     detailed: Function;
     decamelize: Function;
   }),
-  y18nFactory: Function,
-  findUp: ({
-    sync: Function
-  }),
+  y18n: Y18N,
+  findUp: Function,
   requireDirectory: Function
   stringWidth: Function;
   require: RequireType;
@@ -82,4 +80,7 @@ export interface MainType {
 export interface Y18N {
   __(str: string, ...args: string[]): string;
   __n(str: string, ...args: (string|number)[]): string;
+  getLocale(): string;
+  setLocale(locale: string): void;
+  updateLocale(obj: {[key: string]: string}): void;
 }

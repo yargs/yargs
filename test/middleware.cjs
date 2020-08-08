@@ -2,16 +2,21 @@
 /* global describe, it, beforeEach, afterEach */
 
 const { expect } = require('chai')
-const { globalMiddlewareFactory } = require('../build/lib/middleware')
+const { globalMiddlewareFactory } = require('../build/index.cjs')
 let yargs
 require('chai').should()
 
+function clearRequireCache() {
+  delete require.cache[require.resolve('../index.cjs')]
+  delete require.cache[require.resolve('../build/index.cjs')]
+}
+
 describe('middleware', () => {
   beforeEach(() => {
-    yargs = require('../')
+    yargs = require('../index.cjs')
   })
   afterEach(() => {
-    delete require.cache[require.resolve('../')]
+    clearRequireCache()
   })
 
   it('should add a list of callbacks to global middleware', () => {

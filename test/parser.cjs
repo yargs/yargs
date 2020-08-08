@@ -1,7 +1,7 @@
 'use strict'
 /* global it */
 
-const yargs = require('../yargs')
+const yargs = require('../build/index.cjs')
 const Parser = require('yargs-parser')
 
 require('chai').should()

@@ -1,7 +1,7 @@
 'use strict'
 /* global describe, it, beforeEach, after */
 const checkUsage = require('./helpers/utils.cjs').checkOutput
-const yargs = require('../')
+const yargs = require('../index.cjs')
 
 /* polyfill Promise for older Node.js */
 require('es6-promise').polyfill()

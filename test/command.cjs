@@ -1,6 +1,6 @@
 'use strict'
 /* global describe, it, beforeEach */
-const yargs = require('../')
+const yargs = require('../index.cjs')
 const expect = require('chai').expect
 const checkOutput = require('./helpers/utils.cjs').checkOutput
 

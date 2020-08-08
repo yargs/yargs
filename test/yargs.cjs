@@ -7,12 +7,15 @@ const path = require('path')
 const checkOutput = require('./helpers/utils.cjs').checkOutput
 const english = require('../locales/en.json')
 let yargs
-// const { YError } = require('../build/lib/yerror')
-
 require('chai').should()
 
 const noop = () => {}
 const implicationsFailedPattern = new RegExp(english['Implications failed:'])
+
+function clearRequireCache() {
+  delete require.cache[require.resolve('../index.cjs')]
+  delete require.cache[require.resolve('../build/index.cjs')]
+}
 
 describe('yargs dsl tests', () => {
   const oldProcess = { versions: {} }
@@ -28,7 +31,7 @@ describe('yargs dsl tests', () => {
     process.argv = oldProcess.argv
     process.defaultApp = oldProcess.defaultApp
     process.versions.electron = oldProcess.versions.electron
-    delete require.cache[require.resolve('../index.cjs')]
+    clearRequireCache()
   })
 
   it('should use bin name for $0, eliminating path', () => {
@@ -41,7 +44,7 @@ describe('yargs dsl tests', () => {
   })
 
   it('should not remove the 1st argument of bundled electron apps', () => {
-    delete require.cache[require.resolve('../')]
+    clearRequireCache()
     process.argv = ['/usr/local/bin/app', '-f', 'toto', 'tutu']
     process.versions.electron = '10.0.0-nightly.20200211'
     yargs = require('../index.cjs')
@@ -52,7 +55,7 @@ describe('yargs dsl tests', () => {
   })
 
   it('should remove the 1st argument of unbundled electron apps', () => {
-    delete require.cache[require.resolve('../')]
+    clearRequireCache()
     process.argv = ['/usr/local/bin/electron', 'app.js', '-f', 'toto', 'tutu']
     process.versions.electron = '10.0.0-nightly.20200211'
     // Same syntax as in electron
@@ -94,8 +97,6 @@ describe('yargs dsl tests', () => {
       })
       .parse()
     )
-    console.info(r.errors[2], implicationsFailedPattern)
-
     r.errors[2].should.match(implicationsFailedPattern)
   })
 
@@ -656,7 +657,7 @@ describe('yargs dsl tests', () => {
 
   describe('locale', () => {
     function loadLocale (locale) {
-      delete require.cache[require.resolve('../')]
+      clearRequireCache()
       yargs = require('../index.cjs')
       process.env.LC_ALL = locale
     }
@@ -1366,6 +1367,7 @@ describe('yargs dsl tests', () => {
       })
 
       it('protects against circular extended configurations', () => {
+        const {YError} = require('../build/index.cjs')
         expect(() => {
           yargs.config({ extends: './test/fixtures/extends/circular_1.json' })
         }).to.throw(YError)
@@ -2145,7 +2147,7 @@ describe('yargs dsl tests', () => {
 
   describe('yargs context', () => {
     beforeEach(() => {
-      delete require.cache[require.resolve('../')]
+      clearRequireCache()
       yargs = require('../index.cjs')
     })
 
@@ -2587,9 +2589,9 @@ describe('yargs dsl tests', () => {
 
   it('throws error for unsupported Node.js versions', () => {
     process.env.YARGS_MIN_NODE_VERSION = '55'
-    delete require.cache[require.resolve('../yargs')]
+    clearRequireCache()
     expect(() => {
-      require('../yargs')
+      require('../index.cjs')
     }).to.throw(/yargs supports a minimum Node.js version of 55/)
     delete process.env.YARGS_MIN_NODE_VERSION
   })

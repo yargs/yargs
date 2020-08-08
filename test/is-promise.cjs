@@ -1,6 +1,6 @@
 /* global describe, it */
 const { expect } = require('chai')
-const { isPromise } = require('../build/lib/utils/is-promise.js')
+const { isPromise } = require('../build/index.cjs')
 
 describe('isPromise', () => {
   it('returns `false` on non promise value', () => {

@@ -4,9 +4,8 @@
 const checkUsage = require('./helpers/utils.cjs').checkOutput
 const chalk = require('chalk')
 const path = require('path')
-const yargs = require('../')
-const rebase = require('../yargs').rebase
-const { YError } = require('../build/lib/yerror')
+const yargs = require('../index.cjs')
+const { rebase, YError } = require('../build/index.cjs')
 
 const should = require('chai').should()
 
@@ -3640,7 +3639,6 @@ describe('usage tests', () => {
         },
         undefined,
         (err, r) => {
-          console.info(err, r);
           should.exist(err)
           err.message.should.equal('You need at least one command before moving on')
           r.errors[0].split('\n').should.deep.equal([
