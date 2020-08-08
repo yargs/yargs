@@ -39,7 +39,7 @@ jobs:
           node-version: ${{ matrix.node }}
       - run: node --version
       - run: npm install --engine-strict
-      - run: npm test:esm
+      - run: npm run test:esm
   coverage:
     runs-on: ubuntu-latest
     steps:
