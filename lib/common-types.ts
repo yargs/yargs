@@ -55,6 +55,7 @@ export interface RequireDirectoryOptions {
 
 // Dependencies that might vary between CJS, ESM, and Deno are isolated:
 export interface YargsMixin {
+  mainFilename: string;
   Parser: ({
     camelcase: Function;
     detailed: Function;

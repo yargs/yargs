@@ -27,6 +27,7 @@ const { resolve } = require('path')
 const y18n = require('y18n')
 const Yargs = YargsFactory({
   findUp: require('escalade/sync'),
+  mainFilename: require?.main?.filename || process.cwd(),
   Parser,
   require: (require as any),
   requireDirectory: require('require-directory'),

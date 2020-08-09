@@ -24,7 +24,6 @@ import { globalMiddlewareFactory, MiddlewareCallback, Middleware } from './middl
 import * as processArgv from './utils/process-argv.js'
 import { isPromise } from './utils/is-promise.js'
 import setBlocking from './utils/set-blocking.js'
-import requireMainFilename from './utils/require-main-filename.js'
 
 import * as fs from 'fs'
 import * as path from 'path'
@@ -672,7 +671,7 @@ function Yargs (processArgs: string | string[] = [], cwd = process.cwd(), parent
 
     let obj = {}
     try {
-      let startDir = rootPath || requireMainFilename(parentRequire || mixin.require)
+      let startDir = rootPath || mixin.mainFilename
 
       // When called in an environment that lacks require.main.filename, such as a jest test runner,
       // startDir is already process.cwd(), and should not be shortened.
