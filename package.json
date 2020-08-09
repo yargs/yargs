@@ -33,7 +33,7 @@
     "require-directory": "^2.1.1",
     "string-width": "^4.2.0",
     "y18n": "^4.0.0",
-    "yargs-parser": "^19.0.0-beta.3"
+    "yargs-parser": "^19.0.1"
   },
   "devDependencies": {
     "@types/chai": "^4.2.11",
