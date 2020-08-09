@@ -26,6 +26,7 @@ const Parser = require('yargs-parser')
 const { resolve } = require('path')
 const y18n = require('y18n')
 const Yargs = YargsFactory({
+  cliui: require('cliui'),
   findUp: require('escalade/sync'),
   mainFilename: require?.main?.filename || process.cwd(),
   Parser,

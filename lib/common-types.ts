@@ -65,6 +65,7 @@ export interface YargsMixin {
   findUp: Function,
   requireDirectory: Function
   stringWidth: Function;
+  cliui: Function;
   require: RequireType;
 }
 

@@ -173,7 +173,7 @@ export function usage (yargs: YargsInstance, y18n: Y18N, mixin: YargsMixin) {
     }, {} as Dictionary<boolean>))
 
     const theWrap = getWrap()
-    const ui = require('cliui')({
+    const ui = mixin.cliui({
       width: theWrap,
       wrap: !!theWrap
     })
