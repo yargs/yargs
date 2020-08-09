@@ -58,6 +58,7 @@
     "mocha": "^8.0.0",
     "rimraf": "^3.0.2",
     "rollup": "^2.23.0",
+    "rollup-plugin-terser": "^6.1.0",
     "standardx": "^5.0.0",
     "typescript": "^3.7.0",
     "which": "^2.0.0",
