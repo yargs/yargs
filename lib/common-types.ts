@@ -1,4 +1,5 @@
 import { notStrictEqual, strictEqual } from 'assert'
+import { Parser } from 'yargs-parser/build/lib/yargs-parser-types.d.js'
 
 /**
  * An object whose all properties have the same type.
@@ -55,18 +56,34 @@ export interface RequireDirectoryOptions {
 
 // Dependencies that might vary between CJS, ESM, and Deno are isolated:
 export interface YargsMixin {
+  findUp: (startDir: string, fn: (dir: string[], names: string[]) => (string|undefined)) => string;
+  getCallerFile: () => string;
+  getEnv: (key: string) => (string|undefined);
+  getProcessArgvBin: () => string;
+  inspect: (obj: object) => string;
   mainFilename: string;
-  Parser: ({
-    camelcase: Function;
-    detailed: Function;
-    decamelize: Function;
-  }),
-  y18n: Y18N,
-  findUp: Function,
   requireDirectory: Function
-  stringWidth: Function;
+  stringWidth: (str: string) => number;
   cliui: Function;
+  Parser: Parser;
+  path: {
+    basename: (p1: string, p2?: string) => string,
+    extname: (path: string) => string,
+    dirname: (path: string) => string,
+    relative: (p1: string, p2: string) => string;
+    resolve: (p1: string, p2: string) => string;
+  },
+  process: {
+    argv: () => string[],
+    cwd: () => string;
+    execPath: () => string,
+    exit: (code: number) => void,
+    nextTick: (cb: Function) => void,
+    stdColumns: (number|null)
+  },
+  readFileSync: (path: string, encoding: string) => string;
   require: RequireType;
+  y18n: Y18N,
 }
 
 export interface RequireType {

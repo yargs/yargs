@@ -1,6 +1,3 @@
-import * as path from 'path'
-import { inspect } from 'util'
-
 import { Dictionary, assertNotStrictEqual, RequireDirectoryOptions, YargsMixin } from './common-types.js'
 import { isPromise } from './utils/is-promise.js'
 import { applyMiddleware, commandMiddlewareFactory, Middleware } from './middleware.js'
@@ -133,13 +130,13 @@ export function command (
   // if module was not require()d and no name given, throw error
   function moduleName (obj: CommandHandlerDefinition) {
     const mod = whichModule(obj)
-    if (!mod) throw new Error(`No command name given for module: ${inspect(obj)}`)
+    if (!mod) throw new Error(`No command name given for module: ${mixin.inspect(obj)}`)
     return commandFromFilename(mod.filename)
   }
 
   // derive command name from filename
   function commandFromFilename (filename: string) {
-    return path.basename(filename, path.extname(filename))
+    return mixin.path.basename(filename, mixin.path.extname(filename))
   }
 
   function extractDesc ({ describe, description, desc }: CommandHandlerDefinition) {

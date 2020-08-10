@@ -21,12 +21,8 @@ import { validation as Validation, ValidationInstance, KeyOrPos } from './valida
 import { objFilter } from './utils/obj-filter.js'
 import { applyExtends } from './utils/apply-extends.js'
 import { globalMiddlewareFactory, MiddlewareCallback, Middleware } from './middleware.js'
-import * as processArgv from './utils/process-argv.js'
 import { isPromise } from './utils/is-promise.js'
 import setBlocking from './utils/set-blocking.js'
-
-import * as fs from 'fs'
-import * as path from 'path'
 
 let mixin: YargsMixin
 export function YargsFactory (_mixin: YargsMixin) {
@@ -34,7 +30,7 @@ export function YargsFactory (_mixin: YargsMixin) {
   return Yargs
 }
 
-function Yargs (processArgs: string | string[] = [], cwd = process.cwd(), parentRequire?: RequireType) {
+function Yargs (processArgs: string | string[] = [], cwd = mixin.process.cwd(), parentRequire?: RequireType) {
   const self = {} as YargsInstance
   let command: CommandInstance
   let completion: CompletionInstance | null = null
@@ -59,10 +55,10 @@ function Yargs (processArgs: string | string[] = [], cwd = process.cwd(), parent
   // ignore the node bin, specify this in your
   // bin file with #!/usr/bin/env node
   let default$0: string[]
-  if (/\b(node|iojs|electron)(\.exe)?$/.test(process.argv[0])) {
-    default$0 = process.argv.slice(1, 2)
+  if (/\b(node|iojs|electron)(\.exe)?$/.test(mixin.process.argv()[0])) {
+    default$0 = mixin.process.argv().slice(1, 2)
   } else {
-    default$0 = process.argv.slice(0, 1)
+    default$0 = mixin.process.argv().slice(0, 1)
   }
 
   self.$0 = default$0
@@ -72,9 +68,9 @@ function Yargs (processArgs: string | string[] = [], cwd = process.cwd(), parent
     })
     .join(' ').trim()
 
-  if (process.env._ !== undefined && processArgv.getProcessArgvBin() === process.env._) {
-    self.$0 = process.env._.replace(
-      `${path.dirname(process.execPath)}/`, ''
+  if (mixin.getEnv('_') && mixin.getProcessArgvBin() === mixin.getEnv('_')) {
+    self.$0 = mixin.getEnv('_')!.replace(
+      `${mixin.path.dirname(mixin.process.execPath())}/`, ''
     )
   }
 
@@ -149,7 +145,7 @@ function Yargs (processArgs: string | string[] = [], cwd = process.cwd(), parent
     usage = usage ? usage.reset(localLookup) : Usage(self, y18n, mixin)
     validation = validation ? validation.reset(localLookup) : Validation(self, usage, y18n)
     command = command ? command.reset() : Command(self, usage, validation, globalMiddleware, mixin)
-    if (!completion) completion = Completion(self, usage, command)
+    if (!completion) completion = Completion(self, usage, command, mixin)
 
     completionCommand = null
     output = ''
@@ -433,7 +429,7 @@ function Yargs (processArgs: string | string[] = [], cwd = process.cwd(), parent
     argsert('[object|string] [string|function] [function]', [key, msg, parseFn], arguments.length)
     // allow a config object to be provided directly.
     if ((typeof key === 'object') && !Array.isArray(key)) {
-      key = applyExtends(key, cwd, self.getParserConfiguration()['deep-merge-config'])
+      key = applyExtends(key, cwd, self.getParserConfiguration()['deep-merge-config'] || false, mixin)
       options.configObjects = (options.configObjects || []).concat(key)
       return self
     }
@@ -480,7 +476,7 @@ function Yargs (processArgs: string | string[] = [], cwd = process.cwd(), parent
   self.commandDir = function (dir, opts) {
     argsert('<string> [object]', [dir, opts], arguments.length)
     const req = parentRequire || mixin.require
-    command.addDirectory(dir, self.getContext(), req, mixin.require('get-caller-file')(), opts)
+    command.addDirectory(dir, self.getContext(), req, mixin.getCallerFile(), opts)
     return self
   }
 
@@ -657,7 +653,7 @@ function Yargs (processArgs: string | string[] = [], cwd = process.cwd(), parent
 
     // If an object exists in the key, add it to options.configObjects
     if (obj[key] && typeof obj[key] === 'object') {
-      conf = applyExtends(obj[key], rootPath || cwd, self.getParserConfiguration()['deep-merge-config'])
+      conf = applyExtends(obj[key], rootPath || cwd, self.getParserConfiguration()['deep-merge-config'] || false, mixin)
       options.configObjects = (options.configObjects || []).concat(conf)
     }
 
@@ -676,8 +672,8 @@ function Yargs (processArgs: string | string[] = [], cwd = process.cwd(), parent
       // When called in an environment that lacks require.main.filename, such as a jest test runner,
       // startDir is already process.cwd(), and should not be shortened.
       // Whether or not it is _actually_ a directory (e.g., extensionless bin) is irrelevant, find-up handles it.
-      if (!rootPath && path.extname(startDir)) {
-        startDir = path.dirname(startDir)
+      if (!rootPath && mixin.path.extname(startDir)) {
+        startDir = mixin.path.dirname(startDir)
       }
 
       const pkgJsonPath = mixin.findUp(startDir, (dir: string[], names: string[]) => {
@@ -688,7 +684,7 @@ function Yargs (processArgs: string | string[] = [], cwd = process.cwd(), parent
         }
       })
       assertNotStrictEqual(pkgJsonPath, undefined)
-      obj = JSON.parse(fs.readFileSync(pkgJsonPath).toString())
+      obj = JSON.parse(mixin.readFileSync(pkgJsonPath, 'utf8'))
     } catch (noop) {}
 
     pkgs[npath] = obj || {}
@@ -1144,7 +1140,7 @@ function Yargs (processArgs: string | string[] = [], cwd = process.cwd(), parent
   self.exit = (code, err) => {
     hasOutput = true
     exitError = err
-    if (exitProcess) process.exit(code)
+    if (exitProcess) mixin.process.exit(code)
   }
 
   // we use a custom logger that buffers output,
@@ -1187,7 +1183,7 @@ function Yargs (processArgs: string | string[] = [], cwd = process.cwd(), parent
 
   self.terminalWidth = () => {
     argsert([], 0)
-    return typeof process.stdout.columns !== 'undefined' ? process.stdout.columns : null
+    return mixin.process.stdColumns
   }
 
   Object.defineProperty(self, 'argv', {
@@ -1392,7 +1388,7 @@ function Yargs (processArgs: string | string[] = [], cwd = process.cwd(), parent
 
   function guessLocale () {
     if (!detectLocale) return
-    const locale = process.env.LC_ALL || process.env.LC_MESSAGES || process.env.LANG || process.env.LANGUAGE || 'en_US'
+    const locale = mixin.getEnv('LC_ALL') || mixin.getEnv('LC_MESSAGES') || mixin.getEnv('LANG') || mixin.getEnv('LANGUAGE') || 'en_US'
     self.locale(locale.replace(/[.:].*/, ''))
   }
 
@@ -1409,7 +1405,7 @@ export interface RebaseFunction {
   (base: string, dir: string): string
 }
 
-export const rebase: RebaseFunction = (base, dir) => path.relative(base, dir)
+export const rebase: RebaseFunction = (base, dir) => mixin.path.relative(base, dir)
 
 /** Instance of the yargs module. */
 export interface YargsInstance {

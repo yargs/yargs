@@ -7,8 +7,6 @@ import { YError } from './yerror.js'
 import { DetailedArguments } from 'yargs-parser/build/lib/yargs-parser-types.js'
 import setBlocking from './utils/set-blocking.js'
 
-import * as path from 'path'
-
 export function usage (yargs: YargsInstance, y18n: Y18N, mixin: YargsMixin) {
   const __ = y18n.__
   const self = {} as UsageInstance
@@ -154,7 +152,7 @@ export function usage (yargs: YargsInstance, y18n: Y18N, mixin: YargsMixin) {
     normalizeAliases()
 
     // handle old demanded API
-    const base$0 = yargs.customScriptName ? yargs.$0 : path.basename(yargs.$0)
+    const base$0 = yargs.customScriptName ? yargs.$0 : mixin.path.basename(yargs.$0)
     const demandedOptions = yargs.getDemandedOptions()
     const demandedCommands = yargs.getDemandedCommands()
     const deprecatedOptions = yargs.getDeprecatedOptions()
@@ -552,8 +550,8 @@ export function usage (yargs: YargsInstance, y18n: Y18N, mixin: YargsMixin) {
     const maxWidth = 80
     // CI is not a TTY
     /* c8 ignore next 2 */
-    if (typeof process === 'object' && process.stdout && process.stdout.columns) {
-      return Math.min(maxWidth, process.stdout.columns)
+    if (mixin.process.stdColumns) {
+      return Math.min(maxWidth, mixin.process.stdColumns)
     } else {
       return maxWidth
     }

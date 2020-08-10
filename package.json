@@ -30,6 +30,7 @@
   "dependencies": {
     "cliui": "^6.0.0",
     "escalade": "^3.0.2",
+    "get-caller-file": "^2.0.5",
     "require-directory": "^2.1.1",
     "string-width": "^4.2.0",
     "y18n": "^4.0.0",
