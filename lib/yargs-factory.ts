@@ -4,7 +4,7 @@
 // Works by accepting a mixin which shims methods that contain platform
 // specific logic.
 import { CommandInstance, CommandHandler, CommandBuilderDefinition, CommandBuilder, CommandHandlerCallback, FinishCommandHandler, command as Command, CommandHandlerDefinition } from './command.js'
-import { Dictionary, assertNotStrictEqual, KeyOf, DictionaryKeyof, ValueOf, objectKeys, assertSingleKey, RequireDirectoryOptions, YargsMixin, RequireType } from './common-types.js'
+import { Dictionary, assertNotStrictEqual, KeyOf, DictionaryKeyof, ValueOf, objectKeys, assertSingleKey, RequireDirectoryOptions, YargsMixin, RequireType } from './typings/common-types.js'
 import {
   Arguments as ParserArguments,
   DetailedArguments as ParserDetailedArguments,
@@ -12,7 +12,7 @@ import {
   Options as ParserOptions,
   ConfigCallback,
   CoerceCallback
-} from 'yargs-parser/build/lib/yargs-parser-types.js'
+} from './typings/yargs-parser-types.js'
 import { YError } from './yerror.js'
 import { UsageInstance, FailureFunction, usage as Usage } from './usage.js'
 import { argsert } from './argsert.js'
@@ -30,7 +30,7 @@ export function YargsFactory (_mixin: YargsMixin) {
   return Yargs
 }
 
-function Yargs (processArgs: string | string[] = [], cwd = mixin.process.cwd(), parentRequire?: RequireType) {
+function Yargs (processArgs: string | string[] = [], cwd = mixin.process.cwd(), parentRequire?: RequireType): YargsInstance {
   const self = {} as YargsInstance
   let command: CommandInstance
   let completion: CompletionInstance | null = null
@@ -143,7 +143,7 @@ function Yargs (processArgs: string | string[] = [], cwd = mixin.process.cwd(), 
     // if this is the first time being executed, create
     // instances of all our helpers -- otherwise just reset.
     usage = usage ? usage.reset(localLookup) : Usage(self, y18n, mixin)
-    validation = validation ? validation.reset(localLookup) : Validation(self, usage, y18n)
+    validation = validation ? validation.reset(localLookup) : Validation(self, usage, y18n, mixin)
     command = command ? command.reset() : Command(self, usage, validation, globalMiddleware, mixin)
     if (!completion) completion = Completion(self, usage, command, mixin)
 
@@ -182,7 +182,7 @@ function Yargs (processArgs: string | string[] = [], cwd = mixin.process.cwd(), 
   }
   function unfreeze () {
     const frozen = frozens.pop()
-    assertNotStrictEqual(frozen, undefined)
+    assertNotStrictEqual(frozen, undefined, mixin)
     let configObjects: Dictionary[]
     ;({
       options,
@@ -303,11 +303,11 @@ function Yargs (processArgs: string | string[] = [], cwd = mixin.process.cwd(), 
   ) {
     argsert('<object|string|array> [*] [string]', [key, value, defaultDescription], arguments.length)
     if (defaultDescription) {
-      assertSingleKey(key)
+      assertSingleKey(key, mixin)
       options.defaultDescription[key] = defaultDescription
     }
     if (typeof value === 'function') {
-      assertSingleKey(key)
+      assertSingleKey(key, mixin)
       if (!options.defaultDescription[key]) options.defaultDescription[key] = usage.functionDescription(value)
       value = value.call()
     }
@@ -492,7 +492,7 @@ function Yargs (processArgs: string | string[] = [], cwd = mixin.process.cwd(), 
     // options are provided.
     if (Array.isArray(max)) {
       max.forEach((key) => {
-        assertNotStrictEqual(msg, true as true)
+        assertNotStrictEqual(msg, true as true, mixin)
         demandOption(key, msg)
       })
       max = Infinity
@@ -502,11 +502,11 @@ function Yargs (processArgs: string | string[] = [], cwd = mixin.process.cwd(), 
     }
 
     if (typeof keys === 'number') {
-      assertNotStrictEqual(msg, true as true)
+      assertNotStrictEqual(msg, true as true, mixin)
       self.demandCommand(keys, max, msg, msg)
     } else if (Array.isArray(keys)) {
       keys.forEach((key) => {
-        assertNotStrictEqual(msg, true as true)
+        assertNotStrictEqual(msg, true as true, mixin)
         demandOption(key, msg)
       })
     } else {
@@ -590,7 +590,7 @@ function Yargs (processArgs: string | string[] = [], cwd = mixin.process.cwd(), 
     argsert('<string|null|undefined> [string|boolean] [function|object] [function]', [msg, description, builder, handler], arguments.length)
 
     if (description !== undefined) {
-      assertNotStrictEqual(msg, null)
+      assertNotStrictEqual(msg, null, mixin)
       // .usage() can be used as an alias for defining
       // a default command.
       if ((msg || '').match(/^\$0( |$)/)) {
@@ -683,7 +683,7 @@ function Yargs (processArgs: string | string[] = [], cwd = mixin.process.cwd(), 
           return undefined
         }
       })
-      assertNotStrictEqual(pkgJsonPath, undefined)
+      assertNotStrictEqual(pkgJsonPath, undefined, mixin)
       obj = JSON.parse(mixin.readFileSync(pkgJsonPath, 'utf8'))
     } catch (noop) {}
 
@@ -1553,6 +1553,7 @@ export interface YargsInstance {
   options: YargsInstance['option']
   parse: {
     (): Arguments | Promise<Arguments>
+    (args: string | string[]): Arguments | Promise<Arguments>
     (args: string | string[], context: object, parseCallback?: ParseCallback): Arguments | Promise<Arguments>
     (args: string | string[], parseCallback: ParseCallback): Arguments | Promise<Arguments>
     (args: string | string[], shortCircuit: boolean): Arguments | Promise<Arguments>
@@ -1609,7 +1610,10 @@ export interface Context {
   fullCommands: string[]
 }
 
-type LoggerInstance = Pick<Console, 'error' | 'log'>
+interface LoggerInstance {
+  error: Function,
+  log: Function
+}
 
 export interface Options extends ParserOptions {
   __: (format: any, ...param: any[]) => string
@@ -1727,5 +1731,6 @@ export interface Arguments extends ParserArguments {
 }
 
 export interface DetailedArguments extends ParserDetailedArguments {
-  argv: Arguments
+  argv: Arguments;
+  aliases: Dictionary<string[]>;
 }

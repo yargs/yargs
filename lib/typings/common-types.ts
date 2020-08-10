@@ -1,4 +1,3 @@
-import { notStrictEqual, strictEqual } from 'assert'
 import { Parser } from 'yargs-parser/build/lib/yargs-parser-types.d.js'
 
 /**
@@ -29,16 +28,16 @@ export type ValueOf<T> = T extends (infer U)[] ? U : T[keyof T];
 /**
  * Typing wrapper around assert.notStrictEqual()
  */
-export function assertNotStrictEqual<N, T> (actual: T|N, expected: N, message ?: string | Error)
+export function assertNotStrictEqual<N, T> (actual: T|N, expected: N, mixin: YargsMixin, message ?: string | Error)
 : asserts actual is Exclude<T, N> {
-  notStrictEqual(actual, expected, message)
+  mixin.assert.notStrictEqual(actual, expected, message)
 }
 
 /**
  * Asserts actual is a single key, not a key array or a key map.
  */
-export function assertSingleKey (actual: string | string[] | Dictionary): asserts actual is string {
-  strictEqual(typeof actual, 'string')
+export function assertSingleKey (actual: string | string[] | Dictionary, mixin: YargsMixin): asserts actual is string {
+  mixin.assert.strictEqual(typeof actual, 'string')
 }
 
 /**
@@ -56,6 +55,10 @@ export interface RequireDirectoryOptions {
 
 // Dependencies that might vary between CJS, ESM, and Deno are isolated:
 export interface YargsMixin {
+  assert: {
+    notStrictEqual: (expected: any, observed: any, message?: string|Error) => void,
+    strictEqual: (expected: any, observed: any, message?: string|Error) => void
+  },
   findUp: (startDir: string, fn: (dir: string[], names: string[]) => (string|undefined)) => string;
   getCallerFile: () => string;
   getEnv: (key: string) => (string|undefined);

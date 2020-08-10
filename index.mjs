@@ -1,6 +1,7 @@
 'use strict'
 
 // Bootstraps yargs in ESM mode:
+import { notStrictEqual, strictEqual } from 'assert'
 import escalade from 'escalade/sync'
 import { inspect } from 'util'
 import { readFileSync } from 'fs'
@@ -17,6 +18,10 @@ const require = createRequire(import.meta.url);
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const Yargs = YargsFactory({
+  assert: {
+    notStrictEqual,
+    strictEqual
+  },
   cliui: require('cliui'),
   findUp: escalade,
   getEnv: (key) => {

@@ -1,4 +1,4 @@
-import { Dictionary, YargsMixin } from '../common-types.js'
+import { Dictionary, YargsMixin } from '../typings/common-types.js'
 import { YError } from '../yerror.js'
 
 let previouslyVisitedConfigs: string[] = []

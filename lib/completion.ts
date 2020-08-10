@@ -1,11 +1,11 @@
 import { CommandInstance, isCommandBuilderCallback } from './command.js'
-import { YargsMixin, assertNotStrictEqual } from './common-types.js'
+import { YargsMixin, assertNotStrictEqual } from './typings/common-types.js'
 import * as templates from './completion-templates.js'
 import { isPromise } from './utils/is-promise.js'
 import { parseCommand } from './parse-command.js'
 import { UsageInstance } from './usage.js'
 import { YargsInstance } from './yargs-factory.js'
-import { Arguments, DetailedArguments } from 'yargs-parser/build/lib/yargs-parser-types.js'
+import { Arguments, DetailedArguments } from './typings/yargs-parser-types.js'
 
 // add bash completions to your
 //  yargs-powered applications.
@@ -32,7 +32,7 @@ export function completion (yargs: YargsInstance, usage: UsageInstance, command:
     // a custom completion function can be provided
     // to completion().
     function runCompletionFunction (argv: Arguments) {
-      assertNotStrictEqual(completionFunction, null)
+      assertNotStrictEqual(completionFunction, null, mixin)
 
       if (isSyncCompletionFunction(completionFunction)) {
         const result = completionFunction(current, argv)

@@ -1,6 +1,7 @@
 'use strict'
 // This file is used to bootstrap yargs for its legacy CommonJS interface:
 
+import { notStrictEqual, strictEqual } from 'assert'
 import { argsert } from './argsert.js'
 import { isPromise } from './utils/is-promise.js'
 import { objFilter } from './utils/obj-filter.js'
@@ -28,6 +29,10 @@ const { resolve } = require('path')
 const Parser = require('yargs-parser')
 const y18n = require('y18n')
 const Yargs = YargsFactory({
+  assert: {
+    notStrictEqual,
+    strictEqual
+  },
   cliui: require('cliui'),
   findUp: require('escalade/sync'),
   getEnv: (key: string) => {

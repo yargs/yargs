@@ -1,4 +1,4 @@
-import { Dictionary, assertNotStrictEqual, RequireDirectoryOptions, YargsMixin } from './common-types.js'
+import { Dictionary, assertNotStrictEqual, RequireDirectoryOptions, YargsMixin } from './typings/common-types.js'
 import { isPromise } from './utils/is-promise.js'
 import { applyMiddleware, commandMiddlewareFactory, Middleware } from './middleware.js'
 import { parseCommand, Positional } from './parse-command.js'
@@ -142,7 +142,7 @@ export function command (
   function extractDesc ({ describe, description, desc }: CommandHandlerDefinition) {
     for (const test of [describe, description, desc]) {
       if (typeof test === 'string' || test === false) return test
-      assertNotStrictEqual(test, true as true)
+      assertNotStrictEqual(test, true as true, mixin)
     }
     return false
   }
@@ -280,7 +280,7 @@ export function command (
   }
 
   self.runDefaultBuilderOn = function (yargs) {
-    assertNotStrictEqual(defaultCommand, undefined)
+    assertNotStrictEqual(defaultCommand, undefined, mixin)
     if (shouldUpdateUsage(yargs)) {
       // build the root-level command string from the default string.
       const commandString = DEFAULT_MARKER.test(defaultCommand.original)
@@ -441,7 +441,7 @@ export function command (
   }
   self.unfreeze = () => {
     const frozen = frozens.pop()
-    assertNotStrictEqual(frozen, undefined)
+    assertNotStrictEqual(frozen, undefined, mixin)
     ;({
       handlers,
       aliasMap,
@@ -457,7 +457,7 @@ export interface CommandInstance {
   addDirectory(
     dir: string,
     context: Context,
-    req: NodeRequireFunction,
+    req: Function,
     callerFile: string,
     opts?: RequireDirectoryOptions
   ): void
