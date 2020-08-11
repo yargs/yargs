@@ -1,10 +1,10 @@
-import { Dictionary, YargsMixin } from '../typings/common-types.js'
+import { Dictionary, PlatformShim } from '../typings/common-types.js'
 import { YError } from '../yerror.js'
 
 let previouslyVisitedConfigs: string[] = []
-let mixin: YargsMixin
-export function applyExtends (config: Dictionary, cwd: string, mergeExtends: boolean, _mixin: YargsMixin): Dictionary {
-  mixin = _mixin
+let shim: PlatformShim
+export function applyExtends (config: Dictionary, cwd: string, mergeExtends: boolean, _shim: PlatformShim): Dictionary {
+  shim = _shim
   let defaultConfig = {}
 
   if (Object.prototype.hasOwnProperty.call(config, 'extends')) {
@@ -29,9 +29,9 @@ export function applyExtends (config: Dictionary, cwd: string, mergeExtends: boo
 
     previouslyVisitedConfigs.push(pathToDefault)
 
-    defaultConfig = isPath ? JSON.parse(mixin.readFileSync(pathToDefault, 'utf8')) : require(config.extends)
+    defaultConfig = isPath ? JSON.parse(shim.readFileSync(pathToDefault, 'utf8')) : require(config.extends)
     delete config.extends
-    defaultConfig = applyExtends(defaultConfig, mixin.path.dirname(pathToDefault), mergeExtends, mixin)
+    defaultConfig = applyExtends(defaultConfig, shim.path.dirname(pathToDefault), mergeExtends, shim)
   }
 
   previouslyVisitedConfigs = []
@@ -46,7 +46,7 @@ function checkForCircularExtends (cfgPath: string) {
 }
 
 function getPathToDefaultConfig (cwd: string, pathToExtend: string) {
-  return mixin.path.resolve(cwd, pathToExtend)
+  return shim.path.resolve(cwd, pathToExtend)
 }
 
 function mergeDeep (config1: Dictionary, config2: Dictionary) {

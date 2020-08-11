@@ -1,5 +1,5 @@
 import { CommandInstance, isCommandBuilderCallback } from './command.js'
-import { YargsMixin, assertNotStrictEqual } from './typings/common-types.js'
+import { PlatformShim, assertNotStrictEqual } from './typings/common-types.js'
 import * as templates from './completion-templates.js'
 import { isPromise } from './utils/is-promise.js'
 import { parseCommand } from './parse-command.js'
@@ -9,7 +9,7 @@ import { Arguments, DetailedArguments } from './typings/yargs-parser-types.js'
 
 // add bash completions to your
 //  yargs-powered applications.
-export function completion (yargs: YargsInstance, usage: UsageInstance, command: CommandInstance, mixin: YargsMixin) {
+export function completion (yargs: YargsInstance, usage: UsageInstance, command: CommandInstance, shim: PlatformShim) {
   const self: CompletionInstance = {
     completionKey: 'get-yargs-completions'
   } as CompletionInstance
@@ -19,8 +19,8 @@ export function completion (yargs: YargsInstance, usage: UsageInstance, command:
     aliases = parsed.aliases
   }
 
-  const zshShell = (mixin.getEnv('SHELL') && mixin.getEnv('SHELL')!.indexOf('zsh') !== -1) ||
-    (mixin.getEnv('ZSH_NAME') && mixin.getEnv('ZSH_NAME')!.indexOf('zsh') !== -1)
+  const zshShell = (shim.getEnv('SHELL') && shim.getEnv('SHELL')!.indexOf('zsh') !== -1) ||
+    (shim.getEnv('ZSH_NAME') && shim.getEnv('ZSH_NAME')!.indexOf('zsh') !== -1)
   // get a list of completion commands.
   // 'args' is the array of strings from the line to be completed
   self.getCompletion = function getCompletion (args, done) {
@@ -32,7 +32,7 @@ export function completion (yargs: YargsInstance, usage: UsageInstance, command:
     // a custom completion function can be provided
     // to completion().
     function runCompletionFunction (argv: Arguments) {
-      assertNotStrictEqual(completionFunction, null, mixin)
+      assertNotStrictEqual(completionFunction, null, shim)
 
       if (isSyncCompletionFunction(completionFunction)) {
         const result = completionFunction(current, argv)
@@ -40,9 +40,9 @@ export function completion (yargs: YargsInstance, usage: UsageInstance, command:
         // promise based completion function.
         if (isPromise(result)) {
           return result.then((list) => {
-            mixin.process.nextTick(() => { done(list) })
+            shim.process.nextTick(() => { done(list) })
           }).catch((err) => {
-            mixin.process.nextTick(() => { throw err })
+            shim.process.nextTick(() => { throw err })
           })
         }
 
@@ -121,7 +121,7 @@ export function completion (yargs: YargsInstance, usage: UsageInstance, command:
   // generate the completion script to add to your .bashrc.
   self.generateCompletionScript = function generateCompletionScript ($0, cmd) {
     let script = zshShell ? templates.completionZshTemplate : templates.completionShTemplate
-    const name = mixin.path.basename($0)
+    const name = shim.path.basename($0)
 
     // add ./to applications not yet installed as bin.
     if ($0.match(/\.js$/)) $0 = `./${$0}`

@@ -28,20 +28,20 @@ export type ValueOf<T> = T extends (infer U)[] ? U : T[keyof T];
 /**
  * Typing wrapper around assert.notStrictEqual()
  */
-export function assertNotStrictEqual<N, T> (actual: T|N, expected: N, mixin: YargsMixin, message ?: string | Error)
+export function assertNotStrictEqual<N, T> (actual: T|N, expected: N, shim: PlatformShim, message ?: string | Error)
 : asserts actual is Exclude<T, N> {
-  mixin.assert.notStrictEqual(actual, expected, message)
+  shim.assert.notStrictEqual(actual, expected, message)
 }
 
 /**
  * Asserts actual is a single key, not a key array or a key map.
  */
-export function assertSingleKey (actual: string | string[] | Dictionary, mixin: YargsMixin): asserts actual is string {
-  mixin.assert.strictEqual(typeof actual, 'string')
+export function assertSingleKey (actual: string | string[] | Dictionary, shim: PlatformShim): asserts actual is string {
+  shim.assert.strictEqual(typeof actual, 'string')
 }
 
 /**
- * Typing wrapper around Object.keys()
+ * Typing wrappefr around Object.keys()
  */
 export function objectKeys<T> (object: T) {
   return Object.keys(object) as (keyof T)[]
@@ -54,7 +54,7 @@ export interface RequireDirectoryOptions {
 }
 
 // Dependencies that might vary between CJS, ESM, and Deno are isolated:
-export interface YargsMixin {
+export interface PlatformShim {
   assert: {
     notStrictEqual: (expected: any, observed: any, message?: string|Error) => void,
     strictEqual: (expected: any, observed: any, message?: string|Error) => void

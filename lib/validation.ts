@@ -1,5 +1,5 @@
 import { argsert } from './argsert.js'
-import { Dictionary, assertNotStrictEqual, Y18N, YargsMixin } from './typings/common-types.js'
+import { Dictionary, assertNotStrictEqual, Y18N, PlatformShim } from './typings/common-types.js'
 import { levenshtein as distance } from './utils/levenshtein.js'
 import { objFilter } from './utils/obj-filter.js'
 import { UsageInstance } from './usage.js'
@@ -10,7 +10,7 @@ const specialKeys = ['$0', '--', '_']
 
 // validation-type-stuff, missing params,
 // bad implications, custom checks.
-export function validation (yargs: YargsInstance, usage: UsageInstance, y18n: Y18N, mixin: YargsMixin) {
+export function validation (yargs: YargsInstance, usage: UsageInstance, y18n: Y18N, shim: PlatformShim) {
   const __ = y18n.__
   const __n = y18n.__n
   const self = {} as ValidationInstance
@@ -269,7 +269,7 @@ export function validation (yargs: YargsInstance, usage: UsageInstance, y18n: Y1
       if (Array.isArray(value)) {
         value.forEach((i) => self.implies(key, i))
       } else {
-        assertNotStrictEqual(value, undefined, mixin)
+        assertNotStrictEqual(value, undefined, shim)
         implied[key].push(value)
       }
     }
@@ -394,7 +394,7 @@ export function validation (yargs: YargsInstance, usage: UsageInstance, y18n: Y1
   }
   self.unfreeze = function unfreeze () {
     const frozen = frozens.pop()
-    assertNotStrictEqual(frozen, undefined, mixin)
+    assertNotStrictEqual(frozen, undefined, shim)
     ;({
       implied,
       checks,

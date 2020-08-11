@@ -1,13 +1,13 @@
 // this file handles outputting usage instructions,
 // failures, etc. keeps logging in one place.
-import { Dictionary, assertNotStrictEqual, YargsMixin, Y18N } from './typings/common-types.js'
+import { Dictionary, assertNotStrictEqual, PlatformShim, Y18N } from './typings/common-types.js'
 import { objFilter } from './utils/obj-filter.js'
 import { YargsInstance } from './yargs-factory.js'
 import { YError } from './yerror.js'
 import { DetailedArguments } from 'yargs-parser/build/lib/yargs-parser-types.js'
 import setBlocking from './utils/set-blocking.js'
 
-export function usage (yargs: YargsInstance, y18n: Y18N, mixin: YargsMixin) {
+export function usage (yargs: YargsInstance, y18n: Y18N, shim: PlatformShim) {
   const __ = y18n.__
   const self = {} as UsageInstance
 
@@ -152,7 +152,7 @@ export function usage (yargs: YargsInstance, y18n: Y18N, mixin: YargsMixin) {
     normalizeAliases()
 
     // handle old demanded API
-    const base$0 = yargs.customScriptName ? yargs.$0 : mixin.path.basename(yargs.$0)
+    const base$0 = yargs.customScriptName ? yargs.$0 : shim.path.basename(yargs.$0)
     const demandedOptions = yargs.getDemandedOptions()
     const demandedCommands = yargs.getDemandedCommands()
     const deprecatedOptions = yargs.getDeprecatedOptions()
@@ -171,7 +171,7 @@ export function usage (yargs: YargsInstance, y18n: Y18N, mixin: YargsMixin) {
     }, {} as Dictionary<boolean>))
 
     const theWrap = getWrap()
-    const ui = mixin.cliui({
+    const ui = shim.cliui({
       width: theWrap,
       wrap: !!theWrap
     })
@@ -422,7 +422,7 @@ export function usage (yargs: YargsInstance, y18n: Y18N, mixin: YargsMixin) {
       // column might be of the form "text"
       // or { text: "text", indent: 4 }
       width = Math.max(
-        mixin.stringWidth(modifier ? `${modifier} ${getText(v[0])}` : getText(v[0])) + getIndentation(v[0]),
+        shim.stringWidth(modifier ? `${modifier} ${getText(v[0])}` : getText(v[0])) + getIndentation(v[0]),
         width
       )
     })
@@ -501,7 +501,7 @@ export function usage (yargs: YargsInstance, y18n: Y18N, mixin: YargsMixin) {
   }
 
   self.functionDescription = (fn) => {
-    const description = fn.name ? mixin.Parser.decamelize(fn.name, '-') : __('generated-value')
+    const description = fn.name ? shim.Parser.decamelize(fn.name, '-') : __('generated-value')
     return ['(', description, ')'].join('')
   }
 
@@ -550,8 +550,8 @@ export function usage (yargs: YargsInstance, y18n: Y18N, mixin: YargsMixin) {
     const maxWidth = 80
     // CI is not a TTY
     /* c8 ignore next 2 */
-    if (mixin.process.stdColumns) {
-      return Math.min(maxWidth, mixin.process.stdColumns)
+    if (shim.process.stdColumns) {
+      return Math.min(maxWidth, shim.process.stdColumns)
     } else {
       return maxWidth
     }
@@ -597,7 +597,7 @@ export function usage (yargs: YargsInstance, y18n: Y18N, mixin: YargsMixin) {
   }
   self.unfreeze = function unfreeze () {
     const frozen = frozens.pop()
-    assertNotStrictEqual(frozen, undefined, mixin)
+    assertNotStrictEqual(frozen, undefined, shim)
     ;({
       failMessage,
       failureOutput,

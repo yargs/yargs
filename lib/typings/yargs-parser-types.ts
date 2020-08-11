@@ -1,4 +1,5 @@
 // Taken from yargs-parser@19.0.1
+// TODO: update this file periodically.
 import type { Dictionary, ValueOf } from './common-types.js'
 
 type KeyOf<T> = {
@@ -117,7 +118,7 @@ export interface Options {
     /** alias lookup table defaults */
     key: Dictionary<any>;
 }
-export interface YargsParserMixin {
+export interface PlatformShim {
     cwd: Function;
     format: Function;
     normalize: Function;

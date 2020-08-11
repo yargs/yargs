@@ -1,10 +1,10 @@
 // Platform agnostic entrypoint for yargs, i.e., this factory is used to
 // create an instance of yargs for CJS, ESM, Deno.
 //
-// Works by accepting a mixin which shims methods that contain platform
+// Works by accepting a shim which shims methods that contain platform
 // specific logic.
 import { CommandInstance, CommandHandler, CommandBuilderDefinition, CommandBuilder, CommandHandlerCallback, FinishCommandHandler, command as Command, CommandHandlerDefinition } from './command.js'
-import { Dictionary, assertNotStrictEqual, KeyOf, DictionaryKeyof, ValueOf, objectKeys, assertSingleKey, RequireDirectoryOptions, YargsMixin, RequireType } from './typings/common-types.js'
+import { Dictionary, assertNotStrictEqual, KeyOf, DictionaryKeyof, ValueOf, objectKeys, assertSingleKey, RequireDirectoryOptions, PlatformShim, RequireType } from './typings/common-types.js'
 import {
   Arguments as ParserArguments,
   DetailedArguments as ParserDetailedArguments,
@@ -24,13 +24,13 @@ import { globalMiddlewareFactory, MiddlewareCallback, Middleware } from './middl
 import { isPromise } from './utils/is-promise.js'
 import setBlocking from './utils/set-blocking.js'
 
-let mixin: YargsMixin
-export function YargsFactory (_mixin: YargsMixin) {
-  mixin = _mixin
+let shim: PlatformShim
+export function YargsWithShim (_shim: PlatformShim) {
+  shim = _shim
   return Yargs
 }
 
-function Yargs (processArgs: string | string[] = [], cwd = mixin.process.cwd(), parentRequire?: RequireType): YargsInstance {
+function Yargs (processArgs: string | string[] = [], cwd = shim.process.cwd(), parentRequire?: RequireType): YargsInstance {
   const self = {} as YargsInstance
   let command: CommandInstance
   let completion: CompletionInstance | null = null
@@ -42,7 +42,7 @@ function Yargs (processArgs: string | string[] = [], cwd = mixin.process.cwd(), 
   let validation: ValidationInstance
   let handlerFinishCommand: FinishCommandHandler | null = null
 
-  const y18n = mixin.y18n
+  const y18n = shim.y18n
 
   self.middleware = globalMiddlewareFactory(globalMiddleware, self)
 
@@ -55,10 +55,10 @@ function Yargs (processArgs: string | string[] = [], cwd = mixin.process.cwd(), 
   // ignore the node bin, specify this in your
   // bin file with #!/usr/bin/env node
   let default$0: string[]
-  if (/\b(node|iojs|electron)(\.exe)?$/.test(mixin.process.argv()[0])) {
-    default$0 = mixin.process.argv().slice(1, 2)
+  if (/\b(node|iojs|electron)(\.exe)?$/.test(shim.process.argv()[0])) {
+    default$0 = shim.process.argv().slice(1, 2)
   } else {
-    default$0 = mixin.process.argv().slice(0, 1)
+    default$0 = shim.process.argv().slice(0, 1)
   }
 
   self.$0 = default$0
@@ -68,9 +68,9 @@ function Yargs (processArgs: string | string[] = [], cwd = mixin.process.cwd(), 
     })
     .join(' ').trim()
 
-  if (mixin.getEnv('_') && mixin.getProcessArgvBin() === mixin.getEnv('_')) {
-    self.$0 = mixin.getEnv('_')!.replace(
-      `${mixin.path.dirname(mixin.process.execPath())}/`, ''
+  if (shim.getEnv('_') && shim.getProcessArgvBin() === shim.getEnv('_')) {
+    self.$0 = shim.getEnv('_')!.replace(
+      `${shim.path.dirname(shim.process.execPath())}/`, ''
     )
   }
 
@@ -142,10 +142,10 @@ function Yargs (processArgs: string | string[] = [], cwd = mixin.process.cwd(), 
 
     // if this is the first time being executed, create
     // instances of all our helpers -- otherwise just reset.
-    usage = usage ? usage.reset(localLookup) : Usage(self, y18n, mixin)
-    validation = validation ? validation.reset(localLookup) : Validation(self, usage, y18n, mixin)
-    command = command ? command.reset() : Command(self, usage, validation, globalMiddleware, mixin)
-    if (!completion) completion = Completion(self, usage, command, mixin)
+    usage = usage ? usage.reset(localLookup) : Usage(self, y18n, shim)
+    validation = validation ? validation.reset(localLookup) : Validation(self, usage, y18n, shim)
+    command = command ? command.reset() : Command(self, usage, validation, globalMiddleware, shim)
+    if (!completion) completion = Completion(self, usage, command, shim)
 
     completionCommand = null
     output = ''
@@ -182,7 +182,7 @@ function Yargs (processArgs: string | string[] = [], cwd = mixin.process.cwd(), 
   }
   function unfreeze () {
     const frozen = frozens.pop()
-    assertNotStrictEqual(frozen, undefined, mixin)
+    assertNotStrictEqual(frozen, undefined, shim)
     let configObjects: Dictionary[]
     ;({
       options,
@@ -303,11 +303,11 @@ function Yargs (processArgs: string | string[] = [], cwd = mixin.process.cwd(), 
   ) {
     argsert('<object|string|array> [*] [string]', [key, value, defaultDescription], arguments.length)
     if (defaultDescription) {
-      assertSingleKey(key, mixin)
+      assertSingleKey(key, shim)
       options.defaultDescription[key] = defaultDescription
     }
     if (typeof value === 'function') {
-      assertSingleKey(key, mixin)
+      assertSingleKey(key, shim)
       if (!options.defaultDescription[key]) options.defaultDescription[key] = usage.functionDescription(value)
       value = value.call()
     }
@@ -429,7 +429,7 @@ function Yargs (processArgs: string | string[] = [], cwd = mixin.process.cwd(), 
     argsert('[object|string] [string|function] [function]', [key, msg, parseFn], arguments.length)
     // allow a config object to be provided directly.
     if ((typeof key === 'object') && !Array.isArray(key)) {
-      key = applyExtends(key, cwd, self.getParserConfiguration()['deep-merge-config'] || false, mixin)
+      key = applyExtends(key, cwd, self.getParserConfiguration()['deep-merge-config'] || false, shim)
       options.configObjects = (options.configObjects || []).concat(key)
       return self
     }
@@ -475,8 +475,8 @@ function Yargs (processArgs: string | string[] = [], cwd = mixin.process.cwd(), 
 
   self.commandDir = function (dir, opts) {
     argsert('<string> [object]', [dir, opts], arguments.length)
-    const req = parentRequire || mixin.require
-    command.addDirectory(dir, self.getContext(), req, mixin.getCallerFile(), opts)
+    const req = parentRequire || shim.require
+    command.addDirectory(dir, self.getContext(), req, shim.getCallerFile(), opts)
     return self
   }
 
@@ -492,7 +492,7 @@ function Yargs (processArgs: string | string[] = [], cwd = mixin.process.cwd(), 
     // options are provided.
     if (Array.isArray(max)) {
       max.forEach((key) => {
-        assertNotStrictEqual(msg, true as true, mixin)
+        assertNotStrictEqual(msg, true as true, shim)
         demandOption(key, msg)
       })
       max = Infinity
@@ -502,11 +502,11 @@ function Yargs (processArgs: string | string[] = [], cwd = mixin.process.cwd(), 
     }
 
     if (typeof keys === 'number') {
-      assertNotStrictEqual(msg, true as true, mixin)
+      assertNotStrictEqual(msg, true as true, shim)
       self.demandCommand(keys, max, msg, msg)
     } else if (Array.isArray(keys)) {
       keys.forEach((key) => {
-        assertNotStrictEqual(msg, true as true, mixin)
+        assertNotStrictEqual(msg, true as true, shim)
         demandOption(key, msg)
       })
     } else {
@@ -590,7 +590,7 @@ function Yargs (processArgs: string | string[] = [], cwd = mixin.process.cwd(), 
     argsert('<string|null|undefined> [string|boolean] [function|object] [function]', [msg, description, builder, handler], arguments.length)
 
     if (description !== undefined) {
-      assertNotStrictEqual(msg, null, mixin)
+      assertNotStrictEqual(msg, null, shim)
       // .usage() can be used as an alias for defining
       // a default command.
       if ((msg || '').match(/^\$0( |$)/)) {
@@ -653,7 +653,7 @@ function Yargs (processArgs: string | string[] = [], cwd = mixin.process.cwd(), 
 
     // If an object exists in the key, add it to options.configObjects
     if (obj[key] && typeof obj[key] === 'object') {
-      conf = applyExtends(obj[key], rootPath || cwd, self.getParserConfiguration()['deep-merge-config'] || false, mixin)
+      conf = applyExtends(obj[key], rootPath || cwd, self.getParserConfiguration()['deep-merge-config'] || false, shim)
       options.configObjects = (options.configObjects || []).concat(conf)
     }
 
@@ -667,24 +667,24 @@ function Yargs (processArgs: string | string[] = [], cwd = mixin.process.cwd(), 
 
     let obj = {}
     try {
-      let startDir = rootPath || mixin.mainFilename
+      let startDir = rootPath || shim.mainFilename
 
       // When called in an environment that lacks require.main.filename, such as a jest test runner,
       // startDir is already process.cwd(), and should not be shortened.
       // Whether or not it is _actually_ a directory (e.g., extensionless bin) is irrelevant, find-up handles it.
-      if (!rootPath && mixin.path.extname(startDir)) {
-        startDir = mixin.path.dirname(startDir)
+      if (!rootPath && shim.path.extname(startDir)) {
+        startDir = shim.path.dirname(startDir)
       }
 
-      const pkgJsonPath = mixin.findUp(startDir, (dir: string[], names: string[]) => {
+      const pkgJsonPath = shim.findUp(startDir, (dir: string[], names: string[]) => {
         if (names.includes('package.json')) {
           return 'package.json'
         } else {
           return undefined
         }
       })
-      assertNotStrictEqual(pkgJsonPath, undefined, mixin)
-      obj = JSON.parse(mixin.readFileSync(pkgJsonPath, 'utf8'))
+      assertNotStrictEqual(pkgJsonPath, undefined, shim)
+      obj = JSON.parse(shim.readFileSync(pkgJsonPath, 'utf8'))
     } catch (noop) {}
 
     pkgs[npath] = obj || {}
@@ -1140,7 +1140,7 @@ function Yargs (processArgs: string | string[] = [], cwd = mixin.process.cwd(), 
   self.exit = (code, err) => {
     hasOutput = true
     exitError = err
-    if (exitProcess) mixin.process.exit(code)
+    if (exitProcess) shim.process.exit(code)
   }
 
   // we use a custom logger that buffers output,
@@ -1183,7 +1183,7 @@ function Yargs (processArgs: string | string[] = [], cwd = mixin.process.cwd(), 
 
   self.terminalWidth = () => {
     argsert([], 0)
-    return mixin.process.stdColumns
+    return shim.process.stdColumns
   }
 
   Object.defineProperty(self, 'argv', {
@@ -1207,7 +1207,7 @@ function Yargs (processArgs: string | string[] = [], cwd = mixin.process.cwd(), 
     const config = Object.assign({}, options.configuration, {
       'populate--': true
     })
-    const parsed = mixin.Parser.detailed(args, Object.assign({}, options, {
+    const parsed = shim.Parser.detailed(args, Object.assign({}, options, {
       configuration: config
     })) as DetailedArguments
 
@@ -1388,7 +1388,7 @@ function Yargs (processArgs: string | string[] = [], cwd = mixin.process.cwd(), 
 
   function guessLocale () {
     if (!detectLocale) return
-    const locale = mixin.getEnv('LC_ALL') || mixin.getEnv('LC_MESSAGES') || mixin.getEnv('LANG') || mixin.getEnv('LANGUAGE') || 'en_US'
+    const locale = shim.getEnv('LC_ALL') || shim.getEnv('LC_MESSAGES') || shim.getEnv('LANG') || shim.getEnv('LANGUAGE') || 'en_US'
     self.locale(locale.replace(/[.:].*/, ''))
   }
 
@@ -1405,7 +1405,7 @@ export interface RebaseFunction {
   (base: string, dir: string): string
 }
 
-export const rebase: RebaseFunction = (base, dir) => mixin.path.relative(base, dir)
+export const rebase: RebaseFunction = (base, dir) => shim.path.relative(base, dir)
 
 /** Instance of the yargs module. */
 export interface YargsInstance {

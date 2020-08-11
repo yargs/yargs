@@ -25,6 +25,7 @@
     "build",
     "locales",
     "LICENSE",
+    "lib/platform-shims/esm.mjs",
     "!*.d.ts"
   ],
   "dependencies": {
