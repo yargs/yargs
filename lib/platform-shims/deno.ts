@@ -2,10 +2,12 @@
 /* global Deno */
 
 import { assertNotEquals, assertStrictEquals } from 'https://deno.land/std/testing/asserts.ts'
-import cliui from 'https://deno.land/x/cliui/deno.ts'
-import Parser from 'https://deno.land/x/yargs_parser/deno.ts'
 import { basename, dirname, extname, posix } from 'https://deno.land/std/path/mod.ts'
 import { sprintf } from 'https://deno.land/std/fmt/printf.ts'
+
+import cliui from 'https://deno.land/x/cliui@v7.0.0-deno/deno.ts'
+import escalade from 'https://deno.land/x/escalade@v3.0.3/sync.ts'
+import Parser from 'https://deno.land/x/yargs_parser@v19.0.1-deno/deno.ts'
 
 // Deno removes argv[0] and argv[1 from Deno.args:
 const argv = ['deno run', ...Deno.args]
@@ -50,7 +52,7 @@ export default {
     strictEqual: assertStrictEquals
   },
   cliui,
-  findUp: () => undefined,
+  findUp: escalade,
   getEnv: (key: string) => {
     return env[key]
   },

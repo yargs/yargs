@@ -29,7 +29,7 @@
     "!*.d.ts"
   ],
   "dependencies": {
-    "cliui": "^6.0.0",
+    "cliui": "^7.0.0",
     "escalade": "^3.0.2",
     "get-caller-file": "^2.0.5",
     "require-directory": "^2.1.1",
