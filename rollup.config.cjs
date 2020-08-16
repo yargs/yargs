@@ -1,3 +1,4 @@
+const cleanup = require('rollup-plugin-cleanup')
 const ts = require('@wessberg/rollup-plugin-ts')
 
 const output = {
@@ -7,7 +8,11 @@ const output = {
 }
 
 const plugins = [
-  ts()
+  ts(),
+  cleanup({
+    comments: 'none',
+    extensions: ['*']
+  })
 ]
 if (process.env.NODE_ENV === 'test') output.sourcemap = true
 
