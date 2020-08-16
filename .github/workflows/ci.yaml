@@ -40,6 +40,21 @@ jobs:
       - run: node --version
       - run: npm install --engine-strict
       - run: npm run test:esm
+  deno:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 14
+      - run: npm install
+      - run: npm run compile
+      - uses: denolib/setup-deno@v2
+        with:
+          deno-version: v1.x
+      - run: |
+          deno --version
+          deno test --allow-read test/deno/*
   coverage:
     runs-on: ubuntu-latest
     steps:

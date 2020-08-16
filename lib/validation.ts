@@ -37,8 +37,8 @@ export function validation (yargs: YargsInstance, usage: UsageInstance, y18n: Y1
               'Not enough non-option arguments: got %s, need at least %s',
               'Not enough non-option arguments: got %s, need at least %s',
               _s,
-              _s,
-              demandedCommands._.min
+              _s.toString(),
+              demandedCommands._.min.toString()
             )
           )
         }
@@ -56,8 +56,8 @@ export function validation (yargs: YargsInstance, usage: UsageInstance, y18n: Y1
               'Too many non-option arguments: got %s, maximum of %s',
               'Too many non-option arguments: got %s, maximum of %s',
               _s,
-              _s,
-              demandedCommands._.max
+              _s.toString(),
+              demandedCommands._.max.toString()
             )
           )
         }

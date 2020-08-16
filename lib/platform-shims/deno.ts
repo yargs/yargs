@@ -86,17 +86,17 @@ export default {
       const args = str.slice(1)
       return sprintf(str[0], ...args)
     },
-    __n: (...str: string[]) => {
-      if (str.length === 0) return ''
-      const args = str.slice(1)
-      return sprintf(str[0], ...args)
+    __n: (str1: string, str2: string, count: number, ...args: string[]) => {
+      if (count === 1) {
+        return sprintf(str1, ...args)
+      } else {
+        return sprintf(str2, ...args)
+      }
     },
     getLocale: (): string => {
       return 'en_US'
     },
     setLocale: () => {},
-    updateLocale: () => {
-
-    }
+    updateLocale: () => {}
   }
 }
