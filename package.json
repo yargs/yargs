@@ -21,7 +21,9 @@
     }
   ],
   "files": [
+    "browser.mjs",
     "index.cjs",
+    "index.mjs",
     "build",
     "locales",
     "LICENSE",
