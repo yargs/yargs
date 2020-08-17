@@ -14,12 +14,8 @@
   </header>
   <body>
     <textarea id="output" placeholder="type '--help' and hit [enter] to get started" readonly="readonly"></textarea>
-    <input type="text" placeholder=">" id="input" />
+    <input type="text" placeholder=">" id="input" autocomplete="off" />
     <script type="module">
-      // Use the #output element to output parsed "cli" input :
-      const input = document.getElementById('input');
-      const output = document.getElementById('output');
-
       // Import the ESM version of the yargs module:
       import { Yargs } from 'https://unpkg.com/yargs@16.0.0-alpha.2/browser.mjs';
       const yargs = Yargs()
@@ -31,8 +27,11 @@
           alert(argv.message.join(' '))
         })
         .wrap(null)
-        .version('v1.0.0')
+        .version('v1.0.0');
 
+      // Use the #output element to output parsed "cli" #input:
+      const input = document.getElementById('input');
+      const output = document.getElementById('output');
       input.addEventListener('keydown', event => {
         if (event.keyCode === 13) { // Enter.
           const argv = yargs.parse(input.value, (err, argv, _output) => {
