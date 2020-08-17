@@ -21,7 +21,7 @@
       const output = document.getElementById('output');
 
       // Import the ESM version of the yargs module:
-      import { Yargs } from 'http://127.0.0.1:5000/browser.mjs';
+      import { Yargs } from 'https://unpkg.com/yargs@16.0.0-alpha.2/browser.mjs';
       const yargs = Yargs()
         .scriptName('>')
         .command('clear', 'clear the output window', () => {}, () => {
