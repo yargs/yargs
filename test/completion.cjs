@@ -3,9 +3,6 @@
 const checkUsage = require('./helpers/utils.cjs').checkOutput
 const yargs = require('../index.cjs')
 
-/* polyfill Promise for older Node.js */
-require('es6-promise').polyfill()
-
 require('chai').should()
 
 describe('Completion', () => {

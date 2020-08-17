@@ -11,4 +11,15 @@ describe('ESM', () => {
     })
     // TODO: add test for hiding process.argv arguments.
   })
+  describe('commandDir',  () => {
+    it('throws an error if commndDir() used in ESM mode', () => {
+      let err;
+      try {
+        yargs().commandDir('./')
+      } catch (_err) {
+        err = _err
+      }
+      assert.match(err.message, /not supported yet for ESM/)
+    })
+  })
 })

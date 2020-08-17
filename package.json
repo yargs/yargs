@@ -51,7 +51,6 @@
     "cpr": "^3.0.1",
     "cross-env": "^7.0.2",
     "cross-spawn": "^7.0.0",
-    "es6-promise": "^4.2.5",
     "eslint": "^6.8.0",
     "eslint-plugin-import": "^2.20.1",
     "eslint-plugin-node": "^11.0.0",

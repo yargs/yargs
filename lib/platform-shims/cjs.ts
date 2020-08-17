@@ -20,7 +20,7 @@ export default {
   getCallerFile: require('get-caller-file'),
   getProcessArgvBin: processArgv.getProcessArgvBin,
   inspect,
-  mainFilename: require?.main?.filename || process.cwd(),
+  mainFilename: require?.main?.filename ?? process.cwd(),
   Parser,
   path: require('path'),
   process: {
