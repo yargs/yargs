@@ -8,14 +8,14 @@
 
 <br>
 
-[![Build Status][travis-image]][travis-url]
+![ci](https://github.com/yargs/yargs/workflows/ci/badge.svg)
 [![NPM version][npm-image]][npm-url]
 [![js-standard-style][standard-image]][standard-url]
 [![Coverage][coverage-image]][coverage-url]
 [![Conventional Commits][conventional-commits-image]][conventional-commits-url]
 [![Slack][slack-image]][slack-url]
 
-## Description :
+## Description
 Yargs helps you build interactive command line tools, by parsing arguments and generating an elegant user interface.
 
 It gives you:
@@ -40,7 +40,7 @@ Bleeding edge version with the most recent features:
 npm i yargs@next
 ```
 
-## Usage :
+## Usage
 
 ### Simple Example
 
@@ -88,7 +88,9 @@ require('yargs') // eslint-disable-line
 
 Run the example above with `--help` to see the help for the application.
 
-## TypeScript
+## Supported Platforms
+
+### TypeScript
 
 yargs has type definitions at [@types/yargs][type-definitions].
 
@@ -98,15 +100,50 @@ npm i @types/yargs --save-dev
 
 See usage examples in [docs](/docs/typescript.md).
 
-## Webpack
+### Deno
 
-See usage examples of yargs with webpack in [docs](/docs/webpack.md).
+As of `v16`, `yargs` supports [Deno](https://github.com/denoland/deno):
 
-## Community :
+```typescript
+import { Yargs, YargsType, Arguments } from 'https://deno.land/x/yargs/deno.ts'
+
+Yargs()
+  .command('download <files...>', 'download a list of files', (yargs: YargsType) => {
+    return yargs.positional('files', {
+      describe: 'a list of files to do something with'
+    })
+  }, (argv: Arguments) => {
+    console.info(argv)
+  })
+  .strictCommands()
+  .demandCommand(1)
+  .parse(Deno.args)
+```
+
+### ESM
+
+As of `v16`,`yargs` supports ESM imports:
+
+```js
+import { Yargs, getProcessArgvWithoutBin } from 'yargs'
+
+Yargs(getProcessArgvWithoutBin())
+  .command('curl <url>', 'fetch the contents of the URL', () => {}, (argv) => {
+    console.info(argv)
+  })
+  .demandCommand(1)
+  .argv
+```
+
+### Usage in Browser
+
+See examples of using yargs in the browser in [docs](/docs/browser.md).
+
+## Community
 
 Having problems? want to contribute? join our [community slack](http://devtoolscommunity.herokuapp.com).
 
-## Documentation :
+## Documentation
 
 ### Table of Contents
 
@@ -131,8 +168,6 @@ Libraries in this ecosystem make a best effort to track
 [Node.js' release schedule](https://nodejs.org/en/about/releases/). Here's [a
 post on why we think this is important](https://medium.com/the-node-js-collection/maintainers-should-consider-following-node-js-release-schedule-ab08ed4de71a).
 
-[travis-url]: https://travis-ci.org/yargs/yargs
-[travis-image]: https://img.shields.io/travis/yargs/yargs/master.svg
 [npm-url]: https://www.npmjs.com/package/yargs
 [npm-image]: https://img.shields.io/npm/v/yargs.svg
 [standard-image]: https://img.shields.io/badge/code%20style-standard-brightgreen.svg

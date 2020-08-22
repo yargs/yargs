@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-require('../../index')
+require('../../')
   .option('foo', {
     nargs: 1
   })

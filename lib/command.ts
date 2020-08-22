@@ -1,16 +1,11 @@
-import { Dictionary, assertNotStrictEqual } from './common-types'
-import { isPromise } from './is-promise'
-import { applyMiddleware, commandMiddlewareFactory, Middleware } from './middleware'
-import { parseCommand, Positional } from './parse-command'
-import * as path from 'path'
-import { RequireDirectoryOptions } from 'require-directory'
-import { UsageInstance } from './usage'
-import { inspect } from 'util'
-import { ValidationInstance } from './validation'
-import { YargsInstance, isYargsInstance, Options, OptionDefinition, Context, Configuration, Arguments, DetailedArguments } from './yargs'
-import requireDirectory = require('require-directory')
-import whichModule = require('which-module')
-import Parser = require('yargs-parser')
+import { Dictionary, assertNotStrictEqual, RequireDirectoryOptions, PlatformShim } from './typings/common-types.js'
+import { isPromise } from './utils/is-promise.js'
+import { applyMiddleware, commandMiddlewareFactory, Middleware } from './middleware.js'
+import { parseCommand, Positional } from './parse-command.js'
+import { UsageInstance } from './usage.js'
+import { ValidationInstance } from './validation.js'
+import { YargsInstance, isYargsInstance, Options, OptionDefinition, Context, Configuration, Arguments, DetailedArguments } from './yargs-factory.js'
+import whichModule from './utils/which-module.js'
 
 const DEFAULT_MARKER = /(^\*)|(^\$0)/
 
@@ -21,7 +16,8 @@ export function command (
   yargs: YargsInstance,
   usage: UsageInstance,
   validation: ValidationInstance,
-  globalMiddleware: Middleware[] = []
+  globalMiddleware: Middleware[] = [],
+  shim: PlatformShim
 ) {
   const self: CommandInstance = {} as CommandInstance
   let handlers: Dictionary<CommandHandler> = {}
@@ -127,26 +123,26 @@ export function command (
       }
       return visited
     }
-    requireDirectory({ require: req, filename: callerFile } as NodeModule, dir, opts)
+    shim.requireDirectory({ require: req, filename: callerFile }, dir, opts)
   }
 
   // lookup module object from require()d command and derive name
   // if module was not require()d and no name given, throw error
   function moduleName (obj: CommandHandlerDefinition) {
     const mod = whichModule(obj)
-    if (!mod) throw new Error(`No command name given for module: ${inspect(obj)}`)
+    if (!mod) throw new Error(`No command name given for module: ${shim.inspect(obj)}`)
     return commandFromFilename(mod.filename)
   }
 
   // derive command name from filename
   function commandFromFilename (filename: string) {
-    return path.basename(filename, path.extname(filename))
+    return shim.path.basename(filename, shim.path.extname(filename))
   }
 
   function extractDesc ({ describe, description, desc }: CommandHandlerDefinition) {
     for (const test of [describe, description, desc]) {
       if (typeof test === 'string' || test === false) return test
-      assertNotStrictEqual(test, true as true)
+      assertNotStrictEqual(test, true as true, shim)
     }
     return false
   }
@@ -284,7 +280,7 @@ export function command (
   }
 
   self.runDefaultBuilderOn = function (yargs) {
-    assertNotStrictEqual(defaultCommand, undefined)
+    assertNotStrictEqual(defaultCommand, undefined, shim)
     if (shouldUpdateUsage(yargs)) {
       // build the root-level command string from the default string.
       const commandString = DEFAULT_MARKER.test(defaultCommand.original)
@@ -368,7 +364,7 @@ export function command (
     const config: Configuration = Object.assign({}, options.configuration, {
       'populate--': true
     })
-    const parsed = Parser.detailed(unparsed, Object.assign({}, options, {
+    const parsed = shim.Parser.detailed(unparsed, Object.assign({}, options, {
       configuration: config
     }))
 
@@ -445,7 +441,7 @@ export function command (
   }
   self.unfreeze = () => {
     const frozen = frozens.pop()
-    assertNotStrictEqual(frozen, undefined)
+    assertNotStrictEqual(frozen, undefined, shim)
     ;({
       handlers,
       aliasMap,
@@ -461,9 +457,9 @@ export interface CommandInstance {
   addDirectory(
     dir: string,
     context: Context,
-    req: NodeRequireFunction,
+    req: Function,
     callerFile: string,
-    opts?: RequireDirectoryOptions<any>
+    opts?: RequireDirectoryOptions
   ): void
   addHandler (
     cmd: string | string[] | CommandHandlerDefinition,

@@ -4,7 +4,7 @@
 process.stdout.isTTY = true
 process.stderr.isTTY = true
 
-var yargs = require('../../index')
+var yargs = require('../../')
 var y = yargs.command('download <url> <files..>', 'make a get HTTP request')
   .help()
 

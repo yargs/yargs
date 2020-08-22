@@ -1,16 +1,16 @@
-import { argsert } from './argsert'
-import { Dictionary, assertNotStrictEqual } from './common-types'
-import { levenshtein as distance } from './levenshtein'
-import { objFilter } from './obj-filter'
-import { UsageInstance } from './usage'
-import { YargsInstance, Arguments } from './yargs'
-import { DetailedArguments } from 'yargs-parser/build/lib/yargs-parser-types'
-import { Y18N } from 'y18n'
+import { argsert } from './argsert.js'
+import { Dictionary, assertNotStrictEqual, Y18N, PlatformShim } from './typings/common-types.js'
+import { levenshtein as distance } from './utils/levenshtein.js'
+import { objFilter } from './utils/obj-filter.js'
+import { UsageInstance } from './usage.js'
+import { YargsInstance, Arguments } from './yargs-factory.js'
+import { DetailedArguments } from 'yargs-parser/build/lib/yargs-parser-types.js'
+
 const specialKeys = ['$0', '--', '_']
 
 // validation-type-stuff, missing params,
 // bad implications, custom checks.
-export function validation (yargs: YargsInstance, usage: UsageInstance, y18n: Y18N) {
+export function validation (yargs: YargsInstance, usage: UsageInstance, y18n: Y18N, shim: PlatformShim) {
   const __ = y18n.__
   const __n = y18n.__n
   const self = {} as ValidationInstance
@@ -37,8 +37,8 @@ export function validation (yargs: YargsInstance, usage: UsageInstance, y18n: Y1
               'Not enough non-option arguments: got %s, need at least %s',
               'Not enough non-option arguments: got %s, need at least %s',
               _s,
-              _s,
-              demandedCommands._.min
+              _s.toString(),
+              demandedCommands._.min.toString()
             )
           )
         }
@@ -56,8 +56,8 @@ export function validation (yargs: YargsInstance, usage: UsageInstance, y18n: Y1
               'Too many non-option arguments: got %s, maximum of %s',
               'Too many non-option arguments: got %s, maximum of %s',
               _s,
-              _s,
-              demandedCommands._.max
+              _s.toString(),
+              demandedCommands._.max.toString()
             )
           )
         }
@@ -74,8 +74,8 @@ export function validation (yargs: YargsInstance, usage: UsageInstance, y18n: Y1
           'Not enough non-option arguments: got %s, need at least %s',
           'Not enough non-option arguments: got %s, need at least %s',
           observed,
-          observed,
-          required
+          observed + '',
+          required + ''
         )
       )
     }
@@ -269,7 +269,7 @@ export function validation (yargs: YargsInstance, usage: UsageInstance, y18n: Y1
       if (Array.isArray(value)) {
         value.forEach((i) => self.implies(key, i))
       } else {
-        assertNotStrictEqual(value, undefined)
+        assertNotStrictEqual(value, undefined, shim)
         implied[key].push(value)
       }
     }
@@ -394,7 +394,7 @@ export function validation (yargs: YargsInstance, usage: UsageInstance, y18n: Y1
   }
   self.unfreeze = function unfreeze () {
     const frozen = frozens.pop()
-    assertNotStrictEqual(frozen, undefined)
+    assertNotStrictEqual(frozen, undefined, shim)
     ;({
       implied,
       checks,
