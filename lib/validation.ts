@@ -74,8 +74,8 @@ export function validation (yargs: YargsInstance, usage: UsageInstance, y18n: Y1
           'Not enough non-option arguments: got %s, need at least %s',
           'Not enough non-option arguments: got %s, need at least %s',
           observed,
-          observed,
-          required
+          observed + '',
+          required + ''
         )
       )
     }

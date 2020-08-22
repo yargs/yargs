@@ -88,7 +88,9 @@ require('yargs') // eslint-disable-line
 
 Run the example above with `--help` to see the help for the application.
 
-## TypeScript
+## Supported Platforms
+
+### TypeScript
 
 yargs has type definitions at [@types/yargs][type-definitions].
 
@@ -98,15 +100,50 @@ npm i @types/yargs --save-dev
 
 See usage examples in [docs](/docs/typescript.md).
 
-## Webpack
+### Deno
 
-See usage examples of yargs with webpack in [docs](/docs/webpack.md).
+As of `v16`, `yargs` supports [Deno](https://github.com/denoland/deno):
 
-## Community :
+```typescript
+import { Yargs, YargsType, Arguments } from 'https://deno.land/x/yargs/deno.ts'
+
+Yargs()
+  .command('download <files...>', 'download a list of files', (yargs: YargsType) => {
+    return yargs.positional('files', {
+      describe: 'a list of files to do something with'
+    })
+  }, (argv: Arguments) => {
+    console.info(argv)
+  })
+  .strictCommands()
+  .demandCommand(1)
+  .parse(Deno.args)
+```
+
+### ESM
+
+As of `v16`,`yargs` supports ESM imports:
+
+```js
+import { Yargs, getProcessArgvWithoutBin } from 'yargs'
+
+Yargs(getProcessArgvWithoutBin())
+  .command('curl <url>', 'fetch the contents of the URL', () => {}, (argv) => {
+    console.info(argv)
+  })
+  .demandCommand(1)
+  .argv
+```
+
+### Usage in Browser
+
+See examples of using yargs in the browser in [docs](/docs/browser.md).
+
+## Community
 
 Having problems? want to contribute? join our [community slack](http://devtoolscommunity.herokuapp.com).
 
-## Documentation :
+## Documentation
 
 ### Table of Contents
 
