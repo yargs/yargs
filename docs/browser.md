@@ -22,7 +22,7 @@ the browser:
 </script>
 ```
 
-A fully example can be found in [example/yargs.html](/example/yargs.html), or
+A full example can be found in [example/yargs.html](/example/yargs.html), or
 on [jsfiddle](https://jsfiddle.net/bencoe/m9fv2oet/3/).
 
 ## Bundling
