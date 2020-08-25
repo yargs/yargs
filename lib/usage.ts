@@ -2,7 +2,7 @@
 // failures, etc. keeps logging in one place.
 import { Dictionary, assertNotStrictEqual, PlatformShim, Y18N } from './typings/common-types.js'
 import { objFilter } from './utils/obj-filter.js'
-import { YargsInstance } from './yargs-factory.js'
+import { YargsInstance, Arguments } from './yargs-factory.js'
 import { YError } from './yerror.js'
 import { DetailedArguments } from 'yargs-parser/build/lib/yargs-parser-types.js'
 import setBlocking from './utils/set-blocking.js'
@@ -11,7 +11,7 @@ export function usage (yargs: YargsInstance, y18n: Y18N, shim: PlatformShim) {
   const __ = y18n.__
   const self = {} as UsageInstance
 
-  // methods for ouputting/building failure message.
+  // methods for outputting/building failure message.
   const fails: FailureFunction[] = []
   self.failFn = function failFn (f) {
     fails.push(f)
@@ -30,12 +30,12 @@ export function usage (yargs: YargsInstance, y18n: Y18N, shim: PlatformShim) {
   }
 
   let failureOutput = false
-  self.fail = function fail (msg, err) {
+  self.fail = function fail (msg, err, argv) {
     const logger = yargs._getLoggerInstance()
 
     if (fails.length) {
       for (let i = fails.length - 1; i >= 0; --i) {
-        fails[i](msg, err, self)
+        fails[i](msg, err, self, argv)
       }
     } else {
       if (yargs.getExitProcess()) setBlocking(true)
@@ -65,7 +65,7 @@ export function usage (yargs: YargsInstance, y18n: Y18N, shim: PlatformShim) {
     }
   }
 
-  // methods for ouputting/building help (usage) message.
+  // methods for outputting/building help (usage) message.
   let usages: [string, string][] = []
   let usageDisabled = false
   self.usage = (msg, description) => {
@@ -622,7 +622,7 @@ export interface UsageInstance {
   describe(keys: string | string[] | Dictionary<string>, desc?: string): void
   epilog(msg: string): void
   example(cmd: string, description?: string): void
-  fail(msg?: string | null, err?: YError | string): void
+  fail(msg?: string | null, err?: YError | string, argv?: Arguments ): void
   failFn(f: FailureFunction): void
   freeze(): void
   functionDescription(fn: { name?: string }): string
@@ -644,7 +644,7 @@ export interface UsageInstance {
 }
 
 export interface FailureFunction {
-  (msg: string | undefined | null, err: YError | string | undefined, usage: UsageInstance): void
+  (msg: string | undefined | null, err: YError | string | undefined, usage: UsageInstance, argv: Arguments): void
 }
 
 export interface FrozenUsageInstance {

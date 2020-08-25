@@ -242,7 +242,7 @@ export function command (
           })
           .catch(error => {
             try {
-              yargs.getUsageInstance().fail(null, error)
+              yargs.getUsageInstance().fail(null, error, innerArgv as Arguments)
             } catch (err) {
               // fail's throwing would cause an unhandled rejection.
             }
