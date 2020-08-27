@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="250" src="/yargs-logo.png">
+  <img width="250" src="https://raw.githubusercontent.com/yargs/yargs/master/yargs-logo.png">
 </p>
 <h1 align="center"> Yargs </h1>
 <p align="center">
@@ -23,7 +23,7 @@ It gives you:
 * commands and (grouped) options (`my-program.js serve --port=5000`).
 * a dynamically generated help menu based on your arguments.
 
-> <img width="400" src="/screen.png">
+> <img width="400" src="https://raw.githubusercontent.com/yargs/yargs/master/screen.png">
 
 * bash-completion shortcuts for commands and options.
 * and [tons more](/docs/api.md).
