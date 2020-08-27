@@ -104,7 +104,7 @@ export interface Options {
     /** Provide default values for keys: `{ default: { x: 33, y: 'hello world!' } }`. */
     default: Dictionary<any>;
     /** Environment variables (`process.env`) with the prefix provided should be parsed. */
-    envPrefix: string;
+    envPrefix?: string;
     /** Specify that a key requires n arguments: `{ narg: {x: 2} }`. */
     narg: Dictionary<number>;
     /** `path.normalize()` will be applied to values set to this key. */
