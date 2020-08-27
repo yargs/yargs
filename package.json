@@ -8,6 +8,9 @@
       "import": "./index.mjs",
       "require": "./index.cjs"
     },
+    "./helpers": {
+      "import": "./helpers.mjs"
+    },
     "./yargs": {
       "require": "./build/index.cjs"
     }
@@ -23,6 +26,7 @@
   "files": [
     "browser.mjs",
     "index.cjs",
+    "helpers.mjs",
     "index.mjs",
     "build",
     "locales",

@@ -1,12 +1,13 @@
 /* global describe, it */
 
 import * as assert from 'assert'
-import { Yargs, getProcessArgvWithoutBin } from '../../index.mjs'
+import yargs from '../../index.mjs'
+import { hideBin } from '../../helpers.mjs'
 
 describe('ESM', () => {
   describe('parser', () => {
     it('parses process.argv by default', () => {
-      const parsed = Yargs(['--goodnight', 'moon']).parse()
+      const parsed = yargs(['--goodnight', 'moon']).parse()
       assert.strictEqual(parsed.goodnight, 'moon')
     })
   })
@@ -14,17 +15,16 @@ describe('ESM', () => {
     it('throws an error if commndDir() used in ESM mode', () => {
       let err;
       try {
-        Yargs().commandDir('./')
+        yargs().commandDir('./')
       } catch (_err) {
         err = _err
       }
       assert.match(err.message, /not supported yet for ESM/)
     })
   })
-  describe('getProcessArgvWithoutBin', () => {
+  describe('hideBin', () => {
     it('hides bin for standard node.js application', () => {
-      process.argv = ['node', 'foo.js', '--apple', '--banana']
-      const args = getProcessArgvWithoutBin()
+      const args = hideBin(['node', 'foo.js', '--apple', '--banana'])
       assert.deepEqual(args, ['--apple', '--banana'])
     })
   })
