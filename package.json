@@ -8,6 +8,9 @@
       "import": "./index.mjs",
       "require": "./index.cjs"
     },
+    "./helpers": {
+      "import": "./helpers.mjs"
+    },
     "./yargs": {
       "require": "./build/index.cjs"
     }
@@ -23,6 +26,7 @@
   "files": [
     "browser.mjs",
     "index.cjs",
+    "helpers.mjs",
     "index.mjs",
     "build",
     "locales",
@@ -37,7 +41,7 @@
     "require-directory": "^2.1.1",
     "string-width": "^4.2.0",
     "y18n": "^4.0.0",
-    "yargs-parser": "^19.0.1"
+    "yargs-parser": "^19.0.4"
   },
   "devDependencies": {
     "@types/chai": "^4.2.11",
@@ -63,7 +67,7 @@
     "rollup": "^2.23.0",
     "rollup-plugin-cleanup": "^3.1.1",
     "standardx": "^5.0.0",
-    "typescript": "^3.7.0",
+    "typescript": "^4.0.2",
     "which": "^2.0.0",
     "yargs-test-extends": "^1.0.1"
   },

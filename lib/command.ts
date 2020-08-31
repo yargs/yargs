@@ -347,7 +347,7 @@ export function command (
       options.alias[key] = (options.alias[key] || []).concat(parseOptions.alias[key])
     }
     options.array = options.array.concat(parseOptions.array)
-    delete options.config //  don't load config when processing positionals.
+    options.config = {} //  don't load config when processing positionals.
 
     const unparsed: string[] = []
     Object.keys(positionalMap).forEach((key) => {

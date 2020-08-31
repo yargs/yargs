@@ -4,7 +4,7 @@
 // require('yargs/yargs')(process.argv.slice(2))
 const Yargs = require('./build/index.cjs')
 
-Argv(Yargs.processArgv.getProcessArgvWithoutBin())
+Argv(Yargs.processArgv.hideBin(process.argv))
 
 module.exports = Argv
 

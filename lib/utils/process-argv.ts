@@ -20,8 +20,8 @@ function isElectronApp () {
   return !!(process as ElectronProcess).versions.electron
 }
 
-export function getProcessArgvWithoutBin () {
-  return process.argv.slice(getProcessArgvBinIndex() + 1)
+export function hideBin (argv: string[]) {
+  return argv.slice(getProcessArgvBinIndex() + 1)
 }
 
 export function getProcessArgvBin () {
