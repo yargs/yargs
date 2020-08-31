@@ -4,4 +4,4 @@ import { YargsWithShim } from './build/lib/yargs-factory.js'
 
 const Yargs = YargsWithShim(browserPlatformShim)
 
-export { Yargs }
+export default Yargs
