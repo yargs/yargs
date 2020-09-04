@@ -5,7 +5,7 @@ const assert = require('assert')
 const yargs = require('../yargs.cjs');
 const { applyExtends } = require('../yargs.cjs');
 
-const HELPER_COUNT = 3;
+const HELPER_COUNT = 2;
 
 describe('helpers', () => {
   it('does not expose additional helpers beyond blessed list', () => {
@@ -22,12 +22,6 @@ describe('helpers', () => {
     it('exposes functional argument parser', () => {
       const argv = yargs.Parser('--foo --bar=99')
       assert.strictEqual(argv.bar, 99)
-    })
-  })
-  describe('rebase', () => {
-    it('exposes rebase', () => {
-      const path = yargs.rebase('./foo', './foo/bar')
-      assert.strictEqual(path, 'bar')
     })
   })
 })

@@ -7,13 +7,8 @@ const applyExtends = (config, cwd, mergeExtends) => {
   return _applyExtends(config, cwd, mergeExtends, shim)
 }
 
-const rebase = (base, dir) => {
-  return shim.path.relative(base, dir)
-}
-
 export {
   applyExtends,
   hideBin,
   Parser,
-  rebase
 }

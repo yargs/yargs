@@ -6,5 +6,4 @@ Yargs.applyExtends = (config, cwd, mergeExtends) => {
   return applyExtends(config, cwd, mergeExtends, cjsPlatformShim)
 }
 Yargs.Parser = Parser
-Yargs.rebase = rebase
 module.exports = Yargs
