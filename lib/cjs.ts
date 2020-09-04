@@ -1,6 +1,7 @@
 'use strict'
 // Bootstraps yargs for a CommonJS runtime:
 
+import { applyExtends } from './utils/apply-extends'
 import { argsert } from './argsert.js'
 import { isPromise } from './utils/is-promise.js'
 import { objFilter } from './utils/obj-filter.js'
@@ -25,7 +26,10 @@ if (process && process.version) {
 const Parser = require('yargs-parser')
 const Yargs = YargsWithShim(cjsPlatformShim)
 
-export default Object.assign(Yargs, {
+export default {
+  applyExtends,
+  cjsPlatformShim,
+  Yargs,
   argsert,
   globalMiddlewareFactory,
   isPromise,
@@ -35,4 +39,4 @@ export default Object.assign(Yargs, {
   processArgv,
   rebase,
   YError
-})
+}
