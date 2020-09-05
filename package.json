@@ -40,7 +40,7 @@
     "get-caller-file": "^2.0.5",
     "require-directory": "^2.1.1",
     "string-width": "^4.2.0",
-    "y18n": "^4.0.0",
+    "y18n": "^5.0.0",
     "yargs-parser": "^19.0.4"
   },
   "devDependencies": {
