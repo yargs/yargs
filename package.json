@@ -12,7 +12,7 @@
       "import": "./helpers.mjs"
     },
     "./yargs": {
-      "require": "./build/index.cjs"
+      "require": "./yargs.cjs"
     }
   },
   "type": "module",
@@ -28,6 +28,7 @@
     "index.cjs",
     "helpers.mjs",
     "index.mjs",
+    "yargs.mjs",
     "build",
     "locales",
     "LICENSE",
@@ -40,7 +41,7 @@
     "get-caller-file": "^2.0.5",
     "require-directory": "^2.1.1",
     "string-width": "^4.2.0",
-    "y18n": "^4.0.0",
+    "y18n": "^5.0.1",
     "yargs-parser": "^19.0.4"
   },
   "devDependencies": {
@@ -93,8 +94,6 @@
   "standardx": {
     "ignore": [
       "build",
-      "index.cjs",
-      "yargs.cjs",
       "**/example/**"
     ]
   },

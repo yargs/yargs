@@ -2,7 +2,6 @@
 
 import * as assert from 'assert'
 import yargs from '../../index.mjs'
-import { hideBin } from '../../helpers.mjs'
 
 describe('ESM', () => {
   describe('parser', () => {
@@ -20,12 +19,6 @@ describe('ESM', () => {
         err = _err
       }
       assert.match(err.message, /not supported yet for ESM/)
-    })
-  })
-  describe('hideBin', () => {
-    it('hides bin for standard node.js application', () => {
-      const args = hideBin(['node', 'foo.js', '--apple', '--banana'])
-      assert.deepEqual(args, ['--apple', '--banana'])
     })
   })
 })
