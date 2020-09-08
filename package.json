@@ -28,7 +28,7 @@
     "index.cjs",
     "helpers.mjs",
     "index.mjs",
-    "yargs.mjs",
+    "yargs.cjs",
     "build",
     "locales",
     "LICENSE",
