@@ -1522,7 +1522,7 @@ will raise an error.
 ---------
 
 Similar to `.strict()`, except that it only applies to unrecognized options. A
-user can still provide arbitrary positionals, but unknown options
+user can still provide arbitrary positional commands, but unknown options
 will raise an error.
 
 <a name="string"></a>.string(key)
