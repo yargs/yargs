@@ -114,7 +114,7 @@ export function validation (yargs: YargsInstance, usage: UsageInstance, y18n: Y1
   }
 
   // check for unknown arguments (strict-mode).
-  self.unknownArguments = function unknownArguments (argv, aliases, positionalMap, isDefaultCommand) {
+  self.unknownArguments = function unknownArguments (argv, aliases, positionalMap, isDefaultCommand, checkPositionals = true) {
     const commandKeys = yargs.getCommandInstance().getCommands()
     const unknown: string[] = []
     const currentContext = yargs.getContext()
@@ -129,7 +129,7 @@ export function validation (yargs: YargsInstance, usage: UsageInstance, y18n: Y1
       }
     })
 
-    if ((currentContext.commands.length > 0) || (commandKeys.length > 0) || isDefaultCommand) {
+    if (checkPositionals && ((currentContext.commands.length > 0) || (commandKeys.length > 0) || isDefaultCommand)) {
       argv._.slice(currentContext.commands.length).forEach((key) => {
         if (commandKeys.indexOf('' + key) === -1) {
           unknown.push('' + key)
@@ -428,7 +428,8 @@ export interface ValidationInstance {
     argv: Arguments,
     aliases: DetailedArguments['aliases'],
     positionalMap: Dictionary,
-    isDefaultCommand: boolean
+    isDefaultCommand: boolean,
+    checkPositionals?: boolean,
   ): void
   unknownCommands(argv: Arguments): boolean
 }
