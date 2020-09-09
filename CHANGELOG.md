@@ -29,10 +29,6 @@ All notable changes to this project will be documented in this file. See [standa
 * **yargs:** add missing command(module) signature ([#1707](https://www.github.com/yargs/yargs/issues/1707)) ([0f81024](https://www.github.com/yargs/yargs/commit/0f810245494ccf13a35b7786d021b30fc95ecad5)), closes [#1704](https://www.github.com/yargs/yargs/issues/1704)
 
 
-### Code Refactoring
-
-* **ts:** ship yargs.d.ts ([#1671](https://www.github.com/yargs/yargs/issues/1671)) ([c06f886](https://www.github.com/yargs/yargs/commit/c06f886142ad02233db2b2ba82f2e606cbf57ccd))
-
 ## [15.4.0](https://www.github.com/yargs/yargs/compare/v15.3.1...v15.4.0) (2020-06-30)
 
 
