@@ -4,7 +4,7 @@ import { levenshtein as distance } from './utils/levenshtein.js'
 import { objFilter } from './utils/obj-filter.js'
 import { UsageInstance } from './usage.js'
 import { YargsInstance, Arguments } from './yargs-factory.js'
-import { DetailedArguments } from 'yargs-parser/build/lib/yargs-parser-types.js'
+import { DetailedArguments } from './typings/yargs-parser-types.js'
 
 const specialKeys = ['$0', '--', '_']
 
