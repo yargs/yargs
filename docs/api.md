@@ -1518,6 +1518,13 @@ Similar to `.strict()`, except that it only applies to unrecognized commands. A
 user can still provide arbitrary options, but unknown positional commands
 will raise an error.
 
+.strictOptions([enabled=true])
+---------
+
+Similar to `.strict()`, except that it only applies to unrecognized options. A
+user can still provide arbitrary positional commands, but unknown options
+will raise an error.
+
 <a name="string"></a>.string(key)
 ------------
 
