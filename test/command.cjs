@@ -619,6 +619,7 @@ describe('Command', () => {
         .commandDir('fixtures/cmddir')
         .parse())
       r.exit.should.equal(true)
+      r.exitCode.should.equal(0)
       r.errors.length.should.equal(0)
       r.should.have.property('logs')
       r.logs.join('\n').split(/\n+/).should.deep.equal([
@@ -1513,6 +1514,7 @@ describe('Command', () => {
         .parse()
     })
     called.should.equal(false)
+    r.exitCode.should.equal(1)
     r.errors.should.match(/Missing required argument/)
   })
 
