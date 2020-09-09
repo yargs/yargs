@@ -6,6 +6,7 @@ const { format } = require('util')
 // assert against it.
 exports.checkOutput = function checkOutput(f, argv, cb) {
   let exit = false
+  let exitCode = 0
   const _exit = process.exit
   const _emit = process.emit
   const _env = process.env
@@ -14,7 +15,10 @@ exports.checkOutput = function checkOutput(f, argv, cb) {
   const _log = console.log
   const _warn = console.warn
 
-  process.exit = (() => { exit = true })
+  process.exit = ((code) => {
+    exit = true
+    exitCode = code
+  })
   process.env = Hash.merge(process.env, { _: 'node' })
   process.argv = argv || ['./usage']
 
@@ -72,6 +76,7 @@ exports.checkOutput = function checkOutput(f, argv, cb) {
       logs,
       warnings,
       exit,
+      exitCode,
       result
     }
   }
