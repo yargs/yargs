@@ -999,24 +999,6 @@ describe('validation tests', () => {
         .parse()
     })
 
-    // TODO(bcoe): consider implementing this behvaior in the next major version of yargs:
-    //
-    // // for the special case of yargs.demandCommand() and yargs.demandCommand(1), if
-    // // yargs has been configured with commands, we automatically enable strictCommands.
-    // if (commandKeys.length && demandedCommands._ && demandedCommands._.min === 1 && demandedCommands._.max === Infinity) {
-    //   yargs.strictCommands()
-    // }
-    // it('enables strict commands if commands used in conjunction with demandCommand', (done) => {
-    //   yargs('blerg -a 10')
-    //     .demandCommand()
-    //     .command('foo', 'foo command')
-    //     .fail((msg) => {
-    //       msg.should.equal('Unknown command: blerg')
-    //       return done()
-    //     })
-    //     .parse()
-    // })
-
     it('does not apply implicit strictCommands to inner commands', () => {
       const parse = yargs('foo blarg --cool beans')
         .demandCommand()
@@ -1038,6 +1020,54 @@ describe('validation tests', () => {
           return done()
         })
         .parse()
+    })
+  })
+
+  describe('strictOptions', () => {
+    it('succeeds if option is known and command is unknown', (done) => {
+      yargs()
+        .command('foo', 'foo command')
+        .option('a', {
+          describe: 'a is for option'
+        })
+        .strictOptions()
+        .parse('bar -a 10', (err, argv) => {
+          expect(err).to.equal(null)
+          argv.a.should.equal(10)
+          return done()
+        })
+    })
+
+    it('fails if option is unknown', (done) => {
+      yargs()
+        .strictOptions()
+        .parse('bar -a 10', (err, argv) => {
+          expect(err).to.match(/Unknown argument: a/)
+          argv.a.should.equal(10)
+          return done()
+        })
+    })
+
+    it('applies strict options when commands are invoked', () => {
+      yargs()
+        .strictOptions()
+        .parse('foo --cool --awesome', (err) => {
+          expect(err).to.match(/Unknown arguments: cool, awesome/)
+        })
+    })
+
+    it('allows strict options to be turned off', () => {
+      const y = yargs()
+        .strictOptions()
+        .command('foo', 'foo command', (yargs) => {
+          yargs.strictOptions(false)
+        })
+      y.parse('foo --cool --awesome', (err) => {
+        expect(err).to.equal(null)
+      })
+      y.parse('--cool --awesome', (err) => {
+        expect(err).to.match(/Unknown arguments: cool, awesome/)
+      })
     })
   })
 })
