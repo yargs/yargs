@@ -1,4 +1,4 @@
-import { Parser } from 'yargs-parser/build/lib/yargs-parser-types.d.js'
+import { Parser } from './yargs-parser-types.js'
 
 /**
  * An object whose all properties have the same type.
