@@ -7,10 +7,10 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### ⚠ BREAKING CHANGES
 
-* tweaks to ESM/Deno API surface: now exports yargs function by default; getProcessArgvWithoutBin becomes hidBin; types now exported for Deno.
+* tweaks to ESM/Deno API surface: now exports yargs function by default; getProcessArgvWithoutBin becomes hideBin; types now exported for Deno.
 * find-up replaced with escalade; export map added (limits importable files in Node >= 12); yarser-parser@19.x.x (new decamelize/camelcase implementation).
 * **usage:** single character aliases are now shown first in help output
-* **ts:** yargs now ships with its own types
+* rebase helper is no longer provided on yargs instance.
 * drop support for EOL Node 8 (#1686)
 
 ### Features
@@ -153,7 +153,8 @@ arguments when duplicates are provided
 
 ### Bug Fixes
 
-* **docs:** TypeScript import to prevent a future major release warning ([#1441](https://www.github.com/yargs/yargs/issues/1441)) ([b1b156a](https://www.github.com/yargs/yargs/commit/b1b156a3eb4ddd6803fbbd56c611a77919293000))
+* **docs:** 
+cript import to prevent a future major release warning ([#1441](https://www.github.com/yargs/yargs/issues/1441)) ([b1b156a](https://www.github.com/yargs/yargs/commit/b1b156a3eb4ddd6803fbbd56c611a77919293000))
 * stop-parse was not being respected by commands ([#1459](https://www.github.com/yargs/yargs/issues/1459)) ([12c82e6](https://www.github.com/yargs/yargs/commit/12c82e62663e928148a7ee2f51629aa26a0f9bb2))
 * update to yargs-parser with fix for array default values ([#1463](https://www.github.com/yargs/yargs/issues/1463)) ([ebee59d](https://www.github.com/yargs/yargs/commit/ebee59d9022da538410e69a5c025019ed46d13d2))
 * **docs:** update boolean description and examples in docs ([#1474](https://www.github.com/yargs/yargs/issues/1474)) ([afd5b48](https://www.github.com/yargs/yargs/commit/afd5b4871bfeb90d58351ac56c5c44a83ef033e6))
