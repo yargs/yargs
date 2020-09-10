@@ -12,7 +12,7 @@
       "import": "./helpers.mjs"
     },
     "./yargs": {
-      "require": "./yargs.cjs"
+      "require": "./yargs"
     }
   },
   "type": "module",
@@ -28,7 +28,7 @@
     "index.cjs",
     "helpers.mjs",
     "index.mjs",
-    "yargs.cjs",
+    "yargs",
     "build",
     "locales",
     "LICENSE",
