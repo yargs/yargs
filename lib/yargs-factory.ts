@@ -859,6 +859,10 @@ function Yargs (processArgs: string | string[] = [], cwd = shim.process.cwd(), p
       if (opt.requiresArg) {
         self.requiresArg(key)
       }
+
+      if (key === versionOpt) {
+        self._hasCustomVersionHandler = true;
+      }
     }
 
     return self
@@ -1329,7 +1333,7 @@ function Yargs (processArgs: string | string[] = [], cwd = shim.process.cwd(), p
             skipValidation = true
             self.showHelp('log')
             self.exit(0)
-          } else if (key === versionOpt && argv[key]) {
+          } else if (key === versionOpt && argv[key] && !self._hasCustomVersionHandler) {
             if (exitProcess) setBlocking(true)
 
             skipValidation = true
@@ -1425,6 +1429,7 @@ export interface YargsInstance {
   argv: Arguments
   customScriptName: boolean
   parsed: DetailedArguments | false
+  _hasCustomVersionHandler: boolean;
   _copyDoubleDash<T extends Arguments | Promise<Arguments>> (argv: T): T
   _getLoggerInstance (): LoggerInstance
   _getParseContext(): Object

@@ -108,6 +108,17 @@ describe('integration tests', () => {
     })
   })
 
+  it('should allow custom version argument handling', (done) => {
+    testCmd('./version-override-bin.js', ['--version'], (code, stdout) => {
+      if (code) {
+        return done(new Error(`cmd exited with code ${code}`))
+      }
+      console.log(stdout);
+      stdout.should.match(/custom version text/)
+      return done()
+    })
+  })
+
   if (process.platform !== 'win32') {
     describe('load root package.json', () => {
       before(function (done) {
@@ -135,16 +146,6 @@ describe('integration tests', () => {
           })
         })
 
-        it('defaults to appropriate version # when yargs is symlinked', (done) => {
-          testCmd('./symlink-bin.js', ['--version'], (code, stdout) => {
-            if (code) {
-              return done(new Error(`cmd exited with code ${code}`))
-            }
-
-            stdout.should.match(/9\.9\.9/)
-            return done()
-          })
-        })
       })
 
       describe('parser settings', () => {
