@@ -861,7 +861,7 @@ function Yargs (processArgs: string | string[] = [], cwd = shim.process.cwd(), p
       }
 
       if (key === versionOpt) {
-        self._hasCustomVersionHandler = true;
+        self._hasCustomVersionHandler = true
       }
     }
 
