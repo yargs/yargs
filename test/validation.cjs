@@ -5,6 +5,7 @@ const checkUsage = require('./helpers/utils.cjs').checkOutput
 const expect = require('chai').expect
 const english = require('../locales/en.json')
 let yargs = require('../index.cjs')
+const { assert } = require('console')
 
 require('chai').should()
 
@@ -949,6 +950,16 @@ describe('validation tests', () => {
         .fail((msg) => {
           msg.should.equal('Not enough non-option arguments: got 0, need at least 1')
           return done()
+        })
+        .parse()
+    })
+
+    // See: https://github.com/yargs/yargs/issues/1732
+    it('treats positionals in "--" towards count requirement', () => {
+      const argv = yargs('--cool man -- batman robin')
+        .demandCommand(2)
+        .fail((msg) => {
+          throw Error(msg)
         })
         .parse()
     })
