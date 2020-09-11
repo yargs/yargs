@@ -5,7 +5,6 @@ const checkUsage = require('./helpers/utils.cjs').checkOutput
 const expect = require('chai').expect
 const english = require('../locales/en.json')
 let yargs = require('../index.cjs')
-const { assert } = require('console')
 
 require('chai').should()
 
