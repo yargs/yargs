@@ -7,7 +7,8 @@ This document is the Yargs API reference. There are more documentation files in
 - [Examples](https://github.com/yargs/yargs/blob/master/docs/examples.md)
 - [Advanced Topics](https://github.com/yargs/yargs/blob/master/docs/advanced.md)
 - [TypeScript usage examples](https://github.com/yargs/yargs/blob/master/docs/typescript.md)
-- [Webpack usage examples](https://github.com/yargs/yargs/blob/master/docs/webpack.md)
+- [Browser usage example](https://github.com/yargs/yargs/blob/master/docs/browser.md)
+- [Bundling](https://github.com/yargs/yargs/blob/master/docs/bundling.md)
 - [Parsing Tricks](https://github.com/yargs/yargs/blob/master/docs/tricks.md)
 
 API reference
