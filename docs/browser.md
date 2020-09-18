@@ -24,9 +24,3 @@ the browser:
 
 A full example can be found in [example/yargs.html](/example/yargs.html), or
 on [jsfiddle](https://jsfiddle.net/bencoe/m9fv2oet/3/).
-
-## Bundling
-
-Even though yargs can run directly in the browser, you  will still likely 
-want to use a tool like [rollup.js](https://rollupjs.org/guide/en/) to create
-a bundle for the browser.
