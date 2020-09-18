@@ -8,6 +8,25 @@ standalone distributions.
 Newer releases of yargs can run directly in modern browsers, take a look at
 [Running yargs in the browser](https://github.com/yargs/yargs/blob/master/docs/browser.md).
 
+## ncc
+
+If you are targetting Node.js with your bundle, we recommend using
+[`@vercel/ncc`](https://www.npmjs.com/package/@vercel/ncc).
+
+Given a CommonJS file, **index.js**:
+
+```js
+const yargs = require('yargs')
+const chalk = require('chalk')
+yargs
+  .option('awesome-opt', {
+    describe: `my awesome ${chalk.green('option')}`
+  })
+  .parse()
+```
+
+You can simply run: `ncc build index.js`.
+
 ### Webpack
 
 Given a CommonJS file, **index.js**:
