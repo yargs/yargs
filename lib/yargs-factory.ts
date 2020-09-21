@@ -6,7 +6,7 @@
 import { CommandInstance, CommandHandler, CommandBuilderDefinition, CommandBuilder, CommandHandlerCallback, FinishCommandHandler, command as Command, CommandHandlerDefinition } from './command.js'
 import { Dictionary, assertNotStrictEqual, KeyOf, DictionaryKeyof, ValueOf, objectKeys, assertSingleKey, RequireDirectoryOptions, PlatformShim, RequireType } from './typings/common-types.js'
 import {
-  Arguments as ParserArguments,
+  ArgsOutput,
   DetailedArguments as ParserDetailedArguments,
   Configuration as ParserConfiguration,
   Options as ParserOptions,
@@ -1218,7 +1218,7 @@ function Yargs (processArgs: string | string[] = [], cwd = shim.process.cwd(), p
       'populate--': true
     })
     const parsed = shim.Parser.detailed(args, Object.assign({}, options, {
-      configuration: config
+      configuration: {'parse-positional-numbers': false, ...config}
     })) as DetailedArguments
 
     let argv = parsed.argv as Arguments
@@ -1235,7 +1235,7 @@ function Yargs (processArgs: string | string[] = [], cwd = shim.process.cwd(), p
       // are two passes through the parser. If completion
       // is being performed short-circuit on the first pass.
       if (shortCircuit) {
-        return (populateDoubleDash || _calledFromCommand) ? argv : self._copyDoubleDash(argv)
+        return self._postProcess(argv, populateDoubleDash, _calledFromCommand)
       }
 
       // if there's a handler associated with a
@@ -1269,7 +1269,7 @@ function Yargs (processArgs: string | string[] = [], cwd = shim.process.cwd(), p
               // the deepest command first; we keep track of the position in the
               // argv._ array that is currently being executed.
               const innerArgv = command.runCommand(cmd, self, parsed, i + 1)
-              return populateDoubleDash ? innerArgv : self._copyDoubleDash(innerArgv)
+              return self._postProcess(innerArgv, populateDoubleDash)
             } else if (!firstUnknownCommand && cmd !== completionCommand) {
               firstUnknownCommand = cmd
               break
@@ -1279,7 +1279,7 @@ function Yargs (processArgs: string | string[] = [], cwd = shim.process.cwd(), p
           // run the default command, if defined
           if (command.hasDefaultCommand() && !skipDefaultCommand) {
             const innerArgv = command.runCommand(null, self, parsed)
-            return populateDoubleDash ? innerArgv : self._copyDoubleDash(innerArgv)
+            return self._postProcess(innerArgv, populateDoubleDash)
           }
 
           // recommend a command if recommendCommands() has
@@ -1297,7 +1297,7 @@ function Yargs (processArgs: string | string[] = [], cwd = shim.process.cwd(), p
         }
       } else if (command.hasDefaultCommand() && !skipDefaultCommand) {
         const innerArgv = command.runCommand(null, self, parsed)
-        return populateDoubleDash ? innerArgv : self._copyDoubleDash(innerArgv)
+        return self._postProcess(innerArgv, populateDoubleDash)
       }
 
       // we must run completions first, a user might
@@ -1316,7 +1316,7 @@ function Yargs (processArgs: string | string[] = [], cwd = shim.process.cwd(), p
 
           self.exit(0)
         })
-        return (populateDoubleDash || _calledFromCommand) ? argv : self._copyDoubleDash(argv)
+        return self._postProcess(argv, !populateDoubleDash, _calledFromCommand)
       }
 
       // Handle 'help' and 'version' options
@@ -1360,22 +1360,51 @@ function Yargs (processArgs: string | string[] = [], cwd = shim.process.cwd(), p
       else throw err
     }
 
-    return (populateDoubleDash || _calledFromCommand) ? argv : self._copyDoubleDash(argv)
+    return self._postProcess(argv, populateDoubleDash, _calledFromCommand)
+  }
+
+  // Applies a couple post processing steps that are easier to perform
+  // as a final step, rather than
+  self._postProcess = function (argv: Arguments | Promise<Arguments>, populateDoubleDash: boolean, calledFromCommand=false): any {
+    if (isPromise(argv)) return argv
+    if (calledFromCommand) return argv
+    if (!populateDoubleDash) {
+      argv = self._copyDoubleDash(argv)
+    }
+    const parsePositionalNumbers = self.getParserConfiguration()['parse-positional-numbers'] || self.getParserConfiguration()['parse-positional-numbers'] === undefined;
+    if (parsePositionalNumbers) {
+      argv = self._parsePositionalNumbers(argv)
+    }
+    return argv;
   }
 
   // to simplify the parsing of positionals in commands,
   // we temporarily populate '--' rather than _, with arguments
   // after the '--' directive. After the parse, we copy these back.
-  self._copyDoubleDash = function (argv: Arguments | Promise<Arguments>): any {
-    if (isPromise(argv) || !argv._ || !argv['--']) return argv
+  self._copyDoubleDash = function (argv: Arguments): any {
+    if (!argv._ || !argv['--']) return argv
     argv._.push.apply(argv._, argv['--'])
 
-    // TODO(bcoe): refactor command parsing such that this delete is not
-    // necessary: https://github.com/yargs/yargs/issues/1482
+    // We catch an error here, in case someone has called Object.seal()
+    // on the parsed object, see: https://github.com/babel/babel/pull/10733
     try {
       delete argv['--']
     } catch (_err) {}
 
+    return argv
+  }
+
+  // We wait to coerce numbers for positionals until after the initial parse.
+  // This allows commands to configure number parsing on a positional by
+  // positional basis:
+  self._parsePositionalNumbers = function (argv: Arguments): any {
+    const args: (string | number)[] = argv['--'] ? argv['--'] : argv['_']
+
+    for (let i = 0, arg; (arg = args[i]) !== undefined; i++) {
+      if (shim.Parser.looksLikeNumber(arg) && Number.isSafeInteger(Math.floor(parseFloat(`${arg}`)))) {
+        args[i] = Number(arg)
+      }
+    }
     return argv
   }
 
@@ -1425,7 +1454,12 @@ export interface YargsInstance {
   argv: Arguments
   customScriptName: boolean
   parsed: DetailedArguments | false
-  _copyDoubleDash<T extends Arguments | Promise<Arguments>> (argv: T): T
+  // The methods below are called after the parse in yargs-parser is complete
+  // and perform cleanup on the object generated:
+  _postProcess<T extends Arguments | Promise<Arguments>> (argv: T, populateDoubleDash: boolean, calledFromCommand?: boolean): T
+  _copyDoubleDash<T extends Arguments> (argv: T): T
+  _parsePositionalNumbers<T extends Arguments> (argv: T): T
+
   _getLoggerInstance (): LoggerInstance
   _getParseContext(): Object
   _hasOutput (): boolean
@@ -1740,9 +1774,15 @@ interface ParseCallback {
   (err: YError | string | undefined | null, argv: Arguments | Promise<Arguments>, output: string): void
 }
 
-export interface Arguments extends ParserArguments {
+export interface Arguments {
   /** The script name or node command */
   $0: string
+  /** Non-option arguments */
+  _: ArgsOutput;
+  /** Arguments after the end-of-options flag `--` */
+  '--'?: ArgsOutput;
+  /** All remaining options */
+  [argName: string]: any;
 }
 
 export interface DetailedArguments extends ParserDetailedArguments {

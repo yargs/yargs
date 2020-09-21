@@ -1799,18 +1799,18 @@ describe('yargs dsl tests', () => {
       argv.noBaz.should.equal(2)
     })
 
-    it('supports --unknown-options-as-args', () => {
+    it.only('supports --unknown-options-as-args', () => {
       const argv = yargs('--foo.bar 1 --no-baz 2')
         .parserConfiguration({ 'unknown-options-as-args': true })
         .parse()
-      argv._.should.deep.eql(['--foo.bar', '1', '--no-baz', '2'])
+      argv._.should.deep.eql(['--foo.bar', 1, '--no-baz', 2])
       const argv2 = yargs('foo --foo.bar --cool 1 --no-baz 2')
         .command('foo', 'my foo command', (yargs) => {
           yargs.boolean('cool')
         }, () => {})
         .parserConfiguration({ 'unknown-options-as-args': true })
         .parse()
-      argv2._.should.deep.eql(['foo', '--foo.bar', '1', '--no-baz', '2'])
+      argv2._.should.deep.eql(['foo', '--foo.bar', 1, '--no-baz', 2])
       argv2.cool.should.equal(true)
     })
   })
@@ -2594,5 +2594,35 @@ describe('yargs dsl tests', () => {
       require('../index.cjs')
     }).to.throw(/yargs supports a minimum Node.js version of 55/)
     delete process.env.YARGS_MIN_NODE_VERSION
+  })
+
+  // Handling of strings that look like numbers, see:
+  // https://github.com/yargs/yargs/issues/1758
+  describe('bug #1758', () => {
+    it('does not drop .0 if flag is configured as string', () => {
+      const argv = yargs('cmd --foo 33.0')
+        .command('cmd [str]', 'a command', (yargs) => {
+          return yargs.option('foo', {
+            type: 'string'
+          })
+        }).parse()
+      argv.foo.should.equal('33.0')
+    })
+  
+    it('does not drop .0 if positional is configured as string', () => {
+      const argv = yargs('cmd 33.0')
+        .command('cmd [str]', 'a command', (yargs) => {
+          return yargs.positional('str', {
+            type: 'string'
+          })
+        }).parse()
+      argv.str.should.equal('33.0')
+    })
+
+    it('continues to parse values in _ as numbers, when they look like numbers', () => {
+      const argv = yargs('hello 33.0').parse()
+      argv._[0].should.equal('hello')
+      argv._[1].should.equal(33)
+    })
   })
 })
