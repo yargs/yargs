@@ -16,7 +16,7 @@
     }
   },
   "type": "module",
-  "module": "./build/index.mjs",
+  "module": "./index.mjs",
   "contributors": [
     {
       "name": "Yargs Contributors",
