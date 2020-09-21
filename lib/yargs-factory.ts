@@ -1218,7 +1218,7 @@ function Yargs (processArgs: string | string[] = [], cwd = shim.process.cwd(), p
       'populate--': true
     })
     const parsed = shim.Parser.detailed(args, Object.assign({}, options, {
-      configuration: {'parse-positional-numbers': false, ...config}
+      configuration: { 'parse-positional-numbers': false, ...config }
     })) as DetailedArguments
 
     let argv = parsed.argv as Arguments
@@ -1365,17 +1365,17 @@ function Yargs (processArgs: string | string[] = [], cwd = shim.process.cwd(), p
 
   // Applies a couple post processing steps that are easier to perform
   // as a final step, rather than
-  self._postProcess = function (argv: Arguments | Promise<Arguments>, populateDoubleDash: boolean, calledFromCommand=false): any {
+  self._postProcess = function (argv: Arguments | Promise<Arguments>, populateDoubleDash: boolean, calledFromCommand = false): any {
     if (isPromise(argv)) return argv
     if (calledFromCommand) return argv
     if (!populateDoubleDash) {
       argv = self._copyDoubleDash(argv)
     }
-    const parsePositionalNumbers = self.getParserConfiguration()['parse-positional-numbers'] || self.getParserConfiguration()['parse-positional-numbers'] === undefined;
+    const parsePositionalNumbers = self.getParserConfiguration()['parse-positional-numbers'] || self.getParserConfiguration()['parse-positional-numbers'] === undefined
     if (parsePositionalNumbers) {
       argv = self._parsePositionalNumbers(argv)
     }
-    return argv;
+    return argv
   }
 
   // to simplify the parsing of positionals in commands,
@@ -1398,7 +1398,7 @@ function Yargs (processArgs: string | string[] = [], cwd = shim.process.cwd(), p
   // This allows commands to configure number parsing on a positional by
   // positional basis:
   self._parsePositionalNumbers = function (argv: Arguments): any {
-    const args: (string | number)[] = argv['--'] ? argv['--'] : argv['_']
+    const args: (string | number)[] = argv['--'] ? argv['--'] : argv._
 
     for (let i = 0, arg; (arg = args[i]) !== undefined; i++) {
       if (shim.Parser.looksLikeNumber(arg) && Number.isSafeInteger(Math.floor(parseFloat(`${arg}`)))) {
