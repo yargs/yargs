@@ -1799,7 +1799,7 @@ describe('yargs dsl tests', () => {
       argv.noBaz.should.equal(2)
     })
 
-    it.only('supports --unknown-options-as-args', () => {
+    it('supports --unknown-options-as-args', () => {
       const argv = yargs('--foo.bar 1 --no-baz 2')
         .parserConfiguration({ 'unknown-options-as-args': true })
         .parse()
