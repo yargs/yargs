@@ -269,11 +269,11 @@ can either move your module to a different directory or use the `exclude` or
 
 - `include`: RegExp or function
 
-    Whitelist certain modules. See [`require-directory` whitelisting](https://www.npmjs.com/package/require-directory#whitelisting) for details.
+    Allow list certain modules. See [`require-directory`](https://www.npmjs.com/package/require-directory) for details.
 
 - `exclude`: RegExp or function
 
-    Blacklist certain modules. See [`require-directory` blacklisting](https://www.npmjs.com/package/require-directory#blacklisting) for details.
+    Block list certain modules. See [`require-directory`](https://www.npmjs.com/package/require-directory) for details.
 
 ### Example command hierarchy using `.commandDir()`
 

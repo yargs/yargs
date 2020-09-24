@@ -249,9 +249,9 @@ Apply command modules from a directory relative to the module calling this metho
 `commandObject`, `pathToFile`, and `filename` as arguments. Returns `commandObject` 
 to include the command; any falsy value to exclude/skip it.
 
-`include`: Whitelist certain modules. See [`require-directory` whitelisting](https://www.npmjs.com/package/require-directory#whitelisting) for details.
+`include`: Allow list certain modules. See [`require-directory`](https://www.npmjs.com/package/require-directory) for details.
 
-`exclude`: Blacklist certain modules. See [`require-directory` blacklisting](https://www.npmjs.com/package/require-directory#blacklisting) for details.
+`exclude`: Block list certain modules. See [`require-directory`](https://www.npmjs.com/package/require-directory) for details.
 
 <a name="command"></a>
 .command(cmd, desc, [builder], [handler])
