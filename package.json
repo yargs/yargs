@@ -1,6 +1,6 @@
 {
   "name": "yargs",
-  "version": "16.0.1",
+  "version": "16.0.3",
   "description": "yargs the modern, pirate-themed, successor to optimist.",
   "main": "./index.cjs",
   "exports": {
@@ -12,11 +12,11 @@
       "import": "./helpers.mjs"
     },
     "./yargs": {
-      "require": "./yargs.cjs"
+      "require": "./yargs"
     }
   },
   "type": "module",
-  "module": "./build/index.mjs",
+  "module": "./index.mjs",
   "contributors": [
     {
       "name": "Yargs Contributors",
@@ -28,7 +28,7 @@
     "index.cjs",
     "helpers.mjs",
     "index.mjs",
-    "yargs.cjs",
+    "yargs",
     "build",
     "locales",
     "LICENSE",
@@ -42,7 +42,7 @@
     "require-directory": "^2.1.1",
     "string-width": "^4.2.0",
     "y18n": "^5.0.1",
-    "yargs-parser": "^19.0.4"
+    "yargs-parser": "^20.2.0"
   },
   "devDependencies": {
     "@types/chai": "^4.2.11",

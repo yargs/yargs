@@ -952,6 +952,16 @@ describe('validation tests', () => {
         })
         .parse()
     })
+
+    // See: https://github.com/yargs/yargs/issues/1732
+    it('treats positionals in "--" towards count requirement', () => {
+      const argv = yargs('--cool man -- batman robin')
+        .demandCommand(2)
+        .fail((msg) => {
+          throw Error(msg)
+        })
+        .parse()
+    })
   })
 
   describe('strictCommands', () => {

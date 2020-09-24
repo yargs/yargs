@@ -7,7 +7,8 @@ This document is the Yargs API reference. There are more documentation files in
 - [Examples](https://github.com/yargs/yargs/blob/master/docs/examples.md)
 - [Advanced Topics](https://github.com/yargs/yargs/blob/master/docs/advanced.md)
 - [TypeScript usage examples](https://github.com/yargs/yargs/blob/master/docs/typescript.md)
-- [Webpack usage examples](https://github.com/yargs/yargs/blob/master/docs/webpack.md)
+- [Browser usage example](https://github.com/yargs/yargs/blob/master/docs/browser.md)
+- [Bundling](https://github.com/yargs/yargs/blob/master/docs/bundling.md)
 - [Parsing Tricks](https://github.com/yargs/yargs/blob/master/docs/tricks.md)
 
 API reference
@@ -1191,6 +1192,7 @@ Valid `opt` keys include:
 - `default`: value, set a default value for the option, see [`default()`](#default)
 - `defaultDescription`: string, use this description for the default value in help content, see [`default()`](#default)
 - `demandOption`: boolean or string, demand the option be given, with optional error message, see [`demandOption()`](#demandOption)
+- `deprecate`/`deprecated`: boolean or string, mark option as deprecated, see [`deprecateOption()`](#deprecateOption)
 - `desc`/`describe`/`description`: string, the option description for help content, see [`describe()`](#describe)
 - `global`: boolean, indicate that this key should not be [reset](#reset) when a command is invoked, see [`global()`](#global)
 - `group`: string, when displaying usage instructions place the option under an alternative group heading, see [`group()`](#group)

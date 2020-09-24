@@ -221,7 +221,7 @@ export function command (
       // to simplify the parsing of positionals in commands,
       // we temporarily populate '--' rather than _, with arguments
       const populateDoubleDash = !!yargs.getOptions().configuration['populate--']
-      if (!populateDoubleDash) yargs._copyDoubleDash(innerArgv)
+      yargs._postProcess(innerArgv, populateDoubleDash)
 
       innerArgv = applyMiddleware(innerArgv, yargs, middlewares, false)
       let handlerResult

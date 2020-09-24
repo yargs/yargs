@@ -2,8 +2,8 @@
 
 const {describe, it} = require('mocha')
 const assert = require('assert')
-const yargs = require('../yargs.cjs');
-const { applyExtends } = require('../yargs.cjs');
+const yargs = require('../yargs');
+const { applyExtends } = require('../yargs');
 
 const HELPER_COUNT = 2;
 

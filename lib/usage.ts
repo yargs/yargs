@@ -4,7 +4,7 @@ import { Dictionary, assertNotStrictEqual, PlatformShim, Y18N } from './typings/
 import { objFilter } from './utils/obj-filter.js'
 import { YargsInstance, Arguments } from './yargs-factory.js'
 import { YError } from './yerror.js'
-import { DetailedArguments } from 'yargs-parser/build/lib/yargs-parser-types.js'
+import { DetailedArguments } from './typings/yargs-parser-types.js'
 import setBlocking from './utils/set-blocking.js'
 
 export function usage (yargs: YargsInstance, y18n: Y18N, shim: PlatformShim) {

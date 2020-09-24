@@ -4,7 +4,7 @@ import { levenshtein as distance } from './utils/levenshtein.js'
 import { objFilter } from './utils/obj-filter.js'
 import { UsageInstance } from './usage.js'
 import { YargsInstance, Arguments } from './yargs-factory.js'
-import { DetailedArguments } from 'yargs-parser/build/lib/yargs-parser-types.js'
+import { DetailedArguments } from './typings/yargs-parser-types.js'
 
 const specialKeys = ['$0', '--', '_']
 
@@ -20,7 +20,8 @@ export function validation (yargs: YargsInstance, usage: UsageInstance, y18n: Y1
   self.nonOptionCount = function nonOptionCount (argv) {
     const demandedCommands = yargs.getDemandedCommands()
     // don't count currently executing commands
-    const _s = argv._.length - yargs.getContext().commands.length
+    const positionalCount = argv._.length + (argv['--'] ? argv['--'].length : 0)
+    const _s = positionalCount - yargs.getContext().commands.length
 
     if (demandedCommands._ && (_s < demandedCommands._.min || _s > demandedCommands._.max)) {
       if (_s < demandedCommands._.min) {
