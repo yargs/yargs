@@ -21,7 +21,7 @@ Yargs helps you build interactive command line tools, by parsing arguments and g
 It gives you:
 
 * commands and (grouped) options (`my-program.js serve --port=5000`).
-* a dynamically generated help menu based on your arguments.
+* a dynamically generated help menu based on your arguments:
 
 ```bash
 mocha [spec..]
@@ -31,6 +31,11 @@ Run tests with Mocha
 Commands
   mocha inspect [spec..]  Run tests with Mocha                         [default]
   mocha init <path>       create a client-side Mocha setup at <path>
+
+Rules & Behavior
+  --allow-uncaught           Allow uncaught errors to propagate        [boolean]
+  --async-only, -A           Require all tests to use a callback (async) or
+                             return a Promise                          [boolean]
 ```
 
 * bash-completion shortcuts for commands and options.
