@@ -1124,6 +1124,23 @@ var argv = require('yargs')
   .argv
 ```
 
+.onFinishCommand([handler])
+------------
+
+Called after the completion of any command. `handler` is invoked with the
+result returned by the command:
+
+```js
+yargs(process.argv.slice(2))
+    .command('cmd', 'a command', () => {}, async () => {
+        await this.model.find()
+        return Promise.resolve('result value')
+    })
+    .onFinishCommand(async (resultValue) => {
+        await this.db.disconnect()
+    }).argv
+```
+
 <a name="option"></a>.option(key, [opt])
 -----------------
 <a name="options"></a>.options(key, [opt])
@@ -1210,23 +1227,6 @@ Valid `opt` keys include:
     - `'count'`: synonymous for `count: true`, see [`count()`](#count)
     - `'number'`: synonymous for `number: true`, see [`number()`](#number)
     - `'string'`: synonymous for `string: true`, see [`string()`](#string)
-
-.onFinishCommand([handler])
-------------
-
-Called after the completion of any command. `handler` is invoked with the
-result returned by the command:
-
-```js
-yargs(process.argv.slice(2))
-    .command('cmd', 'a command', () => {}, async () => {
-        await this.model.find()
-        return Promise.resolve('result value')
-    })
-    .onFinishCommand(async (resultValue) => {
-        await this.db.disconnect()
-    }).argv
-```
 
 .parse([args], [context], [parseCallback])
 ------------
