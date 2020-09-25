@@ -453,15 +453,14 @@ for detailed documentation of this feature.
 ## Command finish hook
 ### Example
 ```js
-yargs
-    .command('cmd', ..., async () => {
+yargs(process.argv.slice(2))
+    .command('cmd', 'a command', () => {}, async () => {
         await this.model.find()
         return Promise.resolve('result value')
     })
     .onFinishCommand(async (resultValue) => {
         await this.db.disconnect()
-        process.exit()
-    }).argv;
+    }).argv
 ```
 
 ## Middleware
