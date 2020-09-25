@@ -23,7 +23,15 @@ It gives you:
 * commands and (grouped) options (`my-program.js serve --port=5000`).
 * a dynamically generated help menu based on your arguments.
 
-> <img width="400" src="https://raw.githubusercontent.com/yargs/yargs/master/screen.png">
+```bash
+mocha [spec..]
+
+Run tests with Mocha
+
+Commands
+  mocha inspect [spec..]  Run tests with Mocha                         [default]
+  mocha init <path>       create a client-side Mocha setup at <path>
+```
 
 * bash-completion shortcuts for commands and options.
 * and [tons more](/docs/api.md).
