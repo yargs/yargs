@@ -9,7 +9,8 @@
       "require": "./index.cjs"
     },
     "./helpers": {
-      "import": "./helpers.mjs"
+      "import": "./helpers.mjs",
+      "require": "./yargs"
     },
     "./yargs": {
       "require": "./yargs"

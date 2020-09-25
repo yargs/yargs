@@ -46,7 +46,9 @@ npm i yargs@next
 
 ```javascript
 #!/usr/bin/env node
-const {argv} = require('yargs')
+const yargs = require('yargs/yargs')
+const { hideBin } = require('yargs/helpers')
+const argv = yargs(hideBin(process.argv)).argv
 
 if (argv.ships > 3 && argv.distance < 53.5) {
   console.log('Plunder more riffiwobbles!')
@@ -67,7 +69,10 @@ Retreat from the xupptumblers!
 
 ```javascript
 #!/usr/bin/env node
-require('yargs') // eslint-disable-line
+const yargs = require('yargs/yargs')
+const { hideBin } = require('yargs/helpers')
+
+yargs(hideBin(process.argv))
   .command('serve [port]', 'start the server', (yargs) => {
     yargs
       .positional('port', {
@@ -108,7 +113,7 @@ As of `v16`, `yargs` supports [Deno](https://github.com/denoland/deno):
 import yargs from 'https://deno.land/x/yargs/deno.ts'
 import { Arguments, YargsType } from 'https://deno.land/x/yargs/types.ts'
 
-yargs()
+yargs(Deno.args)
   .command('download <files...>', 'download a list of files', (yargs: YargsType) => {
     return yargs.positional('files', {
       describe: 'a list of files to do something with'
@@ -118,7 +123,7 @@ yargs()
   })
   .strictCommands()
   .demandCommand(1)
-  .parse(Deno.args)
+  .argv
 ```
 
 ### ESM

@@ -5,7 +5,7 @@ const assert = require('assert')
 const yargs = require('../yargs');
 const { applyExtends } = require('../yargs');
 
-const HELPER_COUNT = 2;
+const HELPER_COUNT = 3;
 
 describe('helpers', () => {
   it('does not expose additional helpers beyond blessed list', () => {
@@ -22,6 +22,12 @@ describe('helpers', () => {
     it('exposes functional argument parser', () => {
       const argv = yargs.Parser('--foo --bar=99')
       assert.strictEqual(argv.bar, 99)
+    })
+  })
+  describe('hideBin', () => {
+    it('exposes helper for hiding node bin', () => {
+      const argv = yargs.hideBin(['node', 'foo.js', '--hello'])
+      assert.deepStrictEqual(argv, ['--hello'])
     })
   })
 })

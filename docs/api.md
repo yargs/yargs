@@ -18,25 +18,25 @@ You can run Yargs without any configuration, and it will do its
 best to parse `process.argv`:
 
 ```javascript
-require('yargs').argv
+require('yargs/yargs')(process.argv.slice(2)).argv
 ```
 
 You can also pass in the arguments yourself:
 
 ```javascript
-require('yargs')([ '-x', '1', '-y', '2' ]).argv
+require('yargs/yargs')([ '-x', '1', '-y', '2' ]).argv
 ```
 
 or use `.parse()` to do the same thing:
 
 ```javascript
-require('yargs').parse([ '-x', '1', '-y', '2' ])
+require('yargs/yargs')().parse([ '-x', '1', '-y', '2' ])
 ```
 
 Calling `.parse()` with no arguments is equivalent to calling `yargs.argv`:
 
 ```javascript
-require('yargs').parse()
+require('yargs')(process.argv.slice(2)).parse()
 ```
 
 When passing in the arguments yourself, note that Yargs expects the passed array
@@ -46,6 +46,14 @@ usually starts with extra elements. For example, [Node’s
 starts with two extra elements:`process.execPath` and the path to the JavaScript
 file being executed. So if you’re getting your arguments from `process.argv` in
 Node, pass `process.argv.slice(2)` to Yargs.
+
+_Note: yargs exposes the helper `hideBin`, handles the `process.argv.slice
+logic for you._
+
+```javascript
+const { hideBin } = require('yargs/helpers')
+const argv = yargs(hideBin(process.argv)).argv
+```
 
 The rest of these methods below come in just before the terminating `.argv` or
 terminating `.parse()`.
