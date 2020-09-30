@@ -1,7 +1,7 @@
 // expose types for the benefit of Deno.
-import { YargsInstance as YargsType, Arguments } from './build/lib/yargs-factory.d.ts'
+import type { YargsInstance as YargsType, Arguments } from './build/lib/yargs-factory.d.ts'
 
-export {
+export type {
   Arguments,
   YargsType
 }
