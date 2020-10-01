@@ -1,7 +1,7 @@
 /* global describe, it */
 const { argsert } = require('../build/index.cjs')
 const { checkOutput } = require('./helpers/utils.cjs')
-const { should } = require('chai')
+const { expect, should } = require('chai')
 
 should()
 
@@ -163,5 +163,16 @@ describe('Argsert', () => {
     })
 
     o.warnings.length.should.equal(0)
+  })
+
+  // See: https://github.com/yargs/yargs/issues/1666
+  it('should throw on warnings, when under test', () => {
+    function foo (...args) {
+      argsert('<*>', [].slice.call(args))
+    }
+
+    expect(() => {
+      foo('bar', undefined, undefined, 33)
+    }).to.throw();
   })
 })

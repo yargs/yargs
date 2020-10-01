@@ -7,7 +7,8 @@ This document is the Yargs API reference. There are more documentation files in
 - [Examples](https://github.com/yargs/yargs/blob/master/docs/examples.md)
 - [Advanced Topics](https://github.com/yargs/yargs/blob/master/docs/advanced.md)
 - [TypeScript usage examples](https://github.com/yargs/yargs/blob/master/docs/typescript.md)
-- [Webpack usage examples](https://github.com/yargs/yargs/blob/master/docs/webpack.md)
+- [Browser usage example](https://github.com/yargs/yargs/blob/master/docs/browser.md)
+- [Bundling](https://github.com/yargs/yargs/blob/master/docs/bundling.md)
 - [Parsing Tricks](https://github.com/yargs/yargs/blob/master/docs/tricks.md)
 
 API reference
@@ -248,9 +249,9 @@ Apply command modules from a directory relative to the module calling this metho
 `commandObject`, `pathToFile`, and `filename` as arguments. Returns `commandObject` 
 to include the command; any falsy value to exclude/skip it.
 
-`include`: Whitelist certain modules. See [`require-directory` whitelisting](https://www.npmjs.com/package/require-directory#whitelisting) for details.
+`include`: Allow list certain modules. See [`require-directory`](https://www.npmjs.com/package/require-directory) for details.
 
-`exclude`: Blacklist certain modules. See [`require-directory` blacklisting](https://www.npmjs.com/package/require-directory#blacklisting) for details.
+`exclude`: Block list certain modules. See [`require-directory`](https://www.npmjs.com/package/require-directory) for details.
 
 <a name="command"></a>
 .command(cmd, desc, [builder], [handler])
@@ -1123,6 +1124,23 @@ var argv = require('yargs')
   .argv
 ```
 
+.onFinishCommand([handler])
+------------
+
+Called after the completion of any command. `handler` is invoked with the
+result returned by the command:
+
+```js
+yargs(process.argv.slice(2))
+    .command('cmd', 'a command', () => {}, async () => {
+        await this.model.find()
+        return Promise.resolve('result value')
+    })
+    .onFinishCommand(async (resultValue) => {
+        await this.db.disconnect()
+    }).argv
+```
+
 <a name="option"></a>.option(key, [opt])
 -----------------
 <a name="options"></a>.options(key, [opt])
@@ -1191,6 +1209,7 @@ Valid `opt` keys include:
 - `default`: value, set a default value for the option, see [`default()`](#default)
 - `defaultDescription`: string, use this description for the default value in help content, see [`default()`](#default)
 - `demandOption`: boolean or string, demand the option be given, with optional error message, see [`demandOption()`](#demandOption)
+- `deprecate`/`deprecated`: boolean or string, mark option as deprecated, see [`deprecateOption()`](#deprecateOption)
 - `desc`/`describe`/`description`: string, the option description for help content, see [`describe()`](#describe)
 - `global`: boolean, indicate that this key should not be [reset](#reset) when a command is invoked, see [`global()`](#global)
 - `group`: string, when displaying usage instructions place the option under an alternative group heading, see [`group()`](#group)
