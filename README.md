@@ -23,7 +23,7 @@ It gives you:
 * commands and (grouped) options (`my-program.js serve --port=5000`).
 * a dynamically generated help menu based on your arguments:
 
-```bash
+```
 mocha [spec..]
 
 Run tests with Mocha
