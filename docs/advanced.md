@@ -542,5 +542,5 @@ To use yargs without running as a singleton, do:
 const argv = require('yargs/yargs')(process.argv.slice(2))
 ```
 
-We recommend using this approach by default, as the singleton interface is
+We recommend using this approach by default, as the singleton interface (`require('yargs')`) is
 considered deprecated as of `v16`.
