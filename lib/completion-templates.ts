@@ -1,5 +1,4 @@
-export const completionShTemplate =
-`###-begin-{{app_name}}-completions-###
+export const completionShTemplate = `###-begin-{{app_name}}-completions-###
 #
 # yargs command completion script
 #
@@ -27,7 +26,7 @@ _yargs_completions()
 }
 complete -o default -F _yargs_completions {{app_name}}
 ###-end-{{app_name}}-completions-###
-`
+`;
 
 export const completionZshTemplate = `###-begin-{{app_name}}-completions-###
 #
@@ -46,4 +45,4 @@ _{{app_name}}_yargs_completions()
 }
 compdef _{{app_name}}_yargs_completions {{app_name}}
 ###-end-{{app_name}}-completions-###
-`
+`;
