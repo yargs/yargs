@@ -54,9 +54,7 @@
   "devDependencies": {
     "@types/chai": "^4.2.11",
     "@types/mocha": "^8.0.0",
-    "@types/node": "^14.0.27",
-    "@typescript-eslint/eslint-plugin": "^3.0.0",
-    "@typescript-eslint/parser": "^3.0.0",
+    "@types/node": "^14.11.2",
     "@wessberg/rollup-plugin-ts": "^1.3.2",
     "c8": "^7.0.0",
     "chai": "^4.2.0",
@@ -65,9 +63,6 @@
     "cpr": "^3.0.1",
     "cross-env": "^7.0.2",
     "cross-spawn": "^7.0.0",
-    "eslint": "^6.8.0",
-    "eslint-plugin-import": "^2.20.1",
-    "eslint-plugin-node": "^11.0.0",
     "gts": "^3.0.0",
     "hashish": "0.0.4",
     "mocha": "^8.0.0",
@@ -80,8 +75,8 @@
     "yargs-test-extends": "^1.0.1"
   },
   "scripts": {
-    "check": "standardx './*.ts' && standardx '**/*.ts'",
-    "fix": "standardx --fix './*.ts'  && standardx --fix '**/*.ts'",
+    "fix": "gts fix && npm run fix:js", 
+    "fix:js": "standardx --fix '**/*.mjs' && standardx --fix '**/*.cjs' && standardx --fix './*.mjs' && standardx --fix './*.cjs'",
     "posttest": "npm run check",
     "test": "c8 mocha ./test/*.cjs --require ./test/before.cjs --timeout=12000 --check-leaks",
     "test:esm": "c8 mocha ./test/esm/*.mjs --check-leaks",
@@ -91,7 +86,10 @@
     "compile": "rimraf build && tsc",
     "postcompile": "npm run build:cjs",
     "build:cjs": "rollup -c rollup.config.cjs",
-    "postbuild:cjs": "rimraf ./build/index.cjs.d.ts"
+    "postbuild:cjs": "rimraf ./build/index.cjs.d.ts",
+    "check": "gts lint && npm run check:js",
+    "check:js": "standardx '**/*.mjs' && standardx '**/*.cjs' && standardx './*.mjs' && standardx './*.cjs'",
+    "clean": "gts clean"
   },
   "repository": {
     "type": "git",
@@ -101,7 +99,8 @@
   "standardx": {
     "ignore": [
       "build",
-      "**/example/**"
+      "**/example/**",
+      "**/platform-shims/esm.mjs"
     ]
   },
   "keywords": [

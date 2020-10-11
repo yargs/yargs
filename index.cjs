@@ -1,17 +1,17 @@
-'use strict'
+'use strict';
 // classic singleton yargs API, to use yargs
 // without running as a singleton do:
 // require('yargs/yargs')(process.argv.slice(2))
-const { Yargs, processArgv } = require('./build/index.cjs')
+const {Yargs, processArgv} = require('./build/index.cjs');
 
-Argv(processArgv.hideBin(process.argv))
+Argv(processArgv.hideBin(process.argv));
 
-module.exports = Argv
+module.exports = Argv;
 
-function Argv (processArgs, cwd) {
-  const argv = Yargs(processArgs, cwd, require)
-  singletonify(argv)
-  return argv
+function Argv(processArgs, cwd) {
+  const argv = Yargs(processArgs, cwd, require);
+  singletonify(argv);
+  return argv;
 }
 
 /*  Hack an instance of Argv with process.argv into Argv
@@ -21,19 +21,19 @@ function Argv (processArgs, cwd) {
     require('yargs').argv
     to get a parsed version of process.argv.
 */
-function singletonify (inst) {
-  Object.keys(inst).forEach((key) => {
+function singletonify(inst) {
+  Object.keys(inst).forEach(key => {
     if (key === 'argv') {
-      Argv.__defineGetter__(key, inst.__lookupGetter__(key))
+      Argv.__defineGetter__(key, inst.__lookupGetter__(key));
     } else if (typeof inst[key] === 'function') {
-      Argv[key] = inst[key].bind(inst)
+      Argv[key] = inst[key].bind(inst);
     } else {
       Argv.__defineGetter__('$0', () => {
-        return inst.$0
-      })
+        return inst.$0;
+      });
       Argv.__defineGetter__('parsed', () => {
-        return inst.parsed
-      })
+        return inst.parsed;
+      });
     }
-  })
+  });
 }
