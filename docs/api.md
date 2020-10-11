@@ -33,7 +33,7 @@ or use `.parse()` to do the same thing:
 require('yargs/yargs')().parse([ '-x', '1', '-y', '2' ])
 ```
 
-Calling `.parse()` with no arguments is equivalent to calling `yargs.argv`:
+Calling `.parse()` with no arguments is equivalent to calling `.argv`:
 
 ```javascript
 require('yargs/yargs')(process.argv.slice(2)).parse()
