@@ -36,7 +36,7 @@ require('yargs/yargs')().parse([ '-x', '1', '-y', '2' ])
 Calling `.parse()` with no arguments is equivalent to calling `yargs.argv`:
 
 ```javascript
-require('yargs')(process.argv.slice(2)).parse()
+require('yargs/yargs')(process.argv.slice(2)).parse()
 ```
 
 When passing in the arguments yourself, note that Yargs expects the passed array
