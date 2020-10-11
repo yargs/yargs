@@ -11,7 +11,7 @@ plunder.js:
 
 ```javascript
 #!/usr/bin/env node
-var argv = require('yargs').argv;
+var argv = require('yargs/yargs')(process.argv.slice(2)).argv;
 
 if (argv.ships > 3 && argv.distance < 53.5) {
     console.log('Plunder more riffiwobbles!');
@@ -35,7 +35,7 @@ short.js:
 
 ```javascript
 #!/usr/bin/env node
-var argv = require('yargs').argv;
+var argv = require('yargs/yargs')(process.argv.slice(2)).argv;
 console.log('(%d,%d)', argv.x, argv.y);
 ```
 
@@ -51,7 +51,7 @@ bool.js:
 
 ```javascript
 #!/usr/bin/env node
-var argv = require('yargs').argv;
+var argv = require('yargs/yargs')(process.argv.slice(2)).argv;
 
 if (argv.s) {
     process.stdout.write(argv.fr ? 'Le perroquet dit: ' : 'The parrot says: ');
@@ -79,7 +79,7 @@ nonopt.js:
 
 ```javascript
 #!/usr/bin/env node
-var argv = require('yargs').argv;
+var argv = require('yargs/yargs')(process.argv.slice(2)).argv;
 console.log('(%d,%d)', argv.x, argv.y);
 console.log(argv._);
 ```
@@ -101,7 +101,7 @@ count.js:
 
 ```javascript
 #!/usr/bin/env node
-var argv = require('yargs')
+var argv = require('yargs/yargs')(process.argv.slice(2))
     .count('verbose')
     .alias('v', 'verbose')
     .argv;
@@ -142,7 +142,7 @@ area.js:
 
 ```javascript
 #!/usr/bin/env node
-var argv = require('yargs')
+var argv = require('yargs/yargs')(process.argv.slice(2))
     .usage('Usage: $0 -w [num] -h [num]')
     .demandOption(['w','h'])
     .argv;
@@ -171,7 +171,7 @@ demand_count.js:
 
 ```javascript
 #!/usr/bin/env node
-var argv = require('yargs')
+var argv = require('yargs/yargs')(process.argv.slice(2))
     .demandCommand(2)
     .argv;
 console.dir(argv);
@@ -196,7 +196,7 @@ default_singles.js:
 
 ```javascript
 #!/usr/bin/env node
-var argv = require('yargs')
+var argv = require('yargs/yargs')(process.argv.slice(2))
     .default('x', 10)
     .default('y', 10)
     .argv
@@ -213,7 +213,7 @@ default_hash.js:
 
 ```javascript
 #!/usr/bin/env node
-var argv = require('yargs')
+var argv = require('yargs/yargs')(process.argv.slice(2))
     .default({ x : 10, y : 10 })
     .argv
 ;
@@ -232,7 +232,7 @@ boolean_single.js:
 
 ```javascript
 #!/usr/bin/env node
-var argv = require('yargs')
+var argv = require('yargs/yargs')(process.argv.slice(2))
     .boolean(['r','v'])
     .argv
 ;
@@ -251,7 +251,7 @@ boolean_double.js:
 
 ```javascript
 #!/usr/bin/env node
-var argv = require('yargs')
+var argv = require('yargs/yargs')(process.argv.slice(2))
     .boolean(['x','y','z'])
     .argv
 ;
@@ -275,7 +275,7 @@ line_count.js:
 
 ```javascript
 #!/usr/bin/env node
-var argv = require('yargs')
+var argv = require('yargs/yargs')(process.argv.slice(2))
     .usage('Usage: $0 <command> [options]')
     .command('count', 'Count the lines in a file')
     .example('$0 count -f foo.js', 'count the lines in the given file')
