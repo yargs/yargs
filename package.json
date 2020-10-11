@@ -4,16 +4,22 @@
   "description": "yargs the modern, pirate-themed, successor to optimist.",
   "main": "./index.cjs",
   "exports": {
-    ".": {
-      "import": "./index.mjs",
-      "require": "./index.cjs"
-    },
+    ".": [
+      {
+        "import": "./index.mjs",
+        "require": "./index.cjs"
+      },
+      "./index.cjs"
+    ],
     "./helpers": {
       "import": "./helpers.mjs"
     },
-    "./yargs": {
-      "require": "./yargs"
-    }
+    "./yargs": [
+      {
+        "require": "./yargs"
+      },
+      "./yargs"
+    ]
   },
   "type": "module",
   "module": "./index.mjs",
