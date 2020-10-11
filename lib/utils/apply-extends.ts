@@ -19,19 +19,14 @@ export function applyExtends(
     if (!isPath) {
       try {
         pathToDefault = require.resolve(config.extends);
-      } catch (err) {
-        // most likely this simply isn't a module.
+      } catch (_err) {
+        // maybe the module uses key for some other reason,
+        // err on side of caution.
+        return config;
       }
     } else {
       pathToDefault = getPathToDefaultConfig(cwd, config.extends);
     }
-    // maybe the module uses key for some other reason,
-    // err on side of caution.
-    if (!pathToDefault && !isPath) return config;
-    if (!pathToDefault)
-      throw new YError(
-        `Unable to find extended config '${config.extends}' in '${cwd}'.`
-      );
 
     checkForCircularExtends(pathToDefault);
 
