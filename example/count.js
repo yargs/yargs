@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-var argv = require('yargs')
+var argv = require('yargs/yargs')(process.argv.slice(2))
     .count('verbose')
     .alias('v', 'verbose')
     .argv;

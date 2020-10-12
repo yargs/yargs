@@ -21,9 +21,22 @@ Yargs helps you build interactive command line tools, by parsing arguments and g
 It gives you:
 
 * commands and (grouped) options (`my-program.js serve --port=5000`).
-* a dynamically generated help menu based on your arguments.
+* a dynamically generated help menu based on your arguments:
 
-> <img width="400" src="https://raw.githubusercontent.com/yargs/yargs/master/screen.png">
+```
+mocha [spec..]
+
+Run tests with Mocha
+
+Commands
+  mocha inspect [spec..]  Run tests with Mocha                         [default]
+  mocha init <path>       create a client-side Mocha setup at <path>
+
+Rules & Behavior
+  --allow-uncaught           Allow uncaught errors to propagate        [boolean]
+  --async-only, -A           Require all tests to use a callback (async) or
+                             return a Promise                          [boolean]
+```
 
 * bash-completion shortcuts for commands and options.
 * and [tons more](/docs/api.md).
@@ -46,7 +59,9 @@ npm i yargs@next
 
 ```javascript
 #!/usr/bin/env node
-const {argv} = require('yargs')
+const yargs = require('yargs/yargs')
+const { hideBin } = require('yargs/helpers')
+const argv = yargs(hideBin(process.argv)).argv
 
 if (argv.ships > 3 && argv.distance < 53.5) {
   console.log('Plunder more riffiwobbles!')
@@ -67,7 +82,10 @@ Retreat from the xupptumblers!
 
 ```javascript
 #!/usr/bin/env node
-require('yargs') // eslint-disable-line
+const yargs = require('yargs/yargs')
+const { hideBin } = require('yargs/helpers')
+
+yargs(hideBin(process.argv))
   .command('serve [port]', 'start the server', (yargs) => {
     yargs
       .positional('port', {
@@ -108,7 +126,7 @@ As of `v16`, `yargs` supports [Deno](https://github.com/denoland/deno):
 import yargs from 'https://deno.land/x/yargs/deno.ts'
 import { Arguments, YargsType } from 'https://deno.land/x/yargs/types.ts'
 
-yargs()
+yargs(Deno.args)
   .command('download <files...>', 'download a list of files', (yargs: YargsType) => {
     return yargs.positional('files', {
       describe: 'a list of files to do something with'
@@ -118,7 +136,7 @@ yargs()
   })
   .strictCommands()
   .demandCommand(1)
-  .parse(Deno.args)
+  .argv
 ```
 
 ### ESM

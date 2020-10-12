@@ -1,4 +1,4 @@
-var yargs = require('yargs');
+var yargs = require('yargs/yargs')(process.argv.slice(2));
 
 var argv = yargs.usage('This is my awesome program', {
   'about': {

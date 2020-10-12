@@ -14,7 +14,7 @@ commands. tldr; default commands allow you to define the entry point to your
 application using a similar API to subcommands.
 
 ```js
-const argv = require('yargs')
+const argv = require('yargs/yargs')(process.argv.slice(2))
   .command('$0', 'the default command', () => {}, (argv) => {
     console.log('this command will be run by default')
   })
@@ -27,7 +27,7 @@ is run with `./my-cli.js --x=22`.
 Default commands can also be used as a command alias, like so:
 
 ```js
-const argv = require('yargs')
+const argv = require('yargs/yargs')(process.argv.slice(2))
   .command(['serve', '$0'], 'the serve command', () => {}, (argv) => {
     console.log('this command will be run by default')
   })
@@ -124,7 +124,7 @@ line, the command will be executed.
 
 ```js
 #!/usr/bin/env node
-require('yargs')
+require('yargs/yargs')(process.argv.slice(2))
   .command(['start [app]', 'run', 'up'], 'Start up an app', {}, (argv) => {
     console.log('starting up the', argv.app || 'default', 'app')
   })
@@ -305,7 +305,7 @@ cli.js:
 
 ```js
 #!/usr/bin/env node
-require('yargs')
+require('yargs/yargs')(process.argv.slice(2))
   .commandDir('cmds')
   .demandCommand()
   .help()
@@ -383,7 +383,7 @@ const findUp = require('find-up')
 const fs = require('fs')
 const configPath = findUp.sync(['.myapprc', '.myapprc.json'])
 const config = configPath ? JSON.parse(fs.readFileSync(configPath)) : {}
-const argv = require('yargs')
+const argv = require('yargs/yargs')(process.argv.slice(2))
   .config(config)
   .argv
 ```
@@ -411,7 +411,7 @@ Yargs gives you this functionality using the [`pkgConf()`](/docs/api.md#config)
 method:
 
 ```js
-const argv = require('yargs')
+const argv = require('yargs/yargs')(process.argv.slice(2))
   .pkgConf('nyc')
   .argv
 ```
@@ -521,7 +521,7 @@ yargs.middleware(normalizeCredentials)
 #### yargs parsing configuration
 
 ```js
-var argv = require('yargs')
+var argv = require('yargs/yargs')(process.argv.slice(2))
   .usage('Usage: $0 <command> [options]')
   .command('login', 'Authenticate user', (yargs) =>{
         return yargs.option('username')
@@ -533,12 +533,3 @@ var argv = require('yargs')
      )
   .argv;
 ```
-
-### Using the non-singleton interface
-
-To use yargs without running as a singleton, do:
-```js
-const argv = require('yargs/yargs')(process.argv.slice(2))
-```
-
-This is especially useful when using yargs in a library, as library authors should not pollute the global state.

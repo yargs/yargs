@@ -16,9 +16,9 @@ If you are targetting Node.js with your bundle, we recommend using
 Given a CommonJS file, **index.js**:
 
 ```js
-const yargs = require('yargs')
+const yargs = require('yargs/yargs')
 const chalk = require('chalk')
-yargs
+require('yargs/yargs')(process.argv.slice(2))
   .option('awesome-opt', {
     describe: `my awesome ${chalk.green('option')}`
   })
@@ -32,9 +32,9 @@ You can simply run: `ncc build index.js`.
 Given a CommonJS file, **index.js**:
 
 ```js
-const yargs = require('yargs')
+const yargs = require('yargs/yargs')
 const chalk = require('chalk')
-yargs
+require('yargs/yargs')(process.argv.slice(2))
   .option('awesome-opt', {
     describe: `my awesome ${chalk.green('option')}`
   })
