@@ -403,7 +403,7 @@ export function validation(
 
   self.conflicting = function conflictingFn(argv) {
     Object.keys(argv).forEach(key => {
-      if (conflicting[key]) {
+      if (conflicting[key] && conflicting.hasOwnProperty(key)) {
         conflicting[key].forEach(value => {
           // we default keys to 'undefined' that have been configured, we should not
           // apply conflicting check unless they are a value other than 'undefined'.
