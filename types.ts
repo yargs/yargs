@@ -1,7 +1,11 @@
-// expose types for the benefit of Deno.
-import type {
-  YargsInstance as YargsType,
-  Arguments,
-} from './build/lib/yargs-factory.d.ts';
+declare type ArgsOutput = (string | number)[];
 
-export type {Arguments, YargsType};
+// TODO(bcoe): attempt to get the types for YargsInstance working again.
+export interface Arguments {
+  /** Non-option arguments */
+  _: ArgsOutput;
+  /** Arguments after the end-of-options flag `--` */
+  '--'?: ArgsOutput;
+  /** All remaining options */
+  [argName: string]: any;
+}
