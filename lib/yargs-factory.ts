@@ -14,17 +14,19 @@ import {
   command as Command,
   CommandHandlerDefinition,
 } from './command.js';
-import {
+import type {
   Dictionary,
-  assertNotStrictEqual,
   KeyOf,
   DictionaryKeyof,
   ValueOf,
-  objectKeys,
-  assertSingleKey,
   RequireDirectoryOptions,
   PlatformShim,
   RequireType,
+} from './typings/common-types.js';
+import {
+  assertNotStrictEqual,
+  assertSingleKey,
+  objectKeys,
 } from './typings/common-types.js';
 import {
   ArgsOutput,
