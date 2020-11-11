@@ -34,7 +34,7 @@
     "browser.mjs",
     "index.cjs",
     "helpers.mjs",
-    "helpers.js",
+    "helpers",
     "index.mjs",
     "yargs",
     "build",
