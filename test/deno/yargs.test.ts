@@ -5,7 +5,7 @@ import {
   assertMatch
 } from 'https://deno.land/std/testing/asserts.ts'
 import yargs from '../../deno.ts'
-import { Arguments } from '../../types.ts'
+import { Arguments } from '../../deno-types.ts'
 
 Deno.test('demandCommand(1) throw error if no command provided', () => {
   let err: Error|null = null
