@@ -12,8 +12,8 @@
       "./index.cjs"
     ],
     "./helpers": {
-      "import": "./helpers.mjs",
-      "require": "./yargs"
+      "import": "./helpers/helpers.mjs",
+      "require": "./helpers/index.js"
     },
     "./yargs": [
       {
@@ -33,7 +33,8 @@
   "files": [
     "browser.mjs",
     "index.cjs",
-    "helpers.mjs",
+    "helpers/*.js",
+    "helpers/*",
     "index.mjs",
     "yargs",
     "build",
@@ -99,6 +100,7 @@
   "standardx": {
     "ignore": [
       "build",
+      "helpers",
       "**/example/**",
       "**/platform-shims/esm.mjs"
     ]

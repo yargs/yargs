@@ -11,9 +11,9 @@ import {
   posix,
 } from 'https://deno.land/std/path/mod.ts';
 
-import cliui from 'https://deno.land/x/cliui@v7.0.0-deno/deno.ts';
+import cliui from 'https://deno.land/x/cliui@v7.0.4-deno/deno.ts';
 import escalade from 'https://deno.land/x/escalade@v3.0.3/sync.ts';
-import Parser from 'https://deno.land/x/yargs_parser@v20.2.0-deno/deno.ts';
+import Parser from 'https://deno.land/x/yargs_parser@v20.2.4-deno/deno.ts';
 import y18n from 'https://deno.land/x/y18n@v5.0.0-deno/deno.ts';
 import {YError} from '../../build/lib/yerror.js';
 
