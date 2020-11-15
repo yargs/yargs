@@ -1,10 +1,9 @@
-// TODO: remove this file once Node 10 is EOL:
 const {
   applyExtends,
   cjsPlatformShim,
   Parser,
   processArgv,
-} = require('./build/index.cjs');
+} = require('../build/index.cjs');
 
 module.exports = {
   applyExtends: (config, cwd, mergeExtends) => {

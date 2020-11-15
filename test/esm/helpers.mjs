@@ -1,7 +1,7 @@
 'use strict';
 
 import * as assert from 'assert';
-import {applyExtends, hideBin, Parser} from '../../helpers.mjs';
+import {applyExtends, hideBin, Parser} from '../../helpers/helpers.mjs';
 import {describe, it} from 'mocha';
 
 describe('helpers', () => {
