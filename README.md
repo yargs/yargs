@@ -124,7 +124,7 @@ As of `v16`, `yargs` supports [Deno](https://github.com/denoland/deno):
 
 ```typescript
 import yargs from 'https://deno.land/x/yargs/deno.ts'
-import { Arguments } from 'https://deno.land/x/yargs/types.ts'
+import { Arguments } from 'https://deno.land/x/yargs/deno-types.ts'
 
 yargs(Deno.args)
   .command('download <files...>', 'download a list of files', (yargs: any) => {
