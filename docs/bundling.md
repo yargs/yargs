@@ -10,7 +10,7 @@ Newer releases of yargs can run directly in modern browsers, take a look at
 
 ## ncc
 
-If you are targetting Node.js with your bundle, we recommend using
+If you are targeting Node.js with your bundle, we recommend using
 [`@vercel/ncc`](https://www.npmjs.com/package/@vercel/ncc).
 
 Given a CommonJS file, **index.js**:
