@@ -1,6 +1,6 @@
 # Running yargs in the browser
 
-Newer versions of yargs have a `./browser.mjs` entrypoint, which can be used
+Newer versions of yargs have a `./browser.mjs` entry point, which can be used
 through a CDN like [unpkg.com](https://unpkg.com/) to load yargs directly in
 the browser:
 

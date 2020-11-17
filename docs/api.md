@@ -807,7 +807,7 @@ error message when this promise rejects
 <a name="exit"></a>.exit(code, err)
 ---------
 Manually indicate that the program should exit, and provide context about why we
-wanted to exit. Follows the behaviour set by `.exitProcess()`.
+wanted to exit. Follows the behavior set by `.exitProcess()`.
 
 <a name="fail"></a>.fail(fn)
 ---------
@@ -816,7 +816,7 @@ Method to execute when a failure occurs, rather than printing the failure messag
 
 `fn` is called with the failure message that would have been printed, the
 `Error` instance originally thrown and yargs state when the failure
-occured.
+occurred.
 
 ```js
 var argv = require('yargs/yargs')(process.argv.slice(2))
@@ -1308,7 +1308,7 @@ for details of this object
 
 For additional configuration options, see [yargs-parser's configuration](https://github.com/yargs/yargs-parser#configuration).
 
-_Note: configuraton should be top level keys on the `obj` passed to `parserConfiguration`, not populated under the configuration key, as in `yargs-parser`._
+_Note: configuration should be top level keys on the `obj` passed to `parserConfiguration`, not populated under the configuration key, as in `yargs-parser`._
 
 <a name="pkg-conf"></a>
 .pkgConf(key, [cwd])
