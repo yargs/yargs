@@ -1140,6 +1140,23 @@ describe('usage tests', () => {
       r.should.have.property('logs').with.length(0);
       r.should.have.property('exit', false);
     });
+
+    it('should not fail when key in option is object dot-path', () => {
+      const r = checkUsage(() => {
+        return yargs('--obj.path 10')
+            .usage('Usage: $0 [options]')
+            .option('obj.path')
+            .strict()
+            .parse();
+      });
+
+      r.should.have.property('result');
+      r.result.should.have.deep.property('obj', { path: 10 });
+      r.result.should.have.property('_').with.length(0);
+      r.should.have.property('errors').with.length(0);
+      r.should.have.property('logs').with.length(0);
+      r.should.have.property('exit', false);
+    })
   });
 
   it('should display example on fail', () => {
