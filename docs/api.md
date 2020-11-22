@@ -1087,6 +1087,39 @@ require('yargs/yargs')(process.argv.slice(2))
   .parse()
 ```
 
+_Example: Using middleware to apply a transformation on argv after `choices` have
+been enforced ([see #756](https://github.com/yargs/yargs/issues/756)):_
+
+```js
+require('yargs')
+  .command('$0', 'accept username', () => {}, (argv) => {
+    // The middleware will have been applied before the default
+    // command is called:
+    console.info(argv);
+  })
+  .choices('user', ['Goofy', 'Miky'])
+  .middleware(argv => {
+    console.info('gots here');
+    const user = argv.user;
+    switch (user) {
+      case 'Goofy':
+        argv.user = {
+          firstName: 'Mark',
+          lastName: 'Pipe',
+        };
+        break;
+      case 'Miky':
+        argv.user = {
+          firstName: 'Elon',
+          lastName: 'Stone',
+        };
+        break;
+    }
+    return argv;
+  })
+  .parse('--user Miky');
+```
+
 <a name="nargs"></a>.nargs(key, count)
 -----------
 
