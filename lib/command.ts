@@ -26,6 +26,7 @@ import {
 import whichModule from './utils/which-module.js';
 
 const DEFAULT_MARKER = /(^\*)|(^\$0)/;
+export type HandlerArrayItem = string | CommandHandlerDefinition;
 
 // handles parsing positional arguments,
 // and populating argv with said positional
@@ -43,7 +44,7 @@ export function command(
   let defaultCommand: CommandHandler | undefined;
 
   self.addHandler = function addHandler(
-    cmd: string | string[] | CommandHandlerDefinition,
+    cmd: string | CommandHandlerDefinition | HandlerArrayItem[],
     description?: string | false,
     builder?: CommandBuilder | CommandBuilderDefinition,
     handler?: CommandHandlerCallback,
@@ -54,10 +55,19 @@ export function command(
     const middlewares = commandMiddlewareFactory(commandMiddleware);
     handler = handler || (() => {});
 
-    if (Array.isArray(cmd)) {
-      aliases = cmd.slice(1);
+    // If an array is provided that is all CommandHandlerDefinitions, add
+    // each handler individually:
+    if (Array.isArray(cmd) && !cmd.find(c => typeof c === 'string')) {
+      for (const command of cmd) {
+        self.addHandler(command);
+      }
+    } else if (Array.isArray(cmd)) {
+      // Assume the array is a cmd, followed by aliases, if the array contains
+      // any strings [cmd, 'alias1', 'alias2']:
+      aliases = cmd.slice(1) as string[];
       cmd = cmd[0];
     } else if (isCommandHandlerDefinition(cmd)) {
+      // An object was provided rather than individual parameters:
       let command =
         Array.isArray(cmd.command) || typeof cmd.command === 'string'
           ? cmd.command
@@ -75,10 +85,10 @@ export function command(
       return;
     }
 
-    // allow a module to be provided instead of separate builder and handler
+    // Allow a module to be provided as builder, rather than function:
     if (isCommandBuilderDefinition(builder)) {
       self.addHandler(
-        [cmd].concat(aliases),
+        [cmd].concat(aliases) as HandlerArrayItem[],
         description,
         builder.builder,
         builder.handler,
@@ -88,53 +98,57 @@ export function command(
       return;
     }
 
-    // parse positionals out of cmd string
-    const parsedCommand = parseCommand(cmd);
+    // The 'cmd' provided was a string, we apply the command DSL:
+    // https://github.com/yargs/yargs/blob/master/docs/advanced.md#advanced-topics
+    if (typeof cmd === 'string') {
+      // parse positionals out of cmd string
+      const parsedCommand = parseCommand(cmd);
 
-    // remove positional args from aliases only
-    aliases = aliases.map(alias => parseCommand(alias).cmd);
+      // remove positional args from aliases only
+      aliases = aliases.map(alias => parseCommand(alias).cmd);
 
-    // check for default and filter out '*''
-    let isDefault = false;
-    const parsedAliases = [parsedCommand.cmd].concat(aliases).filter(c => {
-      if (DEFAULT_MARKER.test(c)) {
-        isDefault = true;
-        return false;
+      // check for default and filter out '*'
+      let isDefault = false;
+      const parsedAliases = [parsedCommand.cmd].concat(aliases).filter(c => {
+        if (DEFAULT_MARKER.test(c)) {
+          isDefault = true;
+          return false;
+        }
+        return true;
+      });
+
+      // standardize on $0 for default command.
+      if (parsedAliases.length === 0 && isDefault) parsedAliases.push('$0');
+
+      // shift cmd and aliases after filtering out '*'
+      if (isDefault) {
+        parsedCommand.cmd = parsedAliases[0];
+        aliases = parsedAliases.slice(1);
+        cmd = cmd.replace(DEFAULT_MARKER, parsedCommand.cmd);
       }
-      return true;
-    });
 
-    // standardize on $0 for default command.
-    if (parsedAliases.length === 0 && isDefault) parsedAliases.push('$0');
+      // populate aliasMap
+      aliases.forEach(alias => {
+        aliasMap[alias] = parsedCommand.cmd;
+      });
 
-    // shift cmd and aliases after filtering out '*'
-    if (isDefault) {
-      parsedCommand.cmd = parsedAliases[0];
-      aliases = parsedAliases.slice(1);
-      cmd = cmd.replace(DEFAULT_MARKER, parsedCommand.cmd);
+      if (description !== false) {
+        usage.command(cmd, description, isDefault, aliases, deprecated);
+      }
+
+      handlers[parsedCommand.cmd] = {
+        original: cmd,
+        description,
+        handler,
+        builder: builder || {},
+        middlewares,
+        deprecated,
+        demanded: parsedCommand.demanded,
+        optional: parsedCommand.optional,
+      };
+
+      if (isDefault) defaultCommand = handlers[parsedCommand.cmd];
     }
-
-    // populate aliasMap
-    aliases.forEach(alias => {
-      aliasMap[alias] = parsedCommand.cmd;
-    });
-
-    if (description !== false) {
-      usage.command(cmd, description, isDefault, aliases, deprecated);
-    }
-
-    handlers[parsedCommand.cmd] = {
-      original: cmd,
-      description,
-      handler,
-      builder: builder || {},
-      middlewares,
-      deprecated,
-      demanded: parsedCommand.demanded,
-      optional: parsedCommand.optional,
-    };
-
-    if (isDefault) defaultCommand = handlers[parsedCommand.cmd];
   };
 
   self.addDirectory = function addDirectory(
@@ -555,7 +569,7 @@ export interface CommandInstance {
     opts?: RequireDirectoryOptions
   ): void;
   addHandler(
-    cmd: string | string[] | CommandHandlerDefinition,
+    cmd: string | CommandHandlerDefinition | HandlerArrayItem[],
     description?: CommandHandler['description'],
     builder?: CommandBuilderDefinition | CommandBuilder,
     handler?: CommandHandlerCallback,

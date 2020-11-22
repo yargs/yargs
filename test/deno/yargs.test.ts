@@ -6,6 +6,7 @@ import {
 } from 'https://deno.land/std/testing/asserts.ts'
 import yargs from '../../deno.ts'
 import { Arguments } from '../../deno-types.ts'
+import { commands } from '../esm/fixtures/commands/index.mjs'
 
 Deno.test('demandCommand(1) throw error if no command provided', () => {
   let err: Error|null = null
@@ -37,4 +38,12 @@ Deno.test('does not drop .0 if positional is configured as string', async () => 
       })
     }).parse() as Arguments
   assertEquals(argv.str, '33.0')
+})
+
+Deno.test('hierarchy of commands', async () => {
+  const context = {
+    output: {value: 0},
+  };
+  yargs().command(commands).parse('a c 10 5', context);
+  assertEquals(context.output.value, 15);
 })
