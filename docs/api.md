@@ -1087,8 +1087,8 @@ require('yargs/yargs')(process.argv.slice(2))
   .parse()
 ```
 
-_Example: Using middleware to apply a transformation on argv after `choices` have
-been enforced ([see #756](https://github.com/yargs/yargs/issues/756)):_
+Example, Using middleware to apply a transformation on argv after `choices` have
+been enforced ([see #756](https://github.com/yargs/yargs/issues/756)):
 
 ```js
 require('yargs')
