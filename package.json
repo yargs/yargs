@@ -4,6 +4,7 @@
   "description": "yargs the modern, pirate-themed, successor to optimist.",
   "main": "./index.cjs",
   "exports": {
+    "./package.json": "./package.json",
     ".": [
       {
         "import": "./index.mjs",
