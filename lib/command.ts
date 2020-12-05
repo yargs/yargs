@@ -81,10 +81,8 @@ export function command(
         cmd.deprecated
       );
       return;
-    }
-
-    // Allow a module to be provided as builder, rather than function:
-    if (isCommandBuilderDefinition(builder) && isDefinitionOrCommandName(cmd)) {
+    } else if (isCommandBuilderDefinition(builder)) {
+      // Allow a module to be provided as builder, rather than function:
       self.addHandler(
         [cmd].concat(aliases),
         description,
@@ -671,16 +669,6 @@ export function isCommandHandlerDefinition(
   cmd: DefinitionOrCommandName | [DefinitionOrCommandName, ...string[]]
 ): cmd is CommandHandlerDefinition {
   return typeof cmd === 'object' && !Array.isArray(cmd);
-}
-
-function isDefinitionOrCommandName(
-  cmd: DefinitionOrCommandName | [DefinitionOrCommandName, ...string[]]
-): cmd is DefinitionOrCommandName {
-  if (typeof cmd === 'string' || isCommandHandlerDefinition(cmd)) {
-    return true;
-  } else {
-    return false;
-  }
 }
 
 interface Positionals extends Pick<Options, 'alias' | 'array' | 'default'> {
