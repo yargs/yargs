@@ -233,6 +233,8 @@ This example uses [jest](https://github.com/facebook/jest) as a test runner, but
 .commandDir(directory, [opts])
 ------------------------------
 
+_Note: `commandDir()` does not work with ESM or Deno, see [hierarchy using index.mjs](/docs/advanced.md#esm-hierarchy) for an example of building a complex nested CLI using ESM._
+
 Apply command modules from a directory relative to the module calling this method.
 
 This allows you to organize multiple commands into their own modules under a
@@ -358,6 +360,38 @@ exports.builder = {}
 exports.handler = function (argv) {
   console.log('pruning remotes %s', [].concat(argv.name).concat(argv.names).join(', '))
 }
+```
+
+<a name="esm-hierarchy"></a>
+### Example command hierarchy using index.mjs
+
+To support creating a complex nested CLI when using ESM, the method
+`.command()` was extended to accept an array of command modules.
+Rather than using `.commandDir()`, create an `index.mjs` in each command
+directory with a list of the commands:
+
+cmds/index.mjs:
+
+```js
+import * as a from './init.mjs';
+import * as b from './remote.mjs';
+export const commands = [a, b];
+```
+
+This index will then be imported and registered with your CLI:
+
+cli.js:
+
+```js
+#!/usr/bin/env node
+
+import yargs from 'yargs';
+import { hideBin } from 'yargs/helpers';
+import { commands } from './cmds/index.mjs';
+
+yargs(hideBin(process.argv))
+  .command(commands)
+  .argv;
 ```
 
 <a name="configuration"></a>

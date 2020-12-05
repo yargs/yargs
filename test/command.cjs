@@ -1832,4 +1832,32 @@ describe('Command', () => {
     const argv = yargs.command('$0 <phone>', '', yargs => {}).parse('+5550100');
     argv.phone.should.equal('+5550100');
   });
+
+  it('allows an array of commands to be provided', () => {
+    const innerCommands = [
+      {
+        command: 'c <x> <y>',
+        describe: 'add x to y',
+        builder: () => {},
+        handler: argv => {
+          argv.output.value = argv.x + argv.y;
+        },
+      },
+    ];
+    const cmds = [
+      {
+        command: 'a',
+        describe: 'numeric comamand',
+        builder: yargs => {
+          yargs.command(innerCommands);
+        },
+        handler: () => {},
+      },
+    ];
+    const context = {
+      output: {},
+    };
+    yargs().command(cmds).parse('a c 10 5', context);
+    context.output.value.should.equal(15);
+  });
 });

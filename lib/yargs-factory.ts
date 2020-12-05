@@ -5,14 +5,15 @@
 // Works by accepting a shim which shims methods that contain platform
 // specific logic.
 import {
+  command as Command,
   CommandInstance,
   CommandHandler,
   CommandBuilderDefinition,
   CommandBuilder,
   CommandHandlerCallback,
-  FinishCommandHandler,
-  command as Command,
   CommandHandlerDefinition,
+  FinishCommandHandler,
+  DefinitionOrCommandName,
 } from './command.js';
 import type {
   Dictionary,
@@ -655,7 +656,7 @@ function Yargs(
   };
 
   self.command = function (
-    cmd: string | string[] | CommandHandlerDefinition,
+    cmd: string | CommandHandlerDefinition | DefinitionOrCommandName[],
     description?: CommandHandler['description'],
     builder?: CommandBuilderDefinition | CommandBuilder,
     handler?: CommandHandlerCallback,

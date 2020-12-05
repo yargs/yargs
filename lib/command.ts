@@ -26,6 +26,7 @@ import {
 import whichModule from './utils/which-module.js';
 
 const DEFAULT_MARKER = /(^\*)|(^\$0)/;
+export type DefinitionOrCommandName = string | CommandHandlerDefinition;
 
 // handles parsing positional arguments,
 // and populating argv with said positional
@@ -43,9 +44,9 @@ export function command(
   let defaultCommand: CommandHandler | undefined;
 
   self.addHandler = function addHandler(
-    cmd: string | string[] | CommandHandlerDefinition,
+    cmd: DefinitionOrCommandName | [DefinitionOrCommandName, ...string[]],
     description?: string | false,
-    builder?: CommandBuilder | CommandBuilderDefinition,
+    builder?: CommandBuilder,
     handler?: CommandHandlerCallback,
     commandMiddleware?: Middleware[],
     deprecated?: boolean
@@ -54,9 +55,16 @@ export function command(
     const middlewares = commandMiddlewareFactory(commandMiddleware);
     handler = handler || (() => {});
 
+    // If an array is provided that is all CommandHandlerDefinitions, add
+    // each handler individually:
     if (Array.isArray(cmd)) {
-      aliases = cmd.slice(1);
-      cmd = cmd[0];
+      if (isCommandAndAliases(cmd)) {
+        [cmd, ...aliases] = cmd;
+      } else {
+        for (const command of cmd) {
+          self.addHandler(command);
+        }
+      }
     } else if (isCommandHandlerDefinition(cmd)) {
       let command =
         Array.isArray(cmd.command) || typeof cmd.command === 'string'
@@ -73,10 +81,8 @@ export function command(
         cmd.deprecated
       );
       return;
-    }
-
-    // allow a module to be provided instead of separate builder and handler
-    if (isCommandBuilderDefinition(builder)) {
+    } else if (isCommandBuilderDefinition(builder)) {
+      // Allow a module to be provided as builder, rather than function:
       self.addHandler(
         [cmd].concat(aliases),
         description,
@@ -88,53 +94,57 @@ export function command(
       return;
     }
 
-    // parse positionals out of cmd string
-    const parsedCommand = parseCommand(cmd);
+    // The 'cmd' provided was a string, we apply the command DSL:
+    // https://github.com/yargs/yargs/blob/master/docs/advanced.md#advanced-topics
+    if (typeof cmd === 'string') {
+      // parse positionals out of cmd string
+      const parsedCommand = parseCommand(cmd);
 
-    // remove positional args from aliases only
-    aliases = aliases.map(alias => parseCommand(alias).cmd);
+      // remove positional args from aliases only
+      aliases = aliases.map(alias => parseCommand(alias).cmd);
 
-    // check for default and filter out '*''
-    let isDefault = false;
-    const parsedAliases = [parsedCommand.cmd].concat(aliases).filter(c => {
-      if (DEFAULT_MARKER.test(c)) {
-        isDefault = true;
-        return false;
+      // check for default and filter out '*'
+      let isDefault = false;
+      const parsedAliases = [parsedCommand.cmd].concat(aliases).filter(c => {
+        if (DEFAULT_MARKER.test(c)) {
+          isDefault = true;
+          return false;
+        }
+        return true;
+      });
+
+      // standardize on $0 for default command.
+      if (parsedAliases.length === 0 && isDefault) parsedAliases.push('$0');
+
+      // shift cmd and aliases after filtering out '*'
+      if (isDefault) {
+        parsedCommand.cmd = parsedAliases[0];
+        aliases = parsedAliases.slice(1);
+        cmd = cmd.replace(DEFAULT_MARKER, parsedCommand.cmd);
       }
-      return true;
-    });
 
-    // standardize on $0 for default command.
-    if (parsedAliases.length === 0 && isDefault) parsedAliases.push('$0');
+      // populate aliasMap
+      aliases.forEach(alias => {
+        aliasMap[alias] = parsedCommand.cmd;
+      });
 
-    // shift cmd and aliases after filtering out '*'
-    if (isDefault) {
-      parsedCommand.cmd = parsedAliases[0];
-      aliases = parsedAliases.slice(1);
-      cmd = cmd.replace(DEFAULT_MARKER, parsedCommand.cmd);
+      if (description !== false) {
+        usage.command(cmd, description, isDefault, aliases, deprecated);
+      }
+
+      handlers[parsedCommand.cmd] = {
+        original: cmd,
+        description,
+        handler,
+        builder: builder || {},
+        middlewares,
+        deprecated,
+        demanded: parsedCommand.demanded,
+        optional: parsedCommand.optional,
+      };
+
+      if (isDefault) defaultCommand = handlers[parsedCommand.cmd];
     }
-
-    // populate aliasMap
-    aliases.forEach(alias => {
-      aliasMap[alias] = parsedCommand.cmd;
-    });
-
-    if (description !== false) {
-      usage.command(cmd, description, isDefault, aliases, deprecated);
-    }
-
-    handlers[parsedCommand.cmd] = {
-      original: cmd,
-      description,
-      handler,
-      builder: builder || {},
-      middlewares,
-      deprecated,
-      demanded: parsedCommand.demanded,
-      optional: parsedCommand.optional,
-    };
-
-    if (isDefault) defaultCommand = handlers[parsedCommand.cmd];
   };
 
   self.addDirectory = function addDirectory(
@@ -368,7 +378,7 @@ export function command(
     const builder = defaultCommand.builder;
     if (isCommandBuilderCallback(builder)) {
       builder(yargs);
-    } else {
+    } else if (!isCommandBuilderDefinition(builder)) {
       Object.keys(builder).forEach(key => {
         yargs.option(key, builder[key]);
       });
@@ -555,7 +565,7 @@ export interface CommandInstance {
     opts?: RequireDirectoryOptions
   ): void;
   addHandler(
-    cmd: string | string[] | CommandHandlerDefinition,
+    cmd: string | CommandHandlerDefinition | DefinitionOrCommandName[],
     description?: CommandHandler['description'],
     builder?: CommandBuilderDefinition | CommandBuilder,
     handler?: CommandHandlerCallback,
@@ -590,12 +600,6 @@ export interface CommandHandlerDefinition
   command?: string | string[];
   desc?: CommandHandler['description'];
   describe?: CommandHandler['description'];
-}
-
-export function isCommandHandlerDefinition(
-  cmd: string | string[] | CommandHandlerDefinition
-): cmd is CommandHandlerDefinition {
-  return typeof cmd === 'object';
 }
 
 export interface CommandBuilderDefinition {
@@ -639,6 +643,16 @@ interface CommandBuilderCallback {
   (y: YargsInstance): YargsInstance | void;
 }
 
+function isCommandAndAliases(
+  cmd: DefinitionOrCommandName[]
+): cmd is [CommandHandlerDefinition, ...string[]] {
+  if (cmd.every(c => typeof c === 'string')) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
 export function isCommandBuilderCallback(
   builder: CommandBuilder
 ): builder is CommandBuilderCallback {
@@ -649,6 +663,12 @@ function isCommandBuilderOptionDefinitions(
   builder: CommandBuilder
 ): builder is Dictionary<OptionDefinition> {
   return typeof builder === 'object';
+}
+
+export function isCommandHandlerDefinition(
+  cmd: DefinitionOrCommandName | [DefinitionOrCommandName, ...string[]]
+): cmd is CommandHandlerDefinition {
+  return typeof cmd === 'object' && !Array.isArray(cmd);
 }
 
 interface Positionals extends Pick<Options, 'alias' | 'array' | 'default'> {

@@ -3,6 +3,9 @@
 import * as assert from 'assert';
 import yargs from '../../index.mjs';
 
+// Example of composing hierarchical commands when using ESM:
+import {commands} from './fixtures/commands/index.mjs';
+
 describe('ESM', () => {
   describe('parser', () => {
     it('parses process.argv by default', () => {
@@ -33,6 +36,22 @@ describe('ESM', () => {
         })
         .parse();
       assert.strictEqual(argv.str, '33.0');
+    });
+  });
+  describe('hierarchy of commands', () => {
+    it('allows array of commands to be registered', () => {
+      const context = {
+        output: {},
+      };
+      yargs().command(commands).parse('b hello world!', context);
+      assert.strictEqual(context.output.text, 'hello world!');
+    });
+    it('allows array of subcommands to be registered', () => {
+      const context = {
+        output: {},
+      };
+      yargs().command(commands).parse('a d 10 5', context);
+      assert.strictEqual(context.output.value, 50);
     });
   });
 });
