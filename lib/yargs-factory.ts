@@ -13,7 +13,7 @@ import {
   CommandHandlerCallback,
   CommandHandlerDefinition,
   FinishCommandHandler,
-  HandlerArrayItem,
+  DefinitionOrCommandName,
 } from './command.js';
 import type {
   Dictionary,
@@ -656,7 +656,7 @@ function Yargs(
   };
 
   self.command = function (
-    cmd: string | CommandHandlerDefinition | HandlerArrayItem[],
+    cmd: string | CommandHandlerDefinition | DefinitionOrCommandName[],
     description?: CommandHandler['description'],
     builder?: CommandBuilderDefinition | CommandBuilder,
     handler?: CommandHandlerCallback,

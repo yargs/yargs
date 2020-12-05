@@ -26,7 +26,7 @@ import {
 import whichModule from './utils/which-module.js';
 
 const DEFAULT_MARKER = /(^\*)|(^\$0)/;
-export type HandlerArrayItem = string | CommandHandlerDefinition;
+export type DefinitionOrCommandName = string | CommandHandlerDefinition;
 
 // handles parsing positional arguments,
 // and populating argv with said positional
@@ -44,9 +44,9 @@ export function command(
   let defaultCommand: CommandHandler | undefined;
 
   self.addHandler = function addHandler(
-    cmd: string | CommandHandlerDefinition | HandlerArrayItem[],
+    cmd: DefinitionOrCommandName | [DefinitionOrCommandName, ...string[]],
     description?: string | false,
-    builder?: CommandBuilder | CommandBuilderDefinition,
+    builder?: CommandBuilder,
     handler?: CommandHandlerCallback,
     commandMiddleware?: Middleware[],
     deprecated?: boolean
@@ -58,8 +58,8 @@ export function command(
     // If an array is provided that is all CommandHandlerDefinitions, add
     // each handler individually:
     if (Array.isArray(cmd)) {
-      if (cmd.every(c => typeof c === 'string')) {
-        ([cmd, aliases] = cmd);
+      if (isCommandAndAliases(cmd)) {
+        [cmd, ...aliases] = cmd;
       } else {
         for (const command of cmd) {
           self.addHandler(command);
@@ -84,9 +84,9 @@ export function command(
     }
 
     // Allow a module to be provided as builder, rather than function:
-    if (isCommandBuilderDefinition(builder)) {
+    if (isCommandBuilderDefinition(builder) && isDefinitionOrCommandName(cmd)) {
       self.addHandler(
-        [cmd].concat(aliases) as HandlerArrayItem[],
+        [cmd].concat(aliases),
         description,
         builder.builder,
         builder.handler,
@@ -380,7 +380,7 @@ export function command(
     const builder = defaultCommand.builder;
     if (isCommandBuilderCallback(builder)) {
       builder(yargs);
-    } else {
+    } else if (!isCommandBuilderDefinition(builder)) {
       Object.keys(builder).forEach(key => {
         yargs.option(key, builder[key]);
       });
@@ -567,7 +567,7 @@ export interface CommandInstance {
     opts?: RequireDirectoryOptions
   ): void;
   addHandler(
-    cmd: string | CommandHandlerDefinition | HandlerArrayItem[],
+    cmd: string | CommandHandlerDefinition | DefinitionOrCommandName[],
     description?: CommandHandler['description'],
     builder?: CommandBuilderDefinition | CommandBuilder,
     handler?: CommandHandlerCallback,
@@ -602,12 +602,6 @@ export interface CommandHandlerDefinition
   command?: string | string[];
   desc?: CommandHandler['description'];
   describe?: CommandHandler['description'];
-}
-
-export function isCommandHandlerDefinition(
-  cmd: string | string[] | CommandHandlerDefinition
-): cmd is CommandHandlerDefinition {
-  return typeof cmd === 'object';
 }
 
 export interface CommandBuilderDefinition {
@@ -651,6 +645,16 @@ interface CommandBuilderCallback {
   (y: YargsInstance): YargsInstance | void;
 }
 
+function isCommandAndAliases(
+  cmd: DefinitionOrCommandName[]
+): cmd is [CommandHandlerDefinition, ...string[]] {
+  if (cmd.every(c => typeof c === 'string')) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
 export function isCommandBuilderCallback(
   builder: CommandBuilder
 ): builder is CommandBuilderCallback {
@@ -661,6 +665,22 @@ function isCommandBuilderOptionDefinitions(
   builder: CommandBuilder
 ): builder is Dictionary<OptionDefinition> {
   return typeof builder === 'object';
+}
+
+export function isCommandHandlerDefinition(
+  cmd: DefinitionOrCommandName | [DefinitionOrCommandName, ...string[]]
+): cmd is CommandHandlerDefinition {
+  return typeof cmd === 'object' && !Array.isArray(cmd);
+}
+
+function isDefinitionOrCommandName(
+  cmd: DefinitionOrCommandName | [DefinitionOrCommandName, ...string[]]
+): cmd is DefinitionOrCommandName {
+  if (typeof cmd === 'string' || isCommandHandlerDefinition(cmd)) {
+    return true;
+  } else {
+    return false;
+  }
 }
 
 interface Positionals extends Pick<Options, 'alias' | 'array' | 'default'> {
