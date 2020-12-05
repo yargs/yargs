@@ -57,17 +57,15 @@ export function command(
 
     // If an array is provided that is all CommandHandlerDefinitions, add
     // each handler individually:
-    if (Array.isArray(cmd) && !cmd.find(c => typeof c === 'string')) {
-      for (const command of cmd) {
-        self.addHandler(command);
+    if (Array.isArray(cmd)) {
+      if (cmd.every(c => typeof c === 'string')) {
+        ([cmd, aliases] = cmd);
+      } else {
+        for (const command of cmd) {
+          self.addHandler(command);
+        }
       }
-    } else if (Array.isArray(cmd)) {
-      // Assume the array is a cmd, followed by aliases, if the array contains
-      // any strings [cmd, 'alias1', 'alias2']:
-      aliases = cmd.slice(1) as string[];
-      cmd = cmd[0];
     } else if (isCommandHandlerDefinition(cmd)) {
-      // An object was provided rather than individual parameters:
       let command =
         Array.isArray(cmd.command) || typeof cmd.command === 'string'
           ? cmd.command
