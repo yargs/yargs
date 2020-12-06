@@ -2441,46 +2441,6 @@ describe('yargs dsl tests', () => {
     argv['--'].should.eql(['foo']);
   });
 
-  describe('onFinishCommand', () => {
-    it('use with promise', done => {
-      const result = 'noop-result';
-      let calledTimes = 0;
-      yargs(['noop'])
-        .command('noop', 'a noop command', noop, async () => {
-          return result;
-        })
-        .onFinishCommand(async commandResult => {
-          commandResult.should.eql(result);
-          calledTimes++;
-        })
-        .parse('noop');
-
-      setTimeout(() => {
-        calledTimes.should.eql(1);
-        done();
-      }, 5);
-    });
-
-    it('use without promise', done => {
-      const result = 'noop-result';
-      let calledTimes = 0;
-      yargs(['noop'])
-        .command('noop', 'a noop command', noop, () => {
-          return result;
-        })
-        .onFinishCommand(commandResult => {
-          commandResult.should.eql(result);
-          calledTimes++;
-        })
-        .parse('noop');
-
-      setTimeout(() => {
-        calledTimes.should.eql(1);
-        done();
-      }, 5);
-    });
-  });
-
   // See: https://github.com/yargs/yargs/issues/1098
   it('should allow array and requires arg to be used in conjunction', () => {
     const argv = yargs(['-i', 'item1', 'item2', 'item3']).option('i', {
@@ -2695,3 +2655,45 @@ describe('yargs dsl tests', () => {
     });
   });
 });
+
+/*
+  describe('asyncParse', () => {
+    it('use with promise', done => {
+      const result = 'noop-result';
+      let calledTimes = 0;
+      yargs(['noop'])
+        .command('noop', 'a noop command', noop, async () => {
+          return result;
+        })
+        .onFinishCommand(async commandResult => {
+          commandResult.should.eql(result);
+          calledTimes++;
+        })
+        .parse('noop');
+
+      setTimeout(() => {
+        calledTimes.should.eql(1);
+        done();
+      }, 5);
+    });
+
+    it('use without promise', done => {
+      const result = 'noop-result';
+      let calledTimes = 0;
+      yargs(['noop'])
+        .command('noop', 'a noop command', noop, () => {
+          return result;
+        })
+        .onFinishCommand(commandResult => {
+          commandResult.should.eql(result);
+          calledTimes++;
+        })
+        .parse('noop');
+
+      setTimeout(() => {
+        calledTimes.should.eql(1);
+        done();
+      }, 5);
+    });
+  });
+*/

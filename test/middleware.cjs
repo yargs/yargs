@@ -138,6 +138,8 @@ describe('middleware', () => {
         .parse();
     });
 
+    // TODO(bcoe): add test for middleware rejecting, when using promise form.
+
     it('calls the command handler when all middleware promises resolve', done => {
       const middleware = (key, value) => () =>
         new Promise((resolve, reject) => {

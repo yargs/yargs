@@ -1765,30 +1765,29 @@ describe('Command', () => {
         .parse();
     });
 
-    it('succeeds when the promise returned by the command handler resolves', done => {
+    it('returns promise that resolves arguments once handler succeeds', async () => {
+      let complete = false;
       const handler = new Promise((resolve, reject) => {
         setTimeout(() => {
-          return resolve(true);
-        }, 5);
+          complete = true;
+          return resolve();
+        }, 10);
       });
-      const parsed = yargs('foo hello')
+      const parsedPromise = yargs('foo hello')
         .command(
           'foo <pos>',
           'foo command',
           () => {},
-          yargs => handler
+          () => handler
         )
-        .fail((msg, err) => {
-          return done(Error('should not have been called'));
-        })
         .parse();
-
-      handler.then(called => {
-        called.should.equal(true);
-        parsed.pos.should.equal('hello');
-        return done();
-      });
+      complete.should.equal(false);
+      const parsed = await parsedPromise;
+      complete.should.equal(true);
+      parsed.pos.should.equal('hello');
     });
+
+    // TODO(bcoe): add test for handler rejecting, when using parsedPromise.
 
     // see: https://github.com/yargs/yargs/issues/1144
     it('displays error and appropriate help message when handler fails', done => {

@@ -484,19 +484,6 @@ yargs.parserConfiguration({
 See the [yargs-parser](https://github.com/yargs/yargs-parser#configuration) module
 for detailed documentation of this feature.
 
-## Command finish hook
-### Example
-```js
-yargs(process.argv.slice(2))
-    .command('cmd', 'a command', () => {}, async () => {
-        await this.model.find()
-        return Promise.resolve('result value')
-    })
-    .onFinishCommand(async (resultValue) => {
-        await this.db.disconnect()
-    }).argv
-```
-
 ## Middleware
 
 Sometimes you might want to transform arguments before they reach the command handler.

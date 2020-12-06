@@ -307,17 +307,17 @@ export function command(
         handlerResult = innerArgv.then(argv => commandHandler.handler(argv));
       } else {
         handlerResult = commandHandler.handler(innerArgv);
+        if (isPromise(handlerResult) && !isPromise(innerArgv)) {
+          const innerArgvRef = innerArgv;
+          innerArgv = handlerResult.then(() => {
+            return innerArgvRef;
+          });
+        }
       }
 
-      const handlerFinishCommand = yargs.getHandlerFinishCommand();
       if (isPromise(handlerResult)) {
         yargs.getUsageInstance().cacheHelpMessage();
         handlerResult
-          .then(value => {
-            if (handlerFinishCommand) {
-              handlerFinishCommand(value);
-            }
-          })
           .catch(error => {
             try {
               yargs.getUsageInstance().fail(null, error);
@@ -328,10 +328,6 @@ export function command(
           .then(() => {
             yargs.getUsageInstance().clearCachedHelpMessage();
           });
-      } else {
-        if (handlerFinishCommand) {
-          handlerFinishCommand(handlerResult);
-        }
       }
     }
 
@@ -680,7 +676,3 @@ type FrozenCommandInstance = {
   aliasMap: Dictionary<string>;
   defaultCommand: CommandHandler | undefined;
 };
-
-export interface FinishCommandHandler {
-  (handlerResult: any): any;
-}

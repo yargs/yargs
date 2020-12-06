@@ -12,7 +12,6 @@ import {
   CommandBuilder,
   CommandHandlerCallback,
   CommandHandlerDefinition,
-  FinishCommandHandler,
   DefinitionOrCommandName,
 } from './command.js';
 import type {
@@ -80,7 +79,6 @@ function Yargs(
   const preservedGroups: Dictionary<string[]> = {};
   let usage: UsageInstance;
   let validation: ValidationInstance;
-  let handlerFinishCommand: FinishCommandHandler | null = null;
 
   const y18n = shim.y18n;
 
@@ -278,7 +276,6 @@ function Yargs(
       parsed: self.parsed,
       parseFn,
       parseContext,
-      handlerFinishCommand,
     });
     usage.freeze();
     validation.freeze();
@@ -303,7 +300,6 @@ function Yargs(
       completionCommand,
       parseFn,
       parseContext,
-      handlerFinishCommand,
     } = frozen);
     options.configObjects = configObjects;
     usage.unfreeze();
@@ -844,14 +840,6 @@ function Yargs(
     usage.failFn(f);
     return self;
   };
-
-  self.onFinishCommand = function (f) {
-    argsert('<function>', [f], arguments.length);
-    handlerFinishCommand = f;
-    return self;
-  };
-
-  self.getHandlerFinishCommand = () => handlerFinishCommand;
 
   self.check = function (f, _global) {
     argsert('<function> [boolean]', [f, _global], arguments.length);
@@ -1894,7 +1882,6 @@ export interface YargsInstance {
   getDetectLocale(): boolean;
   getExitProcess(): boolean;
   getGroups(): Dictionary<string[]>;
-  getHandlerFinishCommand(): FinishCommandHandler | null;
   getOptions(): Options;
   getParserConfiguration(): Configuration;
   getStrict(): boolean;
@@ -1924,7 +1911,6 @@ export interface YargsInstance {
   };
   normalize(keys: string | string[]): YargsInstance;
   number(keys: string | string[]): YargsInstance;
-  onFinishCommand(f: FinishCommandHandler): YargsInstance;
   option: {
     (key: string, optionDefinition: OptionDefinition): YargsInstance;
     (keyOptionDefinitions: Dictionary<OptionDefinition>): YargsInstance;
@@ -2110,7 +2096,6 @@ interface FrozenYargsInstance {
   parsed: DetailedArguments | false;
   parseFn: ParseCallback | null;
   parseContext: object | null;
-  handlerFinishCommand: FinishCommandHandler | null;
 }
 
 interface ParseCallback {
