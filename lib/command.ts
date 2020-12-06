@@ -302,22 +302,24 @@ export function command(
       yargs._postProcess(innerArgv, populateDoubleDash);
 
       innerArgv = applyMiddleware(innerArgv, yargs, middlewares, false);
-      let handlerResult;
       if (isPromise(innerArgv)) {
-        handlerResult = innerArgv.then(argv => commandHandler.handler(argv));
+        const innerArgvRef = innerArgv;
+        innerArgv = innerArgv
+          .then(argv => commandHandler.handler(argv))
+          .then(() => innerArgvRef);
       } else {
-        handlerResult = commandHandler.handler(innerArgv);
-        if (isPromise(handlerResult) && !isPromise(innerArgv)) {
+        const handlerResult = commandHandler.handler(innerArgv);
+        if (isPromise(handlerResult)) {
           const innerArgvRef = innerArgv;
-          innerArgv = handlerResult.then(() => {
-            return innerArgvRef;
-          });
+          innerArgv = commandHandler
+            .handler(innerArgv)
+            .then(() => innerArgvRef);
         }
       }
 
-      if (isPromise(handlerResult)) {
+      if (isPromise(innerArgv)) {
         yargs.getUsageInstance().cacheHelpMessage();
-        handlerResult
+        innerArgv
           .catch(error => {
             try {
               yargs.getUsageInstance().fail(null, error);
