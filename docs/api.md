@@ -73,7 +73,7 @@ value should be a string or an array of strings.
 
 Get the arguments as a plain old object.
 
-Arguments without a corresponding flag show up in the `argv._` array. By default, elements of `argv._` that appear to be numeric will be parsed as numbers. To change this, see the `parse-positional-numbers` flag for [`parserConfiguration()`](#parserConfiguration).
+Arguments without a corresponding flag show up in the `argv._` array. Note that elements of `argv._` may be [converted to numbers](/docs/tricks.md#numbers) by default.
 
 The script name or node command is available at `argv.$0` similarly to how `$0`
 works in bash or perl.
@@ -1345,6 +1345,7 @@ yargs.parserConfiguration({
   "camel-case-expansion": true,
   "dot-notation": true,
   "parse-numbers": true,
+  "parse-positional-numbers": true,
   "boolean-negation": true,
   "deep-merge-config": false
 })
