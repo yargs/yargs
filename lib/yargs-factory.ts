@@ -1229,7 +1229,7 @@ function Yargs(
 
   self.showHelp = function (level) {
     argsert('[string|function]', [level], arguments.length);
-    if (!self.parsed) self._parseArgs(processArgs); // run parser, if it has not already been executed.
+    if (!self.parsed) self._parseArgs(processArgs, true); // run parser, if it has not already been executed.
     if (command.hasDefaultCommand()) {
       context.resets++; // override the restriction on top-level positoinals.
       command.runDefaultBuilderOn(self);
