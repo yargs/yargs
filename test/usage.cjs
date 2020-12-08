@@ -2575,13 +2575,14 @@ describe('usage tests', () => {
       r.logs[0]
         .split('\n')
         .should.deep.equal([
-          'usage',
+          'usage [command]',
           '',
-          'do something',
+          'Commands:',
+          '  usage     do something  [default]',
           '',
           'Options:',
           '      --version  Show version number  [boolean]',
-          '  -h, --help     Show help  [boolean]',
+          '  -h, --help     Show help  [boolean]'
         ]);
     });
   });
