@@ -535,10 +535,14 @@ export function usage(yargs: YargsInstance, y18n: Y18N, shim: PlatformShim) {
     (Object.keys(options.alias) || []).forEach(key => {
       options.alias[key].forEach(alias => {
         // copy descriptions.
-        if (descriptions[alias]) self.describe(key, descriptions[alias]);
+        if (descriptions[alias])
+          self.describe(key, descriptions[key] || descriptions[alias]);
         // copy demanded.
         if (alias in demandedOptions)
-          yargs.demandOption(key, demandedOptions[alias]);
+          yargs.demandOption(
+            key,
+            demandedOptions[key] || demandedOptions[alias]
+          );
         // type messages.
         if (~options.boolean.indexOf(alias)) yargs.boolean(key);
         if (~options.count.indexOf(alias)) yargs.count(key);
