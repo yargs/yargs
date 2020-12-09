@@ -1238,6 +1238,12 @@ function Yargs(
     return self;
   };
 
+  self.showVersion = function (level) {
+    argsert('[string|function]', [level], arguments.length);
+    usage.showVersion(level);
+    return self;
+  };
+
   let versionOpt: string | null = null;
   self.version = function version(
     opt?: string | false,
@@ -1594,7 +1600,7 @@ function Yargs(
             if (exitProcess) setBlocking(true);
 
             skipValidation = true;
-            usage.showVersion();
+            usage.showVersion('log');
             self.exit(0);
           }
         });
@@ -1958,6 +1964,9 @@ export interface YargsInstance {
   scriptName(scriptName: string): YargsInstance;
   showCompletionScript($0?: string, cmd?: string): YargsInstance;
   showHelp(level: 'error' | 'log' | ((message: string) => void)): YargsInstance;
+  showVersion(
+    level: 'error' | 'log' | ((message: string) => void)
+  ): YargsInstance;
   showHelpOnFail: {
     (message?: string): YargsInstance;
     (enabled: boolean, message: string): YargsInstance;

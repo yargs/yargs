@@ -656,9 +656,11 @@ export function usage(yargs: YargsInstance, y18n: Y18N, shim: PlatformShim) {
     version = ver;
   };
 
-  self.showVersion = () => {
+  self.showVersion = level => {
     const logger = yargs._getLoggerInstance();
-    logger.log(version);
+    if (!level) level = 'error';
+    const emit = typeof level === 'function' ? level : logger[level];
+    emit(version);
   };
 
   self.reset = function reset(localLookup) {
@@ -732,9 +734,9 @@ export interface UsageInstance {
   getUsageDisabled(): boolean;
   help(): string;
   reset(localLookup: Dictionary<boolean>): UsageInstance;
-  showHelp(level: 'error' | 'log' | ((message: string) => void)): void;
+  showHelp(level?: 'error' | 'log' | ((message: string) => void)): void;
   showHelpOnFail(enabled?: boolean | string, message?: string): UsageInstance;
-  showVersion(): void;
+  showVersion(level?: 'error' | 'log' | ((message: string) => void)): void;
   stringifiedValues(values?: any[], separator?: string): string;
   unfreeze(): void;
   usage(msg: string | null, description?: string | false): UsageInstance;
