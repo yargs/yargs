@@ -1,6 +1,6 @@
 # TypeScript usage examples
 
-The TypeScript definitions take into account yargs' `type` key and the prescense of
+The TypeScript definitions take into account yargs' `type` key and the presence of
 `demandOption`/`default`.
 
 The following `.options()` definition:
