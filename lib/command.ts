@@ -320,8 +320,9 @@ export function command(
         innerArgv.catch(error => {
           try {
             yargs.getUsageInstance().fail(null, error);
-          } catch (err) {
-            // fail's throwing would cause an unhandled rejection.
+          } catch (_err) {
+            // If .fail(false) is not set, and no parse cb() has been
+            // registered, run usage's default fail method.
           }
         });
       } else if (isPromise(innerArgv)) {
