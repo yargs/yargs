@@ -1382,9 +1382,18 @@ function Yargs(
     return self;
   };
 
-  self.getCompletion = function (args, done) {
-    argsert('<array> <function>', [args, done], arguments.length);
-    completion!.getCompletion(args, done);
+  self.getCompletion = async function (args, done) {
+    argsert('<array> [function]', [args, done], arguments.length);
+    if (!done) {
+      return new Promise((resolve, reject) => {
+        completion!.getCompletion(args, (err, completions) => {
+          if (err) reject(err);
+          else resolve(completions);
+        });
+      });
+    } else {
+      return completion!.getCompletion(args, done);
+    }
   };
 
   self.locale = function (locale?: string): any {
@@ -1588,11 +1597,11 @@ function Yargs(
         const completionArgs = args.slice(
           args.indexOf(`--${completion!.completionKey}`) + 1
         );
-        completion!.getCompletion(completionArgs, completions => {
+        completion!.getCompletion(completionArgs, (err, completions) => {
+          if (err) throw new YError(err.message);
           (completions || []).forEach(completion => {
             _logger.log(completion);
           });
-
           self.exit(0);
         });
         return self._postProcess(argv, !populateDoubleDash, _calledFromCommand);
@@ -1906,14 +1915,17 @@ export interface YargsInstance {
   exitProcess(enabled: boolean): YargsInstance;
   fail(f: FailureFunction | boolean): YargsInstance;
   getCommandInstance(): CommandInstance;
-  getCompletion(args: string[], done: (completions: string[]) => any): void;
+  getCompletion(
+    args: string[],
+    done?: (err: Error | null, completions: string[] | undefined) => void
+  ): Promise<string[] | void> | any;
+  getHelp(): Promise<string>;
   getContext(): Context;
   getDemandedCommands(): Options['demandedCommands'];
   getDemandedOptions(): Options['demandedOptions'];
   getDeprecatedOptions(): Options['deprecatedOptions'];
   getDetectLocale(): boolean;
   getExitProcess(): boolean;
-  getHelp(): Promise<string>;
   getGroups(): Dictionary<string[]>;
   getOptions(): Options;
   getParserConfiguration(): Configuration;

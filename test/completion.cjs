@@ -1,5 +1,5 @@
 'use strict';
-/* global describe, it, beforeEach, after */
+/* global describe, it, before, beforeEach, after */
 const checkUsage = require('./helpers/utils.cjs').checkOutput;
 const yargs = require('../index.cjs');
 
@@ -522,7 +522,7 @@ describe('Completion', () => {
             .command('foo', 'bar')
             .command('apple', 'banana')
             .completion()
-            .getCompletion([''], completions => {
+            .getCompletion([''], (_err, completions) => {
               (completions || []).forEach(completion => {
                 console.log(completion);
               });
@@ -538,7 +538,7 @@ describe('Completion', () => {
             .option('apple')
             .option('foo')
             .completion()
-            .getCompletion(['$0', '-'], completions => {
+            .getCompletion(['$0', '-'], (_err, completions) => {
               (completions || []).forEach(completion => {
                 console.log(completion);
               });
@@ -642,7 +642,7 @@ describe('Completion', () => {
             .command('foo', 'bar')
             .command('apple', 'banana')
             .completion()
-            .getCompletion([''], completions => {
+            .getCompletion([''], (_err, completions) => {
               (completions || []).forEach(completion => {
                 console.log(completion);
               });
@@ -689,6 +689,35 @@ describe('Completion', () => {
     });
   });
 
-  // TODO: add async tests for getCompletion.
-  // See: https://github.com/yargs/yargs/issues/1420
+  describe('async', () => {
+    before(() => {
+      process.env.SHELL = '/bin/bash';
+    });
+    describe('getCompletion', () => {
+      it('allows completions to be awaited', async () => {
+        const completions = await yargs()
+          .command('foo', 'bar')
+          .command('apple', 'banana')
+          .completion()
+          .getCompletion(['']);
+        completions.should.eql(['foo', 'apple', 'completion']);
+      });
+    });
+    // See: https://github.com/yargs/yargs/issues/1235
+    describe('completion', () => {
+      it('does not apply validation if async completion command provided', async () => {
+        const completions = await yargs(['--get-yargs-completions', 'foo'])
+          .command('foo <bar>', 'foo command')
+          .completion('completion', false, async () => {
+            return new Promise(resolve => {
+              setTimeout(() => {
+                return resolve(['foo', 'bar', 'apple']);
+              }, 5);
+            });
+          })
+          .getCompletion(['foo']);
+        completions.should.eql(['foo', 'bar', 'apple']);
+      });
+    });
+  });
 });

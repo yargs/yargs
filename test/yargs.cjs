@@ -21,6 +21,10 @@ describe('yargs dsl tests', () => {
   const oldProcess = {versions: {}};
 
   beforeEach(() => {
+    process.execPath = 'node';
+    process._ = 'node';
+    process.argv[1] = 'node';
+
     oldProcess.argv = process.argv;
     oldProcess.defaultApp = process.defaultApp;
     oldProcess.versions.electron = process.versions.electron;
@@ -35,17 +39,12 @@ describe('yargs dsl tests', () => {
   });
 
   it('should use bin name for $0, eliminating path', () => {
-    const originalExec = process.execPath;
     process.argv[1] = '/usr/local/bin/ndm';
     process.env._ = '/usr/local/bin/ndm';
     process.execPath = '/usr/local/bin/ndm';
     const argv = yargs([]).parse();
     argv.$0.should.equal('ndm');
     yargs.$0.should.equal('ndm');
-    // Restore env:
-    process.execPath = originalExec;
-    process._ = originalExec;
-    process.argv[1] = originalExec;
   });
 
   it('should not remove the 1st argument of bundled electron apps', () => {

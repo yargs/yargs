@@ -837,7 +837,10 @@ Allows to programmatically get completion choices for any line.
 
 `args`: An array of the words in the command line to complete.
 
-`done`: The callback to be called with the resulting completions.
+`done`: Optional callback which will be invoked with `err`, or the resulting completions.
+
+If no `done` callback is provided, `getCompletion` returns a promise that
+resolves with the completions.
 
 For example:
 
