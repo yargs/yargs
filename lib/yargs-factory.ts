@@ -1223,7 +1223,10 @@ function Yargs(
 
   self.getHelp = async function () {
     if (!usage.hasCachedHelpMessage()) {
+      // TODO(@bcoe): do we need this logic for getHelp()? what should the
+      // behavior be if you use `getHelp()` without having run the parser.
       if (!self.parsed) await self._parseArgs(processArgs); // run parser, if it has not already been executed.
+      // TODO(@bcoe): why is `hasDefaultCommand` separate from the _parseArgs step.
       if (command.hasDefaultCommand()) {
         context.resets++; // override the restriction on top-level positoinals.
         command.runDefaultBuilderOn(self);
