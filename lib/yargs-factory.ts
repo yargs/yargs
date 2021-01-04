@@ -79,6 +79,7 @@ function Yargs(
   const preservedGroups: Dictionary<string[]> = {};
   let usage: UsageInstance;
   let validation: ValidationInstance;
+  let parseCompleted = false;
 
   const y18n = shim.y18n;
 
@@ -836,7 +837,12 @@ function Yargs(
   };
 
   self.fail = function (f) {
-    argsert('<function>', [f], arguments.length);
+    argsert('<function|boolean>', [f], arguments.length);
+    if (typeof f === 'boolean' && f !== false) {
+      throw new YError(
+        "Invalid first argument. Expected function or boolean 'false'"
+      );
+    }
     usage.failFn(f);
     return self;
   };
@@ -1215,12 +1221,25 @@ function Yargs(
   };
   self.getParserConfiguration = () => parserConfig;
 
+  self.getHelp = async function () {
+    if (!usage.hasCachedHelpMessage()) {
+      if (!self.parsed) await self._parseArgs(processArgs); // run parser, if it has not already been executed.
+      if (command.hasDefaultCommand()) {
+        context.resets++; // override the restriction on top-level positoinals.
+        command.runDefaultBuilderOn(self);
+      }
+    }
+    return usage.help();
+  };
+
   self.showHelp = function (level) {
     argsert('[string|function]', [level], arguments.length);
-    if (!self.parsed) self._parseArgs(processArgs); // run parser, if it has not already been executed.
-    if (command.hasDefaultCommand()) {
-      context.resets++; // override the restriction on top-level positoinals.
-      command.runDefaultBuilderOn(self);
+    if (!usage.hasCachedHelpMessage()) {
+      if (!self.parsed) self._parseArgs(processArgs); // run parser, if it has not already been executed.
+      if (command.hasDefaultCommand()) {
+        context.resets++; // override the restriction on top-level positoinals.
+        command.runDefaultBuilderOn(self);
+      }
     }
     usage.showHelp(level);
     return self;
@@ -1445,6 +1464,14 @@ function Yargs(
     _calledFromCommand?: boolean,
     commandIndex?: number
   ) {
+    // A single yargs instance may be used multiple times, e.g.
+    // const y = yargs(); y.parse('foo --bar'); yargs.parse('bar --foo').
+    // When a prior parse has completed and a new parse is beginning, we
+    // need to clear the cached help message from the previous parse:
+    if (parseCompleted) {
+      parseCompleted = false;
+      usage.clearCachedHelpMessage();
+    }
     let skipValidation = !!_calledFromCommand;
     args = args || processArgs;
 
@@ -1615,7 +1642,7 @@ function Yargs(
   };
 
   // Applies a couple post processing steps that are easier to perform
-  // as a final step, rather than
+  // as a final step.
   self._postProcess = function (
     argv: Arguments | Promise<Arguments>,
     populateDoubleDash: boolean,
@@ -1632,6 +1659,8 @@ function Yargs(
     if (parsePositionalNumbers) {
       argv = self._parsePositionalNumbers(argv);
     }
+    // Track that the most recent parse has completed:
+    parseCompleted = true;
     return argv;
   };
 
@@ -1872,7 +1901,7 @@ export interface YargsInstance {
   ): YargsInstance;
   exit(code: number, err?: YError | string): void;
   exitProcess(enabled: boolean): YargsInstance;
-  fail(f: FailureFunction): YargsInstance;
+  fail(f: FailureFunction | boolean): YargsInstance;
   getCommandInstance(): CommandInstance;
   getCompletion(args: string[], done: (completions: string[]) => any): void;
   getContext(): Context;
@@ -1881,6 +1910,7 @@ export interface YargsInstance {
   getDeprecatedOptions(): Options['deprecatedOptions'];
   getDetectLocale(): boolean;
   getExitProcess(): boolean;
+  getHelp(): Promise<string>;
   getGroups(): Dictionary<string[]>;
   getOptions(): Options;
   getParserConfiguration(): Configuration;

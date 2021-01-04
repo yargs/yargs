@@ -311,25 +311,21 @@ export function command(
         const handlerResult = commandHandler.handler(innerArgv);
         if (isPromise(handlerResult)) {
           const innerArgvRef = innerArgv;
-          innerArgv = commandHandler
-            .handler(innerArgv)
-            .then(() => innerArgvRef);
+          innerArgv = handlerResult.then(() => innerArgvRef);
         }
       }
 
-      if (isPromise(innerArgv)) {
+      if (isPromise(innerArgv) && !yargs._hasParseCallback()) {
         yargs.getUsageInstance().cacheHelpMessage();
-        innerArgv
-          .catch(error => {
-            try {
-              yargs.getUsageInstance().fail(null, error);
-            } catch (err) {
-              // fail's throwing would cause an unhandled rejection.
-            }
-          })
-          .then(() => {
-            yargs.getUsageInstance().clearCachedHelpMessage();
-          });
+        innerArgv.catch(error => {
+          try {
+            yargs.getUsageInstance().fail(null, error);
+          } catch (err) {
+            // fail's throwing would cause an unhandled rejection.
+          }
+        });
+      } else if (isPromise(innerArgv)) {
+        yargs.getUsageInstance().cacheHelpMessage();
       }
     }
 

@@ -688,4 +688,7 @@ describe('Completion', () => {
       r.logs.should.include('of-memory:Dream about a specific memory');
     });
   });
+
+  // TODO: add async tests for getCompletion.
+  // See: https://github.com/yargs/yargs/issues/1420
 });
