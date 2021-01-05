@@ -3178,6 +3178,23 @@ describe('usage tests', () => {
         return done();
       }
     });
+    // See: https://github.com/yargs/yargs/issues/1791
+    it('should not run default command', done => {
+      let executed = false;
+      yargs.command(
+        '$0',
+        'a default command',
+        yargs => yargs,
+        () => {
+          executed = true;
+        }
+      );
+      yargs.showHelp(output => {
+        executed.should.equal(false);
+        output.should.match(/a default command/);
+        return done();
+      });
+    });
   });
 
   describe('$0', () => {

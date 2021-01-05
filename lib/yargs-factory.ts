@@ -1572,7 +1572,13 @@ function Yargs(
 
           // run the default command, if defined
           if (command.hasDefaultCommand() && !skipDefaultCommand) {
-            const innerArgv = command.runCommand(null, self, parsed);
+            const innerArgv = command.runCommand(
+              null,
+              self,
+              parsed,
+              0,
+              helpOnly
+            );
             return self._postProcess(innerArgv, populateDoubleDash);
           }
 
@@ -1594,7 +1600,7 @@ function Yargs(
           self.exit(0);
         }
       } else if (command.hasDefaultCommand() && !skipDefaultCommand) {
-        const innerArgv = command.runCommand(null, self, parsed);
+        const innerArgv = command.runCommand(null, self, parsed, 0, helpOnly);
         return self._postProcess(innerArgv, populateDoubleDash);
       }
 

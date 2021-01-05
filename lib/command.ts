@@ -600,8 +600,8 @@ export interface CommandInstance {
     command: string | null,
     yargs: YargsInstance,
     parsed: DetailedArguments,
-    commandIndex?: number,
-    helpOnly?: boolean
+    commandIndex: number,
+    helpOnly: boolean
   ): Arguments | Promise<Arguments>;
   runDefaultBuilderOn(yargs: YargsInstance): void;
   unfreeze(): void;
