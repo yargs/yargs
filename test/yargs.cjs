@@ -2824,7 +2824,7 @@ describe('yargs dsl tests', () => {
               setTimeout(() => {
                 argv.addedAsync = 99;
                 executionCount++;
-                return resolve(argv);
+                return resolve();
               }, 5);
             });
           }
@@ -2851,7 +2851,7 @@ describe('yargs dsl tests', () => {
                     setTimeout(() => {
                       argv.addedAsync = 99;
                       executionCount++;
-                      return resolve(argv);
+                      return resolve();
                     }, 5);
                   });
                 }
@@ -2956,6 +2956,114 @@ describe('yargs dsl tests', () => {
       });
     });
   });
-  // TODO(@bcoe): write tests for new async getHelp() method.
-  // TODO(@bcoe): document .fail(false) shorthand.
+
+  describe('getHelp', () => {
+    it('should run parse() and return help, if parse() not yet called', async () => {
+      const y = yargs(['--foo'])
+        .options('foo', {
+          alias: 'f',
+          describe: 'foo option',
+        })
+        .wrap(null);
+      const help = await y.getHelp();
+      help
+        .split('\n')
+        .should.deep.equal([
+          'Options:',
+          '      --help     Show help  [boolean]',
+          '      --version  Show version number  [boolean]',
+          '  -f, --foo      foo option',
+        ]);
+    });
+    it('should display top-level help with no command given', async () => {
+      const y = yargs('--help')
+        .command(
+          ['list [pattern]', 'ls', '*'],
+          'List key-value pairs for pattern',
+          {},
+          noop
+        )
+        .command('get <key>', 'Get value for key', {}, noop)
+        .command('set <key> [value]', 'Set value for key', {}, noop);
+      const help = await y.getHelp();
+      help
+        .split('\n')
+        .should.deep.equal([
+          'node [pattern]',
+          '',
+          'List key-value pairs for pattern',
+          '',
+          'Commands:',
+          '  node list [pattern]     List key-value pairs for pattern',
+          '                                                         [default] [aliases: ls]',
+          '  node get <key>          Get value for key',
+          '  node set <key> [value]  Set value for key',
+          '',
+          'Options:',
+          '  --help     Show help                                                 [boolean]',
+          '  --version  Show version number                                       [boolean]',
+        ]);
+    });
+    it('should allow help to be output for failed command', async () => {
+      const y = yargs('foo')
+        .command(
+          'foo',
+          'foo command',
+          () => {},
+          async () => {
+            return new Promise((resolve, reject) => {
+              setTimeout(() => {
+                return reject(Error('async failure'));
+              });
+            });
+          }
+        )
+        .fail(false);
+      try {
+        await y.argv;
+        throw Error('unreachable');
+      } catch (err) {
+        err.message.should.equal('async failure');
+        (await y.getHelp()).should.match(/foo command/);
+      }
+    });
+    it('should allow help to be output for successful command', async () => {
+      const y = yargs('foo').command(
+        'foo',
+        'foo command',
+        () => {},
+        async argv => {
+          return new Promise((resolve, reject) => {
+            setTimeout(() => {
+              argv.addedAsync = 99;
+              return resolve();
+            });
+          });
+        }
+      );
+      const argv = await y.argv;
+      (await y.getHelp()).should.match(/foo command/);
+      argv.addedAsync.should.equal(99);
+      argv._.should.eql(['foo']);
+    });
+    it('should not run handler or middleware', async () => {
+      let commandCalled = false;
+      let middlewareCalled = false;
+      const y = yargs('foo')
+        .command(
+          'foo',
+          'foo command',
+          () => {},
+          async argv => {
+            commandCalled = true;
+          }
+        )
+        .middleware(() => {
+          middlewareCalled = true;
+        });
+      (await y.getHelp()).should.match(/foo command/);
+      commandCalled.should.equal(false);
+      middlewareCalled.should.equal(false);
+    });
+  });
 });

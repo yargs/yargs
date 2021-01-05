@@ -211,7 +211,13 @@ export function command(
 
   self.hasDefaultCommand = () => !!defaultCommand;
 
-  self.runCommand = function runCommand(command, yargs, parsed, commandIndex) {
+  self.runCommand = function runCommand(
+    command,
+    yargs,
+    parsed,
+    commandIndex = 0,
+    helpOnly = false
+  ) {
     let aliases = parsed.aliases;
     const commandHandler =
       handlers[command!] || handlers[aliasMap[command!]] || defaultCommand;
@@ -243,7 +249,13 @@ export function command(
             commandHandler.description
           );
       }
-      innerArgv = innerYargs._parseArgs(null, null, true, commandIndex);
+      innerArgv = innerYargs._parseArgs(
+        null,
+        undefined,
+        true,
+        commandIndex,
+        helpOnly
+      );
       aliases = (innerYargs.parsed as DetailedArguments).aliases;
     } else if (isCommandBuilderOptionDefinitions(builder)) {
       // as a short hand, an object can instead be provided, specifying
@@ -263,7 +275,13 @@ export function command(
       Object.keys(commandHandler.builder).forEach(key => {
         innerYargs.option(key, builder[key]);
       });
-      innerArgv = innerYargs._parseArgs(null, null, true, commandIndex);
+      innerArgv = innerYargs._parseArgs(
+        null,
+        undefined,
+        true,
+        commandIndex,
+        helpOnly
+      );
       aliases = (innerYargs.parsed as DetailedArguments).aliases;
     }
 
@@ -274,6 +292,11 @@ export function command(
         currentContext
       );
     }
+
+    // If showHelp() or getHelp() is being run, we should not
+    // execute middleware or handlers (these may perform expensive operations
+    // like creating a DB connection).
+    if (helpOnly) return innerArgv;
 
     const middlewares = globalMiddleware
       .slice(0)
@@ -577,7 +600,8 @@ export interface CommandInstance {
     command: string | null,
     yargs: YargsInstance,
     parsed: DetailedArguments,
-    commandIndex?: number
+    commandIndex?: number,
+    helpOnly?: boolean
   ): Arguments | Promise<Arguments>;
   runDefaultBuilderOn(yargs: YargsInstance): void;
   unfreeze(): void;

@@ -48,7 +48,7 @@ export function usage(yargs: YargsInstance, y18n: Y18N, shim: PlatformShim) {
       for (let i = fails.length - 1; i >= 0; --i) {
         const fail = fails[i];
         if (isBoolean(fail)) {
-          continue;
+          throw err;
         } else {
           fail(msg, err, self);
         }

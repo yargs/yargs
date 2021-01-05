@@ -79,7 +79,6 @@ function Yargs(
   const preservedGroups: Dictionary<string[]> = {};
   let usage: UsageInstance;
   let validation: ValidationInstance;
-  let parseCompleted = false;
 
   const y18n = shim.y18n;
 
@@ -887,7 +886,6 @@ function Yargs(
 
     return self;
   };
-
   const pkgs: Dictionary = {};
   function pkgUp(rootPath?: string) {
     const npath = rootPath || '*';
@@ -1222,11 +1220,13 @@ function Yargs(
   self.getParserConfiguration = () => parserConfig;
 
   self.getHelp = async function () {
+    hasOutput = true;
     if (!usage.hasCachedHelpMessage()) {
-      // TODO(@bcoe): do we need this logic for getHelp()? what should the
-      // behavior be if you use `getHelp()` without having run the parser.
-      if (!self.parsed) await self._parseArgs(processArgs); // run parser, if it has not already been executed.
-      // TODO(@bcoe): why is `hasDefaultCommand` separate from the _parseArgs step.
+      if (!self.parsed) {
+        // Run the parser as if --help was passed to it (this is what
+        // the last parameter `true` indicates).
+        self._parseArgs(processArgs, undefined, undefined, 0, true);
+      }
       if (command.hasDefaultCommand()) {
         context.resets++; // override the restriction on top-level positoinals.
         command.runDefaultBuilderOn(self);
@@ -1237,8 +1237,13 @@ function Yargs(
 
   self.showHelp = function (level) {
     argsert('[string|function]', [level], arguments.length);
+    hasOutput = true;
     if (!usage.hasCachedHelpMessage()) {
-      if (!self.parsed) self._parseArgs(processArgs); // run parser, if it has not already been executed.
+      if (!self.parsed) {
+        // Run the parser as if --help was passed to it (this is what
+        // the last parameter `true` indicates).
+        self._parseArgs(processArgs, undefined, undefined, 0, true);
+      }
       if (command.hasDefaultCommand()) {
         context.resets++; // override the restriction on top-level positoinals.
         command.runDefaultBuilderOn(self);
@@ -1474,16 +1479,9 @@ function Yargs(
     args: string | string[] | null,
     shortCircuit?: boolean | null,
     _calledFromCommand?: boolean,
-    commandIndex?: number
+    commandIndex = 0,
+    helpOnly = false
   ) {
-    // A single yargs instance may be used multiple times, e.g.
-    // const y = yargs(); y.parse('foo --bar'); yargs.parse('bar --foo').
-    // When a prior parse has completed and a new parse is beginning, we
-    // need to clear the cached help message from the previous parse:
-    if (parseCompleted) {
-      parseCompleted = false;
-      usage.clearCachedHelpMessage();
-    }
     let skipValidation = !!_calledFromCommand;
     args = args || processArgs;
 
@@ -1507,6 +1505,14 @@ function Yargs(
 
     argv.$0 = self.$0;
     self.parsed = parsed;
+
+    // A single yargs instance may be used multiple times, e.g.
+    // const y = yargs(); y.parse('foo --bar'); yargs.parse('bar --foo').
+    // When a prior parse has completed and a new parse is beginning, we
+    // need to clear the cached help message from the previous parse:
+    if (!_calledFromCommand) {
+      usage.clearCachedHelpMessage();
+    }
 
     try {
       guessLocale(); // guess locale lazily, so that it can be turned off in chain.
@@ -1550,7 +1556,13 @@ function Yargs(
               // commands are executed using a recursive algorithm that executes
               // the deepest command first; we keep track of the position in the
               // argv._ array that is currently being executed.
-              const innerArgv = command.runCommand(cmd, self, parsed, i + 1);
+              const innerArgv = command.runCommand(
+                cmd,
+                self,
+                parsed,
+                i + 1,
+                helpOnly // Don't run a handler, just figure out the help string.
+              );
               return self._postProcess(innerArgv, populateDoubleDash);
             } else if (!firstUnknownCommand && cmd !== completionCommand) {
               firstUnknownCommand = cmd;
@@ -1671,8 +1683,6 @@ function Yargs(
     if (parsePositionalNumbers) {
       argv = self._parsePositionalNumbers(argv);
     }
-    // Track that the most recent parse has completed:
-    parseCompleted = true;
     return argv;
   };
 
@@ -1790,10 +1800,11 @@ export interface YargsInstance {
   _hasParseCallback(): boolean;
   _parseArgs: {
     (
-      args: null,
-      shortCircuit: null,
-      _calledFromCommand: boolean,
-      commandIndex?: number
+      args: string | string[] | null,
+      shortCircuit?: boolean,
+      _calledFromCommand?: boolean,
+      commandIndex?: number,
+      helpOnly?: boolean
     ): Arguments | Promise<Arguments>;
     (args: string | string[], shortCircuit?: boolean):
       | Arguments
