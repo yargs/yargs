@@ -138,8 +138,62 @@ describe('middleware', () => {
         .parse();
     });
 
-    // TODO(bcoe): add test for middleware rejecting, when using promise form.
-    // TODO(bcoe): add test that ensures handler awaited after middleware.
+    it('it allows middleware rejection to be caught', async () => {
+      const argvPromise = yargs('foo')
+        .command(
+          'foo',
+          'foo command',
+          () => {},
+          () => {}
+        )
+        .middleware(async () => {
+          return new Promise((resolve, reject) => {
+            setTimeout(() => {
+              return reject(Error('error from middleware'));
+            }, 5);
+          });
+        })
+        .fail(false)
+        .parse();
+      try {
+        await argvPromise;
+        throw Error('unreachable');
+      } catch (err) {
+        err.message.should.match(/error from middleware/);
+      }
+    });
+
+    it('it awaits middleware before awaiting handler, when applyBeforeValidation is "false"', async () => {
+      let log = '';
+      const argvPromise = yargs('foo --bar')
+        .command(
+          'foo',
+          'foo command',
+          () => {},
+          async () => {
+            return new Promise(resolve => {
+              setTimeout(() => {
+                log += 'handler';
+                return resolve();
+              }, 5);
+            });
+          }
+        )
+        .middleware(async argv => {
+          return new Promise(resolve => {
+            setTimeout(() => {
+              log += 'middleware';
+              argv.fromMiddleware = 99;
+              return resolve();
+            }, 20);
+          });
+        }, false)
+        .parse();
+      const argv = await argvPromise;
+      log.should.equal('middlewarehandler');
+      argv.fromMiddleware.should.equal(99);
+      argv.bar.should.equal(true);
+    });
 
     it('calls the command handler when all middleware promises resolve', done => {
       const middleware = (key, value) => () =>
