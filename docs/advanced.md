@@ -558,8 +558,8 @@ var argv = require('yargs/yargs')(process.argv.slice(2))
 ## Using Yargs with Async/await
 
 If you use async middleware or async handlers for commands, `yargs.parse` and
-`yargs.argv` will return a Promise. When you `await` this promise the final
-parsed result will be returned:
+`yargs.argv` will return a `Promise`. When you `await` this promise the
+parsed arguments object will be returned after the handler completes.
 
 ```js
 import yargs from 'yargs'
@@ -585,8 +585,8 @@ console.info('finish')
 
 ### Handling async errors
 
-By default, when an error occurs in an during an async parse, yargs will
-exit with code `1` and print the help message. If you would rather
+By default, when an async error occurs within a command yargs will
+exit with code `1` and print a help message. If you would rather
 Use `try`/`catch` to perform error handling, you can do so with the setting
 `.fail(false)`:
 
