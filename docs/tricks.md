@@ -31,6 +31,9 @@ one. This way you can just `net.createConnection(argv.port)` and you can add
 numbers out of `argv` with `+` without having that mean concatenation,
 which is super frustrating.
 
+You can change this behavior by calling [`parserConfiguration()`](/docs/api.md#parserConfiguration)
+or by explicitly specifying [`string`](/docs/api.md/#string) for your flags.
+
 <a name="arrays"></a>
 Arrays
 ----------
