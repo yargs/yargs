@@ -29,12 +29,11 @@ export function completion(
     (shim.getEnv('ZSH_NAME') && shim.getEnv('ZSH_NAME')!.indexOf('zsh') !== -1);
   // get a list of completion commands.
   // 'args' is the array of strings from the line to be completed
-  self.getCompletion = function getCompletion(args, done) {
+  self.getCompletion = function getCompletion(args, done): any {
     const completions: string[] = [];
     const current = args.length ? args[args.length - 1] : '';
     const argv = yargs.parse(args, true);
     const parentCommands = yargs.getContext().commands;
-
     // a custom completion function can be provided
     // to completion().
     function runCompletionFunction(argv: Arguments) {
@@ -48,32 +47,29 @@ export function completion(
           return result
             .then(list => {
               shim.process.nextTick(() => {
-                done(list);
+                done(null, list);
               });
             })
             .catch(err => {
               shim.process.nextTick(() => {
-                throw err;
+                done(err, undefined);
               });
             });
         }
-
         // synchronous completion function.
-        return done(result);
+        return done(null, result);
       } else {
         // asynchronous completion function
         return completionFunction(current, argv, completions => {
-          done(completions);
+          done(null, completions);
         });
       }
     }
-
     if (completionFunction) {
       return isPromise(argv)
         ? argv.then(runCompletionFunction)
         : runCompletionFunction(argv);
     }
-
     const handlers = command.getCommandHandlers();
     for (let i = 0, ii = args.length; i < ii; ++i) {
       if (handlers[args[i]] && handlers[args[i]].builder) {
@@ -85,7 +81,6 @@ export function completion(
         }
       }
     }
-
     if (
       !current.match(/^-/) &&
       parentCommands[parentCommands.length - 1] !== current
@@ -102,7 +97,6 @@ export function completion(
         }
       });
     }
-
     if (current.match(/^-/) || (current === '' && completions.length === 0)) {
       const descs = usage.getDescriptions();
       const options = yargs.getOptions();
@@ -116,7 +110,6 @@ export function completion(
           keyAndAliases = keyAndAliases.concat(
             keyAndAliases.map(key => `no-${key}`)
           );
-
         function completeOptionKey(key: string) {
           const notInArgs = keyAndAliases.every(
             val => args.indexOf(`--${val}`) === -1
@@ -140,13 +133,11 @@ export function completion(
             }
           }
         }
-
         completeOptionKey(key);
         if (negable && !!options.default[key]) completeOptionKey(`no-${key}`);
       });
     }
-
-    done(completions);
+    done(null, completions);
   };
 
   // generate the completion script to add to your .bashrc.
@@ -179,7 +170,10 @@ export function completion(
 export interface CompletionInstance {
   completionKey: string;
   generateCompletionScript($0: string, cmd: string): string;
-  getCompletion(args: string[], done: (completions: string[]) => any): any;
+  getCompletion(
+    args: string[],
+    done: (err: Error | null, completions: string[] | undefined) => void
+  ): any;
   registerFunction(fn: CompletionFunction): void;
   setParsed(parsed: DetailedArguments): void;
 }

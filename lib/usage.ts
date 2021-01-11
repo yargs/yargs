@@ -12,16 +12,19 @@ import {YError} from './yerror.js';
 import {DetailedArguments} from './typings/yargs-parser-types.js';
 import setBlocking from './utils/set-blocking.js';
 
+function isBoolean(fail: FailureFunction | boolean): fail is boolean {
+  return typeof fail === 'boolean';
+}
+
 export function usage(yargs: YargsInstance, y18n: Y18N, shim: PlatformShim) {
   const __ = y18n.__;
   const self = {} as UsageInstance;
 
   // methods for ouputting/building failure message.
-  const fails: FailureFunction[] = [];
+  const fails: (FailureFunction | boolean)[] = [];
   self.failFn = function failFn(f) {
     fails.push(f);
   };
-
   let failMessage: string | undefined | null = null;
   let showHelpOnFail = true;
   self.showHelpOnFail = function showHelpOnFailFn(
@@ -43,7 +46,12 @@ export function usage(yargs: YargsInstance, y18n: Y18N, shim: PlatformShim) {
 
     if (fails.length) {
       for (let i = fails.length - 1; i >= 0; --i) {
-        fails[i](msg, err, self);
+        const fail = fails[i];
+        if (isBoolean(fail)) {
+          throw err;
+        } else {
+          fail(msg, err, self);
+        }
       }
     } else {
       if (yargs.getExitProcess()) setBlocking(true);
@@ -554,6 +562,10 @@ export function usage(yargs: YargsInstance, y18n: Y18N, shim: PlatformShim) {
     cachedHelpMessage = undefined;
   };
 
+  self.hasCachedHelpMessage = function () {
+    return !!cachedHelpMessage;
+  };
+
   // given a set of keys, place any keys that are
   // ungrouped under the 'Options:' grouping.
   function addUngroupedKeys(
@@ -710,6 +722,7 @@ export function usage(yargs: YargsInstance, y18n: Y18N, shim: PlatformShim) {
 export interface UsageInstance {
   cacheHelpMessage(): void;
   clearCachedHelpMessage(): void;
+  hasCachedHelpMessage(): boolean;
   command(
     cmd: string,
     description: string | undefined,
@@ -722,7 +735,7 @@ export interface UsageInstance {
   epilog(msg: string): void;
   example(cmd: string, description?: string): void;
   fail(msg?: string | null, err?: YError | string): void;
-  failFn(f: FailureFunction): void;
+  failFn(f: FailureFunction | boolean): void;
   freeze(): void;
   functionDescription(fn: {name?: string}): string;
   getCommands(): [string, string, boolean, string[], boolean][];

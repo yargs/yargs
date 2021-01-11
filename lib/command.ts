@@ -211,7 +211,13 @@ export function command(
 
   self.hasDefaultCommand = () => !!defaultCommand;
 
-  self.runCommand = function runCommand(command, yargs, parsed, commandIndex) {
+  self.runCommand = function runCommand(
+    command,
+    yargs,
+    parsed,
+    commandIndex = 0,
+    helpOnly = false
+  ) {
     let aliases = parsed.aliases;
     const commandHandler =
       handlers[command!] || handlers[aliasMap[command!]] || defaultCommand;
@@ -243,7 +249,13 @@ export function command(
             commandHandler.description
           );
       }
-      innerArgv = innerYargs._parseArgs(null, null, true, commandIndex);
+      innerArgv = innerYargs._parseArgs(
+        null,
+        undefined,
+        true,
+        commandIndex,
+        helpOnly
+      );
       aliases = (innerYargs.parsed as DetailedArguments).aliases;
     } else if (isCommandBuilderOptionDefinitions(builder)) {
       // as a short hand, an object can instead be provided, specifying
@@ -263,7 +275,13 @@ export function command(
       Object.keys(commandHandler.builder).forEach(key => {
         innerYargs.option(key, builder[key]);
       });
-      innerArgv = innerYargs._parseArgs(null, null, true, commandIndex);
+      innerArgv = innerYargs._parseArgs(
+        null,
+        undefined,
+        true,
+        commandIndex,
+        helpOnly
+      );
       aliases = (innerYargs.parsed as DetailedArguments).aliases;
     }
 
@@ -274,6 +292,11 @@ export function command(
         currentContext
       );
     }
+
+    // If showHelp() or getHelp() is being run, we should not
+    // execute middleware or handlers (these may perform expensive operations
+    // like creating a DB connection).
+    if (helpOnly) return innerArgv;
 
     const middlewares = globalMiddleware
       .slice(0)
@@ -302,36 +325,31 @@ export function command(
       yargs._postProcess(innerArgv, populateDoubleDash);
 
       innerArgv = applyMiddleware(innerArgv, yargs, middlewares, false);
-      let handlerResult;
       if (isPromise(innerArgv)) {
-        handlerResult = innerArgv.then(argv => commandHandler.handler(argv));
+        const innerArgvRef = innerArgv;
+        innerArgv = innerArgv
+          .then(argv => commandHandler.handler(argv))
+          .then(() => innerArgvRef);
       } else {
-        handlerResult = commandHandler.handler(innerArgv);
+        const handlerResult = commandHandler.handler(innerArgv);
+        if (isPromise(handlerResult)) {
+          const innerArgvRef = innerArgv;
+          innerArgv = handlerResult.then(() => innerArgvRef);
+        }
       }
 
-      const handlerFinishCommand = yargs.getHandlerFinishCommand();
-      if (isPromise(handlerResult)) {
+      if (isPromise(innerArgv) && !yargs._hasParseCallback()) {
         yargs.getUsageInstance().cacheHelpMessage();
-        handlerResult
-          .then(value => {
-            if (handlerFinishCommand) {
-              handlerFinishCommand(value);
-            }
-          })
-          .catch(error => {
-            try {
-              yargs.getUsageInstance().fail(null, error);
-            } catch (err) {
-              // fail's throwing would cause an unhandled rejection.
-            }
-          })
-          .then(() => {
-            yargs.getUsageInstance().clearCachedHelpMessage();
-          });
-      } else {
-        if (handlerFinishCommand) {
-          handlerFinishCommand(handlerResult);
-        }
+        innerArgv.catch(error => {
+          try {
+            yargs.getUsageInstance().fail(null, error);
+          } catch (_err) {
+            // If .fail(false) is not set, and no parse cb() has been
+            // registered, run usage's default fail method.
+          }
+        });
+      } else if (isPromise(innerArgv)) {
+        yargs.getUsageInstance().cacheHelpMessage();
       }
     }
 
@@ -582,7 +600,8 @@ export interface CommandInstance {
     command: string | null,
     yargs: YargsInstance,
     parsed: DetailedArguments,
-    commandIndex?: number
+    commandIndex: number,
+    helpOnly: boolean
   ): Arguments | Promise<Arguments>;
   runDefaultBuilderOn(yargs: YargsInstance): void;
   unfreeze(): void;
@@ -680,7 +699,3 @@ type FrozenCommandInstance = {
   aliasMap: Dictionary<string>;
   defaultCommand: CommandHandler | undefined;
 };
-
-export interface FinishCommandHandler {
-  (handlerResult: any): any;
-}

@@ -809,10 +809,14 @@ error message when this promise rejects
 Manually indicate that the program should exit, and provide context about why we
 wanted to exit. Follows the behavior set by `.exitProcess()`.
 
-<a name="fail"></a>.fail(fn)
+<a name="fail"></a>.fail(fn | boolean)
 ---------
 
 Method to execute when a failure occurs, rather than printing the failure message.
+
+Providing `false` as a value for `fn` can be used to prevent yargs from
+exiting and printing a failure message. This is useful if you wish to
+handle failures yourself using `try`/`catch` and [`.getHelp()`](#get-help).
 
 `fn` is called with the failure message that would have been printed, the
 `Error` instance originally thrown and yargs state when the failure
@@ -837,7 +841,10 @@ Allows to programmatically get completion choices for any line.
 
 `args`: An array of the words in the command line to complete.
 
-`done`: The callback to be called with the resulting completions.
+`done`: Optional callback which will be invoked with `err`, or the resulting completions.
+
+If no `done` callback is provided, `getCompletion` returns a promise that
+resolves with the completions.
 
 For example:
 
@@ -852,6 +859,12 @@ require('yargs/yargs')(process.argv.slice(2))
 ```
 
 Outputs the same completion choices as `./test.js --foo`<kbd>TAB</kbd>: `--foobar` and `--foobaz`
+
+<a name="get-help"></a>.getHelp()
+---------------------------
+
+Returns a promise that resolves with a `string` equivalent to what would
+be output by [`.showHelp()`](#show-help), or by running yargs with `--help`.
 
 <a name="global"></a>.global(globals, [global=true])
 ------------
@@ -1165,23 +1178,6 @@ var argv = require('yargs/yargs')(process.argv.slice(2))
   .argv
 ```
 
-.onFinishCommand([handler])
-------------
-
-Called after the completion of any command. `handler` is invoked with the
-result returned by the command:
-
-```js
-yargs(process.argv.slice(2))
-    .command('cmd', 'a command', () => {}, async () => {
-        await this.model.find()
-        return Promise.resolve('result value')
-    })
-    .onFinishCommand(async (resultValue) => {
-        await this.db.disconnect()
-    }).argv
-```
-
 <a name="option"></a>.option(key, [opt])
 -----------------
 <a name="options"></a>.options(key, [opt])
@@ -1481,7 +1477,7 @@ Generate a bash completion script. Users of your application can install this
 script in their `.bashrc`, and yargs will provide completion shortcuts for
 commands and options.
 
-.showHelp([consoleLevel | printCallback])
+<a name="show-help">.showHelp([consoleLevel | printCallback])
 ---------------------------
 
 Print the usage data.
