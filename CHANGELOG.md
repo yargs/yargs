@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [17.0.0](https://www.github.com/yargs/yargs/compare/v16.2.0...v17.0.0) (2021-01-11)
+
+
+### ⚠ BREAKING CHANGES
+
+* #1823 contains the following breaking API changes:
+    * now returns a promise if handler is async.
+    * onFinishCommand removed, in favor of being able to await promise.
+    * getCompletion now invokes callback with err and `completions, returns promise of completions.
+
+### Features
+
+* improve support for async/await ([#1823](https://www.github.com/yargs/yargs/issues/1823)) ([169b815](https://www.github.com/yargs/yargs/commit/169b815df7ae190965f04030f28adc3ab92bb4b5))
+
 ## [16.2.0](https://www.github.com/yargs/yargs/compare/v16.1.1...v16.2.0) (2020-12-05)
 
 
