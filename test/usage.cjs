@@ -612,7 +612,6 @@ describe('usage tests', () => {
             .fail(message => {
               console.log(message);
             })
-            .exitProcess(false)
             .wrap(null)
             .check(argv => {
               throw new Error('foo');
@@ -641,7 +640,6 @@ describe('usage tests', () => {
             .fail((message, error, yargs) => {
               yargs.showHelp();
             })
-            .exitProcess(false)
             .wrap(null)
             .parse()
         );
@@ -656,7 +654,6 @@ describe('usage tests', () => {
               .fail((message, error) => {
                 console.log(error.message);
               })
-              .exitProcess(false)
               .wrap(null)
               .check(() => {
                 throw new Error('foo');
@@ -674,7 +671,6 @@ describe('usage tests', () => {
               .fail(() => {
                 console.log('is triggered last');
               })
-              .exitProcess(false)
               .wrap(null)
               .command(
                 'test',
@@ -698,6 +694,36 @@ describe('usage tests', () => {
           ]);
           r.should.have.property('exit').and.equal(false);
         });
+      });
+
+      it('allows "false" to be provided to prevent exit/output', () => {
+        try {
+          yargs()
+            .fail(false)
+            .wrap(null)
+            .check(argv => {
+              throw new Error('sync error');
+            })
+            .parse();
+          throw Error('unreachable');
+        } catch (err) {
+          err.message.should.equal('sync error');
+        }
+      });
+
+      it('does not allow "true" as argument', () => {
+        try {
+          yargs()
+            .fail(true)
+            .wrap(null)
+            .check(argv => {
+              throw new Error('sync error');
+            })
+            .parse();
+          throw Error('unreachable');
+        } catch (err) {
+          err.message.should.match(/Invalid first argument/);
+        }
       });
     });
   });
@@ -3128,6 +3154,46 @@ describe('usage tests', () => {
           ]);
         return done();
       }
+    });
+    it('should not run handler or middleware', done => {
+      let commandRun = false;
+      let middlewareRun = false;
+      const y = yargs(['foo'])
+        .command(
+          'foo',
+          'foo command',
+          () => {},
+          () => {
+            commandRun = true;
+          }
+        )
+        .middleware(() => {
+          middlewareRun = true;
+        });
+      y.showHelp(printCallback);
+      function printCallback(msg) {
+        commandRun.should.equal(false);
+        middlewareRun.should.equal(false);
+        msg.should.match(/foo command/);
+        return done();
+      }
+    });
+    // See: https://github.com/yargs/yargs/issues/1791
+    it('should not run default command', done => {
+      let executed = false;
+      yargs.command(
+        '$0',
+        'a default command',
+        yargs => yargs,
+        () => {
+          executed = true;
+        }
+      );
+      yargs.showHelp(output => {
+        executed.should.equal(false);
+        output.should.match(/a default command/);
+        return done();
+      });
     });
   });
 

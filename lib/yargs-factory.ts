@@ -12,7 +12,6 @@ import {
   CommandBuilder,
   CommandHandlerCallback,
   CommandHandlerDefinition,
-  FinishCommandHandler,
   DefinitionOrCommandName,
 } from './command.js';
 import type {
@@ -80,7 +79,6 @@ function Yargs(
   const preservedGroups: Dictionary<string[]> = {};
   let usage: UsageInstance;
   let validation: ValidationInstance;
-  let handlerFinishCommand: FinishCommandHandler | null = null;
 
   const y18n = shim.y18n;
 
@@ -278,7 +276,6 @@ function Yargs(
       parsed: self.parsed,
       parseFn,
       parseContext,
-      handlerFinishCommand,
     });
     usage.freeze();
     validation.freeze();
@@ -303,7 +300,6 @@ function Yargs(
       completionCommand,
       parseFn,
       parseContext,
-      handlerFinishCommand,
     } = frozen);
     options.configObjects = configObjects;
     usage.unfreeze();
@@ -840,18 +836,15 @@ function Yargs(
   };
 
   self.fail = function (f) {
-    argsert('<function>', [f], arguments.length);
+    argsert('<function|boolean>', [f], arguments.length);
+    if (typeof f === 'boolean' && f !== false) {
+      throw new YError(
+        "Invalid first argument. Expected function or boolean 'false'"
+      );
+    }
     usage.failFn(f);
     return self;
   };
-
-  self.onFinishCommand = function (f) {
-    argsert('<function>', [f], arguments.length);
-    handlerFinishCommand = f;
-    return self;
-  };
-
-  self.getHandlerFinishCommand = () => handlerFinishCommand;
 
   self.check = function (f, _global) {
     argsert('<function> [boolean]', [f, _global], arguments.length);
@@ -893,7 +886,6 @@ function Yargs(
 
     return self;
   };
-
   const pkgs: Dictionary = {};
   function pkgUp(rootPath?: string) {
     const npath = rootPath || '*';
@@ -1227,12 +1219,35 @@ function Yargs(
   };
   self.getParserConfiguration = () => parserConfig;
 
+  self.getHelp = async function () {
+    hasOutput = true;
+    if (!usage.hasCachedHelpMessage()) {
+      if (!self.parsed) {
+        // Run the parser as if --help was passed to it (this is what
+        // the last parameter `true` indicates).
+        self._parseArgs(processArgs, undefined, undefined, 0, true);
+      }
+      if (command.hasDefaultCommand()) {
+        context.resets++; // override the restriction on top-level positoinals.
+        command.runDefaultBuilderOn(self);
+      }
+    }
+    return usage.help();
+  };
+
   self.showHelp = function (level) {
     argsert('[string|function]', [level], arguments.length);
-    if (!self.parsed) self._parseArgs(processArgs); // run parser, if it has not already been executed.
-    if (command.hasDefaultCommand()) {
-      context.resets++; // override the restriction on top-level positoinals.
-      command.runDefaultBuilderOn(self);
+    hasOutput = true;
+    if (!usage.hasCachedHelpMessage()) {
+      if (!self.parsed) {
+        // Run the parser as if --help was passed to it (this is what
+        // the last parameter `true` indicates).
+        self._parseArgs(processArgs, undefined, undefined, 0, true);
+      }
+      if (command.hasDefaultCommand()) {
+        context.resets++; // override the restriction on top-level positoinals.
+        command.runDefaultBuilderOn(self);
+      }
     }
     usage.showHelp(level);
     return self;
@@ -1372,9 +1387,18 @@ function Yargs(
     return self;
   };
 
-  self.getCompletion = function (args, done) {
-    argsert('<array> <function>', [args, done], arguments.length);
-    completion!.getCompletion(args, done);
+  self.getCompletion = async function (args, done) {
+    argsert('<array> [function]', [args, done], arguments.length);
+    if (!done) {
+      return new Promise((resolve, reject) => {
+        completion!.getCompletion(args, (err, completions) => {
+          if (err) reject(err);
+          else resolve(completions);
+        });
+      });
+    } else {
+      return completion!.getCompletion(args, done);
+    }
   };
 
   self.locale = function (locale?: string): any {
@@ -1455,7 +1479,8 @@ function Yargs(
     args: string | string[] | null,
     shortCircuit?: boolean | null,
     _calledFromCommand?: boolean,
-    commandIndex?: number
+    commandIndex = 0,
+    helpOnly = false
   ) {
     let skipValidation = !!_calledFromCommand;
     args = args || processArgs;
@@ -1480,6 +1505,14 @@ function Yargs(
 
     argv.$0 = self.$0;
     self.parsed = parsed;
+
+    // A single yargs instance may be used multiple times, e.g.
+    // const y = yargs(); y.parse('foo --bar'); yargs.parse('bar --foo').
+    // When a prior parse has completed and a new parse is beginning, we
+    // need to clear the cached help message from the previous parse:
+    if (!_calledFromCommand) {
+      usage.clearCachedHelpMessage();
+    }
 
     try {
       guessLocale(); // guess locale lazily, so that it can be turned off in chain.
@@ -1523,7 +1556,13 @@ function Yargs(
               // commands are executed using a recursive algorithm that executes
               // the deepest command first; we keep track of the position in the
               // argv._ array that is currently being executed.
-              const innerArgv = command.runCommand(cmd, self, parsed, i + 1);
+              const innerArgv = command.runCommand(
+                cmd,
+                self,
+                parsed,
+                i + 1,
+                helpOnly // Don't run a handler, just figure out the help string.
+              );
               return self._postProcess(innerArgv, populateDoubleDash);
             } else if (!firstUnknownCommand && cmd !== completionCommand) {
               firstUnknownCommand = cmd;
@@ -1533,7 +1572,13 @@ function Yargs(
 
           // run the default command, if defined
           if (command.hasDefaultCommand() && !skipDefaultCommand) {
-            const innerArgv = command.runCommand(null, self, parsed);
+            const innerArgv = command.runCommand(
+              null,
+              self,
+              parsed,
+              0,
+              helpOnly
+            );
             return self._postProcess(innerArgv, populateDoubleDash);
           }
 
@@ -1555,7 +1600,7 @@ function Yargs(
           self.exit(0);
         }
       } else if (command.hasDefaultCommand() && !skipDefaultCommand) {
-        const innerArgv = command.runCommand(null, self, parsed);
+        const innerArgv = command.runCommand(null, self, parsed, 0, helpOnly);
         return self._postProcess(innerArgv, populateDoubleDash);
       }
 
@@ -1570,11 +1615,11 @@ function Yargs(
         const completionArgs = args.slice(
           args.indexOf(`--${completion!.completionKey}`) + 1
         );
-        completion!.getCompletion(completionArgs, completions => {
+        completion!.getCompletion(completionArgs, (err, completions) => {
+          if (err) throw new YError(err.message);
           (completions || []).forEach(completion => {
             _logger.log(completion);
           });
-
           self.exit(0);
         });
         return self._postProcess(argv, !populateDoubleDash, _calledFromCommand);
@@ -1627,7 +1672,7 @@ function Yargs(
   };
 
   // Applies a couple post processing steps that are easier to perform
-  // as a final step, rather than
+  // as a final step.
   self._postProcess = function (
     argv: Arguments | Promise<Arguments>,
     populateDoubleDash: boolean,
@@ -1761,10 +1806,11 @@ export interface YargsInstance {
   _hasParseCallback(): boolean;
   _parseArgs: {
     (
-      args: null,
-      shortCircuit: null,
-      _calledFromCommand: boolean,
-      commandIndex?: number
+      args: string | string[] | null,
+      shortCircuit?: boolean,
+      _calledFromCommand?: boolean,
+      commandIndex?: number,
+      helpOnly?: boolean
     ): Arguments | Promise<Arguments>;
     (args: string | string[], shortCircuit?: boolean):
       | Arguments
@@ -1887,9 +1933,13 @@ export interface YargsInstance {
   ): YargsInstance;
   exit(code: number, err?: YError | string): void;
   exitProcess(enabled: boolean): YargsInstance;
-  fail(f: FailureFunction): YargsInstance;
+  fail(f: FailureFunction | boolean): YargsInstance;
   getCommandInstance(): CommandInstance;
-  getCompletion(args: string[], done: (completions: string[]) => any): void;
+  getCompletion(
+    args: string[],
+    done?: (err: Error | null, completions: string[] | undefined) => void
+  ): Promise<string[] | void> | any;
+  getHelp(): Promise<string>;
   getContext(): Context;
   getDemandedCommands(): Options['demandedCommands'];
   getDemandedOptions(): Options['demandedOptions'];
@@ -1897,7 +1947,6 @@ export interface YargsInstance {
   getDetectLocale(): boolean;
   getExitProcess(): boolean;
   getGroups(): Dictionary<string[]>;
-  getHandlerFinishCommand(): FinishCommandHandler | null;
   getOptions(): Options;
   getParserConfiguration(): Configuration;
   getStrict(): boolean;
@@ -1927,7 +1976,6 @@ export interface YargsInstance {
   };
   normalize(keys: string | string[]): YargsInstance;
   number(keys: string | string[]): YargsInstance;
-  onFinishCommand(f: FinishCommandHandler): YargsInstance;
   option: {
     (key: string, optionDefinition: OptionDefinition): YargsInstance;
     (keyOptionDefinitions: Dictionary<OptionDefinition>): YargsInstance;
@@ -2113,7 +2161,6 @@ interface FrozenYargsInstance {
   parsed: DetailedArguments | false;
   parseFn: ParseCallback | null;
   parseContext: object | null;
-  handlerFinishCommand: FinishCommandHandler | null;
 }
 
 interface ParseCallback {
