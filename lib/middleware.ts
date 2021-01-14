@@ -49,9 +49,6 @@ export function applyMiddleware(
   middlewares: Middleware[],
   beforeValidation: boolean
 ) {
-  const beforeValidationError = new Error(
-    'middleware cannot return a promise when applyBeforeValidation is true'
-  );
   return middlewares.reduce<Arguments | Promise<Arguments>>(
     (acc, middleware) => {
       if (middleware.applyBeforeValidation !== beforeValidation) {
@@ -71,8 +68,6 @@ export function applyMiddleware(
           );
       } else {
         const result = middleware(acc, yargs);
-        if (beforeValidation && isPromise(result)) throw beforeValidationError;
-
         return isPromise(result)
           ? result.then(middlewareObj => Object.assign(acc, middlewareObj))
           : Object.assign(acc, result);

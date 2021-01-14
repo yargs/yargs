@@ -52,6 +52,7 @@ import {
 import {objFilter} from './utils/obj-filter.js';
 import {applyExtends} from './utils/apply-extends.js';
 import {
+  applyMiddleware,
   globalMiddlewareFactory,
   MiddlewareCallback,
   Middleware,
@@ -1478,11 +1479,11 @@ function Yargs(
   self._parseArgs = function parseArgs(
     args: string | string[] | null,
     shortCircuit?: boolean | null,
-    _calledFromCommand?: boolean,
+    calledFromCommand?: boolean,
     commandIndex = 0,
     helpOnly = false
   ) {
-    let skipValidation = !!_calledFromCommand;
+    let skipValidation = !!calledFromCommand;
     args = args || processArgs;
 
     options.__ = y18n.__;
@@ -1510,7 +1511,7 @@ function Yargs(
     // const y = yargs(); y.parse('foo --bar'); yargs.parse('bar --foo').
     // When a prior parse has completed and a new parse is beginning, we
     // need to clear the cached help message from the previous parse:
-    if (!_calledFromCommand) {
+    if (commandIndex === 0) {
       usage.clearCachedHelpMessage();
     }
 
@@ -1521,7 +1522,12 @@ function Yargs(
       // are two passes through the parser. If completion
       // is being performed short-circuit on the first pass.
       if (shortCircuit) {
-        return self._postProcess(argv, populateDoubleDash, _calledFromCommand);
+        return self._postProcess(
+          argv,
+          populateDoubleDash,
+          !!calledFromCommand,
+          false // Don't run middleware when figuring out completion.
+        );
       }
 
       // if there's a handler associated with a
@@ -1563,7 +1569,12 @@ function Yargs(
                 i + 1,
                 helpOnly // Don't run a handler, just figure out the help string.
               );
-              return self._postProcess(innerArgv, populateDoubleDash);
+              return self._postProcess(
+                innerArgv,
+                populateDoubleDash,
+                !!calledFromCommand,
+                false
+              );
             } else if (!firstUnknownCommand && cmd !== completionCommand) {
               firstUnknownCommand = cmd;
               break;
@@ -1579,7 +1590,12 @@ function Yargs(
               0,
               helpOnly
             );
-            return self._postProcess(innerArgv, populateDoubleDash);
+            return self._postProcess(
+              innerArgv,
+              populateDoubleDash,
+              !!calledFromCommand,
+              false
+            );
           }
 
           // recommend a command if recommendCommands() has
@@ -1601,7 +1617,12 @@ function Yargs(
         }
       } else if (command.hasDefaultCommand() && !skipDefaultCommand) {
         const innerArgv = command.runCommand(null, self, parsed, 0, helpOnly);
-        return self._postProcess(innerArgv, populateDoubleDash);
+        return self._postProcess(
+          innerArgv,
+          populateDoubleDash,
+          !!calledFromCommand,
+          false
+        );
       }
 
       // we must run completions first, a user might
@@ -1622,7 +1643,12 @@ function Yargs(
           });
           self.exit(0);
         });
-        return self._postProcess(argv, !populateDoubleDash, _calledFromCommand);
+        return self._postProcess(
+          argv,
+          !populateDoubleDash,
+          !!calledFromCommand,
+          false // Don't run middleware when figuring out completion.
+        );
       }
 
       // Handle 'help' and 'version' options
@@ -1660,7 +1686,7 @@ function Yargs(
         // if we're executed via bash completion, don't
         // bother with validation.
         if (!requestCompletions) {
-          self._runValidation(argv, aliases, {}, parsed.error);
+          self._runValidation(aliases, {}, parsed.error)(argv);
         }
       }
     } catch (err) {
@@ -1668,7 +1694,12 @@ function Yargs(
       else throw err;
     }
 
-    return self._postProcess(argv, populateDoubleDash, _calledFromCommand);
+    return self._postProcess(
+      argv,
+      populateDoubleDash,
+      !!calledFromCommand,
+      true
+    );
   };
 
   // Applies a couple post processing steps that are easier to perform
@@ -1676,10 +1707,11 @@ function Yargs(
   self._postProcess = function (
     argv: Arguments | Promise<Arguments>,
     populateDoubleDash: boolean,
-    calledFromCommand = false
+    calledFromCommand: boolean,
+    runGlobalMiddleware: boolean
   ): any {
-    if (isPromise(argv)) return argv;
     if (calledFromCommand) return argv;
+    if (isPromise(argv)) return argv;
     if (!populateDoubleDash) {
       argv = self._copyDoubleDash(argv);
     }
@@ -1688,6 +1720,9 @@ function Yargs(
       self.getParserConfiguration()['parse-positional-numbers'] === undefined;
     if (parsePositionalNumbers) {
       argv = self._parsePositionalNumbers(argv);
+    }
+    if (runGlobalMiddleware) {
+      argv = applyMiddleware(argv, self, globalMiddleware, false);
     }
     return argv;
   };
@@ -1728,33 +1763,37 @@ function Yargs(
   };
 
   self._runValidation = function runValidation(
-    argv,
     aliases,
     positionalMap,
     parseErrors,
     isDefaultCommand = false
-  ) {
-    if (parseErrors) throw new YError(parseErrors.message);
-    validation.nonOptionCount(argv);
-    validation.requiredArguments(argv);
-    let failedStrictCommands = false;
-    if (strictCommands) {
-      failedStrictCommands = validation.unknownCommands(argv);
-    }
-    if (strict && !failedStrictCommands) {
-      validation.unknownArguments(
-        argv,
-        aliases,
-        positionalMap,
-        isDefaultCommand
-      );
-    } else if (strictOptions) {
-      validation.unknownArguments(argv, aliases, {}, false, false);
-    }
-    validation.customChecks(argv, aliases);
-    validation.limitedChoices(argv);
-    validation.implications(argv);
-    validation.conflicting(argv);
+  ): (argv: Arguments) => void {
+    aliases = {...aliases};
+    positionalMap = {...positionalMap};
+    const demandedOptions = {...self.getDemandedOptions()};
+    return (argv: Arguments) => {
+      if (parseErrors) throw new YError(parseErrors.message);
+      validation.nonOptionCount(argv);
+      validation.requiredArguments(argv, demandedOptions);
+      let failedStrictCommands = false;
+      if (strictCommands) {
+        failedStrictCommands = validation.unknownCommands(argv);
+      }
+      if (strict && !failedStrictCommands) {
+        validation.unknownArguments(
+          argv,
+          aliases,
+          positionalMap,
+          isDefaultCommand
+        );
+      } else if (strictOptions) {
+        validation.unknownArguments(argv, aliases, {}, false, false);
+      }
+      validation.customChecks(argv, aliases);
+      validation.limitedChoices(argv);
+      validation.implications(argv);
+      validation.conflicting(argv);
+    };
   };
 
   function guessLocale() {
@@ -1795,11 +1834,11 @@ export interface YargsInstance {
   _postProcess<T extends Arguments | Promise<Arguments>>(
     argv: T,
     populateDoubleDash: boolean,
-    calledFromCommand?: boolean
+    calledFromCommand: boolean,
+    runGlobalMiddleware: boolean
   ): T;
   _copyDoubleDash<T extends Arguments>(argv: T): T;
   _parsePositionalNumbers<T extends Arguments>(argv: T): T;
-
   _getLoggerInstance(): LoggerInstance;
   _getParseContext(): Object;
   _hasOutput(): boolean;
@@ -1808,7 +1847,7 @@ export interface YargsInstance {
     (
       args: string | string[] | null,
       shortCircuit?: boolean,
-      _calledFromCommand?: boolean,
+      calledFromCommand?: boolean,
       commandIndex?: number,
       helpOnly?: boolean
     ): Arguments | Promise<Arguments>;
@@ -1817,12 +1856,11 @@ export interface YargsInstance {
       | Promise<Arguments>;
   };
   _runValidation(
-    argv: Arguments,
     aliases: Dictionary<string[]>,
     positionalMap: Dictionary<string[]>,
     parseErrors: Error | null,
     isDefaultCommand?: boolean
-  ): void;
+  ): (argv: Arguments) => void;
   _setHasOutput(): void;
   addHelpOpt: {
     (opt?: string | false): YargsInstance;
