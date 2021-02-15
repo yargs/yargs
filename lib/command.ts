@@ -347,8 +347,8 @@ export function command(
         }
       }
 
+      yargs.getUsageInstance().cacheHelpMessage();
       if (isPromise(innerArgv) && !yargs._hasParseCallback()) {
-        yargs.getUsageInstance().cacheHelpMessage();
         innerArgv.catch(error => {
           try {
             yargs.getUsageInstance().fail(null, error);
@@ -357,8 +357,6 @@ export function command(
             // registered, run usage's default fail method.
           }
         });
-      } else if (isPromise(innerArgv)) {
-        yargs.getUsageInstance().cacheHelpMessage();
       }
     }
 

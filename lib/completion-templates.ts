@@ -28,7 +28,8 @@ complete -o default -F _yargs_completions {{app_name}}
 ###-end-{{app_name}}-completions-###
 `;
 
-export const completionZshTemplate = `###-begin-{{app_name}}-completions-###
+export const completionZshTemplate = `#compdef {{app_name}}
+###-begin-{{app_name}}-completions-###
 #
 # yargs command completion script
 #
