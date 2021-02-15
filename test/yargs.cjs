@@ -3065,5 +3065,19 @@ describe('yargs dsl tests', () => {
       commandCalled.should.equal(false);
       middlewareCalled.should.equal(false);
     });
+    // Refs: #1853
+    it('should use cached help message for nested synchronous commands', async () => {
+      const y = yargs('object').command(
+        'object',
+        'object command',
+        (yargs) => {
+          yargs.command('get', 'get command');
+        }
+      );
+      const argv = y.argv;
+      const help = (await y.getHelp());
+      help.should.match(/node object get/);
+      argv._.should.eql(['object']);
+    });
   });
 });
