@@ -292,7 +292,6 @@ describe('middleware', () => {
             },
           })
           .parse();
-        console.info(argv);
         throw Error('unreachable');
       } catch (err) {
         err.message.should.match(/Missing required argument/);
@@ -499,7 +498,7 @@ describe('middleware', () => {
     });
 
     describe('$0', () => {
-      it('applies global middleware when no commands are provided', async () => {
+      it('applies global middleware when no commands are provided, with implied $0', async () => {
         const argv = await yargs('--foo 99')
           .middleware(argv => {
             return new Promise(resolve => {
@@ -512,10 +511,63 @@ describe('middleware', () => {
           .parse();
         argv.foo.should.equal(297);
       });
+
+      it('applies middleware before performing validation, with implied $0', async () => {
+        const argvEventual = yargs('--foo 100')
+          .option('bar', {
+            demand: true,
+          })
+          .middleware(async argv => {
+            return new Promise(resolve => {
+              setTimeout(() => {
+                argv.foo = argv.foo * 2;
+                argv.bar = 'hello';
+                return resolve();
+              }, 100);
+            })
+          }, true)
+          .check((argv) => {
+            if (argv.foo > 100) return true;
+            else return false;
+          })
+          .parse();
+        const argv = await argvEventual;
+        argv.foo.should.equal(200);
+        argv.bar.should.equal('hello');
+      });
+
+      it('applies middleware before performing validation, with explicit $0', async () => {
+        const argvEventual = yargs('--foo 100')
+          .usage(
+            '$0',
+            'usage',
+            () => {},
+          )
+          .option('bar', {
+            demand: true,
+          })
+          .middleware(async argv => {
+            return new Promise(resolve => {
+              setTimeout(() => {
+                argv.foo = argv.foo * 2;
+                argv.bar = 'hello';
+                return resolve();
+              }, 100);
+            })
+          }, true)
+          .check((argv) => {
+            if (argv.foo > 100) return true;
+            else return false;
+          })
+          .parse();
+        const argv = await argvEventual;
+        argv.foo.should.equal(200);
+        argv.bar.should.equal('hello');
+      });
     });
   });
 
-  describe('$0', () => {
+  describe('synchronous $0', () => {
     it('applies global middleware when no commands are provided', () => {
       const argv = yargs('--foo 99')
         .middleware(argv => {
@@ -524,7 +576,7 @@ describe('middleware', () => {
         .parse();
       argv.foo.should.equal(198);
     });
-    it('applies global middleware when default command is provided', () => {
+    it('applies global middleware when default command is provided, with explicit $0', () => {
       const argv = yargs('--foo 100')
         .usage(
           '$0',
@@ -540,6 +592,34 @@ describe('middleware', () => {
         .parse();
       argv.foo.should.equal(600);
     });
-    // TODO: add tests for applyBeforeValidation.
+    it('applies middleware before performing validation, with implicit $0', () => {
+      const argv = yargs('--foo 100')
+        .option('bar', {
+          demand: true,
+        })
+        .middleware(argv => {
+          argv.foo = argv.foo * 2;
+          argv.bar = 'hello'
+        }, true)
+        .check((argv) => {
+          if (argv.foo > 100) return true;
+          else return false;
+          return true;
+        })
+        .parse();
+      argv.foo.should.equal(200);
+      argv.bar.should.equal('hello');
+    });
+  });
+
+  // Refs: https://github.com/yargs/yargs/issues/1351
+  it('should run even if no command is matched', () => {
+    const argv = yargs('snuh --foo 99')
+    .middleware(argv => {
+      argv.foo = argv.foo * 2;
+    })
+    .command('bar', 'bar command', () => {}, () => {})
+    .parse();
+    argv.foo.should.equal(198);
   });
 });

@@ -50,7 +50,6 @@ export function usage(yargs: YargsInstance, y18n: Y18N, shim: PlatformShim) {
         if (isBoolean(fail)) {
           if (err) throw err;
           else if (msg) throw Error(msg);
-          else throw Error('unknown error');
         } else {
           fail(msg, err, self);
         }

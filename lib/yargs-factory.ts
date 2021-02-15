@@ -1500,7 +1500,9 @@ function Yargs(
       })
     ) as DetailedArguments;
 
-    let argv = parsed.argv as Arguments;
+    let argv: Arguments = parsed.argv as Arguments;
+    let argvPromise: Arguments | Promise<Arguments> | undefined = undefined;
+    // Used rather than argv, if middleware introduces an async step:
     if (parseContext) argv = Object.assign({}, argv, parseContext);
     const aliases = parsed.aliases;
 
@@ -1686,21 +1688,43 @@ function Yargs(
         // if we're executed via bash completion, don't
         // bother with validation.
         if (!requestCompletions) {
-          self._runValidation(aliases, {}, parsed.error)(argv);
+          const validation = self._runValidation(aliases, {}, parsed.error);
+          if (!calledFromCommand) {
+            argvPromise = applyMiddleware(argv, self, globalMiddleware, true);
+          }
+          argvPromise = validateAsync(validation, argvPromise ?? argv);
         }
       }
     } catch (err) {
       if (err instanceof YError) usage.fail(err.message, err);
       else throw err;
     }
-
     return self._postProcess(
-      argv,
+      argvPromise ?? argv,
       populateDoubleDash,
       !!calledFromCommand,
       true
     );
   };
+
+  // If argv is a promise (which is possible if async middleware is used)
+  // delay applying validation until the promise has resolved:
+  function validateAsync(
+    validation: (argv: Arguments) => void,
+    argv: Arguments | Promise<Arguments>
+  ): Arguments | Promise<Arguments> {
+    if (isPromise(argv)) {
+      // If the middlware returned a promise, resolve the middleware
+      // before applying the validation:
+      argv = argv.then(argv => {
+        validation(argv);
+        return argv;
+      });
+    } else {
+      validation(argv);
+    }
+    return argv;
+  }
 
   // Applies a couple post processing steps that are easier to perform
   // as a final step.
@@ -1814,6 +1838,7 @@ function Yargs(
 
   return self;
 }
+
 // rebase an absolute path to a relative one with respect to a base directory
 // exported for tests
 export interface RebaseFunction {

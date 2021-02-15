@@ -1175,7 +1175,4 @@ describe('validation tests', () => {
       });
     });
   });
-
-  // TODO: add tests for async validation in conjunction with
-  // applyBeforeValidation.
 });
