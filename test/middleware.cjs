@@ -487,7 +487,7 @@ describe('middleware', () => {
         )
         .parse();
 
-      if (!(argv instanceof Promise)) done('argv should be a Promise');
+      if (!(argv instanceof Promise)) done(Error('argv should be a Promise'));
 
       argv
         .then(() => {

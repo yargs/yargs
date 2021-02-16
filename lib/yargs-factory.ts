@@ -1502,7 +1502,7 @@ function Yargs(
 
     let argv: Arguments = parsed.argv as Arguments;
     let argvPromise: Arguments | Promise<Arguments> | undefined = undefined;
-    // Used rather than argv, if middleware introduces an async step:
+    // Used rather than argv if middleware introduces an async step:
     if (parseContext) argv = Object.assign({}, argv, parseContext);
     const aliases = parsed.aliases;
 
