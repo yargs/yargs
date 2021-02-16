@@ -1,19 +1,22 @@
 #!/usr/bin/env node
+/* eslint-disable node/shebang */
 
+/* eslint-disable no-undef */
 // pretend we are a TTY
-process.stdout.isTTY = true
-process.stderr.isTTY = true
+process.stdout.isTTY = true;
+process.stderr.isTTY = true;
 
-var yargs = require('../../')
-var y = yargs.command('download <url> <files..>', 'make a get HTTP request')
-  .help()
+const yargs = require('../../');
+const y = yargs
+  .command('download <url> <files..>', 'make a get HTTP request')
+  .help();
 
-for (var i = 0; i < 1000; i++) {
+for (let i = 0; i < 1000; i++) {
   yargs.option('o' + i, {
-    describe: 'option ' + i
-  })
+    describe: 'option ' + i,
+  });
 }
 
-y.parse()
+y.parse();
 
-console.log('never get here')
+console.log('never get here');
