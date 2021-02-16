@@ -56,7 +56,7 @@ describe('Completion', () => {
             './completion',
             '--get-yargs-completions',
             './completion',
-            '--f',
+            '-f',
             '--',
           ])
             .options({
@@ -346,9 +346,12 @@ describe('Completion', () => {
           yargs(['./completion', '--get-yargs-completions'])
             .command('foo', 'bar')
             .command('apple', 'banana')
-            .completion('completion', (current, argv, defaultCompletion, done) => {
-	      defaultCompletion()
-            })
+            .completion(
+              'completion',
+              (current, argv, defaultCompletion, done) => {
+                defaultCompletion();
+              }
+            )
             .parse();
         },
         null,
@@ -367,9 +370,12 @@ describe('Completion', () => {
           yargs(['./completion', '--get-yargs-completions'])
             .command('foo', 'bar')
             .command('apple', 'banana')
-            .completion('completion', (current, argv, defaultCompletion, done) => {
-	      done(['orange'])
-            })
+            .completion(
+              'completion',
+              (current, argv, defaultCompletion, done) => {
+                done(['orange']);
+              }
+            )
             .parse();
         },
         null,
