@@ -1,5 +1,6 @@
 'use strict';
 /* global describe, it, beforeEach, afterEach */
+/* eslint-disable no-unused-vars */
 
 const {expect} = require('chai');
 const {globalMiddlewareFactory} = require('../build/index.cjs');
@@ -524,9 +525,9 @@ describe('middleware', () => {
                 argv.bar = 'hello';
                 return resolve();
               }, 100);
-            })
+            });
           }, true)
-          .check((argv) => {
+          .check(argv => {
             if (argv.foo > 100) return true;
             else return false;
           })
@@ -538,11 +539,7 @@ describe('middleware', () => {
 
       it('applies middleware before performing validation, with explicit $0', async () => {
         const argvEventual = yargs('--foo 100')
-          .usage(
-            '$0',
-            'usage',
-            () => {},
-          )
+          .usage('$0', 'usage', () => {})
           .option('bar', {
             demand: true,
           })
@@ -553,9 +550,9 @@ describe('middleware', () => {
                 argv.bar = 'hello';
                 return resolve();
               }, 100);
-            })
+            });
           }, true)
-          .check((argv) => {
+          .check(argv => {
             if (argv.foo > 100) return true;
             else return false;
           })
@@ -599,12 +596,11 @@ describe('middleware', () => {
         })
         .middleware(argv => {
           argv.foo = argv.foo * 2;
-          argv.bar = 'hello'
+          argv.bar = 'hello';
         }, true)
-        .check((argv) => {
+        .check(argv => {
           if (argv.foo > 100) return true;
           else return false;
-          return true;
         })
         .parse();
       argv.foo.should.equal(200);
@@ -615,11 +611,16 @@ describe('middleware', () => {
   // Refs: https://github.com/yargs/yargs/issues/1351
   it('should run even if no command is matched', () => {
     const argv = yargs('snuh --foo 99')
-    .middleware(argv => {
-      argv.foo = argv.foo * 2;
-    })
-    .command('bar', 'bar command', () => {}, () => {})
-    .parse();
+      .middleware(argv => {
+        argv.foo = argv.foo * 2;
+      })
+      .command(
+        'bar',
+        'bar command',
+        () => {},
+        () => {}
+      )
+      .parse();
     argv.foo.should.equal(198);
   });
 });

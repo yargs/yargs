@@ -1,12 +1,13 @@
+/* eslint-disable no-undef */
 exports.builder = {
   banana: {
-    default: 'cool'
+    default: 'cool',
   },
   batman: {
-    default: 'sad'
-  }
-}
+    default: 'sad',
+  },
+};
 
 exports.handler = function (argv) {
-  global.commandHandlerCalledWith = argv
-}
+  global.commandHandlerCalledWith = argv;
+};
