@@ -1,5 +1,6 @@
 'use strict';
 /* global context, describe, it, beforeEach, afterEach */
+/* eslint-disable no-unused-vars */
 
 const expect = require('chai').expect;
 const fs = require('fs');
@@ -3064,6 +3065,16 @@ describe('yargs dsl tests', () => {
       (await y.getHelp()).should.match(/foo command/);
       commandCalled.should.equal(false);
       middlewareCalled.should.equal(false);
+    });
+    // Refs: #1853
+    it('should use cached help message for nested synchronous commands', async () => {
+      const y = yargs('object').command('object', 'object command', yargs => {
+        yargs.command('get', 'get command');
+      });
+      const argv = y.argv;
+      const help = await y.getHelp();
+      help.should.match(/node object get/);
+      argv._.should.eql(['object']);
     });
   });
 });

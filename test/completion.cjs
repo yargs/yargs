@@ -1,5 +1,6 @@
 'use strict';
 /* global describe, it, before, beforeEach, after */
+/* eslint-disable no-unused-vars */
 const checkUsage = require('./helpers/utils.cjs').checkOutput;
 const yargs = require('../index.cjs');
 

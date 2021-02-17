@@ -1,5 +1,6 @@
 'use strict';
 /* global describe, it, beforeEach */
+/* eslint-disable no-unused-vars */
 
 const checkUsage = require('./helpers/utils.cjs').checkOutput;
 const chalk = require('chalk');
