@@ -1,4 +1,6 @@
 build/
-test/
 example/
 helpers/
+lib/platform-shims/esm.mjs
+test/fixtures/**/**
+example.mjs

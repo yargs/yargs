@@ -101,8 +101,10 @@ export function validation(
   };
 
   // make sure all the required arguments are present.
-  self.requiredArguments = function requiredArguments(argv) {
-    const demandedOptions = yargs.getDemandedOptions();
+  self.requiredArguments = function requiredArguments(
+    argv,
+    demandedOptions: Dictionary<string | undefined>
+  ) {
     let missing: Dictionary<string | undefined> | null = null;
 
     for (const key of Object.keys(demandedOptions)) {
@@ -125,7 +127,6 @@ export function validation(
       }
 
       const customMsg = customMsgs.length ? `\n${customMsgs.join('\n')}` : '';
-
       usage.fail(
         __n(
           'Missing required argument: %s',
@@ -486,7 +487,10 @@ export interface ValidationInstance {
   nonOptionCount(argv: Arguments): void;
   positionalCount(required: number, observed: number): void;
   recommendCommands(cmd: string, potentialCommands: string[]): void;
-  requiredArguments(argv: Arguments): void;
+  requiredArguments(
+    argv: Arguments,
+    demandedOptions: Dictionary<string | undefined>
+  ): void;
   reset(localLookup: Dictionary): ValidationInstance;
   unfreeze(): void;
   unknownArguments(

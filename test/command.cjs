@@ -1,5 +1,6 @@
-'use strict';
 /* global describe, it, beforeEach */
+/* eslint-disable no-unused-vars */
+'use strict';
 const yargs = require('../index.cjs');
 const expect = require('chai').expect;
 const checkOutput = require('./helpers/utils.cjs').checkOutput;

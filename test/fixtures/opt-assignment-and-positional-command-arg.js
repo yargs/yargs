@@ -1,14 +1,18 @@
 #!/usr/bin/env node
+/* eslint-disable node/shebang */
+/* eslint-disable no-undef */
 require('../../')
   .option('foo', {
-    nargs: 1
+    nargs: 1,
   })
   .command(
     'bar <baz>',
     'example',
-    function (yargs) { return yargs },
-    function (argv) {
-      console.log(JSON.stringify({ _: argv._, foo: argv.foo, baz: argv.baz }))
+    yargs => {
+      return yargs;
+    },
+    argv => {
+      console.log(JSON.stringify({_: argv._, foo: argv.foo, baz: argv.baz}));
     }
   )
-  .parse()
+  .parse();
