@@ -53,7 +53,7 @@ import {objFilter} from './utils/obj-filter.js';
 import {applyExtends} from './utils/apply-extends.js';
 import {
   applyMiddleware,
-  globalMiddlewareFactory,
+  GlobalMiddleware,
   MiddlewareCallback,
   Middleware,
 } from './middleware.js';
@@ -75,15 +75,13 @@ function Yargs(
   let command: CommandInstance;
   let completion: CompletionInstance | null = null;
   let groups: Dictionary<string[]> = {};
-  const globalMiddleware: Middleware[] = [];
   let output = '';
   const preservedGroups: Dictionary<string[]> = {};
+  const globalMiddleware = new GlobalMiddleware(self);
   let usage: UsageInstance;
   let validation: ValidationInstance;
 
   const y18n = shim.y18n;
-
-  self.middleware = globalMiddlewareFactory(globalMiddleware, self);
 
   self.scriptName = function (scriptName) {
     self.customScriptName = true;
@@ -248,6 +246,7 @@ function Yargs(
       ? command.reset()
       : Command(self, usage, validation, globalMiddleware, shim);
     if (!completion) completion = Completion(self, usage, command, shim);
+    globalMiddleware.reset();
 
     completionCommand = null;
     output = '';
@@ -281,6 +280,7 @@ function Yargs(
     usage.freeze();
     validation.freeze();
     command.freeze();
+    globalMiddleware.freeze();
   }
   function unfreeze() {
     const frozen = frozens.pop();
@@ -306,6 +306,7 @@ function Yargs(
     usage.unfreeze();
     validation.unfreeze();
     command.unfreeze();
+    globalMiddleware.unfreeze();
   }
 
   self.boolean = function (keys) {
@@ -847,10 +848,54 @@ function Yargs(
     return self;
   };
 
-  self.check = function (f, _global) {
-    argsert('<function> [boolean]', [f, _global], arguments.length);
-    validation.check(f, _global !== false);
+  self.check = function (f, global) {
+    argsert('<function> [boolean]', [f, global], arguments.length);
+    self.middleware(
+      (
+        argv: Arguments,
+        yargs: YargsInstance
+      ): Partial<Arguments> | Promise<Partial<Arguments>> => {
+        let result;
+        try {
+          result = f(argv, yargs);
+        } catch (err) {
+          console.info('gots here 0', result);
+          usage.fail(err.message ? err.message : err, err);
+          return argv;
+        }
+        if (isPromise(result)) {
+          return result.then((result: any) => {
+            checkResult(result);
+            return argv;
+          });
+        } else {
+          checkResult(result);
+          return argv;
+        }
+        function checkResult(result: any) {
+          if (!result) {
+            usage.fail(y18n.__('Argument check failed: %s', f.toString()));
+          } else if (typeof result === 'string' || result instanceof Error) {
+            usage.fail(result.toString(), result);
+          }
+        }
+      },
+      false,
+      global
+    );
     return self;
+  };
+
+  self.middleware = (
+    callback: MiddlewareCallback | MiddlewareCallback[],
+    applyBeforeValidation?: boolean,
+    global = true
+  ) => {
+    return globalMiddleware.addMiddleware(
+      callback,
+      !!applyBeforeValidation,
+      global
+    );
   };
 
   self.global = function global(globals, global) {
@@ -1688,11 +1733,27 @@ function Yargs(
         // if we're executed via bash completion, don't
         // bother with validation.
         if (!requestCompletions) {
+          // TODO(@bcoe): refactor logic below into new helper:
           const validation = self._runValidation(aliases, {}, parsed.error);
           if (!calledFromCommand) {
-            argvPromise = applyMiddleware(argv, self, globalMiddleware, true);
+            argvPromise = applyMiddleware(
+              argv,
+              self,
+              globalMiddleware.getMiddleware(),
+              true
+            );
           }
           argvPromise = validateAsync(validation, argvPromise ?? argv);
+          if (isPromise(argvPromise) && !calledFromCommand) {
+            argvPromise = argvPromise.then(() => {
+              return applyMiddleware(
+                argv,
+                self,
+                globalMiddleware.getMiddleware(),
+                false
+              );
+            });
+          }
         }
       }
     } catch (err) {
@@ -1746,7 +1807,12 @@ function Yargs(
       argv = self._parsePositionalNumbers(argv);
     }
     if (runGlobalMiddleware) {
-      argv = applyMiddleware(argv, self, globalMiddleware, false);
+      argv = applyMiddleware(
+        argv,
+        self,
+        globalMiddleware.getMiddleware(),
+        false
+      );
     }
     return argv;
   };
@@ -1813,7 +1879,6 @@ function Yargs(
       } else if (strictOptions) {
         validation.unknownArguments(argv, aliases, {}, false, false);
       }
-      validation.customChecks(argv, aliases);
       validation.limitedChoices(argv);
       validation.implications(argv);
       validation.conflicting(argv);
@@ -1902,8 +1967,8 @@ export interface YargsInstance {
   array(keys: string | string[]): YargsInstance;
   boolean(keys: string | string[]): YargsInstance;
   check(
-    f: (argv: Arguments, aliases: Dictionary<string[]>) => any,
-    _global?: boolean
+    f: (argv: Arguments, yargs: YargsInstance) => any,
+    global?: boolean
   ): YargsInstance;
   choices: {
     (keys: string | string[], choices: string | string[]): YargsInstance;
@@ -2028,7 +2093,8 @@ export interface YargsInstance {
   };
   middleware(
     callback: MiddlewareCallback | MiddlewareCallback[],
-    applyBeforeValidation?: boolean
+    applyBeforeValidation?: boolean,
+    global?: boolean
   ): YargsInstance;
   nargs: {
     (keys: string | string[], nargs: number): YargsInstance;

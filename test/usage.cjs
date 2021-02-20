@@ -4175,6 +4175,7 @@ describe('usage tests', () => {
   describe('help message caching', () => {
     it('should display proper usage when an async handler fails', done => {
       const y = yargs()
+        .scriptName('mocha')
         .command('cmd', 'test command', {}, () => {
           return new Promise((resolve, reject) => setTimeout(reject, 10));
         })
@@ -4207,8 +4208,9 @@ describe('usage tests', () => {
 
     it('should not display a cached help message for the next parsing', done => {
       const y = yargs()
+        .scriptName('mocha')
         .command('cmd', 'test command', {}, () => {
-          return new Promise((resolve, reject) => setTimeout(resolve, 10));
+          return new Promise((resolve, _reject) => setTimeout(resolve, 10));
         })
         .demandCommand(1, 'You need at least one command before moving on')
         .exitProcess(false);

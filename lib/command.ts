@@ -8,6 +8,7 @@ import {isPromise} from './utils/is-promise.js';
 import {
   applyMiddleware,
   commandMiddlewareFactory,
+  GlobalMiddleware,
   Middleware,
 } from './middleware.js';
 import {parseCommand, Positional} from './parse-command.js';
@@ -35,7 +36,7 @@ export function command(
   yargs: YargsInstance,
   usage: UsageInstance,
   validation: ValidationInstance,
-  globalMiddleware: Middleware[] = [],
+  globalMiddleware: GlobalMiddleware,
   shim: PlatformShim
 ) {
   const self: CommandInstance = {} as CommandInstance;
@@ -299,6 +300,7 @@ export function command(
     if (helpOnly) return innerArgv;
 
     const middlewares = globalMiddleware
+      .getMiddleware()
       .slice(0)
       .concat(commandHandler.middlewares);
     innerArgv = applyMiddleware(innerArgv, yargs, middlewares, true);

@@ -3,7 +3,7 @@
 /* eslint-disable no-unused-vars */
 
 const {expect} = require('chai');
-const {globalMiddlewareFactory} = require('../build/index.cjs');
+const {assert} = require('console');
 let yargs;
 require('chai').should();
 
@@ -12,36 +12,18 @@ function clearRequireCache() {
   delete require.cache[require.resolve('../build/index.cjs')];
 }
 
+async function wait() {
+  return Promise(resolve => {
+    setTimeout(resolve, 10);
+  });
+}
+
 describe('middleware', () => {
   beforeEach(() => {
     yargs = require('../index.cjs');
   });
   afterEach(() => {
     clearRequireCache();
-  });
-
-  it('should add a list of callbacks to global middleware', () => {
-    const globalMiddleware = [];
-
-    globalMiddlewareFactory(globalMiddleware)([() => {}, () => {}]);
-
-    globalMiddleware.should.have.lengthOf(2);
-  });
-
-  it('should throw exception if middleware is not a function', () => {
-    const globalMiddleware = [];
-
-    expect(() => {
-      globalMiddlewareFactory(globalMiddleware)(['callback1', 'callback2']);
-    }).to.throw('middleware must be a function');
-  });
-
-  it('should add a single callback to global middleware', () => {
-    const globalMiddleware = [];
-
-    globalMiddlewareFactory(globalMiddleware)(() => {});
-
-    globalMiddleware.should.have.lengthOf(1);
   });
 
   it('runs the middleware before reaching the handler', done => {
@@ -622,5 +604,55 @@ describe('middleware', () => {
       )
       .parse();
     argv.foo.should.equal(198);
+  });
+
+  it('throws error if middleware not function', () => {
+    let err;
+    try {
+      yargs('snuh --foo 99').middleware(['hello']).parse();
+    } catch (_err) {
+      err = _err;
+    }
+    err.message.should.match(/middleware must be a function/);
+  });
+
+  describe('async check', () => {
+    describe('success', () => {
+      it('returns promise if check is async', async () => {
+        const argvPromise = yargs('--foo 100')
+          .middleware(argv => {
+            argv.foo *= 2;
+          }, true)
+          .check(async (argv, yargs) => {
+            wait();
+            if (argv.foo < 200) return false;
+            else return true;
+          })
+          .parse();
+        (!!argvPromise.then).should.equal(true);
+        const argv = await argvPromise;
+        argv.foo.should.equal(200);
+      });
+      it('returns promise if check and middleware is async', async () => {
+        const argvPromise = yargs('--foo 100')
+          .middleware(async argv => {
+            wait();
+            argv.foo *= 2;
+          }, true)
+          .check(async (argv, yargs) => {
+            wait();
+            if (argv.foo < 200) return false;
+            else return true;
+          })
+          .parse();
+        (!!argvPromise.then).should.equal(true);
+        const argv = await argvPromise;
+        argv.foo.should.equal(200);
+      });
+    });
+    // TODO: add test that demonstrates using yargs instance to get alias.
+    // TODO: document that check now returns instance rather than aliases.
+    // TODO: add test that demonstrates using command with middleware and check.
+    // TODO: add test that demonstrates using command witn check.
   });
 });
