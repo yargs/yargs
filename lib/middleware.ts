@@ -40,6 +40,18 @@ export class GlobalMiddleware {
     }
     return this.yargs;
   }
+  // For "coerce" middleware, only one middleware instance can be registered
+  // per option:
+  addCoerceMiddleware(
+    callback: MiddlewareCallback | MiddlewareCallback[],
+    option: string
+  ): YargsInstance {
+    const aliases = this.yargs.getAliases();
+    this.globalMiddleware = this.globalMiddleware.filter(m => {
+      return true;
+    });
+    return this.addMiddleware(callback, true, true);
+  }
   getMiddleware() {
     return this.globalMiddleware;
   }
@@ -108,4 +120,5 @@ export interface MiddlewareCallback {
 export interface Middleware extends MiddlewareCallback {
   applyBeforeValidation: boolean;
   global: boolean;
+  option?: string;
 }

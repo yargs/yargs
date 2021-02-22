@@ -58,6 +58,7 @@ import {
   Middleware,
 } from './middleware.js';
 import {isPromise} from './utils/is-promise.js';
+import {maybeAsyncResult} from './utils/maybe-async-result.js';
 import setBlocking from './utils/set-blocking.js';
 
 let shim: PlatformShim;
@@ -221,7 +222,6 @@ function Yargs(
       'choices',
       'demandedOptions',
       'demandedCommands',
-      'coerce',
       'deprecatedOptions',
     ];
 
@@ -492,7 +492,57 @@ function Yargs(
       [keys, value],
       arguments.length
     );
-    populateParserHintSingleValueDictionary(self.coerce, 'coerce', keys, value);
+    if (Array.isArray(keys)) {
+      if (!value) {
+        throw new YError('coerce callback must be provided');
+      }
+      for (const key of keys) {
+        self.coerce(key, value!);
+      }
+      return self;
+    } else if (typeof keys === 'object') {
+      for (const key of Object.keys(keys)) {
+        self.coerce(key, keys[key]);
+      }
+      return self;
+    }
+    if (!value) {
+      throw new YError('coerce callback must be provided');
+    }
+    // This noop tells yargs-parser about the existence of the option
+    // represented by "keys", so that it can apply camel case expansion
+    // if needed:
+    self.alias(keys, keys);
+    self.middleware(
+      (
+        argv: Arguments,
+        yargs: YargsInstance
+      ): Partial<Arguments> | Promise<Partial<Arguments>> => {
+        let aliases: Dictionary<string[]>;
+        return maybeAsyncResult<
+          Partial<Arguments> | Promise<Partial<Arguments>> | any
+        >(
+          () => {
+            aliases = yargs.getAliases();
+            return value(argv[keys]);
+          },
+          (err: Error): Partial<Arguments> | Promise<Partial<Arguments>> => {
+            throw new YError(err.message);
+          },
+          (result: any): Partial<Arguments> => {
+            argv[keys] = result;
+            if (aliases[keys]) {
+              for (const alias of aliases[keys]) {
+                argv[alias] = result;
+              }
+            }
+            return argv;
+          }
+        );
+      },
+      true,
+      true
+    );
     return self;
   };
 
@@ -759,6 +809,10 @@ function Yargs(
     return self;
   };
 
+  self.getAliases = () => {
+    return self.parsed ? self.parsed.aliases : {};
+  };
+
   self.getDemandedOptions = () => {
     argsert([], 0);
     return options.demandedOptions;
@@ -855,30 +909,25 @@ function Yargs(
         argv: Arguments,
         yargs: YargsInstance
       ): Partial<Arguments> | Promise<Partial<Arguments>> => {
-        let result;
-        try {
-          result = f(argv, yargs);
-        } catch (err) {
-          console.info('gots here 0', result);
-          usage.fail(err.message ? err.message : err, err);
-          return argv;
-        }
-        if (isPromise(result)) {
-          return result.then((result: any) => {
-            checkResult(result);
+        return maybeAsyncResult<
+          Partial<Arguments> | Promise<Partial<Arguments>> | any
+        >(
+          () => {
+            return f(argv, yargs);
+          },
+          (err: Error): Partial<Arguments> | Promise<Partial<Arguments>> => {
+            usage.fail(err.message ? err.message : err.toString(), err);
             return argv;
-          });
-        } else {
-          checkResult(result);
-          return argv;
-        }
-        function checkResult(result: any) {
-          if (!result) {
-            usage.fail(y18n.__('Argument check failed: %s', f.toString()));
-          } else if (typeof result === 'string' || result instanceof Error) {
-            usage.fail(result.toString(), result);
+          },
+          (result: any): Partial<Arguments> | Promise<Partial<Arguments>> => {
+            if (!result) {
+              usage.fail(y18n.__('Argument check failed: %s', f.toString()));
+            } else if (typeof result === 'string' || result instanceof Error) {
+              usage.fail(result.toString(), result);
+            }
+            return argv;
           }
-        }
+        );
       },
       false,
       global
@@ -1774,17 +1823,16 @@ function Yargs(
     validation: (argv: Arguments) => void,
     argv: Arguments | Promise<Arguments>
   ): Arguments | Promise<Arguments> {
-    if (isPromise(argv)) {
-      // If the middlware returned a promise, resolve the middleware
-      // before applying the validation:
-      argv = argv.then(argv => {
-        validation(argv);
-        return argv;
-      });
-    } else {
-      validation(argv);
-    }
-    return argv;
+    return maybeAsyncResult<Arguments>(
+      argv,
+      (err: Error) => {
+        throw err;
+      },
+      result => {
+        validation(result);
+        return result;
+      }
+    );
   }
 
   // Applies a couple post processing steps that are easier to perform
@@ -2066,6 +2114,7 @@ export interface YargsInstance {
   ): Promise<string[] | void> | any;
   getHelp(): Promise<string>;
   getContext(): Context;
+  getAliases(): Dictionary<string[]>;
   getDemandedCommands(): Options['demandedCommands'];
   getDemandedOptions(): Options['demandedOptions'];
   getDeprecatedOptions(): Options['deprecatedOptions'];

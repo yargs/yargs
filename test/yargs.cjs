@@ -303,7 +303,6 @@ describe('yargs dsl tests', () => {
         narg: {},
         defaultDescription: {},
         choices: {},
-        coerce: {},
         skipValidation: [],
         count: [],
         normalize: [],
@@ -1985,6 +1984,7 @@ describe('yargs dsl tests', () => {
         '--file',
         path.join(__dirname, 'fixtures', 'package.json'),
       ])
+        .alias('file', 'f')
         .coerce('file', arg => JSON.parse(fs.readFileSync(arg, 'utf8')))
         .parse();
       expect(argv.file).to.have.property('version').and.equal('9.9.9');

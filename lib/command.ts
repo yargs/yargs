@@ -24,6 +24,7 @@ import {
   Arguments,
   DetailedArguments,
 } from './yargs-factory.js';
+import {maybeAsyncResult} from './utils/maybe-async-result.js';
 import whichModule from './utils/which-module.js';
 
 const DEFAULT_MARKER = /(^\*)|(^\$0)/;
@@ -314,16 +315,16 @@ export function command(
         (yargs.parsed as DetailedArguments).error,
         !command
       );
-      if (isPromise(innerArgv)) {
-        // If the middlware returned a promise, resolve the middleware
-        // before applying the validation:
-        innerArgv = innerArgv.then(argv => {
-          validation(argv);
-          return argv;
-        });
-      } else {
-        validation(innerArgv);
-      }
+      innerArgv = maybeAsyncResult<Arguments>(
+        innerArgv,
+        (err: Error) => {
+          throw err;
+        },
+        result => {
+          validation(result);
+          return result;
+        }
+      );
     }
 
     if (commandHandler.handler && !yargs._hasOutput()) {
@@ -336,18 +337,20 @@ export function command(
       yargs._postProcess(innerArgv, populateDoubleDash, false, false);
 
       innerArgv = applyMiddleware(innerArgv, yargs, middlewares, false);
-      if (isPromise(innerArgv)) {
-        const innerArgvRef = innerArgv;
-        innerArgv = innerArgv
-          .then(argv => commandHandler.handler(argv))
-          .then(() => innerArgvRef);
-      } else {
-        const handlerResult = commandHandler.handler(innerArgv);
-        if (isPromise(handlerResult)) {
-          const innerArgvRef = innerArgv;
-          innerArgv = handlerResult.then(() => innerArgvRef);
+      innerArgv = maybeAsyncResult<Arguments>(
+        innerArgv,
+        (err: Error) => {
+          throw err;
+        },
+        result => {
+          const handlerResult = commandHandler.handler(result as Arguments);
+          if (isPromise(handlerResult)) {
+            return handlerResult.then(() => result);
+          } else {
+            return result;
+          }
         }
-      }
+      );
 
       yargs.getUsageInstance().cacheHelpMessage();
       if (isPromise(innerArgv) && !yargs._hasParseCallback()) {
@@ -493,7 +496,7 @@ export function command(
     if (!unparsed.length) return;
 
     const config: Configuration = Object.assign({}, options.configuration, {
-      'populate--': true,
+      'populate--': false,
     });
     const parsed = shim.Parser.detailed(
       unparsed,
