@@ -3,6 +3,7 @@ build/
 node_modules/
 .nyc_output/
 *.swp
+example.mjs
 test.js
 coverage
 package-lock.json
