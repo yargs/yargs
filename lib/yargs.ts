@@ -170,6 +170,7 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
       groups,
       strict,
       strictCommands,
+      strictOptions,
       completionCommand,
       output,
       exitError,
@@ -198,6 +199,7 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
       parsed: self.parsed,
       strict,
       strictCommands,
+      strictOptions,
       completionCommand,
       parseFn,
       parseContext,
@@ -942,6 +944,14 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
   }
   self.getStrictCommands = () => strictCommands
 
+  let strictOptions = false
+  self.strictOptions = function (enabled) {
+    argsert('[boolean]', [enabled], arguments.length)
+    strictOptions = enabled !== false
+    return self
+  }
+  self.getStrictOptions = () => strictOptions
+
   let parserConfig: Configuration = {}
   self.parserConfiguration = function parserConfiguration (config) {
     argsert('<object>', [config], arguments.length)
@@ -1371,6 +1381,8 @@ export function Yargs (processArgs: string | string[] = [], cwd = process.cwd(),
     }
     if (strict && !failedStrictCommands) {
       validation.unknownArguments(argv, aliases, positionalMap, isDefaultCommand)
+    } else if (strictOptions) {
+      validation.unknownArguments(argv, aliases, {}, false, false)
     }
     validation.customChecks(argv, aliases)
     validation.limitedChoices(argv)
@@ -1514,6 +1526,7 @@ export interface YargsInstance {
   getParserConfiguration (): Configuration
   getStrict (): boolean
   getStrictCommands (): boolean
+  getStrictOptions (): boolean
   getUsageInstance (): UsageInstance
   getValidationInstance (): ValidationInstance
   global (keys: string | string[], global?: boolean): YargsInstance
@@ -1567,6 +1580,7 @@ export interface YargsInstance {
   skipValidation (keys: string | string[]): YargsInstance
   strict (enable?: boolean): YargsInstance
   strictCommands (enable?: boolean): YargsInstance
+  strictOptions (enable?: boolean): YargsInstance
   string (key: string | string []): YargsInstance
   terminalWidth (): number | null
   updateStrings (obj: Dictionary<string>): YargsInstance
@@ -1697,6 +1711,7 @@ interface FrozenYargsInstance {
   groups: Dictionary<string[]>
   strict: boolean
   strictCommands: boolean
+  strictOptions: boolean
   completionCommand: string | null
   output: string
   exitError: YError | string | undefined | null

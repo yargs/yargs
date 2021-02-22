@@ -1,14 +1,15 @@
 on:
    push:
      branches:
-       - master
+       - 15.x.x
 name: release-please
 jobs:
   release-please:
     runs-on: ubuntu-latest
     steps:
-      - uses: bcoe/release-please-action@v1.0.1
+      - uses: google-github-actions/release-please-action@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           release-type: node
           package-name: yargs
+          default-branch: 15.x.x
