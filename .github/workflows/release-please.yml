@@ -12,4 +12,4 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           release-type: node
           package-name: yargs
-          default-branch: 15.x.x
+          default-branch: v15.x.x
