@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [15.5.0](https://www.github.com/yargs/yargs/compare/v15.4.0...v15.5.0) (2021-02-22)
+
+
+### Features
+
+* backport strictOptions feature ([#1873](https://www.github.com/yargs/yargs/issues/1873)) ([35ee46a](https://www.github.com/yargs/yargs/commit/35ee46a1e6bea089cec419bbef8c550cd8e54be7))
+
+
+### Bug Fixes
+
+* **deps:** decamelize@3.x is 12mb ([22d7ec0](https://www.github.com/yargs/yargs/commit/22d7ec0dff141f85932194d9e4a1f5a489c74de0))
+
 ## [15.4.0](https://www.github.com/yargs/yargs/compare/v15.3.1...v15.4.0) (2020-06-30)
 
 
