@@ -3,8 +3,6 @@
 /* eslint-disable no-unused-vars */
 
 const {expect} = require('chai');
-const {assert} = require('console');
-const {rawListeners} = require('process');
 let yargs;
 require('chai').should();
 
@@ -650,37 +648,39 @@ describe('middleware', () => {
         const argv = await argvPromise;
         argv.foo.should.equal(200);
       });
-      it('allows two commands to register different coerce methods', async () => {
-        const y = yargs()
-          .command('command1', 'first command', yargs => {
-            yargs.coerce('foo', async arg => {
-              wait();
-              return new Date(arg);
-            });
-          })
-          .command('command2', 'second command', yargs => {
-            yargs.coerce('foo', async arg => {
-              wait();
-              return new Number(arg);
-            });
-          })
-          .coerce('foo', async _arg => {
-            return 'hello';
-          });
-        const r1 = await y.parse('command1 --foo 2020-10-10');
-        expect(r1.foo).to.be.an.instanceof(Date);
-        const r2 = await y.parse('command2 --foo 302');
-        r2.foo.should.equal(302);
-      });
     });
     // TODO: add test that demonstrates using yargs instance to get alias.
     // TODO: document that check now returns instance rather than aliases.
     // TODO: add test that demonstrates using command with middleware and check.
-    // TODO: add test that demonstrates using command witn check.
-
-    // TODO: add test for two commands that register the same coerce.
-    // TODO: add test for async coerce happening prior to validation.
+    // TODO: add test that demonstrates using command with check.
   });
 
-  // TODO: add test for coerce happening prior to validation.
+  describe('async coerce', () => {
+    it('allows two commands to register different coerce methods', async () => {
+      const y = yargs()
+        .command('command1', 'first command', yargs => {
+          yargs.coerce('foo', async arg => {
+            wait();
+            return new Date(arg);
+          });
+        })
+        .command('command2', 'second command', yargs => {
+          yargs.coerce('foo', async arg => {
+            wait();
+            return new Number(arg);
+          });
+        })
+        .coerce('foo', async _arg => {
+          return 'hello';
+        });
+      const r1 = await y.parse('command1 --foo 2020-10-10');
+      expect(r1.foo).to.be.an.instanceof(Date);
+      const r2 = await y.parse('command2 --foo 302');
+      r2.foo.should.equal(302);
+    });
+    // TODO: add test which demonstrates alias used with coerce.
+    // TODO: add test for two commands that register the same coerce.
+    // TODO: add test for async coerce happening prior to validation.
+    // TODO: add test for coerce happening prior to validation.
+  });
 });

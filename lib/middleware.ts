@@ -43,13 +43,16 @@ export class GlobalMiddleware {
   // For "coerce" middleware, only one middleware instance can be registered
   // per option:
   addCoerceMiddleware(
-    callback: MiddlewareCallback | MiddlewareCallback[],
+    callback: MiddlewareCallback,
     option: string
   ): YargsInstance {
     const aliases = this.yargs.getAliases();
     this.globalMiddleware = this.globalMiddleware.filter(m => {
-      return true;
+      const toCheck = [...(aliases[option] ? aliases[option] : []), option];
+      if (!m.option) return true;
+      else return !toCheck.includes(m.option);
     });
+    (callback as Middleware).option = option;
     return this.addMiddleware(callback, true, true);
   }
   getMiddleware() {

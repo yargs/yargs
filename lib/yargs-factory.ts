@@ -513,7 +513,7 @@ function Yargs(
     // represented by "keys", so that it can apply camel case expansion
     // if needed:
     self.alias(keys, keys);
-    self.middleware(
+    globalMiddleware.addCoerceMiddleware(
       (
         argv: Arguments,
         yargs: YargsInstance
@@ -540,8 +540,7 @@ function Yargs(
           }
         );
       },
-      true,
-      true
+      keys
     );
     return self;
   };
