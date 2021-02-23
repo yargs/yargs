@@ -1,5 +1,6 @@
 'use strict';
 /* global describe, it, before, beforeEach, after */
+/* eslint-disable no-unused-vars */
 const checkUsage = require('./helpers/utils.cjs').checkOutput;
 const yargs = require('../index.cjs');
 
@@ -56,7 +57,7 @@ describe('Completion', () => {
             './completion',
             '--get-yargs-completions',
             './completion',
-            '--f',
+            '-f',
             '--',
           ])
             .options({
@@ -338,6 +339,54 @@ describe('Completion', () => {
       );
 
       r.logs.should.include('success!');
+    });
+
+    it('allows the custom completion function to use the standard one', done => {
+      checkUsage(
+        () => {
+          yargs(['./completion', '--get-yargs-completions'])
+            .command('foo', 'bar')
+            .command('apple', 'banana')
+            .completion(
+              'completion',
+              (current, argv, defaultCompletion, done) => {
+                defaultCompletion();
+              }
+            )
+            .parse();
+        },
+        null,
+        (err, r) => {
+          if (err) throw err;
+          r.logs.should.include('apple');
+          r.logs.should.include('foo');
+          return done();
+        }
+      );
+    });
+
+    it('allows calling callback instead of default completion function', done => {
+      checkUsage(
+        () => {
+          yargs(['./completion', '--get-yargs-completions'])
+            .command('foo', 'bar')
+            .command('apple', 'banana')
+            .completion(
+              'completion',
+              (current, argv, defaultCompletion, done) => {
+                done(['orange']);
+              }
+            )
+            .parse();
+        },
+        null,
+        (err, r) => {
+          if (err) throw err;
+          r.logs.should.include('orange');
+          r.logs.should.not.include('foo');
+          return done();
+        }
+      );
     });
 
     it('if a promise is returned, completions can be asynchronous', done => {

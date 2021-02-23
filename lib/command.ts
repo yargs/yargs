@@ -314,18 +314,27 @@ export function command(
     const middlewares = globalMiddleware
       .slice(0)
       .concat(commandHandler.middlewares);
-    applyMiddleware(innerArgv, yargs, middlewares, true);
+    innerArgv = applyMiddleware(innerArgv, yargs, middlewares, true);
 
     // we apply validation post-hoc, so that custom
     // checks get passed populated positional arguments.
     if (!yargs._hasOutput()) {
-      yargs._runValidation(
-        innerArgv as Arguments,
+      const validation = yargs._runValidation(
         aliases,
         positionalMap,
         (yargs.parsed as DetailedArguments).error,
         !command
       );
+      if (isPromise(innerArgv)) {
+        // If the middlware returned a promise, resolve the middleware
+        // before applying the validation:
+        innerArgv = innerArgv.then(argv => {
+          validation(argv);
+          return argv;
+        });
+      } else {
+        validation(innerArgv);
+      }
     }
 
     if (commandHandler.handler && !yargs._hasOutput()) {
@@ -335,7 +344,7 @@ export function command(
       const populateDoubleDash = !!yargs.getOptions().configuration[
         'populate--'
       ];
-      yargs._postProcess(innerArgv, populateDoubleDash);
+      yargs._postProcess(innerArgv, populateDoubleDash, false, false);
 
       innerArgv = applyMiddleware(innerArgv, yargs, middlewares, false);
       if (isPromise(innerArgv)) {
@@ -351,8 +360,8 @@ export function command(
         }
       }
 
+      yargs.getUsageInstance().cacheHelpMessage();
       if (isPromise(innerArgv) && !yargs._hasParseCallback()) {
-        yargs.getUsageInstance().cacheHelpMessage();
         innerArgv.catch(error => {
           try {
             yargs.getUsageInstance().fail(null, error);
@@ -361,8 +370,6 @@ export function command(
             // registered, run usage's default fail method.
           }
         });
-      } else if (isPromise(innerArgv)) {
-        yargs.getUsageInstance().cacheHelpMessage();
       }
     }
 
