@@ -2609,7 +2609,7 @@ describe('usage tests', () => {
           '',
           'Options:',
           '      --version  Show version number  [boolean]',
-          '  -h, --help     Show help  [boolean]'
+          '  -h, --help     Show help  [boolean]',
         ]);
     });
   });
