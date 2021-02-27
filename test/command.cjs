@@ -1,5 +1,6 @@
-'use strict';
 /* global describe, it, beforeEach */
+/* eslint-disable no-unused-vars */
+'use strict';
 const yargs = require('../index.cjs');
 const expect = require('chai').expect;
 const checkOutput = require('./helpers/utils.cjs').checkOutput;
@@ -1765,29 +1766,53 @@ describe('Command', () => {
         .parse();
     });
 
-    it('succeeds when the promise returned by the command handler resolves', done => {
+    it('returns promise that resolves arguments once handler succeeds', async () => {
+      let complete = false;
       const handler = new Promise((resolve, reject) => {
         setTimeout(() => {
-          return resolve(true);
-        }, 5);
+          complete = true;
+          return resolve();
+        }, 10);
       });
-      const parsed = yargs('foo hello')
+      const parsedPromise = yargs('foo hello')
         .command(
           'foo <pos>',
           'foo command',
           () => {},
-          yargs => handler
+          () => handler
         )
-        .fail((msg, err) => {
-          return done(Error('should not have been called'));
-        })
         .parse();
+      complete.should.equal(false);
+      const parsed = await parsedPromise;
+      complete.should.equal(true);
+      parsed.pos.should.equal('hello');
+    });
 
-      handler.then(called => {
-        called.should.equal(true);
-        parsed.pos.should.equal('hello');
-        return done();
+    it('returns promise that can be caught, when fail(false)', async () => {
+      let complete = false;
+      const handler = new Promise((resolve, reject) => {
+        setTimeout(() => {
+          complete = true;
+          return reject(Error('error from handler'));
+        }, 10);
       });
+      const parsedPromise = yargs('foo hello')
+        .command(
+          'foo <pos>',
+          'foo command',
+          () => {},
+          () => handler
+        )
+        .fail(false)
+        .parse();
+      try {
+        complete.should.equal(false);
+        await parsedPromise;
+        throw Error('unreachable');
+      } catch (err) {
+        err.message.should.match(/error from handler/);
+        complete.should.equal(true);
+      }
     });
 
     // see: https://github.com/yargs/yargs/issues/1144

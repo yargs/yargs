@@ -1,5 +1,6 @@
 'use strict';
-/* global describe, it, beforeEach, after */
+/* global describe, it, before, beforeEach, after */
+/* eslint-disable no-unused-vars */
 const checkUsage = require('./helpers/utils.cjs').checkOutput;
 const yargs = require('../index.cjs');
 
@@ -56,7 +57,7 @@ describe('Completion', () => {
             './completion',
             '--get-yargs-completions',
             './completion',
-            '--f',
+            '-f',
             '--',
           ])
             .options({
@@ -340,6 +341,54 @@ describe('Completion', () => {
       r.logs.should.include('success!');
     });
 
+    it('allows the custom completion function to use the standard one', done => {
+      checkUsage(
+        () => {
+          yargs(['./completion', '--get-yargs-completions'])
+            .command('foo', 'bar')
+            .command('apple', 'banana')
+            .completion(
+              'completion',
+              (current, argv, defaultCompletion, done) => {
+                defaultCompletion();
+              }
+            )
+            .parse();
+        },
+        null,
+        (err, r) => {
+          if (err) throw err;
+          r.logs.should.include('apple');
+          r.logs.should.include('foo');
+          return done();
+        }
+      );
+    });
+
+    it('allows calling callback instead of default completion function', done => {
+      checkUsage(
+        () => {
+          yargs(['./completion', '--get-yargs-completions'])
+            .command('foo', 'bar')
+            .command('apple', 'banana')
+            .completion(
+              'completion',
+              (current, argv, defaultCompletion, done) => {
+                done(['orange']);
+              }
+            )
+            .parse();
+        },
+        null,
+        (err, r) => {
+          if (err) throw err;
+          r.logs.should.include('orange');
+          r.logs.should.not.include('foo');
+          return done();
+        }
+      );
+    });
+
     it('if a promise is returned, completions can be asynchronous', done => {
       checkUsage(
         cb => {
@@ -522,7 +571,7 @@ describe('Completion', () => {
             .command('foo', 'bar')
             .command('apple', 'banana')
             .completion()
-            .getCompletion([''], completions => {
+            .getCompletion([''], (_err, completions) => {
               (completions || []).forEach(completion => {
                 console.log(completion);
               });
@@ -538,7 +587,7 @@ describe('Completion', () => {
             .option('apple')
             .option('foo')
             .completion()
-            .getCompletion(['$0', '-'], completions => {
+            .getCompletion(['$0', '-'], (_err, completions) => {
               (completions || []).forEach(completion => {
                 console.log(completion);
               });
@@ -642,7 +691,7 @@ describe('Completion', () => {
             .command('foo', 'bar')
             .command('apple', 'banana')
             .completion()
-            .getCompletion([''], completions => {
+            .getCompletion([''], (_err, completions) => {
               (completions || []).forEach(completion => {
                 console.log(completion);
               });
@@ -686,6 +735,38 @@ describe('Completion', () => {
       });
       r.errors.length.should.equal(0);
       r.logs.should.include('of-memory:Dream about a specific memory');
+    });
+  });
+
+  describe('async', () => {
+    before(() => {
+      process.env.SHELL = '/bin/bash';
+    });
+    describe('getCompletion', () => {
+      it('allows completions to be awaited', async () => {
+        const completions = await yargs()
+          .command('foo', 'bar')
+          .command('apple', 'banana')
+          .completion()
+          .getCompletion(['']);
+        completions.should.eql(['foo', 'apple', 'completion']);
+      });
+    });
+    // See: https://github.com/yargs/yargs/issues/1235
+    describe('completion', () => {
+      it('does not apply validation if async completion command provided', async () => {
+        const completions = await yargs(['--get-yargs-completions', 'foo'])
+          .command('foo <bar>', 'foo command')
+          .completion('completion', false, async () => {
+            return new Promise(resolve => {
+              setTimeout(() => {
+                return resolve(['foo', 'bar', 'apple']);
+              }, 5);
+            });
+          })
+          .getCompletion(['foo']);
+        completions.should.eql(['foo', 'bar', 'apple']);
+      });
     });
   });
 });

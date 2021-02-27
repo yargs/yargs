@@ -1,5 +1,6 @@
 'use strict';
 /* global context, describe, it, beforeEach, afterEach */
+/* eslint-disable no-unused-vars */
 
 const expect = require('chai').expect;
 const fs = require('fs');
@@ -21,6 +22,10 @@ describe('yargs dsl tests', () => {
   const oldProcess = {versions: {}};
 
   beforeEach(() => {
+    process.execPath = 'node';
+    process._ = 'node';
+    process.argv[1] = 'node';
+
     oldProcess.argv = process.argv;
     oldProcess.defaultApp = process.defaultApp;
     oldProcess.versions.electron = process.versions.electron;
@@ -1198,7 +1203,7 @@ describe('yargs dsl tests', () => {
         output1
           .split('\n')
           .should.deep.equal([
-            'ndm batman <api-token>',
+            'node batman <api-token>',
             '',
             'batman command',
             '',
@@ -1210,7 +1215,7 @@ describe('yargs dsl tests', () => {
         output2
           .split('\n')
           .should.deep.equal([
-            'ndm robin <egg>',
+            'node robin <egg>',
             '',
             'robin command',
             '',
@@ -1243,7 +1248,7 @@ describe('yargs dsl tests', () => {
         output1
           .split('\n')
           .should.deep.equal([
-            'ndm batman <api-token>',
+            'node batman <api-token>',
             '',
             'batman command',
             '',
@@ -1258,7 +1263,7 @@ describe('yargs dsl tests', () => {
         output2
           .split('\n')
           .should.deep.equal([
-            'ndm robin <egg>',
+            'node robin <egg>',
             '',
             'robin command',
             '',
@@ -1292,10 +1297,10 @@ describe('yargs dsl tests', () => {
         output
           .split('\n')
           .should.deep.equal([
-            'ndm <command>',
+            'node <command>',
             '',
             'Commands:',
-            '  ndm one <x>  The one and only command',
+            '  node one <x>  The one and only command',
             '',
             'Options:',
             '  --help     Show help  [boolean]',
@@ -2441,46 +2446,6 @@ describe('yargs dsl tests', () => {
     argv['--'].should.eql(['foo']);
   });
 
-  describe('onFinishCommand', () => {
-    it('use with promise', done => {
-      const result = 'noop-result';
-      let calledTimes = 0;
-      yargs(['noop'])
-        .command('noop', 'a noop command', noop, async () => {
-          return result;
-        })
-        .onFinishCommand(async commandResult => {
-          commandResult.should.eql(result);
-          calledTimes++;
-        })
-        .parse('noop');
-
-      setTimeout(() => {
-        calledTimes.should.eql(1);
-        done();
-      }, 5);
-    });
-
-    it('use without promise', done => {
-      const result = 'noop-result';
-      let calledTimes = 0;
-      yargs(['noop'])
-        .command('noop', 'a noop command', noop, () => {
-          return result;
-        })
-        .onFinishCommand(commandResult => {
-          commandResult.should.eql(result);
-          calledTimes++;
-        })
-        .parse('noop');
-
-      setTimeout(() => {
-        calledTimes.should.eql(1);
-        done();
-      }, 5);
-    });
-  });
-
   // See: https://github.com/yargs/yargs/issues/1098
   it('should allow array and requires arg to be used in conjunction', () => {
     const argv = yargs(['-i', 'item1', 'item2', 'item3']).option('i', {
@@ -2692,6 +2657,424 @@ describe('yargs dsl tests', () => {
       const argv = yargs('hello 33.0').parse();
       argv._[0].should.equal('hello');
       argv._[1].should.equal(33);
+    });
+  });
+
+  // See: https://github.com/yargs/yargs/issues/1420
+  describe('async', () => {
+    describe('parse', () => {
+      it('returns promise that resolves argv on success', done => {
+        let executionCount = 0;
+        yargs()
+          .command(
+            'cmd [str]',
+            'a command',
+            () => {},
+            async argv => {
+              return new Promise(resolve => {
+                setTimeout(() => {
+                  argv.addedAsync = 99;
+                  executionCount++;
+                  return resolve(argv);
+                }, 5);
+              });
+            }
+          )
+          .parse('cmd foo', async (_err, argv) => {
+            (typeof argv.then).should.equal('function');
+            argv = await argv;
+            argv.addedAsync.should.equal(99);
+            argv.str.should.equal('foo');
+            executionCount.should.equal(1);
+            return done();
+          });
+      });
+      it('returns deeply nested promise that resolves argv on success', done => {
+        let executionCount = 0;
+        yargs()
+          .command(
+            'cmd',
+            'a command',
+            yargs => {
+              yargs.command(
+                'foo [apple]',
+                'foo command',
+                () => {},
+                async argv => {
+                  return new Promise(resolve => {
+                    setTimeout(() => {
+                      argv.addedAsync = 99;
+                      executionCount++;
+                      return resolve(argv);
+                    }, 5);
+                  });
+                }
+              );
+            },
+            () => {}
+          )
+          .parse('cmd foo orange', async (_err, argv) => {
+            (typeof argv.then).should.equal('function');
+            argv = await argv;
+            argv.addedAsync.should.equal(99);
+            argv.apple.should.equal('orange');
+            executionCount.should.equal(1);
+            return done();
+          });
+      });
+      it('returns promise that can be caught if rejected', done => {
+        let executionCount = 0;
+        yargs()
+          .command(
+            'cmd [str]',
+            'a command',
+            () => {},
+            async argv => {
+              return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                  executionCount++;
+                  return reject(Error('async error'));
+                }, 5);
+              });
+            }
+          )
+          .parse('cmd foo', async (_err, argv) => {
+            (typeof argv.then).should.equal('function');
+            try {
+              await argv;
+            } catch (err) {
+              err.message.should.equal('async error');
+              executionCount.should.equal(1);
+              return done();
+            }
+          });
+      });
+      it('caches nested help output, so that it can be output by showHelp()', done => {
+        let executionCount = 0;
+        const y = yargs();
+        y.command(
+          'cmd [str]',
+          'a command',
+          () => {},
+          async argv => {
+            return new Promise((resolve, reject) => {
+              setTimeout(() => {
+                executionCount++;
+                return reject(Error('async error'));
+              }, 5);
+            });
+          }
+        ).parse('cmd foo', async (_err, argv) => {
+          (typeof argv.then).should.equal('function');
+          try {
+            await argv;
+          } catch (err) {
+            y.showHelp(output => {
+              output.should.match(/a command/);
+              executionCount.should.equal(1);
+              return done();
+            });
+          }
+        });
+      });
+      it('caches deeply nested help output, so that it can be output by showHelp()', done => {
+        let executionCount = 0;
+        const y = yargs();
+        y.command(
+          'cmd',
+          'a command',
+          yargs => {
+            yargs.command(
+              'inner [foo]',
+              'inner command',
+              () => {},
+              async argv => {
+                return new Promise((resolve, reject) => {
+                  setTimeout(() => {
+                    executionCount++;
+                    return reject(Error('async error'));
+                  }, 5);
+                });
+              }
+            );
+          },
+          () => {}
+        ).parse('cmd inner bar', async (_err, argv) => {
+          (typeof argv.then).should.equal('function');
+          try {
+            await argv;
+          } catch (err) {
+            y.showHelp(output => {
+              output.should.match(/inner command/);
+              executionCount.should.equal(1);
+              return done();
+            });
+          }
+        });
+      });
+    });
+    describe('argv', () => {
+      it('returns promise that resolves argv on success', async () => {
+        let executionCount = 0;
+        const argvPromise = yargs('cmd foo').command(
+          'cmd [str]',
+          'a command',
+          () => {},
+          async argv => {
+            return new Promise(resolve => {
+              setTimeout(() => {
+                argv.addedAsync = 99;
+                executionCount++;
+                return resolve();
+              }, 5);
+            });
+          }
+        ).argv;
+        (typeof argvPromise.then).should.equal('function');
+        const argv = await argvPromise;
+        argv.addedAsync.should.equal(99);
+        argv.str.should.equal('foo');
+        executionCount.should.equal(1);
+      });
+      it('returns deeply nested promise that resolves argv on success', async () => {
+        let executionCount = 0;
+        const argvPromise = yargs('cmd foo orange')
+          .command(
+            'cmd',
+            'a command',
+            yargs => {
+              yargs.command(
+                'foo [apple]',
+                'foo command',
+                () => {},
+                async argv => {
+                  return new Promise(resolve => {
+                    setTimeout(() => {
+                      argv.addedAsync = 99;
+                      executionCount++;
+                      return resolve();
+                    }, 5);
+                  });
+                }
+              );
+            },
+            () => {}
+          )
+          .parse();
+        (typeof argvPromise.then).should.equal('function');
+        const argv = await argvPromise;
+        argv.addedAsync.should.equal(99);
+        argv.apple.should.equal('orange');
+        executionCount.should.equal(1);
+      });
+      it('returns promise that can be caught if rejected', async () => {
+        let executionCount = 0;
+        const argv = yargs('cmd foo')
+          .fail(false)
+          .command(
+            'cmd [str]',
+            'a command',
+            () => {},
+            async argv => {
+              return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                  executionCount++;
+                  return reject(Error('async error'));
+                }, 5);
+              });
+            }
+          ).argv;
+        (typeof argv.then).should.equal('function');
+        try {
+          await argv;
+          throw Error('unreachable');
+        } catch (err) {
+          err.message.should.equal('async error');
+          executionCount.should.equal(1);
+        }
+      });
+      it('caches nested help output, so that it can be output by showHelp()', async () => {
+        let executionCount = 0;
+        const y = yargs();
+        const argv = y
+          .fail(false)
+          .command(
+            'cmd [str]',
+            'a command',
+            () => {},
+            async argv => {
+              return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                  executionCount++;
+                  return reject(Error('async error'));
+                }, 5);
+              });
+            }
+          )
+          .parse('cmd foo');
+        (typeof argv.then).should.equal('function');
+        try {
+          await argv;
+          throw Error('unreachable');
+        } catch (err) {
+          const output = await y.getHelp();
+          output.should.match(/a command/);
+          executionCount.should.equal(1);
+        }
+      });
+      it('caches deeply nested help output, so that it can be output by showHelp()', async () => {
+        let executionCount = 0;
+        const y = yargs('cmd inner bar');
+        const argv = y.fail(false).command(
+          'cmd',
+          'a command',
+          yargs => {
+            yargs.command(
+              'inner [foo]',
+              'inner command',
+              () => {},
+              async argv => {
+                return new Promise((resolve, reject) => {
+                  setTimeout(() => {
+                    executionCount++;
+                    return reject(Error('async error'));
+                  }, 5);
+                });
+              }
+            );
+          },
+          () => {}
+        ).argv;
+        (typeof argv.then).should.equal('function');
+        try {
+          await argv;
+          throw Error('unreachable');
+        } catch (err) {
+          const output = await y.getHelp();
+          output.should.match(/inner command/);
+          executionCount.should.equal(1);
+        }
+      });
+    });
+  });
+
+  describe('getHelp', () => {
+    it('should run parse() and return help, if parse() not yet called', async () => {
+      const y = yargs(['--foo'])
+        .options('foo', {
+          alias: 'f',
+          describe: 'foo option',
+        })
+        .wrap(null);
+      const help = await y.getHelp();
+      help
+        .split('\n')
+        .should.deep.equal([
+          'Options:',
+          '      --help     Show help  [boolean]',
+          '      --version  Show version number  [boolean]',
+          '  -f, --foo      foo option',
+        ]);
+    });
+    it('should display top-level help with no command given', async () => {
+      const y = yargs('--help')
+        .command(
+          ['list [pattern]', 'ls', '*'],
+          'List key-value pairs for pattern',
+          {},
+          noop
+        )
+        .command('get <key>', 'Get value for key', {}, noop)
+        .command('set <key> [value]', 'Set value for key', {}, noop);
+      const help = await y.getHelp();
+      help
+        .split('\n')
+        .should.deep.equal([
+          'node [pattern]',
+          '',
+          'List key-value pairs for pattern',
+          '',
+          'Commands:',
+          '  node list [pattern]     List key-value pairs for pattern',
+          '                                                         [default] [aliases: ls]',
+          '  node get <key>          Get value for key',
+          '  node set <key> [value]  Set value for key',
+          '',
+          'Options:',
+          '  --help     Show help                                                 [boolean]',
+          '  --version  Show version number                                       [boolean]',
+        ]);
+    });
+    it('should allow help to be output for failed command', async () => {
+      const y = yargs('foo')
+        .command(
+          'foo',
+          'foo command',
+          () => {},
+          async () => {
+            return new Promise((resolve, reject) => {
+              setTimeout(() => {
+                return reject(Error('async failure'));
+              });
+            });
+          }
+        )
+        .fail(false);
+      try {
+        await y.argv;
+        throw Error('unreachable');
+      } catch (err) {
+        err.message.should.equal('async failure');
+        (await y.getHelp()).should.match(/foo command/);
+      }
+    });
+    it('should allow help to be output for successful command', async () => {
+      const y = yargs('foo').command(
+        'foo',
+        'foo command',
+        () => {},
+        async argv => {
+          return new Promise((resolve, reject) => {
+            setTimeout(() => {
+              argv.addedAsync = 99;
+              return resolve();
+            });
+          });
+        }
+      );
+      const argv = await y.argv;
+      (await y.getHelp()).should.match(/foo command/);
+      argv.addedAsync.should.equal(99);
+      argv._.should.eql(['foo']);
+    });
+    it('should not run handler or middleware', async () => {
+      let commandCalled = false;
+      let middlewareCalled = false;
+      const y = yargs('foo')
+        .command(
+          'foo',
+          'foo command',
+          () => {},
+          async argv => {
+            commandCalled = true;
+          }
+        )
+        .middleware(() => {
+          middlewareCalled = true;
+        });
+      (await y.getHelp()).should.match(/foo command/);
+      commandCalled.should.equal(false);
+      middlewareCalled.should.equal(false);
+    });
+    // Refs: #1853
+    it('should use cached help message for nested synchronous commands', async () => {
+      const y = yargs('object').command('object', 'object command', yargs => {
+        yargs.command('get', 'get command');
+      });
+      const argv = y.argv;
+      const help = await y.getHelp();
+      help.should.match(/node object get/);
+      argv._.should.eql(['object']);
     });
   });
 });

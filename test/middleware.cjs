@@ -1,5 +1,6 @@
 'use strict';
 /* global describe, it, beforeEach, afterEach */
+/* eslint-disable no-unused-vars */
 
 const {expect} = require('chai');
 const {globalMiddlewareFactory} = require('../build/index.cjs');
@@ -115,79 +116,6 @@ describe('middleware', () => {
       ])
       .exitProcess(false)
       .parse();
-  });
-
-  // addresses https://github.com/yargs/yargs/issues/1237
-  describe('async', () => {
-    it('fails when the promise returned by the middleware rejects', done => {
-      const error = new Error();
-      const handlerErr = new Error('should not have been called');
-      yargs('foo')
-        .command(
-          'foo',
-          'foo command',
-          () => {},
-          argv => done(handlerErr),
-          [argv => Promise.reject(error)]
-        )
-        .fail((msg, err) => {
-          expect(msg).to.equal(null);
-          expect(err).to.equal(error);
-          done();
-        })
-        .parse();
-    });
-
-    it('calls the command handler when all middleware promises resolve', done => {
-      const middleware = (key, value) => () =>
-        new Promise((resolve, reject) => {
-          setTimeout(() => {
-            return resolve({[key]: value});
-          }, 5);
-        });
-      yargs('foo hello')
-        .command(
-          'foo <pos>',
-          'foo command',
-          () => {},
-          argv => {
-            argv.hello.should.equal('world');
-            argv.foo.should.equal('bar');
-            done();
-          },
-          [middleware('hello', 'world'), middleware('foo', 'bar')]
-        )
-        .fail((msg, err) => {
-          return done(Error('should not have been called'));
-        })
-        .exitProcess(false)
-        .parse();
-    });
-
-    it('calls an async middleware only once for nested subcommands', done => {
-      let callCount = 0;
-      const argv = yargs('cmd subcmd')
-        .command('cmd', 'cmd command', yargs => {
-          yargs.command('subcmd', 'subcmd command', yargs => {});
-        })
-        .middleware(
-          argv =>
-            new Promise(resolve => {
-              callCount++;
-              resolve(argv);
-            })
-        )
-        .parse();
-
-      if (!(argv instanceof Promise)) done('argv should be a Promise');
-
-      argv
-        .then(() => {
-          callCount.should.equal(1);
-          done();
-        })
-        .catch(err => done(err));
-    });
   });
 
   // see: https://github.com/yargs/yargs/issues/1281
@@ -313,37 +241,62 @@ describe('middleware', () => {
         .parse();
     });
 
-    it('throws an error if promise returned and applyBeforeValidation enabled', () => {
-      expect(() => {
-        yargs(['mw'])
+    it('resolves async middleware, before applying validation', async () => {
+      const argv = await yargs(['mw'])
+        .fail(false)
+        .middleware(
+          [
+            async function (argv) {
+              return new Promise(resolve => {
+                setTimeout(() => {
+                  argv.mw = 'mw';
+                  argv.other = true;
+                  return resolve(argv);
+                }, 5);
+              });
+            },
+          ],
+          true
+        )
+        .command('mw', 'adds func to middleware', {
+          mw: {
+            demand: true,
+            string: true,
+          },
+        })
+        .parse();
+      argv.other.should.equal(true);
+      argv.mw.should.equal('mw');
+    });
+
+    it('still throws error when async middleware is used', async () => {
+      try {
+        const argv = await yargs(['mw'])
+          .fail(false)
           .middleware(
             [
-              function (argv) {
-                argv.mw = 'mw';
-                argv.other = true;
-                return Promise.resolve(argv);
+              async function (argv) {
+                return new Promise(resolve => {
+                  setTimeout(() => {
+                    argv.other = true;
+                    return resolve(argv);
+                  }, 5);
+                });
               },
             ],
             true
           )
-          .command(
-            'mw',
-            'adds func to middleware',
-            {
-              mw: {
-                demand: true,
-                string: true,
-              },
+          .command('mw', 'adds func to middleware', {
+            mw: {
+              demand: true,
+              string: true,
             },
-            argv => {
-              throw Error('we should not get here');
-            }
-          )
-          .exitProcess(false)
+          })
           .parse();
-      }).to.throw(
-        'middleware cannot return a promise when applyBeforeValidation is true'
-      );
+        throw Error('unreachable');
+      } catch (err) {
+        err.message.should.match(/Missing required argument/);
+      }
     });
 
     it('runs before validation, when middleware is added in builder', done => {
@@ -414,5 +367,260 @@ describe('middleware', () => {
         .exitProcess(false)
         .parse();
     });
+  });
+
+  // addresses https://github.com/yargs/yargs/issues/1237
+  describe('async', () => {
+    it('fails when the promise returned by the middleware rejects', done => {
+      const error = new Error();
+      const handlerErr = new Error('should not have been called');
+      yargs('foo')
+        .command(
+          'foo',
+          'foo command',
+          () => {},
+          argv => done(handlerErr),
+          [argv => Promise.reject(error)]
+        )
+        .fail((msg, err) => {
+          expect(msg).to.equal(null);
+          expect(err).to.equal(error);
+          done();
+        })
+        .parse();
+    });
+
+    it('it allows middleware rejection to be caught', async () => {
+      const argvPromise = yargs('foo')
+        .command(
+          'foo',
+          'foo command',
+          () => {},
+          () => {}
+        )
+        .middleware(async () => {
+          return new Promise((resolve, reject) => {
+            setTimeout(() => {
+              return reject(Error('error from middleware'));
+            }, 5);
+          });
+        })
+        .fail(false)
+        .parse();
+      try {
+        await argvPromise;
+        throw Error('unreachable');
+      } catch (err) {
+        err.message.should.match(/error from middleware/);
+      }
+    });
+
+    it('it awaits middleware before awaiting handler, when applyBeforeValidation is "false"', async () => {
+      let log = '';
+      const argvPromise = yargs('foo --bar')
+        .command(
+          'foo',
+          'foo command',
+          () => {},
+          async () => {
+            return new Promise(resolve => {
+              setTimeout(() => {
+                log += 'handler';
+                return resolve();
+              }, 5);
+            });
+          }
+        )
+        .middleware(async argv => {
+          return new Promise(resolve => {
+            setTimeout(() => {
+              log += 'middleware';
+              argv.fromMiddleware = 99;
+              return resolve();
+            }, 20);
+          });
+        }, false)
+        .parse();
+      const argv = await argvPromise;
+      log.should.equal('middlewarehandler');
+      argv.fromMiddleware.should.equal(99);
+      argv.bar.should.equal(true);
+    });
+
+    it('calls the command handler when all middleware promises resolve', done => {
+      const middleware = (key, value) => () =>
+        new Promise((resolve, reject) => {
+          setTimeout(() => {
+            return resolve({[key]: value});
+          }, 5);
+        });
+      yargs('foo hello')
+        .command(
+          'foo <pos>',
+          'foo command',
+          () => {},
+          argv => {
+            argv.hello.should.equal('world');
+            argv.foo.should.equal('bar');
+            done();
+          },
+          [middleware('hello', 'world'), middleware('foo', 'bar')]
+        )
+        .fail((msg, err) => {
+          return done(Error('should not have been called'));
+        })
+        .exitProcess(false)
+        .parse();
+    });
+
+    it('calls an async middleware only once for nested subcommands', done => {
+      let callCount = 0;
+      const argv = yargs('cmd subcmd')
+        .command('cmd', 'cmd command', yargs => {
+          yargs.command('subcmd', 'subcmd command', yargs => {});
+        })
+        .middleware(
+          argv =>
+            new Promise(resolve => {
+              callCount++;
+              resolve(argv);
+            })
+        )
+        .parse();
+
+      if (!(argv instanceof Promise)) done(Error('argv should be a Promise'));
+
+      argv
+        .then(() => {
+          callCount.should.equal(1);
+          done();
+        })
+        .catch(err => done(err));
+    });
+
+    describe('$0', () => {
+      it('applies global middleware when no commands are provided, with implied $0', async () => {
+        const argv = await yargs('--foo 99')
+          .middleware(argv => {
+            return new Promise(resolve => {
+              setTimeout(() => {
+                argv.foo = argv.foo * 3;
+                return resolve();
+              }, 20);
+            });
+          })
+          .parse();
+        argv.foo.should.equal(297);
+      });
+
+      it('applies middleware before performing validation, with implied $0', async () => {
+        const argvEventual = yargs('--foo 100')
+          .option('bar', {
+            demand: true,
+          })
+          .middleware(async argv => {
+            return new Promise(resolve => {
+              setTimeout(() => {
+                argv.foo = argv.foo * 2;
+                argv.bar = 'hello';
+                return resolve();
+              }, 100);
+            });
+          }, true)
+          .check(argv => {
+            if (argv.foo > 100) return true;
+            else return false;
+          })
+          .parse();
+        const argv = await argvEventual;
+        argv.foo.should.equal(200);
+        argv.bar.should.equal('hello');
+      });
+
+      it('applies middleware before performing validation, with explicit $0', async () => {
+        const argvEventual = yargs('--foo 100')
+          .usage('$0', 'usage', () => {})
+          .option('bar', {
+            demand: true,
+          })
+          .middleware(async argv => {
+            return new Promise(resolve => {
+              setTimeout(() => {
+                argv.foo = argv.foo * 2;
+                argv.bar = 'hello';
+                return resolve();
+              }, 100);
+            });
+          }, true)
+          .check(argv => {
+            if (argv.foo > 100) return true;
+            else return false;
+          })
+          .parse();
+        const argv = await argvEventual;
+        argv.foo.should.equal(200);
+        argv.bar.should.equal('hello');
+      });
+    });
+  });
+
+  describe('synchronous $0', () => {
+    it('applies global middleware when no commands are provided', () => {
+      const argv = yargs('--foo 99')
+        .middleware(argv => {
+          argv.foo = argv.foo * 2;
+        })
+        .parse();
+      argv.foo.should.equal(198);
+    });
+    it('applies global middleware when default command is provided, with explicit $0', () => {
+      const argv = yargs('--foo 100')
+        .usage(
+          '$0',
+          'usage',
+          () => {},
+          argv => {
+            argv.foo = argv.foo * 3;
+          }
+        )
+        .middleware(argv => {
+          argv.foo = argv.foo * 2;
+        })
+        .parse();
+      argv.foo.should.equal(600);
+    });
+    it('applies middleware before performing validation, with implicit $0', () => {
+      const argv = yargs('--foo 100')
+        .option('bar', {
+          demand: true,
+        })
+        .middleware(argv => {
+          argv.foo = argv.foo * 2;
+          argv.bar = 'hello';
+        }, true)
+        .check(argv => {
+          if (argv.foo > 100) return true;
+          else return false;
+        })
+        .parse();
+      argv.foo.should.equal(200);
+      argv.bar.should.equal('hello');
+    });
+  });
+
+  // Refs: https://github.com/yargs/yargs/issues/1351
+  it('should run even if no command is matched', () => {
+    const argv = yargs('snuh --foo 99')
+      .middleware(argv => {
+        argv.foo = argv.foo * 2;
+      })
+      .command(
+        'bar',
+        'bar command',
+        () => {},
+        () => {}
+      )
+      .parse();
+    argv.foo.should.equal(198);
   });
 });

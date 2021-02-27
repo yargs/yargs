@@ -484,19 +484,6 @@ yargs.parserConfiguration({
 See the [yargs-parser](https://github.com/yargs/yargs-parser#configuration) module
 for detailed documentation of this feature.
 
-## Command finish hook
-### Example
-```js
-yargs(process.argv.slice(2))
-    .command('cmd', 'a command', () => {}, async () => {
-        await this.model.find()
-        return Promise.resolve('result value')
-    })
-    .onFinishCommand(async (resultValue) => {
-        await this.db.disconnect()
-    }).argv
-```
-
 ## Middleware
 
 Sometimes you might want to transform arguments before they reach the command handler.
@@ -566,4 +553,67 @@ var argv = require('yargs/yargs')(process.argv.slice(2))
       [normalizeCredentials]
      )
   .argv;
+```
+
+## Using Yargs with Async/await
+
+If you use async middleware or async handlers for commands, `yargs.parse` and
+`yargs.argv` will return a `Promise`. When you `await` this promise the
+parsed arguments object will be returned after the handler completes:
+
+```js
+import yargs from 'yargs'
+import { hideBin } from 'yargs/helpers'
+
+async function processValue(value) {
+  return new Promise((resolve) => {
+    // Perform some async operation on value.
+    setTimeout(() => {
+      return resolve(value)
+    }, 1000)
+  })
+}
+
+console.info('start')
+await yargs(hideBin(process.argv))
+  .command('add <x> <y>', 'add two eventual values', () => {}, async (argv) => {
+    const sum = await processValue(argv.x) + await processValue(argv.y)
+    console.info(`x + y = ${sum}`)
+  }).parse()
+console.info('finish')
+```
+
+### Handling async errors
+
+By default, when an async error occurs within a command yargs will
+exit with code `1` and print a help message. If you would rather
+Use `try`/`catch` to perform error handling, you can do so by setting
+`.fail(false)`:
+
+```js
+import yargs from 'yargs'
+import { hideBin } from 'yargs/helpers'
+
+async function processValue(value) {
+  return new Promise((resolve, reject) => {
+    // Perform some async operation on value.
+    setTimeout(() => {
+      return reject(Error('something went wrong'))
+    }, 1000)
+  })
+}
+
+console.info('start')
+const parser = yargs(hideBin(process.argv))
+  .command('add <x> <y>', 'add two eventual values', () => {}, async (argv) => {
+    const sum = await processValue(argv.x) + await processValue(argv.y)
+    console.info(`x + y = ${sum}`)
+  })
+  .fail(false)
+try {
+  const argv = await parser.parse();
+} catch (err) {
+  console.info(`${err.message}\n ${await parser.getHelp()}`)
+}
+console.info('finish')
 ```

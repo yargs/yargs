@@ -5,4 +5,5 @@ export const describe = 'numeric commands';
 export const builder = yargs => {
   yargs.command(commands);
 };
+// eslint-disable-next-line no-unused-vars
 export const handler = function (argv) {};
