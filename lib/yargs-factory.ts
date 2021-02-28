@@ -906,13 +906,13 @@ function Yargs(
     self.middleware(
       (
         argv: Arguments,
-        yargs: YargsInstance
+        _yargs: YargsInstance
       ): Partial<Arguments> | Promise<Partial<Arguments>> => {
         return maybeAsyncResult<
           Partial<Arguments> | Promise<Partial<Arguments>> | any
         >(
           () => {
-            return f(argv, yargs);
+            return f(argv);
           },
           (err: Error): Partial<Arguments> | Promise<Partial<Arguments>> => {
             usage.fail(err.message ? err.message : err.toString(), err);
@@ -2013,10 +2013,7 @@ export interface YargsInstance {
   };
   array(keys: string | string[]): YargsInstance;
   boolean(keys: string | string[]): YargsInstance;
-  check(
-    f: (argv: Arguments, yargs: YargsInstance) => any,
-    global?: boolean
-  ): YargsInstance;
+  check(f: (argv: Arguments) => any, global?: boolean): YargsInstance;
   choices: {
     (keys: string | string[], choices: string | string[]): YargsInstance;
     (keyChoices: Dictionary<string | string[]>): YargsInstance;

@@ -622,7 +622,7 @@ describe('middleware', () => {
           .middleware(argv => {
             argv.foo *= 2;
           }, true)
-          .check(async (argv, yargs) => {
+          .check(async argv => {
             wait();
             if (argv.foo < 200) return false;
             else return true;
@@ -638,7 +638,7 @@ describe('middleware', () => {
             wait();
             argv.foo *= 2;
           }, true)
-          .check(async (argv, yargs) => {
+          .check(async argv => {
             wait();
             if (argv.foo < 200) return false;
             else return true;
@@ -648,11 +648,162 @@ describe('middleware', () => {
         const argv = await argvPromise;
         argv.foo.should.equal(200);
       });
+      it('allows async check to be used with command', async () => {
+        let output = '';
+        const argv = await yargs('cmd --foo 300')
+          .command(
+            'cmd',
+            'a command',
+            yargs => {
+              yargs.check(async argv => {
+                wait();
+                output += 'first';
+                if (argv.foo < 200) return false;
+                else return true;
+              });
+            },
+            async argv => {
+              wait();
+              output += 'second';
+            }
+          )
+          .parse();
+        argv._.should.include('cmd');
+        argv.foo.should.equal(300);
+        output.should.equal('firstsecond');
+      });
+      it('allows async check to be used with command and middleware', async () => {
+        let output = '';
+        const argv = await yargs('cmd --foo 100')
+          .command(
+            'cmd',
+            'a command',
+            yargs => {
+              yargs.check(async argv => {
+                wait();
+                output += 'second';
+                if (argv.foo < 200) return false;
+                else return true;
+              });
+            },
+            async argv => {
+              wait();
+              output += 'fourth';
+            },
+            [
+              async argv => {
+                wait();
+                output += 'third';
+                argv.foo *= 2;
+              },
+            ]
+          )
+          .middleware(async argv => {
+            wait();
+            output += 'first';
+            argv.foo *= 2;
+          }, true)
+          .parse();
+        argv._.should.include('cmd');
+        argv.foo.should.equal(400);
+        output.should.equal('firstsecondthirdfourth');
+      });
     });
-    // TODO: add test that demonstrates using yargs instance to get alias.
-    // TODO: document that check now returns instance rather than aliases.
-    // TODO: add test that demonstrates using command with middleware and check.
-    // TODO: add test that demonstrates using command with check.
+    describe('failure', () => {
+      it('allows failed check to be caught', async () => {
+        try {
+          await yargs('--f 33')
+            .alias('foo', 'f')
+            .fail(false)
+            .check(async argv => {
+              wait();
+              return argv.foo > 50;
+            })
+            .parse();
+          throw Error('unreachable');
+        } catch (err) {
+          err.message.should.match(/Argument check failed/);
+        }
+      });
+      it('allows error to be caught before calling command', async () => {
+        let output = '';
+        try {
+          await yargs('cmd --foo 100')
+            .fail(false)
+            .command(
+              'cmd',
+              'a command',
+              yargs => {
+                yargs.check(async argv => {
+                  wait();
+                  output += 'first';
+                  if (argv.foo < 200) return false;
+                  else return true;
+                });
+              },
+              async argv => {
+                wait();
+                output += 'second';
+              }
+            )
+            .parse();
+          throw Error('unreachable');
+        } catch (err) {
+          output.should.equal('first');
+          err.message.should.match(/Argument check failed/);
+        }
+      });
+      it('allows error to be caught before calling command and middleware', async () => {
+        let output = '';
+        try {
+          const argv = await yargs('cmd --foo 10')
+            .fail(false)
+            .command(
+              'cmd',
+              'a command',
+              yargs => {
+                yargs.check(async argv => {
+                  wait();
+                  output += 'second';
+                  if (argv.foo < 200) return false;
+                  else return true;
+                });
+              },
+              async argv => {
+                wait();
+                output += 'fourth';
+              },
+              [
+                async argv => {
+                  wait();
+                  output += 'third';
+                  argv.foo *= 2;
+                },
+              ]
+            )
+            .middleware(async argv => {
+              wait();
+              output += 'first';
+              argv.foo *= 2;
+            }, true)
+            .parse();
+          throw Error('unreachable');
+        } catch (err) {
+          err.message.should.match(/Argument check failed/);
+          output.should.equal('firstsecond');
+        }
+      });
+    });
+    it('applies alliases prior to calling check', async () => {
+      const argv = await yargs('--f 99')
+        .alias('foo', 'f')
+        .check(async argv => {
+          wait();
+          return argv.foo > 50;
+        })
+        .parse();
+      argv.foo.should.equal(99);
+    });
   });
 
   describe('async coerce', () => {

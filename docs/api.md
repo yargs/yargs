@@ -115,7 +115,7 @@ If `key` is an array, interpret all the elements as booleans.
 
 Check that certain conditions are met in the provided arguments.
 
-`fn` is called with two arguments, the parsed `argv` hash and an array of options and their aliases.
+`fn` is called with the parsed `argv` hash.
 
 If `fn` throws or returns a non-truthy value, Yargs will show the thrown error
 and usage information. Yargs will then exit, unless
