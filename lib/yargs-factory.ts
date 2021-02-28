@@ -702,7 +702,7 @@ function Yargs(
     return self;
   };
 
-  self.command = function (
+  self.command = self.commands = function (
     cmd: string | CommandHandlerDefinition | DefinitionOrCommandName[],
     description?: CommandHandler['description'],
     builder?: CommandBuilderDefinition | CommandBuilder,
@@ -2025,15 +2025,18 @@ export interface YargsInstance {
     (keys: string | string[], coerceCallback: CoerceCallback): YargsInstance;
     (keyCoerceCallbacks: Dictionary<CoerceCallback>): YargsInstance;
   };
-  command(handler: CommandHandlerDefinition): YargsInstance;
-  command(
-    cmd: string | string[],
-    description: CommandHandler['description'],
-    builder?: CommandBuilderDefinition | CommandBuilder,
-    handler?: CommandHandlerCallback,
-    commandMiddleware?: Middleware[],
-    deprecated?: boolean
-  ): YargsInstance;
+  command: {
+    (
+      cmd: string | string[],
+      description: CommandHandler['description'],
+      builder?: CommandBuilderDefinition | CommandBuilder,
+      handler?: CommandHandlerCallback,
+      commandMiddleware?: Middleware[],
+      deprecated?: boolean
+    ): YargsInstance;
+    (handler: CommandHandlerDefinition): YargsInstance;
+  };
+  commands: YargsInstance['command'];
   commandDir(dir: string, opts?: RequireDirectoryOptions): YargsInstance;
   completion: {
     (cmd?: string, fn?: CompletionFunction): YargsInstance;
