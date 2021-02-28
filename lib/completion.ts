@@ -193,7 +193,8 @@ export class Completion implements CompletionInstance {
       return (this.customCompletionFunction as FallbackCompletionFunction)(
         current,
         argv,
-        () => this.defaultCompletion(args, argv, current, done),
+        (onCompleted = done) =>
+          this.defaultCompletion(args, argv, current, onCompleted),
         completions => {
           done(null, completions);
         }
@@ -278,7 +279,7 @@ interface FallbackCompletionFunction {
   (
     current: string,
     argv: Arguments,
-    defaultCompletion: () => any,
+    completionFilter: (onCompleted?: CompletionCallback) => any,
     done: (completions: string[]) => any
   ): any;
 }
