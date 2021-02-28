@@ -279,7 +279,7 @@ interface FallbackCompletionFunction {
   (
     current: string,
     argv: Arguments,
-    defaultCompletion: (onCompleted?: CompletionCallback) => any,
+    completionFilter: (onCompleted?: CompletionCallback) => any,
     done: (completions: string[]) => any
   ): any;
 }
