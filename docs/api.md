@@ -397,7 +397,7 @@ var argv = require('yargs/yargs')(process.argv.slice(2))
   .argv;
 ```
 
-Using default completions in custom implementation. When invoked with no arguments, `completionFilter` with fallback to default completion function. There is no need to call `done` in this case. When provided with a callback function, you can get access to `defaultCompletions` and call `done` with processed version of them.
+Using default completions in custom implementation. When invoked with no arguments, `completionFilter` will fallback to default completion function. There is no need to call `done` in this case. When provided with a callback function, you can get access to `defaultCompletions` and call `done` with processed version of them.
 
 ```js
 var argv = require('yargs/yargs')(process.argv.slice(2))
