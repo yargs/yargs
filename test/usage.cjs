@@ -4261,4 +4261,23 @@ describe('usage tests', () => {
         '  --small    Packet size',
       ]);
   });
+
+  it('should allow setting custom help- and version description', () => {
+    const r = checkUsage(() =>
+      yargs('--help')
+        .options({
+          version: {alias: 'v', description: 'Custom version description'},
+          h: {alias: 'help', description: 'Custom help description'},
+        })
+        .parse()
+    );
+
+    r.logs[0]
+      .split('\n')
+      .should.deep.equal([
+        'Options:',
+        '  -v, --version  Custom version description                            [boolean]',
+        '  -h, --help     Custom help description                               [boolean]',
+      ]);
+  });
 });
