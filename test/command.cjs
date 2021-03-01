@@ -1908,4 +1908,23 @@ describe('Command', () => {
     yargs().command(cmds).parse('a c 10 5', context);
     context.output.value.should.equal(15);
   });
+
+  it('allows async exception in handler to be caught', async () => {
+    try {
+      const argv = await yargs(['mw'])
+        .fail(false)
+        .command(
+          'mw',
+          'adds func to middleware',
+          () => {},
+          async () => {
+            throw Error('not cool');
+          }
+        )
+        .parse();
+      throw Error('unreachable');
+    } catch (err) {
+      err.message.should.match(/not cool/);
+    }
+  });
 });

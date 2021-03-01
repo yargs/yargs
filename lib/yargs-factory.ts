@@ -526,9 +526,6 @@ function Yargs(
             aliases = yargs.getAliases();
             return value(argv[keys]);
           },
-          (err: Error): Partial<Arguments> | Promise<Partial<Arguments>> => {
-            throw new YError(err.message);
-          },
           (result: any): Partial<Arguments> => {
             argv[keys] = result;
             if (aliases[keys]) {
@@ -537,6 +534,9 @@ function Yargs(
               }
             }
             return argv;
+          },
+          (err: Error): Partial<Arguments> | Promise<Partial<Arguments>> => {
+            throw new YError(err.message);
           }
         );
       },
@@ -914,16 +914,16 @@ function Yargs(
           () => {
             return f(argv);
           },
-          (err: Error): Partial<Arguments> | Promise<Partial<Arguments>> => {
-            usage.fail(err.message ? err.message : err.toString(), err);
-            return argv;
-          },
           (result: any): Partial<Arguments> | Promise<Partial<Arguments>> => {
             if (!result) {
               usage.fail(y18n.__('Argument check failed: %s', f.toString()));
             } else if (typeof result === 'string' || result instanceof Error) {
               usage.fail(result.toString(), result);
             }
+            return argv;
+          },
+          (err: Error): Partial<Arguments> | Promise<Partial<Arguments>> => {
+            usage.fail(err.message ? err.message : err.toString(), err);
             return argv;
           }
         );
@@ -1781,7 +1781,6 @@ function Yargs(
         // if we're executed via bash completion, don't
         // bother with validation.
         if (!requestCompletions) {
-          // TODO(@bcoe): refactor logic below into new helper:
           const validation = self._runValidation(aliases, {}, parsed.error);
           if (!calledFromCommand) {
             argvPromise = applyMiddleware(
@@ -1822,16 +1821,10 @@ function Yargs(
     validation: (argv: Arguments) => void,
     argv: Arguments | Promise<Arguments>
   ): Arguments | Promise<Arguments> {
-    return maybeAsyncResult<Arguments>(
-      argv,
-      (err: Error) => {
-        throw err;
-      },
-      result => {
-        validation(result);
-        return result;
-      }
-    );
+    return maybeAsyncResult<Arguments>(argv, result => {
+      validation(result);
+      return result;
+    });
   }
 
   // Applies a couple post processing steps that are easier to perform

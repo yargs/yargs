@@ -8,8 +8,10 @@
 import {isPromise} from './is-promise.js';
 export function maybeAsyncResult<T>(
   getResult: (() => T | Promise<T>) | T | Promise<T>,
-  errorHandler: (err: Error) => T,
-  resultHandler: (result: T) => T | Promise<T>
+  resultHandler: (result: T) => T | Promise<T>,
+  errorHandler: (err: Error) => T = (err: Error) => {
+    throw err;
+  }
 ): T | Promise<T> {
   try {
     const result = isFunction(getResult) ? getResult() : getResult;

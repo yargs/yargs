@@ -829,9 +829,50 @@ describe('middleware', () => {
       const r2 = await y.parse('command2 --foo 302');
       r2.foo.should.equal(302);
     });
-    // TODO: add test which demonstrates alias used with coerce.
-    // TODO: add test for two commands that register the same coerce.
-    // TODO: add test for async coerce happening prior to validation.
-    // TODO: add test for coerce happening prior to validation.
+    it('coerce is applied to argument and aliases', async () => {
+      let callCount = 0;
+      const argvPromise = yargs()
+        .alias('f', 'foo')
+        .coerce('foo', async arg => {
+          wait();
+          callCount++;
+          return new Date(arg.toString());
+        })
+        .parse('-f 2014');
+      (!!argvPromise.then).should.equal(true);
+      const argv = await argvPromise;
+      callCount.should.equal(1);
+      expect(argv.foo).to.be.an.instanceof(Date);
+      expect(argv.f).to.be.an.instanceof(Date);
+    });
+    it('applies coerce before validation', async () => {
+      const argv = await yargs()
+        .option('foo', {
+          choices: [10, 20, 30],
+        })
+        .coerce('foo', async arg => {
+          wait();
+          return (arg *= 2);
+        })
+        .parse('--foo 5');
+      argv.foo.should.equal(10);
+    });
+    it('allows error to be caught', async () => {
+      try {
+        await yargs()
+          .fail(false)
+          .option('foo', {
+            choices: [10, 20, 30],
+          })
+          .coerce('foo', async arg => {
+            wait();
+            return (arg *= 2);
+          })
+          .parse('--foo 2');
+        throw Error('unreachable');
+      } catch (err) {
+        err.message.should.match(/Choices: 10, 20, 30/);
+      }
+    });
   });
 });

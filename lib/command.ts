@@ -315,16 +315,10 @@ export function command(
         (yargs.parsed as DetailedArguments).error,
         !command
       );
-      innerArgv = maybeAsyncResult<Arguments>(
-        innerArgv,
-        (err: Error) => {
-          throw err;
-        },
-        result => {
-          validation(result);
-          return result;
-        }
-      );
+      innerArgv = maybeAsyncResult<Arguments>(innerArgv, result => {
+        validation(result);
+        return result;
+      });
     }
 
     if (commandHandler.handler && !yargs._hasOutput()) {
@@ -337,20 +331,14 @@ export function command(
       yargs._postProcess(innerArgv, populateDoubleDash, false, false);
 
       innerArgv = applyMiddleware(innerArgv, yargs, middlewares, false);
-      innerArgv = maybeAsyncResult<Arguments>(
-        innerArgv,
-        (err: Error) => {
-          throw err;
-        },
-        result => {
-          const handlerResult = commandHandler.handler(result as Arguments);
-          if (isPromise(handlerResult)) {
-            return handlerResult.then(() => result);
-          } else {
-            return result;
-          }
+      innerArgv = maybeAsyncResult<Arguments>(innerArgv, result => {
+        const handlerResult = commandHandler.handler(result as Arguments);
+        if (isPromise(handlerResult)) {
+          return handlerResult.then(() => result);
+        } else {
+          return result;
         }
-      );
+      });
 
       yargs.getUsageInstance().cacheHelpMessage();
       if (isPromise(innerArgv) && !yargs._hasParseCallback()) {
