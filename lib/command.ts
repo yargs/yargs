@@ -225,9 +225,6 @@ export function command(
     let numFiles = currentContext.files.length;
     const parentCommands = currentContext.commands.slice();
 
-    const tmpCommands = yargs.getUsageInstance().getCommands();
-    const tmpUsage = yargs.getUsageInstance().getUsage();
-
     // what does yargs look like after the builder is run?
     let innerArgv: Arguments | Promise<Arguments> = parsed.argv;
     let positionalMap: Dictionary<string[]> = {};
@@ -242,20 +239,15 @@ export function command(
       const builderOutput = builder(yargs.reset(parsed.aliases));
       const innerYargs = isYargsInstance(builderOutput) ? builderOutput : yargs;
       if (shouldUpdateUsage(innerYargs)) {
-        if (!command) {
-          tmpCommands.forEach(e => innerYargs.getUsageInstance().command(...e));
-          tmpUsage.forEach(e => innerYargs.getUsageInstance().usage(...e));
-        } else {
-          innerYargs
-            .getUsageInstance()
-            .usage(
-              usageFromParentCommandsCommandHandler(
-                parentCommands,
-                commandHandler
-              ),
-              commandHandler.description
-            );
-        }
+        innerYargs
+          .getUsageInstance()
+          .usage(
+            usageFromParentCommandsCommandHandler(
+              parentCommands,
+              commandHandler
+            ),
+            commandHandler.description
+          );
       }
       innerArgv = innerYargs._parseArgs(
         null,
@@ -277,20 +269,15 @@ export function command(
 
       if (!command) innerYargs.getUsageInstance().unfreeze();
       if (shouldUpdateUsage(innerYargs)) {
-        if (!command) {
-          tmpCommands.forEach(e => innerYargs.getUsageInstance().command(...e));
-          tmpUsage.forEach(e => innerYargs.getUsageInstance().usage(...e));
-        } else {
-          innerYargs
-            .getUsageInstance()
-            .usage(
-              usageFromParentCommandsCommandHandler(
-                parentCommands,
-                commandHandler
-              ),
-              commandHandler.description
-            );
-        }
+        innerYargs
+          .getUsageInstance()
+          .usage(
+            usageFromParentCommandsCommandHandler(
+              parentCommands,
+              commandHandler
+            ),
+            commandHandler.description
+          );
       }
       Object.keys(commandHandler.builder).forEach(key => {
         innerYargs.option(key, builder[key]);

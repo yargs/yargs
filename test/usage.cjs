@@ -2602,10 +2602,9 @@ describe('usage tests', () => {
       r.logs[0]
         .split('\n')
         .should.deep.equal([
-          'usage [command]',
+          'usage',
           '',
-          'Commands:',
-          '  usage     do something  [default]',
+          'do something',
           '',
           'Options:',
           '      --version  Show version number  [boolean]',
