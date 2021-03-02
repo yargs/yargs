@@ -4262,4 +4262,101 @@ describe('usage tests', () => {
         '  --small    Packet size',
       ]);
   });
+
+  describe('single default command', () => {
+    const expected = [
+      'usage',
+      '',
+      'Default command description',
+      '',
+      'Options:',
+      '  --help     Show help                                                 [boolean]',
+      '  --version  Show version number                                       [boolean]',
+    ];
+
+    it('should contain the expected output for --help', () => {
+      const r = checkUsage(() =>
+        yargs('--help').command('*', 'Default command description').parse()
+      );
+
+      r.logs[0].split('\n').should.deep.equal(expected);
+    });
+
+    it('should contain the expected output for showhelp', () => {
+      const r = checkUsage(() => {
+        yargs.command('*', 'Default command description').parse();
+        yargs.showHelp('log');
+      });
+      r.logs[0].split('\n').should.deep.equal(expected);
+    });
+
+    it('should contain the expected output for showHelp when called from within handler', () => {
+      const r = checkUsage(() =>
+        yargs
+          .command('*', 'Default command description', {}, () =>
+            yargs.showHelp('log')
+          )
+          .parse('')
+      );
+      r.logs[0].split('\n').should.deep.equal(expected);
+    });
+  });
+
+  describe('multiple commands, including a default command', () => {
+    const expected = [
+      'Hello, world!',
+      '',
+      'Commands:',
+      '  usage      Default command description                               [default]',
+      '  usage foo  Foo command description',
+      '',
+      'Options:',
+      '  --help     Show help                                                 [boolean]',
+      '  --version  Show version number                                       [boolean]',
+    ];
+
+    it('should contain the expected output for --help', () => {
+      const r = checkUsage(() =>
+        yargs('--help')
+          .usage('Hello, world!')
+          .commands([
+            {command: '*', desc: 'Default command description'},
+            {command: 'foo', desc: 'Foo command description'},
+          ])
+          .parse()
+      );
+      r.logs[0].split('\n').should.deep.equal(expected);
+    });
+
+    it('should contain the expected output for showHelp', () => {
+      const r = checkUsage(() => {
+        yargs
+          .usage('Hello, world!')
+          .commands([
+            {command: '*', desc: 'Default command description'},
+            {command: 'foo', desc: 'Foo command description'},
+          ])
+          .parse();
+        yargs.showHelp('log');
+      });
+      r.logs[0].split('\n').should.deep.equal(expected);
+    });
+
+    it('should contain the expected output for showHelp when called from within handler', () => {
+      const r = checkUsage(() =>
+        yargs
+          .usage('Hello, world!')
+          .commands([
+            {
+              command: '*',
+              desc: 'Default command description',
+              handler: _ => yargs.showHelp('log'),
+            },
+            {command: 'foo', desc: 'Foo command description'},
+          ])
+          .parse('')
+      );
+      r.logs[0].split('\n').should.deep.equal(expected);
+    });
+  });
 });
