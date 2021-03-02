@@ -258,9 +258,16 @@ export function command(
       );
       aliases = (innerYargs.parsed as DetailedArguments).aliases;
     } else if (isCommandBuilderOptionDefinitions(builder)) {
+      // A null command indicates we are running the default command,
+      // if this is the case, we should show the root usage instructions
+      // rather than the usage instructions for the nested default command:
+      if (!command) yargs.getUsageInstance().freeze();
+
       // as a short hand, an object can instead be provided, specifying
       // the options that a command takes.
       const innerYargs = yargs.reset(parsed.aliases);
+
+      if (!command) innerYargs.getUsageInstance().unfreeze();
       if (shouldUpdateUsage(innerYargs)) {
         innerYargs
           .getUsageInstance()
