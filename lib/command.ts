@@ -231,6 +231,11 @@ export function command(
     if (command) {
       currentContext.commands.push(command);
       currentContext.fullCommands.push(commandHandler.original);
+    } else {
+      // A null command indicates we are running the default command,
+      // if this is the case, we should show the root usage instructions
+      // rather than the usage instructions for the nested default command:
+      yargs.getUsageInstance().freeze();
     }
     const builder = commandHandler.builder;
     if (isCommandBuilderCallback(builder)) {
@@ -238,6 +243,7 @@ export function command(
       // up a yargs chain and possibly returns it.
       const builderOutput = builder(yargs.reset(parsed.aliases));
       const innerYargs = isYargsInstance(builderOutput) ? builderOutput : yargs;
+      if (!command) innerYargs.getUsageInstance().unfreeze();
       if (shouldUpdateUsage(innerYargs)) {
         innerYargs
           .getUsageInstance()
@@ -258,11 +264,6 @@ export function command(
       );
       aliases = (innerYargs.parsed as DetailedArguments).aliases;
     } else if (isCommandBuilderOptionDefinitions(builder)) {
-      // A null command indicates we are running the default command,
-      // if this is the case, we should show the root usage instructions
-      // rather than the usage instructions for the nested default command:
-      if (!command) yargs.getUsageInstance().freeze();
-
       // as a short hand, an object can instead be provided, specifying
       // the options that a command takes.
       const innerYargs = yargs.reset(parsed.aliases);
