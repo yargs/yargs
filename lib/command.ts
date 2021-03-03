@@ -238,60 +238,37 @@ export function command(
       yargs.getUsageInstance().freeze();
     }
     const builder = commandHandler.builder;
-    if (isCommandBuilderCallback(builder)) {
-      // a function can be provided, which builds
-      // up a yargs chain and possibly returns it.
-      const builderOutput = builder(yargs.reset(parsed.aliases));
-      const innerYargs = isYargsInstance(builderOutput) ? builderOutput : yargs;
-      if (!command) innerYargs.getUsageInstance().unfreeze();
-      if (shouldUpdateUsage(innerYargs)) {
-        innerYargs
-          .getUsageInstance()
-          .usage(
-            usageFromParentCommandsCommandHandler(
-              parentCommands,
-              commandHandler
-            ),
-            commandHandler.description
-          );
-      }
-      innerArgv = innerYargs._parseArgs(
-        null,
-        undefined,
-        true,
-        commandIndex,
-        helpOnly
-      );
-      aliases = (innerYargs.parsed as DetailedArguments).aliases;
-    } else if (isCommandBuilderOptionDefinitions(builder)) {
-      // as a short hand, an object can instead be provided, specifying
-      // the options that a command takes.
-      const innerYargs = yargs.reset(parsed.aliases);
 
-      if (!command) innerYargs.getUsageInstance().unfreeze();
-      if (shouldUpdateUsage(innerYargs)) {
-        innerYargs
-          .getUsageInstance()
-          .usage(
-            usageFromParentCommandsCommandHandler(
-              parentCommands,
-              commandHandler
-            ),
-            commandHandler.description
-          );
-      }
+    let innerYargs: YargsInstance;
+    if (isCommandBuilderCallback(builder)) {
+      const builderOutput = builder(yargs.reset(parsed.aliases));
+      innerYargs = isYargsInstance(builderOutput) ? builderOutput : yargs;
+    } else {
+      innerYargs = yargs.reset(parsed.aliases);
+    }
+
+    if (!command) innerYargs.getUsageInstance().unfreeze();
+    if (shouldUpdateUsage(innerYargs)) {
+      innerYargs
+        .getUsageInstance()
+        .usage(
+          usageFromParentCommandsCommandHandler(parentCommands, commandHandler),
+          commandHandler.description
+        );
+    }
+    if (isCommandBuilderOptionDefinitions(builder)) {
       Object.keys(commandHandler.builder).forEach(key => {
         innerYargs.option(key, builder[key]);
       });
-      innerArgv = innerYargs._parseArgs(
-        null,
-        undefined,
-        true,
-        commandIndex,
-        helpOnly
-      );
-      aliases = (innerYargs.parsed as DetailedArguments).aliases;
     }
+    innerArgv = innerYargs._parseArgs(
+      null,
+      undefined,
+      true,
+      commandIndex,
+      helpOnly
+    );
+    aliases = (innerYargs.parsed as DetailedArguments).aliases;
 
     if (!yargs._hasOutput()) {
       positionalMap = populatePositionals(
