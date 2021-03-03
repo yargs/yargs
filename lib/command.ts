@@ -245,6 +245,9 @@ export function command(
       innerYargs = isYargsInstance(builderOutput) ? builderOutput : yargs;
     } else {
       innerYargs = yargs.reset(parsed.aliases);
+      Object.keys(commandHandler.builder).forEach(key => {
+        innerYargs.option(key, builder[key]);
+      });
     }
 
     if (!command) innerYargs.getUsageInstance().unfreeze();
@@ -255,11 +258,6 @@ export function command(
           usageFromParentCommandsCommandHandler(parentCommands, commandHandler),
           commandHandler.description
         );
-    }
-    if (isCommandBuilderOptionDefinitions(builder)) {
-      Object.keys(commandHandler.builder).forEach(key => {
-        innerYargs.option(key, builder[key]);
-      });
     }
     innerArgv = innerYargs._parseArgs(
       null,
