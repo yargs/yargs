@@ -1533,8 +1533,8 @@ Print the version data.
 If no argument is provided, version data is printed using `console.error`.
 
 ```js
-var yargs = require("yargs")
-  .version('1.0.0');
+var yargs = require('yargs/yargs')(process.argv.slice(2));
+yargs.version('1.0.0');
 yargs.showVersion(); //prints to stderr using console.error()
 ```
 
