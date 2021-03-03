@@ -3202,52 +3202,32 @@ describe('usage tests', () => {
     // see #143.
     it('should show version regardless of whether argv has been called', () => {
       const r = checkUsage(() => {
-        const y = yargs()
-          .version('1.0.0')
-          .wrap(null);
+        const y = yargs().version('1.0.0').wrap(null);
 
         y.showVersion();
       });
 
-      r.errors
-        .join('\n')
-        .split(/\n+/)
-        .should.deep.equal([
-          '1.0.0'
-        ]);
+      r.errors.join('\n').split(/\n+/).should.deep.equal(['1.0.0']);
     });
 
     it('should call the correct console.log method when specified', () => {
       const r = checkUsage(() => {
-        const y = yargs()
-          .version('1.0.0')
-          .wrap(null);
+        const y = yargs().version('1.0.0').wrap(null);
 
         y.showVersion('log');
       });
 
       r.errors.length.should.eql(0);
-      r.logs
-        .join('\n')
-        .split(/\n+/)
-        .should.deep.equal([
-          '1.0.0'
-        ]);
+      r.logs.join('\n').split(/\n+/).should.deep.equal(['1.0.0']);
     });
 
     it('should call the callback to print when specified', done => {
-      const y = yargs()
-        .version('1.0.0')
-        .wrap(null);
+      const y = yargs().version('1.0.0').wrap(null);
 
       y.showVersion(printCallback);
 
       function printCallback(msg) {
-        msg
-          .split(/\n+/)
-          .should.deep.equal([
-            '1.0.0'
-          ]);
+        msg.split(/\n+/).should.deep.equal(['1.0.0']);
         return done();
       }
     });
