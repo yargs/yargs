@@ -231,42 +231,67 @@ export function command(
     if (command) {
       currentContext.commands.push(command);
       currentContext.fullCommands.push(commandHandler.original);
-    } else {
+    }
+    const builder = commandHandler.builder;
+    if (isCommandBuilderCallback(builder)) {
+      // a function can be provided, which builds
+      // up a yargs chain and possibly returns it.
+      const builderOutput = builder(yargs.reset(parsed.aliases));
+      const innerYargs = isYargsInstance(builderOutput) ? builderOutput : yargs;
       // A null command indicates we are running the default command,
       // if this is the case, we should show the root usage instructions
       // rather than the usage instructions for the nested default command:
-      yargs.getUsageInstance().freeze();
-    }
-    const builder = commandHandler.builder;
-
-    let innerYargs: YargsInstance;
-    if (isCommandBuilderCallback(builder)) {
-      const builderOutput = builder(yargs.reset(parsed.aliases));
-      innerYargs = isYargsInstance(builderOutput) ? builderOutput : yargs;
-    } else {
-      innerYargs = yargs.reset(parsed.aliases);
+      if (!command) innerYargs.getUsageInstance().unfreeze();
+      if (shouldUpdateUsage(innerYargs)) {
+        innerYargs
+          .getUsageInstance()
+          .usage(
+            usageFromParentCommandsCommandHandler(
+              parentCommands,
+              commandHandler
+            ),
+            commandHandler.description
+          );
+      }
+      innerArgv = innerYargs._parseArgs(
+        null,
+        undefined,
+        true,
+        commandIndex,
+        helpOnly
+      );
+      aliases = (innerYargs.parsed as DetailedArguments).aliases;
+    } else if (isCommandBuilderOptionDefinitions(builder)) {
+      // as a short hand, an object can instead be provided, specifying
+      // the options that a command takes.
+      const innerYargs = yargs.reset(parsed.aliases);
+      // A null command indicates we are running the default command,
+      // if this is the case, we should show the root usage instructions
+      // rather than the usage instructions for the nested default command:
+      if (!command) innerYargs.getUsageInstance().unfreeze();
+      if (shouldUpdateUsage(innerYargs)) {
+        innerYargs
+          .getUsageInstance()
+          .usage(
+            usageFromParentCommandsCommandHandler(
+              parentCommands,
+              commandHandler
+            ),
+            commandHandler.description
+          );
+      }
       Object.keys(commandHandler.builder).forEach(key => {
         innerYargs.option(key, builder[key]);
       });
+      innerArgv = innerYargs._parseArgs(
+        null,
+        undefined,
+        true,
+        commandIndex,
+        helpOnly
+      );
+      aliases = (innerYargs.parsed as DetailedArguments).aliases;
     }
-
-    if (!command) innerYargs.getUsageInstance().unfreeze();
-    if (shouldUpdateUsage(innerYargs)) {
-      innerYargs
-        .getUsageInstance()
-        .usage(
-          usageFromParentCommandsCommandHandler(parentCommands, commandHandler),
-          commandHandler.description
-        );
-    }
-    innerArgv = innerYargs._parseArgs(
-      null,
-      undefined,
-      true,
-      commandIndex,
-      helpOnly
-    );
-    aliases = (innerYargs.parsed as DetailedArguments).aliases;
 
     if (!yargs._hasOutput()) {
       positionalMap = populatePositionals(
