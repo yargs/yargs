@@ -4385,19 +4385,19 @@ describe('usage tests', () => {
       });
 
       it('should contain the expected output for showHelp when called from within handler', () => {
-        const r = checkUsage(() =>
-          yargs()
-            .scriptName('usage')
-            .usage('Hello, world!')
-            .commands([
-              {
-                command: '*',
-                desc: 'Default command description',
-                handler: _ => yargs.showHelp('log'),
-              },
-              {command: 'foo', desc: 'Foo command description'},
-            ])
-            .parse('')
+        const r = checkUsage(
+          () =>
+            yargs()
+              .scriptName('usage')
+              .usage('Hello, world!')
+              .commands([
+                {
+                  command: '*',
+                  desc: 'Default command description',
+                  handler: _ => yargs.showHelp('log'),
+                },
+                {command: 'foo', desc: 'Foo command description'},
+              ]).argv
         );
         r.logs[0].split('\n').should.deep.equal(expected);
       });
@@ -4433,7 +4433,7 @@ describe('usage tests', () => {
             },
             {command: 'foo', desc: 'Foo command description'},
           ]);
-        await y.parse();
+        await y.argv;
         help.split('\n').should.deep.equal(expected);
       });
     });

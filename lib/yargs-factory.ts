@@ -934,12 +934,11 @@ function Yargs(
       [args, shortCircuit, _parseFn],
       arguments.length
     );
-    freeze();
+    freeze(); // Push current state of parser onto stack.
     if (typeof args === 'undefined') {
       const argv = self._parseArgs(processArgs);
       const tmpParsed = self.parsed;
-      unfreeze();
-      // TODO: remove this compatibility hack when we release yargs@15.x:
+      unfreeze(); // Pop the stack.
       self.parsed = tmpParsed;
       return argv;
     }
@@ -967,7 +966,7 @@ function Yargs(
     const parsed = self._parseArgs(args, !!shortCircuit);
     completion!.setParsed(self.parsed as DetailedArguments);
     if (parseFn) parseFn(exitError, parsed, output);
-    unfreeze();
+    unfreeze(); // Pop the stack.
 
     return parsed;
   };
@@ -1472,7 +1471,9 @@ function Yargs(
   };
 
   Object.defineProperty(self, 'argv', {
-    get: () => self._parseArgs(processArgs),
+    get: () => {
+      return self.parse();
+    },
     enumerable: true,
   });
 
