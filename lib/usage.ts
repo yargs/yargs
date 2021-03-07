@@ -231,7 +231,12 @@ export function usage(yargs: YargsInstance, y18n: Y18N, shim: PlatformShim) {
 
     // your application's commands, i.e., non-option
     // arguments populated in '_'.
-    if (commands.length) {
+    //
+    // If there's only a single command, and it's the default command
+    // (represented by commands[0][2]) don't show command stanza:
+    //
+    // TODO(@bcoe): why isnt commands[0][2] an object with a named property?
+    if (commands.length > 1 || (commands.length === 1 && !commands[0][2])) {
       ui.div(__('Commands:'));
 
       const context = yargs.getContext();
@@ -703,7 +708,10 @@ export function usage(yargs: YargsInstance, y18n: Y18N, shim: PlatformShim) {
   };
   self.unfreeze = function unfreeze() {
     const frozen = frozens.pop();
-    assertNotStrictEqual(frozen, undefined, shim);
+    // In the case of running a defaultCommand, we reset
+    // usage early to ensure we receive the top level instructions.
+    // unfreezing again should just be a noop:
+    if (!frozen) return;
     ({
       failMessage,
       failureOutput,
