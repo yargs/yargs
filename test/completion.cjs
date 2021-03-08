@@ -214,6 +214,29 @@ describe('Completion', () => {
       r.logs.should.include('--opt2');
     });
 
+    it('ignores positionals for the correct command', () => {
+      process.env.SHELL = '/bin/bash';
+      const r = checkUsage(
+        () =>
+          yargs(['./completion', '--get-yargs-completions', 'cmd', '--o'])
+            .help(false)
+            .version(false)
+            .command('cmd', 'command', subYargs => {
+              subYargs
+                .options({
+                  opt: {
+                    describe: 'option',
+                  },
+                })
+                .positional('pos-opt', {type: 'string'});
+            }).argv
+      );
+
+      r.logs.should.have.length(1);
+      r.logs.should.include('--opt');
+      r.logs.should.not.include('--pos-opt');
+    });
+
     it('does not complete hidden commands', () => {
       process.env.SHELL = '/bin/bash';
       const r = checkUsage(
