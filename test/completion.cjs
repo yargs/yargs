@@ -214,6 +214,29 @@ describe('Completion', () => {
       r.logs.should.include('--opt2');
     });
 
+    it('ignores positionals for the correct command', () => {
+      process.env.SHELL = '/bin/bash';
+      const r = checkUsage(
+        () =>
+          yargs(['./completion', '--get-yargs-completions', 'cmd', '--o'])
+            .help(false)
+            .version(false)
+            .command('cmd', 'command', subYargs => {
+              subYargs
+                .options({
+                  opt: {
+                    describe: 'option',
+                  },
+                })
+                .positional('pos-opt', {type: 'string'});
+            }).argv
+      );
+
+      r.logs.should.have.length(1);
+      r.logs.should.include('--opt');
+      r.logs.should.not.include('--pos-opt');
+    });
+
     it('does not complete hidden commands', () => {
       process.env.SHELL = '/bin/bash';
       const r = checkUsage(
@@ -341,7 +364,7 @@ describe('Completion', () => {
       r.logs.should.include('success!');
     });
 
-    it('allows the custom completion function to use the standard one', done => {
+    it('allows the custom completion function to use the default completion w/o filter', done => {
       checkUsage(
         () => {
           yargs(['./completion', '--get-yargs-completions'])
@@ -349,8 +372,8 @@ describe('Completion', () => {
             .command('apple', 'banana')
             .completion(
               'completion',
-              (current, argv, defaultCompletion, done) => {
-                defaultCompletion();
+              (current, argv, completionFilter, done) => {
+                completionFilter();
               }
             )
             .parse();
@@ -365,6 +388,35 @@ describe('Completion', () => {
       );
     });
 
+    it('allows custom completion to be combined with default completion, using filter', done => {
+      checkUsage(
+        () => {
+          yargs(['./completion', '--get-yargs-completions'])
+            .command('foo', 'bar')
+            .command('apple', 'banana')
+            .completion(
+              'completion',
+              (current, argv, completionFilter, done) => {
+                completionFilter((err, completions) => {
+                  const filteredCompletions = completions.filter(
+                    completion => completion === 'foo'
+                  );
+                  done(filteredCompletions);
+                });
+              }
+            )
+            .parse();
+        },
+        null,
+        (err, r) => {
+          if (err) throw err;
+          r.logs.should.include('foo');
+          r.logs.should.not.include('apple');
+          return done();
+        }
+      );
+    });
+
     it('allows calling callback instead of default completion function', done => {
       checkUsage(
         () => {
@@ -373,7 +425,7 @@ describe('Completion', () => {
             .command('apple', 'banana')
             .completion(
               'completion',
-              (current, argv, defaultCompletion, done) => {
+              (current, argv, completionFilter, done) => {
                 done(['orange']);
               }
             )

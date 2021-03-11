@@ -1027,12 +1027,11 @@ function Yargs(
       [args, shortCircuit, _parseFn],
       arguments.length
     );
-    freeze();
+    freeze(); // Push current state of parser onto stack.
     if (typeof args === 'undefined') {
       const argv = self._parseArgs(processArgs);
       const tmpParsed = self.parsed;
-      unfreeze();
-      // TODO: remove this compatibility hack when we release yargs@15.x:
+      unfreeze(); // Pop the stack.
       self.parsed = tmpParsed;
       return argv;
     }
@@ -1060,7 +1059,7 @@ function Yargs(
     const parsed = self._parseArgs(args, !!shortCircuit);
     completion!.setParsed(self.parsed as DetailedArguments);
     if (parseFn) parseFn(exitError, parsed, output);
-    unfreeze();
+    unfreeze(); // Pop the stack.
 
     return parsed;
   };
@@ -1565,7 +1564,9 @@ function Yargs(
   };
 
   Object.defineProperty(self, 'argv', {
-    get: () => self._parseArgs(processArgs),
+    get: () => {
+      return self.parse();
+    },
     enumerable: true,
   });
 
@@ -1576,7 +1577,7 @@ function Yargs(
     commandIndex = 0,
     helpOnly = false
   ) {
-    let skipValidation = !!calledFromCommand;
+    let skipValidation = !!calledFromCommand || helpOnly;
     args = args || processArgs;
 
     options.__ = y18n.__;
@@ -1643,10 +1644,8 @@ function Yargs(
 
       const handlerKeys = command.getCommands();
       const requestCompletions = completion!.completionKey in argv;
-      const skipRecommendation = argv[helpOpt!] || requestCompletions;
-      const skipDefaultCommand =
-        skipRecommendation &&
-        (handlerKeys.length > 1 || handlerKeys[0] !== '$0');
+      const skipRecommendation =
+        argv[helpOpt!] || requestCompletions || helpOnly;
 
       if (argv._.length) {
         if (handlerKeys.length) {
@@ -1677,7 +1676,7 @@ function Yargs(
           }
 
           // run the default command, if defined
-          if (command.hasDefaultCommand() && !skipDefaultCommand) {
+          if (command.hasDefaultCommand() && !skipRecommendation) {
             const innerArgv = command.runCommand(
               null,
               self,
@@ -1710,7 +1709,7 @@ function Yargs(
           self.showCompletionScript();
           self.exit(0);
         }
-      } else if (command.hasDefaultCommand() && !skipDefaultCommand) {
+      } else if (command.hasDefaultCommand() && !skipRecommendation) {
         const innerArgv = command.runCommand(null, self, parsed, 0, helpOnly);
         return self._postProcess(
           innerArgv,

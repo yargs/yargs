@@ -240,6 +240,10 @@ export function command(
       // up a yargs chain and possibly returns it.
       const builderOutput = builder(yargs.reset(parsed.aliases));
       const innerYargs = isYargsInstance(builderOutput) ? builderOutput : yargs;
+      // A null command indicates we are running the default command,
+      // if this is the case, we should show the root usage instructions
+      // rather than the usage instructions for the nested default command:
+      if (!command) innerYargs.getUsageInstance().unfreeze();
       if (shouldUpdateUsage(innerYargs)) {
         innerYargs
           .getUsageInstance()
@@ -263,6 +267,10 @@ export function command(
       // as a short hand, an object can instead be provided, specifying
       // the options that a command takes.
       const innerYargs = yargs.reset(parsed.aliases);
+      // A null command indicates we are running the default command,
+      // if this is the case, we should show the root usage instructions
+      // rather than the usage instructions for the nested default command:
+      if (!command) innerYargs.getUsageInstance().unfreeze();
       if (shouldUpdateUsage(innerYargs)) {
         innerYargs
           .getUsageInstance()

@@ -4263,4 +4263,181 @@ describe('usage tests', () => {
         '  --small    Packet size',
       ]);
   });
+
+  // Refs: https://github.com/yargs/yargs/pull/1826
+  describe('usage for default command', () => {
+    describe('default only', () => {
+      const expected = [
+        'usage',
+        '',
+        'Default command description',
+        '',
+        'Options:',
+        '  --help     Show help                                                 [boolean]',
+        '  --version  Show version number                                       [boolean]',
+      ];
+
+      it('should contain the expected output for --help', () => {
+        const r = checkUsage(() =>
+          yargs('--help')
+            .scriptName('usage')
+            .command('*', 'Default command description')
+            .parse()
+        );
+
+        r.logs[0].split('\n').should.deep.equal(expected);
+      });
+
+      it('should contain the expected output for showhelp', () => {
+        const r = checkUsage(() => {
+          const y = yargs()
+            .scriptName('usage')
+            .command('*', 'Default command description');
+          y.showHelp('log');
+        });
+        r.logs[0].split('\n').should.deep.equal(expected);
+      });
+
+      it('should contain the expected output for getHelp', async () => {
+        const y = yargs()
+          .scriptName('usage')
+          .command('*', 'Default command description');
+        const help = await y.getHelp();
+        help.split('\n').should.deep.equal(expected);
+      });
+
+      it('should contain the expected output for getHelp when called from within handler', async () => {
+        let help = '';
+        const y = yargs()
+          .scriptName('usage')
+          .command('*', 'Default command description', {}, async () => {
+            help = await y.getHelp();
+          });
+        await y.parse();
+        help.split('\n').should.deep.equal(expected);
+      });
+
+      it('should contain the expected output for showHelp when called from within handler', () => {
+        const r = checkUsage(() =>
+          yargs()
+            .scriptName('usage')
+            .command('*', 'Default command description', {}, () =>
+              yargs.showHelp('log')
+            )
+            .parse('')
+        );
+        r.logs[0].split('\n').should.deep.equal(expected);
+      });
+
+      it('should contain the expected output for showHelp, when exception occurs', () => {
+        const r = checkUsage(() =>
+          yargs()
+            .scriptName('usage')
+            .command('*', 'Default command description', {}, () =>
+              yargs.showHelp('log')
+            )
+            .check(() => {
+              return false;
+            })
+            .parse('')
+        );
+        r.errors[0].split('\n').should.deep.equal(expected);
+      });
+    });
+
+    describe('multiple', () => {
+      const expected = [
+        'Hello, world!',
+        '',
+        'Commands:',
+        '  usage      Default command description                               [default]',
+        '  usage foo  Foo command description',
+        '',
+        'Options:',
+        '  --help     Show help                                                 [boolean]',
+        '  --version  Show version number                                       [boolean]',
+      ];
+      it('should contain the expected output for --help', () => {
+        const r = checkUsage(() =>
+          yargs('--help')
+            .scriptName('usage')
+            .usage('Hello, world!')
+            .commands([
+              {command: '*', desc: 'Default command description'},
+              {command: 'foo', desc: 'Foo command description'},
+            ])
+            .parse()
+        );
+        r.logs[0].split('\n').should.deep.equal(expected);
+      });
+
+      it('should contain the expected output for showHelp', () => {
+        const r = checkUsage(() => {
+          yargs()
+            .scriptName('usage')
+            .usage('Hello, world!')
+            .commands([
+              {command: '*', desc: 'Default command description'},
+              {command: 'foo', desc: 'Foo command description'},
+            ])
+            .parse();
+          yargs.showHelp('log');
+        });
+        r.logs[0].split('\n').should.deep.equal(expected);
+      });
+
+      it('should contain the expected output for showHelp when called from within handler', () => {
+        const r = checkUsage(
+          () =>
+            yargs()
+              .scriptName('usage')
+              .usage('Hello, world!')
+              .commands([
+                {
+                  command: '*',
+                  desc: 'Default command description',
+                  handler: _ => yargs.showHelp('log'),
+                },
+                {command: 'foo', desc: 'Foo command description'},
+              ]).argv
+        );
+        r.logs[0].split('\n').should.deep.equal(expected);
+      });
+
+      it('should contain the expected output for getHelp', async () => {
+        const y = yargs()
+          .scriptName('usage')
+          .usage('Hello, world!')
+          .commands([
+            {
+              command: '*',
+              desc: 'Default command description',
+              handler: () => {},
+            },
+            {command: 'foo', desc: 'Foo command description'},
+          ]);
+        const help = await y.getHelp();
+        help.split('\n').should.deep.equal(expected);
+      });
+
+      it('should contain the expected output for getHelp when called from within handler', async () => {
+        let help = '';
+        const y = yargs()
+          .scriptName('usage')
+          .usage('Hello, world!')
+          .commands([
+            {
+              command: '*',
+              desc: 'Default command description',
+              handler: async () => {
+                help = await y.getHelp();
+              },
+            },
+            {command: 'foo', desc: 'Foo command description'},
+          ]);
+        await y.argv;
+        help.split('\n').should.deep.equal(expected);
+      });
+    });
+  });
 });

@@ -105,13 +105,20 @@ export class Completion implements CompletionInstance {
   ) {
     if (current.match(/^-/) || (current === '' && completions.length === 0)) {
       const options = this.yargs.getOptions();
+      const positionalKeys =
+        this.yargs.getGroups()[this.usage.getPositionalGroupName()] || [];
+
       Object.keys(options.key).forEach(key => {
         const negable =
           !!options.configuration['boolean-negation'] &&
           options.boolean.includes(key);
+        const isPositionalKey = positionalKeys.includes(key);
 
-        // If the key and its aliases aren't in 'args', add the key to 'completions'
-        if (!this.argsContainKey(args, argv, key, negable)) {
+        // If the key is not positional and its aliases aren't in 'args', add the key to 'completions'
+        if (
+          !isPositionalKey &&
+          !this.argsContainKey(args, argv, key, negable)
+        ) {
           this.completeOptionKey(key, completions, current);
           if (negable && !!options.default[key])
             this.completeOptionKey(`no-${key}`, completions, current);
@@ -193,7 +200,8 @@ export class Completion implements CompletionInstance {
       return (this.customCompletionFunction as FallbackCompletionFunction)(
         current,
         argv,
-        () => this.defaultCompletion(args, argv, current, done),
+        (onCompleted = done) =>
+          this.defaultCompletion(args, argv, current, onCompleted),
         completions => {
           done(null, completions);
         }
@@ -278,7 +286,7 @@ interface FallbackCompletionFunction {
   (
     current: string,
     argv: Arguments,
-    defaultCompletion: () => any,
+    completionFilter: (onCompleted?: CompletionCallback) => any,
     done: (completions: string[]) => any
   ): any;
 }
