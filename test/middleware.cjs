@@ -2,6 +2,7 @@
 /* global describe, it, beforeEach, afterEach */
 /* eslint-disable no-unused-vars */
 
+const assert = require('assert');
 const {expect} = require('chai');
 let yargs;
 require('chai').should();
@@ -607,12 +608,9 @@ describe('middleware', () => {
 
   it('throws error if middleware not function', () => {
     let err;
-    try {
+    assert.throws(() => {
       yargs('snuh --foo 99').middleware(['hello']).parse();
-    } catch (_err) {
-      err = _err;
-    }
-    err.message.should.match(/middleware must be a function/);
+    }, /middleware must be a function/);
   });
 
   describe('async check', () => {
@@ -711,24 +709,22 @@ describe('middleware', () => {
     });
     describe('failure', () => {
       it('allows failed check to be caught', async () => {
-        try {
-          await yargs('--f 33')
+        await assert.rejects(
+          yargs('--f 33')
             .alias('foo', 'f')
             .fail(false)
             .check(async argv => {
               wait();
               return argv.foo > 50;
             })
-            .parse();
-          throw Error('unreachable');
-        } catch (err) {
-          err.message.should.match(/Argument check failed/);
-        }
+            .parse(),
+          /Argument check failed/
+        );
       });
       it('allows error to be caught before calling command', async () => {
         let output = '';
-        try {
-          await yargs('cmd --foo 100')
+        await assert.rejects(
+          yargs('cmd --foo 100')
             .fail(false)
             .command(
               'cmd',
@@ -746,17 +742,15 @@ describe('middleware', () => {
                 output += 'second';
               }
             )
-            .parse();
-          throw Error('unreachable');
-        } catch (err) {
-          output.should.equal('first');
-          err.message.should.match(/Argument check failed/);
-        }
+            .parse(),
+          /Argument check failed/
+        );
+        output.should.equal('first');
       });
       it('allows error to be caught before calling command and middleware', async () => {
         let output = '';
-        try {
-          const argv = await yargs('cmd --foo 10')
+        await assert.rejects(
+          yargs('cmd --foo 10')
             .fail(false)
             .command(
               'cmd',
@@ -786,12 +780,10 @@ describe('middleware', () => {
               output += 'first';
               argv.foo *= 2;
             }, true)
-            .parse();
-          throw Error('unreachable');
-        } catch (err) {
-          err.message.should.match(/Argument check failed/);
-          output.should.equal('firstsecond');
-        }
+            .parse(),
+          /Argument check failed/
+        );
+        output.should.equal('firstsecond');
       });
     });
     it('applies alliases prior to calling check', async () => {
@@ -858,8 +850,8 @@ describe('middleware', () => {
       argv.foo.should.equal(10);
     });
     it('allows error to be caught', async () => {
-      try {
-        await yargs()
+      await assert.rejects(
+        yargs()
           .fail(false)
           .option('foo', {
             choices: [10, 20, 30],
@@ -868,11 +860,9 @@ describe('middleware', () => {
             wait();
             return (arg *= 2);
           })
-          .parse('--foo 2');
-        throw Error('unreachable');
-      } catch (err) {
-        err.message.should.match(/Choices: 10, 20, 30/);
-      }
+          .parse('--foo 2'),
+        /Choices: 10, 20, 30/
+      );
     });
   });
 });

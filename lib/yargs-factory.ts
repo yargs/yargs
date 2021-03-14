@@ -497,7 +497,7 @@ function Yargs(
         throw new YError('coerce callback must be provided');
       }
       for (const key of keys) {
-        self.coerce(key, value!);
+        self.coerce(key, value);
       }
       return self;
     } else if (typeof keys === 'object') {

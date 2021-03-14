@@ -1,6 +1,7 @@
 /* global describe, it, beforeEach */
 /* eslint-disable no-unused-vars */
 'use strict';
+const assert = require('assert');
 const yargs = require('../index.cjs');
 const expect = require('chai').expect;
 const checkOutput = require('./helpers/utils.cjs').checkOutput;
@@ -1910,8 +1911,8 @@ describe('Command', () => {
   });
 
   it('allows async exception in handler to be caught', async () => {
-    try {
-      const argv = await yargs(['mw'])
+    await assert.rejects(
+      yargs(['mw'])
         .fail(false)
         .command(
           'mw',
@@ -1921,10 +1922,24 @@ describe('Command', () => {
             throw Error('not cool');
           }
         )
+        .parse(),
+      /not cool/
+    );
+  });
+
+  it('reports error if error occurs parsing positional', () => {
+    try {
+      yargs(['cmd', 'neat'])
+        .fail(false)
+        .command('cmd <foo>', 'run a foo command', yargs => {
+          yargs.option('foo', {
+            nargs: 3,
+          });
+        })
         .parse();
       throw Error('unreachable');
     } catch (err) {
-      err.message.should.match(/not cool/);
+      err.message.should.match(/Not enough arguments/);
     }
   });
 });

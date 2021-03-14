@@ -2,6 +2,7 @@
 /* global context, describe, it, beforeEach, afterEach */
 /* eslint-disable no-unused-vars */
 
+const assert = require('assert');
 const expect = require('chai').expect;
 const fs = require('fs');
 const path = require('path');
@@ -2137,6 +2138,15 @@ describe('yargs dsl tests', () => {
         .parse();
       expect(msg).to.equal('ball');
       expect(err).to.not.equal(undefined);
+    });
+
+    it('throws error if coerce callback is missing', () => {
+      assert.throws(() => {
+        yargs().coerce(['a', 'b']);
+      }, /coerce callback must be provided/);
+      assert.throws(() => {
+        yargs().coerce('c');
+      }, /coerce callback must be provided/);
     });
   });
 

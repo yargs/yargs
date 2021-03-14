@@ -494,6 +494,7 @@ export function command(
     const config: Configuration = Object.assign({}, options.configuration, {
       'populate--': false,
     });
+
     const parsed = shim.Parser.detailed(
       unparsed,
       Object.assign({}, options, {
