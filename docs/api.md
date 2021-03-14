@@ -1522,6 +1522,33 @@ yargs.showHelp(s => myStream.write(s)); //prints to myStream
 
 Later on, `argv` can be retrieved with `yargs.argv`.
 
+.showVersion([consoleLevel | printCallback])
+---------------------------
+
+Print the version data.
+
+If no argument is provided, version data is printed using `console.error`.
+
+```js
+var yargs = require('yargs/yargs')(process.argv.slice(2));
+yargs.version('1.0.0');
+yargs.showVersion(); //prints to stderr using console.error()
+```
+
+If a string is specified, version data is printed using the [`console`](https://nodejs.org/api/console.html) function `consoleLevel`.
+
+```js
+yargs.showVersion("log"); //prints to stdout using console.log()
+```
+
+If a function is specified, it is called with a single argument - the version data as a string.
+
+```js
+yargs.showVersion(s => myStream.write(s)); //prints to myStream
+```
+
+Later on, `argv` can be retrieved with `yargs.argv`.
+
 .showHelpOnFail(enable, [message])
 ----------------------------------
 
