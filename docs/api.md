@@ -175,7 +175,7 @@ var argv = require('yargs/yargs')(process.argv.slice(2))
 <a name="coerce"></a>.coerce(key, fn)
 ----------------
 
-Provide a synchronous function to coerce or transform the value(s) given on the
+Provide a function to coerce or transform the value(s) given on the
 command line for `key`.
 
 The coercion function should accept one argument, representing the parsed value from
@@ -184,8 +184,7 @@ return a new value or throw an error. The returned value will be used as the val
 `key` (or one of its aliases) in `argv`.
 
 If the function throws, the error will be treated as a validation
-failure, delegating to either a custom [`.fail()`](#fail) handler or printing
-the error message in the console.
+failure, delegating to either a custom [`.fail()`](#fail) handler or printing the error message in the console.
 
 Coercion will be applied to a value after
 all other modifications, such as [`.normalize()`](#normalize).
@@ -195,7 +194,7 @@ _Examples:_
 ```js
 var argv = require('yargs/yargs')(process.argv.slice(2))
   .coerce('file', function (arg) {
-    return require('fs').readFileSync(arg, 'utf8')
+    return await require('fs').promises.readFile(arg, 'utf8')
   })
   .argv
 ```
@@ -212,8 +211,7 @@ var argv = require('yargs/yargs')(process.argv.slice(2))
   .argv
 ```
 
-You can also map the same function to several keys at one time. Just pass an
-array of keys as the first argument to `.coerce()`:
+You can also map the same function to several keys at one time. Just pass an array of keys as the first argument to `.coerce()`:
 
 ```js
 var path = require('path')
@@ -222,8 +220,7 @@ var argv = require('yargs/yargs')(process.argv.slice(2))
   .argv
 ```
 
-If you are using dot-notion or arrays, .e.g., `user.email` and `user.password`,
-coercion will be applied to the final object that has been parsed:
+If you are using dot-notion or arrays, .e.g., `user.email` and `user.password`, coercion will be applied to the final object that has been parsed:
 
 ```js
 // --user.name Batman --user.password 123
