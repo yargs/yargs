@@ -12,6 +12,11 @@ let yargs;
 require('chai').should();
 
 const noop = () => {};
+async function wait() {
+  return new Promise(resolve => {
+    setTimeout(resolve, 10);
+  });
+}
 const implicationsFailedPattern = new RegExp(english['Implications failed:']);
 
 function clearRequireCache() {
@@ -3086,5 +3091,30 @@ describe('yargs dsl tests', () => {
       help.should.match(/node object get/);
       argv._.should.eql(['object']);
     });
+    it('should return appropriate help message when async builder used', async () => {
+      const help = await yargs('foo')
+        .command(
+          'foo [bar]',
+          'foo command',
+          async yargs => {
+            wait();
+            return yargs.positional('foo', {
+              demand: true,
+              default: 'hello',
+              type: 'string',
+            });
+          },
+          async argv => {}
+        )
+        .getHelp();
+      help.should.match(/default: "hello"/);
+      help.should.match(/foo command/);
+    });
   });
+
+  // TODO(bcoe): dig into runDefaultBuilderOn, can we figure out an alternate
+  // way to populate default values.
+  // TODO(bcoe): why is validation error showing when showHelp() called?
+  // TODO(bcoe): how can we deal with the fact that showHelp() needs to be
+  // asynchronous.
 });

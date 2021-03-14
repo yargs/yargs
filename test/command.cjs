@@ -8,7 +8,6 @@ const checkOutput = require('./helpers/utils.cjs').checkOutput;
 
 require('chai').should();
 const noop = () => {};
-
 async function wait() {
   return new Promise(resolve => {
     setTimeout(resolve, 10);
@@ -1950,8 +1949,8 @@ describe('Command', () => {
   });
 
   describe('async builder', async () => {
-    /*it('allows positionals to be configured asynchronously', async () => {
-      const argv = await yargs(['cmd', '999'])
+    it('allows positionals to be configured asynchronously', async () => {
+      const argvPromise = yargs(['cmd', '999'])
         .command('cmd <foo>', 'a test command', async yargs => {
           await wait();
           yargs.positional('foo', {
@@ -1959,8 +1958,9 @@ describe('Command', () => {
           });
         })
         .parse();
+      (typeof argvPromise.then).should.equal('function');
+      const argv = await argvPromise;
       (typeof argv.foo).should.equal('string');
-    });*/
-    // TODO: add test for help output of positionals asynchronously described.
+    });
   });
 });

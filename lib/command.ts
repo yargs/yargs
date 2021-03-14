@@ -202,82 +202,161 @@ export class CommandInstance {
     commandIndex: number,
     helpOnly: boolean
   ): Arguments | Promise<Arguments> {
-    let aliases = parsed.aliases;
     const commandHandler =
       this.handlers[command!] ||
       this.handlers[this.aliasMap[command!]] ||
       this.defaultCommand;
     const currentContext = yargs.getContext();
     const parentCommands = currentContext.commands.slice();
-
-    // what does yargs look like after the builder is run?
-    let innerArgv: Arguments | Promise<Arguments> = parsed.argv;
     if (command) {
       currentContext.commands.push(command);
       currentContext.fullCommands.push(commandHandler.original);
     }
-    const builder = commandHandler.builder;
-    if (isCommandBuilderCallback(builder)) {
-      // a function can be provided, which builds
-      // up a yargs chain and possibly returns it.
-      const builderOutput = builder(yargs.reset(parsed.aliases));
-      const innerYargs = isYargsInstance(builderOutput) ? builderOutput : yargs;
-      // A null command indicates we are running the default command,
-      // if this is the case, we should show the root usage instructions
-      // rather than the usage instructions for the nested default command:
-      if (!command) innerYargs.getUsageInstance().unfreeze();
-      if (this.shouldUpdateUsage(innerYargs)) {
-        innerYargs
-          .getUsageInstance()
-          .usage(
-            this.usageFromParentCommandsCommandHandler(
-              parentCommands,
-              commandHandler
-            ),
-            commandHandler.description
-          );
-      }
-      innerArgv = innerYargs._parseArgs(
-        null,
-        undefined,
-        true,
-        commandIndex,
-        helpOnly
+    const builderResult = this.applyBuilderUpdateUsageAndParse(
+      command,
+      commandHandler,
+      yargs,
+      parsed.aliases,
+      parentCommands,
+      commandIndex,
+      helpOnly
+    );
+    if (isPromise(builderResult)) {
+      return builderResult.then(result => {
+        return this.applyMiddlewareAndGetResult(
+          command,
+          commandHandler,
+          result.innerArgv,
+          currentContext,
+          helpOnly,
+          result.aliases,
+          yargs
+        );
+      });
+    } else {
+      return this.applyMiddlewareAndGetResult(
+        command,
+        commandHandler,
+        builderResult.innerArgv,
+        currentContext,
+        helpOnly,
+        builderResult.aliases,
+        yargs
       );
-      aliases = (innerYargs.parsed as DetailedArguments).aliases;
+    }
+  }
+  private applyBuilderUpdateUsageAndParse(
+    command: string | null,
+    commandHandler: CommandHandler,
+    yargs: YargsInstance,
+    aliases: Dictionary<string[]>,
+    parentCommands: string[],
+    commandIndex: number,
+    helpOnly: boolean
+  ):
+    | {aliases: Dictionary<string[]>; innerArgv: Arguments}
+    | Promise<{aliases: Dictionary<string[]>; innerArgv: Arguments}> {
+    const builder = commandHandler.builder;
+    let innerYargs: YargsInstance = yargs;
+    if (isCommandBuilderCallback(builder)) {
+      // A function can be provided, which builds
+      // up a yargs chain and possibly returns it.
+      const builderOutput = builder(yargs.reset(aliases));
+      // Support the use-case of async builders:
+      if (isPromise(builderOutput)) {
+        return builderOutput.then(output => {
+          innerYargs = isYargsInstance(output) ? output : yargs;
+          return this.parseAndUpdateUsage(
+            command,
+            commandHandler,
+            innerYargs,
+            parentCommands,
+            commandIndex,
+            helpOnly
+          );
+        });
+      }
     } else if (isCommandBuilderOptionDefinitions(builder)) {
       // as a short hand, an object can instead be provided, specifying
       // the options that a command takes.
-      const innerYargs = yargs.reset(parsed.aliases);
-      // A null command indicates we are running the default command,
-      // if this is the case, we should show the root usage instructions
-      // rather than the usage instructions for the nested default command:
-      if (!command) innerYargs.getUsageInstance().unfreeze();
-      if (this.shouldUpdateUsage(innerYargs)) {
-        innerYargs
-          .getUsageInstance()
-          .usage(
-            this.usageFromParentCommandsCommandHandler(
-              parentCommands,
-              commandHandler
-            ),
-            commandHandler.description
-          );
-      }
+      innerYargs = yargs.reset(aliases);
       Object.keys(commandHandler.builder).forEach(key => {
         innerYargs.option(key, builder[key]);
       });
-      innerArgv = innerYargs._parseArgs(
-        null,
-        undefined,
-        true,
-        commandIndex,
-        helpOnly
-      );
-      aliases = (innerYargs.parsed as DetailedArguments).aliases;
     }
+    return this.parseAndUpdateUsage(
+      command,
+      commandHandler,
+      innerYargs,
+      parentCommands,
+      commandIndex,
+      helpOnly
+    );
+  }
+  private parseAndUpdateUsage(
+    command: string | null,
+    commandHandler: CommandHandler,
+    innerYargs: YargsInstance,
+    parentCommands: string[],
+    commandIndex: number,
+    helpOnly: boolean
+  ): {aliases: Dictionary<string[]>; innerArgv: Arguments} {
+    // A null command indicates we are running the default command,
+    // if this is the case, we should show the root usage instructions
+    // rather than the usage instructions for the nested default command:
+    if (!command) innerYargs.getUsageInstance().unfreeze();
+    if (this.shouldUpdateUsage(innerYargs)) {
+      innerYargs
+        .getUsageInstance()
+        .usage(
+          this.usageFromParentCommandsCommandHandler(
+            parentCommands,
+            commandHandler
+          ),
+          commandHandler.description
+        );
+    }
+    const innerArgv = innerYargs._parseArgs(
+      null,
+      undefined,
+      true,
+      commandIndex,
+      helpOnly
+    );
+    return {
+      aliases: (innerYargs.parsed as DetailedArguments).aliases,
+      innerArgv: innerArgv as Arguments,
+    };
+  }
+  private shouldUpdateUsage(yargs: YargsInstance) {
+    return (
+      !yargs.getUsageInstance().getUsageDisabled() &&
+      yargs.getUsageInstance().getUsage().length === 0
+    );
+  }
+  private usageFromParentCommandsCommandHandler(
+    parentCommands: string[],
+    commandHandler: CommandHandler
+  ) {
+    const c = DEFAULT_MARKER.test(commandHandler.original)
+      ? commandHandler.original.replace(DEFAULT_MARKER, '').trim()
+      : commandHandler.original;
+    const pc = parentCommands.filter(c => {
+      return !DEFAULT_MARKER.test(c);
+    });
+    pc.push(c);
+    return `$0 ${pc.join(' ')}`;
+  }
+  private applyMiddlewareAndGetResult(
+    command: string | null,
+    commandHandler: CommandHandler,
+    innerArgv: Arguments | Promise<Arguments>,
+    currentContext: Context,
+    helpOnly: boolean,
+    aliases: Dictionary<string[]>,
+    yargs: YargsInstance
+  ): Arguments | Promise<Arguments> {
     let positionalMap: Dictionary<string[]> = {};
-
     if (!yargs._hasOutput()) {
       positionalMap = this.populatePositionals(
         commandHandler,
@@ -286,7 +365,6 @@ export class CommandInstance {
         yargs
       );
     }
-
     // If showHelp() or getHelp() is being run, we should not
     // execute middleware or handlers (these may perform expensive operations
     // like creating a DB connection).
@@ -351,25 +429,6 @@ export class CommandInstance {
     }
 
     return innerArgv;
-  }
-  private shouldUpdateUsage(yargs: YargsInstance) {
-    return (
-      !yargs.getUsageInstance().getUsageDisabled() &&
-      yargs.getUsageInstance().getUsage().length === 0
-    );
-  }
-  private usageFromParentCommandsCommandHandler(
-    parentCommands: string[],
-    commandHandler: CommandHandler
-  ) {
-    const c = DEFAULT_MARKER.test(commandHandler.original)
-      ? commandHandler.original.replace(DEFAULT_MARKER, '').trim()
-      : commandHandler.original;
-    const pc = parentCommands.filter(c => {
-      return !DEFAULT_MARKER.test(c);
-    });
-    pc.push(c);
-    return `$0 ${pc.join(' ')}`;
   }
   // transcribe all positional arguments "command <foo> <bar> [apple]"
   // onto argv.

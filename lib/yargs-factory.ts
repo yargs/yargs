@@ -1312,7 +1312,18 @@ function Yargs(
       if (!self.parsed) {
         // Run the parser as if --help was passed to it (this is what
         // the last parameter `true` indicates).
-        self._parseArgs(processArgs, undefined, undefined, 0, true);
+        const parse = self._parseArgs(
+          processArgs,
+          undefined,
+          undefined,
+          0,
+          true
+        );
+        if (isPromise(parse)) {
+          return parse.then(() => {
+            return usage.help();
+          });
+        }
       }
       if (command.hasDefaultCommand()) {
         context.resets++; // override the restriction on top-level positoinals.
@@ -1329,7 +1340,19 @@ function Yargs(
       if (!self.parsed) {
         // Run the parser as if --help was passed to it (this is what
         // the last parameter `true` indicates).
-        self._parseArgs(processArgs, undefined, undefined, 0, true);
+        const parse = self._parseArgs(
+          processArgs,
+          undefined,
+          undefined,
+          0,
+          true
+        );
+        if (isPromise(parse)) {
+          parse.then(() => {
+            usage.showHelp(level);
+          });
+          return self;
+        }
       }
       if (command.hasDefaultCommand()) {
         context.resets++; // override the restriction on top-level positoinals.
