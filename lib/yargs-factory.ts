@@ -113,9 +113,9 @@ function Yargs(
       .replace(`${shim.path.dirname(shim.process.execPath())}/`, '');
   }
 
-  // use context object to keep track of resets, subcommand execution, etc
-  // submodules should modify and check the state of context as necessary
-  const context = {resets: -1, commands: [], fullCommands: [], files: []};
+  // use context object to keep track of resets, subcommand execution, etc.,
+  // submodules should modify and check the state of context as necessary:
+  const context = {resets: -1, commands: [], fullCommands: []};
   self.getContext = () => context;
 
   let hasOutput = false;
@@ -244,7 +244,7 @@ function Yargs(
       : Validation(self, usage, y18n, shim);
     command = command
       ? command.reset()
-      : Command(self, usage, validation, globalMiddleware, shim);
+      : Command(usage, validation, globalMiddleware, shim);
     if (!completion) completion = Completion(self, usage, command, shim);
     globalMiddleware.reset();
 
@@ -729,13 +729,7 @@ function Yargs(
   self.commandDir = function (dir, opts) {
     argsert('<string> [object]', [dir, opts], arguments.length);
     const req = parentRequire || shim.require;
-    command.addDirectory(
-      dir,
-      self.getContext(),
-      req,
-      shim.getCallerFile(),
-      opts
-    );
+    command.addDirectory(dir, req, shim.getCallerFile(), opts);
     return self;
   };
 
@@ -2221,7 +2215,6 @@ export function isYargsInstance(y: YargsInstance | void): y is YargsInstance {
 /** Yargs' context. */
 export interface Context {
   commands: string[];
-  files: string[];
   fullCommands: string[];
 }
 
