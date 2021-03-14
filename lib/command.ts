@@ -8,6 +8,7 @@ import {isPromise} from './utils/is-promise.js';
 import {
   applyMiddleware,
   commandMiddlewareFactory,
+  GlobalMiddleware,
   Middleware,
 } from './middleware.js';
 import {parseCommand, Positional} from './parse-command.js';
@@ -23,6 +24,7 @@ import {
   Arguments,
   DetailedArguments,
 } from './yargs-factory.js';
+import {maybeAsyncResult} from './utils/maybe-async-result.js';
 import whichModule from './utils/which-module.js';
 
 const DEFAULT_MARKER = /(^\*)|(^\$0)/;
@@ -35,7 +37,7 @@ export function command(
   yargs: YargsInstance,
   usage: UsageInstance,
   validation: ValidationInstance,
-  globalMiddleware: Middleware[] = [],
+  globalMiddleware: GlobalMiddleware,
   shim: PlatformShim
 ) {
   const self: CommandInstance = {} as CommandInstance;
@@ -238,6 +240,10 @@ export function command(
       // up a yargs chain and possibly returns it.
       const builderOutput = builder(yargs.reset(parsed.aliases));
       const innerYargs = isYargsInstance(builderOutput) ? builderOutput : yargs;
+      // A null command indicates we are running the default command,
+      // if this is the case, we should show the root usage instructions
+      // rather than the usage instructions for the nested default command:
+      if (!command) innerYargs.getUsageInstance().unfreeze();
       if (shouldUpdateUsage(innerYargs)) {
         innerYargs
           .getUsageInstance()
@@ -261,6 +267,10 @@ export function command(
       // as a short hand, an object can instead be provided, specifying
       // the options that a command takes.
       const innerYargs = yargs.reset(parsed.aliases);
+      // A null command indicates we are running the default command,
+      // if this is the case, we should show the root usage instructions
+      // rather than the usage instructions for the nested default command:
+      if (!command) innerYargs.getUsageInstance().unfreeze();
       if (shouldUpdateUsage(innerYargs)) {
         innerYargs
           .getUsageInstance()
@@ -299,6 +309,7 @@ export function command(
     if (helpOnly) return innerArgv;
 
     const middlewares = globalMiddleware
+      .getMiddleware()
       .slice(0)
       .concat(commandHandler.middlewares);
     innerArgv = applyMiddleware(innerArgv, yargs, middlewares, true);
@@ -312,16 +323,10 @@ export function command(
         (yargs.parsed as DetailedArguments).error,
         !command
       );
-      if (isPromise(innerArgv)) {
-        // If the middlware returned a promise, resolve the middleware
-        // before applying the validation:
-        innerArgv = innerArgv.then(argv => {
-          validation(argv);
-          return argv;
-        });
-      } else {
-        validation(innerArgv);
-      }
+      innerArgv = maybeAsyncResult<Arguments>(innerArgv, result => {
+        validation(result);
+        return result;
+      });
     }
 
     if (commandHandler.handler && !yargs._hasOutput()) {
@@ -334,18 +339,14 @@ export function command(
       yargs._postProcess(innerArgv, populateDoubleDash, false, false);
 
       innerArgv = applyMiddleware(innerArgv, yargs, middlewares, false);
-      if (isPromise(innerArgv)) {
-        const innerArgvRef = innerArgv;
-        innerArgv = innerArgv
-          .then(argv => commandHandler.handler(argv))
-          .then(() => innerArgvRef);
-      } else {
-        const handlerResult = commandHandler.handler(innerArgv);
+      innerArgv = maybeAsyncResult<Arguments>(innerArgv, result => {
+        const handlerResult = commandHandler.handler(result as Arguments);
         if (isPromise(handlerResult)) {
-          const innerArgvRef = innerArgv;
-          innerArgv = handlerResult.then(() => innerArgvRef);
+          return handlerResult.then(() => result);
+        } else {
+          return result;
         }
-      }
+      });
 
       yargs.getUsageInstance().cacheHelpMessage();
       if (isPromise(innerArgv) && !yargs._hasParseCallback()) {
@@ -491,8 +492,9 @@ export function command(
     if (!unparsed.length) return;
 
     const config: Configuration = Object.assign({}, options.configuration, {
-      'populate--': true,
+      'populate--': false,
     });
+
     const parsed = shim.Parser.detailed(
       unparsed,
       Object.assign({}, options, {

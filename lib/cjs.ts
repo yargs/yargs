@@ -5,7 +5,6 @@ import {applyExtends} from './utils/apply-extends';
 import {argsert} from './argsert.js';
 import {isPromise} from './utils/is-promise.js';
 import {objFilter} from './utils/obj-filter.js';
-import {globalMiddlewareFactory} from './middleware.js';
 import {parseCommand} from './parse-command.js';
 import * as processArgv from './utils/process-argv.js';
 import {YargsWithShim, rebase} from './yargs-factory.js';
@@ -35,7 +34,6 @@ export default {
   cjsPlatformShim,
   Yargs,
   argsert,
-  globalMiddlewareFactory,
   isPromise,
   objFilter,
   parseCommand,

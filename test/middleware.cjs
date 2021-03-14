@@ -2,8 +2,8 @@
 /* global describe, it, beforeEach, afterEach */
 /* eslint-disable no-unused-vars */
 
+const assert = require('assert');
 const {expect} = require('chai');
-const {globalMiddlewareFactory} = require('../build/index.cjs');
 let yargs;
 require('chai').should();
 
@@ -12,36 +12,18 @@ function clearRequireCache() {
   delete require.cache[require.resolve('../build/index.cjs')];
 }
 
+async function wait() {
+  return Promise(resolve => {
+    setTimeout(resolve, 10);
+  });
+}
+
 describe('middleware', () => {
   beforeEach(() => {
     yargs = require('../index.cjs');
   });
   afterEach(() => {
     clearRequireCache();
-  });
-
-  it('should add a list of callbacks to global middleware', () => {
-    const globalMiddleware = [];
-
-    globalMiddlewareFactory(globalMiddleware)([() => {}, () => {}]);
-
-    globalMiddleware.should.have.lengthOf(2);
-  });
-
-  it('should throw exception if middleware is not a function', () => {
-    const globalMiddleware = [];
-
-    expect(() => {
-      globalMiddlewareFactory(globalMiddleware)(['callback1', 'callback2']);
-    }).to.throw('middleware must be a function');
-  });
-
-  it('should add a single callback to global middleware', () => {
-    const globalMiddleware = [];
-
-    globalMiddlewareFactory(globalMiddleware)(() => {});
-
-    globalMiddleware.should.have.lengthOf(1);
   });
 
   it('runs the middleware before reaching the handler', done => {
@@ -622,5 +604,265 @@ describe('middleware', () => {
       )
       .parse();
     argv.foo.should.equal(198);
+  });
+
+  it('throws error if middleware not function', () => {
+    let err;
+    assert.throws(() => {
+      yargs('snuh --foo 99').middleware(['hello']).parse();
+    }, /middleware must be a function/);
+  });
+
+  describe('async check', () => {
+    describe('success', () => {
+      it('returns promise if check is async', async () => {
+        const argvPromise = yargs('--foo 100')
+          .middleware(argv => {
+            argv.foo *= 2;
+          }, true)
+          .check(async argv => {
+            wait();
+            if (argv.foo < 200) return false;
+            else return true;
+          })
+          .parse();
+        (!!argvPromise.then).should.equal(true);
+        const argv = await argvPromise;
+        argv.foo.should.equal(200);
+      });
+      it('returns promise if check and middleware is async', async () => {
+        const argvPromise = yargs('--foo 100')
+          .middleware(async argv => {
+            wait();
+            argv.foo *= 2;
+          }, true)
+          .check(async argv => {
+            wait();
+            if (argv.foo < 200) return false;
+            else return true;
+          })
+          .parse();
+        (!!argvPromise.then).should.equal(true);
+        const argv = await argvPromise;
+        argv.foo.should.equal(200);
+      });
+      it('allows async check to be used with command', async () => {
+        let output = '';
+        const argv = await yargs('cmd --foo 300')
+          .command(
+            'cmd',
+            'a command',
+            yargs => {
+              yargs.check(async argv => {
+                wait();
+                output += 'first';
+                if (argv.foo < 200) return false;
+                else return true;
+              });
+            },
+            async argv => {
+              wait();
+              output += 'second';
+            }
+          )
+          .parse();
+        argv._.should.include('cmd');
+        argv.foo.should.equal(300);
+        output.should.equal('firstsecond');
+      });
+      it('allows async check to be used with command and middleware', async () => {
+        let output = '';
+        const argv = await yargs('cmd --foo 100')
+          .command(
+            'cmd',
+            'a command',
+            yargs => {
+              yargs.check(async argv => {
+                wait();
+                output += 'second';
+                if (argv.foo < 200) return false;
+                else return true;
+              });
+            },
+            async argv => {
+              wait();
+              output += 'fourth';
+            },
+            [
+              async argv => {
+                wait();
+                output += 'third';
+                argv.foo *= 2;
+              },
+            ]
+          )
+          .middleware(async argv => {
+            wait();
+            output += 'first';
+            argv.foo *= 2;
+          }, true)
+          .parse();
+        argv._.should.include('cmd');
+        argv.foo.should.equal(400);
+        output.should.equal('firstsecondthirdfourth');
+      });
+    });
+    describe('failure', () => {
+      it('allows failed check to be caught', async () => {
+        await assert.rejects(
+          yargs('--f 33')
+            .alias('foo', 'f')
+            .fail(false)
+            .check(async argv => {
+              wait();
+              return argv.foo > 50;
+            })
+            .parse(),
+          /Argument check failed/
+        );
+      });
+      it('allows error to be caught before calling command', async () => {
+        let output = '';
+        await assert.rejects(
+          yargs('cmd --foo 100')
+            .fail(false)
+            .command(
+              'cmd',
+              'a command',
+              yargs => {
+                yargs.check(async argv => {
+                  wait();
+                  output += 'first';
+                  if (argv.foo < 200) return false;
+                  else return true;
+                });
+              },
+              async argv => {
+                wait();
+                output += 'second';
+              }
+            )
+            .parse(),
+          /Argument check failed/
+        );
+        output.should.equal('first');
+      });
+      it('allows error to be caught before calling command and middleware', async () => {
+        let output = '';
+        await assert.rejects(
+          yargs('cmd --foo 10')
+            .fail(false)
+            .command(
+              'cmd',
+              'a command',
+              yargs => {
+                yargs.check(async argv => {
+                  wait();
+                  output += 'second';
+                  if (argv.foo < 200) return false;
+                  else return true;
+                });
+              },
+              async argv => {
+                wait();
+                output += 'fourth';
+              },
+              [
+                async argv => {
+                  wait();
+                  output += 'third';
+                  argv.foo *= 2;
+                },
+              ]
+            )
+            .middleware(async argv => {
+              wait();
+              output += 'first';
+              argv.foo *= 2;
+            }, true)
+            .parse(),
+          /Argument check failed/
+        );
+        output.should.equal('firstsecond');
+      });
+    });
+    it('applies alliases prior to calling check', async () => {
+      const argv = await yargs('--f 99')
+        .alias('foo', 'f')
+        .check(async argv => {
+          wait();
+          return argv.foo > 50;
+        })
+        .parse();
+      argv.foo.should.equal(99);
+    });
+  });
+
+  describe('async coerce', () => {
+    it('allows two commands to register different coerce methods', async () => {
+      const y = yargs()
+        .command('command1', 'first command', yargs => {
+          yargs.coerce('foo', async arg => {
+            wait();
+            return new Date(arg);
+          });
+        })
+        .command('command2', 'second command', yargs => {
+          yargs.coerce('foo', async arg => {
+            wait();
+            return new Number(arg);
+          });
+        })
+        .coerce('foo', async _arg => {
+          return 'hello';
+        });
+      const r1 = await y.parse('command1 --foo 2020-10-10');
+      expect(r1.foo).to.be.an.instanceof(Date);
+      const r2 = await y.parse('command2 --foo 302');
+      r2.foo.should.equal(302);
+    });
+    it('coerce is applied to argument and aliases', async () => {
+      let callCount = 0;
+      const argvPromise = yargs()
+        .alias('f', 'foo')
+        .coerce('foo', async arg => {
+          wait();
+          callCount++;
+          return new Date(arg.toString());
+        })
+        .parse('-f 2014');
+      (!!argvPromise.then).should.equal(true);
+      const argv = await argvPromise;
+      callCount.should.equal(1);
+      expect(argv.foo).to.be.an.instanceof(Date);
+      expect(argv.f).to.be.an.instanceof(Date);
+    });
+    it('applies coerce before validation', async () => {
+      const argv = await yargs()
+        .option('foo', {
+          choices: [10, 20, 30],
+        })
+        .coerce('foo', async arg => {
+          wait();
+          return (arg *= 2);
+        })
+        .parse('--foo 5');
+      argv.foo.should.equal(10);
+    });
+    it('allows error to be caught', async () => {
+      await assert.rejects(
+        yargs()
+          .fail(false)
+          .option('foo', {
+            choices: [10, 20, 30],
+          })
+          .coerce('foo', async arg => {
+            wait();
+            return (arg *= 2);
+          })
+          .parse('--foo 2'),
+        /Choices: 10, 20, 30/
+      );
+    });
   });
 });

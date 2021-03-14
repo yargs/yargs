@@ -1,6 +1,7 @@
 /* global describe, it, beforeEach */
 /* eslint-disable no-unused-vars */
 'use strict';
+const assert = require('assert');
 const yargs = require('../index.cjs');
 const expect = require('chai').expect;
 const checkOutput = require('./helpers/utils.cjs').checkOutput;
@@ -1250,6 +1251,29 @@ describe('Command', () => {
         checkCalled.should.equal(false);
       });
 
+      it('allows each builder to specify own middleware', () => {
+        let checkCalled1 = 0;
+        let checkCalled2 = 0;
+        const y = yargs()
+          .command('command <snuh>', 'a command', () => {
+            yargs.check(argv => {
+              checkCalled1++;
+              return true;
+            });
+          })
+          .command('command2 <snuh>', 'a second command', yargs => {
+            yargs.check(argv => {
+              checkCalled2++;
+              return true;
+            });
+          });
+        y.parse('command blerg --foo');
+        y.parse('command2 blerg --foo');
+        y.parse('command blerg --foo');
+        checkCalled1.should.equal(2);
+        checkCalled2.should.equal(1);
+      });
+
       it('applies demandOption globally', done => {
         yargs('command blerg --foo')
           .command('command <snuh>', 'a command')
@@ -1884,5 +1908,38 @@ describe('Command', () => {
     };
     yargs().command(cmds).parse('a c 10 5', context);
     context.output.value.should.equal(15);
+  });
+
+  it('allows async exception in handler to be caught', async () => {
+    await assert.rejects(
+      yargs(['mw'])
+        .fail(false)
+        .command(
+          'mw',
+          'adds func to middleware',
+          () => {},
+          async () => {
+            throw Error('not cool');
+          }
+        )
+        .parse(),
+      /not cool/
+    );
+  });
+
+  it('reports error if error occurs parsing positional', () => {
+    try {
+      yargs(['cmd', 'neat'])
+        .fail(false)
+        .command('cmd <foo>', 'run a foo command', yargs => {
+          yargs.option('foo', {
+            nargs: 3,
+          });
+        })
+        .parse();
+      throw Error('unreachable');
+    } catch (err) {
+      err.message.should.match(/Not enough arguments/);
+    }
   });
 });
