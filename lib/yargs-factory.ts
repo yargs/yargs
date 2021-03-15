@@ -53,11 +53,12 @@ import {objFilter} from './utils/obj-filter.js';
 import {applyExtends} from './utils/apply-extends.js';
 import {
   applyMiddleware,
-  globalMiddlewareFactory,
+  GlobalMiddleware,
   MiddlewareCallback,
   Middleware,
 } from './middleware.js';
 import {isPromise} from './utils/is-promise.js';
+import {maybeAsyncResult} from './utils/maybe-async-result.js';
 import setBlocking from './utils/set-blocking.js';
 
 let shim: PlatformShim;
@@ -75,15 +76,13 @@ function Yargs(
   let command: CommandInstance;
   let completion: CompletionInstance | null = null;
   let groups: Dictionary<string[]> = {};
-  const globalMiddleware: Middleware[] = [];
   let output = '';
   const preservedGroups: Dictionary<string[]> = {};
+  const globalMiddleware = new GlobalMiddleware(self);
   let usage: UsageInstance;
   let validation: ValidationInstance;
 
   const y18n = shim.y18n;
-
-  self.middleware = globalMiddlewareFactory(globalMiddleware, self);
 
   self.scriptName = function (scriptName) {
     self.customScriptName = true;
@@ -223,7 +222,6 @@ function Yargs(
       'choices',
       'demandedOptions',
       'demandedCommands',
-      'coerce',
       'deprecatedOptions',
     ];
 
@@ -248,6 +246,7 @@ function Yargs(
       ? command.reset()
       : Command(self, usage, validation, globalMiddleware, shim);
     if (!completion) completion = Completion(self, usage, command, shim);
+    globalMiddleware.reset();
 
     completionCommand = null;
     output = '';
@@ -281,6 +280,7 @@ function Yargs(
     usage.freeze();
     validation.freeze();
     command.freeze();
+    globalMiddleware.freeze();
   }
   function unfreeze() {
     const frozen = frozens.pop();
@@ -306,6 +306,7 @@ function Yargs(
     usage.unfreeze();
     validation.unfreeze();
     command.unfreeze();
+    globalMiddleware.unfreeze();
   }
 
   self.boolean = function (keys) {
@@ -491,7 +492,56 @@ function Yargs(
       [keys, value],
       arguments.length
     );
-    populateParserHintSingleValueDictionary(self.coerce, 'coerce', keys, value);
+    if (Array.isArray(keys)) {
+      if (!value) {
+        throw new YError('coerce callback must be provided');
+      }
+      for (const key of keys) {
+        self.coerce(key, value);
+      }
+      return self;
+    } else if (typeof keys === 'object') {
+      for (const key of Object.keys(keys)) {
+        self.coerce(key, keys[key]);
+      }
+      return self;
+    }
+    if (!value) {
+      throw new YError('coerce callback must be provided');
+    }
+    // This noop tells yargs-parser about the existence of the option
+    // represented by "keys", so that it can apply camel case expansion
+    // if needed:
+    self.alias(keys, keys);
+    globalMiddleware.addCoerceMiddleware(
+      (
+        argv: Arguments,
+        yargs: YargsInstance
+      ): Partial<Arguments> | Promise<Partial<Arguments>> => {
+        let aliases: Dictionary<string[]>;
+        return maybeAsyncResult<
+          Partial<Arguments> | Promise<Partial<Arguments>> | any
+        >(
+          () => {
+            aliases = yargs.getAliases();
+            return value(argv[keys]);
+          },
+          (result: any): Partial<Arguments> => {
+            argv[keys] = result;
+            if (aliases[keys]) {
+              for (const alias of aliases[keys]) {
+                argv[alias] = result;
+              }
+            }
+            return argv;
+          },
+          (err: Error): Partial<Arguments> | Promise<Partial<Arguments>> => {
+            throw new YError(err.message);
+          }
+        );
+      },
+      keys
+    );
     return self;
   };
 
@@ -758,6 +808,10 @@ function Yargs(
     return self;
   };
 
+  self.getAliases = () => {
+    return self.parsed ? self.parsed.aliases : {};
+  };
+
   self.getDemandedOptions = () => {
     argsert([], 0);
     return options.demandedOptions;
@@ -847,10 +901,49 @@ function Yargs(
     return self;
   };
 
-  self.check = function (f, _global) {
-    argsert('<function> [boolean]', [f, _global], arguments.length);
-    validation.check(f, _global !== false);
+  self.check = function (f, global) {
+    argsert('<function> [boolean]', [f, global], arguments.length);
+    self.middleware(
+      (
+        argv: Arguments,
+        _yargs: YargsInstance
+      ): Partial<Arguments> | Promise<Partial<Arguments>> => {
+        return maybeAsyncResult<
+          Partial<Arguments> | Promise<Partial<Arguments>> | any
+        >(
+          () => {
+            return f(argv);
+          },
+          (result: any): Partial<Arguments> | Promise<Partial<Arguments>> => {
+            if (!result) {
+              usage.fail(y18n.__('Argument check failed: %s', f.toString()));
+            } else if (typeof result === 'string' || result instanceof Error) {
+              usage.fail(result.toString(), result);
+            }
+            return argv;
+          },
+          (err: Error): Partial<Arguments> | Promise<Partial<Arguments>> => {
+            usage.fail(err.message ? err.message : err.toString(), err);
+            return argv;
+          }
+        );
+      },
+      false,
+      global
+    );
     return self;
+  };
+
+  self.middleware = (
+    callback: MiddlewareCallback | MiddlewareCallback[],
+    applyBeforeValidation?: boolean,
+    global = true
+  ) => {
+    return globalMiddleware.addMiddleware(
+      callback,
+      !!applyBeforeValidation,
+      global
+    );
   };
 
   self.global = function global(globals, global) {
@@ -934,12 +1027,11 @@ function Yargs(
       [args, shortCircuit, _parseFn],
       arguments.length
     );
-    freeze();
+    freeze(); // Push current state of parser onto stack.
     if (typeof args === 'undefined') {
       const argv = self._parseArgs(processArgs);
       const tmpParsed = self.parsed;
-      unfreeze();
-      // TODO: remove this compatibility hack when we release yargs@15.x:
+      unfreeze(); // Pop the stack.
       self.parsed = tmpParsed;
       return argv;
     }
@@ -967,7 +1059,7 @@ function Yargs(
     const parsed = self._parseArgs(args, !!shortCircuit);
     completion!.setParsed(self.parsed as DetailedArguments);
     if (parseFn) parseFn(exitError, parsed, output);
-    unfreeze();
+    unfreeze(); // Pop the stack.
 
     return parsed;
   };
@@ -1254,6 +1346,12 @@ function Yargs(
     return self;
   };
 
+  self.showVersion = function (level) {
+    argsert('[string|function]', [level], arguments.length);
+    usage.showVersion(level);
+    return self;
+  };
+
   let versionOpt: string | null = null;
   self.version = function version(
     opt?: string | false,
@@ -1472,7 +1570,9 @@ function Yargs(
   };
 
   Object.defineProperty(self, 'argv', {
-    get: () => self._parseArgs(processArgs),
+    get: () => {
+      return self.parse();
+    },
     enumerable: true,
   });
 
@@ -1483,7 +1583,7 @@ function Yargs(
     commandIndex = 0,
     helpOnly = false
   ) {
-    let skipValidation = !!calledFromCommand;
+    let skipValidation = !!calledFromCommand || helpOnly;
     args = args || processArgs;
 
     options.__ = y18n.__;
@@ -1550,10 +1650,8 @@ function Yargs(
 
       const handlerKeys = command.getCommands();
       const requestCompletions = completion!.completionKey in argv;
-      const skipRecommendation = argv[helpOpt!] || requestCompletions;
-      const skipDefaultCommand =
-        skipRecommendation &&
-        (handlerKeys.length > 1 || handlerKeys[0] !== '$0');
+      const skipRecommendation =
+        argv[helpOpt!] || requestCompletions || helpOnly;
 
       if (argv._.length) {
         if (handlerKeys.length) {
@@ -1584,7 +1682,7 @@ function Yargs(
           }
 
           // run the default command, if defined
-          if (command.hasDefaultCommand() && !skipDefaultCommand) {
+          if (command.hasDefaultCommand() && !skipRecommendation) {
             const innerArgv = command.runCommand(
               null,
               self,
@@ -1617,7 +1715,7 @@ function Yargs(
           self.showCompletionScript();
           self.exit(0);
         }
-      } else if (command.hasDefaultCommand() && !skipDefaultCommand) {
+      } else if (command.hasDefaultCommand() && !skipRecommendation) {
         const innerArgv = command.runCommand(null, self, parsed, 0, helpOnly);
         return self._postProcess(
           innerArgv,
@@ -1667,7 +1765,7 @@ function Yargs(
             if (exitProcess) setBlocking(true);
 
             skipValidation = true;
-            usage.showVersion();
+            usage.showVersion('log');
             self.exit(0);
           }
         });
@@ -1690,9 +1788,24 @@ function Yargs(
         if (!requestCompletions) {
           const validation = self._runValidation(aliases, {}, parsed.error);
           if (!calledFromCommand) {
-            argvPromise = applyMiddleware(argv, self, globalMiddleware, true);
+            argvPromise = applyMiddleware(
+              argv,
+              self,
+              globalMiddleware.getMiddleware(),
+              true
+            );
           }
           argvPromise = validateAsync(validation, argvPromise ?? argv);
+          if (isPromise(argvPromise) && !calledFromCommand) {
+            argvPromise = argvPromise.then(() => {
+              return applyMiddleware(
+                argv,
+                self,
+                globalMiddleware.getMiddleware(),
+                false
+              );
+            });
+          }
         }
       }
     } catch (err) {
@@ -1713,17 +1826,10 @@ function Yargs(
     validation: (argv: Arguments) => void,
     argv: Arguments | Promise<Arguments>
   ): Arguments | Promise<Arguments> {
-    if (isPromise(argv)) {
-      // If the middlware returned a promise, resolve the middleware
-      // before applying the validation:
-      argv = argv.then(argv => {
-        validation(argv);
-        return argv;
-      });
-    } else {
-      validation(argv);
-    }
-    return argv;
+    return maybeAsyncResult<Arguments>(argv, result => {
+      validation(result);
+      return result;
+    });
   }
 
   // Applies a couple post processing steps that are easier to perform
@@ -1746,7 +1852,12 @@ function Yargs(
       argv = self._parsePositionalNumbers(argv);
     }
     if (runGlobalMiddleware) {
-      argv = applyMiddleware(argv, self, globalMiddleware, false);
+      argv = applyMiddleware(
+        argv,
+        self,
+        globalMiddleware.getMiddleware(),
+        false
+      );
     }
     return argv;
   };
@@ -1813,7 +1924,6 @@ function Yargs(
       } else if (strictOptions) {
         validation.unknownArguments(argv, aliases, {}, false, false);
       }
-      validation.customChecks(argv, aliases);
       validation.limitedChoices(argv);
       validation.implications(argv);
       validation.conflicting(argv);
@@ -1901,10 +2011,7 @@ export interface YargsInstance {
   };
   array(keys: string | string[]): YargsInstance;
   boolean(keys: string | string[]): YargsInstance;
-  check(
-    f: (argv: Arguments, aliases: Dictionary<string[]>) => any,
-    _global?: boolean
-  ): YargsInstance;
+  check(f: (argv: Arguments) => any, global?: boolean): YargsInstance;
   choices: {
     (keys: string | string[], choices: string | string[]): YargsInstance;
     (keyChoices: Dictionary<string | string[]>): YargsInstance;
@@ -2004,6 +2111,7 @@ export interface YargsInstance {
   ): Promise<string[] | void> | any;
   getHelp(): Promise<string>;
   getContext(): Context;
+  getAliases(): Dictionary<string[]>;
   getDemandedCommands(): Options['demandedCommands'];
   getDemandedOptions(): Options['demandedOptions'];
   getDeprecatedOptions(): Options['deprecatedOptions'];
@@ -2031,7 +2139,8 @@ export interface YargsInstance {
   };
   middleware(
     callback: MiddlewareCallback | MiddlewareCallback[],
-    applyBeforeValidation?: boolean
+    applyBeforeValidation?: boolean,
+    global?: boolean
   ): YargsInstance;
   nargs: {
     (keys: string | string[], nargs: number): YargsInstance;
@@ -2072,6 +2181,9 @@ export interface YargsInstance {
   scriptName(scriptName: string): YargsInstance;
   showCompletionScript($0?: string, cmd?: string): YargsInstance;
   showHelp(level: 'error' | 'log' | ((message: string) => void)): YargsInstance;
+  showVersion(
+    level: 'error' | 'log' | ((message: string) => void)
+  ): YargsInstance;
   showHelpOnFail: {
     (message?: string): YargsInstance;
     (enabled: boolean, message: string): YargsInstance;

@@ -14,7 +14,7 @@ import {DetailedArguments} from './typings/yargs-parser-types.js';
 const specialKeys = ['$0', '--', '_'];
 
 // validation-type-stuff, missing params,
-// bad implications, custom checks.
+// bad implications:
 export function validation(
   yargs: YargsInstance,
   usage: UsageInstance,
@@ -275,34 +275,6 @@ export function validation(
     usage.fail(msg);
   };
 
-  // custom checks, added using the `check` option on yargs.
-  let checks: CustomCheck[] = [];
-  self.check = function check(f, global) {
-    checks.push({
-      func: f,
-      global,
-    });
-  };
-
-  self.customChecks = function customChecks(argv, aliases) {
-    for (let i = 0, f; (f = checks[i]) !== undefined; i++) {
-      const func = f.func;
-      let result = null;
-      try {
-        result = func(argv, aliases);
-      } catch (err) {
-        usage.fail(err.message ? err.message : err, err);
-        continue;
-      }
-
-      if (!result) {
-        usage.fail(__('Argument check failed: %s', func.toString()));
-      } else if (typeof result === 'string' || result instanceof Error) {
-        usage.fail(result.toString(), result);
-      }
-    }
-  };
-
   // check implications, argument foo implies => argument bar.
   let implied: Dictionary<KeyOrPos[]> = {};
   self.implies = function implies(key, value) {
@@ -441,7 +413,6 @@ export function validation(
   self.reset = function reset(localLookup) {
     implied = objFilter(implied, k => !localLookup[k]);
     conflicting = objFilter(conflicting, k => !localLookup[k]);
-    checks = checks.filter(c => c.global);
     return self;
   };
 
@@ -449,14 +420,13 @@ export function validation(
   self.freeze = function freeze() {
     frozens.push({
       implied,
-      checks,
       conflicting,
     });
   };
   self.unfreeze = function unfreeze() {
     const frozen = frozens.pop();
     assertNotStrictEqual(frozen, undefined, shim);
-    ({implied, checks, conflicting} = frozen);
+    ({implied, conflicting} = frozen);
   };
 
   return self;
@@ -464,13 +434,11 @@ export function validation(
 
 /** Instance of the validation module. */
 export interface ValidationInstance {
-  check(f: CustomCheck['func'], global: boolean): void;
   conflicting(argv: Arguments): void;
   conflicts(
     key: string | Dictionary<string | string[]>,
     value?: string | string[]
   ): void;
-  customChecks(argv: Arguments, aliases: DetailedArguments['aliases']): void;
   freeze(): void;
   getConflicting(): Dictionary<(string | undefined)[]>;
   getImplied(): Dictionary<KeyOrPos[]>;
@@ -503,14 +471,8 @@ export interface ValidationInstance {
   unknownCommands(argv: Arguments): boolean;
 }
 
-interface CustomCheck {
-  func: (argv: Arguments, aliases: DetailedArguments['aliases']) => any;
-  global: boolean;
-}
-
 interface FrozenValidationInstance {
   implied: Dictionary<KeyOrPos[]>;
-  checks: CustomCheck[];
   conflicting: Dictionary<(string | undefined)[]>;
 }
 

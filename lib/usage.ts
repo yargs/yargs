@@ -231,7 +231,12 @@ export function usage(yargs: YargsInstance, y18n: Y18N, shim: PlatformShim) {
 
     // your application's commands, i.e., non-option
     // arguments populated in '_'.
-    if (commands.length) {
+    //
+    // If there's only a single command, and it's the default command
+    // (represented by commands[0][2]) don't show command stanza:
+    //
+    // TODO(@bcoe): why isnt commands[0][2] an object with a named property?
+    if (commands.length > 1 || (commands.length === 1 && !commands[0][2])) {
       ui.div(__('Commands:'));
 
       const context = yargs.getContext();
@@ -673,9 +678,11 @@ export function usage(yargs: YargsInstance, y18n: Y18N, shim: PlatformShim) {
     version = ver;
   };
 
-  self.showVersion = () => {
+  self.showVersion = level => {
     const logger = yargs._getLoggerInstance();
-    logger.log(version);
+    if (!level) level = 'error';
+    const emit = typeof level === 'function' ? level : logger[level];
+    emit(version);
   };
 
   self.reset = function reset(localLookup) {
@@ -707,7 +714,10 @@ export function usage(yargs: YargsInstance, y18n: Y18N, shim: PlatformShim) {
   };
   self.unfreeze = function unfreeze() {
     const frozen = frozens.pop();
-    assertNotStrictEqual(frozen, undefined, shim);
+    // In the case of running a defaultCommand, we reset
+    // usage early to ensure we receive the top level instructions.
+    // unfreezing again should just be a noop:
+    if (!frozen) return;
     ({
       failMessage,
       failureOutput,
@@ -750,9 +760,9 @@ export interface UsageInstance {
   getUsageDisabled(): boolean;
   help(): string;
   reset(localLookup: Dictionary<boolean>): UsageInstance;
-  showHelp(level: 'error' | 'log' | ((message: string) => void)): void;
+  showHelp(level?: 'error' | 'log' | ((message: string) => void)): void;
   showHelpOnFail(enabled?: boolean | string, message?: string): UsageInstance;
-  showVersion(): void;
+  showVersion(level?: 'error' | 'log' | ((message: string) => void)): void;
   stringifiedValues(values?: any[], separator?: string): string;
   unfreeze(): void;
   usage(msg: string | null, description?: string | false): UsageInstance;

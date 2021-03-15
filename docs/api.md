@@ -115,7 +115,7 @@ If `key` is an array, interpret all the elements as booleans.
 
 Check that certain conditions are met in the provided arguments.
 
-`fn` is called with two arguments, the parsed `argv` hash and an array of options and their aliases.
+`fn` is called with the parsed `argv` hash.
 
 If `fn` throws or returns a non-truthy value, Yargs will show the thrown error
 and usage information. Yargs will then exit, unless
@@ -175,7 +175,7 @@ var argv = require('yargs/yargs')(process.argv.slice(2))
 <a name="coerce"></a>.coerce(key, fn)
 ----------------
 
-Provide a synchronous function to coerce or transform the value(s) given on the
+Provide a function to coerce or transform the value(s) given on the
 command line for `key`.
 
 The coercion function should accept one argument, representing the parsed value from
@@ -184,8 +184,7 @@ return a new value or throw an error. The returned value will be used as the val
 `key` (or one of its aliases) in `argv`.
 
 If the function throws, the error will be treated as a validation
-failure, delegating to either a custom [`.fail()`](#fail) handler or printing
-the error message in the console.
+failure, delegating to either a custom [`.fail()`](#fail) handler or printing the error message in the console.
 
 Coercion will be applied to a value after
 all other modifications, such as [`.normalize()`](#normalize).
@@ -195,7 +194,7 @@ _Examples:_
 ```js
 var argv = require('yargs/yargs')(process.argv.slice(2))
   .coerce('file', function (arg) {
-    return require('fs').readFileSync(arg, 'utf8')
+    return await require('fs').promises.readFile(arg, 'utf8')
   })
   .argv
 ```
@@ -212,8 +211,7 @@ var argv = require('yargs/yargs')(process.argv.slice(2))
   .argv
 ```
 
-You can also map the same function to several keys at one time. Just pass an
-array of keys as the first argument to `.coerce()`:
+You can also map the same function to several keys at one time. Just pass an array of keys as the first argument to `.coerce()`:
 
 ```js
 var path = require('path')
@@ -222,8 +220,7 @@ var argv = require('yargs/yargs')(process.argv.slice(2))
   .argv
 ```
 
-If you are using dot-notion or arrays, .e.g., `user.email` and `user.password`,
-coercion will be applied to the final object that has been parsed:
+If you are using dot-notion or arrays, .e.g., `user.email` and `user.password`, coercion will be applied to the final object that has been parsed:
 
 ```js
 // --user.name Batman --user.password 123
@@ -1521,6 +1518,33 @@ If a function is specified, it is called with a single argument - the usage data
 
 ```js
 yargs.showHelp(s => myStream.write(s)); //prints to myStream
+```
+
+Later on, `argv` can be retrieved with `yargs.argv`.
+
+.showVersion([consoleLevel | printCallback])
+---------------------------
+
+Print the version data.
+
+If no argument is provided, version data is printed using `console.error`.
+
+```js
+var yargs = require('yargs/yargs')(process.argv.slice(2));
+yargs.version('1.0.0');
+yargs.showVersion(); //prints to stderr using console.error()
+```
+
+If a string is specified, version data is printed using the [`console`](https://nodejs.org/api/console.html) function `consoleLevel`.
+
+```js
+yargs.showVersion("log"); //prints to stdout using console.log()
+```
+
+If a function is specified, it is called with a single argument - the version data as a string.
+
+```js
+yargs.showVersion(s => myStream.write(s)); //prints to myStream
 ```
 
 Later on, `argv` can be retrieved with `yargs.argv`.

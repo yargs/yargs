@@ -2,6 +2,7 @@
 /* global context, describe, it, beforeEach, afterEach */
 /* eslint-disable no-unused-vars */
 
+const assert = require('assert');
 const expect = require('chai').expect;
 const fs = require('fs');
 const path = require('path');
@@ -303,7 +304,6 @@ describe('yargs dsl tests', () => {
         narg: {},
         defaultDescription: {},
         choices: {},
-        coerce: {},
         skipValidation: [],
         count: [],
         normalize: [],
@@ -1985,6 +1985,7 @@ describe('yargs dsl tests', () => {
         '--file',
         path.join(__dirname, 'fixtures', 'package.json'),
       ])
+        .alias('file', 'f')
         .coerce('file', arg => JSON.parse(fs.readFileSync(arg, 'utf8')))
         .parse();
       expect(argv.file).to.have.property('version').and.equal('9.9.9');
@@ -2137,6 +2138,15 @@ describe('yargs dsl tests', () => {
         .parse();
       expect(msg).to.equal('ball');
       expect(err).to.not.equal(undefined);
+    });
+
+    it('throws error if coerce callback is missing', () => {
+      assert.throws(() => {
+        yargs().coerce(['a', 'b']);
+      }, /coerce callback must be provided/);
+      assert.throws(() => {
+        yargs().coerce('c');
+      }, /coerce callback must be provided/);
     });
   });
 
