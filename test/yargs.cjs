@@ -2171,21 +2171,6 @@ describe('yargs dsl tests', () => {
       yargs = require('../index.cjs');
     });
 
-    it('should begin with initial state', () => {
-      const context = yargs.getContext();
-      context.resets.should.equal(0);
-      context.commands.should.deep.equal([]);
-    });
-
-    it('should track number of resets', () => {
-      const context = yargs.getContext();
-      yargs.reset();
-      context.resets.should.equal(1);
-      yargs.reset();
-      yargs.reset();
-      context.resets.should.equal(3);
-    });
-
     it('should track commands being executed', () => {
       let context;
       yargs('one two')
@@ -2413,12 +2398,16 @@ describe('yargs dsl tests', () => {
       argv.str.should.equal('33');
     });
 
-    it("can only be used as part of a command's builder function", () => {
-      expect(() => {
-        yargs('foo').positional('foo', {
-          describe: 'I should not work',
-        });
-      }).to.throw(/\.positional\(\) can only be called/);
+    it('allows positionals to be defined for default command', async () => {
+      const help = await yargs()
+        .command('* [foo]', 'default command')
+        .positional('foo', {
+          default: 33,
+          type: 'number',
+        })
+        .getHelp();
+      help.should.include('default: 33');
+      help.should.include('default command');
     });
 
     // see: https://github.com/yargs/yargs-parser/pull/110

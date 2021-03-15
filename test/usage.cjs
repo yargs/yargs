@@ -4324,7 +4324,6 @@ describe('usage tests', () => {
             .command('*', 'Default command description')
             .parse()
         );
-
         r.logs[0].split('\n').should.deep.equal(expected);
       });
 

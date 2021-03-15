@@ -115,7 +115,7 @@ function Yargs(
 
   // use context object to keep track of resets, subcommand execution, etc.,
   // submodules should modify and check the state of context as necessary:
-  const context = {resets: -1, commands: [], fullCommands: []};
+  const context = {commands: [], fullCommands: []};
   self.getContext = () => context;
 
   let hasOutput = false;
@@ -166,7 +166,6 @@ function Yargs(
   // by this action.
   let options: Options;
   self.resetOptions = self.reset = function resetOptions(aliases = {}) {
-    context.resets++;
     options = options || {};
     // put yargs back into an initial state, this
     // logic is used to build a nested command
@@ -1189,14 +1188,8 @@ function Yargs(
 
   self.positional = function (key, opts) {
     argsert('<string> <object>', [key, opts], arguments.length);
-    if (context.resets === 0) {
-      throw new YError(
-        ".positional() can only be called in a command's builder function"
-      );
-    }
-
     // .positional() only supports a subset of the configuration
-    // options available to .option().
+    // options available to .option():
     const supportedOpts: (keyof PositionalDefinition)[] = [
       'default',
       'defaultDescription',
@@ -1325,10 +1318,6 @@ function Yargs(
           });
         }
       }
-      if (command.hasDefaultCommand()) {
-        context.resets++; // override the restriction on top-level positoinals.
-        command.runDefaultBuilderOn(self);
-      }
     }
     return usage.help();
   };
@@ -1353,10 +1342,6 @@ function Yargs(
           });
           return self;
         }
-      }
-      if (command.hasDefaultCommand()) {
-        context.resets++; // override the restriction on top-level positoinals.
-        command.runDefaultBuilderOn(self);
       }
     }
     usage.showHelp(level);
@@ -1697,27 +1682,14 @@ function Yargs(
               break;
             }
           }
-
-          // run the default command, if defined
-          if (command.hasDefaultCommand() && !skipRecommendation) {
-            const innerArgv = command.runCommand(
-              null,
-              self,
-              parsed,
-              0,
-              helpOnly
-            );
-            return self._postProcess(
-              innerArgv,
-              populateDoubleDash,
-              !!calledFromCommand,
-              false
-            );
-          }
-
           // recommend a command if recommendCommands() has
           // been enabled, and no commands were found to execute
-          if (recommendCommands && firstUnknownCommand && !skipRecommendation) {
+          if (
+            !command.hasDefaultCommand() &&
+            recommendCommands &&
+            firstUnknownCommand &&
+            !skipRecommendation
+          ) {
             validation.recommendCommands(firstUnknownCommand, handlerKeys);
           }
         }
@@ -1732,7 +1704,9 @@ function Yargs(
           self.showCompletionScript();
           self.exit(0);
         }
-      } else if (command.hasDefaultCommand() && !skipRecommendation) {
+      }
+
+      if (command.hasDefaultCommand() && !skipRecommendation) {
         const innerArgv = command.runCommand(null, self, parsed, 0, helpOnly);
         return self._postProcess(
           innerArgv,
@@ -1740,6 +1714,10 @@ function Yargs(
           !!calledFromCommand,
           false
         );
+      } else if (!calledFromCommand && helpOnly) {
+        // TODO: what if the default builder is async?
+        // TODO: add better comments.
+        command.runDefaultBuilderOn(self);
       }
 
       // we must run completions first, a user might
@@ -1774,8 +1752,9 @@ function Yargs(
         Object.keys(argv).forEach(key => {
           if (key === helpOpt && argv[key]) {
             if (exitProcess) setBlocking(true);
-
             skipValidation = true;
+            // TODO: add appropriate comment.
+            if (!calledFromCommand) command.runDefaultBuilderOn(self);
             self.showHelp('log');
             self.exit(0);
           } else if (key === versionOpt && argv[key]) {
@@ -1829,6 +1808,7 @@ function Yargs(
       if (err instanceof YError) usage.fail(err.message, err);
       else throw err;
     }
+
     return self._postProcess(
       argvPromise ?? argv,
       populateDoubleDash,

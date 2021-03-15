@@ -577,7 +577,7 @@ export class CommandInstance {
     }
   }
   runDefaultBuilderOn(yargs: YargsInstance): void {
-    assertNotStrictEqual(this.defaultCommand, undefined, this.shim);
+    if (!this.defaultCommand) return;
     if (this.shouldUpdateUsage(yargs)) {
       // build the root-level command string from the default string.
       const commandString = DEFAULT_MARKER.test(this.defaultCommand.original)
