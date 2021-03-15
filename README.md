@@ -87,7 +87,7 @@ const { hideBin } = require('yargs/helpers')
 
 yargs(hideBin(process.argv))
   .command('serve [port]', 'start the server', (yargs) => {
-    yargs
+    return yargs
       .positional('port', {
         describe: 'port to bind on',
         default: 5000
