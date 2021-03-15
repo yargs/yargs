@@ -11,9 +11,9 @@ const {rebase, YError} = require('../build/index.cjs');
 const should = require('chai').should();
 
 const noop = () => {};
-async function wait() {
+async function wait(n = 10) {
   return new Promise(resolve => {
-    setTimeout(resolve, 10);
+    setTimeout(resolve, n);
   });
 }
 
@@ -4500,10 +4500,10 @@ describe('usage tests', () => {
         logs.should.match(/default: "hello"/);
         logs.should.match(/a test command/);
       }
-      // Using showHelp()
-      /*{
-        const r = checkUsage(() => {
-          return yargs(['cmd'])
+      // Using showHelp():
+      {
+        const r = await checkUsage(() => {
+          yargs(['cmd'])
             .command('cmd <foo>', 'a test command', async yargs => {
               await wait();
               yargs.positional('foo', {
@@ -4511,14 +4511,13 @@ describe('usage tests', () => {
                 default: 'hello',
               });
             })
-            .fail(false)
-            .showHelp();
+            .showHelp('log');
+          return wait(20);
         });
-        console.info(r);
         const logs = r.logs.join('\n');
         logs.should.match(/default: "hello"/);
         logs.should.match(/a test command/);
-      }*/
+      }
     });
   });
 });

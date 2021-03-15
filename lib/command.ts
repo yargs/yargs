@@ -357,6 +357,10 @@ export class CommandInstance {
     yargs: YargsInstance
   ): Arguments | Promise<Arguments> {
     let positionalMap: Dictionary<string[]> = {};
+    // If showHelp() or getHelp() is being run, we should not
+    // execute middleware or handlers (these may perform expensive operations
+    // like creating a DB connection).
+    if (helpOnly) return innerArgv;
     if (!yargs._hasOutput()) {
       positionalMap = this.populatePositionals(
         commandHandler,
@@ -365,11 +369,6 @@ export class CommandInstance {
         yargs
       );
     }
-    // If showHelp() or getHelp() is being run, we should not
-    // execute middleware or handlers (these may perform expensive operations
-    // like creating a DB connection).
-    if (helpOnly) return innerArgv;
-
     const middlewares = this.globalMiddleware
       .getMiddleware()
       .slice(0)
