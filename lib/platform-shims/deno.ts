@@ -66,7 +66,7 @@ export default {
     notStrictEqual: assertNotEquals,
     strictEqual: assertStrictEquals,
   },
-  cliui,
+  cliui: cliui,
   findUp: escalade,
   getEnv: (key: string) => {
     return env[key];
@@ -77,8 +77,8 @@ export default {
     return 'deno';
   },
   mainFilename: cwd,
-  Parser,
-  path,
+  Parser: Parser,
+  path: path,
   process: {
     argv: () => argv,
     cwd: () => cwd,
