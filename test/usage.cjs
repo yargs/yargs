@@ -11,6 +11,11 @@ const {rebase, YError} = require('../build/index.cjs');
 const should = require('chai').should();
 
 const noop = () => {};
+async function wait(n = 10) {
+  return new Promise(resolve => {
+    setTimeout(resolve, n);
+  });
+}
 
 describe('usage tests', () => {
   beforeEach(() => {
@@ -4319,7 +4324,6 @@ describe('usage tests', () => {
             .command('*', 'Default command description')
             .parse()
         );
-
         r.logs[0].split('\n').should.deep.equal(expected);
       });
 
@@ -4473,6 +4477,46 @@ describe('usage tests', () => {
         await y.argv;
         help.split('\n').should.deep.equal(expected);
       });
+    });
+  });
+
+  describe('async builder', async () => {
+    it('shows appropriate usage instructions for nested command', async () => {
+      // With --help flag:
+      {
+        const r = await checkUsage(() => {
+          return yargs(['cmd', '--help'])
+            .command('cmd <foo>', 'a test command', async yargs => {
+              await wait();
+              yargs.positional('foo', {
+                type: 'string',
+                default: 'hello',
+              });
+            })
+            .parse();
+        });
+        const logs = r.logs.join('\n');
+        logs.should.match(/default: "hello"/);
+        logs.should.match(/a test command/);
+      }
+      // Using showHelp():
+      {
+        const r = await checkUsage(() => {
+          yargs(['cmd'])
+            .command('cmd <foo>', 'a test command', async yargs => {
+              await wait();
+              yargs.positional('foo', {
+                type: 'string',
+                default: 'hello',
+              });
+            })
+            .showHelp('log');
+          return wait(20);
+        });
+        const logs = r.logs.join('\n');
+        logs.should.match(/default: "hello"/);
+        logs.should.match(/a test command/);
+      }
     });
   });
 });

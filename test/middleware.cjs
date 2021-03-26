@@ -13,7 +13,7 @@ function clearRequireCache() {
 }
 
 async function wait() {
-  return Promise(resolve => {
+  return new Promise(resolve => {
     setTimeout(resolve, 10);
   });
 }

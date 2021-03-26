@@ -293,11 +293,14 @@ yargs
 ```
 
 `builder` can also be a function. This function is executed
-with a `yargs` instance, and can be used to provide _advanced_ command specific help:
+with a `yargs` instance, which can be used to provide command specific
+configuration, and the boolean `helpOrVersionSet`, which indicates whether or
+not the `--help` or `--version` flag was set prior to calling the
+builder.
 
 ```js
 yargs
-  .command('get', 'make a get HTTP request', function (yargs) {
+  .command('get', 'make a get HTTP request', function (yargs, helpOrVersionSet) {
     return yargs.option('url', {
       alias: 'u',
       default: 'http://yargs.js.org/'

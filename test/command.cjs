@@ -8,6 +8,11 @@ const checkOutput = require('./helpers/utils.cjs').checkOutput;
 
 require('chai').should();
 const noop = () => {};
+async function wait() {
+  return new Promise(resolve => {
+    setTimeout(resolve, 10);
+  });
+}
 
 describe('Command', () => {
   beforeEach(() => {
@@ -1941,5 +1946,81 @@ describe('Command', () => {
     } catch (err) {
       err.message.should.match(/Not enough arguments/);
     }
+  });
+
+  describe('async builder', async () => {
+    it('allows positionals to be configured asynchronously', async () => {
+      const argvPromise = yargs(['cmd', '999'])
+        .command('cmd <foo>', 'a test command', async yargs => {
+          await wait();
+          yargs.positional('foo', {
+            type: 'string',
+          });
+        })
+        .parse();
+      (typeof argvPromise.then).should.equal('function');
+      const argv = await argvPromise;
+      (typeof argv.foo).should.equal('string');
+    });
+    describe('helpOrVersionSet', () => {
+      it('--help', async () => {
+        let set = false;
+        await yargs()
+          .command('cmd <foo>', 'a test command', (yargs, helpOrVersionSet) => {
+            set = helpOrVersionSet;
+            if (!helpOrVersionSet) {
+              return wait();
+            }
+          })
+          .parse('cmd --help', () => {});
+        assert.strictEqual(set, true);
+      });
+    });
+    // TODO: investigate why .parse('cmd --help', () => {}); does not
+    // work properly with an async builder. We should test the same
+    // with handler.
+  });
+
+  describe('builder', () => {
+    // Refs: https://github.com/yargs/yargs/issues/1042
+    describe('helpOrVersionSet', () => {
+      it('--version', () => {
+        let set = false;
+        yargs()
+          .command('cmd <foo>', 'a test command', (yargs, helpOrVersionSet) => {
+            set = helpOrVersionSet;
+          })
+          .parse('cmd --version', () => {});
+        assert.strictEqual(set, true);
+      });
+      it('--help', () => {
+        let set = false;
+        yargs()
+          .command('cmd <foo>', 'a test command', (yargs, helpOrVersionSet) => {
+            set = helpOrVersionSet;
+          })
+          .parse('cmd --help', () => {});
+        assert.strictEqual(set, true);
+      });
+      it('help', () => {
+        let set = false;
+        yargs()
+          .command('cmd <foo>', 'a test command', (yargs, helpOrVersionSet) => {
+            set = helpOrVersionSet;
+          })
+          .parse('cmd help', () => {});
+        assert.strictEqual(set, true);
+      });
+      it('cmd', () => {
+        let set = false;
+        const argv = yargs()
+          .command('cmd <foo>', 'a test command', (yargs, helpOrVersionSet) => {
+            set = helpOrVersionSet;
+          })
+          .parse('cmd bar', () => {});
+        assert.strictEqual(set, false);
+        assert.strictEqual(argv.foo, 'bar');
+      });
+    });
   });
 });
