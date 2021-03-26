@@ -1976,6 +1976,9 @@ describe('Command', () => {
         assert.strictEqual(set, true);
       });
     });
+    // TODO: investigate why .parse('cmd --help', () => {}); does not
+    // work properly with an async builder. We should test the same
+    // with handler.
   });
 
   describe('builder', () => {
