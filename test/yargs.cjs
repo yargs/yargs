@@ -12,6 +12,11 @@ let yargs;
 require('chai').should();
 
 const noop = () => {};
+async function wait() {
+  return new Promise(resolve => {
+    setTimeout(resolve, 10);
+  });
+}
 const implicationsFailedPattern = new RegExp(english['Implications failed:']);
 
 function clearRequireCache() {
@@ -2166,21 +2171,6 @@ describe('yargs dsl tests', () => {
       yargs = require('../index.cjs');
     });
 
-    it('should begin with initial state', () => {
-      const context = yargs.getContext();
-      context.resets.should.equal(0);
-      context.commands.should.deep.equal([]);
-    });
-
-    it('should track number of resets', () => {
-      const context = yargs.getContext();
-      yargs.reset();
-      context.resets.should.equal(1);
-      yargs.reset();
-      yargs.reset();
-      context.resets.should.equal(3);
-    });
-
     it('should track commands being executed', () => {
       let context;
       yargs('one two')
@@ -2408,12 +2398,16 @@ describe('yargs dsl tests', () => {
       argv.str.should.equal('33');
     });
 
-    it("can only be used as part of a command's builder function", () => {
-      expect(() => {
-        yargs('foo').positional('foo', {
-          describe: 'I should not work',
-        });
-      }).to.throw(/\.positional\(\) can only be called/);
+    it('allows positionals to be defined for default command', async () => {
+      const help = await yargs()
+        .command('* [foo]', 'default command')
+        .positional('foo', {
+          default: 33,
+          type: 'number',
+        })
+        .getHelp();
+      help.should.include('default: 33');
+      help.should.include('default command');
     });
 
     // see: https://github.com/yargs/yargs-parser/pull/110
@@ -3085,6 +3079,25 @@ describe('yargs dsl tests', () => {
       const help = await y.getHelp();
       help.should.match(/node object get/);
       argv._.should.eql(['object']);
+    });
+    it('should return appropriate help message when async builder used', async () => {
+      const help = await yargs('foo')
+        .command(
+          'foo [bar]',
+          'foo command',
+          async yargs => {
+            wait();
+            return yargs.positional('foo', {
+              demand: true,
+              default: 'hello',
+              type: 'string',
+            });
+          },
+          async argv => {}
+        )
+        .getHelp();
+      help.should.match(/default: "hello"/);
+      help.should.match(/foo command/);
     });
   });
 });

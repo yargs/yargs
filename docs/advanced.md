@@ -557,7 +557,7 @@ var argv = require('yargs/yargs')(process.argv.slice(2))
 
 ## Using Yargs with Async/await
 
-If you use async middleware or async handlers for commands, `yargs.parse` and
+If you use async middleware or async builders/handlers for commands, `yargs.parse` and
 `yargs.argv` will return a `Promise`. When you `await` this promise the
 parsed arguments object will be returned after the handler completes:
 

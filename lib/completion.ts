@@ -58,7 +58,7 @@ export class Completion implements CompletionInstance {
         const builder = handlers[args[i]].builder;
         if (isCommandBuilderCallback(builder)) {
           const y = this.yargs.reset();
-          builder(y);
+          builder(y, true);
           return y.argv;
         }
       }

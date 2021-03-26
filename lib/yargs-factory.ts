@@ -113,9 +113,9 @@ function Yargs(
       .replace(`${shim.path.dirname(shim.process.execPath())}/`, '');
   }
 
-  // use context object to keep track of resets, subcommand execution, etc
-  // submodules should modify and check the state of context as necessary
-  const context = {resets: -1, commands: [], fullCommands: [], files: []};
+  // use context object to keep track of resets, subcommand execution, etc.,
+  // submodules should modify and check the state of context as necessary:
+  const context = {commands: [], fullCommands: []};
   self.getContext = () => context;
 
   let hasOutput = false;
@@ -166,7 +166,6 @@ function Yargs(
   // by this action.
   let options: Options;
   self.resetOptions = self.reset = function resetOptions(aliases = {}) {
-    context.resets++;
     options = options || {};
     // put yargs back into an initial state, this
     // logic is used to build a nested command
@@ -244,7 +243,7 @@ function Yargs(
       : Validation(self, usage, y18n, shim);
     command = command
       ? command.reset()
-      : Command(self, usage, validation, globalMiddleware, shim);
+      : Command(usage, validation, globalMiddleware, shim);
     if (!completion) completion = Completion(self, usage, command, shim);
     globalMiddleware.reset();
 
@@ -729,13 +728,7 @@ function Yargs(
   self.commandDir = function (dir, opts) {
     argsert('<string> [object]', [dir, opts], arguments.length);
     const req = parentRequire || shim.require;
-    command.addDirectory(
-      dir,
-      self.getContext(),
-      req,
-      shim.getCallerFile(),
-      opts
-    );
+    command.addDirectory(dir, req, shim.getCallerFile(), opts);
     return self;
   };
 
@@ -1195,14 +1188,8 @@ function Yargs(
 
   self.positional = function (key, opts) {
     argsert('<string> <object>', [key, opts], arguments.length);
-    if (context.resets === 0) {
-      throw new YError(
-        ".positional() can only be called in a command's builder function"
-      );
-    }
-
     // .positional() only supports a subset of the configuration
-    // options available to .option().
+    // options available to .option():
     const supportedOpts: (keyof PositionalDefinition)[] = [
       'default',
       'defaultDescription',
@@ -1318,11 +1305,18 @@ function Yargs(
       if (!self.parsed) {
         // Run the parser as if --help was passed to it (this is what
         // the last parameter `true` indicates).
-        self._parseArgs(processArgs, undefined, undefined, 0, true);
-      }
-      if (command.hasDefaultCommand()) {
-        context.resets++; // override the restriction on top-level positoinals.
-        command.runDefaultBuilderOn(self);
+        const parse = self._parseArgs(
+          processArgs,
+          undefined,
+          undefined,
+          0,
+          true
+        );
+        if (isPromise(parse)) {
+          return parse.then(() => {
+            return usage.help();
+          });
+        }
       }
     }
     return usage.help();
@@ -1335,11 +1329,19 @@ function Yargs(
       if (!self.parsed) {
         // Run the parser as if --help was passed to it (this is what
         // the last parameter `true` indicates).
-        self._parseArgs(processArgs, undefined, undefined, 0, true);
-      }
-      if (command.hasDefaultCommand()) {
-        context.resets++; // override the restriction on top-level positoinals.
-        command.runDefaultBuilderOn(self);
+        const parse = self._parseArgs(
+          processArgs,
+          undefined,
+          undefined,
+          0,
+          true
+        );
+        if (isPromise(parse)) {
+          parse.then(() => {
+            usage.showHelp(level);
+          });
+          return self;
+        }
       }
     }
     usage.showHelp(level);
@@ -1600,11 +1602,22 @@ function Yargs(
       })
     ) as DetailedArguments;
 
-    let argv: Arguments = parsed.argv as Arguments;
+    const argv: Arguments = Object.assign(
+      parsed.argv,
+      parseContext
+    ) as Arguments;
     let argvPromise: Arguments | Promise<Arguments> | undefined = undefined;
-    // Used rather than argv if middleware introduces an async step:
-    if (parseContext) argv = Object.assign({}, argv, parseContext);
     const aliases = parsed.aliases;
+
+    let helpOptSet = false;
+    let versionOptSet = false;
+    Object.keys(argv).forEach(key => {
+      if (key === helpOpt && argv[key]) {
+        helpOptSet = true;
+      } else if (key === versionOpt && argv[key]) {
+        versionOptSet = true;
+      }
+    });
 
     argv.$0 = self.$0;
     self.parsed = parsed;
@@ -1644,14 +1657,13 @@ function Yargs(
         // check if help should trigger and strip it from _.
         if (~helpCmds.indexOf('' + argv._[argv._.length - 1])) {
           argv._.pop();
-          argv[helpOpt] = true;
+          helpOptSet = true;
         }
       }
 
       const handlerKeys = command.getCommands();
       const requestCompletions = completion!.completionKey in argv;
-      const skipRecommendation =
-        argv[helpOpt!] || requestCompletions || helpOnly;
+      const skipRecommendation = helpOptSet || requestCompletions || helpOnly;
 
       if (argv._.length) {
         if (handlerKeys.length) {
@@ -1667,7 +1679,10 @@ function Yargs(
                 self,
                 parsed,
                 i + 1,
-                helpOnly // Don't run a handler, just figure out the help string.
+                // Don't run a handler, just figure out the help string:
+                helpOnly,
+                // Passed to builder so that expensive commands can be deferred:
+                helpOptSet || versionOptSet || helpOnly
               );
               return self._postProcess(
                 innerArgv,
@@ -1680,27 +1695,14 @@ function Yargs(
               break;
             }
           }
-
-          // run the default command, if defined
-          if (command.hasDefaultCommand() && !skipRecommendation) {
-            const innerArgv = command.runCommand(
-              null,
-              self,
-              parsed,
-              0,
-              helpOnly
-            );
-            return self._postProcess(
-              innerArgv,
-              populateDoubleDash,
-              !!calledFromCommand,
-              false
-            );
-          }
-
           // recommend a command if recommendCommands() has
           // been enabled, and no commands were found to execute
-          if (recommendCommands && firstUnknownCommand && !skipRecommendation) {
+          if (
+            !command.hasDefaultCommand() &&
+            recommendCommands &&
+            firstUnknownCommand &&
+            !skipRecommendation
+          ) {
             validation.recommendCommands(firstUnknownCommand, handlerKeys);
           }
         }
@@ -1715,14 +1717,27 @@ function Yargs(
           self.showCompletionScript();
           self.exit(0);
         }
-      } else if (command.hasDefaultCommand() && !skipRecommendation) {
-        const innerArgv = command.runCommand(null, self, parsed, 0, helpOnly);
+      }
+
+      if (command.hasDefaultCommand() && !skipRecommendation) {
+        const innerArgv = command.runCommand(
+          null,
+          self,
+          parsed,
+          0,
+          helpOnly,
+          helpOptSet || versionOptSet || helpOnly
+        );
         return self._postProcess(
           innerArgv,
           populateDoubleDash,
           !!calledFromCommand,
           false
         );
+      } else if (!calledFromCommand && helpOnly) {
+        // TODO: what if the default builder is async?
+        // TODO: add better comments.
+        command.runDefaultBuilderOn(self);
       }
 
       // we must run completions first, a user might
@@ -1754,21 +1769,20 @@ function Yargs(
       // Handle 'help' and 'version' options
       // if we haven't already output help!
       if (!hasOutput) {
-        Object.keys(argv).forEach(key => {
-          if (key === helpOpt && argv[key]) {
-            if (exitProcess) setBlocking(true);
+        if (helpOptSet) {
+          if (exitProcess) setBlocking(true);
+          skipValidation = true;
+          // TODO: add appropriate comment.
+          if (!calledFromCommand) command.runDefaultBuilderOn(self);
+          self.showHelp('log');
+          self.exit(0);
+        } else if (versionOptSet) {
+          if (exitProcess) setBlocking(true);
 
-            skipValidation = true;
-            self.showHelp('log');
-            self.exit(0);
-          } else if (key === versionOpt && argv[key]) {
-            if (exitProcess) setBlocking(true);
-
-            skipValidation = true;
-            usage.showVersion('log');
-            self.exit(0);
-          }
-        });
+          skipValidation = true;
+          usage.showVersion('log');
+          self.exit(0);
+        }
       }
 
       // Check if any of the options to skip validation were provided
@@ -1812,6 +1826,7 @@ function Yargs(
       if (err instanceof YError) usage.fail(err.message, err);
       else throw err;
     }
+
     return self._postProcess(
       argvPromise ?? argv,
       populateDoubleDash,
@@ -2221,7 +2236,6 @@ export function isYargsInstance(y: YargsInstance | void): y is YargsInstance {
 /** Yargs' context. */
 export interface Context {
   commands: string[];
-  files: string[];
   fullCommands: string[];
 }
 
