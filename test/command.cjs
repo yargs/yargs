@@ -1962,5 +1962,62 @@ describe('Command', () => {
       const argv = await argvPromise;
       (typeof argv.foo).should.equal('string');
     });
+    describe('helpOrVersionSet', () => {
+      it('--help', async () => {
+        let set = false;
+        await yargs()
+          .command('cmd <foo>', 'a test command', (yargs, helpOrVersionSet) => {
+            set = helpOrVersionSet;
+            if (!helpOrVersionSet) {
+              return wait();
+            }
+          })
+          .parse('cmd --help', () => {});
+        assert.strictEqual(set, true);
+      });
+    });
+  });
+
+  describe('builder', () => {
+    // Refs: https://github.com/yargs/yargs/issues/1042
+    describe('helpOrVersionSet', () => {
+      it('--version', () => {
+        let set = false;
+        yargs()
+          .command('cmd <foo>', 'a test command', (yargs, helpOrVersionSet) => {
+            set = helpOrVersionSet;
+          })
+          .parse('cmd --version', () => {});
+        assert.strictEqual(set, true);
+      });
+      it('--help', () => {
+        let set = false;
+        yargs()
+          .command('cmd <foo>', 'a test command', (yargs, helpOrVersionSet) => {
+            set = helpOrVersionSet;
+          })
+          .parse('cmd --help', () => {});
+        assert.strictEqual(set, true);
+      });
+      it('help', () => {
+        let set = false;
+        yargs()
+          .command('cmd <foo>', 'a test command', (yargs, helpOrVersionSet) => {
+            set = helpOrVersionSet;
+          })
+          .parse('cmd help', () => {});
+        assert.strictEqual(set, true);
+      });
+      it('cmd', () => {
+        let set = false;
+        const argv = yargs()
+          .command('cmd <foo>', 'a test command', (yargs, helpOrVersionSet) => {
+            set = helpOrVersionSet;
+          })
+          .parse('cmd bar', () => {});
+        assert.strictEqual(set, false);
+        assert.strictEqual(argv.foo, 'bar');
+      });
+    });
   });
 });

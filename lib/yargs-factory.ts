@@ -1602,11 +1602,22 @@ function Yargs(
       })
     ) as DetailedArguments;
 
-    let argv: Arguments = parsed.argv as Arguments;
+    const argv: Arguments = Object.assign(
+      parsed.argv,
+      parseContext
+    ) as Arguments;
     let argvPromise: Arguments | Promise<Arguments> | undefined = undefined;
-    // Used rather than argv if middleware introduces an async step:
-    if (parseContext) argv = Object.assign({}, argv, parseContext);
     const aliases = parsed.aliases;
+
+    let helpOptSet = false;
+    let versionOptSet = false;
+    Object.keys(argv).forEach(key => {
+      if (key === helpOpt && argv[key]) {
+        helpOptSet = true;
+      } else if (key === versionOpt && argv[key]) {
+        versionOptSet = true;
+      }
+    });
 
     argv.$0 = self.$0;
     self.parsed = parsed;
@@ -1646,14 +1657,13 @@ function Yargs(
         // check if help should trigger and strip it from _.
         if (~helpCmds.indexOf('' + argv._[argv._.length - 1])) {
           argv._.pop();
-          argv[helpOpt] = true;
+          helpOptSet = true;
         }
       }
 
       const handlerKeys = command.getCommands();
       const requestCompletions = completion!.completionKey in argv;
-      const skipRecommendation =
-        argv[helpOpt!] || requestCompletions || helpOnly;
+      const skipRecommendation = helpOptSet || requestCompletions || helpOnly;
 
       if (argv._.length) {
         if (handlerKeys.length) {
@@ -1669,7 +1679,10 @@ function Yargs(
                 self,
                 parsed,
                 i + 1,
-                helpOnly // Don't run a handler, just figure out the help string.
+                // Don't run a handler, just figure out the help string:
+                helpOnly,
+                // Passed to builder so that expensive commands can be deferred:
+                helpOptSet || versionOptSet || helpOnly
               );
               return self._postProcess(
                 innerArgv,
@@ -1707,7 +1720,14 @@ function Yargs(
       }
 
       if (command.hasDefaultCommand() && !skipRecommendation) {
-        const innerArgv = command.runCommand(null, self, parsed, 0, helpOnly);
+        const innerArgv = command.runCommand(
+          null,
+          self,
+          parsed,
+          0,
+          helpOnly,
+          helpOptSet || versionOptSet || helpOnly
+        );
         return self._postProcess(
           innerArgv,
           populateDoubleDash,
@@ -1749,22 +1769,20 @@ function Yargs(
       // Handle 'help' and 'version' options
       // if we haven't already output help!
       if (!hasOutput) {
-        Object.keys(argv).forEach(key => {
-          if (key === helpOpt && argv[key]) {
-            if (exitProcess) setBlocking(true);
-            skipValidation = true;
-            // TODO: add appropriate comment.
-            if (!calledFromCommand) command.runDefaultBuilderOn(self);
-            self.showHelp('log');
-            self.exit(0);
-          } else if (key === versionOpt && argv[key]) {
-            if (exitProcess) setBlocking(true);
+        if (helpOptSet) {
+          if (exitProcess) setBlocking(true);
+          skipValidation = true;
+          // TODO: add appropriate comment.
+          if (!calledFromCommand) command.runDefaultBuilderOn(self);
+          self.showHelp('log');
+          self.exit(0);
+        } else if (versionOptSet) {
+          if (exitProcess) setBlocking(true);
 
-            skipValidation = true;
-            usage.showVersion('log');
-            self.exit(0);
-          }
-        });
+          skipValidation = true;
+          usage.showVersion('log');
+          self.exit(0);
+        }
       }
 
       // Check if any of the options to skip validation were provided

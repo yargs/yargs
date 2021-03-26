@@ -200,7 +200,8 @@ export class CommandInstance {
     yargs: YargsInstance,
     parsed: DetailedArguments,
     commandIndex: number,
-    helpOnly: boolean
+    helpOnly: boolean,
+    helpOrVersionSet: boolean
   ): Arguments | Promise<Arguments> {
     const commandHandler =
       this.handlers[command!] ||
@@ -219,7 +220,8 @@ export class CommandInstance {
       parsed.aliases,
       parentCommands,
       commandIndex,
-      helpOnly
+      helpOnly,
+      helpOrVersionSet
     );
     if (isPromise(builderResult)) {
       return builderResult.then(result => {
@@ -252,7 +254,8 @@ export class CommandInstance {
     aliases: Dictionary<string[]>,
     parentCommands: string[],
     commandIndex: number,
-    helpOnly: boolean
+    helpOnly: boolean,
+    helpOrVersionSet: boolean
   ):
     | {aliases: Dictionary<string[]>; innerArgv: Arguments}
     | Promise<{aliases: Dictionary<string[]>; innerArgv: Arguments}> {
@@ -261,7 +264,7 @@ export class CommandInstance {
     if (isCommandBuilderCallback(builder)) {
       // A function can be provided, which builds
       // up a yargs chain and possibly returns it.
-      const builderOutput = builder(yargs.reset(aliases));
+      const builderOutput = builder(yargs.reset(aliases), helpOrVersionSet);
       // Support the use-case of async builders:
       if (isPromise(builderOutput)) {
         return builderOutput.then(output => {
@@ -589,7 +592,7 @@ export class CommandInstance {
     }
     const builder = this.defaultCommand.builder;
     if (isCommandBuilderCallback(builder)) {
-      builder(yargs);
+      builder(yargs, true);
     } else if (!isCommandBuilderDefinition(builder)) {
       Object.keys(builder).forEach(key => {
         yargs.option(key, builder[key]);
@@ -707,7 +710,7 @@ export type CommandBuilder =
   | Dictionary<OptionDefinition>;
 
 interface CommandBuilderCallback {
-  (y: YargsInstance): YargsInstance | void;
+  (y: YargsInstance, helpOrVersionSet: boolean): YargsInstance | void;
 }
 
 function isCommandAndAliases(

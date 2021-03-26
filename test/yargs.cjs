@@ -3100,10 +3100,4 @@ describe('yargs dsl tests', () => {
       help.should.match(/foo command/);
     });
   });
-
-  // TODO(bcoe): dig into runDefaultBuilderOn, can we figure out an alternate
-  // way to populate default values.
-  // TODO(bcoe): why is validation error showing when showHelp() called?
-  // TODO(bcoe): how can we deal with the fact that showHelp() needs to be
-  // asynchronous.
 });
