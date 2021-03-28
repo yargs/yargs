@@ -19,7 +19,7 @@ async function wait(n = 10) {
 
 describe('usage tests', () => {
   beforeEach(() => {
-    yargs.reset();
+    yargs.getInternalMethods().reset();
   });
 
   describe('demand options', () => {

@@ -16,7 +16,7 @@ async function wait() {
 
 describe('Command', () => {
   beforeEach(() => {
-    yargs.reset();
+    yargs.getInternalMethods().reset();
   });
 
   describe('positional arguments', () => {

@@ -8,11 +8,11 @@ require('chai').should();
 
 describe('Completion', () => {
   beforeEach(() => {
-    yargs.reset();
+    yargs.getInternalMethods().reset();
   });
 
   after(() => {
-    yargs.reset();
+    yargs.getInternalMethods().reset();
   });
 
   describe('default completion behavior', () => {

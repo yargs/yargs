@@ -297,6 +297,7 @@ describe('yargs dsl tests', () => {
         .global('foo', false)
         .global('qux', false)
         .env('YARGS')
+        .getInternalMethods()
         .reset();
 
       const emptyOptions = {
@@ -343,7 +344,7 @@ describe('yargs dsl tests', () => {
       y.parse('hello', err => {
         err.message.should.match(/Missing required argument/);
       });
-      y.reset();
+      y.getInternalMethods().reset();
       y.parse('cake', err => {
         expect(err).to.equal(null);
         return done();
@@ -1601,6 +1602,7 @@ describe('yargs dsl tests', () => {
           global: false,
         })
         .global('foo')
+        .getInternalMethods()
         .reset();
       const options = y.getOptions();
       options.key.foo.should.equal(true);
@@ -1622,6 +1624,7 @@ describe('yargs dsl tests', () => {
           global: false,
         })
         .global('foo')
+        .getInternalMethods()
         .reset({
           foo: ['awesome-sauce', 'awesomeSauce'],
         });
@@ -1654,6 +1657,7 @@ describe('yargs dsl tests', () => {
         .describe('foo', 'my awesome foo option')
         .global('foo')
         .global('bar', false)
+        .getInternalMethods()
         .reset();
       const descriptions = y.getUsageInstance().getDescriptions();
       Object.keys(descriptions).should.include('foo');
@@ -1669,6 +1673,7 @@ describe('yargs dsl tests', () => {
           z: 'w',
         })
         .global(['z'], false)
+        .getInternalMethods()
         .reset();
       const implied = y.getValidationInstance().getImplied();
       Object.keys(implied).should.include('x');
@@ -1684,6 +1689,7 @@ describe('yargs dsl tests', () => {
           nargs: 2,
           global: false,
         })
+        .getInternalMethods()
         .reset();
       const options = y.getOptions();
       options.key.foo.should.equal(true);

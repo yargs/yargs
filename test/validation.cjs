@@ -11,7 +11,7 @@ require('chai').should();
 
 describe('validation tests', () => {
   beforeEach(() => {
-    yargs.reset();
+    yargs.getInternalMethods().reset();
   });
 
   describe('implies', () => {

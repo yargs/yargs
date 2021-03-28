@@ -37,7 +37,7 @@ export function usage(yargs: YargsInstance, y18n: Y18N, shim: PlatformShim) {
 
   let failureOutput = false;
   self.fail = function fail(msg, err) {
-    const logger = yargs.getLoggerInstance();
+    const logger = yargs.getInternalMethods().getLoggerInstance();
 
     if (fails.length) {
       for (let i = fails.length - 1; i >= 0; --i) {
@@ -69,7 +69,7 @@ export function usage(yargs: YargsInstance, y18n: Y18N, shim: PlatformShim) {
       err = err || new YError(msg);
       if (yargs.getExitProcess()) {
         return yargs.exit(1);
-      } else if (yargs.hasParseCallback()) {
+      } else if (yargs.getInternalMethods().hasParseCallback()) {
         return yargs.exit(1, err);
       } else {
         throw err;
@@ -234,12 +234,15 @@ export function usage(yargs: YargsInstance, y18n: Y18N, shim: PlatformShim) {
     if (commands.length > 1 || (commands.length === 1 && !commands[0][2])) {
       ui.div(__('Commands:'));
 
-      const context = yargs.getContext();
+      const context = yargs.getInternalMethods().getContext();
       const parentCommands = context.commands.length
         ? `${context.commands.join(' ')} `
         : '';
 
-      if (yargs.getParserConfiguration()['sort-commands'] === true) {
+      if (
+        yargs.getInternalMethods().getParserConfiguration()['sort-commands'] ===
+        true
+      ) {
         commands = commands.sort((a, b) => a[0].localeCompare(b[0]));
       }
 
@@ -598,7 +601,7 @@ export function usage(yargs: YargsInstance, y18n: Y18N, shim: PlatformShim) {
   }
 
   self.showHelp = (level: 'error' | 'log' | ((message: string) => void)) => {
-    const logger = yargs.getLoggerInstance();
+    const logger = yargs.getInternalMethods().getLoggerInstance();
     if (!level) level = 'error';
     const emit = typeof level === 'function' ? level : logger[level];
     emit(self.help());
@@ -670,7 +673,7 @@ export function usage(yargs: YargsInstance, y18n: Y18N, shim: PlatformShim) {
   };
 
   self.showVersion = level => {
-    const logger = yargs.getLoggerInstance();
+    const logger = yargs.getInternalMethods().getLoggerInstance();
     if (!level) level = 'error';
     const emit = typeof level === 'function' ? level : logger[level];
     emit(version);

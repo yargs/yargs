@@ -207,7 +207,7 @@ export class CommandInstance {
       this.handlers[command!] ||
       this.handlers[this.aliasMap[command!]] ||
       this.defaultCommand;
-    const currentContext = yargs.getContext();
+    const currentContext = yargs.getInternalMethods().getContext();
     const parentCommands = currentContext.commands.slice();
     if (command) {
       currentContext.commands.push(command);
@@ -264,7 +264,10 @@ export class CommandInstance {
     if (isCommandBuilderCallback(builder)) {
       // A function can be provided, which builds
       // up a yargs chain and possibly returns it.
-      const builderOutput = builder(yargs.reset(aliases), helpOrVersionSet);
+      const builderOutput = builder(
+        yargs.getInternalMethods().reset(aliases),
+        helpOrVersionSet
+      );
       // Support the use-case of async builders:
       if (isPromise(builderOutput)) {
         return builderOutput.then(output => {
@@ -282,7 +285,7 @@ export class CommandInstance {
     } else if (isCommandBuilderOptionDefinitions(builder)) {
       // as a short hand, an object can instead be provided, specifying
       // the options that a command takes.
-      innerYargs = yargs.reset(aliases);
+      innerYargs = yargs.getInternalMethods().reset(aliases);
       Object.keys(commandHandler.builder).forEach(key => {
         innerYargs.option(key, builder[key]);
       });
@@ -307,9 +310,10 @@ export class CommandInstance {
     // A null command indicates we are running the default command,
     // if this is the case, we should show the root usage instructions
     // rather than the usage instructions for the nested default command:
-    if (!command) innerYargs.getUsageInstance().unfreeze();
+    if (!command) innerYargs.getInternalMethods().getUsageInstance().unfreeze();
     if (this.shouldUpdateUsage(innerYargs)) {
       innerYargs
+        .getInternalMethods()
         .getUsageInstance()
         .usage(
           this.usageFromParentCommandsCommandHandler(
@@ -319,13 +323,15 @@ export class CommandInstance {
           commandHandler.description
         );
     }
-    const innerArgv = innerYargs.runYargsParserAndExecuteCommands(
-      null,
-      undefined,
-      true,
-      commandIndex,
-      helpOnly
-    );
+    const innerArgv = innerYargs
+      .getInternalMethods()
+      .runYargsParserAndExecuteCommands(
+        null,
+        undefined,
+        true,
+        commandIndex,
+        helpOnly
+      );
     return {
       aliases: (innerYargs.parsed as DetailedArguments).aliases,
       innerArgv: innerArgv as Arguments,
@@ -333,8 +339,8 @@ export class CommandInstance {
   }
   private shouldUpdateUsage(yargs: YargsInstance) {
     return (
-      !yargs.getUsageInstance().getUsageDisabled() &&
-      yargs.getUsageInstance().getUsage().length === 0
+      !yargs.getInternalMethods().getUsageInstance().getUsageDisabled() &&
+      yargs.getInternalMethods().getUsageInstance().getUsage().length === 0
     );
   }
   private usageFromParentCommandsCommandHandler(
@@ -364,7 +370,7 @@ export class CommandInstance {
     // execute middleware or handlers (these may perform expensive operations
     // like creating a DB connection).
     if (helpOnly) return innerArgv;
-    if (!yargs.getHasOutput()) {
+    if (!yargs.getInternalMethods().getHasOutput()) {
       positionalMap = this.populatePositionals(
         commandHandler,
         innerArgv as Arguments,
@@ -380,27 +386,31 @@ export class CommandInstance {
 
     // we apply validation post-hoc, so that custom
     // checks get passed populated positional arguments.
-    if (!yargs.getHasOutput()) {
-      const validation = yargs.runValidation(
-        aliases,
-        positionalMap,
-        (yargs.parsed as DetailedArguments).error,
-        !command
-      );
+    if (!yargs.getInternalMethods().getHasOutput()) {
+      const validation = yargs
+        .getInternalMethods()
+        .runValidation(
+          aliases,
+          positionalMap,
+          (yargs.parsed as DetailedArguments).error,
+          !command
+        );
       innerArgv = maybeAsyncResult<Arguments>(innerArgv, result => {
         validation(result);
         return result;
       });
     }
 
-    if (commandHandler.handler && !yargs.getHasOutput()) {
-      yargs.setHasOutput();
+    if (commandHandler.handler && !yargs.getInternalMethods().getHasOutput()) {
+      yargs.getInternalMethods().setHasOutput();
       // to simplify the parsing of positionals in commands,
       // we temporarily populate '--' rather than _, with arguments
       const populateDoubleDash = !!yargs.getOptions().configuration[
         'populate--'
       ];
-      yargs.postProcess(innerArgv, populateDoubleDash, false, false);
+      yargs
+        .getInternalMethods()
+        .postProcess(innerArgv, populateDoubleDash, false, false);
 
       innerArgv = applyMiddleware(innerArgv, yargs, middlewares, false);
       innerArgv = maybeAsyncResult<Arguments>(innerArgv, result => {
@@ -412,11 +422,14 @@ export class CommandInstance {
         }
       });
 
-      yargs.getUsageInstance().cacheHelpMessage();
-      if (isPromise(innerArgv) && !yargs.hasParseCallback()) {
+      yargs.getInternalMethods().getUsageInstance().cacheHelpMessage();
+      if (
+        isPromise(innerArgv) &&
+        !yargs.getInternalMethods().hasParseCallback()
+      ) {
         innerArgv.catch(error => {
           try {
-            yargs.getUsageInstance().fail(null, error);
+            yargs.getInternalMethods().getUsageInstance().fail(null, error);
           } catch (_err) {
             // If .fail(false) is not set, and no parse cb() has been
             // registered, run usage's default fail method.
@@ -560,7 +573,10 @@ export class CommandInstance {
     );
 
     if (parsed.error) {
-      yargs.getUsageInstance().fail(parsed.error.message, parsed.error);
+      yargs
+        .getInternalMethods()
+        .getUsageInstance()
+        .fail(parsed.error.message, parsed.error);
     } else {
       // only copy over positional keys (don't overwrite
       // flag arguments that were already parsed).
@@ -587,6 +603,7 @@ export class CommandInstance {
         ? this.defaultCommand.original
         : this.defaultCommand.original.replace(/^[^[\]<>]*/, '$0 ');
       yargs
+        .getInternalMethods()
         .getUsageInstance()
         .usage(commandString, this.defaultCommand.description);
     }
