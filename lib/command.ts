@@ -319,7 +319,7 @@ export class CommandInstance {
           commandHandler.description
         );
     }
-    const innerArgv = innerYargs._parseArgs(
+    const innerArgv = innerYargs.runYargsParserAndExecuteCommands(
       null,
       undefined,
       true,
@@ -364,7 +364,7 @@ export class CommandInstance {
     // execute middleware or handlers (these may perform expensive operations
     // like creating a DB connection).
     if (helpOnly) return innerArgv;
-    if (!yargs._hasOutput()) {
+    if (!yargs.getHasOutput()) {
       positionalMap = this.populatePositionals(
         commandHandler,
         innerArgv as Arguments,
@@ -380,8 +380,8 @@ export class CommandInstance {
 
     // we apply validation post-hoc, so that custom
     // checks get passed populated positional arguments.
-    if (!yargs._hasOutput()) {
-      const validation = yargs._runValidation(
+    if (!yargs.getHasOutput()) {
+      const validation = yargs.runValidation(
         aliases,
         positionalMap,
         (yargs.parsed as DetailedArguments).error,
@@ -393,14 +393,14 @@ export class CommandInstance {
       });
     }
 
-    if (commandHandler.handler && !yargs._hasOutput()) {
-      yargs._setHasOutput();
+    if (commandHandler.handler && !yargs.getHasOutput()) {
+      yargs.setHasOutput();
       // to simplify the parsing of positionals in commands,
       // we temporarily populate '--' rather than _, with arguments
       const populateDoubleDash = !!yargs.getOptions().configuration[
         'populate--'
       ];
-      yargs._postProcess(innerArgv, populateDoubleDash, false, false);
+      yargs.postProcess(innerArgv, populateDoubleDash, false, false);
 
       innerArgv = applyMiddleware(innerArgv, yargs, middlewares, false);
       innerArgv = maybeAsyncResult<Arguments>(innerArgv, result => {
@@ -413,7 +413,7 @@ export class CommandInstance {
       });
 
       yargs.getUsageInstance().cacheHelpMessage();
-      if (isPromise(innerArgv) && !yargs._hasParseCallback()) {
+      if (isPromise(innerArgv) && !yargs.hasParseCallback()) {
         innerArgv.catch(error => {
           try {
             yargs.getUsageInstance().fail(null, error);

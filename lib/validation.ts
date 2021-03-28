@@ -154,7 +154,7 @@ export function validation(
       if (
         specialKeys.indexOf(key) === -1 &&
         !Object.prototype.hasOwnProperty.call(positionalMap, key) &&
-        !Object.prototype.hasOwnProperty.call(yargs._getParseContext(), key) &&
+        !Object.prototype.hasOwnProperty.call(yargs.getParseContext(), key) &&
         !self.isValidAndSomeAliasIsNotNew(key, aliases)
       ) {
         unknown.push(key);

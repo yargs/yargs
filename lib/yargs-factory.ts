@@ -22,6 +22,7 @@ import type {
   RequireDirectoryOptions,
   PlatformShim,
   RequireType,
+  Y18N,
 } from './typings/common-types.js';
 import {
   assertNotStrictEqual,
@@ -64,76 +65,145 @@ import setBlocking from './utils/set-blocking.js';
 let shim: PlatformShim;
 export function YargsWithShim(_shim: PlatformShim) {
   shim = _shim;
-  return Yargs;
+  return YargsFactory;
 }
 
-function Yargs(
-  processArgs: string | string[] = [],
-  cwd = shim.process.cwd(),
-  parentRequire?: RequireType
-): YargsInstance {
-  const self = {} as YargsInstance;
-  let command: CommandInstance;
-  let completion: CompletionInstance | null = null;
-  let groups: Dictionary<string[]> = {};
-  let output = '';
-  const preservedGroups: Dictionary<string[]> = {};
-  const globalMiddleware = new GlobalMiddleware(self);
-  let usage: UsageInstance;
-  let validation: ValidationInstance;
+export class YargsInstance {
+  $0: string;
+  argv?: Arguments;
+  customScriptName = false;
+  parsed: DetailedArguments | false = false;
 
-  const y18n = shim.y18n;
-
-  self.scriptName = function (scriptName) {
-    self.customScriptName = true;
-    self.$0 = scriptName;
-    return self;
-  };
-
-  // ignore the node bin, specify this in your
-  // bin file with #!/usr/bin/env node
-  let default$0: string[];
-  if (/\b(node|iojs|electron)(\.exe)?$/.test(shim.process.argv()[0])) {
-    default$0 = shim.process.argv().slice(1, 2);
-  } else {
-    default$0 = shim.process.argv().slice(0, 1);
-  }
-
-  self.$0 = default$0
-    .map(x => {
-      const b = rebase(cwd, x);
-      return x.match(/^(\/|([a-zA-Z]:)?\\)/) && b.length < x.length ? b : x;
-    })
-    .join(' ')
-    .trim();
-
-  if (shim.getEnv('_') && shim.getProcessArgvBin() === shim.getEnv('_')) {
-    self.$0 = shim
-      .getEnv('_')!
-      .replace(`${shim.path.dirname(shim.process.execPath())}/`, '');
-  }
-
+  #command?: CommandInstance;
+  #cwd: string;
   // use context object to keep track of resets, subcommand execution, etc.,
   // submodules should modify and check the state of context as necessary:
-  const context = {commands: [], fullCommands: []};
-  self.getContext = () => context;
+  #context: Context = {commands: [], fullCommands: []};
+  #completion?: CompletionInstance | null = null;
+  #completionCommand: string | null = null;
+  #defaultShowHiddenOpt = 'show-hidden';
+  #exitError: YError | string | undefined | null = null;
+  #detectLocale = true;
+  #exitProcess = true;
+  #frozens: FrozenYargsInstance[] = [];
+  #globalMiddleware: GlobalMiddleware;
+  #groups: Dictionary<string[]> = {};
+  #hasOutput = false;
+  #helpOpt: string | null = null;
+  #logger: LoggerInstance;
+  #output = '';
+  #options?: Options;
+  #parentRequire?: RequireType;
+  #parserConfig: Configuration = {};
+  #parseFn: ParseCallback | null = null;
+  #parseContext: object | null = null;
+  #pkgs: Dictionary<{[key: string]: string | {[key: string]: string}}> = {};
+  #preservedGroups: Dictionary<string[]> = {};
+  #processArgs: string | string[];
+  #recommendCommands = false;
+  #strict = false;
+  #strictCommands = false;
+  #strictOptions = false;
+  #usage?: UsageInstance;
+  #versionOpt: string | null = null;
+  #validation?: ValidationInstance;
+  #y18n: Y18N;
 
-  let hasOutput = false;
-  let exitError: YError | string | undefined | null = null;
-  // maybe exit, always capture
-  // context about why we wanted to exit.
-  self.exit = (code, err) => {
-    hasOutput = true;
-    exitError = err;
-    if (exitProcess) shim.process.exit(code);
-  };
+  constructor(
+    processArgs: string | string[] = [],
+    cwd: string,
+    parentRequire: RequireType | undefined
+  ) {
+    this.#processArgs = processArgs;
+    this.#cwd = cwd;
+    this.#parentRequire = parentRequire;
+    this.#globalMiddleware = new GlobalMiddleware(this);
+    this.$0 = this.getDollarZero();
+    this.#y18n = shim.y18n;
+    // TODO(@bcoe): make reset initialize dependent classes so ! is not required.
+    this.reset();
+    this.#options!.showHiddenOpt = this.#defaultShowHiddenOpt;
+    this.#logger = this.createLogger();
+  }
+  // TODO(bcoe): arrange public methods alphabetically:
+  addHelpOpt(opt?: string | false, msg?: string): YargsInstance {
+    const defaultHelpOpt = 'help';
+    argsert('[string|boolean] [string]', [opt, msg], arguments.length);
 
-  let completionCommand: string | null = null;
-  self.completion = function (
+    // nuke the key previously configured
+    // to return help.
+    if (this.#helpOpt) {
+      this.deleteFromParserHintObject(this.#helpOpt);
+      this.#helpOpt = null;
+    }
+
+    if (opt === false && msg === undefined) return this;
+
+    // use arguments, fallback to defaults for opt and msg
+    this.#helpOpt = typeof opt === 'string' ? opt : defaultHelpOpt;
+    this.boolean(this.#helpOpt);
+    this.describe(
+      this.#helpOpt,
+      msg || this.#usage!.deferY18nLookup('Show help')
+    );
+    return this;
+  }
+  help(opt?: string, msg?: string): YargsInstance {
+    return this.addHelpOpt(opt, msg);
+  }
+  addShowHiddenOpt(opt?: string | false, msg?: string): YargsInstance {
+    argsert('[string|boolean] [string]', [opt, msg], arguments.length);
+    if (opt === false && msg === undefined) return this;
+    const showHiddenOpt =
+      typeof opt === 'string' ? opt : this.#defaultShowHiddenOpt;
+    this.boolean(showHiddenOpt);
+    this.describe(
+      showHiddenOpt,
+      msg || this.#usage!.deferY18nLookup('Show hidden options')
+    );
+    this.#options!.showHiddenOpt = showHiddenOpt;
+    return this;
+  }
+  showHidden(opt?: string | false, msg?: string): YargsInstance {
+    return this.addShowHiddenOpt(opt, msg);
+  }
+  boolean(keys: string | string[]): YargsInstance {
+    argsert('<array|string>', [keys], arguments.length);
+    this.populateParserHintArray('boolean', keys);
+    return this;
+  }
+  describe(
+    keys: string | string[] | Dictionary<string>,
+    description?: string
+  ): YargsInstance {
+    argsert(
+      '<object|string|array> [string]',
+      [keys, description],
+      arguments.length
+    );
+    this.setKey(keys, true);
+    this.#usage!.describe(keys, description);
+    return this;
+  }
+  scriptName(scriptName: string): YargsInstance {
+    this.customScriptName = true;
+    this.$0 = scriptName;
+    return this;
+  }
+  getContext(): Context {
+    return this.#context;
+  }
+  // maybe exit, always capture context about why we wanted to exit:
+  exit(code: number, err?: YError | string): void {
+    this.#hasOutput = true;
+    this.#exitError = err;
+    if (this.#exitProcess) shim.process.exit(code);
+  }
+  completion(
     cmd?: string,
     desc?: string | false | CompletionFunction,
     fn?: CompletionFunction
-  ) {
+  ): YargsInstance {
     argsert(
       '[string] [string|boolean|function] [function]',
       [cmd, desc, fn],
@@ -149,282 +219,191 @@ function Yargs(
     }
 
     // register the completion command.
-    completionCommand = cmd || completionCommand || 'completion';
+    this.#completionCommand = cmd || this.#completionCommand || 'completion';
     if (!desc && desc !== false) {
       desc = 'generate completion script';
     }
-    self.command(completionCommand, desc);
+    this.command(this.#completionCommand, desc);
 
     // a function can be provided
-    if (fn) completion!.registerFunction(fn);
+    if (fn) this.#completion!.registerFunction(fn);
 
-    return self;
-  };
-
-  // puts yargs back into an initial state. any keys
-  // that have been set to "global" will not be reset
-  // by this action.
-  let options: Options;
-  self.resetOptions = self.reset = function resetOptions(aliases = {}) {
-    options = options || {};
-    // put yargs back into an initial state, this
-    // logic is used to build a nested command
-    // hierarchy.
-    const tmpOptions = {} as Options;
-    tmpOptions.local = options.local ? options.local : [];
-    tmpOptions.configObjects = options.configObjects
-      ? options.configObjects
-      : [];
-
-    // if a key has been explicitly set as local,
-    // we should reset it before passing options to command.
-    const localLookup: Dictionary<boolean> = {};
-    tmpOptions.local.forEach(l => {
-      localLookup[l] = true;
-      (aliases[l] || []).forEach(a => {
-        localLookup[a] = true;
-      });
-    });
-
-    // add all groups not set to local to preserved groups
-    Object.assign(
-      preservedGroups,
-      Object.keys(groups).reduce((acc, groupName) => {
-        const keys = groups[groupName].filter(key => !(key in localLookup));
-        if (keys.length > 0) {
-          acc[groupName] = keys;
-        }
-        return acc;
-      }, {} as Dictionary<string[]>)
+    return this;
+  }
+  command(
+    cmd: string | CommandHandlerDefinition | DefinitionOrCommandName[],
+    description?: CommandHandler['description'],
+    builder?: CommandBuilderDefinition | CommandBuilder,
+    handler?: CommandHandlerCallback,
+    middlewares?: Middleware[],
+    deprecated?: boolean
+  ): YargsInstance {
+    argsert(
+      '<string|array|object> [string|boolean] [function|object] [function] [array] [boolean|string]',
+      [cmd, description, builder, handler, middlewares, deprecated],
+      arguments.length
     );
-    // groups can now be reset
-    groups = {};
-
-    const arrayOptions: KeyOf<Options, string[]>[] = [
-      'array',
-      'boolean',
-      'string',
-      'skipValidation',
-      'count',
-      'normalize',
-      'number',
-      'hiddenOptions',
-    ];
-
-    const objectOptions: DictionaryKeyof<Options>[] = [
-      'narg',
-      'key',
-      'alias',
-      'default',
-      'defaultDescription',
-      'config',
-      'choices',
-      'demandedOptions',
-      'demandedCommands',
-      'deprecatedOptions',
-    ];
-
-    arrayOptions.forEach(k => {
-      tmpOptions[k] = (options[k] || []).filter((k: string) => !localLookup[k]);
-    });
-
-    objectOptions.forEach(<K extends DictionaryKeyof<Options>>(k: K) => {
-      tmpOptions[k] = objFilter(options[k], k => !localLookup[k as string]);
-    });
-
-    tmpOptions.envPrefix = options.envPrefix;
-    options = tmpOptions;
-
-    // if this is the first time being executed, create
-    // instances of all our helpers -- otherwise just reset.
-    usage = usage ? usage.reset(localLookup) : Usage(self, y18n, shim);
-    validation = validation
-      ? validation.reset(localLookup)
-      : Validation(self, usage, y18n, shim);
-    command = command
-      ? command.reset()
-      : Command(usage, validation, globalMiddleware, shim);
-    if (!completion) completion = Completion(self, usage, command, shim);
-    globalMiddleware.reset();
-
-    completionCommand = null;
-    output = '';
-    exitError = null;
-    hasOutput = false;
-    self.parsed = false;
-
-    return self;
-  };
-  self.resetOptions();
-
-  // temporary hack: allow "freezing" of reset-able state for parse(msg, cb)
-  const frozens: FrozenYargsInstance[] = [];
-  function freeze() {
-    frozens.push({
-      options,
-      configObjects: options.configObjects.slice(0),
-      exitProcess,
-      groups,
-      strict,
-      strictCommands,
-      strictOptions,
-      completionCommand,
-      output,
-      exitError,
-      hasOutput,
-      parsed: self.parsed,
-      parseFn,
-      parseContext,
-    });
-    usage.freeze();
-    validation.freeze();
-    command.freeze();
-    globalMiddleware.freeze();
+    this.#command!.addHandler(
+      cmd,
+      description,
+      builder,
+      handler,
+      middlewares,
+      deprecated
+    );
+    return this;
   }
-  function unfreeze() {
-    const frozen = frozens.pop();
-    assertNotStrictEqual(frozen, undefined, shim);
-    let configObjects: Dictionary[];
-    ({
-      options,
-      configObjects,
-      exitProcess,
-      groups,
-      output,
-      exitError,
-      hasOutput,
-      parsed: self.parsed,
-      strict,
-      strictCommands,
-      strictOptions,
-      completionCommand,
-      parseFn,
-      parseContext,
-    } = frozen);
-    options.configObjects = configObjects;
-    usage.unfreeze();
-    validation.unfreeze();
-    command.unfreeze();
-    globalMiddleware.unfreeze();
+  commands(
+    cmd: string | CommandHandlerDefinition | DefinitionOrCommandName[],
+    description?: CommandHandler['description'],
+    builder?: CommandBuilderDefinition | CommandBuilder,
+    handler?: CommandHandlerCallback,
+    middlewares?: Middleware[],
+    deprecated?: boolean
+  ): YargsInstance {
+    return this.command(
+      cmd,
+      description,
+      builder,
+      handler,
+      middlewares,
+      deprecated
+    );
   }
-
-  self.boolean = function (keys) {
+  commandDir(dir: string, opts?: RequireDirectoryOptions): YargsInstance {
+    argsert('<string> [object]', [dir, opts], arguments.length);
+    const req = this.#parentRequire || shim.require;
+    this.#command!.addDirectory(dir, req, shim.getCallerFile(), opts);
+    return this;
+  }
+  async getCompletion(
+    args: string[],
+    done?: (err: Error | null, completions: string[] | undefined) => void
+  ): Promise<string[] | void> {
+    argsert('<array> [function]', [args, done], arguments.length);
+    if (!done) {
+      return new Promise((resolve, reject) => {
+        this.#completion!.getCompletion(args, (err, completions) => {
+          if (err) reject(err);
+          else resolve(completions);
+        });
+      });
+    } else {
+      return this.#completion!.getCompletion(args, done);
+    }
+  }
+  getParserConfiguration() {
+    return this.#parserConfig;
+  }
+  parserConfiguration(config: Configuration) {
+    argsert('<object>', [config], arguments.length);
+    this.#parserConfig = config;
+    return this;
+  }
+  array(keys: string | string[]): YargsInstance {
     argsert('<array|string>', [keys], arguments.length);
-    populateParserHintArray('boolean', keys);
-    return self;
-  };
-
-  self.array = function (keys) {
+    this.populateParserHintArray('array', keys);
+    return this;
+  }
+  number(keys: string | string[]): YargsInstance {
     argsert('<array|string>', [keys], arguments.length);
-    populateParserHintArray('array', keys);
-    return self;
-  };
-
-  self.number = function (keys) {
+    this.populateParserHintArray('number', keys);
+    return this;
+  }
+  normalize(keys: string | string[]): YargsInstance {
     argsert('<array|string>', [keys], arguments.length);
-    populateParserHintArray('number', keys);
-    return self;
-  };
-
-  self.normalize = function (keys) {
+    this.populateParserHintArray('normalize', keys);
+    return this;
+  }
+  count(keys: string | string[]): YargsInstance {
     argsert('<array|string>', [keys], arguments.length);
-    populateParserHintArray('normalize', keys);
-    return self;
-  };
-
-  self.count = function (keys) {
-    argsert('<array|string>', [keys], arguments.length);
-    populateParserHintArray('count', keys);
-    return self;
-  };
-
-  self.string = function (keys) {
-    argsert('<array|string>', [keys], arguments.length);
-    populateParserHintArray('string', keys);
-    return self;
-  };
-
-  self.requiresArg = function (keys) {
+    this.populateParserHintArray('count', keys);
+    return this;
+  }
+  string(key: string | string[]): YargsInstance {
+    argsert('<array|string>', [key], arguments.length);
+    this.populateParserHintArray('string', key);
+    return this;
+  }
+  requiresArg(keys: string | string[] | Dictionary): YargsInstance {
     // the 2nd paramter [number] in the argsert the assertion is mandatory
     // as populateParserHintSingleValueDictionary recursively calls requiresArg
     // with Nan as a 2nd parameter, although we ignore it
     argsert('<array|string|object> [number]', [keys], arguments.length);
     // If someone configures nargs at the same time as requiresArg,
-    // nargs should take precedent,
+    // nargs should take precedence,
     // see: https://github.com/yargs/yargs/pull/1572
     // TODO: make this work with aliases, using a check similar to
     // checkAllAliases() in yargs-parser.
-    if (typeof keys === 'string' && options.narg[keys]) {
-      return self;
+    if (typeof keys === 'string' && this.#options!.narg[keys]) {
+      return this;
     } else {
-      populateParserHintSingleValueDictionary(
-        self.requiresArg,
+      this.populateParserHintSingleValueDictionary(
+        this.requiresArg.bind(this),
         'narg',
         keys,
         NaN
       );
     }
-    return self;
-  };
-
-  self.skipValidation = function (keys) {
-    argsert('<array|string>', [keys], arguments.length);
-    populateParserHintArray('skipValidation', keys);
-    return self;
-  };
-
-  function populateParserHintArray<T extends KeyOf<Options, string[]>>(
-    type: T,
-    keys: string | string[]
-  ) {
-    keys = ([] as string[]).concat(keys);
-    keys.forEach(key => {
-      key = sanitizeKey(key);
-      options[type].push(key);
-    });
+    return this;
   }
-
-  self.nargs = function (
+  skipValidation(keys: string | string[]): YargsInstance {
+    argsert('<array|string>', [keys], arguments.length);
+    this.populateParserHintArray('skipValidation', keys);
+    return this;
+  }
+  nargs(
     key: string | string[] | Dictionary<number>,
     value?: number
-  ) {
+  ): YargsInstance {
     argsert('<string|object|array> [number]', [key, value], arguments.length);
-    populateParserHintSingleValueDictionary(self.nargs, 'narg', key, value);
-    return self;
-  };
-
-  self.choices = function (
+    this.populateParserHintSingleValueDictionary(
+      this.nargs.bind(this),
+      'narg',
+      key,
+      value
+    );
+    return this;
+  }
+  choices(
     key: string | string[] | Dictionary<string | string[]>,
     value?: string | string[]
-  ) {
+  ): YargsInstance {
     argsert(
       '<object|string|array> [string|array]',
       [key, value],
       arguments.length
     );
-    populateParserHintArrayDictionary(self.choices, 'choices', key, value);
-    return self;
-  };
-
-  self.alias = function (
+    this.populateParserHintArrayDictionary(
+      this.choices.bind(this),
+      'choices',
+      key,
+      value
+    );
+    return this;
+  }
+  alias(
     key: string | string[] | Dictionary<string | string[]>,
     value?: string | string[]
-  ) {
+  ): YargsInstance {
     argsert(
       '<object|string|array> [string|array]',
       [key, value],
       arguments.length
     );
-    populateParserHintArrayDictionary(self.alias, 'alias', key, value);
-    return self;
-  };
-
-  // TODO: actually deprecate self.defaults.
-  self.default = self.defaults = function (
+    this.populateParserHintArrayDictionary(
+      this.alias.bind(this),
+      'alias',
+      key,
+      value
+    );
+    return this;
+  }
+  default(
     key: string | string[] | Dictionary<any>,
     value?: any,
     defaultDescription?: string
-  ) {
+  ): YargsInstance {
     argsert(
       '<object|string|array> [*] [string]',
       [key, value, defaultDescription],
@@ -432,60 +411,48 @@ function Yargs(
     );
     if (defaultDescription) {
       assertSingleKey(key, shim);
-      options.defaultDescription[key] = defaultDescription;
+      this.#options!.defaultDescription[key] = defaultDescription;
     }
     if (typeof value === 'function') {
       assertSingleKey(key, shim);
-      if (!options.defaultDescription[key])
-        options.defaultDescription[key] = usage.functionDescription(value);
+      if (!this.#options!.defaultDescription[key])
+        this.#options!.defaultDescription[
+          key
+        ] = this.#usage!.functionDescription(value);
       value = value.call();
     }
-    populateParserHintSingleValueDictionary<'default'>(
-      self.default,
+    this.populateParserHintSingleValueDictionary<'default'>(
+      this.default.bind(this),
       'default',
       key,
       value
     );
-    return self;
-  };
-
-  self.describe = function (
-    key: string | string[] | Dictionary<string>,
-    desc?: string
-  ) {
-    argsert('<object|string|array> [string]', [key, desc], arguments.length);
-    setKey(key, true);
-    usage.describe(key, desc);
-    return self;
-  };
-
-  function setKey(
-    key: string | string[] | Dictionary<string | boolean>,
-    set?: boolean | string
-  ) {
-    populateParserHintSingleValueDictionary(setKey, 'key', key, set);
-    return self;
+    return this;
   }
-
-  function demandOption(
+  defaults(
+    key: string | string[] | Dictionary<any>,
+    value?: any,
+    defaultDescription?: string
+  ): YargsInstance {
+    return this.default(key, value, defaultDescription);
+  }
+  demandOption(
     keys: string | string[] | Dictionary<string | undefined>,
     msg?: string
-  ) {
+  ): YargsInstance {
     argsert('<object|string|array> [string]', [keys, msg], arguments.length);
-    populateParserHintSingleValueDictionary(
-      self.demandOption,
+    this.populateParserHintSingleValueDictionary(
+      this.demandOption.bind(this),
       'demandedOptions',
       keys,
       msg
     );
-    return self;
+    return this;
   }
-  self.demandOption = demandOption;
-
-  self.coerce = function (
+  coerce(
     keys: string | string[] | Dictionary<CoerceCallback>,
     value?: CoerceCallback
-  ) {
+  ): YargsInstance {
     argsert(
       '<object|string|array> [function]',
       [keys, value],
@@ -496,14 +463,14 @@ function Yargs(
         throw new YError('coerce callback must be provided');
       }
       for (const key of keys) {
-        self.coerce(key, value);
+        this.coerce(key, value);
       }
-      return self;
+      return this;
     } else if (typeof keys === 'object') {
       for (const key of Object.keys(keys)) {
-        self.coerce(key, keys[key]);
+        this.coerce(key, keys[key]);
       }
-      return self;
+      return this;
     }
     if (!value) {
       throw new YError('coerce callback must be provided');
@@ -511,8 +478,8 @@ function Yargs(
     // This noop tells yargs-parser about the existence of the option
     // represented by "keys", so that it can apply camel case expansion
     // if needed:
-    self.alias(keys, keys);
-    globalMiddleware.addCoerceMiddleware(
+    this.alias(keys, keys);
+    this.#globalMiddleware.addCoerceMiddleware(
       (
         argv: Arguments,
         yargs: YargsInstance
@@ -541,10 +508,799 @@ function Yargs(
       },
       keys
     );
-    return self;
-  };
+    return this;
+  }
+  getAliases(): Dictionary<string[]> {
+    return this.parsed ? this.parsed.aliases : {};
+  }
+  config(
+    key: string | string[] | Dictionary = 'config',
+    msg?: string | ConfigCallback,
+    parseFn?: ConfigCallback
+  ): YargsInstance {
+    argsert(
+      '[object|string] [string|function] [function]',
+      [key, msg, parseFn],
+      arguments.length
+    );
+    // allow a config object to be provided directly.
+    if (typeof key === 'object' && !Array.isArray(key)) {
+      key = applyExtends(
+        key,
+        this.#cwd,
+        this.getParserConfiguration()['deep-merge-config'] || false,
+        shim
+      );
+      this.#options!.configObjects = (
+        this.#options!.configObjects || []
+      ).concat(key);
+      return this;
+    }
 
-  function populateParserHintSingleValueDictionary<
+    // allow for a custom parsing function.
+    if (typeof msg === 'function') {
+      parseFn = msg;
+      msg = undefined;
+    }
+
+    this.describe(
+      key,
+      msg || this.#usage!.deferY18nLookup('Path to JSON config file')
+    );
+    (Array.isArray(key) ? key : [key]).forEach(k => {
+      this.#options!.config[k] = parseFn || true;
+    });
+
+    return this;
+  }
+  example(
+    cmd: string | [string, string?][],
+    description?: string
+  ): YargsInstance {
+    argsert('<string|array> [string]', [cmd, description], arguments.length);
+
+    if (Array.isArray(cmd)) {
+      cmd.forEach(exampleParams => this.example(...exampleParams));
+    } else {
+      this.#usage!.example(cmd, description);
+    }
+
+    return this;
+  }
+  demand(
+    keys: string | string[] | Dictionary<string | undefined> | number,
+    max?: number | string[] | string | true,
+    msg?: string | true
+  ): YargsInstance {
+    // you can optionally provide a 'max' key,
+    // which will raise an exception if too many '_'
+    // options are provided.
+    if (Array.isArray(max)) {
+      max.forEach(key => {
+        assertNotStrictEqual(msg, true as const, shim);
+        this.demandOption(key, msg);
+      });
+      max = Infinity;
+    } else if (typeof max !== 'number') {
+      msg = max;
+      max = Infinity;
+    }
+
+    if (typeof keys === 'number') {
+      assertNotStrictEqual(msg, true as const, shim);
+      this.demandCommand(keys, max, msg, msg);
+    } else if (Array.isArray(keys)) {
+      keys.forEach(key => {
+        assertNotStrictEqual(msg, true as const, shim);
+        this.demandOption(key, msg);
+      });
+    } else {
+      if (typeof msg === 'string') {
+        this.demandOption(keys, msg);
+      } else if (msg === true || typeof msg === 'undefined') {
+        this.demandOption(keys);
+      }
+    }
+
+    return this;
+  }
+  required(
+    keys: string | string[] | Dictionary<string | undefined> | number,
+    max?: number | string[] | string | true,
+    msg?: string | true
+  ): YargsInstance {
+    return this.demand(keys, max, msg);
+  }
+  require(
+    keys: string | string[] | Dictionary<string | undefined> | number,
+    max?: number | string[] | string | true,
+    msg?: string | true
+  ): YargsInstance {
+    return this.demand(keys, max, msg);
+  }
+  demandCommand(
+    min = 1,
+    max?: number | string,
+    minMsg?: string | null,
+    maxMsg?: string | null
+  ): YargsInstance {
+    argsert(
+      '[number] [number|string] [string|null|undefined] [string|null|undefined]',
+      [min, max, minMsg, maxMsg],
+      arguments.length
+    );
+
+    if (typeof max !== 'number') {
+      minMsg = max;
+      max = Infinity;
+    }
+
+    this.global('_', false);
+
+    this.#options!.demandedCommands._ = {
+      min,
+      max,
+      minMsg,
+      maxMsg,
+    };
+
+    return this;
+  }
+  global(globals: string | string[], global?: boolean): YargsInstance {
+    argsert('<string|array> [boolean]', [globals, global], arguments.length);
+    globals = ([] as string[]).concat(globals);
+    if (global !== false) {
+      this.#options!.local = this.#options!.local.filter(
+        l => globals.indexOf(l) === -1
+      );
+    } else {
+      globals.forEach(g => {
+        if (this.#options!.local.indexOf(g) === -1)
+          this.#options!.local.push(g);
+      });
+    }
+    return this;
+  }
+  getDemandedOptions() {
+    argsert([], 0);
+    return this.#options!.demandedOptions;
+  }
+  getDemandedCommands() {
+    argsert([], 0);
+    return this.#options!.demandedCommands;
+  }
+  deprecateOption(option: string, message: string | boolean): YargsInstance {
+    argsert('<string> [string|boolean]', [option, message], arguments.length);
+    this.#options!.deprecatedOptions[option] = message;
+    return this;
+  }
+  getDeprecatedOptions() {
+    argsert([], 0);
+    return this.#options!.deprecatedOptions;
+  }
+  implies(
+    key: string | Dictionary<KeyOrPos | KeyOrPos[]>,
+    value?: KeyOrPos | KeyOrPos[]
+  ): YargsInstance {
+    argsert(
+      '<string|object> [number|string|array]',
+      [key, value],
+      arguments.length
+    );
+    this.#validation!.implies(key, value);
+    return this;
+  }
+  conflicts(
+    key1: string | Dictionary<string | string[]>,
+    key2?: string | string[]
+  ): YargsInstance {
+    argsert('<string|object> [string|array]', [key1, key2], arguments.length);
+    this.#validation!.conflicts(key1, key2);
+    return this;
+  }
+  usage(
+    msg: string | null,
+    description?: CommandHandler['description'],
+    builder?: CommandBuilderDefinition | CommandBuilder,
+    handler?: CommandHandlerCallback
+  ): YargsInstance {
+    argsert(
+      '<string|null|undefined> [string|boolean] [function|object] [function]',
+      [msg, description, builder, handler],
+      arguments.length
+    );
+
+    if (description !== undefined) {
+      assertNotStrictEqual(msg, null, shim);
+      // .usage() can be used as an alias for defining
+      // a default command.
+      if ((msg || '').match(/^\$0( |$)/)) {
+        return this.command(msg, description, builder, handler);
+      } else {
+        throw new YError(
+          '.usage() description must start with $0 if being used as alias for .command()'
+        );
+      }
+    } else {
+      this.#usage!.usage(msg);
+      return this;
+    }
+  }
+  epilogue(msg: string): YargsInstance {
+    argsert('<string>', [msg], arguments.length);
+    this.#usage!.epilog(msg);
+    return this;
+  }
+  epilog(msg: string): YargsInstance {
+    return this.epilogue(msg);
+  }
+  fail(f: FailureFunction | boolean): YargsInstance {
+    argsert('<function|boolean>', [f], arguments.length);
+    if (typeof f === 'boolean' && f !== false) {
+      throw new YError(
+        "Invalid first argument. Expected function or boolean 'false'"
+      );
+    }
+    this.#usage!.failFn(f);
+    return this;
+  }
+  check(f: (argv: Arguments) => any, global?: boolean): YargsInstance {
+    argsert('<function> [boolean]', [f, global], arguments.length);
+    this.middleware(
+      (
+        argv: Arguments,
+        _yargs: YargsInstance
+      ): Partial<Arguments> | Promise<Partial<Arguments>> => {
+        return maybeAsyncResult<
+          Partial<Arguments> | Promise<Partial<Arguments>> | any
+        >(
+          () => {
+            return f(argv);
+          },
+          (result: any): Partial<Arguments> | Promise<Partial<Arguments>> => {
+            if (!result) {
+              this.#usage!.fail(
+                this.#y18n.__('Argument check failed: %s', f.toString())
+              );
+            } else if (typeof result === 'string' || result instanceof Error) {
+              this.#usage!.fail(result.toString(), result);
+            }
+            return argv;
+          },
+          (err: Error): Partial<Arguments> | Promise<Partial<Arguments>> => {
+            this.#usage!.fail(err.message ? err.message : err.toString(), err);
+            return argv;
+          }
+        );
+      },
+      false,
+      global
+    );
+    return this;
+  }
+  middleware(
+    callback: MiddlewareCallback | MiddlewareCallback[],
+    applyBeforeValidation?: boolean,
+    global?: boolean
+  ): YargsInstance {
+    return this.#globalMiddleware.addMiddleware(
+      callback,
+      !!applyBeforeValidation,
+      global
+    );
+  }
+  pkgConf(key: string, rootPath?: string): YargsInstance {
+    argsert('<string> [string]', [key, rootPath], arguments.length);
+    let conf = null;
+    // prefer cwd to require-main-filename in this method
+    // since we're looking for e.g. "nyc" config in nyc consumer
+    // rather than "yargs" config in nyc (where nyc is the main filename)
+    const obj = this.pkgUp(rootPath || this.#cwd);
+
+    // If an object exists in the key, add it to options.configObjects
+    if (obj[key] && typeof obj[key] === 'object') {
+      conf = applyExtends(
+        obj[key] as {[key: string]: string},
+        rootPath || this.#cwd,
+        this.getParserConfiguration()['deep-merge-config'] || false,
+        shim
+      );
+      this.#options!.configObjects = (
+        this.#options!.configObjects || []
+      ).concat(conf);
+    }
+    return this;
+  }
+  option(
+    key: string | Dictionary<OptionDefinition>,
+    opt?: OptionDefinition
+  ): YargsInstance {
+    argsert('<string|object> [object]', [key, opt], arguments.length);
+    if (typeof key === 'object') {
+      Object.keys(key).forEach(k => {
+        this.options(k, key[k]);
+      });
+    } else {
+      if (typeof opt !== 'object') {
+        opt = {};
+      }
+
+      this.#options!.key[key] = true; // track manually set keys.
+
+      if (opt.alias) this.alias(key, opt.alias);
+
+      const deprecate = opt.deprecate || opt.deprecated;
+
+      if (deprecate) {
+        this.deprecateOption(key, deprecate);
+      }
+
+      const demand = opt.demand || opt.required || opt.require;
+
+      // A required option can be specified via "demand: true".
+      if (demand) {
+        this.demand(key, demand);
+      }
+
+      if (opt.demandOption) {
+        this.demandOption(
+          key,
+          typeof opt.demandOption === 'string' ? opt.demandOption : undefined
+        );
+      }
+
+      if (opt.conflicts) {
+        this.conflicts(key, opt.conflicts);
+      }
+
+      if ('default' in opt) {
+        this.default(key, opt.default);
+      }
+
+      if (opt.implies !== undefined) {
+        this.implies(key, opt.implies);
+      }
+
+      if (opt.nargs !== undefined) {
+        this.nargs(key, opt.nargs);
+      }
+
+      if (opt.config) {
+        this.config(key, opt.configParser);
+      }
+
+      if (opt.normalize) {
+        this.normalize(key);
+      }
+
+      if (opt.choices) {
+        this.choices(key, opt.choices);
+      }
+
+      if (opt.coerce) {
+        this.coerce(key, opt.coerce);
+      }
+
+      if (opt.group) {
+        this.group(key, opt.group);
+      }
+
+      if (opt.boolean || opt.type === 'boolean') {
+        this.boolean(key);
+        if (opt.alias) this.boolean(opt.alias);
+      }
+
+      if (opt.array || opt.type === 'array') {
+        this.array(key);
+        if (opt.alias) this.array(opt.alias);
+      }
+
+      if (opt.number || opt.type === 'number') {
+        this.number(key);
+        if (opt.alias) this.number(opt.alias);
+      }
+
+      if (opt.string || opt.type === 'string') {
+        this.string(key);
+        if (opt.alias) this.string(opt.alias);
+      }
+
+      if (opt.count || opt.type === 'count') {
+        this.count(key);
+      }
+
+      if (typeof opt.global === 'boolean') {
+        this.global(key, opt.global);
+      }
+
+      if (opt.defaultDescription) {
+        this.#options!.defaultDescription[key] = opt.defaultDescription;
+      }
+
+      if (opt.skipValidation) {
+        this.skipValidation(key);
+      }
+
+      const desc = opt.describe || opt.description || opt.desc;
+      this.describe(key, desc);
+      if (opt.hidden) {
+        this.hide(key);
+      }
+
+      if (opt.requiresArg) {
+        this.requiresArg(key);
+      }
+    }
+
+    return this;
+  }
+  options(
+    key: string | Dictionary<OptionDefinition>,
+    opt?: OptionDefinition
+  ): YargsInstance {
+    return this.option(key, opt);
+  }
+  getOptions(): Options {
+    return this.#options!;
+  }
+  group(opts: string | string[], groupName: string): YargsInstance {
+    argsert('<string|array> <string>', [opts, groupName], arguments.length);
+    const existing =
+      this.#preservedGroups[groupName] || this.#groups[groupName];
+    if (this.#preservedGroups[groupName]) {
+      // we now only need to track this group name in groups.
+      delete this.#preservedGroups[groupName];
+    }
+    const seen: Dictionary<boolean> = {};
+    this.#groups[groupName] = (existing || []).concat(opts).filter(key => {
+      if (seen[key]) return false;
+      return (seen[key] = true);
+    });
+    return this;
+  }
+  // combine explicit and preserved groups. explicit groups should be first
+  getGroups(): Dictionary<string[]> {
+    return Object.assign({}, this.#groups, this.#preservedGroups);
+  }
+  hide(key: string): YargsInstance {
+    argsert('<string>', [key], arguments.length);
+    this.#options!.hiddenOptions.push(key);
+    return this;
+  }
+  positional(key: string, opts: PositionalDefinition): YargsInstance {
+    argsert('<string> <object>', [key, opts], arguments.length);
+    // .positional() only supports a subset of the configuration
+    // options available to .option():
+    const supportedOpts: (keyof PositionalDefinition)[] = [
+      'default',
+      'defaultDescription',
+      'implies',
+      'normalize',
+      'choices',
+      'conflicts',
+      'coerce',
+      'type',
+      'describe',
+      'desc',
+      'description',
+      'alias',
+    ];
+    opts = objFilter(opts, (k, v) => {
+      let accept = supportedOpts.indexOf(k) !== -1;
+      // type can be one of string|number|boolean.
+      if (k === 'type' && ['string', 'number', 'boolean'].indexOf(v) === -1)
+        accept = false;
+      return accept;
+    });
+
+    // copy over any settings that can be inferred from the command string.
+    const fullCommand = this.#context.fullCommands[
+      this.#context.fullCommands.length - 1
+    ];
+    const parseOptions = fullCommand
+      ? this.#command!.cmdToParseOptions(fullCommand)
+      : {
+          array: [],
+          alias: {},
+          default: {},
+          demand: {},
+        };
+    objectKeys(parseOptions).forEach(pk => {
+      const parseOption = parseOptions[pk];
+      if (Array.isArray(parseOption)) {
+        if (parseOption.indexOf(key) !== -1) opts[pk] = true;
+      } else {
+        if (parseOption[key] && !(pk in opts)) opts[pk] = parseOption[key];
+      }
+    });
+    this.group(key, this.#usage!.getPositionalGroupName());
+    return this.option(key, opts);
+  }
+  // as long as options.envPrefix is not undefined,
+  // parser will apply env vars matching prefix to argv
+  env(prefix?: string | false): YargsInstance {
+    argsert('[string|boolean]', [prefix], arguments.length);
+    if (prefix === false) delete this.#options!.envPrefix;
+    else this.#options!.envPrefix = prefix || '';
+    return this;
+  }
+  wrap(cols: number | null | undefined): YargsInstance {
+    argsert('<number|null|undefined>', [cols], arguments.length);
+    this.#usage!.wrap(cols);
+    return this;
+  }
+  strict(enabled?: boolean): YargsInstance {
+    argsert('[boolean]', [enabled], arguments.length);
+    this.#strict = enabled !== false;
+    return this;
+  }
+  getStrict(): boolean {
+    return this.#strict;
+  }
+  strictCommands(enabled?: boolean): YargsInstance {
+    argsert('[boolean]', [enabled], arguments.length);
+    this.#strictCommands = enabled !== false;
+    return this;
+  }
+  getStrictCommands(): boolean {
+    return this.#strictCommands;
+  }
+  strictOptions(enabled?: boolean): YargsInstance {
+    argsert('[boolean]', [enabled], arguments.length);
+    this.#strictOptions = enabled !== false;
+    return this;
+  }
+  getStrictOptions(): boolean {
+    return this.#strictOptions;
+  }
+  getHelp(): Promise<string> {
+    this.#hasOutput = true;
+    if (!this.#usage!.hasCachedHelpMessage()) {
+      if (!this.parsed) {
+        // Run the parser as if --help was passed to it (this is what
+        // the last parameter `true` indicates).
+        const parse = this.runYargsParserAndExecuteCommands(
+          this.#processArgs,
+          undefined,
+          undefined,
+          0,
+          true
+        );
+        if (isPromise(parse)) {
+          return parse.then(() => {
+            return this.#usage!.help();
+          });
+        }
+      }
+    }
+    return Promise.resolve(this.#usage!.help());
+  }
+  showHelp(
+    level: 'error' | 'log' | ((message: string) => void)
+  ): YargsInstance {
+    argsert('[string|function]', [level], arguments.length);
+    this.#hasOutput = true;
+    if (!this.#usage!.hasCachedHelpMessage()) {
+      if (!this.parsed) {
+        // Run the parser as if --help was passed to it (this is what
+        // the last parameter `true` indicates).
+        const parse = this.runYargsParserAndExecuteCommands(
+          this.#processArgs,
+          undefined,
+          undefined,
+          0,
+          true
+        );
+        if (isPromise(parse)) {
+          parse.then(() => {
+            this.#usage!.showHelp(level);
+          });
+          return this;
+        }
+      }
+    }
+    this.#usage!.showHelp(level);
+    return this;
+  }
+  showVersion(
+    level: 'error' | 'log' | ((message: string) => void)
+  ): YargsInstance {
+    argsert('[string|function]', [level], arguments.length);
+    this.#usage!.showVersion(level);
+    return this;
+  }
+  version(opt?: string | false, msg?: string, ver?: string): YargsInstance {
+    const defaultVersionOpt = 'version';
+    argsert(
+      '[boolean|string] [string] [string]',
+      [opt, msg, ver],
+      arguments.length
+    );
+
+    // nuke the key previously configured
+    // to return version #.
+    if (this.#versionOpt) {
+      this.deleteFromParserHintObject(this.#versionOpt);
+      this.#usage!.version(undefined);
+      this.#versionOpt = null;
+    }
+
+    if (arguments.length === 0) {
+      ver = this.guessVersion();
+      opt = defaultVersionOpt;
+    } else if (arguments.length === 1) {
+      if (opt === false) {
+        // disable default 'version' key.
+        return this;
+      }
+      ver = opt;
+      opt = defaultVersionOpt;
+    } else if (arguments.length === 2) {
+      ver = msg;
+      msg = undefined;
+    }
+
+    this.#versionOpt = typeof opt === 'string' ? opt : defaultVersionOpt;
+    msg = msg || this.#usage!.deferY18nLookup('Show version number');
+
+    this.#usage!.version(ver || undefined);
+    this.boolean(this.#versionOpt);
+    this.describe(this.#versionOpt, msg);
+    return this;
+  }
+  showHelpOnFail(enabled?: string | boolean, message?: string): YargsInstance {
+    argsert('[boolean|string] [string]', [enabled, message], arguments.length);
+    this.#usage!.showHelpOnFail(enabled, message);
+    return this;
+  }
+  exitProcess(enabled = true): YargsInstance {
+    argsert('[boolean]', [enabled], arguments.length);
+    this.#exitProcess = enabled;
+    return this;
+  }
+  getExitProcess(): boolean {
+    return this.#exitProcess;
+  }
+  showCompletionScript($0?: string, cmd?: string): YargsInstance {
+    argsert('[string] [string]', [$0, cmd], arguments.length);
+    $0 = $0 || this.$0;
+    this.#logger.log(
+      this.#completion!.generateCompletionScript(
+        $0,
+        cmd || this.#completionCommand || 'completion'
+      )
+    );
+    return this;
+  }
+  // TODO(bcoe): add getLocale() rather than overloading behavior.
+  locale(locale?: string): YargsInstance | string {
+    argsert('[string]', [locale], arguments.length);
+    if (!locale) {
+      this.guessLocale();
+      return this.#y18n.getLocale();
+    }
+    this.#detectLocale = false;
+    this.#y18n.setLocale(locale);
+    return this;
+  }
+  updateStrings(obj: Dictionary<string>): YargsInstance {
+    argsert('<object>', [obj], arguments.length);
+    this.#detectLocale = false;
+    this.#y18n.updateLocale(obj);
+    return this;
+  }
+  updateLocale(obj: Dictionary<string>): YargsInstance {
+    return this.updateStrings(obj);
+  }
+  detectLocale(detect: boolean): YargsInstance {
+    argsert('<boolean>', [detect], arguments.length);
+    this.#detectLocale = detect;
+    return this;
+  }
+  getDetectLocale(): boolean {
+    return this.#detectLocale;
+  }
+  recommendCommands(recommend = true): YargsInstance {
+    argsert('[boolean]', [recommend], arguments.length);
+    this.#recommendCommands = recommend;
+    return this;
+  }
+  getCommandInstance(): CommandInstance {
+    return this.#command!;
+  }
+  getUsageInstance(): UsageInstance {
+    return this.#usage!;
+  }
+  getValidationInstance(): ValidationInstance {
+    return this.#validation!;
+  }
+  terminalWidth(): number | null {
+    argsert([], 0);
+    return shim.process.stdColumns;
+  }
+  parse(
+    args?: string | string[],
+    shortCircuit?: object | ParseCallback | boolean,
+    _parseFn?: ParseCallback
+  ): Arguments | Promise<Arguments> {
+    argsert(
+      '[string|array] [function|boolean|object] [function]',
+      [args, shortCircuit, _parseFn],
+      arguments.length
+    );
+    this.freeze(); // Push current state of parser onto stack.
+    if (typeof args === 'undefined') {
+      const argv = this.runYargsParserAndExecuteCommands(this.#processArgs);
+      const tmpParsed = this.parsed;
+      this.unfreeze(); // Pop the stack.
+      this.parsed = tmpParsed;
+      return argv;
+    }
+
+    // a context object can optionally be provided, this allows
+    // additional information to be passed to a command handler.
+    if (typeof shortCircuit === 'object') {
+      this.#parseContext = shortCircuit;
+      shortCircuit = _parseFn;
+    }
+
+    // by providing a function as a second argument to
+    // parse you can capture output that would otherwise
+    // default to printing to stdout/stderr.
+    if (typeof shortCircuit === 'function') {
+      this.#parseFn = shortCircuit as ParseCallback;
+      shortCircuit = false;
+    }
+    // completion short-circuits the parsing process,
+    // skipping validation, etc.
+    if (!shortCircuit) this.#processArgs = args;
+
+    if (this.#parseFn) this.#exitProcess = false;
+
+    const parsed = this.runYargsParserAndExecuteCommands(args, !!shortCircuit);
+    this.#completion!.setParsed(this.parsed as DetailedArguments);
+    if (this.#parseFn) this.#parseFn(this.#exitError, parsed, this.#output);
+    this.unfreeze(); // Pop the stack.
+    return parsed;
+  }
+  // TODO(bcoe): arrange private methods alphabetically:
+  private getDollarZero(): string {
+    let $0 = '';
+    // ignore the node bin, specify this in your
+    // bin file with #!/usr/bin/env node
+    let default$0: string[];
+    if (/\b(node|iojs|electron)(\.exe)?$/.test(shim.process.argv()[0])) {
+      default$0 = shim.process.argv().slice(1, 2);
+    } else {
+      default$0 = shim.process.argv().slice(0, 1);
+    }
+
+    $0 = default$0
+      .map(x => {
+        const b = rebase(this.#cwd, x);
+        return x.match(/^(\/|([a-zA-Z]:)?\\)/) && b.length < x.length ? b : x;
+      })
+      .join(' ')
+      .trim();
+
+    if (shim.getEnv('_') && shim.getProcessArgvBin() === shim.getEnv('_')) {
+      $0 = shim
+        .getEnv('_')!
+        .replace(`${shim.path.dirname(shim.process.execPath())}/`, '');
+    }
+    return $0;
+  }
+  private populateParserHintArray<T extends KeyOf<Options, string[]>>(
+    type: T,
+    keys: string | string[]
+  ) {
+    keys = ([] as string[]).concat(keys);
+    keys.forEach(key => {
+      key = this.sanitizeKey(key);
+      this.#options![type].push(key);
+    });
+  }
+  private populateParserHintSingleValueDictionary<
     T extends
       | Exclude<DictionaryKeyof<Options>, DictionaryKeyof<Options, any[]>>
       | 'default',
@@ -556,18 +1312,17 @@ function Yargs(
     key: K | K[] | {[key in K]: V},
     value?: V
   ) {
-    populateParserHintDictionary<T, K, V>(
+    this.populateParserHintDictionary<T, K, V>(
       builder,
       type,
       key,
       value,
       (type, key, value) => {
-        options[type][key] = value as ValueOf<Options[T]>;
+        this.#options![type][key] = value as ValueOf<Options[T]>;
       }
     );
   }
-
-  function populateParserHintArrayDictionary<
+  private populateParserHintArrayDictionary<
     T extends DictionaryKeyof<Options, any[]>,
     K extends keyof Options[T] & string = keyof Options[T] & string,
     V extends ValueOf<ValueOf<Options[T]>> | ValueOf<ValueOf<Options[T]>>[] =
@@ -579,20 +1334,19 @@ function Yargs(
     key: K | K[] | {[key in K]: V},
     value?: V
   ) {
-    populateParserHintDictionary<T, K, V>(
+    this.populateParserHintDictionary<T, K, V>(
       builder,
       type,
       key,
       value,
       (type, key, value) => {
-        options[type][key] = (
-          options[type][key] || ([] as Options[T][keyof Options[T]])
+        this.#options![type][key] = (
+          this.#options![type][key] || ([] as Options[T][keyof Options[T]])
         ).concat(value);
       }
     );
   }
-
-  function populateParserHintDictionary<
+  private populateParserHintDictionary<
     T extends keyof Options,
     K extends keyof Options[T],
     V
@@ -616,27 +1370,33 @@ function Yargs(
         builder(k, key[k]);
       }
     } else {
-      singleKeyHandler(type, sanitizeKey(key), value);
+      singleKeyHandler(type, this.sanitizeKey(key), value);
     }
   }
-
-  // TODO(bcoe): in future major versions move more objects towards
-  // Object.create(null):
-  function sanitizeKey<K extends any>(key: K): K;
-  function sanitizeKey(key: '__proto__'): '___proto___';
-  function sanitizeKey(key: any) {
+  private sanitizeKey(key: any) {
     if (key === '__proto__') return '___proto___';
     return key;
   }
-
-  function deleteFromParserHintObject(optionKey: string) {
+  private setKey(
+    key: string | string[] | Dictionary<string | boolean>,
+    set?: boolean | string
+  ) {
+    this.populateParserHintSingleValueDictionary(
+      this.setKey.bind(this),
+      'key',
+      key,
+      set
+    );
+    return this;
+  }
+  private deleteFromParserHintObject(optionKey: string) {
     // delete from all parsing hints:
     // boolean, array, key, alias, etc.
-    objectKeys(options).forEach((hintKey: keyof Options) => {
+    objectKeys(this.#options).forEach((hintKey: keyof Options) => {
       // configObjects is not a parsing hint array
       if (((key): key is 'configObjects' => key === 'configObjects')(hintKey))
         return;
-      const hint = options[hintKey];
+      const hint = this.#options![hintKey];
       if (Array.isArray(hint)) {
         if (~hint.indexOf(optionKey)) hint.splice(hint.indexOf(optionKey), 1);
       } else if (typeof hint === 'object') {
@@ -644,339 +1404,92 @@ function Yargs(
       }
     });
     // now delete the description from usage.js.
-    delete usage.getDescriptions()[optionKey];
+    delete this.#usage!.getDescriptions()[optionKey];
   }
-
-  self.config = function config(
-    key: string | string[] | Dictionary = 'config',
-    msg?: string | ConfigCallback,
-    parseFn?: ConfigCallback
-  ) {
-    argsert(
-      '[object|string] [string|function] [function]',
-      [key, msg, parseFn],
-      arguments.length
-    );
-    // allow a config object to be provided directly.
-    if (typeof key === 'object' && !Array.isArray(key)) {
-      key = applyExtends(
-        key,
-        cwd,
-        self.getParserConfiguration()['deep-merge-config'] || false,
-        shim
-      );
-      options.configObjects = (options.configObjects || []).concat(key);
-      return self;
-    }
-
-    // allow for a custom parsing function.
-    if (typeof msg === 'function') {
-      parseFn = msg;
-      msg = undefined;
-    }
-
-    self.describe(
-      key,
-      msg || usage.deferY18nLookup('Path to JSON config file')
-    );
-    (Array.isArray(key) ? key : [key]).forEach(k => {
-      options.config[k] = parseFn || true;
+  private freeze() {
+    this.#frozens.push({
+      options: this.#options!,
+      configObjects: this.#options!.configObjects.slice(0),
+      exitProcess: this.#exitProcess,
+      groups: this.#groups,
+      strict: this.#strict,
+      strictCommands: this.#strictCommands,
+      strictOptions: this.#strictOptions,
+      completionCommand: this.#completionCommand,
+      output: this.#output,
+      exitError: this.#exitError!,
+      hasOutput: this.#hasOutput,
+      parsed: this.parsed,
+      parseFn: this.#parseFn!,
+      parseContext: this.#parseContext,
     });
+    this.#usage!.freeze();
+    this.#validation!.freeze();
+    this.#command!.freeze();
+    this.#globalMiddleware.freeze();
+  }
+  private unfreeze() {
+    const frozen = this.#frozens.pop();
+    assertNotStrictEqual(frozen, undefined, shim);
+    let configObjects: Dictionary[];
+    ({
+      options: this.#options,
+      configObjects,
+      exitProcess: this.#exitProcess,
+      groups: this.#groups,
+      output: this.#output,
+      exitError: this.#exitError,
+      hasOutput: this.#hasOutput,
+      parsed: this.parsed,
+      strict: this.#strict,
+      strictCommands: this.#strictCommands,
+      strictOptions: this.#strictOptions,
+      completionCommand: this.#completionCommand,
+      parseFn: this.#parseFn,
+      parseContext: this.#parseContext,
+    } = frozen);
+    this.#options.configObjects = configObjects;
+    this.#usage!.unfreeze();
+    this.#validation!.unfreeze();
+    this.#command!.unfreeze();
+    this.#globalMiddleware.unfreeze();
+  }
+  // to simplify the parsing of positionals in commands,
+  // we temporarily populate '--' rather than _, with arguments
+  // after the '--' directive. After the parse, we copy these back.
+  private copyDoubleDash(argv: Arguments): any {
+    if (!argv._ || !argv['--']) return argv;
+    // eslint-disable-next-line prefer-spread
+    argv._.push.apply(argv._, argv['--']);
 
-    return self;
-  };
+    // We catch an error here, in case someone has called Object.seal()
+    // on the parsed object, see: https://github.com/babel/babel/pull/10733
+    try {
+      delete argv['--'];
+      // eslint-disable-next-line no-empty
+    } catch (_err) {}
 
-  self.example = function (
-    cmd: string | [string, string?][],
-    description?: string
-  ) {
-    argsert('<string|array> [string]', [cmd, description], arguments.length);
+    return argv;
+  }
+  // We wait to coerce numbers for positionals until after the initial parse.
+  // This allows commands to configure number parsing on a positional by
+  // positional basis:
+  private parsePositionalNumbers(argv: Arguments): any {
+    const args: (string | number)[] = argv['--'] ? argv['--'] : argv._;
 
-    if (Array.isArray(cmd)) {
-      cmd.forEach(exampleParams => self.example(...exampleParams));
-    } else {
-      usage.example(cmd, description);
-    }
-
-    return self;
-  };
-
-  self.command = self.commands = function (
-    cmd: string | CommandHandlerDefinition | DefinitionOrCommandName[],
-    description?: CommandHandler['description'],
-    builder?: CommandBuilderDefinition | CommandBuilder,
-    handler?: CommandHandlerCallback,
-    middlewares?: Middleware[],
-    deprecated?: boolean
-  ) {
-    argsert(
-      '<string|array|object> [string|boolean] [function|object] [function] [array] [boolean|string]',
-      [cmd, description, builder, handler, middlewares, deprecated],
-      arguments.length
-    );
-    command.addHandler(
-      cmd,
-      description,
-      builder,
-      handler,
-      middlewares,
-      deprecated
-    );
-    return self;
-  };
-
-  self.commandDir = function (dir, opts) {
-    argsert('<string> [object]', [dir, opts], arguments.length);
-    const req = parentRequire || shim.require;
-    command.addDirectory(dir, req, shim.getCallerFile(), opts);
-    return self;
-  };
-
-  // TODO: deprecate self.demand in favor of
-  // .demandCommand() .demandOption().
-  self.demand = self.required = self.require = function demand(
-    keys: string | string[] | Dictionary<string | undefined> | number,
-    max?: number | string[] | string | true,
-    msg?: string | true
-  ) {
-    // you can optionally provide a 'max' key,
-    // which will raise an exception if too many '_'
-    // options are provided.
-    if (Array.isArray(max)) {
-      max.forEach(key => {
-        assertNotStrictEqual(msg, true as const, shim);
-        demandOption(key, msg);
-      });
-      max = Infinity;
-    } else if (typeof max !== 'number') {
-      msg = max;
-      max = Infinity;
-    }
-
-    if (typeof keys === 'number') {
-      assertNotStrictEqual(msg, true as const, shim);
-      self.demandCommand(keys, max, msg, msg);
-    } else if (Array.isArray(keys)) {
-      keys.forEach(key => {
-        assertNotStrictEqual(msg, true as const, shim);
-        demandOption(key, msg);
-      });
-    } else {
-      if (typeof msg === 'string') {
-        demandOption(keys, msg);
-      } else if (msg === true || typeof msg === 'undefined') {
-        demandOption(keys);
+    for (let i = 0, arg; (arg = args[i]) !== undefined; i++) {
+      if (
+        shim.Parser.looksLikeNumber(arg) &&
+        Number.isSafeInteger(Math.floor(parseFloat(`${arg}`)))
+      ) {
+        args[i] = Number(arg);
       }
     }
-
-    return self;
-  };
-
-  self.demandCommand = function demandCommand(
-    min = 1,
-    max?: number | string,
-    minMsg?: string | null,
-    maxMsg?: string | null
-  ) {
-    argsert(
-      '[number] [number|string] [string|null|undefined] [string|null|undefined]',
-      [min, max, minMsg, maxMsg],
-      arguments.length
-    );
-
-    if (typeof max !== 'number') {
-      minMsg = max;
-      max = Infinity;
-    }
-
-    self.global('_', false);
-
-    options.demandedCommands._ = {
-      min,
-      max,
-      minMsg,
-      maxMsg,
-    };
-
-    return self;
-  };
-
-  self.getAliases = () => {
-    return self.parsed ? self.parsed.aliases : {};
-  };
-
-  self.getDemandedOptions = () => {
-    argsert([], 0);
-    return options.demandedOptions;
-  };
-
-  self.getDemandedCommands = () => {
-    argsert([], 0);
-    return options.demandedCommands;
-  };
-
-  self.deprecateOption = function deprecateOption(option, message) {
-    argsert('<string> [string|boolean]', [option, message], arguments.length);
-    options.deprecatedOptions[option] = message;
-    return self;
-  };
-
-  self.getDeprecatedOptions = () => {
-    argsert([], 0);
-    return options.deprecatedOptions;
-  };
-
-  self.implies = function (
-    key: string | Dictionary<KeyOrPos | KeyOrPos[]>,
-    value?: KeyOrPos | KeyOrPos[]
-  ) {
-    argsert(
-      '<string|object> [number|string|array]',
-      [key, value],
-      arguments.length
-    );
-    validation.implies(key, value);
-    return self;
-  };
-
-  self.conflicts = function (
-    key1: string | Dictionary<string | string[]>,
-    key2?: string | string[]
-  ) {
-    argsert('<string|object> [string|array]', [key1, key2], arguments.length);
-    validation.conflicts(key1, key2);
-    return self;
-  };
-
-  self.usage = function (
-    msg: string | null,
-    description?: CommandHandler['description'],
-    builder?: CommandBuilderDefinition | CommandBuilder,
-    handler?: CommandHandlerCallback
-  ) {
-    argsert(
-      '<string|null|undefined> [string|boolean] [function|object] [function]',
-      [msg, description, builder, handler],
-      arguments.length
-    );
-
-    if (description !== undefined) {
-      assertNotStrictEqual(msg, null, shim);
-      // .usage() can be used as an alias for defining
-      // a default command.
-      if ((msg || '').match(/^\$0( |$)/)) {
-        return self.command(msg, description, builder, handler);
-      } else {
-        throw new YError(
-          '.usage() description must start with $0 if being used as alias for .command()'
-        );
-      }
-    } else {
-      usage.usage(msg);
-      return self;
-    }
-  };
-
-  self.epilogue = self.epilog = function (msg) {
-    argsert('<string>', [msg], arguments.length);
-    usage.epilog(msg);
-    return self;
-  };
-
-  self.fail = function (f) {
-    argsert('<function|boolean>', [f], arguments.length);
-    if (typeof f === 'boolean' && f !== false) {
-      throw new YError(
-        "Invalid first argument. Expected function or boolean 'false'"
-      );
-    }
-    usage.failFn(f);
-    return self;
-  };
-
-  self.check = function (f, global) {
-    argsert('<function> [boolean]', [f, global], arguments.length);
-    self.middleware(
-      (
-        argv: Arguments,
-        _yargs: YargsInstance
-      ): Partial<Arguments> | Promise<Partial<Arguments>> => {
-        return maybeAsyncResult<
-          Partial<Arguments> | Promise<Partial<Arguments>> | any
-        >(
-          () => {
-            return f(argv);
-          },
-          (result: any): Partial<Arguments> | Promise<Partial<Arguments>> => {
-            if (!result) {
-              usage.fail(y18n.__('Argument check failed: %s', f.toString()));
-            } else if (typeof result === 'string' || result instanceof Error) {
-              usage.fail(result.toString(), result);
-            }
-            return argv;
-          },
-          (err: Error): Partial<Arguments> | Promise<Partial<Arguments>> => {
-            usage.fail(err.message ? err.message : err.toString(), err);
-            return argv;
-          }
-        );
-      },
-      false,
-      global
-    );
-    return self;
-  };
-
-  self.middleware = (
-    callback: MiddlewareCallback | MiddlewareCallback[],
-    applyBeforeValidation?: boolean,
-    global = true
-  ) => {
-    return globalMiddleware.addMiddleware(
-      callback,
-      !!applyBeforeValidation,
-      global
-    );
-  };
-
-  self.global = function global(globals, global) {
-    argsert('<string|array> [boolean]', [globals, global], arguments.length);
-    globals = ([] as string[]).concat(globals);
-    if (global !== false) {
-      options.local = options.local.filter(l => globals.indexOf(l) === -1);
-    } else {
-      globals.forEach(g => {
-        if (options.local.indexOf(g) === -1) options.local.push(g);
-      });
-    }
-    return self;
-  };
-
-  self.pkgConf = function pkgConf(key, rootPath) {
-    argsert('<string> [string]', [key, rootPath], arguments.length);
-    let conf = null;
-    // prefer cwd to require-main-filename in this method
-    // since we're looking for e.g. "nyc" config in nyc consumer
-    // rather than "yargs" config in nyc (where nyc is the main filename)
-    const obj = pkgUp(rootPath || cwd);
-
-    // If an object exists in the key, add it to options.configObjects
-    if (obj[key] && typeof obj[key] === 'object') {
-      conf = applyExtends(
-        obj[key],
-        rootPath || cwd,
-        self.getParserConfiguration()['deep-merge-config'] || false,
-        shim
-      );
-      options.configObjects = (options.configObjects || []).concat(conf);
-    }
-
-    return self;
-  };
-  const pkgs: Dictionary = {};
-  function pkgUp(rootPath?: string) {
+    return argv;
+  }
+  private pkgUp(rootPath?: string) {
     const npath = rootPath || '*';
-    if (pkgs[npath]) return pkgs[npath];
+    if (this.#pkgs[npath]) return this.#pkgs[npath];
 
     let obj = {};
     try {
@@ -1004,607 +1517,180 @@ function Yargs(
       // eslint-disable-next-line no-empty
     } catch (_noop) {}
 
-    pkgs[npath] = obj || {};
-    return pkgs[npath];
+    this.#pkgs[npath] = obj || {};
+    return this.#pkgs[npath];
   }
+  guessLocale() {
+    if (!this.#detectLocale) return;
+    const locale =
+      shim.getEnv('LC_ALL') ||
+      shim.getEnv('LC_MESSAGES') ||
+      shim.getEnv('LANG') ||
+      shim.getEnv('LANGUAGE') ||
+      'en_US';
+    this.locale(locale.replace(/[.:].*/, ''));
+  }
+  private guessVersion(): string {
+    const obj = this.pkgUp();
+    return (obj.version as string) || 'unknown';
+  }
+  private createLogger(): LoggerInstance {
+    return {
+      log: (...args: any[]) => {
+        if (!this.hasParseCallback()) console.log(...args);
+        this.#hasOutput = true;
+        if (this.#output.length) this.#output += '\n';
+        this.#output += args.join(' ');
+      },
+      error: (...args: any[]) => {
+        if (!this.hasParseCallback()) console.error(...args);
+        this.#hasOutput = true;
+        if (this.#output.length) this.#output += '\n';
+        this.#output += args.join(' ');
+      },
+    };
+  }
+  // If argv is a promise (which is possible if async middleware is used)
+  // delay applying validation until the promise has resolved:
+  private validateAsync(
+    validation: (argv: Arguments) => void,
+    argv: Arguments | Promise<Arguments>
+  ): Arguments | Promise<Arguments> {
+    return maybeAsyncResult<Arguments>(argv, result => {
+      validation(result);
+      return result;
+    });
+  }
+  // TODO(bcoe): figure out how to make the following methods protected:
 
-  let parseFn: ParseCallback | null = null;
-  let parseContext: object | null = null;
-  self.parse = function parse(
-    args?: string | string[],
-    shortCircuit?: object | ParseCallback | boolean,
-    _parseFn?: ParseCallback
-  ) {
-    argsert(
-      '[string|array] [function|boolean|object] [function]',
-      [args, shortCircuit, _parseFn],
-      arguments.length
-    );
-    freeze(); // Push current state of parser onto stack.
-    if (typeof args === 'undefined') {
-      const argv = self._parseArgs(processArgs);
-      const tmpParsed = self.parsed;
-      unfreeze(); // Pop the stack.
-      self.parsed = tmpParsed;
-      return argv;
-    }
+  // put yargs back into an initial state; this is used mainly for running
+  // commands in a breadth first manner:
+  // TODO(bcoe): in release notes document that .reset() has been removed
+  // from API.
+  reset(aliases: Aliases = {}) {
+    this.#options = this.#options || ({} as Options);
+    const tmpOptions = {} as Options;
+    tmpOptions.local = this.#options.local ? this.#options.local : [];
+    tmpOptions.configObjects = this.#options.configObjects
+      ? this.#options.configObjects
+      : [];
 
-    // a context object can optionally be provided, this allows
-    // additional information to be passed to a command handler.
-    if (typeof shortCircuit === 'object') {
-      parseContext = shortCircuit;
-      shortCircuit = _parseFn;
-    }
-
-    // by providing a function as a second argument to
-    // parse you can capture output that would otherwise
-    // default to printing to stdout/stderr.
-    if (typeof shortCircuit === 'function') {
-      parseFn = shortCircuit as ParseCallback;
-      shortCircuit = false;
-    }
-    // completion short-circuits the parsing process,
-    // skipping validation, etc.
-    if (!shortCircuit) processArgs = args;
-
-    if (parseFn) exitProcess = false;
-
-    const parsed = self._parseArgs(args, !!shortCircuit);
-    completion!.setParsed(self.parsed as DetailedArguments);
-    if (parseFn) parseFn(exitError, parsed, output);
-    unfreeze(); // Pop the stack.
-
-    return parsed;
-  };
-
-  self._getParseContext = () => parseContext || {};
-
-  self._hasParseCallback = () => !!parseFn;
-
-  self.option = self.options = function option(
-    key: string | Dictionary<OptionDefinition>,
-    opt?: OptionDefinition
-  ) {
-    argsert('<string|object> [object]', [key, opt], arguments.length);
-    if (typeof key === 'object') {
-      Object.keys(key).forEach(k => {
-        self.options(k, key[k]);
+    // if a key has been explicitly set as local,
+    // we should reset it before passing options to command.
+    const localLookup: Dictionary<boolean> = {};
+    tmpOptions.local.forEach(l => {
+      localLookup[l] = true;
+      (aliases[l] || []).forEach(a => {
+        localLookup[a] = true;
       });
-    } else {
-      if (typeof opt !== 'object') {
-        opt = {};
-      }
+    });
 
-      options.key[key] = true; // track manually set keys.
-
-      if (opt.alias) self.alias(key, opt.alias);
-
-      const deprecate = opt.deprecate || opt.deprecated;
-
-      if (deprecate) {
-        self.deprecateOption(key, deprecate);
-      }
-
-      const demand = opt.demand || opt.required || opt.require;
-
-      // A required option can be specified via "demand: true".
-      if (demand) {
-        self.demand(key, demand);
-      }
-
-      if (opt.demandOption) {
-        self.demandOption(
-          key,
-          typeof opt.demandOption === 'string' ? opt.demandOption : undefined
+    // add all groups not set to local to preserved groups
+    Object.assign(
+      this.#preservedGroups,
+      Object.keys(this.#groups).reduce((acc, groupName) => {
+        const keys = this.#groups[groupName].filter(
+          key => !(key in localLookup)
         );
-      }
+        if (keys.length > 0) {
+          acc[groupName] = keys;
+        }
+        return acc;
+      }, {} as Dictionary<string[]>)
+    );
+    // groups can now be reset
+    this.#groups = {};
 
-      if (opt.conflicts) {
-        self.conflicts(key, opt.conflicts);
-      }
+    const arrayOptions: KeyOf<Options, string[]>[] = [
+      'array',
+      'boolean',
+      'string',
+      'skipValidation',
+      'count',
+      'normalize',
+      'number',
+      'hiddenOptions',
+    ];
 
-      if ('default' in opt) {
-        self.default(key, opt.default);
-      }
-
-      if (opt.implies !== undefined) {
-        self.implies(key, opt.implies);
-      }
-
-      if (opt.nargs !== undefined) {
-        self.nargs(key, opt.nargs);
-      }
-
-      if (opt.config) {
-        self.config(key, opt.configParser);
-      }
-
-      if (opt.normalize) {
-        self.normalize(key);
-      }
-
-      if (opt.choices) {
-        self.choices(key, opt.choices);
-      }
-
-      if (opt.coerce) {
-        self.coerce(key, opt.coerce);
-      }
-
-      if (opt.group) {
-        self.group(key, opt.group);
-      }
-
-      if (opt.boolean || opt.type === 'boolean') {
-        self.boolean(key);
-        if (opt.alias) self.boolean(opt.alias);
-      }
-
-      if (opt.array || opt.type === 'array') {
-        self.array(key);
-        if (opt.alias) self.array(opt.alias);
-      }
-
-      if (opt.number || opt.type === 'number') {
-        self.number(key);
-        if (opt.alias) self.number(opt.alias);
-      }
-
-      if (opt.string || opt.type === 'string') {
-        self.string(key);
-        if (opt.alias) self.string(opt.alias);
-      }
-
-      if (opt.count || opt.type === 'count') {
-        self.count(key);
-      }
-
-      if (typeof opt.global === 'boolean') {
-        self.global(key, opt.global);
-      }
-
-      if (opt.defaultDescription) {
-        options.defaultDescription[key] = opt.defaultDescription;
-      }
-
-      if (opt.skipValidation) {
-        self.skipValidation(key);
-      }
-
-      const desc = opt.describe || opt.description || opt.desc;
-      self.describe(key, desc);
-      if (opt.hidden) {
-        self.hide(key);
-      }
-
-      if (opt.requiresArg) {
-        self.requiresArg(key);
-      }
-    }
-
-    return self;
-  };
-  self.getOptions = () => options;
-
-  self.positional = function (key, opts) {
-    argsert('<string> <object>', [key, opts], arguments.length);
-    // .positional() only supports a subset of the configuration
-    // options available to .option():
-    const supportedOpts: (keyof PositionalDefinition)[] = [
+    const objectOptions: DictionaryKeyof<Options>[] = [
+      'narg',
+      'key',
+      'alias',
       'default',
       'defaultDescription',
-      'implies',
-      'normalize',
+      'config',
       'choices',
-      'conflicts',
-      'coerce',
-      'type',
-      'describe',
-      'desc',
-      'description',
-      'alias',
+      'demandedOptions',
+      'demandedCommands',
+      'deprecatedOptions',
     ];
-    opts = objFilter(opts, (k, v) => {
-      let accept = supportedOpts.indexOf(k) !== -1;
-      // type can be one of string|number|boolean.
-      if (k === 'type' && ['string', 'number', 'boolean'].indexOf(v) === -1)
-        accept = false;
-      return accept;
+
+    arrayOptions.forEach(k => {
+      tmpOptions[k] = (this.#options![k] || []).filter(
+        (k: string) => !localLookup[k]
+      );
     });
 
-    // copy over any settings that can be inferred from the command string.
-    const fullCommand = context.fullCommands[context.fullCommands.length - 1];
-    const parseOptions = fullCommand
-      ? command.cmdToParseOptions(fullCommand)
-      : {
-          array: [],
-          alias: {},
-          default: {},
-          demand: {},
-        };
-    objectKeys(parseOptions).forEach(pk => {
-      const parseOption = parseOptions[pk];
-      if (Array.isArray(parseOption)) {
-        if (parseOption.indexOf(key) !== -1) opts[pk] = true;
-      } else {
-        if (parseOption[key] && !(pk in opts)) opts[pk] = parseOption[key];
-      }
+    objectOptions.forEach(<K extends DictionaryKeyof<Options>>(k: K) => {
+      tmpOptions[k] = objFilter(
+        this.#options![k],
+        k => !localLookup[k as string]
+      );
     });
-    self.group(key, usage.getPositionalGroupName());
-    return self.option(key, opts);
-  };
 
-  self.group = function group(opts, groupName) {
-    argsert('<string|array> <string>', [opts, groupName], arguments.length);
-    const existing = preservedGroups[groupName] || groups[groupName];
-    if (preservedGroups[groupName]) {
-      // we now only need to track this group name in groups.
-      delete preservedGroups[groupName];
-    }
+    tmpOptions.envPrefix = this.#options.envPrefix;
+    this.#options = tmpOptions;
 
-    const seen: Dictionary<boolean> = {};
-    groups[groupName] = (existing || []).concat(opts).filter(key => {
-      if (seen[key]) return false;
-      return (seen[key] = true);
-    });
-    return self;
-  };
-  // combine explicit and preserved groups. explicit groups should be first
-  self.getGroups = () => Object.assign({}, groups, preservedGroups);
+    // if this is the first time being executed, create
+    // instances of all our helpers -- otherwise just reset.
+    this.#usage = this.#usage
+      ? this.#usage.reset(localLookup)
+      : Usage(this, this.#y18n, shim);
+    this.#validation = this.#validation
+      ? this.#validation.reset(localLookup)
+      : Validation(this, this.#usage, this.#y18n, shim);
+    this.#command = this.#command
+      ? this.#command.reset()
+      : Command(this.#usage, this.#validation, this.#globalMiddleware, shim);
+    if (!this.#completion)
+      this.#completion = Completion(this, this.#usage, this.#command, shim);
+    this.#globalMiddleware.reset();
 
-  // as long as options.envPrefix is not undefined,
-  // parser will apply env vars matching prefix to argv
-  self.env = function (prefix) {
-    argsert('[string|boolean]', [prefix], arguments.length);
-    if (prefix === false) delete options.envPrefix;
-    else options.envPrefix = prefix || '';
-    return self;
-  };
+    this.#completionCommand = null;
+    this.#output = '';
+    this.#exitError = null;
+    this.#hasOutput = false;
+    this.parsed = false;
 
-  self.wrap = function (cols) {
-    argsert('<number|null|undefined>', [cols], arguments.length);
-    usage.wrap(cols);
-    return self;
-  };
-
-  let strict = false;
-  self.strict = function (enabled) {
-    argsert('[boolean]', [enabled], arguments.length);
-    strict = enabled !== false;
-    return self;
-  };
-  self.getStrict = () => strict;
-
-  let strictCommands = false;
-  self.strictCommands = function (enabled) {
-    argsert('[boolean]', [enabled], arguments.length);
-    strictCommands = enabled !== false;
-    return self;
-  };
-  self.getStrictCommands = () => strictCommands;
-
-  let strictOptions = false;
-  self.strictOptions = function (enabled) {
-    argsert('[boolean]', [enabled], arguments.length);
-    strictOptions = enabled !== false;
-    return self;
-  };
-  self.getStrictOptions = () => strictOptions;
-
-  let parserConfig: Configuration = {};
-  self.parserConfiguration = function parserConfiguration(config) {
-    argsert('<object>', [config], arguments.length);
-    parserConfig = config;
-    return self;
-  };
-  self.getParserConfiguration = () => parserConfig;
-
-  self.getHelp = async function () {
-    hasOutput = true;
-    if (!usage.hasCachedHelpMessage()) {
-      if (!self.parsed) {
-        // Run the parser as if --help was passed to it (this is what
-        // the last parameter `true` indicates).
-        const parse = self._parseArgs(
-          processArgs,
-          undefined,
-          undefined,
-          0,
-          true
-        );
-        if (isPromise(parse)) {
-          return parse.then(() => {
-            return usage.help();
-          });
-        }
-      }
-    }
-    return usage.help();
-  };
-
-  self.showHelp = function (level) {
-    argsert('[string|function]', [level], arguments.length);
-    hasOutput = true;
-    if (!usage.hasCachedHelpMessage()) {
-      if (!self.parsed) {
-        // Run the parser as if --help was passed to it (this is what
-        // the last parameter `true` indicates).
-        const parse = self._parseArgs(
-          processArgs,
-          undefined,
-          undefined,
-          0,
-          true
-        );
-        if (isPromise(parse)) {
-          parse.then(() => {
-            usage.showHelp(level);
-          });
-          return self;
-        }
-      }
-    }
-    usage.showHelp(level);
-    return self;
-  };
-
-  self.showVersion = function (level) {
-    argsert('[string|function]', [level], arguments.length);
-    usage.showVersion(level);
-    return self;
-  };
-
-  let versionOpt: string | null = null;
-  self.version = function version(
-    opt?: string | false,
-    msg?: string,
-    ver?: string
-  ) {
-    const defaultVersionOpt = 'version';
-    argsert(
-      '[boolean|string] [string] [string]',
-      [opt, msg, ver],
-      arguments.length
-    );
-
-    // nuke the key previously configured
-    // to return version #.
-    if (versionOpt) {
-      deleteFromParserHintObject(versionOpt);
-      usage.version(undefined);
-      versionOpt = null;
-    }
-
-    if (arguments.length === 0) {
-      ver = guessVersion();
-      opt = defaultVersionOpt;
-    } else if (arguments.length === 1) {
-      if (opt === false) {
-        // disable default 'version' key.
-        return self;
-      }
-      ver = opt;
-      opt = defaultVersionOpt;
-    } else if (arguments.length === 2) {
-      ver = msg;
-      msg = undefined;
-    }
-
-    versionOpt = typeof opt === 'string' ? opt : defaultVersionOpt;
-    msg = msg || usage.deferY18nLookup('Show version number');
-
-    usage.version(ver || undefined);
-    self.boolean(versionOpt);
-    self.describe(versionOpt, msg);
-    return self;
-  };
-
-  function guessVersion() {
-    const obj = pkgUp();
-
-    return obj.version || 'unknown';
+    return this;
   }
-
-  let helpOpt: string | null = null;
-  self.addHelpOpt = self.help = function addHelpOpt(
-    opt?: string | false,
-    msg?: string
-  ) {
-    const defaultHelpOpt = 'help';
-    argsert('[string|boolean] [string]', [opt, msg], arguments.length);
-
-    // nuke the key previously configured
-    // to return help.
-    if (helpOpt) {
-      deleteFromParserHintObject(helpOpt);
-      helpOpt = null;
-    }
-
-    if (arguments.length === 1) {
-      if (opt === false) return self;
-    }
-
-    // use arguments, fallback to defaults for opt and msg
-    helpOpt = typeof opt === 'string' ? opt : defaultHelpOpt;
-    self.boolean(helpOpt);
-    self.describe(helpOpt, msg || usage.deferY18nLookup('Show help'));
-    return self;
-  };
-
-  const defaultShowHiddenOpt = 'show-hidden';
-  options!.showHiddenOpt = defaultShowHiddenOpt;
-  self.addShowHiddenOpt = self.showHidden = function addShowHiddenOpt(
-    opt?: string | false,
-    msg?: string
-  ) {
-    argsert('[string|boolean] [string]', [opt, msg], arguments.length);
-
-    if (arguments.length === 1) {
-      if (opt === false) return self;
-    }
-
-    const showHiddenOpt = typeof opt === 'string' ? opt : defaultShowHiddenOpt;
-    self.boolean(showHiddenOpt);
-    self.describe(
-      showHiddenOpt,
-      msg || usage.deferY18nLookup('Show hidden options')
-    );
-    options.showHiddenOpt = showHiddenOpt;
-    return self;
-  };
-
-  self.hide = function hide(key) {
-    argsert('<string>', [key], arguments.length);
-    options.hiddenOptions.push(key);
-    return self;
-  };
-
-  self.showHelpOnFail = function showHelpOnFail(
-    enabled?: string | boolean,
-    message?: string
-  ) {
-    argsert('[boolean|string] [string]', [enabled, message], arguments.length);
-    usage.showHelpOnFail(enabled, message);
-    return self;
-  };
-
-  let exitProcess = true;
-  self.exitProcess = function (enabled = true) {
-    argsert('[boolean]', [enabled], arguments.length);
-    exitProcess = enabled;
-    return self;
-  };
-  self.getExitProcess = () => exitProcess;
-
-  self.showCompletionScript = function ($0, cmd) {
-    argsert('[string] [string]', [$0, cmd], arguments.length);
-    $0 = $0 || self.$0;
-    _logger.log(
-      completion!.generateCompletionScript(
-        $0,
-        cmd || completionCommand || 'completion'
-      )
-    );
-    return self;
-  };
-
-  self.getCompletion = async function (args, done) {
-    argsert('<array> [function]', [args, done], arguments.length);
-    if (!done) {
-      return new Promise((resolve, reject) => {
-        completion!.getCompletion(args, (err, completions) => {
-          if (err) reject(err);
-          else resolve(completions);
-        });
-      });
-    } else {
-      return completion!.getCompletion(args, done);
-    }
-  };
-
-  self.locale = function (locale?: string): any {
-    argsert('[string]', [locale], arguments.length);
-    if (!locale) {
-      guessLocale();
-      return y18n.getLocale();
-    }
-    detectLocale = false;
-    y18n.setLocale(locale);
-    return self;
-  };
-
-  self.updateStrings = self.updateLocale = function (obj) {
-    argsert('<object>', [obj], arguments.length);
-    detectLocale = false;
-    y18n.updateLocale(obj);
-    return self;
-  };
-
-  let detectLocale = true;
-  self.detectLocale = function (detect) {
-    argsert('<boolean>', [detect], arguments.length);
-    detectLocale = detect;
-    return self;
-  };
-  self.getDetectLocale = () => detectLocale;
-
-  // we use a custom logger that buffers output,
-  // so that we can print to non-CLIs, e.g., chat-bots.
-  const _logger = {
-    log(...args: any[]) {
-      if (!self._hasParseCallback()) console.log(...args);
-      hasOutput = true;
-      if (output.length) output += '\n';
-      output += args.join(' ');
-    },
-    error(...args: any[]) {
-      if (!self._hasParseCallback()) console.error(...args);
-      hasOutput = true;
-      if (output.length) output += '\n';
-      output += args.join(' ');
-    },
-  };
-  self._getLoggerInstance = () => _logger;
-  // has yargs output an error our help
-  // message in the current execution context.
-  self._hasOutput = () => hasOutput;
-
-  self._setHasOutput = () => {
-    hasOutput = true;
-  };
-
-  let recommendCommands: boolean;
-  self.recommendCommands = function (recommend = true) {
-    argsert('[boolean]', [recommend], arguments.length);
-    recommendCommands = recommend;
-    return self;
-  };
-
-  self.getUsageInstance = () => usage;
-
-  self.getValidationInstance = () => validation;
-
-  self.getCommandInstance = () => command;
-
-  self.terminalWidth = () => {
-    argsert([], 0);
-    return shim.process.stdColumns;
-  };
-
-  Object.defineProperty(self, 'argv', {
-    get: () => {
-      return self.parse();
-    },
-    enumerable: true,
-  });
-
-  self._parseArgs = function parseArgs(
+  runYargsParserAndExecuteCommands(
     args: string | string[] | null,
     shortCircuit?: boolean | null,
     calledFromCommand?: boolean,
     commandIndex = 0,
     helpOnly = false
-  ) {
+  ): Arguments | Promise<Arguments> {
     let skipValidation = !!calledFromCommand || helpOnly;
-    args = args || processArgs;
+    args = args || this.#processArgs;
 
-    options.__ = y18n.__;
-    options.configuration = self.getParserConfiguration();
+    this.#options!.__ = this.#y18n.__;
+    this.#options!.configuration = this.getParserConfiguration();
 
-    const populateDoubleDash = !!options.configuration['populate--'];
-    const config = Object.assign({}, options.configuration, {
+    const populateDoubleDash = !!this.#options!.configuration['populate--'];
+    const config = Object.assign({}, this.#options!.configuration, {
       'populate--': true,
     });
     const parsed = shim.Parser.detailed(
       args,
-      Object.assign({}, options, {
+      Object.assign({}, this.#options, {
         configuration: {'parse-positional-numbers': false, ...config},
       })
     ) as DetailedArguments;
 
     const argv: Arguments = Object.assign(
       parsed.argv,
-      parseContext
+      this.#parseContext
     ) as Arguments;
     let argvPromise: Arguments | Promise<Arguments> | undefined = undefined;
     const aliases = parsed.aliases;
@@ -1612,32 +1698,32 @@ function Yargs(
     let helpOptSet = false;
     let versionOptSet = false;
     Object.keys(argv).forEach(key => {
-      if (key === helpOpt && argv[key]) {
+      if (key === this.#helpOpt && argv[key]) {
         helpOptSet = true;
-      } else if (key === versionOpt && argv[key]) {
+      } else if (key === this.#versionOpt && argv[key]) {
         versionOptSet = true;
       }
     });
 
-    argv.$0 = self.$0;
-    self.parsed = parsed;
+    argv.$0 = this.$0;
+    this.parsed = parsed;
 
     // A single yargs instance may be used multiple times, e.g.
     // const y = yargs(); y.parse('foo --bar'); yargs.parse('bar --foo').
     // When a prior parse has completed and a new parse is beginning, we
     // need to clear the cached help message from the previous parse:
     if (commandIndex === 0) {
-      usage.clearCachedHelpMessage();
+      this.#usage!.clearCachedHelpMessage();
     }
 
     try {
-      guessLocale(); // guess locale lazily, so that it can be turned off in chain.
+      this.guessLocale(); // guess locale lazily, so that it can be turned off in chain.
 
       // while building up the argv object, there
       // are two passes through the parser. If completion
       // is being performed short-circuit on the first pass.
       if (shortCircuit) {
-        return self._postProcess(
+        return this.postProcess(
           argv,
           populateDoubleDash,
           !!calledFromCommand,
@@ -1647,12 +1733,12 @@ function Yargs(
 
       // if there's a handler associated with a
       // command defer processing to it.
-      if (helpOpt) {
+      if (this.#helpOpt) {
         // consider any multi-char helpOpt alias as a valid help command
         // unless all helpOpt aliases are single-char
         // note that parsed.aliases is a normalized bidirectional map :)
-        const helpCmds = [helpOpt]
-          .concat(aliases[helpOpt] || [])
+        const helpCmds = [this.#helpOpt]
+          .concat(aliases[this.#helpOpt] || [])
           .filter(k => k.length > 1);
         // check if help should trigger and strip it from _.
         if (~helpCmds.indexOf('' + argv._[argv._.length - 1])) {
@@ -1661,8 +1747,8 @@ function Yargs(
         }
       }
 
-      const handlerKeys = command.getCommands();
-      const requestCompletions = completion!.completionKey in argv;
+      const handlerKeys = this.#command!.getCommands();
+      const requestCompletions = this.#completion!.completionKey in argv;
       const skipRecommendation = helpOptSet || requestCompletions || helpOnly;
 
       if (argv._.length) {
@@ -1670,13 +1756,13 @@ function Yargs(
           let firstUnknownCommand;
           for (let i = commandIndex || 0, cmd; argv._[i] !== undefined; i++) {
             cmd = String(argv._[i]);
-            if (~handlerKeys.indexOf(cmd) && cmd !== completionCommand) {
+            if (~handlerKeys.indexOf(cmd) && cmd !== this.#completionCommand) {
               // commands are executed using a recursive algorithm that executes
               // the deepest command first; we keep track of the position in the
               // argv._ array that is currently being executed.
-              const innerArgv = command.runCommand(
+              const innerArgv = this.#command!.runCommand(
                 cmd,
-                self,
+                this,
                 parsed,
                 i + 1,
                 // Don't run a handler, just figure out the help string:
@@ -1684,13 +1770,16 @@ function Yargs(
                 // Passed to builder so that expensive commands can be deferred:
                 helpOptSet || versionOptSet || helpOnly
               );
-              return self._postProcess(
+              return this.postProcess(
                 innerArgv,
                 populateDoubleDash,
                 !!calledFromCommand,
                 false
               );
-            } else if (!firstUnknownCommand && cmd !== completionCommand) {
+            } else if (
+              !firstUnknownCommand &&
+              cmd !== this.#completionCommand
+            ) {
               firstUnknownCommand = cmd;
               break;
             }
@@ -1698,67 +1787,71 @@ function Yargs(
           // recommend a command if recommendCommands() has
           // been enabled, and no commands were found to execute
           if (
-            !command.hasDefaultCommand() &&
-            recommendCommands &&
+            !this.#command!.hasDefaultCommand() &&
+            this.#recommendCommands &&
             firstUnknownCommand &&
             !skipRecommendation
           ) {
-            validation.recommendCommands(firstUnknownCommand, handlerKeys);
+            this.#validation!.recommendCommands(
+              firstUnknownCommand,
+              handlerKeys
+            );
           }
         }
 
         // generate a completion script for adding to ~/.bashrc.
         if (
-          completionCommand &&
-          ~argv._.indexOf(completionCommand) &&
+          this.#completionCommand &&
+          ~argv._.indexOf(this.#completionCommand) &&
           !requestCompletions
         ) {
-          if (exitProcess) setBlocking(true);
-          self.showCompletionScript();
-          self.exit(0);
+          if (this.#exitProcess) setBlocking(true);
+          this.showCompletionScript();
+          this.exit(0);
         }
       }
 
-      if (command.hasDefaultCommand() && !skipRecommendation) {
-        const innerArgv = command.runCommand(
+      if (this.#command!.hasDefaultCommand() && !skipRecommendation) {
+        const innerArgv = this.#command!.runCommand(
           null,
-          self,
+          this,
           parsed,
           0,
           helpOnly,
           helpOptSet || versionOptSet || helpOnly
         );
-        return self._postProcess(
+        return this.postProcess(
           innerArgv,
           populateDoubleDash,
           !!calledFromCommand,
           false
         );
       } else if (!calledFromCommand && helpOnly) {
-        // TODO: what if the default builder is async?
-        // TODO: add better comments.
-        command.runDefaultBuilderOn(self);
+        // TODO(bcoe): what if the default builder is async?
+        // TODO(bcoe): add better comments for runDefaultBuilderOn, why
+        // are we doing this?
+        this.#command!.runDefaultBuilderOn(this);
       }
 
       // we must run completions first, a user might
       // want to complete the --help or --version option.
       if (requestCompletions) {
-        if (exitProcess) setBlocking(true);
+        if (this.#exitProcess) setBlocking(true);
 
         // we allow for asynchronous completions,
         // e.g., loading in a list of commands from an API.
         args = ([] as string[]).concat(args);
         const completionArgs = args.slice(
-          args.indexOf(`--${completion!.completionKey}`) + 1
+          args.indexOf(`--${this.#completion!.completionKey}`) + 1
         );
-        completion!.getCompletion(completionArgs, (err, completions) => {
+        this.#completion!.getCompletion(completionArgs, (err, completions) => {
           if (err) throw new YError(err.message);
           (completions || []).forEach(completion => {
-            _logger.log(completion);
+            this.#logger.log(completion);
           });
-          self.exit(0);
+          this.exit(0);
         });
-        return self._postProcess(
+        return this.postProcess(
           argv,
           !populateDoubleDash,
           !!calledFromCommand,
@@ -1768,27 +1861,28 @@ function Yargs(
 
       // Handle 'help' and 'version' options
       // if we haven't already output help!
-      if (!hasOutput) {
+      if (!this.#hasOutput) {
         if (helpOptSet) {
-          if (exitProcess) setBlocking(true);
+          if (this.#exitProcess) setBlocking(true);
           skipValidation = true;
           // TODO: add appropriate comment.
-          if (!calledFromCommand) command.runDefaultBuilderOn(self);
-          self.showHelp('log');
-          self.exit(0);
+          if (!calledFromCommand) this.#command!.runDefaultBuilderOn(this);
+          this.showHelp('log');
+          this.exit(0);
         } else if (versionOptSet) {
-          if (exitProcess) setBlocking(true);
-
+          if (this.#exitProcess) setBlocking(true);
           skipValidation = true;
-          usage.showVersion('log');
-          self.exit(0);
+          this.#usage!.showVersion('log');
+          this.exit(0);
         }
       }
 
       // Check if any of the options to skip validation were provided
-      if (!skipValidation && options.skipValidation.length > 0) {
+      if (!skipValidation && this.#options!.skipValidation.length > 0) {
         skipValidation = Object.keys(argv).some(
-          key => options.skipValidation.indexOf(key) >= 0 && argv[key] === true
+          key =>
+            this.#options!.skipValidation.indexOf(key) >= 0 &&
+            argv[key] === true
         );
       }
 
@@ -1800,22 +1894,22 @@ function Yargs(
         // if we're executed via bash completion, don't
         // bother with validation.
         if (!requestCompletions) {
-          const validation = self._runValidation(aliases, {}, parsed.error);
+          const validation = this.runValidation(aliases, {}, parsed.error);
           if (!calledFromCommand) {
             argvPromise = applyMiddleware(
               argv,
-              self,
-              globalMiddleware.getMiddleware(),
+              this,
+              this.#globalMiddleware.getMiddleware(),
               true
             );
           }
-          argvPromise = validateAsync(validation, argvPromise ?? argv);
+          argvPromise = this.validateAsync(validation, argvPromise ?? argv);
           if (isPromise(argvPromise) && !calledFromCommand) {
             argvPromise = argvPromise.then(() => {
               return applyMiddleware(
                 argv,
-                self,
-                globalMiddleware.getMiddleware(),
+                this,
+                this.#globalMiddleware.getMiddleware(),
                 false
               );
             });
@@ -1823,33 +1917,56 @@ function Yargs(
         }
       }
     } catch (err) {
-      if (err instanceof YError) usage.fail(err.message, err);
+      if (err instanceof YError) this.#usage!.fail(err.message, err);
       else throw err;
     }
 
-    return self._postProcess(
+    return this.postProcess(
       argvPromise ?? argv,
       populateDoubleDash,
       !!calledFromCommand,
       true
     );
-  };
-
-  // If argv is a promise (which is possible if async middleware is used)
-  // delay applying validation until the promise has resolved:
-  function validateAsync(
-    validation: (argv: Arguments) => void,
-    argv: Arguments | Promise<Arguments>
-  ): Arguments | Promise<Arguments> {
-    return maybeAsyncResult<Arguments>(argv, result => {
-      validation(result);
-      return result;
-    });
   }
-
-  // Applies a couple post processing steps that are easier to perform
-  // as a final step.
-  self._postProcess = function (
+  runValidation(
+    aliases: Dictionary<string[]>,
+    positionalMap: Dictionary<string[]>,
+    parseErrors: Error | null,
+    isDefaultCommand?: boolean
+  ): (argv: Arguments) => void {
+    aliases = {...aliases};
+    positionalMap = {...positionalMap};
+    const demandedOptions = {...this.getDemandedOptions()};
+    return (argv: Arguments) => {
+      if (parseErrors) throw new YError(parseErrors.message);
+      this.#validation!.nonOptionCount(argv);
+      this.#validation!.requiredArguments(argv, demandedOptions);
+      let failedStrictCommands = false;
+      if (this.#strictCommands) {
+        failedStrictCommands = this.#validation!.unknownCommands(argv);
+      }
+      if (this.#strict && !failedStrictCommands) {
+        this.#validation!.unknownArguments(
+          argv,
+          aliases,
+          positionalMap,
+          !!isDefaultCommand
+        );
+      } else if (this.#strictOptions) {
+        this.#validation!.unknownArguments(argv, aliases, {}, false, false);
+      }
+      this.#validation!.limitedChoices(argv);
+      this.#validation!.implications(argv);
+      this.#validation!.conflicting(argv);
+    };
+  }
+  getHasOutput(): boolean {
+    return this.#hasOutput;
+  }
+  setHasOutput() {
+    this.#hasOutput = true;
+  }
+  postProcess<T extends Arguments | Promise<Arguments>>(
     argv: Arguments | Promise<Arguments>,
     populateDoubleDash: boolean,
     calledFromCommand: boolean,
@@ -1858,110 +1975,57 @@ function Yargs(
     if (calledFromCommand) return argv;
     if (isPromise(argv)) return argv;
     if (!populateDoubleDash) {
-      argv = self._copyDoubleDash(argv);
+      argv = this.copyDoubleDash(argv);
     }
     const parsePositionalNumbers =
-      self.getParserConfiguration()['parse-positional-numbers'] ||
-      self.getParserConfiguration()['parse-positional-numbers'] === undefined;
+      this.getParserConfiguration()['parse-positional-numbers'] ||
+      this.getParserConfiguration()['parse-positional-numbers'] === undefined;
     if (parsePositionalNumbers) {
-      argv = self._parsePositionalNumbers(argv);
+      argv = this.parsePositionalNumbers(argv as Arguments);
     }
     if (runGlobalMiddleware) {
       argv = applyMiddleware(
         argv,
-        self,
-        globalMiddleware.getMiddleware(),
+        this,
+        this.#globalMiddleware.getMiddleware(),
         false
       );
     }
     return argv;
-  };
-
-  // to simplify the parsing of positionals in commands,
-  // we temporarily populate '--' rather than _, with arguments
-  // after the '--' directive. After the parse, we copy these back.
-  self._copyDoubleDash = function (argv: Arguments): any {
-    if (!argv._ || !argv['--']) return argv;
-    // eslint-disable-next-line prefer-spread
-    argv._.push.apply(argv._, argv['--']);
-
-    // We catch an error here, in case someone has called Object.seal()
-    // on the parsed object, see: https://github.com/babel/babel/pull/10733
-    try {
-      delete argv['--'];
-      // eslint-disable-next-line no-empty
-    } catch (_err) {}
-
-    return argv;
-  };
-
-  // We wait to coerce numbers for positionals until after the initial parse.
-  // This allows commands to configure number parsing on a positional by
-  // positional basis:
-  self._parsePositionalNumbers = function (argv: Arguments): any {
-    const args: (string | number)[] = argv['--'] ? argv['--'] : argv._;
-
-    for (let i = 0, arg; (arg = args[i]) !== undefined; i++) {
-      if (
-        shim.Parser.looksLikeNumber(arg) &&
-        Number.isSafeInteger(Math.floor(parseFloat(`${arg}`)))
-      ) {
-        args[i] = Number(arg);
-      }
-    }
-    return argv;
-  };
-
-  self._runValidation = function runValidation(
-    aliases,
-    positionalMap,
-    parseErrors,
-    isDefaultCommand = false
-  ): (argv: Arguments) => void {
-    aliases = {...aliases};
-    positionalMap = {...positionalMap};
-    const demandedOptions = {...self.getDemandedOptions()};
-    return (argv: Arguments) => {
-      if (parseErrors) throw new YError(parseErrors.message);
-      validation.nonOptionCount(argv);
-      validation.requiredArguments(argv, demandedOptions);
-      let failedStrictCommands = false;
-      if (strictCommands) {
-        failedStrictCommands = validation.unknownCommands(argv);
-      }
-      if (strict && !failedStrictCommands) {
-        validation.unknownArguments(
-          argv,
-          aliases,
-          positionalMap,
-          isDefaultCommand
-        );
-      } else if (strictOptions) {
-        validation.unknownArguments(argv, aliases, {}, false, false);
-      }
-      validation.limitedChoices(argv);
-      validation.implications(argv);
-      validation.conflicting(argv);
-    };
-  };
-
-  function guessLocale() {
-    if (!detectLocale) return;
-    const locale =
-      shim.getEnv('LC_ALL') ||
-      shim.getEnv('LC_MESSAGES') ||
-      shim.getEnv('LANG') ||
-      shim.getEnv('LANGUAGE') ||
-      'en_US';
-    self.locale(locale.replace(/[.:].*/, ''));
   }
+  hasParseCallback(): boolean {
+    return !!this.#parseFn;
+  }
+  getLoggerInstance(): LoggerInstance {
+    return this.#logger;
+  }
+  getParseContext(): Object {
+    return this.#parseContext || {};
+  }
+}
+
+// TODO(bcoe): simplify bootstrapping process so that only a single factory
+// method is used, and shim is not set globally.
+function YargsFactory(
+  processArgs: string | string[] = [],
+  cwd = shim.process.cwd(),
+  parentRequire?: RequireType
+): YargsInstance {
+  const yargs = new YargsInstance(processArgs, cwd, parentRequire);
+
+  // Legacy yargs.argv interface, it's recommended that you use .parse().
+  Object.defineProperty(yargs, 'argv', {
+    get: () => {
+      return yargs.parse();
+    },
+    enumerable: true,
+  });
 
   // an app should almost always have --version and --help,
   // if you *really* want to disable this use .help(false)/.version(false).
-  self.help();
-  self.version();
-
-  return self;
+  yargs.help();
+  yargs.version();
+  return yargs;
 }
 
 // rebase an absolute path to a relative one with respect to a base directory
@@ -1973,264 +2037,12 @@ export interface RebaseFunction {
 export const rebase: RebaseFunction = (base, dir) =>
   shim.path.relative(base, dir);
 
-/** Instance of the yargs module. */
-export interface YargsInstance {
-  $0: string;
-  argv: Arguments;
-  customScriptName: boolean;
-  parsed: DetailedArguments | false;
-  // The methods below are called after the parse in yargs-parser is complete
-  // and perform cleanup on the object generated:
-  _postProcess<T extends Arguments | Promise<Arguments>>(
-    argv: T,
-    populateDoubleDash: boolean,
-    calledFromCommand: boolean,
-    runGlobalMiddleware: boolean
-  ): T;
-  _copyDoubleDash<T extends Arguments>(argv: T): T;
-  _parsePositionalNumbers<T extends Arguments>(argv: T): T;
-  _getLoggerInstance(): LoggerInstance;
-  _getParseContext(): Object;
-  _hasOutput(): boolean;
-  _hasParseCallback(): boolean;
-  _parseArgs: {
-    (
-      args: string | string[] | null,
-      shortCircuit?: boolean,
-      calledFromCommand?: boolean,
-      commandIndex?: number,
-      helpOnly?: boolean
-    ): Arguments | Promise<Arguments>;
-    (args: string | string[], shortCircuit?: boolean):
-      | Arguments
-      | Promise<Arguments>;
-  };
-  _runValidation(
-    aliases: Dictionary<string[]>,
-    positionalMap: Dictionary<string[]>,
-    parseErrors: Error | null,
-    isDefaultCommand?: boolean
-  ): (argv: Arguments) => void;
-  _setHasOutput(): void;
-  addHelpOpt: {
-    (opt?: string | false): YargsInstance;
-    (opt?: string, msg?: string): YargsInstance;
-  };
-  addShowHiddenOpt: {
-    (opt?: string | false): YargsInstance;
-    (opt?: string, msg?: string): YargsInstance;
-  };
-  alias: {
-    (keys: string | string[], aliases: string | string[]): YargsInstance;
-    (keyAliases: Dictionary<string | string[]>): YargsInstance;
-  };
-  array(keys: string | string[]): YargsInstance;
-  boolean(keys: string | string[]): YargsInstance;
-  check(f: (argv: Arguments) => any, global?: boolean): YargsInstance;
-  choices: {
-    (keys: string | string[], choices: string | string[]): YargsInstance;
-    (keyChoices: Dictionary<string | string[]>): YargsInstance;
-  };
-  coerce: {
-    (keys: string | string[], coerceCallback: CoerceCallback): YargsInstance;
-    (keyCoerceCallbacks: Dictionary<CoerceCallback>): YargsInstance;
-  };
-  command: {
-    (
-      cmd: string | string[],
-      description: CommandHandler['description'],
-      builder?: CommandBuilderDefinition | CommandBuilder,
-      handler?: CommandHandlerCallback,
-      commandMiddleware?: Middleware[],
-      deprecated?: boolean
-    ): YargsInstance;
-    (handler: CommandHandlerDefinition): YargsInstance;
-  };
-  commands: YargsInstance['command'];
-  commandDir(dir: string, opts?: RequireDirectoryOptions): YargsInstance;
-  completion: {
-    (cmd?: string, fn?: CompletionFunction): YargsInstance;
-    (
-      cmd?: string,
-      desc?: string | false,
-      fn?: CompletionFunction
-    ): YargsInstance;
-  };
-  config: {
-    (config: Dictionary): YargsInstance;
-    (keys?: string | string[], configCallback?: ConfigCallback): YargsInstance;
-    (
-      keys?: string | string[],
-      msg?: string,
-      configCallback?: ConfigCallback
-    ): YargsInstance;
-  };
-  conflicts: {
-    (key: string, conflictsWith: string | string[]): YargsInstance;
-    (keyConflicts: Dictionary<string | string[]>): YargsInstance;
-  };
-  count(keys: string | string[]): YargsInstance;
-  default: {
-    (key: string, value: any, defaultDescription?: string): YargsInstance;
-    (keys: string[], value: Exclude<any, Function>): YargsInstance;
-    (keys: Dictionary<any>): YargsInstance;
-  };
-  defaults: YargsInstance['default'];
-  demand: {
-    (min: number, max?: number | string, msg?: string): YargsInstance;
-    (keys: string | string[], msg?: string | true): YargsInstance;
-    (
-      keys: string | string[],
-      max: string[],
-      msg?: string | true
-    ): YargsInstance;
-    (keyMsgs: Dictionary<string | undefined>): YargsInstance;
-    (
-      keyMsgs: Dictionary<string | undefined>,
-      max: string[],
-      msg?: string
-    ): YargsInstance;
-  };
-  demandCommand(): YargsInstance;
-  demandCommand(min: number, minMsg?: string): YargsInstance;
-  demandCommand(
-    min: number,
-    max: number,
-    minMsg?: string | null,
-    maxMsg?: string | null
-  ): YargsInstance;
-  demandOption: {
-    (keys: string | string[], msg?: string): YargsInstance;
-    (keyMsgs: Dictionary<string | undefined>): YargsInstance;
-  };
-  deprecateOption(option: string, message?: string | boolean): YargsInstance;
-  describe: {
-    (keys: string | string[], description?: string): YargsInstance;
-    (keyDescriptions: Dictionary<string>): YargsInstance;
-  };
-  detectLocale(detect: boolean): YargsInstance;
-  env(prefix?: string | false): YargsInstance;
-  epilog: YargsInstance['epilogue'];
-  epilogue(msg: string): YargsInstance;
-  example(
-    cmd: string | [string, string?][],
-    description?: string
-  ): YargsInstance;
-  exit(code: number, err?: YError | string): void;
-  exitProcess(enabled: boolean): YargsInstance;
-  fail(f: FailureFunction | boolean): YargsInstance;
-  getCommandInstance(): CommandInstance;
-  getCompletion(
-    args: string[],
-    done?: (err: Error | null, completions: string[] | undefined) => void
-  ): Promise<string[] | void> | any;
-  getHelp(): Promise<string>;
-  getContext(): Context;
-  getAliases(): Dictionary<string[]>;
-  getDemandedCommands(): Options['demandedCommands'];
-  getDemandedOptions(): Options['demandedOptions'];
-  getDeprecatedOptions(): Options['deprecatedOptions'];
-  getDetectLocale(): boolean;
-  getExitProcess(): boolean;
-  getGroups(): Dictionary<string[]>;
-  getOptions(): Options;
-  getParserConfiguration(): Configuration;
-  getStrict(): boolean;
-  getStrictCommands(): boolean;
-  getStrictOptions(): boolean;
-  getUsageInstance(): UsageInstance;
-  getValidationInstance(): ValidationInstance;
-  global(keys: string | string[], global?: boolean): YargsInstance;
-  group(keys: string | string[], groupName: string): YargsInstance;
-  help: YargsInstance['addHelpOpt'];
-  hide(key: string): YargsInstance;
-  implies: {
-    (key: string, implication: KeyOrPos | KeyOrPos[]): YargsInstance;
-    (keyImplications: Dictionary<KeyOrPos | KeyOrPos[]>): YargsInstance;
-  };
-  locale: {
-    (): string;
-    (locale: string): YargsInstance;
-  };
-  middleware(
-    callback: MiddlewareCallback | MiddlewareCallback[],
-    applyBeforeValidation?: boolean,
-    global?: boolean
-  ): YargsInstance;
-  nargs: {
-    (keys: string | string[], nargs: number): YargsInstance;
-    (keyNargs: Dictionary<number>): YargsInstance;
-  };
-  normalize(keys: string | string[]): YargsInstance;
-  number(keys: string | string[]): YargsInstance;
-  option: {
-    (key: string, optionDefinition: OptionDefinition): YargsInstance;
-    (keyOptionDefinitions: Dictionary<OptionDefinition>): YargsInstance;
-  };
-  options: YargsInstance['option'];
-  parse: {
-    (): Arguments | Promise<Arguments>;
-    (args: string | string[]): Arguments | Promise<Arguments>;
-    (args: string | string[], context: object, parseCallback?: ParseCallback):
-      | Arguments
-      | Promise<Arguments>;
-    (args: string | string[], parseCallback: ParseCallback):
-      | Arguments
-      | Promise<Arguments>;
-    (args: string | string[], shortCircuit: boolean):
-      | Arguments
-      | Promise<Arguments>;
-  };
-  parserConfiguration(config: Configuration): YargsInstance;
-  pkgConf(key: string, rootPath?: string): YargsInstance;
-  positional(
-    key: string,
-    positionalDefinition: PositionalDefinition
-  ): YargsInstance;
-  recommendCommands(recommend: boolean): YargsInstance;
-  require: YargsInstance['demand'];
-  required: YargsInstance['demand'];
-  requiresArg(keys: string | string[] | Dictionary): YargsInstance;
-  reset(aliases?: DetailedArguments['aliases']): YargsInstance;
-  resetOptions(aliases?: DetailedArguments['aliases']): YargsInstance;
-  scriptName(scriptName: string): YargsInstance;
-  showCompletionScript($0?: string, cmd?: string): YargsInstance;
-  showHelp(level: 'error' | 'log' | ((message: string) => void)): YargsInstance;
-  showVersion(
-    level: 'error' | 'log' | ((message: string) => void)
-  ): YargsInstance;
-  showHelpOnFail: {
-    (message?: string): YargsInstance;
-    (enabled: boolean, message: string): YargsInstance;
-  };
-  showHidden: YargsInstance['addShowHiddenOpt'];
-  skipValidation(keys: string | string[]): YargsInstance;
-  strict(enable?: boolean): YargsInstance;
-  strictCommands(enable?: boolean): YargsInstance;
-  strictOptions(enable?: boolean): YargsInstance;
-  string(key: string | string[]): YargsInstance;
-  terminalWidth(): number | null;
-  updateStrings(obj: Dictionary<string>): YargsInstance;
-  updateLocale: YargsInstance['updateStrings'];
-  usage: {
-    (msg: string | null): YargsInstance;
-    (
-      msg: string,
-      description: CommandHandler['description'],
-      builder?: CommandBuilderDefinition | CommandBuilder,
-      handler?: CommandHandlerCallback
-    ): YargsInstance;
-  };
-  version: {
-    (ver?: string | false): YargsInstance;
-    (key?: string, ver?: string): YargsInstance;
-    (key?: string, msg?: string, ver?: string): YargsInstance;
-  };
-  wrap(cols: number | null | undefined): YargsInstance;
-}
-
 export function isYargsInstance(y: YargsInstance | void): y is YargsInstance {
-  return !!y && typeof y._parseArgs === 'function';
+  return (
+    !!y &&
+    typeof y.demandOption === 'function' &&
+    typeof y.getCommandInstance === 'function'
+  );
 }
 
 /** Yargs' context. */
@@ -2358,6 +2170,10 @@ interface ParseCallback {
     argv: Arguments | Promise<Arguments>,
     output: string
   ): void;
+}
+
+interface Aliases {
+  [key: string]: Array<string>;
 }
 
 export interface Arguments {

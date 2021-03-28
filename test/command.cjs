@@ -1845,39 +1845,33 @@ describe('Command', () => {
     });
 
     // see: https://github.com/yargs/yargs/issues/1144
-    it('displays error and appropriate help message when handler fails', done => {
-      const y = yargs('foo')
-        .command(
-          'foo',
-          'foo command',
-          yargs => {
-            yargs.option('bar', {
-              describe: 'bar option',
-            });
-          },
-          argv => {
-            return Promise.reject(Error('foo error'));
-          }
-        )
-        .exitProcess(false);
+    it('displays error and appropriate help message when handler fails', async () => {
       // the bug reported in #1144 only happens when
       // usage.help() is called, this does not occur when
       // console output is suppressed. tldr; we capture
       // the log output:
-      let errorLog = '';
-      y._getLoggerInstance().error = out => {
-        if (out) errorLog += `${out}\n`;
-      };
-      y.parse();
-      // the promise returned by the handler rejects immediately,
-      // so we can wait for a small number of ms:
-      setTimeout(() => {
-        // ensure the appropriate help is displayed:
-        errorLog.should.include('bar option');
-        // ensure error was displayed:
-        errorLog.should.include('foo error');
-        return done();
-      }, 5);
+      const r = await checkOutput(async () => {
+        return yargs('foo')
+          .command(
+            'foo',
+            'foo command',
+            yargs => {
+              yargs.option('bar', {
+                describe: 'bar option',
+              });
+            },
+            argv => {
+              return Promise.reject(Error('foo error'));
+            }
+          )
+          .exitProcess(false)
+          .parse();
+      });
+      const errorLog = r.errors.join('\n');
+      // ensure the appropriate help is displayed:
+      errorLog.should.include('bar option');
+      // ensure error was displayed:
+      errorLog.should.include('foo error');
     });
   });
 

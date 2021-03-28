@@ -1,11 +1,6 @@
 // this file handles outputting usage instructions,
 // failures, etc. keeps logging in one place.
-import {
-  Dictionary,
-  assertNotStrictEqual,
-  PlatformShim,
-  Y18N,
-} from './typings/common-types.js';
+import {Dictionary, PlatformShim, Y18N} from './typings/common-types.js';
 import {objFilter} from './utils/obj-filter.js';
 import {YargsInstance} from './yargs-factory.js';
 import {YError} from './yerror.js';
@@ -42,7 +37,7 @@ export function usage(yargs: YargsInstance, y18n: Y18N, shim: PlatformShim) {
 
   let failureOutput = false;
   self.fail = function fail(msg, err) {
-    const logger = yargs._getLoggerInstance();
+    const logger = yargs.getLoggerInstance();
 
     if (fails.length) {
       for (let i = fails.length - 1; i >= 0; --i) {
@@ -74,7 +69,7 @@ export function usage(yargs: YargsInstance, y18n: Y18N, shim: PlatformShim) {
       err = err || new YError(msg);
       if (yargs.getExitProcess()) {
         return yargs.exit(1);
-      } else if (yargs._hasParseCallback()) {
+      } else if (yargs.hasParseCallback()) {
         return yargs.exit(1, err);
       } else {
         throw err;
@@ -603,7 +598,7 @@ export function usage(yargs: YargsInstance, y18n: Y18N, shim: PlatformShim) {
   }
 
   self.showHelp = (level: 'error' | 'log' | ((message: string) => void)) => {
-    const logger = yargs._getLoggerInstance();
+    const logger = yargs.getLoggerInstance();
     if (!level) level = 'error';
     const emit = typeof level === 'function' ? level : logger[level];
     emit(self.help());
@@ -675,7 +670,7 @@ export function usage(yargs: YargsInstance, y18n: Y18N, shim: PlatformShim) {
   };
 
   self.showVersion = level => {
-    const logger = yargs._getLoggerInstance();
+    const logger = yargs.getLoggerInstance();
     if (!level) level = 'error';
     const emit = typeof level === 'function' ? level : logger[level];
     emit(version);
