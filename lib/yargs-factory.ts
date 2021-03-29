@@ -22,7 +22,6 @@ import type {
   RequireDirectoryOptions,
   PlatformShim,
   RequireType,
-  Y18N,
 } from './typings/common-types.js';
 import {
   assertNotStrictEqual,
@@ -61,11 +60,28 @@ import {
 import {isPromise} from './utils/is-promise.js';
 import {maybeAsyncResult} from './utils/maybe-async-result.js';
 import setBlocking from './utils/set-blocking.js';
+import {assert} from 'node:console';
 
-let shim: PlatformShim;
-export function YargsWithShim(_shim: PlatformShim) {
-  shim = _shim;
-  return YargsFactory;
+export function YargsFactory(_shim: PlatformShim) {
+  return (
+    processArgs: string | string[] = [],
+    cwd = _shim.process.cwd(),
+    parentRequire?: RequireType
+  ): YargsInstance => {
+    const yargs = new YargsInstance(processArgs, cwd, parentRequire, _shim);
+    // Legacy yargs.argv interface, it's recommended that you use .parse().
+    Object.defineProperty(yargs, 'argv', {
+      get: () => {
+        return yargs.parse();
+      },
+      enumerable: true,
+    });
+    // an app should almost always have --version and --help,
+    // if you *really* want to disable this use .help(false)/.version(false).
+    yargs.help();
+    yargs.version();
+    return yargs;
+  };
 }
 
 // Used to expose private methods to other module-level classes,
@@ -101,6 +117,7 @@ const kGetUsageInstance = Symbol('getUsageInstance');
 const kGetValidationInstance = Symbol('getValidationInstance');
 const kHasParseCallback = Symbol('hasParseCallback');
 const kPostProcess = Symbol('postProcess');
+const kRebase = Symbol('rebase');
 const kReset = Symbol('reset');
 const kRunYargsParserAndExecuteCommands = Symbol(
   'runYargsParserAndExecuteCommands'
@@ -146,12 +163,12 @@ export class YargsInstance {
   customScriptName = false;
   parsed: DetailedArguments | false = false;
 
-  #command?: CommandInstance;
+  #command: CommandInstance;
   #cwd: string;
   // use context object to keep track of resets, subcommand execution, etc.,
   // submodules should modify and check the state of context as necessary:
   #context: Context = {commands: [], fullCommands: []};
-  #completion?: CompletionInstance | null = null;
+  #completion: CompletionInstance | null = null;
   #completionCommand: string | null = null;
   #defaultShowHiddenOpt = 'show-hidden';
   #exitError: YError | string | undefined | null = null;
@@ -164,7 +181,7 @@ export class YargsInstance {
   #helpOpt: string | null = null;
   #logger: LoggerInstance;
   #output = '';
-  #options?: Options;
+  #options: Options;
   #parentRequire?: RequireType;
   #parserConfig: Configuration = {};
   #parseFn: ParseCallback | null = null;
@@ -173,28 +190,33 @@ export class YargsInstance {
   #preservedGroups: Dictionary<string[]> = {};
   #processArgs: string | string[];
   #recommendCommands = false;
+  #shim: PlatformShim;
   #strict = false;
   #strictCommands = false;
   #strictOptions = false;
-  #usage?: UsageInstance;
+  #usage: UsageInstance;
   #versionOpt: string | null = null;
-  #validation?: ValidationInstance;
-  #y18n: Y18N;
+  #validation: ValidationInstance;
 
   constructor(
     processArgs: string | string[] = [],
     cwd: string,
-    parentRequire: RequireType | undefined
+    parentRequire: RequireType | undefined,
+    shim: PlatformShim
   ) {
+    this.#shim = shim;
     this.#processArgs = processArgs;
     this.#cwd = cwd;
     this.#parentRequire = parentRequire;
     this.#globalMiddleware = new GlobalMiddleware(this);
     this.$0 = this[kGetDollarZero]();
-    this.#y18n = shim.y18n;
-    // TODO(@bcoe): make reset initialize dependent classes so ! is not required.
+    // #command, #validation, and #usage are initialized on first reset:
     this[kReset]();
-    this.#options!.showHiddenOpt = this.#defaultShowHiddenOpt;
+    this.#command = this!.#command;
+    this.#usage = this!.#usage;
+    this.#validation = this!.#validation;
+    this.#options = this!.#options;
+    this.#options.showHiddenOpt = this.#defaultShowHiddenOpt;
     this.#logger = this[kCreateLogger]();
   }
   addHelpOpt(opt?: string | false, msg?: string): YargsInstance {
@@ -215,7 +237,7 @@ export class YargsInstance {
     this.boolean(this.#helpOpt);
     this.describe(
       this.#helpOpt,
-      msg || this.#usage!.deferY18nLookup('Show help')
+      msg || this.#usage.deferY18nLookup('Show help')
     );
     return this;
   }
@@ -231,9 +253,9 @@ export class YargsInstance {
     this.boolean(showHiddenOpt);
     this.describe(
       showHiddenOpt,
-      msg || this.#usage!.deferY18nLookup('Show hidden options')
+      msg || this.#usage.deferY18nLookup('Show hidden options')
     );
-    this.#options!.showHiddenOpt = showHiddenOpt;
+    this.#options.showHiddenOpt = showHiddenOpt;
     return this;
   }
   showHidden(opt?: string | false, msg?: string): YargsInstance {
@@ -282,16 +304,16 @@ export class YargsInstance {
           },
           (result: any): Partial<Arguments> | Promise<Partial<Arguments>> => {
             if (!result) {
-              this.#usage!.fail(
-                this.#y18n.__('Argument check failed: %s', f.toString())
+              this.#usage.fail(
+                this.#shim.y18n.__('Argument check failed: %s', f.toString())
               );
             } else if (typeof result === 'string' || result instanceof Error) {
-              this.#usage!.fail(result.toString(), result);
+              this.#usage.fail(result.toString(), result);
             }
             return argv;
           },
           (err: Error): Partial<Arguments> | Promise<Partial<Arguments>> => {
-            this.#usage!.fail(err.message ? err.message : err.toString(), err);
+            this.#usage.fail(err.message ? err.message : err.toString(), err);
             return argv;
           }
         );
@@ -384,7 +406,7 @@ export class YargsInstance {
     key2?: string | string[]
   ): YargsInstance {
     argsert('<string|object> [string|array]', [key1, key2], arguments.length);
-    this.#validation!.conflicts(key1, key2);
+    this.#validation.conflicts(key1, key2);
     return this;
   }
   config(
@@ -403,11 +425,11 @@ export class YargsInstance {
         key,
         this.#cwd,
         this[kGetParserConfiguration]()['deep-merge-config'] || false,
-        shim
+        this.#shim
       );
-      this.#options!.configObjects = (
-        this.#options!.configObjects || []
-      ).concat(key);
+      this.#options.configObjects = (this.#options.configObjects || []).concat(
+        key
+      );
       return this;
     }
 
@@ -419,10 +441,10 @@ export class YargsInstance {
 
     this.describe(
       key,
-      msg || this.#usage!.deferY18nLookup('Path to JSON config file')
+      msg || this.#usage.deferY18nLookup('Path to JSON config file')
     );
     (Array.isArray(key) ? key : [key]).forEach(k => {
-      this.#options!.config[k] = parseFn || true;
+      this.#options.config[k] = parseFn || true;
     });
 
     return this;
@@ -471,7 +493,7 @@ export class YargsInstance {
       [cmd, description, builder, handler, middlewares, deprecated],
       arguments.length
     );
-    this.#command!.addHandler(
+    this.#command.addHandler(
       cmd,
       description,
       builder,
@@ -500,8 +522,8 @@ export class YargsInstance {
   }
   commandDir(dir: string, opts?: RequireDirectoryOptions): YargsInstance {
     argsert('<string> [object]', [dir, opts], arguments.length);
-    const req = this.#parentRequire || shim.require;
-    this.#command!.addDirectory(dir, req, shim.getCallerFile(), opts);
+    const req = this.#parentRequire || this.#shim.require;
+    this.#command.addDirectory(dir, req, this.#shim.getCallerFile(), opts);
     return this;
   }
   count(keys: string | string[]): YargsInstance {
@@ -520,15 +542,15 @@ export class YargsInstance {
       arguments.length
     );
     if (defaultDescription) {
-      assertSingleKey(key, shim);
-      this.#options!.defaultDescription[key] = defaultDescription;
+      assertSingleKey(key, this.#shim);
+      this.#options.defaultDescription[key] = defaultDescription;
     }
     if (typeof value === 'function') {
-      assertSingleKey(key, shim);
-      if (!this.#options!.defaultDescription[key])
-        this.#options!.defaultDescription[
-          key
-        ] = this.#usage!.functionDescription(value);
+      assertSingleKey(key, this.#shim);
+      if (!this.#options.defaultDescription[key])
+        this.#options.defaultDescription[key] = this.#usage.functionDescription(
+          value
+        );
       value = value.call();
     }
     this[kPopulateParserHintSingleValueDictionary]<'default'>(
@@ -565,7 +587,7 @@ export class YargsInstance {
 
     this.global('_', false);
 
-    this.#options!.demandedCommands._ = {
+    this.#options.demandedCommands._ = {
       min,
       max,
       minMsg,
@@ -584,7 +606,7 @@ export class YargsInstance {
     // options are provided.
     if (Array.isArray(max)) {
       max.forEach(key => {
-        assertNotStrictEqual(msg, true as const, shim);
+        assertNotStrictEqual(msg, true as const, this.#shim);
         this.demandOption(key, msg);
       });
       max = Infinity;
@@ -594,11 +616,11 @@ export class YargsInstance {
     }
 
     if (typeof keys === 'number') {
-      assertNotStrictEqual(msg, true as const, shim);
+      assertNotStrictEqual(msg, true as const, this.#shim);
       this.demandCommand(keys, max, msg, msg);
     } else if (Array.isArray(keys)) {
       keys.forEach(key => {
-        assertNotStrictEqual(msg, true as const, shim);
+        assertNotStrictEqual(msg, true as const, this.#shim);
         this.demandOption(key, msg);
       });
     } else {
@@ -626,7 +648,7 @@ export class YargsInstance {
   }
   deprecateOption(option: string, message: string | boolean): YargsInstance {
     argsert('<string> [string|boolean]', [option, message], arguments.length);
-    this.#options!.deprecatedOptions[option] = message;
+    this.#options.deprecatedOptions[option] = message;
     return this;
   }
   describe(
@@ -639,7 +661,7 @@ export class YargsInstance {
       arguments.length
     );
     this[kSetKey](keys, true);
-    this.#usage!.describe(keys, description);
+    this.#usage.describe(keys, description);
     return this;
   }
   detectLocale(detect: boolean): YargsInstance {
@@ -651,13 +673,13 @@ export class YargsInstance {
   // parser will apply env vars matching prefix to argv
   env(prefix?: string | false): YargsInstance {
     argsert('[string|boolean]', [prefix], arguments.length);
-    if (prefix === false) delete this.#options!.envPrefix;
-    else this.#options!.envPrefix = prefix || '';
+    if (prefix === false) delete this.#options.envPrefix;
+    else this.#options.envPrefix = prefix || '';
     return this;
   }
   epilogue(msg: string): YargsInstance {
     argsert('<string>', [msg], arguments.length);
-    this.#usage!.epilog(msg);
+    this.#usage.epilog(msg);
     return this;
   }
   epilog(msg: string): YargsInstance {
@@ -672,7 +694,7 @@ export class YargsInstance {
     if (Array.isArray(cmd)) {
       cmd.forEach(exampleParams => this.example(...exampleParams));
     } else {
-      this.#usage!.example(cmd, description);
+      this.#usage.example(cmd, description);
     }
 
     return this;
@@ -681,7 +703,7 @@ export class YargsInstance {
   exit(code: number, err?: YError | string): void {
     this.#hasOutput = true;
     this.#exitError = err;
-    if (this.#exitProcess) shim.process.exit(code);
+    if (this.#exitProcess) this.#shim.process.exit(code);
   }
   exitProcess(enabled = true): YargsInstance {
     argsert('[boolean]', [enabled], arguments.length);
@@ -695,7 +717,7 @@ export class YargsInstance {
         "Invalid first argument. Expected function or boolean 'false'"
       );
     }
-    this.#usage!.failFn(f);
+    this.#usage.failFn(f);
     return this;
   }
   getAliases(): Dictionary<string[]> {
@@ -719,15 +741,15 @@ export class YargsInstance {
   }
   getDemandedOptions() {
     argsert([], 0);
-    return this.#options!.demandedOptions;
+    return this.#options.demandedOptions;
   }
   getDemandedCommands() {
     argsert([], 0);
-    return this.#options!.demandedCommands;
+    return this.#options.demandedCommands;
   }
   getDeprecatedOptions() {
     argsert([], 0);
-    return this.#options!.deprecatedOptions;
+    return this.#options.deprecatedOptions;
   }
   getDetectLocale(): boolean {
     return this.#detectLocale;
@@ -741,7 +763,7 @@ export class YargsInstance {
   }
   getHelp(): Promise<string> {
     this.#hasOutput = true;
-    if (!this.#usage!.hasCachedHelpMessage()) {
+    if (!this.#usage.hasCachedHelpMessage()) {
       if (!this.parsed) {
         // Run the parser as if --help was passed to it (this is what
         // the last parameter `true` indicates).
@@ -754,15 +776,15 @@ export class YargsInstance {
         );
         if (isPromise(parse)) {
           return parse.then(() => {
-            return this.#usage!.help();
+            return this.#usage.help();
           });
         }
       }
     }
-    return Promise.resolve(this.#usage!.help());
+    return Promise.resolve(this.#usage.help());
   }
   getOptions(): Options {
-    return this.#options!;
+    return this.#options;
   }
   getStrict(): boolean {
     return this.#strict;
@@ -777,13 +799,12 @@ export class YargsInstance {
     argsert('<string|array> [boolean]', [globals, global], arguments.length);
     globals = ([] as string[]).concat(globals);
     if (global !== false) {
-      this.#options!.local = this.#options!.local.filter(
+      this.#options.local = this.#options.local.filter(
         l => globals.indexOf(l) === -1
       );
     } else {
       globals.forEach(g => {
-        if (this.#options!.local.indexOf(g) === -1)
-          this.#options!.local.push(g);
+        if (this.#options.local.indexOf(g) === -1) this.#options.local.push(g);
       });
     }
     return this;
@@ -805,7 +826,7 @@ export class YargsInstance {
   }
   hide(key: string): YargsInstance {
     argsert('<string>', [key], arguments.length);
-    this.#options!.hiddenOptions.push(key);
+    this.#options.hiddenOptions.push(key);
     return this;
   }
   implies(
@@ -817,7 +838,7 @@ export class YargsInstance {
       [key, value],
       arguments.length
     );
-    this.#validation!.implies(key, value);
+    this.#validation.implies(key, value);
     return this;
   }
   // TODO(bcoe): add getLocale() rather than overloading behavior.
@@ -825,10 +846,10 @@ export class YargsInstance {
     argsert('[string]', [locale], arguments.length);
     if (!locale) {
       this[kGuessLocale]();
-      return this.#y18n.getLocale();
+      return this.#shim.y18n.getLocale();
     }
     this.#detectLocale = false;
-    this.#y18n.setLocale(locale);
+    this.#shim.y18n.setLocale(locale);
     return this;
   }
   middleware(
@@ -879,7 +900,7 @@ export class YargsInstance {
         opt = {};
       }
 
-      this.#options!.key[key] = true; // track manually set keys.
+      this.#options.key[key] = true; // track manually set keys.
 
       if (opt.alias) this.alias(key, opt.alias);
 
@@ -968,7 +989,7 @@ export class YargsInstance {
       }
 
       if (opt.defaultDescription) {
-        this.#options!.defaultDescription[key] = opt.defaultDescription;
+        this.#options.defaultDescription[key] = opt.defaultDescription;
       }
 
       if (opt.skipValidation) {
@@ -1061,11 +1082,11 @@ export class YargsInstance {
         obj[key] as {[key: string]: string},
         rootPath || this.#cwd,
         this[kGetParserConfiguration]()['deep-merge-config'] || false,
-        shim
+        this.#shim
       );
-      this.#options!.configObjects = (
-        this.#options!.configObjects || []
-      ).concat(conf);
+      this.#options.configObjects = (this.#options.configObjects || []).concat(
+        conf
+      );
     }
     return this;
   }
@@ -1100,7 +1121,7 @@ export class YargsInstance {
       this.#context.fullCommands.length - 1
     ];
     const parseOptions = fullCommand
-      ? this.#command!.cmdToParseOptions(fullCommand)
+      ? this.#command.cmdToParseOptions(fullCommand)
       : {
           array: [],
           alias: {},
@@ -1115,7 +1136,7 @@ export class YargsInstance {
         if (parseOption[key] && !(pk in opts)) opts[pk] = parseOption[key];
       }
     });
-    this.group(key, this.#usage!.getPositionalGroupName());
+    this.group(key, this.#usage.getPositionalGroupName());
     return this.option(key, opts);
   }
   recommendCommands(recommend = true): YargsInstance {
@@ -1147,7 +1168,7 @@ export class YargsInstance {
     // see: https://github.com/yargs/yargs/pull/1572
     // TODO: make this work with aliases, using a check similar to
     // checkAllAliases() in yargs-parser.
-    if (typeof keys === 'string' && this.#options!.narg[keys]) {
+    if (typeof keys === 'string' && this.#options.narg[keys]) {
       return this;
     } else {
       this[kPopulateParserHintSingleValueDictionary](
@@ -1175,7 +1196,7 @@ export class YargsInstance {
   ): YargsInstance {
     argsert('[string|function]', [level], arguments.length);
     this.#hasOutput = true;
-    if (!this.#usage!.hasCachedHelpMessage()) {
+    if (!this.#usage.hasCachedHelpMessage()) {
       if (!this.parsed) {
         // Run the parser as if --help was passed to it (this is what
         // the last parameter `true` indicates).
@@ -1188,13 +1209,13 @@ export class YargsInstance {
         );
         if (isPromise(parse)) {
           parse.then(() => {
-            this.#usage!.showHelp(level);
+            this.#usage.showHelp(level);
           });
           return this;
         }
       }
     }
-    this.#usage!.showHelp(level);
+    this.#usage.showHelp(level);
     return this;
   }
   scriptName(scriptName: string): YargsInstance {
@@ -1204,14 +1225,14 @@ export class YargsInstance {
   }
   showHelpOnFail(enabled?: string | boolean, message?: string): YargsInstance {
     argsert('[boolean|string] [string]', [enabled, message], arguments.length);
-    this.#usage!.showHelpOnFail(enabled, message);
+    this.#usage.showHelpOnFail(enabled, message);
     return this;
   }
   showVersion(
     level: 'error' | 'log' | ((message: string) => void)
   ): YargsInstance {
     argsert('[string|function]', [level], arguments.length);
-    this.#usage!.showVersion(level);
+    this.#usage.showVersion(level);
     return this;
   }
   skipValidation(keys: string | string[]): YargsInstance {
@@ -1241,7 +1262,7 @@ export class YargsInstance {
   }
   terminalWidth(): number | null {
     argsert([], 0);
-    return shim.process.stdColumns;
+    return this.#shim.process.stdColumns;
   }
   updateLocale(obj: Dictionary<string>): YargsInstance {
     return this.updateStrings(obj);
@@ -1249,7 +1270,7 @@ export class YargsInstance {
   updateStrings(obj: Dictionary<string>): YargsInstance {
     argsert('<object>', [obj], arguments.length);
     this.#detectLocale = false;
-    this.#y18n.updateLocale(obj);
+    this.#shim.y18n.updateLocale(obj);
     return this;
   }
   usage(
@@ -1265,7 +1286,7 @@ export class YargsInstance {
     );
 
     if (description !== undefined) {
-      assertNotStrictEqual(msg, null, shim);
+      assertNotStrictEqual(msg, null, this.#shim);
       // .usage() can be used as an alias for defining
       // a default command.
       if ((msg || '').match(/^\$0( |$)/)) {
@@ -1276,7 +1297,7 @@ export class YargsInstance {
         );
       }
     } else {
-      this.#usage!.usage(msg);
+      this.#usage.usage(msg);
       return this;
     }
   }
@@ -1292,7 +1313,7 @@ export class YargsInstance {
     // to return version #.
     if (this.#versionOpt) {
       this[kDeleteFromParserHintObject](this.#versionOpt);
-      this.#usage!.version(undefined);
+      this.#usage.version(undefined);
       this.#versionOpt = null;
     }
 
@@ -1312,16 +1333,16 @@ export class YargsInstance {
     }
 
     this.#versionOpt = typeof opt === 'string' ? opt : defaultVersionOpt;
-    msg = msg || this.#usage!.deferY18nLookup('Show version number');
+    msg = msg || this.#usage.deferY18nLookup('Show version number');
 
-    this.#usage!.version(ver || undefined);
+    this.#usage.version(ver || undefined);
     this.boolean(this.#versionOpt);
     this.describe(this.#versionOpt, msg);
     return this;
   }
   wrap(cols: number | null | undefined): YargsInstance {
     argsert('<number|null|undefined>', [cols], arguments.length);
-    this.#usage!.wrap(cols);
+    this.#usage.wrap(cols);
     return this;
   }
 
@@ -1365,7 +1386,7 @@ export class YargsInstance {
       // configObjects is not a parsing hint array
       if (((key): key is 'configObjects' => key === 'configObjects')(hintKey))
         return;
-      const hint = this.#options![hintKey];
+      const hint = this.#options[hintKey];
       if (Array.isArray(hint)) {
         if (~hint.indexOf(optionKey)) hint.splice(hint.indexOf(optionKey), 1);
       } else if (typeof hint === 'object') {
@@ -1373,12 +1394,12 @@ export class YargsInstance {
       }
     });
     // now delete the description from usage.js.
-    delete this.#usage!.getDescriptions()[optionKey];
+    delete this.#usage.getDescriptions()[optionKey];
   }
   [kFreeze]() {
     this.#frozens.push({
-      options: this.#options!,
-      configObjects: this.#options!.configObjects.slice(0),
+      options: this.#options,
+      configObjects: this.#options.configObjects.slice(0),
       exitProcess: this.#exitProcess,
       groups: this.#groups,
       strict: this.#strict,
@@ -1392,9 +1413,9 @@ export class YargsInstance {
       parseFn: this.#parseFn!,
       parseContext: this.#parseContext,
     });
-    this.#usage!.freeze();
-    this.#validation!.freeze();
-    this.#command!.freeze();
+    this.#usage.freeze();
+    this.#validation.freeze();
+    this.#command.freeze();
     this.#globalMiddleware.freeze();
   }
   [kGetDollarZero](): string {
@@ -1402,24 +1423,30 @@ export class YargsInstance {
     // ignore the node bin, specify this in your
     // bin file with #!/usr/bin/env node
     let default$0: string[];
-    if (/\b(node|iojs|electron)(\.exe)?$/.test(shim.process.argv()[0])) {
-      default$0 = shim.process.argv().slice(1, 2);
+    if (/\b(node|iojs|electron)(\.exe)?$/.test(this.#shim.process.argv()[0])) {
+      default$0 = this.#shim.process.argv().slice(1, 2);
     } else {
-      default$0 = shim.process.argv().slice(0, 1);
+      default$0 = this.#shim.process.argv().slice(0, 1);
     }
 
     $0 = default$0
       .map(x => {
-        const b = rebase(this.#cwd, x);
+        const b = this[kRebase](this.#cwd, x);
         return x.match(/^(\/|([a-zA-Z]:)?\\)/) && b.length < x.length ? b : x;
       })
       .join(' ')
       .trim();
 
-    if (shim.getEnv('_') && shim.getProcessArgvBin() === shim.getEnv('_')) {
-      $0 = shim
+    if (
+      this.#shim.getEnv('_') &&
+      this.#shim.getProcessArgvBin() === this.#shim.getEnv('_')
+    ) {
+      $0 = this.#shim
         .getEnv('_')!
-        .replace(`${shim.path.dirname(shim.process.execPath())}/`, '');
+        .replace(
+          `${this.#shim.path.dirname(this.#shim.process.execPath())}/`,
+          ''
+        );
     }
     return $0;
   }
@@ -1429,10 +1456,10 @@ export class YargsInstance {
   [kGuessLocale]() {
     if (!this.#detectLocale) return;
     const locale =
-      shim.getEnv('LC_ALL') ||
-      shim.getEnv('LC_MESSAGES') ||
-      shim.getEnv('LANG') ||
-      shim.getEnv('LANGUAGE') ||
+      this.#shim.getEnv('LC_ALL') ||
+      this.#shim.getEnv('LC_MESSAGES') ||
+      this.#shim.getEnv('LANG') ||
+      this.#shim.getEnv('LANGUAGE') ||
       'en_US';
     this.locale(locale.replace(/[.:].*/, ''));
   }
@@ -1448,7 +1475,7 @@ export class YargsInstance {
 
     for (let i = 0, arg; (arg = args[i]) !== undefined; i++) {
       if (
-        shim.Parser.looksLikeNumber(arg) &&
+        this.#shim.Parser.looksLikeNumber(arg) &&
         Number.isSafeInteger(Math.floor(parseFloat(`${arg}`)))
       ) {
         args[i] = Number(arg);
@@ -1462,16 +1489,16 @@ export class YargsInstance {
 
     let obj = {};
     try {
-      let startDir = rootPath || shim.mainFilename;
+      let startDir = rootPath || this.#shim.mainFilename;
 
       // When called in an environment that lacks require.main.filename, such as a jest test runner,
       // startDir is already process.cwd(), and should not be shortened.
       // Whether or not it is _actually_ a directory (e.g., extensionless bin) is irrelevant, find-up handles it.
-      if (!rootPath && shim.path.extname(startDir)) {
-        startDir = shim.path.dirname(startDir);
+      if (!rootPath && this.#shim.path.extname(startDir)) {
+        startDir = this.#shim.path.dirname(startDir);
       }
 
-      const pkgJsonPath = shim.findUp(
+      const pkgJsonPath = this.#shim.findUp(
         startDir,
         (dir: string[], names: string[]) => {
           if (names.includes('package.json')) {
@@ -1481,8 +1508,8 @@ export class YargsInstance {
           }
         }
       );
-      assertNotStrictEqual(pkgJsonPath, undefined, shim);
-      obj = JSON.parse(shim.readFileSync(pkgJsonPath, 'utf8'));
+      assertNotStrictEqual(pkgJsonPath, undefined, this.#shim);
+      obj = JSON.parse(this.#shim.readFileSync(pkgJsonPath, 'utf8'));
       // eslint-disable-next-line no-empty
     } catch (_noop) {}
 
@@ -1496,7 +1523,7 @@ export class YargsInstance {
     keys = ([] as string[]).concat(keys);
     keys.forEach(key => {
       key = this[kSanitizeKey](key);
-      this.#options![type].push(key);
+      this.#options[type].push(key);
     });
   }
   [kPopulateParserHintSingleValueDictionary]<
@@ -1517,7 +1544,7 @@ export class YargsInstance {
       key,
       value,
       (type, key, value) => {
-        this.#options![type][key] = value as ValueOf<Options[T]>;
+        this.#options[type][key] = value as ValueOf<Options[T]>;
       }
     );
   }
@@ -1539,8 +1566,8 @@ export class YargsInstance {
       key,
       value,
       (type, key, value) => {
-        this.#options![type][key] = (
-          this.#options![type][key] || ([] as Options[T][keyof Options[T]])
+        this.#options[type][key] = (
+          this.#options[type][key] || ([] as Options[T][keyof Options[T]])
         ).concat(value);
       }
     );
@@ -1590,7 +1617,7 @@ export class YargsInstance {
   }
   [kUnfreeze]() {
     const frozen = this.#frozens.pop();
-    assertNotStrictEqual(frozen, undefined, shim);
+    assertNotStrictEqual(frozen, undefined, this.#shim);
     let configObjects: Dictionary[];
     ({
       options: this.#options,
@@ -1609,9 +1636,9 @@ export class YargsInstance {
       parseContext: this.#parseContext,
     } = frozen);
     this.#options.configObjects = configObjects;
-    this.#usage!.unfreeze();
-    this.#validation!.unfreeze();
-    this.#command!.unfreeze();
+    this.#usage.unfreeze();
+    this.#validation.unfreeze();
+    this.#command.unfreeze();
     this.#globalMiddleware.unfreeze();
   }
   // If argv is a promise (which is possible if async middleware is used)
@@ -1649,7 +1676,7 @@ export class YargsInstance {
     };
   }
   [kGetCommandInstance](): CommandInstance {
-    return this.#command!;
+    return this.#command;
   }
   [kGetContext](): Context {
     return this.#context;
@@ -1664,10 +1691,10 @@ export class YargsInstance {
     return this.#parseContext || {};
   }
   [kGetUsageInstance](): UsageInstance {
-    return this.#usage!;
+    return this.#usage;
   }
   [kGetValidationInstance](): ValidationInstance {
-    return this.#validation!;
+    return this.#validation;
   }
   [kHasParseCallback](): boolean {
     return !!this.#parseFn;
@@ -1760,14 +1787,14 @@ export class YargsInstance {
     ];
 
     arrayOptions.forEach(k => {
-      tmpOptions[k] = (this.#options![k] || []).filter(
+      tmpOptions[k] = (this.#options[k] || []).filter(
         (k: string) => !localLookup[k]
       );
     });
 
     objectOptions.forEach(<K extends DictionaryKeyof<Options>>(k: K) => {
       tmpOptions[k] = objFilter(
-        this.#options![k],
+        this.#options[k],
         k => !localLookup[k as string]
       );
     });
@@ -1779,15 +1806,25 @@ export class YargsInstance {
     // instances of all our helpers -- otherwise just reset.
     this.#usage = this.#usage
       ? this.#usage.reset(localLookup)
-      : Usage(this, this.#y18n, shim);
+      : Usage(this, this.#shim);
     this.#validation = this.#validation
       ? this.#validation.reset(localLookup)
-      : Validation(this, this.#usage, this.#y18n, shim);
+      : Validation(this, this.#usage, this.#shim);
     this.#command = this.#command
       ? this.#command.reset()
-      : Command(this.#usage, this.#validation, this.#globalMiddleware, shim);
+      : Command(
+          this.#usage,
+          this.#validation,
+          this.#globalMiddleware,
+          this.#shim
+        );
     if (!this.#completion)
-      this.#completion = Completion(this, this.#usage, this.#command, shim);
+      this.#completion = Completion(
+        this,
+        this.#usage,
+        this.#command,
+        this.#shim
+      );
     this.#globalMiddleware.reset();
 
     this.#completionCommand = null;
@@ -1797,6 +1834,9 @@ export class YargsInstance {
     this.parsed = false;
 
     return this;
+  }
+  [kRebase](base: string, dir: string): string {
+    return this.#shim.path.relative(base, dir);
   }
   [kRunYargsParserAndExecuteCommands](
     args: string | string[] | null,
@@ -1808,14 +1848,14 @@ export class YargsInstance {
     let skipValidation = !!calledFromCommand || helpOnly;
     args = args || this.#processArgs;
 
-    this.#options!.__ = this.#y18n.__;
-    this.#options!.configuration = this[kGetParserConfiguration]();
+    this.#options.__ = this.#shim.y18n.__;
+    this.#options.configuration = this[kGetParserConfiguration]();
 
-    const populateDoubleDash = !!this.#options!.configuration['populate--'];
-    const config = Object.assign({}, this.#options!.configuration, {
+    const populateDoubleDash = !!this.#options.configuration['populate--'];
+    const config = Object.assign({}, this.#options.configuration, {
       'populate--': true,
     });
-    const parsed = shim.Parser.detailed(
+    const parsed = this.#shim.Parser.detailed(
       args,
       Object.assign({}, this.#options, {
         configuration: {'parse-positional-numbers': false, ...config},
@@ -1847,7 +1887,7 @@ export class YargsInstance {
     // When a prior parse has completed and a new parse is beginning, we
     // need to clear the cached help message from the previous parse:
     if (commandIndex === 0) {
-      this.#usage!.clearCachedHelpMessage();
+      this.#usage.clearCachedHelpMessage();
     }
 
     try {
@@ -1881,7 +1921,7 @@ export class YargsInstance {
         }
       }
 
-      const handlerKeys = this.#command!.getCommands();
+      const handlerKeys = this.#command.getCommands();
       const requestCompletions = this.#completion!.completionKey in argv;
       const skipRecommendation = helpOptSet || requestCompletions || helpOnly;
 
@@ -1894,7 +1934,7 @@ export class YargsInstance {
               // commands are executed using a recursive algorithm that executes
               // the deepest command first; we keep track of the position in the
               // argv._ array that is currently being executed.
-              const innerArgv = this.#command!.runCommand(
+              const innerArgv = this.#command.runCommand(
                 cmd,
                 this,
                 parsed,
@@ -1921,12 +1961,12 @@ export class YargsInstance {
           // recommend a command if recommendCommands() has
           // been enabled, and no commands were found to execute
           if (
-            !this.#command!.hasDefaultCommand() &&
+            !this.#command.hasDefaultCommand() &&
             this.#recommendCommands &&
             firstUnknownCommand &&
             !skipRecommendation
           ) {
-            this.#validation!.recommendCommands(
+            this.#validation.recommendCommands(
               firstUnknownCommand,
               handlerKeys
             );
@@ -1945,8 +1985,8 @@ export class YargsInstance {
         }
       }
 
-      if (this.#command!.hasDefaultCommand() && !skipRecommendation) {
-        const innerArgv = this.#command!.runCommand(
+      if (this.#command.hasDefaultCommand() && !skipRecommendation) {
+        const innerArgv = this.#command.runCommand(
           null,
           this,
           parsed,
@@ -1964,7 +2004,7 @@ export class YargsInstance {
         // TODO(bcoe): what if the default builder is async?
         // TODO(bcoe): add better comments for runDefaultBuilderOn, why
         // are we doing this?
-        this.#command!.runDefaultBuilderOn(this);
+        this.#command.runDefaultBuilderOn(this);
       }
 
       // we must run completions first, a user might
@@ -2000,23 +2040,22 @@ export class YargsInstance {
           if (this.#exitProcess) setBlocking(true);
           skipValidation = true;
           // TODO: add appropriate comment.
-          if (!calledFromCommand) this.#command!.runDefaultBuilderOn(this);
+          if (!calledFromCommand) this.#command.runDefaultBuilderOn(this);
           this.showHelp('log');
           this.exit(0);
         } else if (versionOptSet) {
           if (this.#exitProcess) setBlocking(true);
           skipValidation = true;
-          this.#usage!.showVersion('log');
+          this.#usage.showVersion('log');
           this.exit(0);
         }
       }
 
       // Check if any of the options to skip validation were provided
-      if (!skipValidation && this.#options!.skipValidation.length > 0) {
+      if (!skipValidation && this.#options.skipValidation.length > 0) {
         skipValidation = Object.keys(argv).some(
           key =>
-            this.#options!.skipValidation.indexOf(key) >= 0 &&
-            argv[key] === true
+            this.#options.skipValidation.indexOf(key) >= 0 && argv[key] === true
         );
       }
 
@@ -2051,7 +2090,7 @@ export class YargsInstance {
         }
       }
     } catch (err) {
-      if (err instanceof YError) this.#usage!.fail(err.message, err);
+      if (err instanceof YError) this.#usage.fail(err.message, err);
       else throw err;
     }
 
@@ -2073,64 +2112,31 @@ export class YargsInstance {
     const demandedOptions = {...this.getDemandedOptions()};
     return (argv: Arguments) => {
       if (parseErrors) throw new YError(parseErrors.message);
-      this.#validation!.nonOptionCount(argv);
-      this.#validation!.requiredArguments(argv, demandedOptions);
+      this.#validation.nonOptionCount(argv);
+      this.#validation.requiredArguments(argv, demandedOptions);
       let failedStrictCommands = false;
       if (this.#strictCommands) {
-        failedStrictCommands = this.#validation!.unknownCommands(argv);
+        failedStrictCommands = this.#validation.unknownCommands(argv);
       }
       if (this.#strict && !failedStrictCommands) {
-        this.#validation!.unknownArguments(
+        this.#validation.unknownArguments(
           argv,
           aliases,
           positionalMap,
           !!isDefaultCommand
         );
       } else if (this.#strictOptions) {
-        this.#validation!.unknownArguments(argv, aliases, {}, false, false);
+        this.#validation.unknownArguments(argv, aliases, {}, false, false);
       }
-      this.#validation!.limitedChoices(argv);
-      this.#validation!.implications(argv);
-      this.#validation!.conflicting(argv);
+      this.#validation.limitedChoices(argv);
+      this.#validation.implications(argv);
+      this.#validation.conflicting(argv);
     };
   }
   [kSetHasOutput]() {
     this.#hasOutput = true;
   }
 }
-
-// TODO(bcoe): simplify bootstrapping process so that only a single factory
-// method is used, and shim is not set globally.
-function YargsFactory(
-  processArgs: string | string[] = [],
-  cwd = shim.process.cwd(),
-  parentRequire?: RequireType
-): YargsInstance {
-  const yargs = new YargsInstance(processArgs, cwd, parentRequire);
-
-  // Legacy yargs.argv interface, it's recommended that you use .parse().
-  Object.defineProperty(yargs, 'argv', {
-    get: () => {
-      return yargs.parse();
-    },
-    enumerable: true,
-  });
-
-  // an app should almost always have --version and --help,
-  // if you *really* want to disable this use .help(false)/.version(false).
-  yargs.help();
-  yargs.version();
-  return yargs;
-}
-
-// rebase an absolute path to a relative one with respect to a base directory
-// exported for tests
-export interface RebaseFunction {
-  (base: string, dir: string): string;
-}
-
-export const rebase: RebaseFunction = (base, dir) =>
-  shim.path.relative(base, dir);
 
 export function isYargsInstance(y: YargsInstance | void): y is YargsInstance {
   return !!y && typeof y.getInternalMethods === 'function';

@@ -1,6 +1,6 @@
 // this file handles outputting usage instructions,
 // failures, etc. keeps logging in one place.
-import {Dictionary, PlatformShim, Y18N} from './typings/common-types.js';
+import {Dictionary, PlatformShim} from './typings/common-types.js';
 import {objFilter} from './utils/obj-filter.js';
 import {YargsInstance} from './yargs-factory.js';
 import {YError} from './yerror.js';
@@ -11,8 +11,8 @@ function isBoolean(fail: FailureFunction | boolean): fail is boolean {
   return typeof fail === 'boolean';
 }
 
-export function usage(yargs: YargsInstance, y18n: Y18N, shim: PlatformShim) {
-  const __ = y18n.__;
+export function usage(yargs: YargsInstance, shim: PlatformShim) {
+  const __ = shim.y18n.__;
   const self = {} as UsageInstance;
 
   // methods for ouputting/building failure message.

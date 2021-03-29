@@ -2,7 +2,6 @@ import {argsert} from './argsert.js';
 import {
   Dictionary,
   assertNotStrictEqual,
-  Y18N,
   PlatformShim,
 } from './typings/common-types.js';
 import {levenshtein as distance} from './utils/levenshtein.js';
@@ -18,11 +17,10 @@ const specialKeys = ['$0', '--', '_'];
 export function validation(
   yargs: YargsInstance,
   usage: UsageInstance,
-  y18n: Y18N,
   shim: PlatformShim
 ) {
-  const __ = y18n.__;
-  const __n = y18n.__n;
+  const __ = shim.y18n.__;
+  const __n = shim.y18n.__n;
   const self = {} as ValidationInstance;
 
   // validate appropriate # of non-option

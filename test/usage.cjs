@@ -1707,21 +1707,6 @@ describe('usage tests', () => {
     });
   });
 
-  it('should succeed when rebase', () => {
-    rebase(
-      ['home', 'chevex'].join(path.sep),
-      ['home', 'chevex', 'foo', 'bar', 'baz'].join(path.sep)
-    ).should.equal(['foo', 'bar', 'baz'].join(path.sep));
-    rebase(
-      ['home', 'chevex', 'foo', 'bar', 'baz'].join(path.sep),
-      ['home', 'chevex'].join(path.sep)
-    ).should.equal(['..', '..', '..'].join(path.sep));
-    rebase(
-      ['home', 'chevex', 'foo'].join(path.sep),
-      ['home', 'chevex', 'pow', 'zoom.txt'].join(path.sep)
-    ).should.equal(['..', 'pow', 'zoom.txt'].join(path.sep));
-  });
-
   it('should not print usage string if help() is called without arguments', () => {
     const r = checkUsage(() => yargs([]).usage('foo').help().parse());
 
