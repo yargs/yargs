@@ -70,8 +70,43 @@ export function YargsWithShim(_shim: PlatformShim) {
 
 // Used to expose private methods to other module-level classes,
 // such as the command parser and usage printer.
+const kCopyDoubleDash = Symbol('copyDoubleDash');
+const kCreateLogger = Symbol('copyDoubleDash');
+const kDeleteFromParserHintObject = Symbol('deleteFromParserHintObject');
+const kFreeze = Symbol('freeze');
+const kGetDollarZero = Symbol('getDollarZero');
+const kGetParserConfiguration = Symbol('getParserConfiguration');
+const kGuessLocale = Symbol('guessLocale');
+const kGuessVersion = Symbol('guessVersion');
+const kParsePositionalNumbers = Symbol('parsePositionalNumbers');
+const kPkgUp = Symbol('pkgUp');
+const kPopulateParserHintArray = Symbol('populateParserHintArray');
+const kPopulateParserHintSingleValueDictionary = Symbol(
+  'populateParserHintSingleValueDictionary'
+);
+const kPopulateParserHintArrayDictionary = Symbol(
+  'populateParserHintArrayDictionary'
+);
+const kPopulateParserHintDictionary = Symbol('populateParserHintDictionary');
+const kSanitizeKey = Symbol('sanitizeKey');
+const kSetKey = Symbol('setKey');
+const kUnfreeze = Symbol('unfreeze');
+const kValidateAsync = Symbol('validateAsync');
+const kGetCommandInstance = Symbol('getCommandInstance');
+const kGetContext = Symbol('getContext');
+const kGetHasOutput = Symbol('getHasOutput');
+const kGetLoggerInstance = Symbol('getLoggerInstance');
+const kGetParseContext = Symbol('getParseContext');
+const kGetUsageInstance = Symbol('getUsageInstance');
+const kGetValidationInstance = Symbol('getValidationInstance');
+const kHasParseCallback = Symbol('hasParseCallback');
+const kPostProcess = Symbol('postProcess');
 const kReset = Symbol('reset');
-
+const kRunYargsParserAndExecuteCommands = Symbol(
+  'runYargsParserAndExecuteCommands'
+);
+const kRunValidation = Symbol('runValidation');
+const kSetHasOutput = Symbol('setHasOutput');
 export interface YargsInternalMethods {
   getCommandInstance(): CommandInstance;
   getContext(): Context;
@@ -155,12 +190,12 @@ export class YargsInstance {
     this.#cwd = cwd;
     this.#parentRequire = parentRequire;
     this.#globalMiddleware = new GlobalMiddleware(this);
-    this.$0 = this.getDollarZero();
+    this.$0 = this[kGetDollarZero]();
     this.#y18n = shim.y18n;
     // TODO(@bcoe): make reset initialize dependent classes so ! is not required.
     this[kReset]();
     this.#options!.showHiddenOpt = this.#defaultShowHiddenOpt;
-    this.#logger = this.createLogger();
+    this.#logger = this[kCreateLogger]();
   }
   addHelpOpt(opt?: string | false, msg?: string): YargsInstance {
     const defaultHelpOpt = 'help';
@@ -169,7 +204,7 @@ export class YargsInstance {
     // nuke the key previously configured
     // to return help.
     if (this.#helpOpt) {
-      this.deleteFromParserHintObject(this.#helpOpt);
+      this[kDeleteFromParserHintObject](this.#helpOpt);
       this.#helpOpt = null;
     }
 
@@ -214,7 +249,7 @@ export class YargsInstance {
       [key, value],
       arguments.length
     );
-    this.populateParserHintArrayDictionary(
+    this[kPopulateParserHintArrayDictionary](
       this.alias.bind(this),
       'alias',
       key,
@@ -224,12 +259,12 @@ export class YargsInstance {
   }
   array(keys: string | string[]): YargsInstance {
     argsert('<array|string>', [keys], arguments.length);
-    this.populateParserHintArray('array', keys);
+    this[kPopulateParserHintArray]('array', keys);
     return this;
   }
   boolean(keys: string | string[]): YargsInstance {
     argsert('<array|string>', [keys], arguments.length);
-    this.populateParserHintArray('boolean', keys);
+    this[kPopulateParserHintArray]('boolean', keys);
     return this;
   }
   check(f: (argv: Arguments) => any, global?: boolean): YargsInstance {
@@ -275,7 +310,7 @@ export class YargsInstance {
       [key, value],
       arguments.length
     );
-    this.populateParserHintArrayDictionary(
+    this[kPopulateParserHintArrayDictionary](
       this.choices.bind(this),
       'choices',
       key,
@@ -367,7 +402,7 @@ export class YargsInstance {
       key = applyExtends(
         key,
         this.#cwd,
-        this.getParserConfiguration()['deep-merge-config'] || false,
+        this[kGetParserConfiguration]()['deep-merge-config'] || false,
         shim
       );
       this.#options!.configObjects = (
@@ -471,7 +506,7 @@ export class YargsInstance {
   }
   count(keys: string | string[]): YargsInstance {
     argsert('<array|string>', [keys], arguments.length);
-    this.populateParserHintArray('count', keys);
+    this[kPopulateParserHintArray]('count', keys);
     return this;
   }
   default(
@@ -496,7 +531,7 @@ export class YargsInstance {
         ] = this.#usage!.functionDescription(value);
       value = value.call();
     }
-    this.populateParserHintSingleValueDictionary<'default'>(
+    this[kPopulateParserHintSingleValueDictionary]<'default'>(
       this.default.bind(this),
       'default',
       key,
@@ -581,7 +616,7 @@ export class YargsInstance {
     msg?: string
   ): YargsInstance {
     argsert('<object|string|array> [string]', [keys, msg], arguments.length);
-    this.populateParserHintSingleValueDictionary(
+    this[kPopulateParserHintSingleValueDictionary](
       this.demandOption.bind(this),
       'demandedOptions',
       keys,
@@ -603,7 +638,7 @@ export class YargsInstance {
       [keys, description],
       arguments.length
     );
-    this.setKey(keys, true);
+    this[kSetKey](keys, true);
     this.#usage!.describe(keys, description);
     return this;
   }
@@ -710,7 +745,7 @@ export class YargsInstance {
       if (!this.parsed) {
         // Run the parser as if --help was passed to it (this is what
         // the last parameter `true` indicates).
-        const parse = this.runYargsParserAndExecuteCommands(
+        const parse = this[kRunYargsParserAndExecuteCommands](
           this.#processArgs,
           undefined,
           undefined,
@@ -789,7 +824,7 @@ export class YargsInstance {
   locale(locale?: string): YargsInstance | string {
     argsert('[string]', [locale], arguments.length);
     if (!locale) {
-      this.guessLocale();
+      this[kGuessLocale]();
       return this.#y18n.getLocale();
     }
     this.#detectLocale = false;
@@ -812,7 +847,7 @@ export class YargsInstance {
     value?: number
   ): YargsInstance {
     argsert('<string|object|array> [number]', [key, value], arguments.length);
-    this.populateParserHintSingleValueDictionary(
+    this[kPopulateParserHintSingleValueDictionary](
       this.nargs.bind(this),
       'narg',
       key,
@@ -822,12 +857,12 @@ export class YargsInstance {
   }
   normalize(keys: string | string[]): YargsInstance {
     argsert('<array|string>', [keys], arguments.length);
-    this.populateParserHintArray('normalize', keys);
+    this[kPopulateParserHintArray]('normalize', keys);
     return this;
   }
   number(keys: string | string[]): YargsInstance {
     argsert('<array|string>', [keys], arguments.length);
-    this.populateParserHintArray('number', keys);
+    this[kPopulateParserHintArray]('number', keys);
     return this;
   }
   option(
@@ -969,11 +1004,11 @@ export class YargsInstance {
       [args, shortCircuit, _parseFn],
       arguments.length
     );
-    this.freeze(); // Push current state of parser onto stack.
+    this[kFreeze](); // Push current state of parser onto stack.
     if (typeof args === 'undefined') {
-      const argv = this.runYargsParserAndExecuteCommands(this.#processArgs);
+      const argv = this[kRunYargsParserAndExecuteCommands](this.#processArgs);
       const tmpParsed = this.parsed;
-      this.unfreeze(); // Pop the stack.
+      this[kUnfreeze](); // Pop the stack.
       this.parsed = tmpParsed;
       return argv;
     }
@@ -998,10 +1033,13 @@ export class YargsInstance {
 
     if (this.#parseFn) this.#exitProcess = false;
 
-    const parsed = this.runYargsParserAndExecuteCommands(args, !!shortCircuit);
+    const parsed = this[kRunYargsParserAndExecuteCommands](
+      args,
+      !!shortCircuit
+    );
     this.#completion!.setParsed(this.parsed as DetailedArguments);
     if (this.#parseFn) this.#parseFn(this.#exitError, parsed, this.#output);
-    this.unfreeze(); // Pop the stack.
+    this[kUnfreeze](); // Pop the stack.
     return parsed;
   }
   parserConfiguration(config: Configuration) {
@@ -1015,14 +1053,14 @@ export class YargsInstance {
     // prefer cwd to require-main-filename in this method
     // since we're looking for e.g. "nyc" config in nyc consumer
     // rather than "yargs" config in nyc (where nyc is the main filename)
-    const obj = this.pkgUp(rootPath || this.#cwd);
+    const obj = this[kPkgUp](rootPath || this.#cwd);
 
     // If an object exists in the key, add it to options.configObjects
     if (obj[key] && typeof obj[key] === 'object') {
       conf = applyExtends(
         obj[key] as {[key: string]: string},
         rootPath || this.#cwd,
-        this.getParserConfiguration()['deep-merge-config'] || false,
+        this[kGetParserConfiguration]()['deep-merge-config'] || false,
         shim
       );
       this.#options!.configObjects = (
@@ -1112,7 +1150,7 @@ export class YargsInstance {
     if (typeof keys === 'string' && this.#options!.narg[keys]) {
       return this;
     } else {
-      this.populateParserHintSingleValueDictionary(
+      this[kPopulateParserHintSingleValueDictionary](
         this.requiresArg.bind(this),
         'narg',
         keys,
@@ -1141,7 +1179,7 @@ export class YargsInstance {
       if (!this.parsed) {
         // Run the parser as if --help was passed to it (this is what
         // the last parameter `true` indicates).
-        const parse = this.runYargsParserAndExecuteCommands(
+        const parse = this[kRunYargsParserAndExecuteCommands](
           this.#processArgs,
           undefined,
           undefined,
@@ -1178,7 +1216,7 @@ export class YargsInstance {
   }
   skipValidation(keys: string | string[]): YargsInstance {
     argsert('<array|string>', [keys], arguments.length);
-    this.populateParserHintArray('skipValidation', keys);
+    this[kPopulateParserHintArray]('skipValidation', keys);
     return this;
   }
   strict(enabled?: boolean): YargsInstance {
@@ -1198,7 +1236,7 @@ export class YargsInstance {
   }
   string(key: string | string[]): YargsInstance {
     argsert('<array|string>', [key], arguments.length);
-    this.populateParserHintArray('string', key);
+    this[kPopulateParserHintArray]('string', key);
     return this;
   }
   terminalWidth(): number | null {
@@ -1253,13 +1291,13 @@ export class YargsInstance {
     // nuke the key previously configured
     // to return version #.
     if (this.#versionOpt) {
-      this.deleteFromParserHintObject(this.#versionOpt);
+      this[kDeleteFromParserHintObject](this.#versionOpt);
       this.#usage!.version(undefined);
       this.#versionOpt = null;
     }
 
     if (arguments.length === 0) {
-      ver = this.guessVersion();
+      ver = this[kGuessVersion]();
       opt = defaultVersionOpt;
     } else if (arguments.length === 1) {
       if (opt === false) {
@@ -1290,7 +1328,7 @@ export class YargsInstance {
   // to simplify the parsing of positionals in commands,
   // we temporarily populate '--' rather than _, with arguments
   // after the '--' directive. After the parse, we copy these back.
-  private copyDoubleDash(argv: Arguments): any {
+  [kCopyDoubleDash](argv: Arguments): any {
     if (!argv._ || !argv['--']) return argv;
     // eslint-disable-next-line prefer-spread
     argv._.push.apply(argv._, argv['--']);
@@ -1304,23 +1342,23 @@ export class YargsInstance {
 
     return argv;
   }
-  private createLogger(): LoggerInstance {
+  [kCreateLogger](): LoggerInstance {
     return {
       log: (...args: any[]) => {
-        if (!this.hasParseCallback()) console.log(...args);
+        if (!this[kHasParseCallback]()) console.log(...args);
         this.#hasOutput = true;
         if (this.#output.length) this.#output += '\n';
         this.#output += args.join(' ');
       },
       error: (...args: any[]) => {
-        if (!this.hasParseCallback()) console.error(...args);
+        if (!this[kHasParseCallback]()) console.error(...args);
         this.#hasOutput = true;
         if (this.#output.length) this.#output += '\n';
         this.#output += args.join(' ');
       },
     };
   }
-  private deleteFromParserHintObject(optionKey: string) {
+  [kDeleteFromParserHintObject](optionKey: string) {
     // delete from all parsing hints:
     // boolean, array, key, alias, etc.
     objectKeys(this.#options).forEach((hintKey: keyof Options) => {
@@ -1337,7 +1375,7 @@ export class YargsInstance {
     // now delete the description from usage.js.
     delete this.#usage!.getDescriptions()[optionKey];
   }
-  private freeze() {
+  [kFreeze]() {
     this.#frozens.push({
       options: this.#options!,
       configObjects: this.#options!.configObjects.slice(0),
@@ -1359,7 +1397,7 @@ export class YargsInstance {
     this.#command!.freeze();
     this.#globalMiddleware.freeze();
   }
-  private getDollarZero(): string {
+  [kGetDollarZero](): string {
     let $0 = '';
     // ignore the node bin, specify this in your
     // bin file with #!/usr/bin/env node
@@ -1385,10 +1423,10 @@ export class YargsInstance {
     }
     return $0;
   }
-  private getParserConfiguration(): Configuration {
+  [kGetParserConfiguration](): Configuration {
     return this.#parserConfig;
   }
-  private guessLocale() {
+  [kGuessLocale]() {
     if (!this.#detectLocale) return;
     const locale =
       shim.getEnv('LC_ALL') ||
@@ -1398,14 +1436,14 @@ export class YargsInstance {
       'en_US';
     this.locale(locale.replace(/[.:].*/, ''));
   }
-  private guessVersion(): string {
-    const obj = this.pkgUp();
+  [kGuessVersion](): string {
+    const obj = this[kPkgUp]();
     return (obj.version as string) || 'unknown';
   }
   // We wait to coerce numbers for positionals until after the initial parse.
   // This allows commands to configure number parsing on a positional by
   // positional basis:
-  private parsePositionalNumbers(argv: Arguments): any {
+  [kParsePositionalNumbers](argv: Arguments): any {
     const args: (string | number)[] = argv['--'] ? argv['--'] : argv._;
 
     for (let i = 0, arg; (arg = args[i]) !== undefined; i++) {
@@ -1418,7 +1456,7 @@ export class YargsInstance {
     }
     return argv;
   }
-  private pkgUp(rootPath?: string) {
+  [kPkgUp](rootPath?: string) {
     const npath = rootPath || '*';
     if (this.#pkgs[npath]) return this.#pkgs[npath];
 
@@ -1451,17 +1489,17 @@ export class YargsInstance {
     this.#pkgs[npath] = obj || {};
     return this.#pkgs[npath];
   }
-  private populateParserHintArray<T extends KeyOf<Options, string[]>>(
+  [kPopulateParserHintArray]<T extends KeyOf<Options, string[]>>(
     type: T,
     keys: string | string[]
   ) {
     keys = ([] as string[]).concat(keys);
     keys.forEach(key => {
-      key = this.sanitizeKey(key);
+      key = this[kSanitizeKey](key);
       this.#options![type].push(key);
     });
   }
-  private populateParserHintSingleValueDictionary<
+  [kPopulateParserHintSingleValueDictionary]<
     T extends
       | Exclude<DictionaryKeyof<Options>, DictionaryKeyof<Options, any[]>>
       | 'default',
@@ -1473,7 +1511,7 @@ export class YargsInstance {
     key: K | K[] | {[key in K]: V},
     value?: V
   ) {
-    this.populateParserHintDictionary<T, K, V>(
+    this[kPopulateParserHintDictionary]<T, K, V>(
       builder,
       type,
       key,
@@ -1483,7 +1521,7 @@ export class YargsInstance {
       }
     );
   }
-  private populateParserHintArrayDictionary<
+  [kPopulateParserHintArrayDictionary]<
     T extends DictionaryKeyof<Options, any[]>,
     K extends keyof Options[T] & string = keyof Options[T] & string,
     V extends ValueOf<ValueOf<Options[T]>> | ValueOf<ValueOf<Options[T]>>[] =
@@ -1495,7 +1533,7 @@ export class YargsInstance {
     key: K | K[] | {[key in K]: V},
     value?: V
   ) {
-    this.populateParserHintDictionary<T, K, V>(
+    this[kPopulateParserHintDictionary]<T, K, V>(
       builder,
       type,
       key,
@@ -1507,7 +1545,7 @@ export class YargsInstance {
       }
     );
   }
-  private populateParserHintDictionary<
+  [kPopulateParserHintDictionary]<
     T extends keyof Options,
     K extends keyof Options[T],
     V
@@ -1531,26 +1569,26 @@ export class YargsInstance {
         builder(k, key[k]);
       }
     } else {
-      singleKeyHandler(type, this.sanitizeKey(key), value);
+      singleKeyHandler(type, this[kSanitizeKey](key), value);
     }
   }
-  private sanitizeKey(key: any) {
+  [kSanitizeKey](key: any) {
     if (key === '__proto__') return '___proto___';
     return key;
   }
-  private setKey(
+  [kSetKey](
     key: string | string[] | Dictionary<string | boolean>,
     set?: boolean | string
   ) {
-    this.populateParserHintSingleValueDictionary(
-      this.setKey.bind(this),
+    this[kPopulateParserHintSingleValueDictionary](
+      this[kSetKey].bind(this),
       'key',
       key,
       set
     );
     return this;
   }
-  private unfreeze() {
+  [kUnfreeze]() {
     const frozen = this.#frozens.pop();
     assertNotStrictEqual(frozen, undefined, shim);
     let configObjects: Dictionary[];
@@ -1578,7 +1616,7 @@ export class YargsInstance {
   }
   // If argv is a promise (which is possible if async middleware is used)
   // delay applying validation until the promise has resolved:
-  private validateAsync(
+  [kValidateAsync](
     validation: (argv: Arguments) => void,
     argv: Arguments | Promise<Arguments>
   ): Arguments | Promise<Arguments> {
@@ -1592,49 +1630,49 @@ export class YargsInstance {
   // depended upon externally:
   getInternalMethods(): YargsInternalMethods {
     return {
-      getCommandInstance: this.getCommandInstance.bind(this),
-      getContext: this.getContext.bind(this),
-      getHasOutput: this.getHasOutput.bind(this),
-      getLoggerInstance: this.getLoggerInstance.bind(this),
-      getParseContext: this.getParseContext.bind(this),
-      getParserConfiguration: this.getParserConfiguration.bind(this),
-      getUsageInstance: this.getUsageInstance.bind(this),
-      getValidationInstance: this.getValidationInstance.bind(this),
-      hasParseCallback: this.hasParseCallback.bind(this),
-      postProcess: this.postProcess.bind(this),
+      getCommandInstance: this[kGetCommandInstance].bind(this),
+      getContext: this[kGetContext].bind(this),
+      getHasOutput: this[kGetHasOutput].bind(this),
+      getLoggerInstance: this[kGetLoggerInstance].bind(this),
+      getParseContext: this[kGetParseContext].bind(this),
+      getParserConfiguration: this[kGetParserConfiguration].bind(this),
+      getUsageInstance: this[kGetUsageInstance].bind(this),
+      getValidationInstance: this[kGetValidationInstance].bind(this),
+      hasParseCallback: this[kHasParseCallback].bind(this),
+      postProcess: this[kPostProcess].bind(this),
       reset: this[kReset].bind(this),
-      runValidation: this.runValidation.bind(this),
-      runYargsParserAndExecuteCommands: this.runYargsParserAndExecuteCommands.bind(
-        this
-      ),
-      setHasOutput: this.setHasOutput.bind(this),
+      runValidation: this[kRunValidation].bind(this),
+      runYargsParserAndExecuteCommands: this[
+        kRunYargsParserAndExecuteCommands
+      ].bind(this),
+      setHasOutput: this[kSetHasOutput].bind(this),
     };
   }
-  private getCommandInstance(): CommandInstance {
+  [kGetCommandInstance](): CommandInstance {
     return this.#command!;
   }
-  private getContext(): Context {
+  [kGetContext](): Context {
     return this.#context;
   }
-  private getHasOutput(): boolean {
+  [kGetHasOutput](): boolean {
     return this.#hasOutput;
   }
-  private getLoggerInstance(): LoggerInstance {
+  [kGetLoggerInstance](): LoggerInstance {
     return this.#logger;
   }
-  private getParseContext(): Object {
+  [kGetParseContext](): Object {
     return this.#parseContext || {};
   }
-  private getUsageInstance(): UsageInstance {
+  [kGetUsageInstance](): UsageInstance {
     return this.#usage!;
   }
-  private getValidationInstance(): ValidationInstance {
+  [kGetValidationInstance](): ValidationInstance {
     return this.#validation!;
   }
-  private hasParseCallback(): boolean {
+  [kHasParseCallback](): boolean {
     return !!this.#parseFn;
   }
-  private postProcess<T extends Arguments | Promise<Arguments>>(
+  [kPostProcess]<T extends Arguments | Promise<Arguments>>(
     argv: Arguments | Promise<Arguments>,
     populateDoubleDash: boolean,
     calledFromCommand: boolean,
@@ -1643,13 +1681,13 @@ export class YargsInstance {
     if (calledFromCommand) return argv;
     if (isPromise(argv)) return argv;
     if (!populateDoubleDash) {
-      argv = this.copyDoubleDash(argv);
+      argv = this[kCopyDoubleDash](argv);
     }
     const parsePositionalNumbers =
-      this.getParserConfiguration()['parse-positional-numbers'] ||
-      this.getParserConfiguration()['parse-positional-numbers'] === undefined;
+      this[kGetParserConfiguration]()['parse-positional-numbers'] ||
+      this[kGetParserConfiguration]()['parse-positional-numbers'] === undefined;
     if (parsePositionalNumbers) {
-      argv = this.parsePositionalNumbers(argv as Arguments);
+      argv = this[kParsePositionalNumbers](argv as Arguments);
     }
     if (runGlobalMiddleware) {
       argv = applyMiddleware(
@@ -1760,7 +1798,7 @@ export class YargsInstance {
 
     return this;
   }
-  private runYargsParserAndExecuteCommands(
+  [kRunYargsParserAndExecuteCommands](
     args: string | string[] | null,
     shortCircuit?: boolean | null,
     calledFromCommand?: boolean,
@@ -1771,7 +1809,7 @@ export class YargsInstance {
     args = args || this.#processArgs;
 
     this.#options!.__ = this.#y18n.__;
-    this.#options!.configuration = this.getParserConfiguration();
+    this.#options!.configuration = this[kGetParserConfiguration]();
 
     const populateDoubleDash = !!this.#options!.configuration['populate--'];
     const config = Object.assign({}, this.#options!.configuration, {
@@ -1813,13 +1851,13 @@ export class YargsInstance {
     }
 
     try {
-      this.guessLocale(); // guess locale lazily, so that it can be turned off in chain.
+      this[kGuessLocale](); // guess locale lazily, so that it can be turned off in chain.
 
       // while building up the argv object, there
       // are two passes through the parser. If completion
       // is being performed short-circuit on the first pass.
       if (shortCircuit) {
-        return this.postProcess(
+        return this[kPostProcess](
           argv,
           populateDoubleDash,
           !!calledFromCommand,
@@ -1866,7 +1904,7 @@ export class YargsInstance {
                 // Passed to builder so that expensive commands can be deferred:
                 helpOptSet || versionOptSet || helpOnly
               );
-              return this.postProcess(
+              return this[kPostProcess](
                 innerArgv,
                 populateDoubleDash,
                 !!calledFromCommand,
@@ -1916,7 +1954,7 @@ export class YargsInstance {
           helpOnly,
           helpOptSet || versionOptSet || helpOnly
         );
-        return this.postProcess(
+        return this[kPostProcess](
           innerArgv,
           populateDoubleDash,
           !!calledFromCommand,
@@ -1947,7 +1985,7 @@ export class YargsInstance {
           });
           this.exit(0);
         });
-        return this.postProcess(
+        return this[kPostProcess](
           argv,
           !populateDoubleDash,
           !!calledFromCommand,
@@ -1990,7 +2028,7 @@ export class YargsInstance {
         // if we're executed via bash completion, don't
         // bother with validation.
         if (!requestCompletions) {
-          const validation = this.runValidation(aliases, {}, parsed.error);
+          const validation = this[kRunValidation](aliases, {}, parsed.error);
           if (!calledFromCommand) {
             argvPromise = applyMiddleware(
               argv,
@@ -1999,7 +2037,7 @@ export class YargsInstance {
               true
             );
           }
-          argvPromise = this.validateAsync(validation, argvPromise ?? argv);
+          argvPromise = this[kValidateAsync](validation, argvPromise ?? argv);
           if (isPromise(argvPromise) && !calledFromCommand) {
             argvPromise = argvPromise.then(() => {
               return applyMiddleware(
@@ -2017,14 +2055,14 @@ export class YargsInstance {
       else throw err;
     }
 
-    return this.postProcess(
+    return this[kPostProcess](
       argvPromise ?? argv,
       populateDoubleDash,
       !!calledFromCommand,
       true
     );
   }
-  private runValidation(
+  [kRunValidation](
     aliases: Dictionary<string[]>,
     positionalMap: Dictionary<string[]>,
     parseErrors: Error | null,
@@ -2056,7 +2094,7 @@ export class YargsInstance {
       this.#validation!.conflicting(argv);
     };
   }
-  private setHasOutput() {
+  [kSetHasOutput]() {
     this.#hasOutput = true;
   }
 }

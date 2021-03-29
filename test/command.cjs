@@ -26,7 +26,7 @@ describe('Command', () => {
         'my awesome command',
         yargs => yargs
       );
-      const command = y.getCommandInstance();
+      const command = y.getInternalMethods().getCommandInstance();
       const handlers = command.getCommandHandlers();
       handlers.foo.demanded.should.deep.include({
         cmd: ['bar'],
@@ -116,7 +116,7 @@ describe('Command', () => {
         ['foo [awesome]', 'wat <yo>'],
         'my awesome command'
       );
-      const command = y.getCommandInstance();
+      const command = y.getInternalMethods().getCommandInstance();
       const handlers = command.getCommandHandlers();
       handlers.foo.optional.should.deep.include({
         cmd: ['awesome'],
@@ -299,7 +299,7 @@ describe('Command', () => {
       const deprecated = false;
 
       const y = yargs([]).command(cmd, desc);
-      const commands = y.getUsageInstance().getCommands();
+      const commands = y.getInternalMethods().getUsageInstance().getCommands();
       commands[0].should.deep.equal([
         cmd,
         desc,
@@ -317,7 +317,10 @@ describe('Command', () => {
       const deprecated = false;
 
       const y = yargs([]).command([cmd].concat(aliases), desc);
-      const usageCommands = y.getUsageInstance().getCommands();
+      const usageCommands = y
+        .getInternalMethods()
+        .getUsageInstance()
+        .getCommands();
       usageCommands[0].should.deep.equal([
         cmd,
         desc,
@@ -325,7 +328,10 @@ describe('Command', () => {
         aliases,
         deprecated,
       ]);
-      const cmdCommands = y.getCommandInstance().getCommands();
+      const cmdCommands = y
+        .getInternalMethods()
+        .getCommandInstance()
+        .getCommands();
       cmdCommands.should.deep.equal(['foo', 'bar', 'baz']);
     });
 
@@ -334,7 +340,7 @@ describe('Command', () => {
       const desc = false;
 
       const y = yargs([]).command(cmd, desc);
-      const commands = y.getUsageInstance().getCommands();
+      const commands = y.getInternalMethods().getUsageInstance().getCommands();
       commands.should.deep.equal([]);
     });
 
@@ -344,9 +350,15 @@ describe('Command', () => {
       const desc = false;
 
       const y = yargs([]).command([cmd].concat(aliases), desc);
-      const usageCommands = y.getUsageInstance().getCommands();
+      const usageCommands = y
+        .getInternalMethods()
+        .getUsageInstance()
+        .getCommands();
       usageCommands.should.deep.equal([]);
-      const cmdCommands = y.getCommandInstance().getCommands();
+      const cmdCommands = y
+        .getInternalMethods()
+        .getCommandInstance()
+        .getCommands();
       cmdCommands.should.deep.equal(['foo', 'bar', 'baz']);
     });
 
@@ -356,7 +368,10 @@ describe('Command', () => {
       const builder = yargs => yargs;
 
       const y = yargs([]).command(cmd, desc, builder);
-      const handlers = y.getCommandInstance().getCommandHandlers();
+      const handlers = y
+        .getInternalMethods()
+        .getCommandInstance()
+        .getCommandHandlers();
       handlers.foo.original.should.equal(cmd);
       handlers.foo.builder.should.equal(builder);
     });
@@ -369,7 +384,10 @@ describe('Command', () => {
       };
 
       const y = yargs([]).command(cmd, desc, builder);
-      const handlers = y.getCommandInstance().getCommandHandlers();
+      const handlers = y
+        .getInternalMethods()
+        .getCommandInstance()
+        .getCommandHandlers();
       handlers.foo.original.should.equal(cmd);
       handlers.foo.builder.should.equal(builder);
     });
@@ -385,7 +403,10 @@ describe('Command', () => {
       };
 
       const y = yargs([]).command(cmd, desc, module);
-      const handlers = y.getCommandInstance().getCommandHandlers();
+      const handlers = y
+        .getInternalMethods()
+        .getCommandInstance()
+        .getCommandHandlers();
       handlers.foo.original.should.equal(cmd);
       handlers.foo.builder.should.equal(module.builder);
       handlers.foo.handler.should.equal(module.handler);
@@ -402,7 +423,10 @@ describe('Command', () => {
       };
 
       const y = yargs([]).command(cmd, desc, module);
-      const handlers = y.getCommandInstance().getCommandHandlers();
+      const handlers = y
+        .getInternalMethods()
+        .getCommandInstance()
+        .getCommandHandlers();
       handlers.foo.original.should.equal(cmd);
       handlers.foo.builder.should.equal(module.builder);
       handlers.foo.handler.should.equal(module.handler);
@@ -422,11 +446,14 @@ describe('Command', () => {
       const deprecated = false;
 
       const y = yargs([]).command(module);
-      const handlers = y.getCommandInstance().getCommandHandlers();
+      const handlers = y
+        .getInternalMethods()
+        .getCommandInstance()
+        .getCommandHandlers();
       handlers.foo.original.should.equal(module.command);
       handlers.foo.builder.should.equal(module.builder);
       handlers.foo.handler.should.equal(module.handler);
-      const commands = y.getUsageInstance().getCommands();
+      const commands = y.getInternalMethods().getUsageInstance().getCommands();
       commands[0].should.deep.equal([
         module.command,
         module.describe,
@@ -450,11 +477,14 @@ describe('Command', () => {
       const deprecated = false;
 
       const y = yargs([]).command(module);
-      const handlers = y.getCommandInstance().getCommandHandlers();
+      const handlers = y
+        .getInternalMethods()
+        .getCommandInstance()
+        .getCommandHandlers();
       handlers.foo.original.should.equal(module.command);
       handlers.foo.builder.should.equal(module.builder);
       handlers.foo.handler.should.equal(module.handler);
-      const commands = y.getUsageInstance().getCommands();
+      const commands = y.getInternalMethods().getUsageInstance().getCommands();
       commands[0].should.deep.equal([
         module.command,
         module.description,
@@ -478,11 +508,14 @@ describe('Command', () => {
       const deprecated = false;
 
       const y = yargs([]).command(module);
-      const handlers = y.getCommandInstance().getCommandHandlers();
+      const handlers = y
+        .getInternalMethods()
+        .getCommandInstance()
+        .getCommandHandlers();
       handlers.foo.original.should.equal(module.command);
       handlers.foo.builder.should.equal(module.builder);
       handlers.foo.handler.should.equal(module.handler);
-      const commands = y.getUsageInstance().getCommands();
+      const commands = y.getInternalMethods().getUsageInstance().getCommands();
       commands[0].should.deep.equal([
         module.command,
         module.desc,
@@ -503,11 +536,14 @@ describe('Command', () => {
       };
 
       const y = yargs([]).command(module);
-      const handlers = y.getCommandInstance().getCommandHandlers();
+      const handlers = y
+        .getInternalMethods()
+        .getCommandInstance()
+        .getCommandHandlers();
       handlers.foo.original.should.equal(module.command);
       handlers.foo.builder.should.equal(module.builder);
       handlers.foo.handler.should.equal(module.handler);
-      const commands = y.getUsageInstance().getCommands();
+      const commands = y.getInternalMethods().getUsageInstance().getCommands();
       commands.should.deep.equal([]);
     });
 
@@ -521,11 +557,14 @@ describe('Command', () => {
       };
 
       const y = yargs([]).command(module);
-      const handlers = y.getCommandInstance().getCommandHandlers();
+      const handlers = y
+        .getInternalMethods()
+        .getCommandInstance()
+        .getCommandHandlers();
       handlers.foo.original.should.equal(module.command);
       handlers.foo.builder.should.equal(module.builder);
       handlers.foo.handler.should.equal(module.handler);
-      const commands = y.getUsageInstance().getCommands();
+      const commands = y.getInternalMethods().getUsageInstance().getCommands();
       commands.should.deep.equal([]);
     });
 
@@ -545,11 +584,14 @@ describe('Command', () => {
       const deprecated = false;
 
       const y = yargs([]).command(module);
-      const handlers = y.getCommandInstance().getCommandHandlers();
+      const handlers = y
+        .getInternalMethods()
+        .getCommandInstance()
+        .getCommandHandlers();
       handlers.foo.original.should.equal(module.command);
       handlers.foo.builder.should.equal(module.builder);
       handlers.foo.handler.should.equal(module.handler);
-      const commands = y.getUsageInstance().getCommands();
+      const commands = y.getInternalMethods().getUsageInstance().getCommands();
       commands[0].should.deep.equal([
         module.command,
         module.describe,
@@ -574,11 +616,14 @@ describe('Command', () => {
       const deprecated = false;
 
       const y = yargs([]).command(module);
-      const handlers = y.getCommandInstance().getCommandHandlers();
+      const handlers = y
+        .getInternalMethods()
+        .getCommandInstance()
+        .getCommandHandlers();
       handlers.foo.original.should.equal(module.command);
       handlers.foo.builder.should.equal(module.builder);
       expect(typeof handlers.foo.handler).to.equal('function');
-      const commands = y.getUsageInstance().getCommands();
+      const commands = y.getInternalMethods().getUsageInstance().getCommands();
       commands[0].should.deep.equal([
         module.command,
         module.describe,
@@ -601,11 +646,17 @@ describe('Command', () => {
       const deprecated = false;
 
       const y = yargs([]).command(module);
-      const handlers = y.getCommandInstance().getCommandHandlers();
+      const handlers = y
+        .getInternalMethods()
+        .getCommandInstance()
+        .getCommandHandlers();
       handlers.foo.original.should.equal(module.command[0]);
       handlers.foo.builder.should.equal(module.builder);
       handlers.foo.handler.should.equal(module.handler);
-      const usageCommands = y.getUsageInstance().getCommands();
+      const usageCommands = y
+        .getInternalMethods()
+        .getUsageInstance()
+        .getCommands();
       usageCommands[0].should.deep.equal([
         module.command[0],
         module.describe,
@@ -613,7 +664,10 @@ describe('Command', () => {
         ['bar', 'baz'],
         deprecated,
       ]);
-      const cmdCommands = y.getCommandInstance().getCommands();
+      const cmdCommands = y
+        .getInternalMethods()
+        .getCommandInstance()
+        .getCommands();
       cmdCommands.should.deep.equal(['foo', 'bar', 'baz']);
     });
 
@@ -631,11 +685,17 @@ describe('Command', () => {
       const deprecated = false;
 
       const y = yargs([]).command(module);
-      const handlers = y.getCommandInstance().getCommandHandlers();
+      const handlers = y
+        .getInternalMethods()
+        .getCommandInstance()
+        .getCommandHandlers();
       handlers.foo.original.should.equal(module.command);
       handlers.foo.builder.should.equal(module.builder);
       handlers.foo.handler.should.equal(module.handler);
-      const usageCommands = y.getUsageInstance().getCommands();
+      const usageCommands = y
+        .getInternalMethods()
+        .getUsageInstance()
+        .getCommands();
       usageCommands[0].should.deep.equal([
         module.command,
         module.describe,
@@ -643,7 +703,10 @@ describe('Command', () => {
         module.aliases,
         deprecated,
       ]);
-      const cmdCommands = y.getCommandInstance().getCommands();
+      const cmdCommands = y
+        .getInternalMethods()
+        .getCommandInstance()
+        .getCommands();
       cmdCommands.should.deep.equal(['foo', 'bar', 'baz']);
     });
 
@@ -661,11 +724,17 @@ describe('Command', () => {
       const deprecated = false;
 
       const y = yargs([]).command(module);
-      const handlers = y.getCommandInstance().getCommandHandlers();
+      const handlers = y
+        .getInternalMethods()
+        .getCommandInstance()
+        .getCommandHandlers();
       handlers.foo.original.should.equal(module.command[0]);
       handlers.foo.builder.should.equal(module.builder);
       handlers.foo.handler.should.equal(module.handler);
-      const usageCommands = y.getUsageInstance().getCommands();
+      const usageCommands = y
+        .getInternalMethods()
+        .getUsageInstance()
+        .getCommands();
       usageCommands[0].should.deep.equal([
         module.command[0],
         module.describe,
@@ -673,7 +742,10 @@ describe('Command', () => {
         ['bar', 'baz', 'nat'],
         deprecated,
       ]);
-      const cmdCommands = y.getCommandInstance().getCommands();
+      const cmdCommands = y
+        .getInternalMethods()
+        .getCommandInstance()
+        .getCommands();
       cmdCommands.should.deep.equal(['foo', 'bar', 'baz', 'nat']);
     });
 
@@ -691,11 +763,17 @@ describe('Command', () => {
       const deprecated = false;
 
       const y = yargs([]).command(module);
-      const handlers = y.getCommandInstance().getCommandHandlers();
+      const handlers = y
+        .getInternalMethods()
+        .getCommandInstance()
+        .getCommandHandlers();
       handlers.foo.original.should.equal(module.command);
       handlers.foo.builder.should.equal(module.builder);
       handlers.foo.handler.should.equal(module.handler);
-      const usageCommands = y.getUsageInstance().getCommands();
+      const usageCommands = y
+        .getInternalMethods()
+        .getUsageInstance()
+        .getCommands();
       usageCommands[0].should.deep.equal([
         module.command,
         module.describe,
@@ -703,7 +781,10 @@ describe('Command', () => {
         ['bar'],
         deprecated,
       ]);
-      const cmdCommands = y.getCommandInstance().getCommands();
+      const cmdCommands = y
+        .getInternalMethods()
+        .getCommandInstance()
+        .getCommands();
       cmdCommands.should.deep.equal(['foo', 'bar']);
     });
 
@@ -721,7 +802,10 @@ describe('Command', () => {
         [],
         deprecated
       );
-      const usageCommands = y.getUsageInstance().getCommands();
+      const usageCommands = y
+        .getInternalMethods()
+        .getUsageInstance()
+        .getCommands();
       usageCommands[0].should.deep.equal([
         command,
         description,
@@ -1086,7 +1170,7 @@ describe('Command', () => {
       'my awesome command',
       yargs => yargs
     );
-    const command = y.getCommandInstance();
+    const command = y.getInternalMethods().getCommandInstance();
     const handlers = command.getCommandHandlers();
     handlers.foo.demanded.should.not.include({
       cmd: '',

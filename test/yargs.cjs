@@ -325,13 +325,21 @@ describe('yargs dsl tests', () => {
       };
 
       expect(y.getOptions()).to.deep.equal(emptyOptions);
-      expect(y.getUsageInstance().getDescriptions()).to.deep.equal({
+      expect(
+        y.getInternalMethods().getUsageInstance().getDescriptions()
+      ).to.deep.equal({
         help: '__yargsString__:Show help',
         version: '__yargsString__:Show version number',
       });
-      expect(y.getValidationInstance().getImplied()).to.deep.equal({});
-      expect(y.getValidationInstance().getConflicting()).to.deep.equal({});
-      expect(y.getCommandInstance().getCommandHandlers()).to.deep.equal({});
+      expect(
+        y.getInternalMethods().getValidationInstance().getImplied()
+      ).to.deep.equal({});
+      expect(
+        y.getInternalMethods().getValidationInstance().getConflicting()
+      ).to.deep.equal({});
+      expect(
+        y.getInternalMethods().getCommandInstance().getCommandHandlers()
+      ).to.deep.equal({});
       expect(y.getExitProcess()).to.equal(false);
       expect(y.getDemandedOptions()).to.deep.equal({});
       expect(y.getDemandedCommands()).to.deep.equal({});
@@ -1659,7 +1667,10 @@ describe('yargs dsl tests', () => {
         .global('bar', false)
         .getInternalMethods()
         .reset();
-      const descriptions = y.getUsageInstance().getDescriptions();
+      const descriptions = y
+        .getInternalMethods()
+        .getUsageInstance()
+        .getDescriptions();
       Object.keys(descriptions).should.include('foo');
       Object.keys(descriptions).should.not.include('bar');
     });
@@ -1675,7 +1686,10 @@ describe('yargs dsl tests', () => {
         .global(['z'], false)
         .getInternalMethods()
         .reset();
-      const implied = y.getValidationInstance().getImplied();
+      const implied = y
+        .getInternalMethods()
+        .getValidationInstance()
+        .getImplied();
       Object.keys(implied).should.include('x');
       Object.keys(implied).should.not.include('z');
     });
@@ -2184,7 +2198,7 @@ describe('yargs dsl tests', () => {
           'one',
           'level one',
           yargs => {
-            context = yargs.getContext();
+            context = yargs.getInternalMethods().getContext();
             context.commands.should.deep.equal(['one']);
             return yargs.command(
               'two',
