@@ -4,9 +4,8 @@
 
 const checkUsage = require('./helpers/utils.cjs').checkOutput;
 const chalk = require('chalk');
-const path = require('path');
 const yargs = require('../index.cjs');
-const {rebase, YError} = require('../build/index.cjs');
+const {YError} = require('../build/index.cjs');
 
 const should = require('chai').should();
 

@@ -1721,7 +1721,7 @@ describe('yargs dsl tests', () => {
 
     it('combines yargs defaults with package.json values', () => {
       const argv = yargs('--foo a')
-        .default('b', 99)
+        .defaults('b', 99)
         .pkgConf('repository')
         .parse();
 
@@ -3118,6 +3118,20 @@ describe('yargs dsl tests', () => {
         .getHelp();
       help.should.match(/default: "hello"/);
       help.should.match(/foo command/);
+    });
+  });
+  describe('getters', () => {
+    it('has getter for strict commands', () => {
+      const y1 = yargs('foo').strictCommands();
+      const y2 = yargs('bar');
+      assert.strictEqual(y1.getStrictCommands(), true);
+      assert.strictEqual(y2.getStrictCommands(), false);
+    });
+    it('has getter for strict options', () => {
+      const y1 = yargs('foo').strictOptions();
+      const y2 = yargs('bar');
+      assert.strictEqual(y1.getStrictOptions(), true);
+      assert.strictEqual(y2.getStrictOptions(), false);
     });
   });
 });

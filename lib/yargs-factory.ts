@@ -60,7 +60,6 @@ import {
 import {isPromise} from './utils/is-promise.js';
 import {maybeAsyncResult} from './utils/maybe-async-result.js';
 import setBlocking from './utils/set-blocking.js';
-import {assert} from 'node:console';
 
 export function YargsFactory(_shim: PlatformShim) {
   return (
