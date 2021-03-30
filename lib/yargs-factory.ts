@@ -840,7 +840,6 @@ export class YargsInstance {
     this.#validation.implies(key, value);
     return this;
   }
-  // TODO(bcoe): add getLocale() rather than overloading behavior.
   locale(locale?: string): YargsInstance | string {
     argsert('[string]', [locale], arguments.length);
     if (!locale) {
