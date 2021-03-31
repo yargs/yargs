@@ -2,7 +2,7 @@
 
 // Bootstraps yargs for ESM:
 import esmPlatformShim from './lib/platform-shims/esm.mjs';
-import {YargsWithShim} from './build/lib/yargs-factory.js';
+import {YargsFactory} from './build/lib/yargs-factory.js';
 
-const Yargs = YargsWithShim(esmPlatformShim);
+const Yargs = YargsFactory(esmPlatformShim);
 export default Yargs;

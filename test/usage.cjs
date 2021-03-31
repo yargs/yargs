@@ -4,9 +4,8 @@
 
 const checkUsage = require('./helpers/utils.cjs').checkOutput;
 const chalk = require('chalk');
-const path = require('path');
 const yargs = require('../index.cjs');
-const {rebase, YError} = require('../build/index.cjs');
+const {YError} = require('../build/index.cjs');
 
 const should = require('chai').should();
 
@@ -19,7 +18,7 @@ async function wait(n = 10) {
 
 describe('usage tests', () => {
   beforeEach(() => {
-    yargs.reset();
+    yargs.getInternalMethods().reset();
   });
 
   describe('demand options', () => {
@@ -1705,21 +1704,6 @@ describe('usage tests', () => {
       r.errors.should.have.length(0);
       r.exit.should.equal(true);
     });
-  });
-
-  it('should succeed when rebase', () => {
-    rebase(
-      ['home', 'chevex'].join(path.sep),
-      ['home', 'chevex', 'foo', 'bar', 'baz'].join(path.sep)
-    ).should.equal(['foo', 'bar', 'baz'].join(path.sep));
-    rebase(
-      ['home', 'chevex', 'foo', 'bar', 'baz'].join(path.sep),
-      ['home', 'chevex'].join(path.sep)
-    ).should.equal(['..', '..', '..'].join(path.sep));
-    rebase(
-      ['home', 'chevex', 'foo'].join(path.sep),
-      ['home', 'chevex', 'pow', 'zoom.txt'].join(path.sep)
-    ).should.equal(['..', 'pow', 'zoom.txt'].join(path.sep));
   });
 
   it('should not print usage string if help() is called without arguments', () => {
