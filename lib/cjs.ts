@@ -7,7 +7,7 @@ import {isPromise} from './utils/is-promise.js';
 import {objFilter} from './utils/obj-filter.js';
 import {parseCommand} from './parse-command.js';
 import * as processArgv from './utils/process-argv.js';
-import {YargsWithShim, rebase} from './yargs-factory.js';
+import {YargsFactory} from './yargs-factory.js';
 import {YError} from './yerror.js';
 import cjsPlatformShim from './platform-shims/cjs.js';
 
@@ -27,7 +27,7 @@ if (process && process.version) {
 }
 
 const Parser = require('yargs-parser');
-const Yargs = YargsWithShim(cjsPlatformShim);
+const Yargs = YargsFactory(cjsPlatformShim);
 
 export default {
   applyExtends,
@@ -39,6 +39,5 @@ export default {
   parseCommand,
   Parser,
   processArgv,
-  rebase,
   YError,
 };

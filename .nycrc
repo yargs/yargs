@@ -3,6 +3,7 @@
     "build/test/**",
     "test/**"
   ],
+  "exclude-after-remap": true,
   "reporter": [
     "html",
     "text"

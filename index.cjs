@@ -11,6 +11,7 @@ module.exports = Argv;
 function Argv(processArgs, cwd) {
   const argv = Yargs(processArgs, cwd, require);
   singletonify(argv);
+  // TODO(bcoe): warn if argv.parse() or argv.argv is used directly.
   return argv;
 }
 
@@ -22,7 +23,10 @@ function Argv(processArgs, cwd) {
     to get a parsed version of process.argv.
 */
 function singletonify(inst) {
-  Object.keys(inst).forEach(key => {
+  [
+    ...Object.keys(inst),
+    ...Object.getOwnPropertyNames(inst.constructor.prototype),
+  ].forEach(key => {
     if (key === 'argv') {
       Argv.__defineGetter__(key, inst.__lookupGetter__(key));
     } else if (typeof inst[key] === 'function') {

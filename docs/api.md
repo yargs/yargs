@@ -1439,43 +1439,6 @@ usage information and exit.
 The default behavior is to set the value of any key not followed by an
 option value to `true`.
 
-<a name="reset"></a>.reset() [DEPRECATED]
---------
-
-Reset the argument object built up so far. This is useful for
-creating nested command line interfaces. Use [global](#global)
-to specify keys that should not be reset.
-
-```js
-var yargs = require('yargs/yargs')(process.argv.slice(2))
-  .usage('$0 command')
-  .command('hello', 'hello command')
-  .command('world', 'world command')
-  .demandCommand(1, 'must provide a valid command'),
-  argv = yargs.argv,
-  command = argv._[0];
-
-if (command === 'hello') {
-  yargs.reset()
-    .usage('$0 hello')
-    .help('h')
-    .example('$0 hello', 'print the hello message!')
-    .argv
-
-  console.log('hello!');
-} else if (command === 'world'){
-  yargs.reset()
-    .usage('$0 world')
-    .help('h')
-    .example('$0 world', 'print the world message!')
-    .argv
-
-  console.log('world!');
-} else {
-  yargs.showHelp();
-}
-```
-
 <a name="scriptName"></a>.scriptName($0)
 ------------------
 
