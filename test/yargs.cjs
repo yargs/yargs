@@ -23,6 +23,9 @@ function clearRequireCache() {
   delete require.cache[require.resolve('../index.cjs')];
   delete require.cache[require.resolve('../build/index.cjs')];
 }
+function isPromise(maybePromise) {
+  return typeof maybePromise.then === 'function';
+}
 
 describe('yargs dsl tests', () => {
   const oldProcess = {versions: {}};
@@ -3115,4 +3118,18 @@ describe('yargs dsl tests', () => {
       assert.strictEqual(y2.getStrictOptions(), false);
     });
   });
+  describe('parseAsync', () => {
+    it('returns promise when parse is synchronous', () => {
+      const argv = yargs('foo').parseAsync();
+      assert.strictEqual(isPromise(argv), true);
+    });
+    it('returns promise when parse is asynchronous', async () => {
+      const argv = yargs('--foo bar').middleware(async () => {
+        await wait();
+      }).parse();
+      assert.strictEqual(isPromise(argv), true);
+      assert.strictEqual((await argv).foo, 'bar');
+    });
+  });
+  // TODO: add tests for parseSync.
 });
