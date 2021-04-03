@@ -1338,9 +1338,21 @@ the resulting error and output will not be passed to the `parse()` callback (the
 
 ***Note:*** `parse()` should be called only once when [`command()`](#command) is called with a handler
 returning a promise. If your use case requires `parse()` to be called several times, any asynchronous
-operation performed in a command handler should not result in the handler returning a promise
+operation performed in a command handler should not result in the handler returning a promise.
 
-<a name="parsed"></a>.parsed
+.parseAsync([args], [context], [parseCallback])
+------------
+
+Identical to `.parse()`, except always returns a promise for a parsed argv
+object, regardless of whether an async builder, handler, or middleware is used.
+
+.parseSync([args], [context], [parseCallback])
+------------
+
+Identical to `.parse()`, except an exception is thrown if an asynchronous
+builder, handler, or middleware is used.
+
+<a name="parsed"></a>.parsed [DEPRECATED]
 ------------
 If the arguments have not been parsed, this property is `false`.
 

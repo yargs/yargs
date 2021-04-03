@@ -3124,12 +3124,44 @@ describe('yargs dsl tests', () => {
       assert.strictEqual(isPromise(argv), true);
     });
     it('returns promise when parse is asynchronous', async () => {
-      const argv = yargs('--foo bar').middleware(async () => {
-        await wait();
-      }).parse();
+      const argv = yargs('--foo bar')
+        .middleware(async () => {
+          await wait();
+        })
+        .parseAsync();
       assert.strictEqual(isPromise(argv), true);
       assert.strictEqual((await argv).foo, 'bar');
     });
   });
-  // TODO: add tests for parseSync.
+  describe('parseSync', () => {
+    it('succeeds if no async functions used during parsing', () => {
+      const argv = yargs('foo 33')
+        .command(
+          'foo [bar]',
+          'foo command',
+          () => {},
+          () => {}
+        )
+        .middleware(argv => {
+          argv.bar *= 2;
+        })
+        .parseSync();
+      assert.strictEqual(argv.bar, 66);
+    });
+    it('throws if any async method is used', () => {
+      assert.throws(() => {
+        yargs('foo 33')
+          .command(
+            'foo [bar]',
+            'foo command',
+            () => {},
+            () => {}
+          )
+          .middleware(async argv => {
+            argv.bar *= 2;
+          })
+          .parseSync();
+      }, /.*parseSync\(\) must not be used.*/);
+    });
+  });
 });
