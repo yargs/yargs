@@ -1052,10 +1052,13 @@ export class YargsInstance {
 
     if (this.#parseFn) this.#exitProcess = false;
 
-    let parsed = this[kRunYargsParserAndExecuteCommands](args, !!shortCircuit);
+    const parsed = this[kRunYargsParserAndExecuteCommands](
+      args,
+      !!shortCircuit
+    );
     this.#completion!.setParsed(this.parsed as DetailedArguments);
     if (isPromise(parsed)) {
-      parsed = parsed
+      return parsed
         .then(argv => {
           if (this.#parseFn) this.#parseFn(this.#exitError, argv, this.#output);
           return argv;
