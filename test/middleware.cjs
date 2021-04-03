@@ -857,7 +857,7 @@ describe('middleware', () => {
             choices: [10, 20, 30],
           })
           .coerce('foo', async arg => {
-            wait();
+            await wait();
             return (arg *= 2);
           })
           .parse('--foo 2'),

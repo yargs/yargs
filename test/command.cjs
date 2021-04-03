@@ -2054,9 +2054,17 @@ describe('Command', () => {
         assert.strictEqual(set, true);
       });
     });
-    // TODO: investigate why .parse('cmd --help', () => {}); does not
-    // work properly with an async builder. We should test the same
-    // with handler.
+    // Refs: https://github.com/yargs/yargs/issues/1894
+    it('does not print to stdout when parse callback is provided', async () => {
+      await yargs()
+        .command('cmd <foo>', 'a test command', async () => {
+          await wait();
+        })
+        .parse('cmd --help', (_err, argv, output) => {
+          output.should.include('a test command');
+          argv.help.should.equal(true);
+        });
+    });
   });
 
   describe('builder', () => {

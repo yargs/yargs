@@ -2687,7 +2687,7 @@ describe('yargs dsl tests', () => {
   // See: https://github.com/yargs/yargs/issues/1420
   describe('async', () => {
     describe('parse', () => {
-      it('returns promise that resolves argv on success', done => {
+      it('calls parse callback once async handler has resolved', done => {
         let executionCount = 0;
         yargs()
           .command(
@@ -2705,15 +2705,13 @@ describe('yargs dsl tests', () => {
             }
           )
           .parse('cmd foo', async (_err, argv) => {
-            (typeof argv.then).should.equal('function');
-            argv = await argv;
             argv.addedAsync.should.equal(99);
             argv.str.should.equal('foo');
             executionCount.should.equal(1);
             return done();
           });
       });
-      it('returns deeply nested promise that resolves argv on success', done => {
+      it('calls parse callback once deeply nested promise has resolved', done => {
         let executionCount = 0;
         yargs()
           .command(
@@ -2738,15 +2736,13 @@ describe('yargs dsl tests', () => {
             () => {}
           )
           .parse('cmd foo orange', async (_err, argv) => {
-            (typeof argv.then).should.equal('function');
-            argv = await argv;
             argv.addedAsync.should.equal(99);
             argv.apple.should.equal('orange');
             executionCount.should.equal(1);
             return done();
           });
       });
-      it('returns promise that can be caught if rejected', done => {
+      it('populates err with async rejection', done => {
         let executionCount = 0;
         yargs()
           .command(
@@ -2762,15 +2758,10 @@ describe('yargs dsl tests', () => {
               });
             }
           )
-          .parse('cmd foo', async (_err, argv) => {
-            (typeof argv.then).should.equal('function');
-            try {
-              await argv;
-            } catch (err) {
-              err.message.should.equal('async error');
-              executionCount.should.equal(1);
-              return done();
-            }
+          .parse('cmd foo', async err => {
+            err.message.should.equal('async error');
+            executionCount.should.equal(1);
+            return done();
           });
       });
       it('caches nested help output, so that it can be output by showHelp()', done => {
@@ -2789,16 +2780,11 @@ describe('yargs dsl tests', () => {
             });
           }
         ).parse('cmd foo', async (_err, argv) => {
-          (typeof argv.then).should.equal('function');
-          try {
-            await argv;
-          } catch (err) {
-            y.showHelp(output => {
-              output.should.match(/a command/);
-              executionCount.should.equal(1);
-              return done();
-            });
-          }
+          y.showHelp(output => {
+            output.should.match(/a command/);
+            executionCount.should.equal(1);
+            return done();
+          });
         });
       });
       it('caches deeply nested help output, so that it can be output by showHelp()', done => {
@@ -2824,16 +2810,11 @@ describe('yargs dsl tests', () => {
           },
           () => {}
         ).parse('cmd inner bar', async (_err, argv) => {
-          (typeof argv.then).should.equal('function');
-          try {
-            await argv;
-          } catch (err) {
-            y.showHelp(output => {
-              output.should.match(/inner command/);
-              executionCount.should.equal(1);
-              return done();
-            });
-          }
+          y.showHelp(output => {
+            output.should.match(/inner command/);
+            executionCount.should.equal(1);
+            return done();
+          });
         });
       });
     });
