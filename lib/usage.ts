@@ -1,11 +1,6 @@
 // this file handles outputting usage instructions,
 // failures, etc. keeps logging in one place.
-import {
-  Dictionary,
-  assertNotStrictEqual,
-  PlatformShim,
-  Y18N,
-} from './typings/common-types.js';
+import {Dictionary, PlatformShim} from './typings/common-types.js';
 import {objFilter} from './utils/obj-filter.js';
 import {YargsInstance} from './yargs-factory.js';
 import {YError} from './yerror.js';
@@ -16,8 +11,8 @@ function isBoolean(fail: FailureFunction | boolean): fail is boolean {
   return typeof fail === 'boolean';
 }
 
-export function usage(yargs: YargsInstance, y18n: Y18N, shim: PlatformShim) {
-  const __ = y18n.__;
+export function usage(yargs: YargsInstance, shim: PlatformShim) {
+  const __ = shim.y18n.__;
   const self = {} as UsageInstance;
 
   // methods for ouputting/building failure message.
@@ -42,7 +37,7 @@ export function usage(yargs: YargsInstance, y18n: Y18N, shim: PlatformShim) {
 
   let failureOutput = false;
   self.fail = function fail(msg, err) {
-    const logger = yargs._getLoggerInstance();
+    const logger = yargs.getInternalMethods().getLoggerInstance();
 
     if (fails.length) {
       for (let i = fails.length - 1; i >= 0; --i) {
@@ -74,7 +69,7 @@ export function usage(yargs: YargsInstance, y18n: Y18N, shim: PlatformShim) {
       err = err || new YError(msg);
       if (yargs.getExitProcess()) {
         return yargs.exit(1);
-      } else if (yargs._hasParseCallback()) {
+      } else if (yargs.getInternalMethods().hasParseCallback()) {
         return yargs.exit(1, err);
       } else {
         throw err;
@@ -239,12 +234,15 @@ export function usage(yargs: YargsInstance, y18n: Y18N, shim: PlatformShim) {
     if (commands.length > 1 || (commands.length === 1 && !commands[0][2])) {
       ui.div(__('Commands:'));
 
-      const context = yargs.getContext();
+      const context = yargs.getInternalMethods().getContext();
       const parentCommands = context.commands.length
         ? `${context.commands.join(' ')} `
         : '';
 
-      if (yargs.getParserConfiguration()['sort-commands'] === true) {
+      if (
+        yargs.getInternalMethods().getParserConfiguration()['sort-commands'] ===
+        true
+      ) {
         commands = commands.sort((a, b) => a[0].localeCompare(b[0]));
       }
 
@@ -607,7 +605,7 @@ export function usage(yargs: YargsInstance, y18n: Y18N, shim: PlatformShim) {
   }
 
   self.showHelp = (level: 'error' | 'log' | ((message: string) => void)) => {
-    const logger = yargs._getLoggerInstance();
+    const logger = yargs.getInternalMethods().getLoggerInstance();
     if (!level) level = 'error';
     const emit = typeof level === 'function' ? level : logger[level];
     emit(self.help());
@@ -679,7 +677,7 @@ export function usage(yargs: YargsInstance, y18n: Y18N, shim: PlatformShim) {
   };
 
   self.showVersion = level => {
-    const logger = yargs._getLoggerInstance();
+    const logger = yargs.getInternalMethods().getLoggerInstance();
     if (!level) level = 'error';
     const emit = typeof level === 'function' ? level : logger[level];
     emit(version);

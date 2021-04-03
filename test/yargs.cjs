@@ -12,6 +12,11 @@ let yargs;
 require('chai').should();
 
 const noop = () => {};
+async function wait() {
+  return new Promise(resolve => {
+    setTimeout(resolve, 10);
+  });
+}
 const implicationsFailedPattern = new RegExp(english['Implications failed:']);
 
 function clearRequireCache() {
@@ -292,6 +297,7 @@ describe('yargs dsl tests', () => {
         .global('foo', false)
         .global('qux', false)
         .env('YARGS')
+        .getInternalMethods()
         .reset();
 
       const emptyOptions = {
@@ -319,13 +325,21 @@ describe('yargs dsl tests', () => {
       };
 
       expect(y.getOptions()).to.deep.equal(emptyOptions);
-      expect(y.getUsageInstance().getDescriptions()).to.deep.equal({
+      expect(
+        y.getInternalMethods().getUsageInstance().getDescriptions()
+      ).to.deep.equal({
         help: '__yargsString__:Show help',
         version: '__yargsString__:Show version number',
       });
-      expect(y.getValidationInstance().getImplied()).to.deep.equal({});
-      expect(y.getValidationInstance().getConflicting()).to.deep.equal({});
-      expect(y.getCommandInstance().getCommandHandlers()).to.deep.equal({});
+      expect(
+        y.getInternalMethods().getValidationInstance().getImplied()
+      ).to.deep.equal({});
+      expect(
+        y.getInternalMethods().getValidationInstance().getConflicting()
+      ).to.deep.equal({});
+      expect(
+        y.getInternalMethods().getCommandInstance().getCommandHandlers()
+      ).to.deep.equal({});
       expect(y.getExitProcess()).to.equal(false);
       expect(y.getDemandedOptions()).to.deep.equal({});
       expect(y.getDemandedCommands()).to.deep.equal({});
@@ -338,7 +352,7 @@ describe('yargs dsl tests', () => {
       y.parse('hello', err => {
         err.message.should.match(/Missing required argument/);
       });
-      y.reset();
+      y.getInternalMethods().reset();
       y.parse('cake', err => {
         expect(err).to.equal(null);
         return done();
@@ -1596,6 +1610,7 @@ describe('yargs dsl tests', () => {
           global: false,
         })
         .global('foo')
+        .getInternalMethods()
         .reset();
       const options = y.getOptions();
       options.key.foo.should.equal(true);
@@ -1617,6 +1632,7 @@ describe('yargs dsl tests', () => {
           global: false,
         })
         .global('foo')
+        .getInternalMethods()
         .reset({
           foo: ['awesome-sauce', 'awesomeSauce'],
         });
@@ -1649,8 +1665,12 @@ describe('yargs dsl tests', () => {
         .describe('foo', 'my awesome foo option')
         .global('foo')
         .global('bar', false)
+        .getInternalMethods()
         .reset();
-      const descriptions = y.getUsageInstance().getDescriptions();
+      const descriptions = y
+        .getInternalMethods()
+        .getUsageInstance()
+        .getDescriptions();
       Object.keys(descriptions).should.include('foo');
       Object.keys(descriptions).should.not.include('bar');
     });
@@ -1664,8 +1684,12 @@ describe('yargs dsl tests', () => {
           z: 'w',
         })
         .global(['z'], false)
+        .getInternalMethods()
         .reset();
-      const implied = y.getValidationInstance().getImplied();
+      const implied = y
+        .getInternalMethods()
+        .getValidationInstance()
+        .getImplied();
       Object.keys(implied).should.include('x');
       Object.keys(implied).should.not.include('z');
     });
@@ -1679,6 +1703,7 @@ describe('yargs dsl tests', () => {
           nargs: 2,
           global: false,
         })
+        .getInternalMethods()
         .reset();
       const options = y.getOptions();
       options.key.foo.should.equal(true);
@@ -1696,7 +1721,7 @@ describe('yargs dsl tests', () => {
 
     it('combines yargs defaults with package.json values', () => {
       const argv = yargs('--foo a')
-        .default('b', 99)
+        .defaults('b', 99)
         .pkgConf('repository')
         .parse();
 
@@ -2166,21 +2191,6 @@ describe('yargs dsl tests', () => {
       yargs = require('../index.cjs');
     });
 
-    it('should begin with initial state', () => {
-      const context = yargs.getContext();
-      context.resets.should.equal(0);
-      context.commands.should.deep.equal([]);
-    });
-
-    it('should track number of resets', () => {
-      const context = yargs.getContext();
-      yargs.reset();
-      context.resets.should.equal(1);
-      yargs.reset();
-      yargs.reset();
-      context.resets.should.equal(3);
-    });
-
     it('should track commands being executed', () => {
       let context;
       yargs('one two')
@@ -2188,7 +2198,7 @@ describe('yargs dsl tests', () => {
           'one',
           'level one',
           yargs => {
-            context = yargs.getContext();
+            context = yargs.getInternalMethods().getContext();
             context.commands.should.deep.equal(['one']);
             return yargs.command(
               'two',
@@ -2408,12 +2418,16 @@ describe('yargs dsl tests', () => {
       argv.str.should.equal('33');
     });
 
-    it("can only be used as part of a command's builder function", () => {
-      expect(() => {
-        yargs('foo').positional('foo', {
-          describe: 'I should not work',
-        });
-      }).to.throw(/\.positional\(\) can only be called/);
+    it('allows positionals to be defined for default command', async () => {
+      const help = await yargs()
+        .command('* [foo]', 'default command')
+        .positional('foo', {
+          default: 33,
+          type: 'number',
+        })
+        .getHelp();
+      help.should.include('default: 33');
+      help.should.include('default command');
     });
 
     // see: https://github.com/yargs/yargs-parser/pull/110
@@ -3085,6 +3099,39 @@ describe('yargs dsl tests', () => {
       const help = await y.getHelp();
       help.should.match(/node object get/);
       argv._.should.eql(['object']);
+    });
+    it('should return appropriate help message when async builder used', async () => {
+      const help = await yargs('foo')
+        .command(
+          'foo [bar]',
+          'foo command',
+          async yargs => {
+            wait();
+            return yargs.positional('foo', {
+              demand: true,
+              default: 'hello',
+              type: 'string',
+            });
+          },
+          async argv => {}
+        )
+        .getHelp();
+      help.should.match(/default: "hello"/);
+      help.should.match(/foo command/);
+    });
+  });
+  describe('getters', () => {
+    it('has getter for strict commands', () => {
+      const y1 = yargs('foo').strictCommands();
+      const y2 = yargs('bar');
+      assert.strictEqual(y1.getStrictCommands(), true);
+      assert.strictEqual(y2.getStrictCommands(), false);
+    });
+    it('has getter for strict options', () => {
+      const y1 = yargs('foo').strictOptions();
+      const y2 = yargs('bar');
+      assert.strictEqual(y1.getStrictOptions(), true);
+      assert.strictEqual(y2.getStrictOptions(), false);
     });
   });
 });

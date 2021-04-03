@@ -2,7 +2,6 @@ import {argsert} from './argsert.js';
 import {
   Dictionary,
   assertNotStrictEqual,
-  Y18N,
   PlatformShim,
 } from './typings/common-types.js';
 import {levenshtein as distance} from './utils/levenshtein.js';
@@ -18,11 +17,10 @@ const specialKeys = ['$0', '--', '_'];
 export function validation(
   yargs: YargsInstance,
   usage: UsageInstance,
-  y18n: Y18N,
   shim: PlatformShim
 ) {
-  const __ = y18n.__;
-  const __n = y18n.__n;
+  const __ = shim.y18n.__;
+  const __n = shim.y18n.__n;
   const self = {} as ValidationInstance;
 
   // validate appropriate # of non-option
@@ -32,7 +30,8 @@ export function validation(
     // don't count currently executing commands
     const positionalCount =
       argv._.length + (argv['--'] ? argv['--'].length : 0);
-    const _s = positionalCount - yargs.getContext().commands.length;
+    const _s =
+      positionalCount - yargs.getInternalMethods().getContext().commands.length;
 
     if (
       demandedCommands._ &&
@@ -146,15 +145,21 @@ export function validation(
     isDefaultCommand,
     checkPositionals = true
   ) {
-    const commandKeys = yargs.getCommandInstance().getCommands();
+    const commandKeys = yargs
+      .getInternalMethods()
+      .getCommandInstance()
+      .getCommands();
     const unknown: string[] = [];
-    const currentContext = yargs.getContext();
+    const currentContext = yargs.getInternalMethods().getContext();
 
     Object.keys(argv).forEach(key => {
       if (
         specialKeys.indexOf(key) === -1 &&
         !Object.prototype.hasOwnProperty.call(positionalMap, key) &&
-        !Object.prototype.hasOwnProperty.call(yargs._getParseContext(), key) &&
+        !Object.prototype.hasOwnProperty.call(
+          yargs.getInternalMethods().getParseContext(),
+          key
+        ) &&
         !self.isValidAndSomeAliasIsNotNew(key, aliases)
       ) {
         unknown.push(key);
@@ -187,9 +192,12 @@ export function validation(
   };
 
   self.unknownCommands = function unknownCommands(argv) {
-    const commandKeys = yargs.getCommandInstance().getCommands();
+    const commandKeys = yargs
+      .getInternalMethods()
+      .getCommandInstance()
+      .getCommands();
     const unknown: string[] = [];
-    const currentContext = yargs.getContext();
+    const currentContext = yargs.getInternalMethods().getContext();
 
     if (currentContext.commands.length > 0 || commandKeys.length > 0) {
       argv._.slice(currentContext.commands.length).forEach(key => {

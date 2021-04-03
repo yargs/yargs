@@ -56,10 +56,20 @@ exports.checkOutput = function checkOutput(f, argv, cb) {
   } else {
     try {
       result = f();
-    } finally {
+      if (typeof result.then === 'function') {
+        return result.then((r) => {
+          reset();
+          return done();
+        }).catch(() => {
+          reset();
+          return done();
+        });
+      } else {
+        reset();
+      }
+    } catch (_err) {
       reset();
     }
-
     return done();
   }
 

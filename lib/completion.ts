@@ -57,8 +57,8 @@ export class Completion implements CompletionInstance {
       if (handlers[args[i]] && handlers[args[i]].builder) {
         const builder = handlers[args[i]].builder;
         if (isCommandBuilderCallback(builder)) {
-          const y = this.yargs.reset();
-          builder(y);
+          const y = this.yargs.getInternalMethods().reset();
+          builder(y, true);
           return y.argv;
         }
       }
@@ -77,7 +77,8 @@ export class Completion implements CompletionInstance {
     args: string[],
     current: string
   ) {
-    const parentCommands = this.yargs.getContext().commands;
+    const parentCommands = this.yargs.getInternalMethods().getContext()
+      .commands;
     if (
       !current.match(/^-/) &&
       parentCommands[parentCommands.length - 1] !== current
