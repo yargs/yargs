@@ -1057,9 +1057,55 @@ export class YargsInstance {
       !!shortCircuit
     );
     this.#completion!.setParsed(this.parsed as DetailedArguments);
-    if (this.#parseFn) this.#parseFn(this.#exitError, parsed, this.#output);
-    this[kUnfreeze](); // Pop the stack.
+    if (isPromise(parsed)) {
+      return parsed
+        .then(argv => {
+          if (this.#parseFn) this.#parseFn(this.#exitError, argv, this.#output);
+          return argv;
+        })
+        .catch(err => {
+          if (this.#parseFn) {
+            this.#parseFn!(
+              err,
+              (this.parsed as DetailedArguments).argv,
+              this.#output
+            );
+          }
+          throw err;
+        })
+        .finally(() => {
+          this[kUnfreeze](); // Pop the stack.
+        });
+    } else {
+      if (this.#parseFn) this.#parseFn(this.#exitError, parsed, this.#output);
+      this[kUnfreeze](); // Pop the stack.
+    }
     return parsed;
+  }
+  parseAsync(
+    args?: string | string[],
+    shortCircuit?: object | ParseCallback | boolean,
+    _parseFn?: ParseCallback
+  ): Promise<Arguments> {
+    const maybePromise = this.parse(args, shortCircuit, _parseFn);
+    if (!isPromise(maybePromise)) {
+      return Promise.resolve(maybePromise);
+    } else {
+      return maybePromise;
+    }
+  }
+  parseSync(
+    args?: string | string[],
+    shortCircuit?: object | ParseCallback | boolean,
+    _parseFn?: ParseCallback
+  ): Arguments {
+    const maybePromise = this.parse(args, shortCircuit, _parseFn);
+    if (isPromise(maybePromise)) {
+      throw new YError(
+        '.parseSync() must not be used with asynchronous builders, handlers, or middleware'
+      );
+    }
+    return maybePromise;
   }
   parserConfiguration(config: Configuration) {
     argsert('<object>', [config], arguments.length);
@@ -2262,7 +2308,7 @@ interface FrozenYargsInstance {
 interface ParseCallback {
   (
     err: YError | string | undefined | null,
-    argv: Arguments | Promise<Arguments>,
+    argv: Arguments,
     output: string
   ): void;
 }
