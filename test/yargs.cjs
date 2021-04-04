@@ -23,6 +23,9 @@ function clearRequireCache() {
   delete require.cache[require.resolve('../index.cjs')];
   delete require.cache[require.resolve('../build/index.cjs')];
 }
+function isPromise(maybePromise) {
+  return typeof maybePromise.then === 'function';
+}
 
 describe('yargs dsl tests', () => {
   const oldProcess = {versions: {}};
@@ -3113,6 +3116,52 @@ describe('yargs dsl tests', () => {
       const y2 = yargs('bar');
       assert.strictEqual(y1.getStrictOptions(), true);
       assert.strictEqual(y2.getStrictOptions(), false);
+    });
+  });
+  describe('parseAsync', () => {
+    it('returns promise when parse is synchronous', () => {
+      const argv = yargs('foo').parseAsync();
+      assert.strictEqual(isPromise(argv), true);
+    });
+    it('returns promise when parse is asynchronous', async () => {
+      const argv = yargs('--foo bar')
+        .middleware(async () => {
+          await wait();
+        })
+        .parseAsync();
+      assert.strictEqual(isPromise(argv), true);
+      assert.strictEqual((await argv).foo, 'bar');
+    });
+  });
+  describe('parseSync', () => {
+    it('succeeds if no async functions used during parsing', () => {
+      const argv = yargs('foo 33')
+        .command(
+          'foo [bar]',
+          'foo command',
+          () => {},
+          () => {}
+        )
+        .middleware(argv => {
+          argv.bar *= 2;
+        })
+        .parseSync();
+      assert.strictEqual(argv.bar, 66);
+    });
+    it('throws if any async method is used', () => {
+      assert.throws(() => {
+        yargs('foo 33')
+          .command(
+            'foo [bar]',
+            'foo command',
+            () => {},
+            () => {}
+          )
+          .middleware(async argv => {
+            argv.bar *= 2;
+          })
+          .parseSync();
+      }, /.*parseSync\(\) must not be used.*/);
     });
   });
 });
