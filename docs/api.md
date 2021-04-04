@@ -1343,13 +1343,13 @@ operation performed in a command handler should not result in the handler return
 .parseAsync([args], [context], [parseCallback])
 ------------
 
-Identical to `.parse()`, except always returns a promise for a parsed argv
+Identical to `.parse()` except always returns a promise for a parsed argv
 object, regardless of whether an async builder, handler, or middleware is used.
 
 .parseSync([args], [context], [parseCallback])
 ------------
 
-Identical to `.parse()`, except an exception is thrown if an asynchronous
+Identical to `.parse()` except an exception is thrown if an asynchronous
 builder, handler, or middleware is used.
 
 <a name="parsed"></a>.parsed [DEPRECATED]
