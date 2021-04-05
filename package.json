@@ -1,6 +1,6 @@
 {
   "name": "yargs",
-  "version": "17.0.0-candidate.0",
+  "version": "17.0.0-candidate.10",
   "description": "yargs the modern, pirate-themed, successor to optimist.",
   "main": "./index.cjs",
   "exports": {
@@ -42,7 +42,8 @@
     "locales",
     "LICENSE",
     "lib/platform-shims/*.mjs",
-    "!*.d.ts"
+    "!*.d.ts",
+    "!**/*.d.ts"
   ],
   "dependencies": {
     "cliui": "^7.0.2",
