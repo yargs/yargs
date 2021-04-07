@@ -53,3 +53,20 @@ Deno.test('hierarchy of commands', async () => {
   yargs().command(commands).parse('a c 10 5', context);
   assertEquals(context.output.value, 15);
 });
+
+Deno.test('parseAsync()', async () => {
+  const err: Error | null = null;
+  const argvPromise = yargs()
+    .middleware([
+      async (argv: Arguments) => {
+        await new Promise(resolve => {
+          setTimeout(resolve, 10);
+        });
+        argv.foo *= 2;
+      },
+    ])
+    .parseAsync('--foo 33');
+  assertEquals(typeof argvPromise.then, 'function');
+  const argv = (await argvPromise) as Arguments;
+  assertEquals(argv.foo, 66);
+});
