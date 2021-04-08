@@ -1384,7 +1384,7 @@ export class YargsInstance {
     this.describe(this.#versionOpt, msg);
     return this;
   }
-  wrap(cols: number | null | undefined): YargsInstance {
+  wrap(cols: number | null | undefined = this.#usage.terminalWidth()): YargsInstance {
     argsert('<number|null|undefined>', [cols], arguments.length);
     this.#usage.wrap(cols);
     return this;
