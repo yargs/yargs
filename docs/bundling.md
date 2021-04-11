@@ -29,38 +29,40 @@ You can simply run: `ncc build index.js`.
 
 ### Webpack
 
-Given a CommonJS file, **index.js**:
+_The following is tested with webpack 5.x_
 
-```js
-const yargs = require('yargs/yargs')
-const chalk = require('chalk')
-require('yargs/yargs')(process.argv.slice(2))
-  .option('awesome-opt', {
-    describe: `my awesome ${chalk.green('option')}`
-  })
-  .parse()
-```
+In a new project (see: [npm-init](https://docs.npmjs.com/cli/v7/commands/npm-init)):
 
-You can create a CommonJS bundle with the following `webpack.config.js`:
+1. `npm install yargs assert path-browserify`.
+2. Create the following **index.js**:
+    ```js
+    const yargs = require('yargs/yargs')
+    require('yargs/yargs')(process.argv.slice(2))
+      .option('awesome-opt', {
+        describe: `my awesome option`
+      })
+      .parse()
+    ```
+3. Create the following **webpack.config.js**:
+    ```js
+    const path = require('path');
 
-```js
-module.exports = {
-  mode: "development",
-  entry: {
-    index: "./index.js",
-  },
-  output: {
-    filename: './index.js'
-  },
-  resolve: {
-    extensions: ['.js', '.cjs', '.json']
-  },
-  target: 'node',
-  devtool: "source-map-inline",
-  externals: {
-    'cliui': 'commonjs2 cliui',
-    'y18n': 'commonjs2 y18n',
-    'yargs-parser': 'commonjs2 yargs-parser',
-  },
-};
-```
+    module.exports = {
+      mode: 'development',
+      devtool: 'source-map',
+      entry: './index.js',
+      output: {
+        filename: 'bundle.js',
+        path: path.resolve(__dirname, 'dist'),
+      },
+      resolve: {
+        fallback: {
+          assert: require.resolve("assert"),
+          fs: false,
+          path: require.resolve("path-browserify")
+        },
+      },
+    };
+    ```
+4. Run: `npx webpack@5 --config webpack.config.js`.
+5. You can now execute `dist/bundle.js`.

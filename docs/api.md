@@ -117,10 +117,10 @@ Check that certain conditions are met in the provided arguments.
 
 `fn` is called with the parsed `argv` hash.
 
-If `fn` throws or returns a non-truthy value, Yargs will show the thrown error
-and usage information. Yargs will then exit, unless
-[`.exitProcess()`](#exitprocess) was used to prevent Yargs from exiting after a
-failed check.
+If `fn` throws anything, returns an instance of error, returns a string, or
+returns any non-truthy value, Yargs will show the thrown error and usage
+information. Yargs will then exit, unless [`.exitProcess()`](#exitprocess) was
+used to prevent Yargs from exiting after a failed check.
 
 `global` indicates whether `check()` should be enabled both
 at the top-level and for each sub-command.
