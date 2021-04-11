@@ -4288,24 +4288,6 @@ describe('usage tests', () => {
       ]);
   });
 
-  it('should allow setting custom help- and version description', () => {
-    const r = checkUsage(() =>
-      yargs('--help')
-        .options({
-          version: {alias: 'v', description: 'Custom version description'},
-          h: {alias: 'help', description: 'Custom help description'},
-        })
-        .parse()
-    );
-
-    r.logs[0]
-      .split('\n')
-      .should.deep.equal([
-        'Options:',
-        '  -v, --version  Custom version description                            [boolean]',
-        '  -h, --help     Custom help description                               [boolean]',
-      ]);
-  });
   // Refs: https://github.com/yargs/yargs/pull/1826
   describe('usage for default command', () => {
     describe('default only', () => {
@@ -4520,5 +4502,24 @@ describe('usage tests', () => {
         logs.should.match(/a test command/);
       }
     });
+  });
+
+  // Refs: https://github.com/yargs/yargs/issues/1820
+  it('allows setting help and version with aliases and custom description', () => {
+    const r = checkUsage(() =>
+      yargs('--help')
+        .describe('help', 'Custom help description')
+        .describe('version', 'Custom version description')
+        .alias('help', 'h')
+        .alias('v', 'version')
+        .parse()
+    );
+    r.logs[0]
+      .split('\n')
+      .should.deep.equal([
+        'Options:',
+        '  -h, --help     Custom help description                               [boolean]',
+        '  -v, --version  Custom version description                            [boolean]',
+      ]);
   });
 });
