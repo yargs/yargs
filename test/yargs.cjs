@@ -2176,6 +2176,25 @@ describe('yargs dsl tests', () => {
         yargs().coerce('c');
       }, /coerce callback must be provided/);
     });
+
+    // Refs: https://github.com/yargs/yargs/issues/1909
+    it('shows coerced option in help', async () => {
+      const help = await yargs()
+        .option('option1', {
+          describe: 'option1 description',
+          type: 'string',
+          demandOption: true,
+        })
+        .option('option2', {
+          describe: 'option2 description',
+          type: 'string',
+          demandOption: true,
+        })
+        .coerce('option2', () => undefined)
+        .getHelp();
+      console.info(help);
+      help.should.match(/option2 description/);
+    });
   });
 
   describe('stop parsing', () => {

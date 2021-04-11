@@ -368,7 +368,7 @@ export class YargsInstance {
     // This noop tells yargs-parser about the existence of the option
     // represented by "keys", so that it can apply camel case expansion
     // if needed:
-    this.alias(keys, keys);
+    this.#options.key[keys] = true;
     this.#globalMiddleware.addCoerceMiddleware(
       (
         argv: Arguments,
