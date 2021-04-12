@@ -596,6 +596,7 @@ describe('usage tests', () => {
             // ignore the error, we only test the output here
           }
         });
+        console.info(r);
         r.errors
           .join('\n')
           .split(/\n+/)
@@ -4462,6 +4463,54 @@ describe('usage tests', () => {
         help.split('\n').should.deep.equal(expected);
       });
     });
+    // Refs: https://github.com/yargs/yargs/issues/1912
+    describe('positional', () => {
+      const expected = [
+        'Hello, world!',
+        '',
+        'Commands:',
+        '  usage [foo]     Default command description                          [default]',
+        '  usage foo       Foo command description',
+        '',
+        'Positionals:',
+        '  foo  foo parameter',
+        '',
+        'Options:',
+        '  --help     Show help                                                 [boolean]',
+        '  --version  Show version number                                       [boolean]',
+      ];
+      it('should contain the expected output for --help', () => {
+        const r = checkUsage(() =>
+          yargs('--help')
+            .scriptName('usage')
+            .usage('Hello, world!')
+            .command('* [foo]', 'Default command description', yargs => {
+              yargs.positional('foo', {
+                describe: 'foo parameter',
+              });
+            })
+            .commands([{command: 'foo', desc: 'Foo command description'}])
+            .parse()
+        );
+        r.logs[0].split('\n').should.deep.equal(expected);
+      });
+      it('should contain the expected output for showHelp', () => {
+        const r = checkUsage(() => {
+          const y = yargs()
+            .scriptName('usage')
+            .usage('Hello, world!')
+            .command('* [foo]', 'Default command description', yargs => {
+              yargs.positional('foo', {
+                describe: 'foo parameter',
+              });
+            })
+            .commands([{command: 'foo', desc: 'Foo command description'}]);
+          y.parse();
+          y.showHelp('log');
+        });
+        r.logs[0].split('\n').should.deep.equal(expected);
+      });
+    });
   });
 
   describe('async builder', async () => {
@@ -4501,6 +4550,56 @@ describe('usage tests', () => {
         logs.should.match(/default: "hello"/);
         logs.should.match(/a test command/);
       }
+    });
+    // Refs: https://github.com/yargs/yargs/issues/1912
+    describe('positional', () => {
+      const expected = [
+        'Hello, world!',
+        '',
+        'Commands:',
+        '  usage [foo]     Default command description                          [default]',
+        '  usage foo       Foo command description',
+        '',
+        'Positionals:',
+        '  foo  foo parameter',
+        '',
+        'Options:',
+        '  --help     Show help                                                 [boolean]',
+        '  --version  Show version number                                       [boolean]',
+      ];
+      it('should contain the expected output for --help', async () => {
+        const r = await checkUsage(() => {
+          yargs('--help')
+            .scriptName('usage')
+            .usage('Hello, world!')
+            .command('* [foo]', 'Default command description', async yargs => {
+              await wait();
+              yargs.positional('foo', {
+                describe: 'foo parameter',
+              });
+            })
+            .commands([{command: 'foo', desc: 'Foo command description'}])
+            .parse();
+          return wait(20);
+        });
+        r.logs[0].split('\n').should.deep.equal(expected);
+      });
+      it('should contain the expected output for getHelp', async () => {
+        const y = yargs()
+          .scriptName('usage')
+          .usage('Hello, world!')
+          .command('* [foo]', 'Default command description', async yargs => {
+            // await wait();
+            yargs.positional('foo', {
+              describe: 'foo parameter',
+            });
+          })
+          .commands([{command: 'foo', desc: 'Foo command description'}]);
+        await y.parse('');
+        await wait();
+        const help = await y.getHelp();
+        help.split('\n').should.deep.equal(expected);
+      });
     });
   });
 

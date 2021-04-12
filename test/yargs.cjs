@@ -2192,7 +2192,6 @@ describe('yargs dsl tests', () => {
         })
         .coerce('option2', () => undefined)
         .getHelp();
-      console.info(help);
       help.should.match(/option2 description/);
     });
   });

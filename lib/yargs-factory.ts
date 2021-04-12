@@ -779,6 +779,13 @@ export class YargsInstance {
           });
         }
       }
+      // Ensure top level options/positionals have been configured:
+      const builderResponse = this.#command.runDefaultBuilderOn(this);
+      if (isPromise(builderResponse)) {
+        return builderResponse.then(() => {
+          return this.#usage.help();
+        });
+      }
     }
     return Promise.resolve(this.#usage.help());
   }
@@ -1257,6 +1264,14 @@ export class YargsInstance {
           });
           return this;
         }
+      }
+      // Ensure top level options/positionals have been configured:
+      const builderResponse = this.#command.runDefaultBuilderOn(this);
+      if (isPromise(builderResponse)) {
+        builderResponse.then(() => {
+          this.#usage.showHelp(level);
+        });
+        return this;
       }
     }
     this.#usage.showHelp(level);
@@ -2044,11 +2059,6 @@ export class YargsInstance {
           !!calledFromCommand,
           false
         );
-      } else if (!calledFromCommand && helpOnly) {
-        // TODO(bcoe): what if the default builder is async?
-        // TODO(bcoe): add better comments for runDefaultBuilderOn, why
-        // are we doing this?
-        this.#command.runDefaultBuilderOn(this);
       }
 
       // we must run completions first, a user might
@@ -2083,8 +2093,6 @@ export class YargsInstance {
         if (helpOptSet) {
           if (this.#exitProcess) setBlocking(true);
           skipValidation = true;
-          // TODO: add appropriate comment.
-          if (!calledFromCommand) this.#command.runDefaultBuilderOn(this);
           this.showHelp('log');
           this.exit(0);
         } else if (versionOptSet) {
