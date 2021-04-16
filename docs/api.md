@@ -11,6 +11,94 @@ This document is the Yargs API reference. There are more documentation files in
 - [Bundling](https://github.com/yargs/yargs/blob/master/docs/bundling.md)
 - [Parsing Tricks](https://github.com/yargs/yargs/blob/master/docs/tricks.md)
 
+API listing
+===
+```
+.alias(key, alias)
+.argv
+.array(key)
+.boolean(key)
+.check(fn, [global=true])
+.choices(key, choices)
+.coerce(key, fn)
+.commandDir(directory, [opts])
+.command(cmd, desc, [builder], [handler])
+.command(cmd, desc, [module])
+.command(module)
+.completion([cmd], [description], [fn])
+.config([key], [description], [parseFn])
+.config(object)
+.conflicts(x, y)
+.count(key)
+.default(key, value, [description])
+.defaults(key, value, [description]) [DEPRECATED]
+.demand(count, [max], [msg]) [DEPRECATED]
+.demandOption(key, [msg | boolean])
+.demandOption(key, msg)
+.demandCommand([min=1], [minMsg])
+.demandCommand([min=1], [max], [minMsg], [maxMsg])
+.deprecateOption(key, [msg | boolean])
+.describe(key, desc)
+.hide(key)
+.detectLocale(boolean)
+.env([prefix])
+.epilog(str)
+.epilogue(str)
+.example(cmd, desc)
+.example([[cmd1, desc1], [cmd2, desc2], ...])
+.exitProcess(enable)
+.exit(code, err)
+.fail(fn | boolean)
+.getCompletion(args, done);
+.getHelp()
+.global(globals, [global=true])
+.group(key(s), groupName)
+.help()
+.help([option | boolean])
+.help([option, [description]])
+.implies(x, y)
+.locale()
+.locale(locale)
+.middleware(callbacks, [applyBeforeValidation])
+.nargs(key, count)
+.normalize(key)
+.number(key)
+.option(key, [opt])
+.options(key, [opt])
+.parse([args], [context], [parseCallback])
+.parseAsync([args], [context], [parseCallback])
+.parseSync([args], [context], [parseCallback])
+.parsed [DEPRECATED]
+.parserConfiguration(obj)
+.pkgConf(key, [cwd])
+.positional(key, opt)
+.recommendCommands()
+.require(key, [msg | boolean])
+.required(key, [msg | boolean])
+.requiresArg(key)
+.scriptName($0)
+.showCompletionScript()
+.showHelp([consoleLevel | printCallback])
+.showVersion([consoleLevel | printCallback])
+.showHelpOnFail(enable, [message])
+.showHidden()
+.showHidden([option | boolean])
+.showHidden([option, [description]])
+.skipValidation(key)
+.strict([enabled=true])
+.strictCommands([enabled=true])
+.strictOptions([enabled=true])
+.string(key)
+.updateLocale(obj)
+.updateStrings(obj)
+.usage(<message|command>, [desc], [builder], [handler])
+.version()
+.version([version|boolean])
+.version([option], [description], [version])
+.wrap(columns)
+```
+
+
 API reference
 ===
 
@@ -179,7 +267,7 @@ Provide a function to coerce or transform the value(s) given on the
 command line for `key`.
 
 The coercion function should accept one argument, representing the parsed value from
-the command line (an array if multiple values are parsed for the key), and should 
+the command line (an array if multiple values are parsed for the key), and should
 return a new value or throw an error. The returned value will be used as the value for
 `key` (or one of its aliases) in `argv`.
 
@@ -245,13 +333,13 @@ Apply command modules from a directory relative to the module calling this metho
 
 `opts` is an options object (optional). The following options are valid:
 
-`recurse`: Look for command modules in all subdirectories and apply them as a flattened 
+`recurse`: Look for command modules in all subdirectories and apply them as a flattened
 (non-hierarchical) list.
 
 `extensions`: The types of files to look for when requiring command modules.
 
-`visit`: A synchronous function called for each command module encountered. Accepts 
-`commandObject`, `pathToFile`, and `filename` as arguments. Returns `commandObject` 
+`visit`: A synchronous function called for each command module encountered. Accepts
+`commandObject`, `pathToFile`, and `filename` as arguments. Returns `commandObject`
 to include the command; any falsy value to exclude/skip it.
 
 `include`: Allow list certain modules. See [`require-directory`](https://www.npmjs.com/package/require-directory) for details.
