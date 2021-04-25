@@ -36,9 +36,3 @@ jobs:
           node-version: 14
           registry-url: 'https://external-dot-oss-automation.appspot.com/'
         if: ${{ steps.release.outputs.release_created }}
-      - run: npm install
-        if: ${{ steps.release.outputs.release_created }}
-      - run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
-        if: ${{ steps.release.outputs.release_created }}
