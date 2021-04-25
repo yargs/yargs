@@ -1,7 +1,7 @@
  on:
    push:
      branches:
-      - v7.x.x
+      - 7.x.x
  name: release-please
  jobs:
    release-please:
@@ -11,5 +11,5 @@
          with:
            command: manifest
            token: ${{ secrets.GITHUB_TOKEN }}
-           default-branch: v7.x.x
+           default-branch: 7.x.x
 
