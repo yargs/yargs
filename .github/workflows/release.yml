@@ -1,0 +1,15 @@
+ on:
+   push:
+     branches:
+      - v7.x.x
+ name: release-please
+ jobs:
+   release-please:
+     runs-on: ubuntu-latest
+     steps:
+       - uses: google-github-actions/release-please-action@v2
+         with:
+           command: manifest
+           token: ${{ secrets.GITHUB_TOKEN }}
+           default-branch: v7.x.x
+
