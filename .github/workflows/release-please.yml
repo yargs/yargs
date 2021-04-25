@@ -26,10 +26,10 @@ jobs:
           git remote add gh-token "https://${{ secrets.GITHUB_TOKEN}}@github.com/yargs/yargs.git"
           git checkout -b deno
           git add -f build
-          git commit -a -m 'chore: ${{ steps.release.outputs[".--tag_name"] }} release'
+          git commit -a -m 'chore: ${{ steps.release.outputs['.--tag_name'] }} release'
           git push origin +deno
-          git tag -a ${{ steps.release.outputs[".--tag_name"] }}-deno -m 'chore: ${{ steps.release.outputs[".--tag_name"] }} release'
-          git push origin ${{ steps.release.outputs[".--tag_name"] }}-deno
+          git tag -a ${{ steps.release.outputs['.--tag_name'] }}-deno -m 'chore: ${{ steps.release.outputs['.--tag_name'] }} release'
+          git push origin ${{ steps.release.outputs['.--tag_name'] }}-deno
         if: ${{ steps.release.outputs.release_created }}
       - uses: actions/setup-node@v1
         with:
