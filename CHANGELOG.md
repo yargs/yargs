@@ -20,6 +20,13 @@ All notable changes to this project will be documented in this file. See [standa
 
 
 <a name="7.0.2"></a>
+### [7.1.2](https://www.github.com/yargs/yargs/compare/yargs-v7.1.1...yargs-v7.1.2) (2021-04-25)
+
+
+### Bug Fixes
+
+* **deps:** explicitly bump yargs-parser ([#1887](https://www.github.com/yargs/yargs/issues/1887)) ([06db5fc](https://www.github.com/yargs/yargs/commit/06db5fcdbaf9a6150c0039acf210ed26af6e012f))
+
 ## [7.0.2](https://github.com/yargs/yargs/compare/v7.0.1...v7.0.2) (2017-03-10)
 
 
