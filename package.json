@@ -50,7 +50,7 @@
     "escalade": "^3.1.1",
     "get-caller-file": "^2.0.5",
     "require-directory": "^2.1.1",
-    "string-width": "^4.2.0",
+    "string-width": "^5.0.0",
     "y18n": "^5.0.5",
     "yargs-parser": "^20.2.2"
   },
