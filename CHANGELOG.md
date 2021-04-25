@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [16.2.1](https://www.github.com/yargs/yargs/compare/yargs-v16.2.0...yargs-v16.2.1) (2021-04-25)
+
+
+### Bug Fixes
+
+* **deno:** force release of deno ([#1923](https://www.github.com/yargs/yargs/issues/1923)) ([26efe45](https://www.github.com/yargs/yargs/commit/26efe45763945fce9d045d6c44da1e6897d3f7a8))
+
 ## [16.2.0](https://www.github.com/yargs/yargs/compare/v16.1.1...v16.2.0) (2020-12-05)
 
 
