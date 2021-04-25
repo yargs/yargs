@@ -209,12 +209,13 @@ export class CommandInstance {
       this.defaultCommand;
     const currentContext = yargs.getInternalMethods().getContext();
     const parentCommands = currentContext.commands.slice();
+    const isDefaultCommand = !command;
     if (command) {
       currentContext.commands.push(command);
       currentContext.fullCommands.push(commandHandler.original);
     }
     const builderResult = this.applyBuilderUpdateUsageAndParse(
-      command,
+      isDefaultCommand,
       commandHandler,
       yargs,
       parsed.aliases,
@@ -226,7 +227,7 @@ export class CommandInstance {
     if (isPromise(builderResult)) {
       return builderResult.then(result => {
         return this.applyMiddlewareAndGetResult(
-          command,
+          isDefaultCommand,
           commandHandler,
           result.innerArgv,
           currentContext,
@@ -237,7 +238,7 @@ export class CommandInstance {
       });
     } else {
       return this.applyMiddlewareAndGetResult(
-        command,
+        isDefaultCommand,
         commandHandler,
         builderResult.innerArgv,
         currentContext,
@@ -248,7 +249,7 @@ export class CommandInstance {
     }
   }
   private applyBuilderUpdateUsageAndParse(
-    command: string | null,
+    isDefaultCommand: boolean,
     commandHandler: CommandHandler,
     yargs: YargsInstance,
     aliases: Dictionary<string[]>,
@@ -273,7 +274,7 @@ export class CommandInstance {
         return builderOutput.then(output => {
           innerYargs = isYargsInstance(output) ? output : yargs;
           return this.parseAndUpdateUsage(
-            command,
+            isDefaultCommand,
             commandHandler,
             innerYargs,
             parentCommands,
@@ -291,7 +292,7 @@ export class CommandInstance {
       });
     }
     return this.parseAndUpdateUsage(
-      command,
+      isDefaultCommand,
       commandHandler,
       innerYargs,
       parentCommands,
@@ -300,7 +301,7 @@ export class CommandInstance {
     );
   }
   private parseAndUpdateUsage(
-    command: string | null,
+    isDefaultCommand: boolean,
     commandHandler: CommandHandler,
     innerYargs: YargsInstance,
     parentCommands: string[],
@@ -310,7 +311,8 @@ export class CommandInstance {
     // A null command indicates we are running the default command,
     // if this is the case, we should show the root usage instructions
     // rather than the usage instructions for the nested default command:
-    if (!command) innerYargs.getInternalMethods().getUsageInstance().unfreeze();
+    if (isDefaultCommand)
+      innerYargs.getInternalMethods().getUsageInstance().unfreeze();
     if (this.shouldUpdateUsage(innerYargs)) {
       innerYargs
         .getInternalMethods()
@@ -357,7 +359,7 @@ export class CommandInstance {
     return `$0 ${pc.join(' ')}`;
   }
   private applyMiddlewareAndGetResult(
-    command: string | null,
+    isDefaultCommand: boolean,
     commandHandler: CommandHandler,
     innerArgv: Arguments | Promise<Arguments>,
     currentContext: Context,
@@ -393,7 +395,7 @@ export class CommandInstance {
           aliases,
           positionalMap,
           (yargs.parsed as DetailedArguments).error,
-          !command
+          isDefaultCommand
         );
       innerArgv = maybeAsyncResult<Arguments>(innerArgv, result => {
         validation(result);
@@ -422,7 +424,10 @@ export class CommandInstance {
         }
       });
 
-      yargs.getInternalMethods().getUsageInstance().cacheHelpMessage();
+      if (!isDefaultCommand) {
+        yargs.getInternalMethods().getUsageInstance().cacheHelpMessage();
+      }
+
       if (
         isPromise(innerArgv) &&
         !yargs.getInternalMethods().hasParseCallback()
@@ -438,7 +443,7 @@ export class CommandInstance {
       }
     }
 
-    if (command) {
+    if (!isDefaultCommand) {
       currentContext.commands.pop();
       currentContext.fullCommands.pop();
     }
@@ -595,7 +600,7 @@ export class CommandInstance {
       });
     }
   }
-  runDefaultBuilderOn(yargs: YargsInstance): void {
+  runDefaultBuilderOn(yargs: YargsInstance): unknown | Promise<unknown> {
     if (!this.defaultCommand) return;
     if (this.shouldUpdateUsage(yargs)) {
       // build the root-level command string from the default string.
@@ -609,12 +614,13 @@ export class CommandInstance {
     }
     const builder = this.defaultCommand.builder;
     if (isCommandBuilderCallback(builder)) {
-      builder(yargs, true);
+      return builder(yargs, true);
     } else if (!isCommandBuilderDefinition(builder)) {
       Object.keys(builder).forEach(key => {
         yargs.option(key, builder[key]);
       });
     }
+    return undefined;
   }
   // lookup module object from require()d command and derive name
   // if module was not require()d and no name given, throw error
