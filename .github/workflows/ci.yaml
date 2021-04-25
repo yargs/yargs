@@ -1,7 +1,7 @@
 on:
   push:
     branches:
-      - master
+      - 16.x.x
   pull_request:
     types: [ assigned, opened, synchronize, reopened, labeled ]
 name: ci

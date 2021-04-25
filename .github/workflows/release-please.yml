@@ -1,18 +1,18 @@
 on:
    push:
      branches:
-       - master
+       - 16.x.x
 name: release-please
 jobs:
   release-please:
     runs-on: ubuntu-latest
     steps:
-      - uses: bcoe/release-please-action@v2
+      - uses: google-github-actions/release-please-action@v2
         id: release
         with:
+          command: manifest
           token: ${{ secrets.GITHUB_TOKEN }}
-          release-type: node
-          package-name: yargs
+          default-branch: 16.x.x
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
         with:
@@ -26,10 +26,10 @@ jobs:
           git remote add gh-token "https://${{ secrets.GITHUB_TOKEN}}@github.com/yargs/yargs.git"
           git checkout -b deno
           git add -f build
-          git commit -a -m 'chore: ${{ steps.release.outputs.tag_name }} release'
+          git commit -a -m 'chore: ${{ steps.release.outputs[".--tag_name"] }} release'
           git push origin +deno
-          git tag -a ${{ steps.release.outputs.tag_name }}-deno -m 'chore: ${{ steps.release.outputs.tag_name }} release'
-          git push origin ${{ steps.release.outputs.tag_name }}-deno
+          git tag -a ${{ steps.release.outputs[".--tag_name"] }}-deno -m 'chore: ${{ steps.release.outputs[".--tag_name"] }} release'
+          git push origin ${{ steps.release.outputs[".--tag_name"] }}-deno
         if: ${{ steps.release.outputs.release_created }}
       - uses: actions/setup-node@v1
         with:
