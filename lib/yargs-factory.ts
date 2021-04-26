@@ -1032,11 +1032,7 @@ export class YargsInstance {
     );
     this[kFreeze](); // Push current state of parser onto stack.
     if (typeof args === 'undefined') {
-      const argv = this[kRunYargsParserAndExecuteCommands](this.#processArgs);
-      const tmpParsed = this.parsed;
-      this[kUnfreeze](); // Pop the stack.
-      this.parsed = tmpParsed;
-      return argv;
+      args = this.#processArgs;
     }
 
     // a context object can optionally be provided, this allows
@@ -1063,6 +1059,7 @@ export class YargsInstance {
       args,
       !!shortCircuit
     );
+    const tmpParsed = this.parsed;
     this.#completion!.setParsed(this.parsed as DetailedArguments);
     if (isPromise(parsed)) {
       return parsed
@@ -1082,10 +1079,12 @@ export class YargsInstance {
         })
         .finally(() => {
           this[kUnfreeze](); // Pop the stack.
+          this.parsed = tmpParsed;
         });
     } else {
       if (this.#parseFn) this.#parseFn(this.#exitError, parsed, this.#output);
       this[kUnfreeze](); // Pop the stack.
+      this.parsed = tmpParsed;
     }
     return parsed;
   }
@@ -1983,7 +1982,6 @@ export class YargsInstance {
       const handlerKeys = this.#command.getCommands();
       const requestCompletions = this.#completion!.completionKey in argv;
       const skipRecommendation = helpOptSet || requestCompletions || helpOnly;
-
       if (argv._.length) {
         if (handlerKeys.length) {
           let firstUnknownCommand;
