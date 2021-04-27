@@ -1,6 +1,9 @@
 Additional documentation
 ===
 
+For more details refer to the offical [API reference](https://yargs.js.org/docs/#api-reference) 
+document on the yargs.js.org website.
+
 This document is the Yargs API reference. There are more documentation files in
 [`docs` in the Yargs source tree](https://github.com/yargs/yargs/tree/master/docs):
 
@@ -10,93 +13,6 @@ This document is the Yargs API reference. There are more documentation files in
 - [Browser usage example](https://github.com/yargs/yargs/blob/master/docs/browser.md)
 - [Bundling](https://github.com/yargs/yargs/blob/master/docs/bundling.md)
 - [Parsing Tricks](https://github.com/yargs/yargs/blob/master/docs/tricks.md)
-
-API listing
-===
-```
-.alias(key, alias)
-.argv
-.array(key)
-.boolean(key)
-.check(fn, [global=true])
-.choices(key, choices)
-.coerce(key, fn)
-.commandDir(directory, [opts])
-.command(cmd, desc, [builder], [handler])
-.command(cmd, desc, [module])
-.command(module)
-.completion([cmd], [description], [fn])
-.config([key], [description], [parseFn])
-.config(object)
-.conflicts(x, y)
-.count(key)
-.default(key, value, [description])
-.defaults(key, value, [description]) [DEPRECATED]
-.demand(count, [max], [msg]) [DEPRECATED]
-.demandOption(key, [msg | boolean])
-.demandOption(key, msg)
-.demandCommand([min=1], [minMsg])
-.demandCommand([min=1], [max], [minMsg], [maxMsg])
-.deprecateOption(key, [msg | boolean])
-.describe(key, desc)
-.hide(key)
-.detectLocale(boolean)
-.env([prefix])
-.epilog(str)
-.epilogue(str)
-.example(cmd, desc)
-.example([[cmd1, desc1], [cmd2, desc2], ...])
-.exitProcess(enable)
-.exit(code, err)
-.fail(fn | boolean)
-.getCompletion(args, done);
-.getHelp()
-.global(globals, [global=true])
-.group(key(s), groupName)
-.help()
-.help([option | boolean])
-.help([option, [description]])
-.implies(x, y)
-.locale()
-.locale(locale)
-.middleware(callbacks, [applyBeforeValidation])
-.nargs(key, count)
-.normalize(key)
-.number(key)
-.option(key, [opt])
-.options(key, [opt])
-.parse([args], [context], [parseCallback])
-.parseAsync([args], [context], [parseCallback])
-.parseSync([args], [context], [parseCallback])
-.parsed [DEPRECATED]
-.parserConfiguration(obj)
-.pkgConf(key, [cwd])
-.positional(key, opt)
-.recommendCommands()
-.require(key, [msg | boolean])
-.required(key, [msg | boolean])
-.requiresArg(key)
-.scriptName($0)
-.showCompletionScript()
-.showHelp([consoleLevel | printCallback])
-.showVersion([consoleLevel | printCallback])
-.showHelpOnFail(enable, [message])
-.showHidden()
-.showHidden([option | boolean])
-.showHidden([option, [description]])
-.skipValidation(key)
-.strict([enabled=true])
-.strictCommands([enabled=true])
-.strictOptions([enabled=true])
-.string(key)
-.updateLocale(obj)
-.updateStrings(obj)
-.usage(<message|command>, [desc], [builder], [handler])
-.version()
-.version([version|boolean])
-.version([option], [description], [version])
-.wrap(columns)
-```
 
 
 API reference
