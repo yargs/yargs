@@ -70,6 +70,8 @@ if (argv.ships > 3 && argv.distance < 53.5) {
 }
 ```
 
+> Note: `hideBin` is a shorthand for [`process.argv.slice(2)`](https://nodejs.org/en/knowledge/command-line/how-to-parse-command-line-arguments/). It has the benefit that it takes into account variations in some environments, e.g., [Electron](https://github.com/electron/electron/issues/4690).
+
 ```bash
 $ ./plunder.js --ships=4 --distance=22
 Plunder more riffiwobbles!
