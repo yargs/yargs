@@ -307,7 +307,9 @@ export class CommandInstance {
     parentCommands: string[],
     commandIndex: number,
     helpOnly: boolean
-  ): {aliases: Dictionary<string[]>; innerArgv: Arguments} {
+  ):
+    | {aliases: Dictionary<string[]>; innerArgv: Arguments}
+    | Promise<{aliases: Dictionary<string[]>; innerArgv: Arguments}> {
     // A null command indicates we are running the default command,
     // if this is the case, we should show the root usage instructions
     // rather than the usage instructions for the nested default command:
@@ -334,10 +336,19 @@ export class CommandInstance {
         commandIndex,
         helpOnly
       );
-    return {
-      aliases: (innerYargs.parsed as DetailedArguments).aliases,
-      innerArgv: innerArgv as Arguments,
-    };
+    if (isPromise(innerArgv)) {
+      return innerArgv.then(argv => {
+        return {
+          aliases: (innerYargs.parsed as DetailedArguments).aliases,
+          innerArgv: argv,
+        };
+      });
+    } else {
+      return {
+        aliases: (innerYargs.parsed as DetailedArguments).aliases,
+        innerArgv: innerArgv,
+      };
+    }
   }
   private shouldUpdateUsage(yargs: YargsInstance) {
     return (

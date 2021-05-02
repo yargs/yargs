@@ -596,7 +596,6 @@ describe('usage tests', () => {
             // ignore the error, we only test the output here
           }
         });
-        console.info(r);
         r.errors
           .join('\n')
           .split(/\n+/)
