@@ -1,6 +1,9 @@
 Additional documentation
 ===
 
+For more details refer to the offical [API reference](https://yargs.js.org/docs/#api-reference) 
+document on the yargs.js.org website.
+
 This document is the Yargs API reference. There are more documentation files in
 [`docs` in the Yargs source tree](https://github.com/yargs/yargs/tree/master/docs):
 
@@ -10,6 +13,7 @@ This document is the Yargs API reference. There are more documentation files in
 - [Browser usage example](https://github.com/yargs/yargs/blob/master/docs/browser.md)
 - [Bundling](https://github.com/yargs/yargs/blob/master/docs/bundling.md)
 - [Parsing Tricks](https://github.com/yargs/yargs/blob/master/docs/tricks.md)
+
 
 API reference
 ===
@@ -179,7 +183,7 @@ Provide a function to coerce or transform the value(s) given on the
 command line for `key`.
 
 The coercion function should accept one argument, representing the parsed value from
-the command line (an array if multiple values are parsed for the key), and should 
+the command line (an array if multiple values are parsed for the key), and should
 return a new value or throw an error. The returned value will be used as the value for
 `key` (or one of its aliases) in `argv`.
 
@@ -245,13 +249,13 @@ Apply command modules from a directory relative to the module calling this metho
 
 `opts` is an options object (optional). The following options are valid:
 
-`recurse`: Look for command modules in all subdirectories and apply them as a flattened 
+`recurse`: Look for command modules in all subdirectories and apply them as a flattened
 (non-hierarchical) list.
 
 `extensions`: The types of files to look for when requiring command modules.
 
-`visit`: A synchronous function called for each command module encountered. Accepts 
-`commandObject`, `pathToFile`, and `filename` as arguments. Returns `commandObject` 
+`visit`: A synchronous function called for each command module encountered. Accepts
+`commandObject`, `pathToFile`, and `filename` as arguments. Returns `commandObject`
 to include the command; any falsy value to exclude/skip it.
 
 `include`: Allow list certain modules. See [`require-directory`](https://www.npmjs.com/package/require-directory) for details.

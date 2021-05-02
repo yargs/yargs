@@ -78,6 +78,8 @@ $ ./plunder.js --ships 12 --distance 98.7
 Retreat from the xupptumblers!
 ```
 
+> Note: `hideBin` is a shorthand for [`process.argv.slice(2)`](https://nodejs.org/en/knowledge/command-line/how-to-parse-command-line-arguments/). It has the benefit that it takes into account variations in some environments, e.g., [Electron](https://github.com/electron/electron/issues/4690).
+
 ### Complex Example
 
 ```javascript
