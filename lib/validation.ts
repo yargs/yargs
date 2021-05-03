@@ -232,15 +232,10 @@ export function validation(
       return false;
     }
     const newAliases = (yargs.parsed as DetailedArguments).newAliases;
-    for (const a of [key, ...aliases[key]]) {
-      if (
-        !Object.prototype.hasOwnProperty.call(newAliases, a) ||
-        !newAliases[key]
-      ) {
-        return true;
-      }
-    }
-    return false;
+    return [key, ...aliases[key]].some(
+      a =>
+        !Object.prototype.hasOwnProperty.call(newAliases, a) || !newAliases[key]
+    );
   };
 
   // validate arguments limited to enumerated choices

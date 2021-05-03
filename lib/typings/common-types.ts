@@ -54,7 +54,7 @@ export function assertSingleKey(
 }
 
 /**
- * Typing wrappefr around Object.keys()
+ * Typing wrapper around Object.keys()
  */
 export function objectKeys<T>(object: T) {
   return Object.keys(object) as (keyof T)[];
