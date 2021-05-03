@@ -16,7 +16,7 @@ import cjsPlatformShim from './platform-shims/cjs.js';
 const minNodeVersion =
   process && process.env && process.env.YARGS_MIN_NODE_VERSION
     ? Number(process.env.YARGS_MIN_NODE_VERSION)
-    : 10;
+    : 12;
 if (process && process.version) {
   const major = Number(process.version.match(/v([^.]+)/)![1]);
   if (major < minNodeVersion) {
