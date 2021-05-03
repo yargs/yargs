@@ -48,7 +48,7 @@ export class GlobalMiddleware {
   ): YargsInstance {
     const aliases = this.yargs.getAliases();
     this.globalMiddleware = this.globalMiddleware.filter(m => {
-      const toCheck = [...(aliases[option] ? aliases[option] : []), option];
+      const toCheck = [...(aliases[option] || []), option];
       if (!m.option) return true;
       else return !toCheck.includes(m.option);
     });

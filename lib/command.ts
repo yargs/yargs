@@ -750,11 +750,7 @@ interface CommandBuilderCallback {
 function isCommandAndAliases(
   cmd: DefinitionOrCommandName[]
 ): cmd is [CommandHandlerDefinition, ...string[]] {
-  if (cmd.every(c => typeof c === 'string')) {
-    return true;
-  } else {
-    return false;
-  }
+  return cmd.every(c => typeof c === 'string');
 }
 
 export function isCommandBuilderCallback(
