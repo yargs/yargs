@@ -1094,11 +1094,9 @@ export class YargsInstance {
     _parseFn?: ParseCallback
   ): Promise<Arguments> {
     const maybePromise = this.parse(args, shortCircuit, _parseFn);
-    if (!isPromise(maybePromise)) {
-      return Promise.resolve(maybePromise);
-    } else {
-      return maybePromise;
-    }
+    return !isPromise(maybePromise)
+      ? Promise.resolve(maybePromise)
+      : maybePromise;
   }
   parseSync(
     args?: string | string[],
@@ -1789,10 +1787,8 @@ export class YargsInstance {
   [kReset](aliases: Aliases = {}): YargsInstance {
     this.#options = this.#options || ({} as Options);
     const tmpOptions = {} as Options;
-    tmpOptions.local = this.#options.local ? this.#options.local : [];
-    tmpOptions.configObjects = this.#options.configObjects
-      ? this.#options.configObjects
-      : [];
+    tmpOptions.local = this.#options.local || [];
+    tmpOptions.configObjects = this.#options.configObjects || [];
 
     // if a key has been explicitly set as local,
     // we should reset it before passing options to command.
@@ -2109,7 +2105,7 @@ export class YargsInstance {
         );
       }
 
-      // If the help or version options where used and exitProcess is false,
+      // If the help or version options were used and exitProcess is false,
       // or if explicitly skipped, we won't run validations.
       if (!skipValidation) {
         if (parsed.error) throw new YError(parsed.error.message);
@@ -2157,8 +2153,6 @@ export class YargsInstance {
     parseErrors: Error | null,
     isDefaultCommand?: boolean
   ): (argv: Arguments) => void {
-    aliases = {...aliases};
-    positionalMap = {...positionalMap};
     const demandedOptions = {...this.getDemandedOptions()};
     return (argv: Arguments) => {
       if (parseErrors) throw new YError(parseErrors.message);
