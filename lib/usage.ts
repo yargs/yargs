@@ -334,41 +334,40 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
       .filter(({normalizedKeys}) => normalizedKeys.length > 0)
       .map(({groupName, normalizedKeys}) => {
         // actually generate the switches string --foo, -f, --bar.
-        const switches: Dictionary<
-          string | IndentedText
-        > = normalizedKeys.reduce((acc, key) => {
-          acc[key] = [key]
-            .concat(options.alias[key] || [])
-            .map(sw => {
-              // for the special positional group don't
-              // add '--' or '-' prefix.
-              if (groupName === self.getPositionalGroupName()) return sw;
-              else {
-                return (
-                  // matches yargs-parser logic in which single-digits
-                  // aliases declared with a boolean type are now valid
-                  (/^[0-9]$/.test(sw)
-                    ? ~options.boolean.indexOf(key)
-                      ? '-'
-                      : '--'
-                    : sw.length > 1
-                    ? '--'
-                    : '-') + sw
-                );
-              }
-            })
-            // place short switches first (see #1403)
-            .sort((sw1, sw2) =>
-              isLongSwitch(sw1) === isLongSwitch(sw2)
-                ? 0
-                : isLongSwitch(sw1)
-                ? 1
-                : -1
-            )
-            .join(', ');
+        const switches: Dictionary<string | IndentedText> =
+          normalizedKeys.reduce((acc, key) => {
+            acc[key] = [key]
+              .concat(options.alias[key] || [])
+              .map(sw => {
+                // for the special positional group don't
+                // add '--' or '-' prefix.
+                if (groupName === self.getPositionalGroupName()) return sw;
+                else {
+                  return (
+                    // matches yargs-parser logic in which single-digits
+                    // aliases declared with a boolean type are now valid
+                    (/^[0-9]$/.test(sw)
+                      ? ~options.boolean.indexOf(key)
+                        ? '-'
+                        : '--'
+                      : sw.length > 1
+                      ? '--'
+                      : '-') + sw
+                  );
+                }
+              })
+              // place short switches first (see #1403)
+              .sort((sw1, sw2) =>
+                isLongSwitch(sw1) === isLongSwitch(sw2)
+                  ? 0
+                  : isLongSwitch(sw1)
+                  ? 1
+                  : -1
+              )
+              .join(', ');
 
-          return acc;
-        }, {} as Dictionary<string>);
+            return acc;
+          }, {} as Dictionary<string>);
 
         return {groupName, normalizedKeys, switches};
       });

@@ -415,9 +415,8 @@ export class CommandInstance {
       yargs.getInternalMethods().setHasOutput();
       // to simplify the parsing of positionals in commands,
       // we temporarily populate '--' rather than _, with arguments
-      const populateDoubleDash = !!yargs.getOptions().configuration[
-        'populate--'
-      ];
+      const populateDoubleDash =
+        !!yargs.getOptions().configuration['populate--'];
       yargs
         .getInternalMethods()
         .postProcess(innerArgv, populateDoubleDash, false, false);

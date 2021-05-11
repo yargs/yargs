@@ -77,8 +77,9 @@ export class Completion implements CompletionInstance {
     args: string[],
     current: string
   ) {
-    const parentCommands = this.yargs.getInternalMethods().getContext()
-      .commands;
+    const parentCommands = this.yargs
+      .getInternalMethods()
+      .getContext().commands;
     if (
       !current.match(/^-/) &&
       parentCommands[parentCommands.length - 1] !== current
