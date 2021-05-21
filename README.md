@@ -146,7 +146,7 @@ yargs(Deno.args)
 As of `v16`,`yargs` supports ESM imports:
 
 ```js
-import * as yargs from 'yargs';
+import * as yargs from 'yargs'
 import { hideBin } from 'yargs/helpers'
 
 yargs(hideBin(process.argv))
