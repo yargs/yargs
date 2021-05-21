@@ -21,7 +21,7 @@ const REQUIRE_ERROR = 'require is not supported by ESM';
 const REQUIRE_DIRECTORY_ERROR =
   'loading a directory of commands is not supported yet for ESM';
 
-// Deno removes argv[0] and argv[1 from Deno.args:
+// Deno removes argv[0] and argv[1] from Deno.args:
 const argv = ['deno run', ...Deno.args];
 const __dirname = new URL('.', import.meta.url).pathname;
 
