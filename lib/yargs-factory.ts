@@ -1442,7 +1442,7 @@ export class YargsInstance {
         return;
       const hint = this.#options[hintKey];
       if (Array.isArray(hint)) {
-        if (~hint.indexOf(optionKey)) hint.splice(hint.indexOf(optionKey), 1);
+        if (hint.includes(optionKey)) hint.splice(hint.indexOf(optionKey), 1);
       } else if (typeof hint === 'object') {
         delete (hint as Dictionary)[optionKey];
       }
@@ -1966,7 +1966,7 @@ export class YargsInstance {
           .concat(aliases[this.#helpOpt] || [])
           .filter(k => k.length > 1);
         // check if help should trigger and strip it from _.
-        if (~helpCmds.indexOf('' + argv._[argv._.length - 1])) {
+        if (helpCmds.includes('' + argv._[argv._.length - 1])) {
           argv._.pop();
           helpOptSet = true;
         }
@@ -1980,7 +1980,7 @@ export class YargsInstance {
           let firstUnknownCommand;
           for (let i = commandIndex || 0, cmd; argv._[i] !== undefined; i++) {
             cmd = String(argv._[i]);
-            if (~handlerKeys.indexOf(cmd) && cmd !== this.#completionCommand) {
+            if (handlerKeys.includes(cmd) && cmd !== this.#completionCommand) {
               // commands are executed using a recursive algorithm that executes
               // the deepest command first; we keep track of the position in the
               // argv._ array that is currently being executed.
@@ -2026,7 +2026,7 @@ export class YargsInstance {
         // generate a completion script for adding to ~/.bashrc.
         if (
           this.#completionCommand &&
-          ~argv._.indexOf(this.#completionCommand) &&
+          argv._.includes(this.#completionCommand) &&
           !requestCompletions
         ) {
           if (this.#exitProcess) setBlocking(true);

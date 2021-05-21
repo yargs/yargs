@@ -1813,7 +1813,7 @@ describe('Command', () => {
   });
 
   // see: https://github.com/yargs/yargs/issues/853
-  it('should not execute command if it is proceeded by another positional argument', () => {
+  it('should not execute command if it is preceded by another positional argument', () => {
     let commandCalled = false;
     yargs()
       .command('foo', 'foo command', noop, () => {

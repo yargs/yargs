@@ -596,7 +596,7 @@ export class CommandInstance {
       });
 
       Object.keys(parsed.argv).forEach(key => {
-        if (~positionalKeys.indexOf(key)) {
+        if (positionalKeys.includes(key)) {
           // any new aliases need to be placed in positionalMap, which
           // is used for validation.
           if (!positionalMap[key]) positionalMap[key] = parsed.argv[key];
