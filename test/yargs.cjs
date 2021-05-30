@@ -2381,9 +2381,7 @@ describe('yargs dsl tests', () => {
       const argv = yargs('cmd batman')
         .command('cmd <hero>', 'a command', yargs => {
           yargs.positional('hero', {
-            coerce: function (arg) {
-              return arg.toUpperCase();
-            },
+            coerce: arg => arg.toUpperCase(),
             alias: 'do-gooder',
           });
         })
