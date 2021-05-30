@@ -96,7 +96,7 @@ describe('yargs dsl tests', () => {
     argv.cat.should.eql(33);
   });
 
-  it('do not populates argv with placeholder keys for unset options', () => {
+  it('does not populate argv with placeholder keys for unset options', () => {
     const argv = yargs([]).option('cool', {}).parse();
 
     Object.keys(argv).should.not.include('cool');
@@ -1389,7 +1389,7 @@ describe('yargs dsl tests', () => {
         }).to.throw(YError);
       });
 
-      it('handles aboslute paths', () => {
+      it('handles absolute paths', () => {
         const absolutePath = path.join(
           process.cwd(),
           'test',
