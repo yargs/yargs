@@ -190,9 +190,9 @@ describe('validation tests', () => {
         .parse();
     });
 
-    // strip-dash breaks conflicting
+    // strip-dashed breaks conflicting
     // https://github.com/yargs/yargs/issues/1952
-    it('fails if conflicting arguments are provided, and strip-dash is enabled', () => {
+    it('fails if conflicting arguments are provided, and strip-dashed is enabled', () => {
       yargs()
         .option('foo-foo', {
           description: 'a foo-foo',
