@@ -80,9 +80,7 @@ export declare type ArrayOption =
       integer?: boolean;
     };
 export declare type CoerceCallback = (arg: any) => any;
-export declare type ConfigCallback = (
-  configPath: string
-) =>
+export declare type ConfigCallback = (configPath: string) =>
   | {
       [key: string]: any;
     }

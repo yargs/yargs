@@ -336,19 +336,16 @@ export class CommandInstance {
         commandIndex,
         helpOnly
       );
-    if (isPromise(innerArgv)) {
-      return innerArgv.then(argv => {
-        return {
+
+    return isPromise(innerArgv)
+      ? innerArgv.then(argv => ({
           aliases: (innerYargs.parsed as DetailedArguments).aliases,
           innerArgv: argv,
+        }))
+      : {
+          aliases: (innerYargs.parsed as DetailedArguments).aliases,
+          innerArgv: innerArgv,
         };
-      });
-    } else {
-      return {
-        aliases: (innerYargs.parsed as DetailedArguments).aliases,
-        innerArgv: innerArgv,
-      };
-    }
   }
   private shouldUpdateUsage(yargs: YargsInstance) {
     return (
@@ -418,9 +415,8 @@ export class CommandInstance {
       yargs.getInternalMethods().setHasOutput();
       // to simplify the parsing of positionals in commands,
       // we temporarily populate '--' rather than _, with arguments
-      const populateDoubleDash = !!yargs.getOptions().configuration[
-        'populate--'
-      ];
+      const populateDoubleDash =
+        !!yargs.getOptions().configuration['populate--'];
       yargs
         .getInternalMethods()
         .postProcess(innerArgv, populateDoubleDash, false, false);
@@ -428,11 +424,9 @@ export class CommandInstance {
       innerArgv = applyMiddleware(innerArgv, yargs, middlewares, false);
       innerArgv = maybeAsyncResult<Arguments>(innerArgv, result => {
         const handlerResult = commandHandler.handler(result as Arguments);
-        if (isPromise(handlerResult)) {
-          return handlerResult.then(() => result);
-        } else {
-          return result;
-        }
+        return isPromise(handlerResult)
+          ? handlerResult.then(() => result)
+          : result;
       });
 
       if (!isDefaultCommand) {
@@ -602,7 +596,7 @@ export class CommandInstance {
       });
 
       Object.keys(parsed.argv).forEach(key => {
-        if (positionalKeys.indexOf(key) !== -1) {
+        if (positionalKeys.includes(key)) {
           // any new aliases need to be placed in positionalMap, which
           // is used for validation.
           if (!positionalMap[key]) positionalMap[key] = parsed.argv[key];

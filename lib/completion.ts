@@ -8,7 +8,7 @@ import {YargsInstance} from './yargs-factory.js';
 import {Arguments, DetailedArguments} from './typings/yargs-parser-types.js';
 
 // add bash completions to your
-//  yargs-powered applications.
+// yargs-powered applications.
 
 type CompletionCallback = (
   err: Error | null,
@@ -77,8 +77,9 @@ export class Completion implements CompletionInstance {
     args: string[],
     current: string
   ) {
-    const parentCommands = this.yargs.getInternalMethods().getContext()
-      .commands;
+    const parentCommands = this.yargs
+      .getInternalMethods()
+      .getContext().commands;
     if (
       !current.match(/^-/) &&
       parentCommands[parentCommands.length - 1] !== current
@@ -240,7 +241,7 @@ export class Completion implements CompletionInstance {
       : templates.completionShTemplate;
     const name = this.shim.path.basename($0);
 
-    // add ./to applications not yet installed as bin.
+    // add ./ to applications not yet installed as bin.
     if ($0.match(/\.js$/)) $0 = `./${$0}`;
 
     script = script.replace(/{{app_name}}/g, name);
@@ -249,8 +250,8 @@ export class Completion implements CompletionInstance {
   }
 
   // register a function to perform your own custom
-  // completions., this function can be either
-  // synchrnous or asynchronous.
+  // completions. this function can be either
+  // synchronous or asynchronous.
   registerFunction(fn: CompletionFunction) {
     this.customCompletionFunction = fn;
   }
