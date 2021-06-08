@@ -57,13 +57,15 @@ exports.checkOutput = function checkOutput(f, argv, cb) {
     try {
       result = f();
       if (typeof result.then === 'function') {
-        return result.then((r) => {
-          reset();
-          return done();
-        }).catch(() => {
-          reset();
-          return done();
-        });
+        return result
+          .then(() => {
+            reset();
+            return done();
+          })
+          .catch(() => {
+            reset();
+            return done();
+          });
       } else {
         reset();
       }

@@ -509,10 +509,7 @@ describe('middleware', () => {
               }, 100);
             });
           }, true)
-          .check(argv => {
-            if (argv.foo > 100) return true;
-            else return false;
-          })
+          .check(argv => argv.foo > 100)
           .parse();
         const argv = await argvEventual;
         argv.foo.should.equal(200);
@@ -534,10 +531,7 @@ describe('middleware', () => {
               }, 100);
             });
           }, true)
-          .check(argv => {
-            if (argv.foo > 100) return true;
-            else return false;
-          })
+          .check(argv => argv.foo > 100)
           .parse();
         const argv = await argvEventual;
         argv.foo.should.equal(200);
@@ -580,10 +574,7 @@ describe('middleware', () => {
           argv.foo = argv.foo * 2;
           argv.bar = 'hello';
         }, true)
-        .check(argv => {
-          if (argv.foo > 100) return true;
-          else return false;
-        })
+        .check(argv => argv.foo > 100)
         .parse();
       argv.foo.should.equal(200);
       argv.bar.should.equal('hello');
@@ -622,8 +613,7 @@ describe('middleware', () => {
           }, true)
           .check(async argv => {
             wait();
-            if (argv.foo < 200) return false;
-            else return true;
+            return argv.foo >= 200;
           })
           .parse();
         (!!argvPromise.then).should.equal(true);
@@ -638,8 +628,7 @@ describe('middleware', () => {
           }, true)
           .check(async argv => {
             wait();
-            if (argv.foo < 200) return false;
-            else return true;
+            return argv.foo >= 200;
           })
           .parse();
         (!!argvPromise.then).should.equal(true);
@@ -656,8 +645,7 @@ describe('middleware', () => {
               yargs.check(async argv => {
                 wait();
                 output += 'first';
-                if (argv.foo < 200) return false;
-                else return true;
+                return argv.foo >= 200;
               });
             },
             async argv => {
@@ -680,8 +668,7 @@ describe('middleware', () => {
               yargs.check(async argv => {
                 wait();
                 output += 'second';
-                if (argv.foo < 200) return false;
-                else return true;
+                return argv.foo >= 200;
               });
             },
             async argv => {
@@ -733,8 +720,7 @@ describe('middleware', () => {
                 yargs.check(async argv => {
                   wait();
                   output += 'first';
-                  if (argv.foo < 200) return false;
-                  else return true;
+                  return argv.foo >= 200;
                 });
               },
               async argv => {
@@ -759,8 +745,7 @@ describe('middleware', () => {
                 yargs.check(async argv => {
                   wait();
                   output += 'second';
-                  if (argv.foo < 200) return false;
-                  else return true;
+                  return argv.foo >= 200;
                 });
               },
               async argv => {
@@ -786,7 +771,7 @@ describe('middleware', () => {
         output.should.equal('firstsecond');
       });
     });
-    it('applies alliases prior to calling check', async () => {
+    it('applies aliases prior to calling check', async () => {
       const argv = await yargs('--f 99')
         .alias('foo', 'f')
         .check(async argv => {

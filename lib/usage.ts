@@ -317,13 +317,13 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
         const normalizedKeys: string[] = groups[groupName]
           .filter(filterHiddenOptions)
           .map(key => {
-            if (~aliasKeys.indexOf(key)) return key;
+            if (aliasKeys.includes(key)) return key;
             for (
               let i = 0, aliasKey;
               (aliasKey = aliasKeys[i]) !== undefined;
               i++
             ) {
-              if (~(options.alias[aliasKey] || []).indexOf(key))
+              if ((options.alias[aliasKey] || []).includes(key))
                 return aliasKey;
             }
             return key;
@@ -334,41 +334,40 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
       .filter(({normalizedKeys}) => normalizedKeys.length > 0)
       .map(({groupName, normalizedKeys}) => {
         // actually generate the switches string --foo, -f, --bar.
-        const switches: Dictionary<
-          string | IndentedText
-        > = normalizedKeys.reduce((acc, key) => {
-          acc[key] = [key]
-            .concat(options.alias[key] || [])
-            .map(sw => {
-              // for the special positional group don't
-              // add '--' or '-' prefix.
-              if (groupName === self.getPositionalGroupName()) return sw;
-              else {
-                return (
-                  // matches yargs-parser logic in which single-digits
-                  // aliases declared with a boolean type are now valid
-                  (/^[0-9]$/.test(sw)
-                    ? ~options.boolean.indexOf(key)
-                      ? '-'
-                      : '--'
-                    : sw.length > 1
-                    ? '--'
-                    : '-') + sw
-                );
-              }
-            })
-            // place short switches first (see #1403)
-            .sort((sw1, sw2) =>
-              isLongSwitch(sw1) === isLongSwitch(sw2)
-                ? 0
-                : isLongSwitch(sw1)
-                ? 1
-                : -1
-            )
-            .join(', ');
+        const switches: Dictionary<string | IndentedText> =
+          normalizedKeys.reduce((acc, key) => {
+            acc[key] = [key]
+              .concat(options.alias[key] || [])
+              .map(sw => {
+                // for the special positional group don't
+                // add '--' or '-' prefix.
+                if (groupName === self.getPositionalGroupName()) return sw;
+                else {
+                  return (
+                    // matches yargs-parser logic in which single-digits
+                    // aliases declared with a boolean type are now valid
+                    (/^[0-9]$/.test(sw)
+                      ? options.boolean.includes(key)
+                        ? '-'
+                        : '--'
+                      : sw.length > 1
+                      ? '--'
+                      : '-') + sw
+                  );
+                }
+              })
+              // place short switches first (see #1403)
+              .sort((sw1, sw2) =>
+                isLongSwitch(sw1) === isLongSwitch(sw2)
+                  ? 0
+                  : isLongSwitch(sw1)
+                  ? 1
+                  : -1
+              )
+              .join(', ');
 
-          return acc;
-        }, {} as Dictionary<string>);
+            return acc;
+          }, {} as Dictionary<string>);
 
         return {groupName, normalizedKeys, switches};
       });
@@ -402,15 +401,15 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
         let desc = descriptions[key] || '';
         let type = null;
 
-        if (~desc.lastIndexOf(deferY18nLookupPrefix))
+        if (desc.includes(deferY18nLookupPrefix))
           desc = __(desc.substring(deferY18nLookupPrefix.length));
 
-        if (~options.boolean.indexOf(key)) type = `[${__('boolean')}]`;
-        if (~options.count.indexOf(key)) type = `[${__('count')}]`;
-        if (~options.string.indexOf(key)) type = `[${__('string')}]`;
-        if (~options.normalize.indexOf(key)) type = `[${__('string')}]`;
-        if (~options.array.indexOf(key)) type = `[${__('array')}]`;
-        if (~options.number.indexOf(key)) type = `[${__('number')}]`;
+        if (options.boolean.includes(key)) type = `[${__('boolean')}]`;
+        if (options.count.includes(key)) type = `[${__('count')}]`;
+        if (options.string.includes(key)) type = `[${__('string')}]`;
+        if (options.normalize.includes(key)) type = `[${__('string')}]`;
+        if (options.array.includes(key)) type = `[${__('array')}]`;
+        if (options.number.includes(key)) type = `[${__('number')}]`;
 
         const deprecatedExtra = (deprecated?: string | boolean) =>
           typeof deprecated === 'string'
@@ -543,12 +542,12 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
         if (alias in demandedOptions)
           yargs.demandOption(key, demandedOptions[alias]);
         // type messages.
-        if (~options.boolean.indexOf(alias)) yargs.boolean(key);
-        if (~options.count.indexOf(alias)) yargs.count(key);
-        if (~options.string.indexOf(alias)) yargs.string(key);
-        if (~options.normalize.indexOf(alias)) yargs.normalize(key);
-        if (~options.array.indexOf(alias)) yargs.array(key);
-        if (~options.number.indexOf(alias)) yargs.number(key);
+        if (options.boolean.includes(alias)) yargs.boolean(key);
+        if (options.count.includes(alias)) yargs.count(key);
+        if (options.string.includes(alias)) yargs.string(key);
+        if (options.normalize.includes(alias)) yargs.normalize(key);
+        if (options.array.includes(alias)) yargs.array(key);
+        if (options.number.includes(alias)) yargs.number(key);
       });
     });
   }
