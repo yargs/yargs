@@ -3,6 +3,7 @@ const ts = require('@wessberg/rollup-plugin-ts');
 const {terser} = require('rollup-plugin-terser');
 
 const output = {
+  sourcemap: true,
   format: 'cjs',
   file: './build/index.cjs',
   exports: 'default',
