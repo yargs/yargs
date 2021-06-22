@@ -1,0 +1,50 @@
+<!doctype html>
+  <header>
+    <style>
+      #output {
+        width: 400px;
+        height: 350px;
+        font-family: Lucida Console, Courier, monospace;
+        display: block;
+      }
+      #input {
+        width: 400px;
+      }
+    </style>
+  </header>
+  <body>
+    <textarea id="output" placeholder="type '--help' and hit [enter] to get started" readonly="readonly"></textarea>
+    <input type="text" placeholder=">" id="input" autocomplete="off" />
+    <script type="module">
+      // Import the ESM version of the yargs module:
+      import Yargs from 'https://unpkg.com/yargs@16.0.0-beta.1/browser.mjs';
+      const yargs = Yargs()
+        .scriptName('>')
+        .command('clear', 'clear the output window', () => {}, () => {
+          output.value = '';
+        })
+        .command('alert <message...>', 'display an alert', () => {}, (argv) => {
+          alert(argv.message.join(' '))
+        })
+        .wrap(null)
+        .strict()
+        .demandCommand(1)
+        .version('v1.0.0');
+
+      // Use the #output element to output parsed "cli" #input:
+      const input = document.getElementById('input');
+      const output = document.getElementById('output');
+      input.addEventListener('keydown', event => {
+        if (event.keyCode === 13) { // Enter.
+          const argv = yargs.parse(input.value, (err, argv, _output) => {
+            if (output) {
+              output.value += `\n${_output}`;
+              output.scrollTop = output.scrollHeight;
+            }
+          });
+          input.value = '';
+        }
+      });
+    </script>
+  </body>
+</html>

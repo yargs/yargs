@@ -2,398 +2,150 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-### [15.3.1](https://www.github.com/yargs/yargs/compare/v15.3.0...v15.3.1) (2020-03-16)
+### [17.0.1](https://www.github.com/yargs/yargs/compare/v17.0.0...v17.0.1) (2021-05-03)
 
 
 ### Bug Fixes
 
-* \_\_proto\_\_ will now be replaced with \_\_\_proto\_\_\_ in parse ([#258](https://www.github.com/yargs/yargs-parser/issues/258)), patching a potential 
-prototype pollution vulnerability. This was reported by the Snyk Security Research Team. ([63810ca](https://www.github.com/yargs/yargs-parser/commit/63810ca1ae1a24b08293a4d971e70e058c7a41e2))
+* **build:** Node 12 is now minimum version ([#1936](https://www.github.com/yargs/yargs/issues/1936)) ([0924566](https://www.github.com/yargs/yargs/commit/09245666e57facb140e0b45a9e45ca704883e5dd))
 
-## [15.3.0](https://www.github.com/yargs/yargs/compare/v15.2.0...v15.3.0) (2020-03-08)
-
-
-### Features
-
-* **yargs-parser:** introduce single-digit boolean aliases ([#1576](https://www.github.com/yargs/yargs/issues/1576)) ([3af7f04](https://www.github.com/yargs/yargs/commit/3af7f04cdbfcbd4b3f432aca5144d43f21958c39))
-* add usage for single-digit boolean aliases ([#1580](https://www.github.com/yargs/yargs/issues/1580)) ([6014e39](https://www.github.com/yargs/yargs/commit/6014e39bca3a1e8445aa0fb2a435f6181e344c45))
-
-
-### Bug Fixes
-
-* address ambiguity between nargs of 1 and requiresArg ([#1572](https://www.github.com/yargs/yargs/issues/1572)) ([a5edc32](https://www.github.com/yargs/yargs/commit/a5edc328ecb3f90d1ba09cfe70a0040f68adf50a))
-
-## [15.2.0](https://www.github.com/yargs/yargs/compare/v15.1.0...v15.2.0) (2020-03-01)
+## [17.0.0](https://www.github.com/yargs/yargs/compare/v16.2.0...v17.0.0) (2021-05-02)
 
 
 ### ⚠ BREAKING CHANGES
 
-* **deps:** yargs-parser@17.0.0 no longer implicitly creates arrays out of boolean
-arguments when duplicates are provided
+* **node:** drop Node 10 (#1919)
+* implicitly private methods are now actually private
+* deprecated reset() method is now private (call yargs() instead).
+* **yargs-factory:** refactor yargs-factory to use class (#1895)
+* .positional() now allowed at root level of yargs.
+* **coerce:** coerce is now applied before validation.
+* **async:** yargs now returns a promise if async or check are asynchronous.
+* **middleware:** global middleware now applied when no command is configured.
+* #1823 contains the following breaking API changes:
+    * now returns a promise if handler is async.
+    * onFinishCommand removed, in favor of being able to await promise.
+    * getCompletion now invokes callback with err and `completions, returns promise of completions.
 
 ### Features
 
-* **completion:** takes negated flags into account when boolean-negation is set ([#1509](https://www.github.com/yargs/yargs/issues/1509)) ([7293ad5](https://www.github.com/yargs/yargs/commit/7293ad50d20ea0fb7dd1ac9b925e90e1bd95dea8))
-* **deps:** pull in yargs-parser@17.0.0 ([#1553](https://www.github.com/yargs/yargs/issues/1553)) ([b9409da](https://www.github.com/yargs/yargs/commit/b9409da199ebca515a848489c206b807fab2e65d))
-* deprecateOption ([#1559](https://www.github.com/yargs/yargs/issues/1559)) ([8aae333](https://www.github.com/yargs/yargs/commit/8aae3332251d09fa136db17ef4a40d83fa052bc4))
-* display appropriate $0 for electron apps ([#1536](https://www.github.com/yargs/yargs/issues/1536)) ([d0e4379](https://www.github.com/yargs/yargs/commit/d0e437912917d6a66bb5128992fa2f566a5f830b))
-* introduces strictCommands() subset of strict mode ([#1540](https://www.github.com/yargs/yargs/issues/1540)) ([1d4cca3](https://www.github.com/yargs/yargs/commit/1d4cca395a98b395e6318f0505fc73bef8b01350))
-* **deps:** yargs-parser with 'greedy-array' configuration ([#1569](https://www.github.com/yargs/yargs/issues/1569)) ([a03a320](https://www.github.com/yargs/yargs/commit/a03a320dbf5c0ce33d829a857fc04a651c0bb53e))
+* add commands alias (similar to options function) ([#1850](https://www.github.com/yargs/yargs/issues/1850)) ([00b74ad](https://www.github.com/yargs/yargs/commit/00b74adcb30ab89b4450ef7105ef1ad32d820ebf))
+* add parseSync/parseAsync method ([#1898](https://www.github.com/yargs/yargs/issues/1898)) ([6130ad8](https://www.github.com/yargs/yargs/commit/6130ad89b85dc49e34190e596e14a2fd3e668781))
+* add support for `showVersion`, similar to `showHelp` ([#1831](https://www.github.com/yargs/yargs/issues/1831)) ([1a1e2d5](https://www.github.com/yargs/yargs/commit/1a1e2d554dca3566bc174584394419be0120d207))
+* adds support for async builder ([#1888](https://www.github.com/yargs/yargs/issues/1888)) ([ade29b8](https://www.github.com/yargs/yargs/commit/ade29b864abecaa8c4f8dcc3493f5eb24fb73d84)), closes [#1042](https://www.github.com/yargs/yargs/issues/1042)
+* allow calling standard completion function from custom one ([#1855](https://www.github.com/yargs/yargs/issues/1855)) ([31765cb](https://www.github.com/yargs/yargs/commit/31765cbdce812ee5c16aaae70ab523a2c7e0fcec))
+* allow default completion to be referenced and modified, in custom completion ([#1878](https://www.github.com/yargs/yargs/issues/1878)) ([01619f6](https://www.github.com/yargs/yargs/commit/01619f6191a3ab16bf6b77456d4e9dfa80533907))
+* **async:** add support for async check and coerce ([#1872](https://www.github.com/yargs/yargs/issues/1872)) ([8b95f57](https://www.github.com/yargs/yargs/commit/8b95f57bb2a49b098c6bf23cea88c6f900a34f89))
+* improve support for async/await ([#1823](https://www.github.com/yargs/yargs/issues/1823)) ([169b815](https://www.github.com/yargs/yargs/commit/169b815df7ae190965f04030f28adc3ab92bb4b5))
+* **locale:** add Ukrainian locale ([#1893](https://www.github.com/yargs/yargs/issues/1893)) ([c872dfc](https://www.github.com/yargs/yargs/commit/c872dfc1d87ebaa7fcc79801f649318a16195495))
+* **middleware:** async middleware can now be used before validation. ([e0f9363](https://www.github.com/yargs/yargs/commit/e0f93636e04fa7e02a2c3b1fe465b6a14aa1f06d))
+* **middleware:** global middleware now applied when no command is configured. ([e0f9363](https://www.github.com/yargs/yargs/commit/e0f93636e04fa7e02a2c3b1fe465b6a14aa1f06d))
+* **node:** drop Node 10 ([#1919](https://www.github.com/yargs/yargs/issues/1919)) ([5edeb9e](https://www.github.com/yargs/yargs/commit/5edeb9ea17b1f0190a3590508f2e7911b5f70659))
 
 
 ### Bug Fixes
 
-* help always displayed for the first command parsed having an async handler ([#1535](https://www.github.com/yargs/yargs/issues/1535)) ([d585b30](https://www.github.com/yargs/yargs/commit/d585b303a43746201b05c9c9fda94a444634df33))
-* **deps:** fix enumeration for normalized path arguments ([#1567](https://www.github.com/yargs/yargs/issues/1567)) ([0b5b1b0](https://www.github.com/yargs/yargs/commit/0b5b1b0e5f4f9baf393c48e9cc2bc85c1b67a47a))
-* **locales:** only translate default option group name ([acc16de](https://www.github.com/yargs/yargs/commit/acc16de6b846ea7332db753646a9cec76b589162))
-* **locales:** remove extra space in French for 'default' ([#1564](https://www.github.com/yargs/yargs/issues/1564)) ([ecfc2c4](https://www.github.com/yargs/yargs/commit/ecfc2c474575c6cdbc6d273c94c13181bd1dbaa6))
-* **translations:** add French translation for unknown command ([#1563](https://www.github.com/yargs/yargs/issues/1563)) ([18b0b75](https://www.github.com/yargs/yargs/commit/18b0b752424bf560271e670ff95a0f90c8386787))
-* **translations:** fix pluralization in error messages. ([#1557](https://www.github.com/yargs/yargs/issues/1557)) ([94fa38c](https://www.github.com/yargs/yargs/commit/94fa38cbab8d86943e87bf41d368ed56dffa6835))
-* **yargs:** correct support of bundled electron apps ([#1554](https://www.github.com/yargs/yargs/issues/1554)) ([a0b61ac](https://www.github.com/yargs/yargs/commit/a0b61ac21e2b554aa73dbf1a66d4a7af94047c2f))
-
-## [15.1.0](https://www.github.com/yargs/yargs/compare/v15.0.2...v15.1.0) (2020-01-02)
-
-
-### Features
-
-* **lang:** add Finnish localization (language code fi) ([222c8fe](https://www.github.com/yargs/yargs/commit/222c8fef2e2ad46e314c337dec96940f896bec35))
-* complete short options with a single dash ([#1507](https://www.github.com/yargs/yargs/issues/1507)) ([99011ab](https://www.github.com/yargs/yargs/commit/99011ab5ba90232506ece0a17e59e2001a1ab562))
-* onFinishCommand handler ([#1473](https://www.github.com/yargs/yargs/issues/1473)) ([fe380cd](https://www.github.com/yargs/yargs/commit/fe380cd356aa33aef0449facd59c22cab8930ac9))
-
-
-### Bug Fixes
-
-* getCompletion() was not working for options ([#1495](https://www.github.com/yargs/yargs/issues/1495)) ([463feb2](https://www.github.com/yargs/yargs/commit/463feb2870158eb9df670222b0f0a40a05cf18d0))
-* misspelling of package.json `engines` field ([0891d0e](https://www.github.com/yargs/yargs/commit/0891d0ed35b30c83a6d9e9f6a5c5f84d13c546a0))
-* populate positionals when unknown-options-as-args is set ([#1508](https://www.github.com/yargs/yargs/issues/1508)) ([bb0f2eb](https://www.github.com/yargs/yargs/commit/bb0f2eb996fa4e19d330b31a01c2036cafa99a7e)), closes [#1444](https://www.github.com/yargs/yargs/issues/1444)
-* show 2 dashes on help for single digit option key or alias ([#1493](https://www.github.com/yargs/yargs/issues/1493)) ([63b3dd3](https://www.github.com/yargs/yargs/commit/63b3dd31a455d428902220c1992ae930e18aff5c))
-* **docs:** use recommended cjs import syntax for ts examples ([#1513](https://www.github.com/yargs/yargs/issues/1513)) ([f9a18bf](https://www.github.com/yargs/yargs/commit/f9a18bfd624a5013108084f690cd8a1de794c430))
-
-### [15.0.2](https://www.github.com/yargs/yargs/compare/v15.0.1...v15.0.2) (2019-11-19)
-
-
-### Bug Fixes
-
-* temporary fix for libraries that call Object.freeze() ([#1483](https://www.github.com/yargs/yargs/issues/1483)) ([99c2dc8](https://www.github.com/yargs/yargs/commit/99c2dc850e67c606644f8b0c0bca1a59c87dcbcd))
-
-### [15.0.1](https://www.github.com/yargs/yargs/compare/v15.0.0...v15.0.1) (2019-11-16)
-
-
-### Bug Fixes
-
-* **deps:** cliui, find-up, and string-width, all drop Node 6 support ([#1479](https://www.github.com/yargs/yargs/issues/1479)) ([6a9ebe2](https://www.github.com/yargs/yargs/commit/6a9ebe2d955e3e979e76c07ffbb1c17fef64cb49))
-
-## [15.0.0](https://www.github.com/yargs/yargs/compare/v14.2.0...v15.0.0) (2019-11-10)
-
-
-### ⚠ BREAKING CHANGES
-
-* **deps:** yargs-parser now throws on invalid combinations of config (#1470)
-* yargs-parser@16.0.0 drops support for Node 6
-* drop Node 6 support (#1461)
-* remove package.json-based parserConfiguration (#1460)
-
-### Features
-
-* **deps:** yargs-parser now throws on invalid combinations of config ([#1470](https://www.github.com/yargs/yargs/issues/1470)) ([c10c38c](https://www.github.com/yargs/yargs/commit/c10c38cca04298f96b55a7e374a9a134abefffa7))
-* expose `Parser` from `require('yargs/yargs')` ([#1477](https://www.github.com/yargs/yargs/issues/1477)) ([1840ba2](https://www.github.com/yargs/yargs/commit/1840ba22f1a24c0ece8e32bbd31db4134a080aee))
-
-
-### Bug Fixes
-
-* **docs:** TypeScript import to prevent a future major release warning ([#1441](https://www.github.com/yargs/yargs/issues/1441)) ([b1b156a](https://www.github.com/yargs/yargs/commit/b1b156a3eb4ddd6803fbbd56c611a77919293000))
-* stop-parse was not being respected by commands ([#1459](https://www.github.com/yargs/yargs/issues/1459)) ([12c82e6](https://www.github.com/yargs/yargs/commit/12c82e62663e928148a7ee2f51629aa26a0f9bb2))
-* update to yargs-parser with fix for array default values ([#1463](https://www.github.com/yargs/yargs/issues/1463)) ([ebee59d](https://www.github.com/yargs/yargs/commit/ebee59d9022da538410e69a5c025019ed46d13d2))
-* **docs:** update boolean description and examples in docs ([#1474](https://www.github.com/yargs/yargs/issues/1474)) ([afd5b48](https://www.github.com/yargs/yargs/commit/afd5b4871bfeb90d58351ac56c5c44a83ef033e6))
-
-
-### Miscellaneous Chores
-
-* drop Node 6 support ([#1461](https://www.github.com/yargs/yargs/issues/1461)) ([2ba8ce0](https://www.github.com/yargs/yargs/commit/2ba8ce05e8fefbeffc6cb7488d9ebf6e86cceb1d))
+* always cache help message when running commands ([#1865](https://www.github.com/yargs/yargs/issues/1865)) ([d57ca77](https://www.github.com/yargs/yargs/commit/d57ca7751d533d7e0f216cd9fbf7c2b0ec98f791)), closes [#1853](https://www.github.com/yargs/yargs/issues/1853)
+* **async:** don't call parse callback until async ops complete ([#1896](https://www.github.com/yargs/yargs/issues/1896)) ([a93f5ff](https://www.github.com/yargs/yargs/commit/a93f5ff35d7c09b01e0ca93d7d855d2b26593165)), closes [#1888](https://www.github.com/yargs/yargs/issues/1888)
+* **builder:** apply default builder for showHelp/getHelp ([#1913](https://www.github.com/yargs/yargs/issues/1913)) ([395bb67](https://www.github.com/yargs/yargs/commit/395bb67749787d269cabe80ffc3133c2f6958aeb)), closes [#1912](https://www.github.com/yargs/yargs/issues/1912)
+* **builder:** nested builder is now awaited ([#1925](https://www.github.com/yargs/yargs/issues/1925)) ([b5accd6](https://www.github.com/yargs/yargs/commit/b5accd64ccbd3ffb800517fb40d0f59382515fbb))
+* **coerce:** options using coerce now displayed in help ([#1911](https://www.github.com/yargs/yargs/issues/1911)) ([d2128cc](https://www.github.com/yargs/yargs/commit/d2128cc4ffd411eed7111e6a3c561948330e4f6f)), closes [#1909](https://www.github.com/yargs/yargs/issues/1909)
+* completion script name clashing on bash ([#1903](https://www.github.com/yargs/yargs/issues/1903)) ([8f62d9a](https://www.github.com/yargs/yargs/commit/8f62d9a9e8bebf86f988c100ad3c417dc32b2471))
+* **deno:** use actual names for keys instead of inferring ([#1891](https://www.github.com/yargs/yargs/issues/1891)) ([b96ef01](https://www.github.com/yargs/yargs/commit/b96ef01b16bc5377b79d7914dd5495068037fe7b))
+* exclude positionals from default completion ([#1881](https://www.github.com/yargs/yargs/issues/1881)) ([0175677](https://www.github.com/yargs/yargs/commit/0175677b79ffe50a9c5477631288ae10120b8a32))
+* https://github.com/yargs/yargs/issues/1841#issuecomment-804770453 ([b96ef01](https://www.github.com/yargs/yargs/commit/b96ef01b16bc5377b79d7914dd5495068037fe7b))
+* showHelp() and .getHelp() now return same output for commands as --help ([#1826](https://www.github.com/yargs/yargs/issues/1826)) ([36abf26](https://www.github.com/yargs/yargs/commit/36abf26919b5a19f3adec08598539851c34b7086))
+* zsh completion is now autoloadable ([#1856](https://www.github.com/yargs/yargs/issues/1856)) ([d731f9f](https://www.github.com/yargs/yargs/commit/d731f9f9adbc11f918e918443c5bff4149fc6681))
 
 
 ### Code Refactoring
 
-* remove package.json-based parserConfiguration ([#1460](https://www.github.com/yargs/yargs/issues/1460)) ([0d3642b](https://www.github.com/yargs/yargs/commit/0d3642b6f829b637938774c0c6ce5f6bfe1afa51))
+* **coerce:** coerce is now applied before validation. ([8b95f57](https://www.github.com/yargs/yargs/commit/8b95f57bb2a49b098c6bf23cea88c6f900a34f89))
+* deprecated reset() method is now private (call yargs() instead). ([376f892](https://www.github.com/yargs/yargs/commit/376f89242733dcd4ecb8040685c40ae1d622931d))
+* implicitly private methods are now actually private ([376f892](https://www.github.com/yargs/yargs/commit/376f89242733dcd4ecb8040685c40ae1d622931d))
+* **yargs-factory:** refactor yargs-factory to use class ([#1895](https://www.github.com/yargs/yargs/issues/1895)) ([376f892](https://www.github.com/yargs/yargs/commit/376f89242733dcd4ecb8040685c40ae1d622931d))
 
-## [14.2.0](https://github.com/yargs/yargs/compare/v14.1.0...v14.2.0) (2019-10-07)
-
-
-### Bug Fixes
-
-* async middleware was called twice ([#1422](https://github.com/yargs/yargs/issues/1422)) ([9a42b63](https://github.com/yargs/yargs/commit/9a42b63))
-* fix promise check to accept any spec conform object ([#1424](https://github.com/yargs/yargs/issues/1424)) ([0be43d2](https://github.com/yargs/yargs/commit/0be43d2))
-* groups were not being maintained for nested commands ([#1430](https://github.com/yargs/yargs/issues/1430)) ([d38650e](https://github.com/yargs/yargs/commit/d38650e))
-* **docs:** broken markdown link ([#1426](https://github.com/yargs/yargs/issues/1426)) ([236e24e](https://github.com/yargs/yargs/commit/236e24e))
-* support merging deeply nested configuration ([#1423](https://github.com/yargs/yargs/issues/1423)) ([bae66fe](https://github.com/yargs/yargs/commit/bae66fe))
+## [16.2.0](https://www.github.com/yargs/yargs/compare/v16.1.1...v16.2.0) (2020-12-05)
 
 
 ### Features
 
-* **deps:** introduce yargs-parser with support for unknown-options-as-args ([#1440](https://github.com/yargs/yargs/issues/1440)) ([4d21520](https://github.com/yargs/yargs/commit/4d21520))
-
-## [14.1.0](https://github.com/yargs/yargs/compare/v14.0.0...v14.1.0) (2019-09-06)
+* command() now accepts an array of modules ([f415388](https://www.github.com/yargs/yargs/commit/f415388cc454d02786c65c50dd6c7a0cf9d8b842))
 
 
 ### Bug Fixes
 
-* **docs:** fix incorrect parserConfiguration documentation ([2a99124](https://github.com/yargs/yargs/commit/2a99124))
-* detect zsh when zsh isnt run as a login prompt ([#1395](https://github.com/yargs/yargs/issues/1395)) ([8792d13](https://github.com/yargs/yargs/commit/8792d13))
-* populate correct value on yargs.parsed and stop warning on access ([#1412](https://github.com/yargs/yargs/issues/1412)) ([bb0eb52](https://github.com/yargs/yargs/commit/bb0eb52))
-* showCompletionScript was logging script twice ([#1388](https://github.com/yargs/yargs/issues/1388)) ([07c8537](https://github.com/yargs/yargs/commit/07c8537))
-* strict() should not ignore hyphenated arguments ([#1414](https://github.com/yargs/yargs/issues/1414)) ([b774b5e](https://github.com/yargs/yargs/commit/b774b5e))
-* **docs:** formalize existing callback argument to showHelp ([#1386](https://github.com/yargs/yargs/issues/1386)) ([d217764](https://github.com/yargs/yargs/commit/d217764))
+* add package.json to module exports ([#1818](https://www.github.com/yargs/yargs/issues/1818)) ([d783a49](https://www.github.com/yargs/yargs/commit/d783a49a7f21c9bbd4eec2990268f3244c4d5662)), closes [#1817](https://www.github.com/yargs/yargs/issues/1817)
+
+### [16.1.1](https://www.github.com/yargs/yargs/compare/v16.1.0...v16.1.1) (2020-11-15)
+
+
+### Bug Fixes
+
+* expose helpers for legacy versions of Node.js ([#1801](https://www.github.com/yargs/yargs/issues/1801)) ([107deaa](https://www.github.com/yargs/yargs/commit/107deaa4f68b7bc3f2386041e1f4fe0272b29c0a))
+* **deno:** get yargs working on deno@1.5.x ([#1799](https://www.github.com/yargs/yargs/issues/1799)) ([cb01c98](https://www.github.com/yargs/yargs/commit/cb01c98c44e30f55c2dc9434caef524ae433d9a4))
+
+## [16.1.0](https://www.github.com/yargs/yargs/compare/v16.0.3...v16.1.0) (2020-10-15)
 
 
 ### Features
 
-* make it possible to merge configurations when extending other config. ([#1411](https://github.com/yargs/yargs/issues/1411)) ([5d7ad98](https://github.com/yargs/yargs/commit/5d7ad98))
+* expose hideBin helper for CJS ([#1768](https://www.github.com/yargs/yargs/issues/1768)) ([63e1173](https://www.github.com/yargs/yargs/commit/63e1173bb47dc651c151973a16ef659082a9ae66))
 
-## [14.0.0](https://github.com/yargs/yargs/compare/v13.3.0...v14.0.0) (2019-07-30)
+
+### Bug Fixes
+
+* **deno:** update types for deno ^1.4.0 ([#1772](https://www.github.com/yargs/yargs/issues/1772)) ([0801752](https://www.github.com/yargs/yargs/commit/080175207d281be63edf90adfe4f0568700b0bf5))
+* **exports:** node 13.0-13.6 require a string fallback ([#1776](https://www.github.com/yargs/yargs/issues/1776)) ([b45c43a](https://www.github.com/yargs/yargs/commit/b45c43a5f64b565c3794f9792150eaeec4e00b69))
+* **modules:** module path was incorrect ([#1759](https://www.github.com/yargs/yargs/issues/1759)) ([95a4a0a](https://www.github.com/yargs/yargs/commit/95a4a0ac573cfe158e6e4bc8c8682ebd1644a198))
+* **positional:** positional strings no longer drop decimals ([#1761](https://www.github.com/yargs/yargs/issues/1761)) ([e1a300f](https://www.github.com/yargs/yargs/commit/e1a300f1293ad821c900284616337f080b207980))
+* make positionals in -- count towards validation ([#1752](https://www.github.com/yargs/yargs/issues/1752)) ([eb2b29d](https://www.github.com/yargs/yargs/commit/eb2b29d34f1a41e0fd6c4e841960e5bfc329dc3c))
+
+### [16.0.3](https://www.github.com/yargs/yargs/compare/v16.0.2...v16.0.3) (2020-09-10)
+
+
+### Bug Fixes
+
+* move yargs.cjs to yargs to fix Node 10 imports ([#1747](https://www.github.com/yargs/yargs/issues/1747)) ([5bfb85b](https://www.github.com/yargs/yargs/commit/5bfb85b33b85db8a44b5f7a700a8e4dbaf022df0))
+
+### [16.0.2](https://www.github.com/yargs/yargs/compare/v16.0.1...v16.0.2) (2020-09-09)
+
+
+### Bug Fixes
+
+* **typescript:** yargs-parser was breaking @types/yargs ([#1745](https://www.github.com/yargs/yargs/issues/1745)) ([2253284](https://www.github.com/yargs/yargs/commit/2253284b233cceabd8db677b81c5bf1755eef230))
+
+### [16.0.1](https://www.github.com/yargs/yargs/compare/v16.0.0...v16.0.1) (2020-09-09)
+
+
+### Bug Fixes
+
+* code was not passed to process.exit ([#1742](https://www.github.com/yargs/yargs/issues/1742)) ([d1a9930](https://www.github.com/yargs/yargs/commit/d1a993035a2f76c138460052cf19425f9684b637))
+
+## [16.0.0](https://www.github.com/yargs/yargs/compare/v15.4.2...v16.0.0) (2020-09-09)
 
 
 ### ⚠ BREAKING CHANGES
 
-* we now only officially support yargs.$0 parameter and discourage direct access to yargs.parsed
-* previously to this fix methods like `yargs.getOptions()` contained the state of the last command to execute.
-* do not allow additional positionals in strict mode
-
-### Bug Fixes
-
-* calling parse multiple times now appropriately maintains state ([#1137](https://github.com/yargs/yargs/issues/1137)) ([#1369](https://github.com/yargs/yargs/issues/1369)) ([026b151](https://github.com/yargs/yargs/commit/026b151))
-* prefer user supplied script name in usage ([#1383](https://github.com/yargs/yargs/issues/1383)) ([28c74b9](https://github.com/yargs/yargs/commit/28c74b9))
-* **deps:** use decamelize from npm instead of vendored copy ([#1377](https://github.com/yargs/yargs/issues/1377)) ([015eeb9](https://github.com/yargs/yargs/commit/015eeb9))
-* **examples:** fix usage-options.js to reflect current API ([#1375](https://github.com/yargs/yargs/issues/1375)) ([6e5b76b](https://github.com/yargs/yargs/commit/6e5b76b))
-* do not allow additional positionals in strict mode ([35d777c](https://github.com/yargs/yargs/commit/35d777c))
-* properties accessed on singleton now reflect current state of instance ([#1366](https://github.com/yargs/yargs/issues/1366)) ([409d35b](https://github.com/yargs/yargs/commit/409d35b))
-* tolerate null prototype for config objects with `extends` ([#1376](https://github.com/yargs/yargs/issues/1376)) ([3d26d11](https://github.com/yargs/yargs/commit/3d26d11)), closes [#1372](https://github.com/yargs/yargs/issues/1372)
-* yargs.parsed now populated before returning, when yargs.parse() called with no args (#1382) ([e3981fd](https://github.com/yargs/yargs/commit/e3981fd)), closes [#1382](https://github.com/yargs/yargs/issues/1382)
+* tweaks to ESM/Deno API surface: now exports yargs function by default; getProcessArgvWithoutBin becomes hideBin; types now exported for Deno.
+* find-up replaced with escalade; export map added (limits importable files in Node >= 12); yarser-parser@19.x.x (new decamelize/camelcase implementation).
+* **usage:** single character aliases are now shown first in help output
+* rebase helper is no longer provided on yargs instance.
+* drop support for EOL Node 8 (#1686)
 
 ### Features
 
-* adds support for multiple epilog messages ([#1384](https://github.com/yargs/yargs/issues/1384)) ([07a5554](https://github.com/yargs/yargs/commit/07a5554))
-* allow completionCommand to be set via showCompletionScript ([#1385](https://github.com/yargs/yargs/issues/1385)) ([5562853](https://github.com/yargs/yargs/commit/5562853))
-
-## [13.3.0](https://www.github.com/yargs/yargs/compare/v13.2.4...v13.3.0) (2019-06-10)
-
-
-### Bug Fixes
-
-* **deps:** yargs-parser update addressing several parsing bugs ([#1357](https://www.github.com/yargs/yargs/issues/1357)) ([e230d5b](https://www.github.com/yargs/yargs/commit/e230d5b))
-
-
-### Features
-
-* **i18n:** swap out os-locale dependency for simple inline implementation ([#1356](https://www.github.com/yargs/yargs/issues/1356)) ([4dfa19b](https://www.github.com/yargs/yargs/commit/4dfa19b))
-* support defaultDescription for positional arguments ([812048c](https://www.github.com/yargs/yargs/commit/812048c))
-
-### [13.2.4](https://github.com/yargs/yargs/compare/v13.2.3...v13.2.4) (2019-05-13)
+* adds strictOptions() ([#1738](https://www.github.com/yargs/yargs/issues/1738)) ([b215fba](https://www.github.com/yargs/yargs/commit/b215fba0ed6e124e5aad6cf22c8d5875661c63a3))
+* **helpers:** rebase, Parser, applyExtends now blessed helpers ([#1733](https://www.github.com/yargs/yargs/issues/1733)) ([c7debe8](https://www.github.com/yargs/yargs/commit/c7debe8eb1e5bc6ea20b5ed68026c56e5ebec9e1))
+* adds support for ESM and Deno ([#1708](https://www.github.com/yargs/yargs/issues/1708)) ([ac6d5d1](https://www.github.com/yargs/yargs/commit/ac6d5d105a75711fe703f6a39dad5181b383d6c6))
+* drop support for EOL Node 8 ([#1686](https://www.github.com/yargs/yargs/issues/1686)) ([863937f](https://www.github.com/yargs/yargs/commit/863937f23c3102f804cdea78ee3097e28c7c289f))
+* i18n for ESM and Deno ([#1735](https://www.github.com/yargs/yargs/issues/1735)) ([c71783a](https://www.github.com/yargs/yargs/commit/c71783a5a898a0c0e92ac501c939a3ec411ac0c1))
+* tweaks to API surface based on user feedback ([#1726](https://www.github.com/yargs/yargs/issues/1726)) ([4151fee](https://www.github.com/yargs/yargs/commit/4151fee4c33a97d26bc40de7e623e5b0eb87e9bb))
+* **usage:** single char aliases first in help ([#1574](https://www.github.com/yargs/yargs/issues/1574)) ([a552990](https://www.github.com/yargs/yargs/commit/a552990c120646c2d85a5c9b628e1ce92a68e797))
 
 
 ### Bug Fixes
 
-* **i18n:** rename unclear 'implication failed' to 'missing dependent arguments' ([#1317](https://github.com/yargs/yargs/issues/1317)) ([bf46813](https://github.com/yargs/yargs/commit/bf46813))
+* **yargs:** add missing command(module) signature ([#1707](https://www.github.com/yargs/yargs/issues/1707)) ([0f81024](https://www.github.com/yargs/yargs/commit/0f810245494ccf13a35b7786d021b30fc95ecad5)), closes [#1704](https://www.github.com/yargs/yargs/issues/1704)
 
-
-
-### [13.2.3](https://github.com/yargs/yargs/compare/v13.2.2...v13.2.3) (2019-05-05)
-
-
-### Bug Fixes
-
-* **deps:** upgrade cliui for compatibility with latest chalk. ([#1330](https://github.com/yargs/yargs/issues/1330)) ([b20db65](https://github.com/yargs/yargs/commit/b20db65))
-* address issues with dutch translation ([#1316](https://github.com/yargs/yargs/issues/1316)) ([0295132](https://github.com/yargs/yargs/commit/0295132))
-
-
-### Tests
-
-* accept differently formatted output ([#1327](https://github.com/yargs/yargs/issues/1327)) ([c294d1b](https://github.com/yargs/yargs/commit/c294d1b))
-
-
-
-## [13.2.2](https://github.com/yargs/yargs/compare/v13.2.1...v13.2.2) (2019-03-06)
-
-
-
-## [13.2.1](https://github.com/yargs/yargs/compare/v13.2.0...v13.2.1) (2019-02-18)
-
-
-### Bug Fixes
-
-* add zsh script to files array ([3180224](https://github.com/yargs/yargs/commit/3180224))
-* support options/sub-commands in zsh completion ([0a96394](https://github.com/yargs/yargs/commit/0a96394))
-
-
-# [13.2.0](https://github.com/yargs/yargs/compare/v13.1.0...v13.2.0) (2019-02-15)
-
-
-### Features
-
-* zsh auto completion ([#1292](https://github.com/yargs/yargs/issues/1292)) ([16c5d25](https://github.com/yargs/yargs/commit/16c5d25)), closes [#1156](https://github.com/yargs/yargs/issues/1156)
-
-
-<a name="13.1.0"></a>
-# [13.1.0](https://github.com/yargs/yargs/compare/v13.0.0...v13.1.0) (2019-02-12)
-
-
-### Features
-
-* add applyBeforeValidation, for applying sync middleware before validation ([5be206a](https://github.com/yargs/yargs/commit/5be206a))
-
-
-
-<a name="13.0.0"></a>
-# [13.0.0](https://github.com/yargs/yargs/compare/v12.0.5...v13.0.0) (2019-02-02)
-
-
-### Bug Fixes
-
-* **deps:** Update os-locale to avoid security vulnerability ([#1270](https://github.com/yargs/yargs/issues/1270)) ([27bf739](https://github.com/yargs/yargs/commit/27bf739))
-* **validation:** Use the error as a message when none exists otherwise ([#1268](https://github.com/yargs/yargs/issues/1268)) ([0510fe6](https://github.com/yargs/yargs/commit/0510fe6))
-* better bash path completion ([#1272](https://github.com/yargs/yargs/issues/1272)) ([da75ea2](https://github.com/yargs/yargs/commit/da75ea2))
-* middleware added multiple times due to reference bug ([#1282](https://github.com/yargs/yargs/issues/1282)) ([64af518](https://github.com/yargs/yargs/commit/64af518))
-
-
-### Chores
-
-* ~drop Node 6 from testing matrix ([#1287](https://github.com/yargs/yargs/issues/1287)) ([ef16792](https://github.com/yargs/yargs/commit/ef16792))~
-  * _opting to not drop Node 6 support until April, [see](https://github.com/nodejs/Release)._
-* update dependencies ([#1284](https://github.com/yargs/yargs/issues/1284)) ([f25de4f](https://github.com/yargs/yargs/commit/f25de4f))
-
-
-### Features
-
-* Add `.parserConfiguration()` method, deprecating package.json config ([#1262](https://github.com/yargs/yargs/issues/1262)) ([3c6869a](https://github.com/yargs/yargs/commit/3c6869a))
-* adds config option for sorting command output ([#1256](https://github.com/yargs/yargs/issues/1256)) ([6916ce9](https://github.com/yargs/yargs/commit/6916ce9))
-* options/positionals with leading '+' and '0' no longer parse as numbers ([#1286](https://github.com/yargs/yargs/issues/1286)) ([e9dc3aa](https://github.com/yargs/yargs/commit/e9dc3aa))
-* support promises in middleware ([f3a4e4f](https://github.com/yargs/yargs/commit/f3a4e4f))
-
-
-### BREAKING CHANGES
-
-* options with leading '+' or '0' now parse as strings
-* dropping Node 6 which hits end of life in April 2019
-* see [yargs-parser@12.0.0 CHANGELOG](https://github.com/yargs/yargs-parser/blob/master/CHANGELOG.md#breaking-changes)
-* we now warn if the yargs stanza package.json is used.
-
-
-
-<a name="12.0.5"></a>
-## [12.0.5](https://github.com/yargs/yargs/compare/v12.0.4...v12.0.5) (2018-11-19)
-
-
-### Bug Fixes
-
-* allows camel-case, variadic arguments, and strict mode to be combined ([#1247](https://github.com/yargs/yargs/issues/1247)) ([eacc035](https://github.com/yargs/yargs/commit/eacc035))
-
-
-
-<a name="12.0.4"></a>
-## [12.0.4](https://github.com/yargs/yargs/compare/v12.0.3...v12.0.4) (2018-11-10)
-
-
-### Bug Fixes
-
-* don't load config when processing positionals ([5d0dc92](https://github.com/yargs/yargs/commit/5d0dc92))
-
-
-
-<a name="12.0.3"></a>
-## [12.0.3](https://github.com/yargs/yargs/compare/v12.0.2...v12.0.3) (2018-10-06)
-
-
-### Bug Fixes
-
-* $0 contains first arg in bundled electron apps ([#1206](https://github.com/yargs/yargs/issues/1206)) ([567820b](https://github.com/yargs/yargs/commit/567820b))
-* accept single function for middleware ([66fd6f7](https://github.com/yargs/yargs/commit/66fd6f7)), closes [#1214](https://github.com/yargs/yargs/issues/1214) [#1214](https://github.com/yargs/yargs/issues/1214)
-* hide `hidden` options from help output even if they are in a group ([#1221](https://github.com/yargs/yargs/issues/1221)) ([da54028](https://github.com/yargs/yargs/commit/da54028))
-* improve Norwegian Bokmål translations ([#1208](https://github.com/yargs/yargs/issues/1208)) ([a458fa4](https://github.com/yargs/yargs/commit/a458fa4))
-* improve Norwegian Nynorsk translations ([#1207](https://github.com/yargs/yargs/issues/1207)) ([d422eb5](https://github.com/yargs/yargs/commit/d422eb5))
-
-
-
-<a name="12.0.2"></a>
-## [12.0.2](https://github.com/yargs/yargs/compare/v12.0.1...v12.0.2) (2018-09-04)
-
-
-### Bug Fixes
-
-* middleware should work regardless of when method is called  ([664b265](https://github.com/yargs/yargs/commit/664b265)), closes [#1178](https://github.com/yargs/yargs/issues/1178)
-* translation not working when using __ with a single parameter ([#1183](https://github.com/yargs/yargs/issues/1183)) ([f449aea](https://github.com/yargs/yargs/commit/f449aea))
-* upgrade os-locale to version that addresses license issue ([#1195](https://github.com/yargs/yargs/issues/1195)) ([efc0970](https://github.com/yargs/yargs/commit/efc0970))
-
-
-
-<a name="12.0.1"></a>
-## [12.0.1](https://github.com/yargs/yargs/compare/v12.0.0...v12.0.1) (2018-06-29)
-
-
-
-<a name="12.0.0"></a>
-# [12.0.0](https://github.com/yargs/yargs/compare/v11.1.0...v12.0.0) (2018-06-26)
-
-
-### Bug Fixes
-
-* .argv and .parse() now invoke identical code path ([#1126](https://github.com/yargs/yargs/issues/1126)) ([f13ebf4](https://github.com/yargs/yargs/commit/f13ebf4))
-* remove the trailing white spaces from the help output ([#1090](https://github.com/yargs/yargs/issues/1090)) ([3f0746c](https://github.com/yargs/yargs/commit/3f0746c))
-* **completion:** Avoid default command and recommendations during completion ([#1123](https://github.com/yargs/yargs/issues/1123)) ([036e7c5](https://github.com/yargs/yargs/commit/036e7c5))
-
-
-### Chores
-
-* test Node.js 6, 8 and 10 ([#1160](https://github.com/yargs/yargs/issues/1160)) ([84f9d2b](https://github.com/yargs/yargs/commit/84f9d2b))
-* upgrade to version of yargs-parser that does not populate value for unset boolean ([#1104](https://github.com/yargs/yargs/issues/1104)) ([d4705f4](https://github.com/yargs/yargs/commit/d4705f4))
-
-
-### Features
-
-* add support for global middleware, useful for shared tasks like metrics ([#1119](https://github.com/yargs/yargs/issues/1119)) ([9d71ac7](https://github.com/yargs/yargs/commit/9d71ac7))
-* allow setting scriptName $0 ([#1143](https://github.com/yargs/yargs/issues/1143)) ([a2f2eae](https://github.com/yargs/yargs/commit/a2f2eae))
-* remove `setPlaceholderKeys` ([#1105](https://github.com/yargs/yargs/issues/1105)) ([6ee2c82](https://github.com/yargs/yargs/commit/6ee2c82))
-
-
-### BREAKING CHANGES
-
-* Options absent from `argv` (not set via CLI argument) are now absent from the parsed result object rather than being set with `undefined`
-* drop Node 4 from testing matrix, such that we'll gradually start drifting away from supporting Node 4.
-* yargs-parser does not populate 'false' when boolean flag is not passed
-* tests that assert against help output will need to be updated
-
-
-
-<a name="11.1.0"></a>
-# [11.1.0](https://github.com/yargs/yargs/compare/v11.0.0...v11.1.0) (2018-03-04)
-
-
-### Bug Fixes
-
-* choose correct config directory when require.main does not exist ([#1056](https://github.com/yargs/yargs/issues/1056)) ([a04678c](https://github.com/yargs/yargs/commit/a04678c))
-
-
-### Features
-
-* allow hidden options to be displayed with --show-hidden ([#1061](https://github.com/yargs/yargs/issues/1061)) ([ea862ae](https://github.com/yargs/yargs/commit/ea862ae))
-* extend *.rc files in addition to json ([#1080](https://github.com/yargs/yargs/issues/1080)) ([11691a6](https://github.com/yargs/yargs/commit/11691a6))
-
-
-
-<a name="11.0.0"></a>
-# [11.0.0](https://github.com/yargs/yargs/compare/v10.1.2...v11.0.0) (2018-01-22)
-
-
-### Bug Fixes
-
-* Set implicit nargs=1 when type=number requiresArg=true ([#1050](https://github.com/yargs/yargs/issues/1050)) ([2b56812](https://github.com/yargs/yargs/commit/2b56812))
-
-
-### Features
-
-* requiresArg is now simply an alias for nargs(1) ([#1054](https://github.com/yargs/yargs/issues/1054)) ([a3ddacc](https://github.com/yargs/yargs/commit/a3ddacc))
-
-
-### BREAKING CHANGES
-
-* requiresArg now has significantly different error output, matching nargs.
-
-[Historical Versions](/docs/CHANGELOG-historical.md)
+[Older CHANGELOG Entries](https://github.com/yargs/yargs/blob/master/docs/CHANGELOG-historical.md)

@@ -5,5 +5,5 @@
   "pinVersions": false,
   "rebaseStalePrs": true,
   "gitAuthor": null,
-  "ignoreDeps": ["decamelize"]
+  "ignoreDeps": ["string-width"]
 }

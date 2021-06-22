@@ -1,12 +1,11 @@
-export const completionShTemplate =
-`###-begin-{{app_name}}-completions-###
+export const completionShTemplate = `###-begin-{{app_name}}-completions-###
 #
 # yargs command completion script
 #
 # Installation: {{app_path}} {{completion_command}} >> ~/.bashrc
 #    or {{app_path}} {{completion_command}} >> ~/.bash_profile on OSX.
 #
-_yargs_completions()
+_{{app_name}}_yargs_completions()
 {
     local cur_word args type_list
 
@@ -25,11 +24,12 @@ _yargs_completions()
 
     return 0
 }
-complete -o default -F _yargs_completions {{app_name}}
+complete -o default -F _{{app_name}}_yargs_completions {{app_name}}
 ###-end-{{app_name}}-completions-###
-`
+`;
 
-export const completionZshTemplate = `###-begin-{{app_name}}-completions-###
+export const completionZshTemplate = `#compdef {{app_name}}
+###-begin-{{app_name}}-completions-###
 #
 # yargs command completion script
 #
@@ -46,4 +46,4 @@ _{{app_name}}_yargs_completions()
 }
 compdef _{{app_name}}_yargs_completions {{app_name}}
 ###-end-{{app_name}}-completions-###
-`
+`;
