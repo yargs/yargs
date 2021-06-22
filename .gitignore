@@ -6,4 +6,6 @@ node_modules/
 test.js
 coverage
 package-lock.json
+example.*
+.DS_Store
 .npmrc

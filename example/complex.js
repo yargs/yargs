@@ -1,5 +1,5 @@
 // a fairly complex CLI defined using the yargs 3.0 API:
-var argv = require('yargs')
+var argv = require('yargs/yargs')(process.argv.slice(2))
   .usage('Usage: $0 <cmd> [options]') // usage string of application.
   .command('install', 'install a package (name@version)') // describe commands available.
   .command('publish', 'publish the package inside the current working directory')

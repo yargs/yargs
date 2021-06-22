@@ -1,10 +1,11 @@
 #!/usr/bin/env node
-var argv = require('./yargs-symlink/index.js')
+/* eslint-disable node/shebang */
+/* eslint-disable no-undef */
+const argv = require('./yargs-symlink')
   .help('help')
   .version()
   .parserConfiguration({
     'dot-notation': false,
-    'boolean-negation': false
-  })
-  .argv
-console.log(argv)
+    'boolean-negation': false,
+  }).argv;
+console.log(argv);

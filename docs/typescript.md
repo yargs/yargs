@@ -1,15 +1,15 @@
 # TypeScript usage examples
 
-The TypeScript definitions take into account yargs' `type` key and the prescense of
+The TypeScript definitions take into account yargs' `type` key and the presence of
 `demandOption`/`default`.
 
 The following `.options()` definition:
 
 ```typescript
 #!/usr/bin/env node
-import yargs = require('yargs');
+import yargs = require('yargs/yargs');
 
-const argv = yargs.options({
+const argv = yargs(process.argv.slice(2)).options({
   a: { type: 'boolean', default: false },
   b: { type: 'string', demandOption: true },
   c: { type: 'number', alias: 'chill' },

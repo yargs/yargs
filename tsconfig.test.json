@@ -4,7 +4,10 @@
     "sourceMap": true
   },
   "include": [
-    "lib/**/*.ts",
-    "test/**/*.ts"
+    "lib/**/*.ts"
+  ],
+  "exclude": [
+    "lib/cjs.ts",
+    "lib/platform-shims/*.ts"
   ]
 }

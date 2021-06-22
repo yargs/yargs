@@ -1,32 +1,66 @@
-API
-=======
+Additional documentation
+===
 
-You can run Yargs without any configuration, and it will do its
-best to parse `process.argv`:
+For more details refer to the offical [API reference](https://yargs.js.org/docs/#api-reference) 
+document on the yargs.js.org website.
 
-````javascript
-require('yargs').argv
-````
+This document is the Yargs API reference. There are more documentation files in
+[`docs` in the Yargs source tree](https://github.com/yargs/yargs/tree/master/docs):
 
-You can also pass in the `process.argv` yourself:
+- [Examples](https://github.com/yargs/yargs/blob/master/docs/examples.md)
+- [Advanced Topics](https://github.com/yargs/yargs/blob/master/docs/advanced.md)
+- [TypeScript usage examples](https://github.com/yargs/yargs/blob/master/docs/typescript.md)
+- [Browser usage example](https://github.com/yargs/yargs/blob/master/docs/browser.md)
+- [Bundling](https://github.com/yargs/yargs/blob/master/docs/bundling.md)
+- [Parsing Tricks](https://github.com/yargs/yargs/blob/master/docs/tricks.md)
 
-````javascript
-require('yargs')([ '-x', '1', '-y', '2' ]).argv
-````
+
+API reference
+===
+
+You can pass Yargs the `process.argv` without any additional configuration
+and it will do its best to parse it into an object:
+
+```javascript
+require('yargs/yargs')(process.argv.slice(2)).argv
+```
+
+You can also pass in an arbitrary array of arguments:
+
+```javascript
+require('yargs/yargs')([ '-x', '1', '-y', '2' ]).argv
+```
 
 or use `.parse()` to do the same thing:
 
-````javascript
-require('yargs').parse([ '-x', '1', '-y', '2' ])
-````
-
-Calling `.parse()` with no arguments is equivalent to calling `yargs.argv`:
-
 ```javascript
-require('yargs').parse()
+require('yargs/yargs')().parse([ '-x', '1', '-y', '2' ])
 ```
 
-The rest of these methods below come in just before the terminating `.argv`.
+Calling `.parse()` with no arguments is equivalent to calling `.argv`:
+
+```javascript
+require('yargs/yargs')(process.argv.slice(2)).parse()
+```
+
+When passing in the arguments yourself, note that Yargs expects the passed array
+to contain only the arguments after the program name, while `process.argv`
+usually starts with extra elements. For example, [Node’s
+`process.argv`](https://nodejs.org/api/process.html#process_process_argv) array
+starts with two extra elements:`process.execPath` and the path to the JavaScript
+file being executed. So if you’re getting your arguments from `process.argv` in
+Node, pass `process.argv.slice(2)` to Yargs.
+
+***Note:*** Yargs exposes the helper `hideBin`, which handles the
+`process.argv.slice` logic for you.
+
+```javascript
+const { hideBin } = require('yargs/helpers')
+const argv = yargs(hideBin(process.argv)).argv
+```
+
+The rest of these methods below come in just before the terminating `.argv` or
+terminating `.parse()`.
 
 <a name="alias"></a>.alias(key, alias)
 ------------------
@@ -43,7 +77,7 @@ value should be a string or an array of strings.
 
 Get the arguments as a plain old object.
 
-Arguments without a corresponding flag show up in the `argv._` array.
+Arguments without a corresponding flag show up in the `argv._` array. Note that elements of `argv._` may be [converted to numbers](/docs/tricks.md#numbers) by default.
 
 The script name or node command is available at `argv.$0` similarly to how `$0`
 works in bash or perl.
@@ -85,13 +119,28 @@ If `key` is an array, interpret all the elements as booleans.
 
 Check that certain conditions are met in the provided arguments.
 
-`fn` is called with two arguments, the parsed `argv` hash and an array of options and their aliases.
+`fn` is called with the parsed `argv` hash.
 
-If `fn` throws or returns a non-truthy value, show the thrown error, usage information, and
-exit.
+If `fn` throws anything, returns an instance of error, returns a string, or
+returns any non-truthy value, Yargs will show the thrown error and usage
+information. Yargs will then exit, unless [`.exitProcess()`](#exitprocess) was
+used to prevent Yargs from exiting after a failed check.
 
 `global` indicates whether `check()` should be enabled both
 at the top-level and for each sub-command.
+
+```js
+const argv = require('yargs/yargs')(process.argv.slice(2))
+  .check((argv, options) => {
+    const filePaths = argv._
+    if (filePaths.length > 1) {
+      throw new Error("Only 0 or 1 files may be passed.")
+    } else {
+      return true // tell Yargs that the arguments passed the check
+    }
+  })
+  .argv
+```
 
 <a name="choices"></a>.choices(key, choices)
 ----------------------
@@ -100,7 +149,7 @@ Limit valid values for `key` to a predefined set of `choices`, given as an array
 or as an individual value.
 
 ```js
-var argv = require('yargs')
+var argv = require('yargs/yargs')(process.argv.slice(2))
   .alias('i', 'ingredient')
   .describe('i', 'choose your sandwich ingredients')
   .choices('i', ['peanut-butter', 'jelly', 'banana', 'pickles'])
@@ -118,7 +167,7 @@ choices.
 Choices can also be specified as `choices` in the object given to `option()`.
 
 ```js
-var argv = require('yargs')
+var argv = require('yargs/yargs')(process.argv.slice(2))
   .option('size', {
     alias: 's',
     describe: 'choose a size',
@@ -130,17 +179,16 @@ var argv = require('yargs')
 <a name="coerce"></a>.coerce(key, fn)
 ----------------
 
-Provide a synchronous function to coerce or transform the value(s) given on the
+Provide a function to coerce or transform the value(s) given on the
 command line for `key`.
 
 The coercion function should accept one argument, representing the parsed value from
-the command line (an array if multiple values are parsed for the key), and should 
+the command line (an array if multiple values are parsed for the key), and should
 return a new value or throw an error. The returned value will be used as the value for
 `key` (or one of its aliases) in `argv`.
 
 If the function throws, the error will be treated as a validation
-failure, delegating to either a custom [`.fail()`](#fail) handler or printing
-the error message in the console.
+failure, delegating to either a custom [`.fail()`](#fail) handler or printing the error message in the console.
 
 Coercion will be applied to a value after
 all other modifications, such as [`.normalize()`](#normalize).
@@ -148,9 +196,9 @@ all other modifications, such as [`.normalize()`](#normalize).
 _Examples:_
 
 ```js
-var argv = require('yargs')
+var argv = require('yargs/yargs')(process.argv.slice(2))
   .coerce('file', function (arg) {
-    return require('fs').readFileSync(arg, 'utf8')
+    return await require('fs').promises.readFile(arg, 'utf8')
   })
   .argv
 ```
@@ -159,7 +207,7 @@ Optionally `.coerce()` can take an object that maps several keys to their
 respective coercion function.
 
 ```js
-var argv = require('yargs')
+var argv = require('yargs/yargs')(process.argv.slice(2))
   .coerce({
     date: Date.parse,
     json: JSON.parse
@@ -167,23 +215,21 @@ var argv = require('yargs')
   .argv
 ```
 
-You can also map the same function to several keys at one time. Just pass an
-array of keys as the first argument to `.coerce()`:
+You can also map the same function to several keys at one time. Just pass an array of keys as the first argument to `.coerce()`:
 
 ```js
 var path = require('path')
-var argv = require('yargs')
+var argv = require('yargs/yargs')(process.argv.slice(2))
   .coerce(['src', 'dest'], path.resolve)
   .argv
 ```
 
-If you are using dot-notion or arrays, .e.g., `user.email` and `user.password`,
-coercion will be applied to the final object that has been parsed:
+If you are using dot-notion or arrays, .e.g., `user.email` and `user.password`, coercion will be applied to the final object that has been parsed:
 
 ```js
 // --user.name Batman --user.password 123
 // gives us: {name: 'batman', password: '[SECRET]'}
-var argv = require('yargs')
+var argv = require('yargs/yargs')(process.argv.slice(2))
   .option('user')
   .coerce('user', opt => {
     opt.name = opt.name.toLowerCase()
@@ -192,6 +238,29 @@ var argv = require('yargs')
   })
   .argv
 ```
+
+<a name="commandDir"></a>
+.commandDir(directory, [opts])
+------------------------------
+
+Apply command modules from a directory relative to the module calling this method.
+
+`directory` is a relative directory path as a string (required).
+
+`opts` is an options object (optional). The following options are valid:
+
+`recurse`: Look for command modules in all subdirectories and apply them as a flattened
+(non-hierarchical) list.
+
+`extensions`: The types of files to look for when requiring command modules.
+
+`visit`: A synchronous function called for each command module encountered. Accepts
+`commandObject`, `pathToFile`, and `filename` as arguments. Returns `commandObject`
+to include the command; any falsy value to exclude/skip it.
+
+`include`: Allow list certain modules. See [`require-directory`](https://www.npmjs.com/package/require-directory) for details.
+
+`exclude`: Block list certain modules. See [`require-directory`](https://www.npmjs.com/package/require-directory) for details.
 
 <a name="command"></a>
 .command(cmd, desc, [builder], [handler])
@@ -228,11 +297,14 @@ yargs
 ```
 
 `builder` can also be a function. This function is executed
-with a `yargs` instance, and can be used to provide _advanced_ command specific help:
+with a `yargs` instance, which can be used to provide command specific
+configuration, and the boolean `helpOrVersionSet`, which indicates whether or
+not the `--help` or `--version` flag was set prior to calling the
+builder.
 
 ```js
 yargs
-  .command('get', 'make a get HTTP request', function (yargs) {
+  .command('get', 'make a get HTTP request', function (yargs, helpOrVersionSet) {
     return yargs.option('url', {
       alias: 'u',
       default: 'http://yargs.js.org/'
@@ -287,7 +359,7 @@ If invoked without parameters, `.completion()` will make `completion` the comman
 the completion script.
 
 ```js
-var argv = require('yargs')
+var argv = require('yargs/yargs')(process.argv.slice(2))
   .completion('completion', function(current, argv) {
     // 'current' is the current command being completed.
     // 'argv' is the parsed arguments so far.
@@ -303,7 +375,7 @@ var argv = require('yargs')
 You can also provide asynchronous completions.
 
 ```js
-var argv = require('yargs')
+var argv = require('yargs/yargs')(process.argv.slice(2))
   .completion('completion', function(current, argv, done) {
     setTimeout(function() {
       done([
@@ -318,13 +390,34 @@ var argv = require('yargs')
 But wait, there's more! You can return an asynchronous promise.
 
 ```js
-var argv = require('yargs')
+var argv = require('yargs/yargs')(process.argv.slice(2))
   .completion('completion', function(current, argv) {
     return new Promise(function (resolve, reject) {
       setTimeout(function () {
         resolve(['apple', 'banana'])
       }, 10)
     })
+  })
+  .argv;
+```
+
+Using default completions in a custom implementation. When invoked with no arguments, `completionFilter` will fallback to the default completion function. There is no need to call `done` in this case. When provided with a callback function, you can get access to `defaultCompletions` and call `done` with your processed version of them.
+
+```js
+var argv = require('yargs/yargs')(process.argv.slice(2))
+  .completion('completion', function(current, argv, completionFilter, done) {
+    // if 'apple' present return default completions
+    if (argv._.includes('apple')) {
+      completionFilter();
+    } else {
+      completionFilter((err, defaultCompletions) => {
+        const filteredCompletions = defaultCompletions.filter(
+          completion => !completion.includes('banana'),
+        );
+        // else return default completions w/o 'banana'
+        done(filteredCompletions);
+      });
+    }
   })
   .argv;
 ```
@@ -350,7 +443,7 @@ function must be synchronous, and should return an object containing
 key value pairs or an error.
 
 ```js
-var argv = require('yargs')
+var argv = require('yargs/yargs')(process.argv.slice(2))
   .config('settings', function (configPath) {
     return JSON.parse(fs.readFileSync(configPath, 'utf-8'))
   })
@@ -361,7 +454,7 @@ You can also pass an explicit configuration `object`, it will be parsed
 and its properties will be set as arguments.
 
 ```js
-var argv = require('yargs')
+var argv = require('yargs/yargs')(process.argv.slice(2))
   .config({foo: 1, bar: 2})
   .argv
 console.log(argv)
@@ -441,7 +534,7 @@ But wait, there's more! The default value can be a `function` which returns
 a value. The name of the function will be used in the usage string:
 
 ```js
-var argv = require('yargs')
+var argv = require('yargs/yargs')(process.argv.slice(2))
   .default('random', function randomValue() {
     return Math.random() * 256;
   }).argv;
@@ -474,7 +567,7 @@ If a `msg` string is given, it will be printed when the argument is missing, ins
 
 ```javascript
 // demand an array of keys to be provided
-require('yargs')
+require('yargs/yargs')(process.argv.slice(2))
   .option('run', {
     alias: 'r',
     describe: 'run your program'
@@ -508,7 +601,7 @@ this is useful when using `.options()` to specify command line parameters.
 
 ```javascript
 // demand individual options within the option constructor
-require('yargs')
+require('yargs/yargs')(process.argv.slice(2))
   .options({
     'run': {
       alias: 'r',
@@ -546,7 +639,7 @@ Missing required arguments: run, path
 
 Demand in context of commands. You can demand a minimum and a maximum number a user can have within your program, as well as provide corresponding error messages if either of the demands is not met.
 ```javascript
-require('yargs')
+require('yargs/yargs')(process.argv.slice(2))
   .command({
     command: 'configure <key> [value]',
     aliases: ['config', 'cfg'],
@@ -584,7 +677,7 @@ expected value._
 Shows a `[deprecated]` notice in front of the option.
 
 ```javascript
-require('yargs')
+require('yargs/yargs')(process.argv.slice(2))
   .option('old')
   .deprecateOption('old')
   .option('new')
@@ -598,7 +691,7 @@ Options:
 You can also specify a message
 
 ```javascript
-require('yargs')
+require('yargs/yargs')(process.argv.slice(2))
   .option('old')
   .deprecateOption('old', 'use --new')
   .option('new')
@@ -612,7 +705,7 @@ Options:
 You can also use it within the option constructor
 
 ```javascript
-require('yargs')
+require('yargs/yargs')(process.argv.slice(2))
   .option('old', { deprecated: true })
 ```
 
@@ -653,7 +746,7 @@ Program arguments are defined in this order of precedence:
 4. Configured defaults
 
 ```js
-var argv = require('yargs')
+var argv = require('yargs/yargs')(process.argv.slice(2))
   .env('MY_PROGRAM')
   .option('f', {
     alias: 'fruit-thing',
@@ -701,17 +794,28 @@ by calling `.env(false)`, e.g. if you need to undo previous configuration.
 A message to print at the end of the usage instructions, e.g.
 
 ```js
-var argv = require('yargs')
+var argv = require('yargs/yargs')(process.argv.slice(2))
   .epilogue('for more information, find our manual at http://example.com');
 ```
 
 .example(cmd, desc)
+-------------------
+.example([[cmd1, desc1], [cmd2, desc2], ...])
 -------------------
 
 Give some example invocations of your program. Inside `cmd`, the string
 `$0` will get interpolated to the current script name or node command for the
 present script similar to how `$0` works in bash or perl.
 Examples will be printed out as part of the help message.
+
+If you want to add multiple examples at once, just pass an array of examples, e.g
+```js
+require('yargs/yargs')(process.argv.slice(2))
+  .example([
+    ['$0 --config "~/config.json"', 'Use custom config'],
+    ['$0 --safe', 'Start in safe mode']
+  ]);
+```
 
 <a name="exitprocess"></a>.exitProcess(enable)
 ----------------------------------
@@ -728,19 +832,23 @@ error message when this promise rejects
 <a name="exit"></a>.exit(code, err)
 ---------
 Manually indicate that the program should exit, and provide context about why we
-wanted to exit. Follows the behaviour set by `.exitProcess()`.
+wanted to exit. Follows the behavior set by `.exitProcess()`.
 
-<a name="fail"></a>.fail(fn)
+<a name="fail"></a>.fail(fn | boolean)
 ---------
 
 Method to execute when a failure occurs, rather than printing the failure message.
 
+Providing `false` as a value for `fn` can be used to prevent yargs from
+exiting and printing a failure message. This is useful if you wish to
+handle failures yourself using `try`/`catch` and [`.getHelp()`](#get-help).
+
 `fn` is called with the failure message that would have been printed, the
 `Error` instance originally thrown and yargs state when the failure
-occured.
+occurred.
 
 ```js
-var argv = require('yargs')
+var argv = require('yargs/yargs')(process.argv.slice(2))
   .fail(function (msg, err, yargs) {
     if (err) throw err // preserve stack
     console.error('You broke it!')
@@ -758,12 +866,15 @@ Allows to programmatically get completion choices for any line.
 
 `args`: An array of the words in the command line to complete.
 
-`done`: The callback to be called with the resulting completions.
+`done`: Optional callback which will be invoked with `err`, or the resulting completions.
+
+If no `done` callback is provided, `getCompletion` returns a promise that
+resolves with the completions.
 
 For example:
 
 ```js
-require('yargs')
+require('yargs/yargs')(process.argv.slice(2))
   .option('foobar')
   .option('foobaz')
   .completion()
@@ -774,6 +885,12 @@ require('yargs')
 
 Outputs the same completion choices as `./test.js --foo`<kbd>TAB</kbd>: `--foobar` and `--foobaz`
 
+<a name="get-help"></a>.getHelp()
+---------------------------
+
+Returns a promise that resolves with a `string` equivalent to what would
+be output by [`.showHelp()`](#show-help), or by running yargs with `--help`.
+
 <a name="global"></a>.global(globals, [global=true])
 ------------
 
@@ -781,7 +898,7 @@ Indicate that an option (or group of options) should not be reset when a command
 is executed, as an example:
 
 ```js
-var argv = require('yargs')
+var argv = require('yargs/yargs')(process.argv.slice(2))
   .option('a', {
     alias: 'all',
     default: true,
@@ -814,7 +931,7 @@ Given a key, or an array of keys, places options under an alternative heading
 when displaying usage instructions, e.g.,
 
 ```js
-var yargs = require('yargs')(['--help'])
+require('yargs/yargs')(['--help'])
   .help()
   .group('batman', 'Heroes:')
   .describe('batman', "world's greatest detective")
@@ -887,7 +1004,7 @@ locale. Note that the OS locale can be modified by setting/exporting the `LC_ALL
 environment variable.
 
 ```js
-var argv = require('yargs')
+var argv = require('yargs/yargs')(process.argv.slice(2))
   .usage('./$0 - follow ye instructions true')
   .option('option', {
     alias: 'o',
@@ -990,7 +1107,7 @@ handler function.
 
 ```js
 // populating home directory from an environment variable.
-require('yargs')
+require('yargs/yargs')(process.argv.slice(2))
   .middleware(function (argv) {
     if (process.env.HOME) argv.home = process.env.HOME
   }, true)
@@ -1008,6 +1125,39 @@ require('yargs')
   .parse()
 ```
 
+Example, Using middleware to apply a transformation on argv after `choices` have
+been enforced ([see #756](https://github.com/yargs/yargs/issues/756)):
+
+```js
+require('yargs')
+  .command('$0', 'accept username', () => {}, (argv) => {
+    // The middleware will have been applied before the default
+    // command is called:
+    console.info(argv);
+  })
+  .choices('user', ['Goofy', 'Miky'])
+  .middleware(argv => {
+    console.info('gots here');
+    const user = argv.user;
+    switch (user) {
+      case 'Goofy':
+        argv.user = {
+          firstName: 'Mark',
+          lastName: 'Pipe',
+        };
+        break;
+      case 'Miky':
+        argv.user = {
+          firstName: 'Elon',
+          lastName: 'Stone',
+        };
+        break;
+    }
+    return argv;
+  })
+  .parse('--user Miky');
+```
+
 <a name="nargs"></a>.nargs(key, count)
 -----------
 
@@ -1015,7 +1165,7 @@ The number of arguments that should be consumed after a key. This can be a
 useful hint to prevent parsing ambiguity. For example:
 
 ```js
-var argv = require('yargs')
+var argv = require('yargs/yargs')(process.argv.slice(2))
   .nargs('token', 1)
   .parse(['--token', '-my-token']);
 ```
@@ -1047,7 +1197,7 @@ be populated with `NaN`.
 Note that decimals, hexadecimals, and scientific notation are all accepted.
 
 ```js
-var argv = require('yargs')
+var argv = require('yargs/yargs')(process.argv.slice(2))
   .number('n')
   .number(['width', 'height'])
   .argv
@@ -1064,8 +1214,8 @@ customization, like `.alias()`, `.demandOption()` etc. for that option.
 
 For example:
 
-````javascript
-var argv = require('yargs')
+```javascript
+var argv = require('yargs/yargs')(process.argv.slice(2))
     .option('f', {
         alias: 'file',
         demandOption: true,
@@ -1075,12 +1225,12 @@ var argv = require('yargs')
     })
     .argv
 ;
-````
+```
 
 is the same as
 
-````javascript
-var argv = require('yargs')
+```javascript
+var argv = require('yargs/yargs')(process.argv.slice(2))
     .alias('f', 'file')
     .demandOption('f')
     .default('f', '/etc/passwd')
@@ -1088,12 +1238,12 @@ var argv = require('yargs')
     .string('f')
     .argv
 ;
-````
+```
 
 Optionally `.options()` can take an object that maps keys to `opt` parameters.
 
-````javascript
-var argv = require('yargs')
+```javascript
+var argv = require('yargs/yargs')(process.argv.slice(2))
     .options({
       'f': {
         alias: 'file',
@@ -1105,7 +1255,7 @@ var argv = require('yargs')
     })
     .argv
 ;
-````
+```
 
 Valid `opt` keys include:
 
@@ -1121,6 +1271,7 @@ Valid `opt` keys include:
 - `default`: value, set a default value for the option, see [`default()`](#default)
 - `defaultDescription`: string, use this description for the default value in help content, see [`default()`](#default)
 - `demandOption`: boolean or string, demand the option be given, with optional error message, see [`demandOption()`](#demandOption)
+- `deprecate`/`deprecated`: boolean or string, mark option as deprecated, see [`deprecateOption()`](#deprecateOption)
 - `desc`/`describe`/`description`: string, the option description for help content, see [`describe()`](#describe)
 - `global`: boolean, indicate that this key should not be [reset](#reset) when a command is invoked, see [`global()`](#global)
 - `group`: string, when displaying usage instructions place the option under an alternative group heading, see [`group()`](#group)
@@ -1178,7 +1329,9 @@ parser.parse(bot.userText, function (err, argv, output) {
 })
 ```
 
-***Note:*** Providing a callback to `parse()` disables the [`exitProcess` setting](#exitprocess) until after the callback is invoked.
+***Note:*** Providing a callback to `parse()` prevents Yargs from exiting
+automatically while there is still work in the event loop, as if the
+[`exitProcess` setting](#exitprocess) were set to `false`.
 
 ***Note:*** the `output` parameter of a `parse()` callback only contains text output by yargs using its internal logger.
 It *does not* include any text output by user-supplied callback, such as `console.log()` outputs in a
@@ -1189,9 +1342,21 @@ the resulting error and output will not be passed to the `parse()` callback (the
 
 ***Note:*** `parse()` should be called only once when [`command()`](#command) is called with a handler
 returning a promise. If your use case requires `parse()` to be called several times, any asynchronous
-operation performed in a command handler should not result in the handler returning a promise
+operation performed in a command handler should not result in the handler returning a promise.
 
-<a name="parsed"></a>.parsed
+.parseAsync([args], [context], [parseCallback])
+------------
+
+Identical to `.parse()` except always returns a promise for a parsed argv
+object, regardless of whether an async builder, handler, or middleware is used.
+
+.parseSync([args], [context], [parseCallback])
+------------
+
+Identical to `.parse()` except an exception is thrown if an asynchronous
+builder, handler, or middleware is used.
+
+<a name="parsed"></a>.parsed [DEPRECATED]
 ------------
 If the arguments have not been parsed, this property is `false`.
 
@@ -1203,13 +1368,21 @@ for details of this object
 ------------
 `parserConfiguration()` allows you to configure advanced yargs features.
 
-`obj` accepts the following configuration options:
+See [yargs-parser's configuration](https://github.com/yargs/yargs-parser#configuration) for valid configuration options. Yargs also supports the following options:
 
 * `sort-commands` when set to `true` (boolean) will sort the commands added, the default is `false`.
 
-For additional configuration options, see [yargs-parser's configuration](https://github.com/yargs/yargs-parser#configuration).
-
-_Note: configuraton should be top level keys on the `obj` passed to `parserConfiguration`, not populated under the configuration key, as in `yargs-parser`._
+```js
+yargs.parserConfiguration({
+  "short-option-groups": true,
+  "camel-case-expansion": true,
+  "dot-notation": true,
+  "parse-numbers": true,
+  "parse-positional-numbers": true,
+  "boolean-negation": true,
+  "deep-merge-config": false
+})
+```
 
 <a name="pkg-conf"></a>
 .pkgConf(key, [cwd])
@@ -1233,7 +1406,7 @@ available on the top-level yargs instance.
   [default commands](/docs/advanced.md#default-commands)._
 
 ```js
-const argv = require('yargs')('run --help')
+const argv = require('yargs/yargs')('run --help')
   .command('run <port> <guid>', 'run the server', (yargs) => {
     yargs.positional('guid', {
       describe: 'a unique identifier for the server',
@@ -1282,43 +1455,6 @@ usage information and exit.
 The default behavior is to set the value of any key not followed by an
 option value to `true`.
 
-<a name="reset"></a>.reset() [DEPRECATED]
---------
-
-Reset the argument object built up so far. This is useful for
-creating nested command line interfaces. Use [global](#global)
-to specify keys that should not be reset.
-
-```js
-var yargs = require('yargs')
-  .usage('$0 command')
-  .command('hello', 'hello command')
-  .command('world', 'world command')
-  .demandCommand(1, 'must provide a valid command'),
-  argv = yargs.argv,
-  command = argv._[0];
-
-if (command === 'hello') {
-  yargs.reset()
-    .usage('$0 hello')
-    .help('h')
-    .example('$0 hello', 'print the hello message!')
-    .argv
-
-  console.log('hello!');
-} else if (command === 'world'){
-  yargs.reset()
-    .usage('$0 world')
-    .help('h')
-    .example('$0 world', 'print the world message!')
-    .argv
-
-  console.log('world!');
-} else {
-  yargs.showHelp();
-}
-```
-
 <a name="scriptName"></a>.scriptName($0)
 ------------------
 
@@ -1341,7 +1477,7 @@ Generate a bash completion script. Users of your application can install this
 script in their `.bashrc`, and yargs will provide completion shortcuts for
 commands and options.
 
-.showHelp([consoleLevel | printCallback])
+<a name="show-help">.showHelp([consoleLevel | printCallback])
 ---------------------------
 
 Print the usage data.
@@ -1368,6 +1504,33 @@ yargs.showHelp(s => myStream.write(s)); //prints to myStream
 
 Later on, `argv` can be retrieved with `yargs.argv`.
 
+.showVersion([consoleLevel | printCallback])
+---------------------------
+
+Print the version data.
+
+If no argument is provided, version data is printed using `console.error`.
+
+```js
+var yargs = require('yargs/yargs')(process.argv.slice(2));
+yargs.version('1.0.0');
+yargs.showVersion(); //prints to stderr using console.error()
+```
+
+If a string is specified, version data is printed using the [`console`](https://nodejs.org/api/console.html) function `consoleLevel`.
+
+```js
+yargs.showVersion("log"); //prints to stdout using console.log()
+```
+
+If a function is specified, it is called with a single argument - the version data as a string.
+
+```js
+yargs.showVersion(s => myStream.write(s)); //prints to myStream
+```
+
+Later on, `argv` can be retrieved with `yargs.argv`.
+
 .showHelpOnFail(enable, [message])
 ----------------------------------
 
@@ -1378,9 +1541,9 @@ message is output after the error message.
 
 line_count.js:
 
-````javascript
+```javascript
 #!/usr/bin/env node
-var argv = require('yargs')
+var argv = require('yargs/yargs')(process.argv.slice(2))
     .usage('Count the lines in a file.\nUsage: $0 -f <file>')
     .demandOption('f')
     .alias('f', 'file')
@@ -1391,7 +1554,7 @@ var argv = require('yargs')
     .argv;
 
 // etc.
-````
+```
 
 ***
 
@@ -1446,6 +1609,13 @@ Similar to `.strict()`, except that it only applies to unrecognized commands. A
 user can still provide arbitrary options, but unknown positional commands
 will raise an error.
 
+.strictOptions([enabled=true])
+---------
+
+Similar to `.strict()`, except that it only applies to unrecognized options. A
+user can still provide arbitrary positional commands, but unknown options
+will raise an error.
+
 <a name="string"></a>.string(key)
 ------------
 
@@ -1466,7 +1636,7 @@ Override the default strings used by yargs with the key/value
 pairs provided in `obj`:
 
 ```js
-var argv = require('yargs')
+var argv = require('yargs/yargs')(process.argv.slice(2))
   .command('run', 'the run command')
   .help('help')
   .updateStrings({
@@ -1503,7 +1673,7 @@ acts an an alias for [`.command()`](#command). This allows you to use
 to provide configuration for the positional arguments accepted by your program:
 
 ```js
-const argv = require('yargs')
+const argv = require('yargs/yargs')(process.argv.slice(2))
   .usage('$0 <port>', 'start the application server', (yargs) => {
     yargs.positional('port', {
       describe: 'the port that your application should bind to',

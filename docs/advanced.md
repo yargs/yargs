@@ -14,7 +14,7 @@ commands. tldr; default commands allow you to define the entry point to your
 application using a similar API to subcommands.
 
 ```js
-const argv = require('yargs')
+const argv = require('yargs/yargs')(process.argv.slice(2))
   .command('$0', 'the default command', () => {}, (argv) => {
     console.log('this command will be run by default')
   })
@@ -27,7 +27,7 @@ is run with `./my-cli.js --x=22`.
 Default commands can also be used as a command alias, like so:
 
 ```js
-const argv = require('yargs')
+const argv = require('yargs/yargs')(process.argv.slice(2))
   .command(['serve', '$0'], 'the serve command', () => {}, (argv) => {
     console.log('this command will be run by default')
   })
@@ -124,7 +124,7 @@ line, the command will be executed.
 
 ```js
 #!/usr/bin/env node
-require('yargs')
+require('yargs/yargs')(process.argv.slice(2))
   .command(['start [app]', 'run', 'up'], 'Start up an app', {}, (argv) => {
     console.log('starting up the', argv.app || 'default', 'app')
   })
@@ -233,6 +233,8 @@ This example uses [jest](https://github.com/facebook/jest) as a test runner, but
 .commandDir(directory, [opts])
 ------------------------------
 
+_Note: `commandDir()` does not work with ESM or Deno, see [hierarchy using index.mjs](/docs/advanced.md#esm-hierarchy) for an example of building a complex nested CLI using ESM._
+
 Apply command modules from a directory relative to the module calling this method.
 
 This allows you to organize multiple commands into their own modules under a
@@ -269,11 +271,11 @@ can either move your module to a different directory or use the `exclude` or
 
 - `include`: RegExp or function
 
-    Whitelist certain modules. See [`require-directory` whitelisting](https://www.npmjs.com/package/require-directory#whitelisting) for details.
+    Allow list certain modules. See [`require-directory`](https://www.npmjs.com/package/require-directory) for details.
 
 - `exclude`: RegExp or function
 
-    Blacklist certain modules. See [`require-directory` blacklisting](https://www.npmjs.com/package/require-directory#blacklisting) for details.
+    Block list certain modules. See [`require-directory`](https://www.npmjs.com/package/require-directory) for details.
 
 ### Example command hierarchy using `.commandDir()`
 
@@ -305,7 +307,7 @@ cli.js:
 
 ```js
 #!/usr/bin/env node
-require('yargs')
+require('yargs/yargs')(process.argv.slice(2))
   .commandDir('cmds')
   .demandCommand()
   .help()
@@ -360,6 +362,38 @@ exports.handler = function (argv) {
 }
 ```
 
+<a name="esm-hierarchy"></a>
+### Example command hierarchy using index.mjs
+
+To support creating a complex nested CLI when using ESM, the method
+`.command()` was extended to accept an array of command modules.
+Rather than using `.commandDir()`, create an `index.mjs` in each command
+directory with a list of the commands:
+
+cmds/index.mjs:
+
+```js
+import * as a from './init.mjs';
+import * as b from './remote.mjs';
+export const commands = [a, b];
+```
+
+This index will then be imported and registered with your CLI:
+
+cli.js:
+
+```js
+#!/usr/bin/env node
+
+import yargs from 'yargs';
+import { hideBin } from 'yargs/helpers';
+import { commands } from './cmds/index.mjs';
+
+yargs(hideBin(process.argv))
+  .command(commands)
+  .argv;
+```
+
 <a name="configuration"></a>
 ## Building Configurable CLI Apps
 
@@ -383,7 +417,7 @@ const findUp = require('find-up')
 const fs = require('fs')
 const configPath = findUp.sync(['.myapprc', '.myapprc.json'])
 const config = configPath ? JSON.parse(fs.readFileSync(configPath)) : {}
-const argv = require('yargs')
+const argv = require('yargs/yargs')(process.argv.slice(2))
   .config(config)
   .argv
 ```
@@ -411,7 +445,7 @@ Yargs gives you this functionality using the [`pkgConf()`](/docs/api.md#config)
 method:
 
 ```js
-const argv = require('yargs')
+const argv = require('yargs/yargs')(process.argv.slice(2))
   .pkgConf('nyc')
   .argv
 ```
@@ -449,20 +483,6 @@ yargs.parserConfiguration({
 
 See the [yargs-parser](https://github.com/yargs/yargs-parser#configuration) module
 for detailed documentation of this feature.
-
-## Command finish hook
-### Example
-```js
-yargs
-    .command('cmd', ..., async () => {
-        await this.model.find()
-        return Promise.resolve('result value')
-    })
-    .onFinishCommand(async (resultValue) => {
-        await this.db.disconnect()
-        process.exit()
-    }).argv;
-```
 
 ## Middleware
 
@@ -522,7 +542,7 @@ yargs.middleware(normalizeCredentials)
 #### yargs parsing configuration
 
 ```js
-var argv = require('yargs')
+var argv = require('yargs/yargs')(process.argv.slice(2))
   .usage('Usage: $0 <command> [options]')
   .command('login', 'Authenticate user', (yargs) =>{
         return yargs.option('username')
@@ -535,11 +555,65 @@ var argv = require('yargs')
   .argv;
 ```
 
-### Using the non-singleton interface
+## Using Yargs with Async/await
 
-To use yargs without running as a singleton, do:
+If you use async middleware or async builders/handlers for commands, `yargs.parse` and
+`yargs.argv` will return a `Promise`. When you `await` this promise the
+parsed arguments object will be returned after the handler completes:
+
 ```js
-const argv = require('yargs/yargs')(process.argv.slice(2))
+import yargs from 'yargs'
+import { hideBin } from 'yargs/helpers'
+
+async function processValue(value) {
+  return new Promise((resolve) => {
+    // Perform some async operation on value.
+    setTimeout(() => {
+      return resolve(value)
+    }, 1000)
+  })
+}
+
+console.info('start')
+await yargs(hideBin(process.argv))
+  .command('add <x> <y>', 'add two eventual values', () => {}, async (argv) => {
+    const sum = await processValue(argv.x) + await processValue(argv.y)
+    console.info(`x + y = ${sum}`)
+  }).parse()
+console.info('finish')
 ```
 
-This is especially useful when using yargs in a library, as library authors should not pollute the global state.
+### Handling async errors
+
+By default, when an async error occurs within a command yargs will
+exit with code `1` and print a help message. If you would rather
+Use `try`/`catch` to perform error handling, you can do so by setting
+`.fail(false)`:
+
+```js
+import yargs from 'yargs'
+import { hideBin } from 'yargs/helpers'
+
+async function processValue(value) {
+  return new Promise((resolve, reject) => {
+    // Perform some async operation on value.
+    setTimeout(() => {
+      return reject(Error('something went wrong'))
+    }, 1000)
+  })
+}
+
+console.info('start')
+const parser = yargs(hideBin(process.argv))
+  .command('add <x> <y>', 'add two eventual values', () => {}, async (argv) => {
+    const sum = await processValue(argv.x) + await processValue(argv.y)
+    console.info(`x + y = ${sum}`)
+  })
+  .fail(false)
+try {
+  const argv = await parser.parse();
+} catch (err) {
+  console.info(`${err.message}\n ${await parser.getHelp()}`)
+}
+console.info('finish')
+```

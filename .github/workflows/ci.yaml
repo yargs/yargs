@@ -3,20 +3,21 @@ on:
     branches:
       - master
   pull_request:
+    types: [ assigned, opened, synchronize, reopened, labeled ]
 name: ci
 jobs:
   test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: [8, 10, 12, 13]
+        node: [12, 14, 16]
     steps:
       - uses: actions/checkout@v1
       - uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node }}
       - run: node --version
-      - run: npm install
+      - run: npm install --engine-strict
       - run: npm test
   windows:
     runs-on: windows-latest
@@ -27,13 +28,41 @@ jobs:
           node-version: 12
       - run: npm install
       - run: npm test
+  esm:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [14]
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node }}
+      - run: node --version
+      - run: npm install --engine-strict
+      - run: npm run test:esm
+  deno:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 14
+      - run: npm install
+      - run: npm run compile
+      - uses: denolib/setup-deno@v2
+        with:
+          deno-version: v1.x
+      - run: |
+          deno --version
+          deno test --allow-read test/deno/*
   coverage:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
       - uses: actions/setup-node@v1
         with:
-          node-version: 13
+          node-version: 15
       - run: npm install
       - run: npm test
       - run: npm run coverage

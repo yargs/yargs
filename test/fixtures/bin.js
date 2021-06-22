@@ -1,6 +1,5 @@
 #!/usr/bin/env node
-var argv = require('../../index')
-  .help('help')
-  .completion()
-  .argv
-console.log(JSON.stringify(argv._))
+/* eslint-disable node/shebang */
+// eslint-disable-next-line no-undef
+const argv = require('../../').help('help').completion().argv;
+console.log(JSON.stringify(argv._));
