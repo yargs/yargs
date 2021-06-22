@@ -49,12 +49,12 @@ export function levenshtein(a: string, b: string) {
         matrix[i][j] = matrix[i - 1][j - 1];
       } else {
         if (
-            i > 1 &&
-            j > 1 &&
-            b.charAt(i - 2) === a.charAt(j - 1) &&
-            b.charAt(i - 1) === a.charAt(j - 2)
+          i > 1 &&
+          j > 1 &&
+          b.charAt(i - 2) === a.charAt(j - 1) &&
+          b.charAt(i - 1) === a.charAt(j - 2)
         ) {
-          matrix[i][j] = matrix[i - 2][j - 2] + 1;  // transposition
+          matrix[i][j] = matrix[i - 2][j - 2] + 1; // transposition
         } else {
           matrix[i][j] = Math.min(
             matrix[i - 1][j - 1] + 1, // substitution
