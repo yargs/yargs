@@ -182,17 +182,18 @@ export function validation(
     // https://github.com/yargs/yargs/issues/1861
     if (checkPositionals) {
       // Check for non-option args that are not in currentContext.commands
-      // If yargs.demand called, tolerate non-option args within min/max range
+      // Take into account expected args from commands and yargs.demand(number)
       const demandedCommands = yargs.getDemandedCommands();
       const maxNonOptDemanded = demandedCommands._?.max || 0;
-      if (maxNonOptDemanded < argv._.length) {
-        argv._.slice(maxNonOptDemanded).forEach(nonOptArg => {
-          nonOptArg = String(nonOptArg);
+      const expected = currentContext.commands.length + maxNonOptDemanded;
+      if (expected < argv._.length) {
+        argv._.slice(expected).forEach(key => {
+          key = String(key);
           if (
-            !currentContext.commands.includes(nonOptArg) &&
-            !unknown.includes(nonOptArg)
+            !currentContext.commands.includes(key) &&
+            !unknown.includes(key)
           ) {
-            unknown.push(nonOptArg);
+            unknown.push(key);
           }
         });
       }
