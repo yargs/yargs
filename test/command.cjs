@@ -1547,6 +1547,30 @@ describe('Command', () => {
             return done();
           });
       });
+
+      // addresses https://github.com/yargs/yargs/issues/1966
+      it('should not be applied multiple times', done => {
+        yargs('rule add foo bar baz')
+          .command('rule', 'rule desc', yargs =>
+            yargs.command(
+              'add <name> <abc...>',
+              'add desc',
+              yargs =>
+                yargs.positional('abc', {
+                  type: 'string',
+                  coerce: arg => arg.join(' '),
+                }),
+              argv => {
+                argv.abc.should.equal('bar baz');
+                return done();
+              }
+            )
+          )
+          .fail(() => {
+            expect.fail();
+          })
+          .parse();
+      });
     });
 
     describe('defaults', () => {
