@@ -411,18 +411,6 @@ describe('yargs dsl tests', () => {
       r.logs.length.should.equal(0);
     });
 
-    it('tranposing two characters also counts as one mistake. longer strings match first', () => {
-      const r = checkOutput(() => {
-        yargs(['boat'])
-          .command('baot')
-          .command('bot')
-          .recommendCommands()
-          .parse();
-      });
-
-      r.errors[2].should.match(/Did you mean boat/);
-    });
-
     it('recommends the longest match first', () => {
       const r = checkOutput(() => {
         yargs(['boat'])
@@ -433,6 +421,18 @@ describe('yargs dsl tests', () => {
       });
 
       r.errors[2].should.match(/Did you mean goat/);
+    });
+
+    it('counts tranposition as one mistake', () => {
+      const r = checkOutput(() => {
+        yargs(['baot'])
+          .command('boat')
+          .command('bot')
+          .recommendCommands()
+          .parse();
+      });
+
+      r.errors[2].should.match(/Did you mean boat/);
     });
 
     // see: https://github.com/yargs/yargs/issues/822
