@@ -411,6 +411,18 @@ describe('yargs dsl tests', () => {
       r.logs.length.should.equal(0);
     });
 
+    it('tranposing two characters also counts as one mistake. longer strings match first', () => {
+      const r = checkOutput(() => {
+        yargs(['boat'])
+          .command('baot')
+          .command('bot')
+          .recommendCommands()
+          .parse();
+      });
+
+      r.errors[2].should.match(/Did you mean boat/);
+    });
+
     it('recommends the longest match first', () => {
       const r = checkOutput(() => {
         yargs(['boat'])
