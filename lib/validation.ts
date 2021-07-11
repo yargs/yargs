@@ -154,7 +154,7 @@ export function validation(
 
     Object.keys(argv).forEach(key => {
       if (
-        specialKeys.indexOf(key) === -1 &&
+        !specialKeys.includes(key) &&
         !Object.prototype.hasOwnProperty.call(positionalMap, key) &&
         !Object.prototype.hasOwnProperty.call(
           yargs.getInternalMethods().getParseContext(),
@@ -173,13 +173,33 @@ export function validation(
         isDefaultCommand)
     ) {
       argv._.slice(currentContext.commands.length).forEach(key => {
-        if (commandKeys.indexOf('' + key) === -1) {
+        if (!commandKeys.includes('' + key)) {
           unknown.push('' + key);
         }
       });
     }
 
-    if (unknown.length > 0) {
+    // https://github.com/yargs/yargs/issues/1861
+    if (checkPositionals) {
+      // Check for non-option args that are not in currentContext.commands
+      // Take into account expected args from commands and yargs.demand(number)
+      const demandedCommands = yargs.getDemandedCommands();
+      const maxNonOptDemanded = demandedCommands._?.max || 0;
+      const expected = currentContext.commands.length + maxNonOptDemanded;
+      if (expected < argv._.length) {
+        argv._.slice(expected).forEach(key => {
+          key = String(key);
+          if (
+            !currentContext.commands.includes(key) &&
+            !unknown.includes(key)
+          ) {
+            unknown.push(key);
+          }
+        });
+      }
+    }
+
+    if (unknown.length) {
       usage.fail(
         __n(
           'Unknown argument: %s',
@@ -201,7 +221,7 @@ export function validation(
 
     if (currentContext.commands.length > 0 || commandKeys.length > 0) {
       argv._.slice(currentContext.commands.length).forEach(key => {
-        if (commandKeys.indexOf('' + key) === -1) {
+        if (!commandKeys.includes('' + key)) {
           unknown.push('' + key);
         }
       });
