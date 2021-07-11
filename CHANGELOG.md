@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [17.0.2](https://www.github.com/yargs/yargs/compare/v17.0.1...v17.0.2) (2021-07-11)
+
+
+### Bug Fixes
+
+* strict should fail unknown arguments ([#1977](https://www.github.com/yargs/yargs/issues/1977)) ([c804f0d](https://www.github.com/yargs/yargs/commit/c804f0db78e56b44341cc7a91878c27b1b68b9f2))
+
 ### [17.0.1](https://www.github.com/yargs/yargs/compare/v17.0.0...v17.0.1) (2021-05-03)
 
 
