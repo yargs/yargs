@@ -423,6 +423,18 @@ describe('yargs dsl tests', () => {
       r.errors[2].should.match(/Did you mean goat/);
     });
 
+    it('counts tranposition as one mistake', () => {
+      const r = checkOutput(() => {
+        yargs(['baot'])
+          .command('boat')
+          .command('bot')
+          .recommendCommands()
+          .parse();
+      });
+
+      r.errors[2].should.match(/Did you mean boat/);
+    });
+
     // see: https://github.com/yargs/yargs/issues/822
     it('does not print command recommendation if help message will be shown', done => {
       const parser = yargs().command('goat').help().recommendCommands();
