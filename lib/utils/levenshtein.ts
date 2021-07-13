@@ -21,6 +21,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 // levenshtein distance algorithm, pulled from Andrei Mackenzie's MIT licensed.
 // gist, which can be found here: https://gist.github.com/andrei-m/982927
+// extended to compute damerau-levenshtein distance
 
 // Compute the edit distance between the two given strings
 export function levenshtein(a: string, b: string) {
@@ -47,13 +48,22 @@ export function levenshtein(a: string, b: string) {
       if (b.charAt(i - 1) === a.charAt(j - 1)) {
         matrix[i][j] = matrix[i - 1][j - 1];
       } else {
-        matrix[i][j] = Math.min(
-          matrix[i - 1][j - 1] + 1, // substitution
-          Math.min(
-            matrix[i][j - 1] + 1, // insertion
-            matrix[i - 1][j] + 1
-          )
-        ); // deletion
+        if (
+          i > 1 &&
+          j > 1 &&
+          b.charAt(i - 2) === a.charAt(j - 1) &&
+          b.charAt(i - 1) === a.charAt(j - 2)
+        ) {
+          matrix[i][j] = matrix[i - 2][j - 2] + 1; // transposition
+        } else {
+          matrix[i][j] = Math.min(
+            matrix[i - 1][j - 1] + 1, // substitution
+            Math.min(
+              matrix[i][j - 1] + 1, // insertion
+              matrix[i - 1][j] + 1
+            )
+          ); // deletion
+        }
       }
     }
   }
