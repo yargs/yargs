@@ -101,6 +101,28 @@ describe('validation tests', () => {
       failCalled.should.equal(true);
     });
 
+    it("doesn't fail if implied key exists with value 0", () => {
+      let failCalled = false;
+      yargs('--foo --bar 0')
+        .implies('foo', 'bar')
+        .fail(msg => {
+          failCalled = true;
+        })
+        .parse();
+      failCalled.should.equal(false);
+    });
+
+    it("doesn't fail if implied key exists with value false", () => {
+      let failCalled = false;
+      yargs('--foo --bar false')
+        .implies('foo', 'bar')
+        .fail(msg => {
+          failCalled = true;
+        })
+        .parse();
+      failCalled.should.equal(false);
+    });
+
     it('doesn\'t fail if implied key (with "no" in the name) is set', () => {
       let failCalled = false;
       const argv = yargs('--bar --noFoo')
