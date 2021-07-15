@@ -1550,6 +1550,8 @@ describe('Command', () => {
 
       // addresses https://github.com/yargs/yargs/issues/1966
       it('should not be applied multiple times', done => {
+        let coerceExecutionCount = 0;
+
         yargs('rule add foo bar baz')
           .command('rule', 'rule desc', yargs =>
             yargs.command(
@@ -1558,10 +1560,17 @@ describe('Command', () => {
               yargs =>
                 yargs.positional('abc', {
                   type: 'string',
-                  coerce: arg => arg.join(' '),
+                  coerce: arg => {
+                    if (coerceExecutionCount) {
+                      throw Error('coerce applied multiple times');
+                    }
+                    coerceExecutionCount++;
+                    return arg.join(' ');
+                  },
                 }),
               argv => {
                 argv.abc.should.equal('bar baz');
+                coerceExecutionCount.should.equal(1);
                 return done();
               }
             )
