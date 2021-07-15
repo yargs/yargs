@@ -1549,7 +1549,7 @@ describe('Command', () => {
       });
 
       // addresses https://github.com/yargs/yargs/issues/1966
-      it('should not be applied multiple times for nested commands', done => {
+      it('should not be applied multiple times for nested commands', () => {
         let coerceExecutionCount = 0;
 
         const argv = yargs('cmd1 cmd2 foo bar baz')
@@ -1575,7 +1575,6 @@ describe('Command', () => {
 
         argv.rest.should.equal('bar baz');
         coerceExecutionCount.should.equal(1);
-        return done();
       });
     });
 
