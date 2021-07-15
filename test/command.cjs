@@ -1552,13 +1552,11 @@ describe('Command', () => {
       it('should not be applied multiple times for nested commands', done => {
         let coerceExecutionCount = 0;
 
-        yargs('cmd1 cmd2 foo bar baz')
+        const argv = yargs('cmd1 cmd2 foo bar baz')
           .command('cmd1', 'cmd1 desc', yargs =>
-            yargs.command(
-              'cmd2 <positional1> <rest...>',
-              'cmd2 desc',
-              yargs =>
-                yargs.positional('rest', {
+            yargs.command('cmd2 <positional1> <rest...>', 'cmd2 desc', yargs =>
+              yargs
+                .positional('rest', {
                   type: 'string',
                   coerce: arg => {
                     if (coerceExecutionCount) {
@@ -1567,18 +1565,17 @@ describe('Command', () => {
                     coerceExecutionCount++;
                     return arg.join(' ');
                   },
-                }),
-              argv => {
-                argv.rest.should.equal('bar baz');
-                coerceExecutionCount.should.equal(1);
-                return done();
-              }
+                })
+                .fail(() => {
+                  expect.fail();
+                })
             )
           )
-          .fail(() => {
-            expect.fail();
-          })
           .parse();
+
+        argv.rest.should.equal('bar baz');
+        coerceExecutionCount.should.equal(1);
+        return done();
       });
     });
 
