@@ -1553,30 +1553,27 @@ describe('Command', () => {
         let coerceExecutionCount = 0;
 
         yargs('cmd1 cmd2 foo bar baz')
-          .command(
-            'cmd1',
-            'cmd1 desc',
-            yargs =>
-              yargs.command(
-                'cmd2 <positional1> <rest...>',
-                'cmd2 desc',
-                yargs =>
-                  yargs.positional('rest', {
-                    type: 'string',
-                    coerce: arg => {
-                      if (coerceExecutionCount) {
-                        throw Error('coerce applied multiple times');
-                      }
-                      coerceExecutionCount++;
-                      return arg.join(' ');
-                    },
-                  })
-              ),
-            argv => {
-              argv.abc.should.equal('bar baz');
-              coerceExecutionCount.should.equal(1);
-              return done();
-            }
+          .command('cmd1', 'cmd1 desc', yargs =>
+            yargs.command(
+              'cmd2 <positional1> <rest...>',
+              'cmd2 desc',
+              yargs =>
+                yargs.positional('rest', {
+                  type: 'string',
+                  coerce: arg => {
+                    if (coerceExecutionCount) {
+                      throw Error('coerce applied multiple times');
+                    }
+                    coerceExecutionCount++;
+                    return arg.join(' ');
+                  },
+                }),
+              argv => {
+                argv.rest.should.equal('bar baz');
+                coerceExecutionCount.should.equal(1);
+                return done();
+              }
+            )
           )
           .fail(() => {
             expect.fail();
