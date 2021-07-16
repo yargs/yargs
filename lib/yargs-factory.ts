@@ -547,8 +547,9 @@ export class YargsInstance {
     if (typeof value === 'function') {
       assertSingleKey(key, this.#shim);
       if (!this.#options.defaultDescription[key])
-        this.#options.defaultDescription[key] =
-          this.#usage.functionDescription(value);
+        this.#options.defaultDescription[key] = this.#usage.functionDescription(
+          value
+        );
       value = value.call();
     }
     this[kPopulateParserHintSingleValueDictionary]<'default'>(
@@ -1164,8 +1165,9 @@ export class YargsInstance {
     });
 
     // copy over any settings that can be inferred from the command string.
-    const fullCommand =
-      this.#context.fullCommands[this.#context.fullCommands.length - 1];
+    const fullCommand = this.#context.fullCommands[
+      this.#context.fullCommands.length - 1
+    ];
     const parseOptions = fullCommand
       ? this.#command.cmdToParseOptions(fullCommand)
       : {
@@ -1723,8 +1725,9 @@ export class YargsInstance {
       postProcess: this[kPostProcess].bind(this),
       reset: this[kReset].bind(this),
       runValidation: this[kRunValidation].bind(this),
-      runYargsParserAndExecuteCommands:
-        this[kRunYargsParserAndExecuteCommands].bind(this),
+      runYargsParserAndExecuteCommands: this[
+        kRunYargsParserAndExecuteCommands
+      ].bind(this),
       setHasOutput: this[kSetHasOutput].bind(this),
     };
   }
