@@ -904,6 +904,13 @@ export class YargsInstance {
         opt = {};
       }
 
+      // Prevent version name collision
+      if (key === 'version' || opt?.alias === 'version') {
+        throw new YError(
+          '"version" is a reserved word.\nPlease use a different option key or use the built-in version method (if applicable).\nhttps://yargs.js.org/docs/#api-reference-version'
+        );
+      }
+
       this.#options.key[key] = true; // track manually set keys.
 
       if (opt.alias) this.alias(key, opt.alias);
