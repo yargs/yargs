@@ -1572,7 +1572,7 @@ describe('usage tests', () => {
     });
 
     describe('when an option or alias "version" is set', () => {
-      it('fails unless false is first argument', done => {
+      it('fails unless version is disabled', done => {
         yargs
           .command('cmd1', 'cmd desc', yargs =>
             yargs.option('v', {
@@ -1589,7 +1589,7 @@ describe('usage tests', () => {
           .parse('cmd1 --version 0.25.10');
       });
 
-      it('allows if false is first argument', () => {
+      it('works if version is disabled', () => {
         yargs
           .command(
             'cmd1',
