@@ -1571,6 +1571,7 @@ describe('usage tests', () => {
       r.logs[0].should.eql('1.0.2');
     });
 
+    // Addresses: https://github.com/yargs/yargs/issues/1979
     describe('when an option or alias "version" is set', () => {
       it('fails unless version is disabled', done => {
         yargs
