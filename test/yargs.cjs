@@ -2620,8 +2620,12 @@ describe('yargs dsl tests', () => {
 
   describe('parsing --value as a value in -f=--value and --bar=--value', () => {
     it('should work in the general case', () => {
-      const argv = yargs(['-f=--item1', 'item2', '--bar=--item3', 'item4'])
-        .argv;
+      const argv = yargs([
+        '-f=--item1',
+        'item2',
+        '--bar=--item3',
+        'item4',
+      ]).argv;
       argv.f.should.eql('--item1');
       argv.bar.should.eql('--item3');
       argv._.should.eql(['item2', 'item4']);
