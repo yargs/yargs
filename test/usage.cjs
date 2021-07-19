@@ -1884,6 +1884,32 @@ describe('usage tests', () => {
           '  -h, --help     Show help                                             [boolean]',
         ]);
     });
+
+    it('should not indent usage when no wrap is specified', () => {
+      const expected = [
+        '                              My greatest CLI App',
+        'Hello, world',
+        '',
+        'Options:',
+        '  --help     Show help  [boolean]',
+        '  --version  Show version number  [boolean]',
+      ];
+
+      const r = checkUsage(() =>
+        yargs('--help')
+          .usage(
+            [
+              '                              My greatest CLI App',
+              'Hello, world',
+            ].join('\n')
+          )
+          .wrap(null)
+          .parse()
+      );
+
+      // the leading whitespaces on the first line should not cause indentation to usage string
+      r.logs[0].split('\n').should.deep.equal(expected);
+    });
   });
 
   describe('commands', () => {
