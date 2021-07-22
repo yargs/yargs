@@ -598,13 +598,7 @@ export class CommandInstance {
           // any new aliases need to be placed in positionalMap, which
           // is used for validation.
           if (!positionalMap[key]) positionalMap[key] = parsed.argv[key];
-          // addresses: https://github.com/yargs/yargs/issues/1637
-          // don't overwrite if key already exists in argv
-          if (argv[key]) {
-            argv[key] = ([] as string[]).concat(argv[key], positionalMap[key]);
-          } else {
-            argv[key] = parsed.argv[key];
-          }
+          argv[key] = parsed.argv[key];
         }
       });
     }

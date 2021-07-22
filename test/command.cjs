@@ -209,6 +209,41 @@ describe('Command', () => {
       argv['--'].should.eql(['apple', 'banana']);
       called.should.equal(true);
     });
+
+    // Addresses: https://github.com/yargs/yargs/issues/1637
+    it('does not overwrite options in argv', () => {
+      yargs
+        .command({
+          command: 'cmd [foods..]',
+          desc: 'cmd desc',
+          builder: yargs =>
+            yargs.positional('foods', {
+              desc: 'foods desc',
+              type: 'string',
+            }),
+          handler: argv => {
+            argv.foods.should.deep.equal(['apples', 'cherries', 'grapes']);
+          },
+        })
+        .parse('cmd --foods apples cherries grapes');
+    });
+
+    it('does not overwrite options in argv when using default command', () => {
+      yargs
+        .command({
+          command: '$0 [foods..]',
+          desc: 'default desc',
+          builder: yargs =>
+            yargs.positional('foods', {
+              desc: 'foods desc',
+              type: 'string',
+            }),
+          handler: argv => {
+            argv.foods.should.deep.equal(['apples', 'cherries', 'grapes']);
+          },
+        })
+        .parse('--foods apples cherries grapes');
+    });
   });
 
   describe('variadic', () => {
