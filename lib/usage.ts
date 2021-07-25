@@ -246,8 +246,10 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
         commands = commands.sort((a, b) => a[0].localeCompare(b[0]));
       }
 
+      const prefix = base$0 ? `${base$0} ` : ''
+
       commands.forEach(command => {
-        const commandString = `${base$0} ${parentCommands}${command[0].replace(
+        const commandString = `${prefix}${parentCommands}${command[0].replace(
           /^\$0 ?/,
           ''
         )}`; // drop $0 from default commands.
@@ -256,7 +258,7 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
             text: commandString,
             padding: [0, 2, 0, 2],
             width:
-              maxWidth(commands, theWrap, `${base$0}${parentCommands}`) + 4,
+              maxWidth(commands, theWrap, `${prefix}${parentCommands}`) + 4,
           },
           {text: command[1]}
         );
