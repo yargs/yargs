@@ -211,7 +211,7 @@ describe('Command', () => {
     });
 
     // Addresses: https://github.com/yargs/yargs/issues/1637
-    it('does not overwrite options in argv', () => {
+    it('does not overwrite options in argv if variadic', () => {
       yargs
         .command({
           command: 'cmd [foods..]',
@@ -228,7 +228,7 @@ describe('Command', () => {
         .parse('cmd --foods apples cherries grapes');
     });
 
-    it('does not overwrite options in argv when using default command', () => {
+    it('does not overwrite options in argv if variadic and when using default command', () => {
       yargs
         .command({
           command: '$0 [foods..]',
@@ -243,6 +243,23 @@ describe('Command', () => {
           },
         })
         .parse('--foods apples cherries grapes');
+    });
+
+    it('does not overwrite options in argv if variadic and preserves falsey values', () => {
+      yargs
+        .command({
+          command: '$0 [numbers..]',
+          desc: 'default desc',
+          builder: yargs =>
+            yargs.positional('numbers', {
+              desc: 'numbers desc',
+              type: 'number',
+            }),
+          handler: argv => {
+            argv.numbers.should.deep.equal([0, 1, 2]);
+          },
+        })
+        .parse('--numbers 0 1 2');
     });
   });
 

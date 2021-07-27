@@ -602,8 +602,8 @@ export class CommandInstance {
           // If both positionals/options provided,
           // and if at least one is an array: don't overwrite, combine.
           if (
-            argv[key] &&
-            parsed.argv[key] &&
+            Object.prototype.hasOwnProperty.call(argv, key) &&
+            Object.prototype.hasOwnProperty.call(parsed.argv, key) &&
             (Array.isArray(argv[key]) || Array.isArray(parsed.argv[key]))
           ) {
             argv[key] = ([] as string[]).concat(argv[key], parsed.argv[key]);
