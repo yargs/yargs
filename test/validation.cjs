@@ -986,6 +986,46 @@ describe('validation tests', () => {
       args.matey.should.equal('ben');
       args._.should.deep.equal(['ahoy', '--arrr']);
     });
+
+    it('does not fail when options are defined using array/boolean/count/number/string', () => {
+      yargs
+        .command({
+          command: 'cmd',
+          desc: 'cmd desc',
+          builder: yargs =>
+            yargs
+              .option('opt1', {
+                desc: 'opt1 desc',
+                type: 'boolean',
+              })
+              .option('opt2', {
+                desc: 'opt2 desc',
+                boolean: true,
+              })
+              .array('opt3')
+              .boolean('opt4')
+              .count('opt5')
+              .number('opt6')
+              .string('opt7')
+              .fail(() => {
+                expect.fail();
+              }),
+          handler: argv => {
+            argv.opt1.should.equal(true);
+            argv.opt2.should.equal(true);
+            argv.opt3.should.deep.equal(['foo', 'bar', 'baz']);
+            argv.opt4.should.equal(true);
+            argv.opt5.should.equal(1);
+            argv.opt6.should.equal(3);
+            argv.opt7.should.equal('cat');
+          },
+        })
+        .help()
+        .strict()
+        .parse(
+          'cmd --opt1 --opt2 --opt3 foo bar baz --opt4 --opt5 --opt6 3 --opt7 cat'
+        );
+    });
   });
 
   describe('demandOption', () => {
