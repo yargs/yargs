@@ -209,6 +209,42 @@ describe('Command', () => {
       argv['--'].should.eql(['apple', 'banana']);
       called.should.equal(true);
     });
+
+    // Addresses: https://github.com/yargs/yargs/issues/1848
+    it('is not stolen by array options', () => {
+      yargs
+        .command({
+          command: 'cmd <entree>',
+          desc: 'cmd desc',
+          builder: yargs =>
+            yargs
+              .positional('entree', {
+                desc: 'entree desc',
+                type: 'string',
+              })
+              .option('drink', {
+                desc: 'drink desc',
+                type: 'string',
+              })
+              .option('desserts', {
+                desc: 'desserts desc',
+                type: 'string',
+                array: 'true',
+              })
+              .fail(() => {
+                expect.fail();
+              }),
+          handler: argv => {
+            argv.should.have.property('entree');
+            argv.entree.should.equall('barbacoa');
+            argv.drink.should.equall('horchata');
+            argv.desserts.should.deep.equall(['churro', 'sopapilla']);
+          },
+        })
+        .help()
+        .strict()
+        .parse('cmd --drink horchata --desserts churro sopapilla barbacoa');
+    });
   });
 
   describe('variadic', () => {
