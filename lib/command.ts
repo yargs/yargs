@@ -224,29 +224,27 @@ export class CommandInstance {
       helpOnly,
       helpOrVersionSet
     );
-    if (isPromise(builderResult)) {
-      return builderResult.then(result => {
-        return this.applyMiddlewareAndGetResult(
+    return isPromise(builderResult)
+      ? builderResult.then(result =>
+          this.applyMiddlewareAndGetResult(
+            isDefaultCommand,
+            commandHandler,
+            result.innerArgv,
+            currentContext,
+            helpOnly,
+            result.aliases,
+            yargs
+          )
+        )
+      : this.applyMiddlewareAndGetResult(
           isDefaultCommand,
           commandHandler,
-          result.innerArgv,
+          builderResult.innerArgv,
           currentContext,
           helpOnly,
-          result.aliases,
+          builderResult.aliases,
           yargs
         );
-      });
-    } else {
-      return this.applyMiddlewareAndGetResult(
-        isDefaultCommand,
-        commandHandler,
-        builderResult.innerArgv,
-        currentContext,
-        helpOnly,
-        builderResult.aliases,
-        yargs
-      );
-    }
   }
   private applyBuilderUpdateUsageAndParse(
     isDefaultCommand: boolean,
@@ -600,7 +598,18 @@ export class CommandInstance {
           // any new aliases need to be placed in positionalMap, which
           // is used for validation.
           if (!positionalMap[key]) positionalMap[key] = parsed.argv[key];
-          argv[key] = parsed.argv[key];
+          // Addresses: https://github.com/yargs/yargs/issues/1637
+          // If both positionals/options provided,
+          // and if at least one is an array: don't overwrite, combine.
+          if (
+            Object.prototype.hasOwnProperty.call(argv, key) &&
+            Object.prototype.hasOwnProperty.call(parsed.argv, key) &&
+            (Array.isArray(argv[key]) || Array.isArray(parsed.argv[key]))
+          ) {
+            argv[key] = ([] as string[]).concat(argv[key], parsed.argv[key]);
+          } else {
+            argv[key] = parsed.argv[key];
+          }
         }
       });
     }
