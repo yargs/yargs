@@ -598,7 +598,18 @@ export class CommandInstance {
           // any new aliases need to be placed in positionalMap, which
           // is used for validation.
           if (!positionalMap[key]) positionalMap[key] = parsed.argv[key];
-          argv[key] = parsed.argv[key];
+          // Addresses: https://github.com/yargs/yargs/issues/1637
+          // If both positionals/options provided,
+          // and if at least one is an array: don't overwrite, combine.
+          if (
+            Object.prototype.hasOwnProperty.call(argv, key) &&
+            Object.prototype.hasOwnProperty.call(parsed.argv, key) &&
+            (Array.isArray(argv[key]) || Array.isArray(parsed.argv[key]))
+          ) {
+            argv[key] = ([] as string[]).concat(argv[key], parsed.argv[key]);
+          } else {
+            argv[key] = parsed.argv[key];
+          }
         }
       });
     }
