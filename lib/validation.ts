@@ -6,7 +6,7 @@ import {
 } from './typings/common-types.js';
 import {levenshtein as distance} from './utils/levenshtein.js';
 import {objFilter} from './utils/obj-filter.js';
-import {camelCase} from './utils/camel-case';
+import {camelCase} from './utils/camel-case.js';
 import {UsageInstance} from './usage.js';
 import {YargsInstance, Arguments} from './yargs-factory.js';
 import {DetailedArguments} from './typings/yargs-parser-types.js';
