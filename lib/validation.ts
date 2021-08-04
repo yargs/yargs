@@ -6,6 +6,7 @@ import {
 } from './typings/common-types.js';
 import {levenshtein as distance} from './utils/levenshtein.js';
 import {objFilter} from './utils/obj-filter.js';
+import {camelCase} from './utils/camel-case';
 import {UsageInstance} from './usage.js';
 import {YargsInstance, Arguments} from './yargs-factory.js';
 import {DetailedArguments} from './typings/yargs-parser-types.js';
@@ -411,6 +412,24 @@ export function validation(
         });
       }
     });
+
+    // When strip-dashed is true, match conflicts (kebab) with argv (camel)
+    // Addresses: https://github.com/yargs/yargs/issues/1952
+    if (yargs.getInternalMethods().getParserConfiguration()['strip-dashed']) {
+      Object.keys(conflicting).forEach(key => {
+        conflicting[key].forEach(value => {
+          if (
+            value &&
+            argv[camelCase(key)] !== undefined &&
+            argv[camelCase(value)] !== undefined
+          ) {
+            usage.fail(
+              __('Arguments %s and %s are mutually exclusive', key, value)
+            );
+          }
+        });
+      });
+    }
   };
 
   self.recommendCommands = function recommendCommands(cmd, potentialCommands) {
