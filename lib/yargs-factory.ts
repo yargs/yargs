@@ -813,7 +813,7 @@ export class YargsInstance {
       );
     } else {
       globals.forEach(g => {
-        if (this.#options.local.indexOf(g) === -1) this.#options.local.push(g);
+        if (!this.#options.local.includes(g)) this.#options.local.push(g);
       });
     }
     return this;
