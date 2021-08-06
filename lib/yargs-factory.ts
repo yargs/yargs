@@ -1471,12 +1471,12 @@ export class YargsInstance {
   [kEmitWarning](
     warning: string,
     type: string | undefined,
-    deduplicationID: string
+    deduplicationId: string
   ) {
     // prevent duplicate warning emissions
-    if (!this.#emittedWarnings[deduplicationID]) {
+    if (!this.#emittedWarnings[deduplicationId]) {
       this.#shim.process.emitWarning(warning, type);
-      this.#emittedWarnings[deduplicationID] = true;
+      this.#emittedWarnings[deduplicationId] = true;
     }
   }
   [kFreeze]() {
