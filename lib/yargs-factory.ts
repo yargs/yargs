@@ -1470,12 +1470,12 @@ export class YargsInstance {
   }
   [kEmitWarning](
     warning: string,
-    name: string | undefined,
+    type: string | undefined,
     deduplicationID: string
   ) {
     // prevent duplicate warning emissions
     if (!this.#emittedWarnings[deduplicationID]) {
-      this.#shim.process.emitWarning(warning, name);
+      this.#shim.process.emitWarning(warning, type);
       this.#emittedWarnings[deduplicationID] = true;
     }
   }
