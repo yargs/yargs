@@ -1573,7 +1573,7 @@ describe('usage tests', () => {
 
     // Addresses: https://github.com/yargs/yargs/issues/1979
     describe('when an option or alias "version" is set', () => {
-      it('fails unless version is disabled', done => {
+      it('emits warning unless version is disabled', () => {
         yargs
           .command('cmd1', 'cmd desc', yargs =>
             yargs.option('v', {
@@ -1582,15 +1582,14 @@ describe('usage tests', () => {
               type: 'string',
             })
           )
-          .fail(msg => {
-            msg.should.match(/reserved word/);
-            return done();
+          .fail(() => {
+            expect.fail();
           })
           .wrap(null)
           .parse('cmd1 --version 0.25.10');
       });
 
-      it('works if version is disabled', () => {
+      it('does not emit warning if version is disabled', () => {
         yargs
           .command(
             'cmd1',

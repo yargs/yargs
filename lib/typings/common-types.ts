@@ -103,6 +103,7 @@ export interface PlatformShim {
   process: {
     argv: () => string[];
     cwd: () => string;
+    emitWarning: typeof process.emitWarning;
     execPath: () => string;
     exit: (code: number) => void;
     nextTick: (cb: Function) => void;

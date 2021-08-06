@@ -904,10 +904,10 @@ export class YargsInstance {
         opt = {};
       }
 
-      // Prevent version name collision
+      // Warn about version name collision
       // Addresses: https://github.com/yargs/yargs/issues/1979
       if (this.#versionOpt && (key === 'version' || opt?.alias === 'version')) {
-        throw new YError(
+        this.#shim.process.emitWarning(
           [
             '"version" is a reserved word.',
             'Please do one of the following:',
