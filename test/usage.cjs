@@ -1573,41 +1573,49 @@ describe('usage tests', () => {
 
     // Addresses: https://github.com/yargs/yargs/issues/1979
     describe('when an option or alias "version" is set', () => {
-      it('emits warning unless version is disabled', () => {
-        yargs
-          .command('cmd1', 'cmd desc', yargs =>
-            yargs.option('v', {
-              alias: 'version',
-              describe: 'version desc',
-              type: 'string',
+      it('emits warning if version is not disabled', () => {
+        const r = checkUsage(() =>
+          yargs
+            .command('cmd1', 'cmd1 desc', yargs =>
+              yargs.option('v', {
+                alias: 'version',
+                describe: 'version desc',
+                type: 'string',
+              })
+            )
+            .fail(() => {
+              expect.fail();
             })
-          )
-          .fail(() => {
-            expect.fail();
-          })
-          .wrap(null)
-          .parse('cmd1 --version 0.25.10');
+            .wrap(null)
+            .parse('cmd1 --version 0.25.10')
+        );
+        r.should.have.property('emittedWarnings').with.length(1);
+        r.emittedWarnings[0].should.match(/reserved word/);
       });
 
       it('does not emit warning if version is disabled', () => {
-        yargs
-          .command(
-            'cmd1',
-            'cmd1 desc',
-            yargs =>
-              yargs.version(false).option('version', {
-                alias: 'v',
-                describe: 'version desc',
-                type: 'string',
-              }),
-            argv => {
-              argv.version.should.equal('0.25.10');
-            }
-          )
-          .fail(() => {
-            expect.fail();
-          })
-          .parse('cmd1 --version 0.25.10');
+        const r = checkUsage(() =>
+          yargs
+            .command(
+              'cmd1',
+              'cmd1 desc',
+              yargs =>
+                yargs.version(false).option('version', {
+                  alias: 'v',
+                  describe: 'version desc',
+                  type: 'string',
+                }),
+              argv => {
+                argv.version.should.equal('0.25.10');
+              }
+            )
+            .fail(() => {
+              expect.fail();
+            })
+            .parse('cmd1 --version 0.25.10')
+        );
+
+        r.should.have.property('emittedWarnings').with.length(0);
       });
     });
 

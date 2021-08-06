@@ -88,6 +88,7 @@ export function YargsFactory(_shim: PlatformShim) {
 const kCopyDoubleDash = Symbol('copyDoubleDash');
 const kCreateLogger = Symbol('copyDoubleDash');
 const kDeleteFromParserHintObject = Symbol('deleteFromParserHintObject');
+const kEmitWarning = Symbol('emitWarning');
 const kFreeze = Symbol('freeze');
 const kGetDollarZero = Symbol('getDollarZero');
 const kGetParserConfiguration = Symbol('getParserConfiguration');
@@ -172,6 +173,7 @@ export class YargsInstance {
   #defaultShowHiddenOpt = 'show-hidden';
   #exitError: YError | string | undefined | null = null;
   #detectLocale = true;
+  #emittedWarnings: Dictionary<boolean> = {};
   #exitProcess = true;
   #frozens: FrozenYargsInstance[] = [];
   #globalMiddleware: GlobalMiddleware;
@@ -907,7 +909,7 @@ export class YargsInstance {
       // Warn about version name collision
       // Addresses: https://github.com/yargs/yargs/issues/1979
       if (this.#versionOpt && (key === 'version' || opt?.alias === 'version')) {
-        this.#shim.process.emitWarning(
+        this[kEmitWarning](
           [
             '"version" is a reserved word.',
             'Please do one of the following:',
@@ -915,7 +917,9 @@ export class YargsInstance {
             '- Use the built-in `yargs.version` method instead (if applicable)',
             '- Use a different option key',
             'https://yargs.js.org/docs/#api-reference-version',
-          ].join('\n')
+          ].join('\n'),
+          undefined,
+          'versionWarning' // TODO: better dedupeId
         );
       }
 
@@ -1463,6 +1467,17 @@ export class YargsInstance {
     });
     // now delete the description from usage.js.
     delete this.#usage.getDescriptions()[optionKey];
+  }
+  [kEmitWarning](
+    warning: string,
+    name: string | undefined,
+    deduplicationID: string
+  ) {
+    // prevent duplicate warning emissions
+    if (!this.#emittedWarnings[deduplicationID]) {
+      this.#shim.process.emitWarning(warning, name);
+      this.#emittedWarnings[deduplicationID] = true;
+    }
   }
   [kFreeze]() {
     this.#frozens.push({
