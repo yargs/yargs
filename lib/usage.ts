@@ -258,7 +258,7 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
             text: commandString,
             padding: [0, 2, 0, 2],
             width:
-              maxWidth(commands, theWrap, `${prefix}${parentCommands}`) + 4,
+              maxWidth(commands, theWrap, `${base$0}${parentCommands}`) + 4,
           },
           {text: command[1]}
         );
