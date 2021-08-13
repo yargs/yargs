@@ -209,6 +209,77 @@ describe('Command', () => {
       argv['--'].should.eql(['apple', 'banana']);
       called.should.equal(true);
     });
+
+    // Addresses: https://github.com/yargs/yargs/issues/1637
+    it('does not overwrite options in argv if variadic', () => {
+      yargs
+        .command({
+          command: 'cmd [foods..]',
+          desc: 'cmd desc',
+          builder: yargs =>
+            yargs.positional('foods', {
+              desc: 'foods desc',
+              type: 'string',
+            }),
+          handler: argv => {
+            argv.foods.should.deep.equal(['apples', 'cherries', 'grapes']);
+          },
+        })
+        .parse('cmd --foods apples cherries grapes');
+    });
+
+    it('does not overwrite options in argv if variadic and when using default command', () => {
+      yargs
+        .command({
+          command: '$0 [foods..]',
+          desc: 'default desc',
+          builder: yargs =>
+            yargs.positional('foods', {
+              desc: 'foods desc',
+              type: 'string',
+            }),
+          handler: argv => {
+            argv.foods.should.deep.equal(['apples', 'cherries', 'grapes']);
+          },
+        })
+        .parse('--foods apples cherries grapes');
+    });
+
+    it('does not combine positional default and provided values', () => {
+      yargs()
+        .command({
+          command: 'cmd [foods..]',
+          desc: 'cmd desc',
+          builder: yargs =>
+            yargs.positional('foods', {
+              desc: 'foods desc',
+              type: 'string',
+              default: ['pizza', 'wings'],
+            }),
+          handler: argv => {
+            argv.foods.should.deep.equal(['apples', 'cherries', 'grapes']);
+            argv.foods.should.not.include('pizza');
+          },
+        })
+        .parse('cmd apples cherries grapes');
+    });
+
+    it('does not overwrite options in argv if variadic and preserves falsy values', () => {
+      yargs
+        .command({
+          command: '$0 [numbers..]',
+          desc: 'default desc',
+          builder: yargs =>
+            yargs.positional('numbers', {
+              desc: 'numbers desc',
+              type: 'number',
+            }),
+          handler: argv => {
+            argv.numbers.should.deep.equal([0, 1, 2]);
+          },
+        })
+        .parse('--numbers 0 1 2');
+    });
   });
 
   describe('variadic', () => {

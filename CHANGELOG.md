@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [17.1.1](https://www.github.com/yargs/yargs/compare/v17.1.0...v17.1.1) (2021-08-13)
+
+
+### Bug Fixes
+
+* positional array defaults should not be combined with provided values ([#2006](https://www.github.com/yargs/yargs/issues/2006)) ([832222d](https://www.github.com/yargs/yargs/commit/832222d7777da49e5c9da6c5801c2dd90d7fa6a2))
+
+## [17.1.0](https://www.github.com/yargs/yargs/compare/v17.0.1...v17.1.0) (2021-08-04)
+
+
+### Features
+
+* update Levenshtein to Damerau-Levenshtein ([#1973](https://www.github.com/yargs/yargs/issues/1973)) ([d2c121b](https://www.github.com/yargs/yargs/commit/d2c121b00f2e1eb2ea8cc3a23a5039b3a4425bea))
+
+
+### Bug Fixes
+
+* coerce middleware should be applied once ([#1978](https://www.github.com/yargs/yargs/issues/1978)) ([14bd6be](https://www.github.com/yargs/yargs/commit/14bd6bebc3027ae929106b20dd198b9dccdeec31))
+* implies should not fail when implied key's value is 0, false or empty string ([#1985](https://www.github.com/yargs/yargs/issues/1985)) ([8010472](https://www.github.com/yargs/yargs/commit/80104727d5f2ec4c5b491c1bdec4c94b2db95d9c))
+* positionals should not overwrite options ([#1992](https://www.github.com/yargs/yargs/issues/1992)) ([9d84309](https://www.github.com/yargs/yargs/commit/9d84309e53ce1d30b1c61035ed5c78827a89df86))
+* strict should fail unknown arguments ([#1977](https://www.github.com/yargs/yargs/issues/1977)) ([c804f0d](https://www.github.com/yargs/yargs/commit/c804f0db78e56b44341cc7a91878c27b1b68b9f2))
+* wrap(null) no longer causes strange indentation behavior ([#1988](https://www.github.com/yargs/yargs/issues/1988)) ([e1871aa](https://www.github.com/yargs/yargs/commit/e1871aa792de219b221179417d410931af70d405))
+
 ### [17.0.1](https://www.github.com/yargs/yargs/compare/v17.0.0...v17.0.1) (2021-05-03)
 
 
