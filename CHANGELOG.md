@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [17.1.1](https://www.github.com/yargs/yargs/compare/v17.1.0...v17.1.1) (2021-08-13)
+
+
+### Bug Fixes
+
+* positional array defaults should not be combined with provided values ([#2006](https://www.github.com/yargs/yargs/issues/2006)) ([832222d](https://www.github.com/yargs/yargs/commit/832222d7777da49e5c9da6c5801c2dd90d7fa6a2))
+
 ## [17.1.0](https://www.github.com/yargs/yargs/compare/v17.0.1...v17.1.0) (2021-08-04)
 
 
