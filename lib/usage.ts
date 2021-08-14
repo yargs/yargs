@@ -246,7 +246,7 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
         commands = commands.sort((a, b) => a[0].localeCompare(b[0]));
       }
 
-      const prefix = base$0 ? `${base$0} ` : ''
+      const prefix = base$0 ? `${base$0} ` : '';
 
       commands.forEach(command => {
         const commandString = `${prefix}${parentCommands}${command[0].replace(
