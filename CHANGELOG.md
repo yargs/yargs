@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [17.1.2](https://www.github.com/yargs/yargs/compare/v17.1.1...v17.1.2) (2021-08-16)
+
+
+### Bug Fixes
+
+* help command spacing when scriptName is empty ([#1994](https://www.github.com/yargs/yargs/issues/1994)) ([d33e997](https://www.github.com/yargs/yargs/commit/d33e9972291406490cd8fdad0b3589be234e0f12))
+
 ### [17.1.1](https://www.github.com/yargs/yargs/compare/v17.1.0...v17.1.1) (2021-08-13)
 
 
