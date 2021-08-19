@@ -245,7 +245,26 @@ describe('Command', () => {
         .parse('--foods apples cherries grapes');
     });
 
-    it('does not overwrite options in argv if variadic and preserves falsey values', () => {
+    it('does not combine positional default and provided values', () => {
+      yargs()
+        .command({
+          command: 'cmd [foods..]',
+          desc: 'cmd desc',
+          builder: yargs =>
+            yargs.positional('foods', {
+              desc: 'foods desc',
+              type: 'string',
+              default: ['pizza', 'wings'],
+            }),
+          handler: argv => {
+            argv.foods.should.deep.equal(['apples', 'cherries', 'grapes']);
+            argv.foods.should.not.include('pizza');
+          },
+        })
+        .parse('cmd apples cherries grapes');
+    });
+
+    it('does not overwrite options in argv if variadic and preserves falsy values', () => {
       yargs
         .command({
           command: '$0 [numbers..]',
