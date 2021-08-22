@@ -28,15 +28,23 @@ function singletonify(inst) {
     ...Object.getOwnPropertyNames(inst.constructor.prototype),
   ].forEach(key => {
     if (key === 'argv') {
-      Argv.__defineGetter__(key, inst.__lookupGetter__(key));
+      Object.defineProperty(Argv, key, Object.getOwnPropertyDescriptor(inst, key));
     } else if (typeof inst[key] === 'function') {
       Argv[key] = inst[key].bind(inst);
     } else {
-      Argv.__defineGetter__('$0', () => {
-        return inst.$0;
+      Object.defineProperty(Argv, '$0', {
+        configurable: true,
+        enumerable: true,
+        get() {
+          return inst.$0;
+        }
       });
-      Argv.__defineGetter__('parsed', () => {
-        return inst.parsed;
+      Object.defineProperty(Argv, '$0', {
+        configurable: true,
+        enumerable: true,
+        get() {
+          return inst.parsed;
+        }
       });
     }
   });
