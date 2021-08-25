@@ -15,6 +15,26 @@ function Argv(processArgs, cwd) {
   return argv;
 }
 
+function defineGetter(obj, key, getter) {
+  Object.defineProperty(obj, key, {
+    configurable: true,
+    enumerable: true,
+    get: getter,
+  });
+}
+function lookupGetter(obj, key) {
+  while (obj) {
+    const desc = Object.getOwnPropertyDescriptor(obj, key);
+    if (typeof desc !== 'undefined') {
+      if (desc.get) {
+        return desc.get;
+      }
+      return undefined;
+    }
+    obj = Object.getPrototypeOf(obj);
+  }
+}
+
 /*  Hack an instance of Argv with process.argv into Argv
     so people can do
     require('yargs')(['--beeble=1','-z','zizzle']).argv
@@ -28,24 +48,12 @@ function singletonify(inst) {
     ...Object.getOwnPropertyNames(inst.constructor.prototype),
   ].forEach(key => {
     if (key === 'argv') {
-      Object.defineProperty(Argv, key, Object.getOwnPropertyDescriptor(inst, key));
+      defineGetter(Argv, key, lookupGetter(inst, key));
     } else if (typeof inst[key] === 'function') {
       Argv[key] = inst[key].bind(inst);
     } else {
-      Object.defineProperty(Argv, '$0', {
-        configurable: true,
-        enumerable: true,
-        get() {
-          return inst.$0;
-        }
-      });
-      Object.defineProperty(Argv, 'parsed', {
-        configurable: true,
-        enumerable: true,
-        get() {
-          return inst.parsed;
-        }
-      });
+      defineGetter(Argv, '$0', () => inst.$0);
+      defineGetter(Argv, 'parsed', () => inst.parsed);
     }
   });
 }
