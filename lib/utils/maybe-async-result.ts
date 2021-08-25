@@ -15,13 +15,9 @@ export function maybeAsyncResult<T>(
 ): T | Promise<T> {
   try {
     const result = isFunction(getResult) ? getResult() : getResult;
-    if (isPromise(result)) {
-      return result.then((result: T) => {
-        return resultHandler(result);
-      });
-    } else {
-      return resultHandler(result);
-    }
+    return isPromise(result)
+      ? result.then((result: T) => resultHandler(result))
+      : resultHandler(result);
   } catch (err) {
     return errorHandler(err);
   }

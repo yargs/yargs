@@ -96,7 +96,7 @@ describe('yargs dsl tests', () => {
     argv.cat.should.eql(33);
   });
 
-  it('do not populates argv with placeholder keys for unset options', () => {
+  it('does not populate argv with placeholder keys for unset options', () => {
     const argv = yargs([]).option('cool', {}).parse();
 
     Object.keys(argv).should.not.include('cool');
@@ -421,6 +421,18 @@ describe('yargs dsl tests', () => {
       });
 
       r.errors[2].should.match(/Did you mean goat/);
+    });
+
+    it('counts tranposition as one mistake', () => {
+      const r = checkOutput(() => {
+        yargs(['baot'])
+          .command('boat')
+          .command('bot')
+          .recommendCommands()
+          .parse();
+      });
+
+      r.errors[2].should.match(/Did you mean boat/);
     });
 
     // see: https://github.com/yargs/yargs/issues/822
@@ -1389,7 +1401,7 @@ describe('yargs dsl tests', () => {
         }).to.throw(YError);
       });
 
-      it('handles aboslute paths', () => {
+      it('handles absolute paths', () => {
         const absolutePath = path.join(
           process.cwd(),
           'test',
@@ -2381,9 +2393,7 @@ describe('yargs dsl tests', () => {
       const argv = yargs('cmd batman')
         .command('cmd <hero>', 'a command', yargs => {
           yargs.positional('hero', {
-            coerce: function (arg) {
-              return arg.toUpperCase();
-            },
+            coerce: arg => arg.toUpperCase(),
             alias: 'do-gooder',
           });
         })
@@ -2610,8 +2620,12 @@ describe('yargs dsl tests', () => {
 
   describe('parsing --value as a value in -f=--value and --bar=--value', () => {
     it('should work in the general case', () => {
-      const argv = yargs(['-f=--item1', 'item2', '--bar=--item3', 'item4'])
-        .argv;
+      const argv = yargs([
+        '-f=--item1',
+        'item2',
+        '--bar=--item3',
+        'item4',
+      ]).argv;
       argv.f.should.eql('--item1');
       argv.bar.should.eql('--item3');
       argv._.should.eql(['item2', 'item4']);

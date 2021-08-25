@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: [10, 12, 13, 14]
+        node: [12, 14, 16]
     steps:
       - uses: actions/checkout@v1
       - uses: actions/setup-node@v1
@@ -50,7 +50,7 @@ jobs:
           node-version: 14
       - run: npm install
       - run: npm run compile
-      - uses: denolib/setup-deno@v2
+      - uses: denoland/setup-deno@v1
         with:
           deno-version: v1.x
       - run: |

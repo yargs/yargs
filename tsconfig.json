@@ -4,7 +4,8 @@
     "outDir": "build",
     "rootDir": ".",
     "sourceMap": false,
-    "target": "es2017",
+    "target": "es2019",
+    "lib": ["es2019", "es2020.bigint", "es2020.string", "es2020.symbol.wellknown"],
     "moduleResolution": "node",
     "module": "es2015",
     "removeComments": true
