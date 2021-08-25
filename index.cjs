@@ -39,7 +39,7 @@ function singletonify(inst) {
           return inst.$0;
         }
       });
-      Object.defineProperty(Argv, '$0', {
+      Object.defineProperty(Argv, 'parsed', {
         configurable: true,
         enumerable: true,
         get() {
