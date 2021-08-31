@@ -296,6 +296,83 @@ describe('Completion', () => {
       r.logs.should.include('--foo');
       r.logs.should.not.include('bar');
     });
+
+    it('completes choices if previous option requires a choice', () => {
+      process.env.SHELL = '/bin/bash';
+      const r = checkUsage(() => {
+        return yargs([
+          './completion',
+          '--get-yargs-completions',
+          './completion',
+          '--fruit',
+        ])
+          .options({
+            fruit: {
+              describe: 'fruit option',
+              choices: ['apple', 'banana', 'pear'],
+            },
+            amount: {describe: 'amount', type: 'number'},
+          })
+          .completion('completion', false).argv;
+      });
+
+      r.logs.should.have.length(3);
+      r.logs.should.include('apple');
+      r.logs.should.include('banana');
+      r.logs.should.include('pear');
+    });
+
+    it('completes choices if previous option requires a choice and space has been entered', () => {
+      process.env.SHELL = '/bin/bash';
+      const r = checkUsage(() => {
+        return yargs([
+          './completion',
+          '--get-yargs-completions',
+          './completion',
+          '--fruit',
+          '',
+        ])
+          .options({
+            fruit: {
+              describe: 'fruit option',
+              choices: ['apple', 'banana', 'pear'],
+            },
+            amount: {describe: 'amount', type: 'number'},
+          })
+          .completion('completion', false).argv;
+      });
+
+      r.logs.should.have.length(3);
+      r.logs.should.include('apple');
+      r.logs.should.include('banana');
+      r.logs.should.include('pear');
+    });
+
+    it('completes choices if previous option requires a choice and a partial choice has been entered', () => {
+      process.env.SHELL = '/bin/bash';
+      const r = checkUsage(() => {
+        return yargs([
+          './completion',
+          '--get-yargs-completions',
+          './completion',
+          '--fruit',
+          'ap',
+        ])
+          .options({
+            fruit: {
+              describe: 'fruit option',
+              choices: ['apple', 'banana', 'pear'],
+            },
+            amount: {describe: 'amount', type: 'number'},
+          })
+          .completion('completion', false).argv;
+      });
+
+      r.logs.should.have.length(1);
+      r.logs.should.include('apple');
+      r.logs.should.not.include('banana');
+      r.logs.should.not.include('pear');
+    });
   });
 
   describe('generateCompletionScript()', () => {
