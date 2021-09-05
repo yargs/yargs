@@ -26,6 +26,8 @@ export default {
   process: {
     argv: () => process.argv,
     cwd: process.cwd,
+    emitWarning: (warning: string | Error, type?: string) =>
+      process.emitWarning(warning, type),
     execPath: () => process.execPath,
     exit: (code: number) => {
       // eslint-disable-next-line no-process-exit

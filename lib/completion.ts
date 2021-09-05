@@ -68,6 +68,7 @@ export class Completion implements CompletionInstance {
 
     this.commandCompletions(completions, args, current);
     this.optionCompletions(completions, args, argv, current);
+    this.choicesCompletions(completions, args, argv, current);
     done(null, completions);
   }
 
@@ -82,7 +83,8 @@ export class Completion implements CompletionInstance {
       .getContext().commands;
     if (
       !current.match(/^-/) &&
-      parentCommands[parentCommands.length - 1] !== current
+      parentCommands[parentCommands.length - 1] !== current &&
+      !this.previousArgHasChoices(args)
     ) {
       this.usage.getCommands().forEach(usageCommand => {
         const commandName = parseCommand(usageCommand[0]).cmd;
@@ -105,7 +107,10 @@ export class Completion implements CompletionInstance {
     argv: Arguments,
     current: string
   ) {
-    if (current.match(/^-/) || (current === '' && completions.length === 0)) {
+    if (
+      (current.match(/^-/) || (current === '' && completions.length === 0)) &&
+      !this.previousArgHasChoices(args)
+    ) {
       const options = this.yargs.getOptions();
       const positionalKeys =
         this.yargs.getGroups()[this.usage.getPositionalGroupName()] || [];
@@ -127,6 +132,48 @@ export class Completion implements CompletionInstance {
         }
       });
     }
+  }
+
+  private choicesCompletions(
+    completions: string[],
+    args: string[],
+    argv: Arguments,
+    current: string
+  ) {
+    if (this.previousArgHasChoices(args)) {
+      const choices = this.getPreviousArgChoices(args);
+      if (choices && choices.length > 0) {
+        completions.push(...choices);
+      }
+    }
+  }
+
+  private getPreviousArgChoices(args: string[]): string[] | void {
+    if (args.length < 1) return; // no args
+    let previousArg = args[args.length - 1];
+    let filter = '';
+    // use second to last argument if the last one is not an option starting with --
+    if (!previousArg.startsWith('--') && args.length > 1) {
+      filter = previousArg; // use last arg as filter for choices
+      previousArg = args[args.length - 2];
+    }
+    if (!previousArg.startsWith('--')) return; // still no valid arg, abort
+    const previousArgKey = previousArg.replace(/-/g, '');
+
+    const options = this.yargs.getOptions();
+    if (
+      Object.keys(options.key).some(key => key === previousArgKey) &&
+      Array.isArray(options.choices[previousArgKey])
+    ) {
+      return options.choices[previousArgKey].filter(
+        choice => !filter || choice.startsWith(filter)
+      );
+    }
+  }
+
+  private previousArgHasChoices(args: string[]): boolean {
+    const choices = this.getPreviousArgChoices(args);
+    return choices !== undefined && choices.length > 0;
   }
 
   private argsContainKey(

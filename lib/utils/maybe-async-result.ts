@@ -19,7 +19,7 @@ export function maybeAsyncResult<T>(
       ? result.then((result: T) => resultHandler(result))
       : resultHandler(result);
   } catch (err) {
-    return errorHandler(err);
+    return errorHandler(err as Error);
   }
 }
 
