@@ -73,7 +73,7 @@ export function argsert(
       position += 1;
     });
   } catch (err) {
-    console.warn(err.stack);
+    console.warn((err as Error).stack);
   }
 }
 
