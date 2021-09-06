@@ -82,6 +82,7 @@ export default {
   process: {
     argv: () => argv,
     cwd: () => cwd,
+    emitWarning: (warning: string | Error, type?: string) => {},
     execPath: () => {
       try {
         return Deno.execPath();
