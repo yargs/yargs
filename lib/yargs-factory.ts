@@ -912,7 +912,7 @@ export class YargsInstance {
       }
 
       this[kTrackManuallySetKeys](key);
-      
+
       // Warn about version name collision
       // Addresses: https://github.com/yargs/yargs/issues/1979
       if (this.#versionOpt && (key === 'version' || opt?.alias === 'version')) {
