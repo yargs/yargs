@@ -5,6 +5,7 @@
 const checkUsage = require('./helpers/utils.cjs').checkOutput;
 const chalk = require('chalk');
 const yargs = require('../index.cjs');
+const expect = require('chai').expect;
 const {YError} = require('../build/index.cjs');
 
 const should = require('chai').should();
@@ -1568,6 +1569,54 @@ describe('usage tests', () => {
         yargs(['--version']).version('1.0.2').wrap(null).parse()
       );
       r.logs[0].should.eql('1.0.2');
+    });
+
+    // Addresses: https://github.com/yargs/yargs/issues/1979
+    describe('when an option or alias "version" is set', () => {
+      it('emits warning if version is not disabled', () => {
+        const r = checkUsage(() =>
+          yargs
+            .command('cmd1', 'cmd1 desc', yargs =>
+              yargs.option('v', {
+                alias: 'version',
+                describe: 'version desc',
+                type: 'string',
+              })
+            )
+            .fail(() => {
+              expect.fail();
+            })
+            .wrap(null)
+            .parse('cmd1 --version 0.25.10')
+        );
+        r.should.have.property('emittedWarnings').with.length(1);
+        r.emittedWarnings[0].should.match(/reserved word/);
+      });
+
+      it('does not emit warning if version is disabled', () => {
+        const r = checkUsage(() =>
+          yargs
+            .command(
+              'cmd1',
+              'cmd1 desc',
+              yargs =>
+                yargs.version(false).option('version', {
+                  alias: 'v',
+                  describe: 'version desc',
+                  type: 'string',
+                }),
+              argv => {
+                argv.version.should.equal('0.25.10');
+              }
+            )
+            .fail(() => {
+              expect.fail();
+            })
+            .parse('cmd1 --version 0.25.10')
+        );
+
+        r.should.have.property('emittedWarnings').with.length(0);
+      });
     });
 
     describe('when exitProcess is false', () => {
