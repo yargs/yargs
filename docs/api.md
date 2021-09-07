@@ -1062,6 +1062,7 @@ Locales currently supported:
 * **pt:** Portuguese.
 * **pt_BR:** Brazilian Portuguese.
 * **ru:** Russian.
+* **uz:** Uzbek.
 * **th:** Thai.
 * **tr:** Turkish.
 * **zh_CN:** Chinese (Mainland China).
