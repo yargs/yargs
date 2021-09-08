@@ -411,6 +411,24 @@ export function validation(
         });
       }
     });
+
+    // When strip-dashed is true, match conflicts (kebab) with argv (camel)
+    // Addresses: https://github.com/yargs/yargs/issues/1952
+    if (yargs.getInternalMethods().getParserConfiguration()['strip-dashed']) {
+      Object.keys(conflicting).forEach(key => {
+        conflicting[key].forEach(value => {
+          if (
+            value &&
+            argv[shim.Parser.camelCase(key)] !== undefined &&
+            argv[shim.Parser.camelCase(value)] !== undefined
+          ) {
+            usage.fail(
+              __('Arguments %s and %s are mutually exclusive', key, value)
+            );
+          }
+        });
+      });
+    }
   };
 
   self.recommendCommands = function recommendCommands(cmd, potentialCommands) {
