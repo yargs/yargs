@@ -338,7 +338,7 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
         // actually generate the switches string --foo, -f, --bar.
         const switches: Dictionary<string | IndentedText> =
           normalizedKeys.reduce((acc, key) => {
-            acc[key] = [key]
+            const my = [key]
               .concat(options.alias[key] || [])
               .map(sw => {
                 // for the special positional group don't
@@ -366,8 +366,10 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
                   ? 1
                   : -1
               )
-              .join(', ');
-
+            my.push(...my.filter(i => i.startsWith("--")).map(i => {
+                 return "[$" + i.slice(2).replace(/([A-Z])/g, '_$1').toUpperCase() + ']';
+            }));
+            acc[key] = my.join(', ');
             return acc;
           }, {} as Dictionary<string>);
 
