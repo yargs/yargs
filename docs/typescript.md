@@ -126,8 +126,8 @@ interface Arguments {
 To improve the `choices` option typing you can also specify its types:
 
 ```typescript
-type Difficulty = 'normal' | 'nightmare' | 'hell';
-const difficulties: ReadonlyArray<Difficulty> = ['normal', 'nightmare', 'hell'];
+const difficulties = ["normal", "nightmare", "hell"] as const;
+type Difficulty = typeof difficulties[number];
 
 const argv = yargs.option('difficulty', {
   choices: difficulties,

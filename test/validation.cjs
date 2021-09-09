@@ -204,6 +204,27 @@ describe('validation tests', () => {
         .parse();
     });
 
+    // Addresses: https://github.com/yargs/yargs/issues/1952
+    it('fails if conflicting arguments are provided, and strip-dashed is enabled', () => {
+      yargs()
+        .option('foo-foo', {
+          description: 'a foo-foo',
+          type: 'string',
+        })
+        .option('bar-bar', {
+          description: 'a bar-bar',
+          type: 'string',
+        })
+        .conflicts({'foo-foo': 'bar-bar'})
+        .parserConfiguration({'strip-dashed': true})
+        .parse('--foo-foo a --bar-bar b', (error, argv, output) => {
+          expect(error).to.not.equal(null);
+          error.message.should.match(
+            /Arguments foo-foo and bar-bar are mutually exclusive/
+          );
+        });
+    });
+
     it('should not fail if no conflicting arguments are provided', () => {
       yargs(['-b', '-c'])
         .conflicts('f', ['b', 'c'])

@@ -87,6 +87,8 @@ If `yargs` is executed in an environment that embeds node and there's no script 
 expects it to be the script name. In order to override this behavior, use `.parse(process.argv.slice(1))`
 instead of `.argv` and the first parameter won't be ignored.
 
+***Note:*** `.argv` should only be used at the top level, not inside a command's builder function.
+
 <a name="array"></a>.array(key)
 ----------
 
@@ -335,6 +337,8 @@ yargs
   .help()
   .argv
 ```
+
+***Note:*** `.parse()` and `.argv` should only be used at the top level, not inside a command's builder function.
 
 Please see [Advanced Topics: Commands](https://github.com/yargs/yargs/blob/master/docs/advanced.md#commands) for a thorough
 discussion of the advanced features exposed in the Command API.
@@ -1058,6 +1062,7 @@ Locales currently supported:
 * **pt:** Portuguese.
 * **pt_BR:** Brazilian Portuguese.
 * **ru:** Russian.
+* **uz:** Uzbek.
 * **th:** Thai.
 * **tr:** Turkish.
 * **zh_CN:** Chinese (Mainland China).
@@ -1343,6 +1348,8 @@ the resulting error and output will not be passed to the `parse()` callback (the
 ***Note:*** `parse()` should be called only once when [`command()`](#command) is called with a handler
 returning a promise. If your use case requires `parse()` to be called several times, any asynchronous
 operation performed in a command handler should not result in the handler returning a promise.
+
+***Note:*** `.parse()` should only be used at the top level, not inside a command's builder function.
 
 .parseAsync([args], [context], [parseCallback])
 ------------

@@ -88,6 +88,7 @@ export function YargsFactory(_shim: PlatformShim) {
 const kCopyDoubleDash = Symbol('copyDoubleDash');
 const kCreateLogger = Symbol('copyDoubleDash');
 const kDeleteFromParserHintObject = Symbol('deleteFromParserHintObject');
+const kEmitWarning = Symbol('emitWarning');
 const kFreeze = Symbol('freeze');
 const kGetDollarZero = Symbol('getDollarZero');
 const kGetParserConfiguration = Symbol('getParserConfiguration');
@@ -172,6 +173,7 @@ export class YargsInstance {
   #defaultShowHiddenOpt = 'show-hidden';
   #exitError: YError | string | undefined | null = null;
   #detectLocale = true;
+  #emittedWarnings: Dictionary<boolean> = {};
   #exitProcess = true;
   #frozens: FrozenYargsInstance[] = [];
   #globalMiddleware: GlobalMiddleware;
@@ -904,6 +906,23 @@ export class YargsInstance {
         opt = {};
       }
 
+      // Warn about version name collision
+      // Addresses: https://github.com/yargs/yargs/issues/1979
+      if (this.#versionOpt && (key === 'version' || opt?.alias === 'version')) {
+        this[kEmitWarning](
+          [
+            '"version" is a reserved word.',
+            'Please do one of the following:',
+            '- Disable version with `yargs.version(false)` if using "version" as an option',
+            '- Use the built-in `yargs.version` method instead (if applicable)',
+            '- Use a different option key',
+            'https://yargs.js.org/docs/#api-reference-version',
+          ].join('\n'),
+          undefined,
+          'versionWarning' // TODO: better dedupeId
+        );
+      }
+
       this.#options.key[key] = true; // track manually set keys.
 
       if (opt.alias) this.alias(key, opt.alias);
@@ -1448,6 +1467,17 @@ export class YargsInstance {
     });
     // now delete the description from usage.js.
     delete this.#usage.getDescriptions()[optionKey];
+  }
+  [kEmitWarning](
+    warning: string,
+    type: string | undefined,
+    deduplicationId: string
+  ) {
+    // prevent duplicate warning emissions
+    if (!this.#emittedWarnings[deduplicationId]) {
+      this.#shim.process.emitWarning(warning, type);
+      this.#emittedWarnings[deduplicationId] = true;
+    }
   }
   [kFreeze]() {
     this.#frozens.push({
