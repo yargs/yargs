@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-var util = require('util');
 var argv = require('yargs/yargs')(process.argv.slice(2)).argv;
 
 if (argv.s) {
