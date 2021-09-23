@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="250" src="https://raw.githubusercontent.com/yargs/yargs/master/yargs-logo.png">
+  <img width="250" src="https://raw.githubusercontent.com/yargs/yargs/main/yargs-logo.png">
 </p>
 <h1 align="center"> Yargs </h1>
 <p align="center">
@@ -199,6 +199,6 @@ post on why we think this is important](https://medium.com/the-node-js-collectio
 [conventional-commits-url]: https://conventionalcommits.org/
 [slack-image]: http://devtoolscommunity.herokuapp.com/badge.svg
 [slack-url]: http://devtoolscommunity.herokuapp.com
-[type-definitions]: https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/yargs
+[type-definitions]: https://github.com/DefinitelyTyped/DefinitelyTyped/tree/main/types/yargs
 [coverage-image]: https://img.shields.io/nycrc/yargs/yargs
-[coverage-url]: https://github.com/yargs/yargs/blob/master/.nycrc
+[coverage-url]: https://github.com/yargs/yargs/blob/main/.nycrc
