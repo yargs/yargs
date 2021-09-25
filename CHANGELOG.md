@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [17.2.1](https://www.github.com/yargs/yargs/compare/v17.2.0...v17.2.1) (2021-09-25)
+
+
+### Bug Fixes
+
+* **docs:** stop advertising .argv property ([#2036](https://www.github.com/yargs/yargs/issues/2036)) ([4f5ecc1](https://www.github.com/yargs/yargs/commit/4f5ecc1427ed6c83f23ea90ee6da75ce0c332f7a)), closes [#2035](https://www.github.com/yargs/yargs/issues/2035)
+
 ## [17.2.0](https://www.github.com/yargs/yargs/compare/v17.1.1...v17.2.0) (2021-09-23)
 
 
