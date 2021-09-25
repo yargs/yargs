@@ -103,7 +103,7 @@ yargs(hideBin(process.argv))
     type: 'boolean',
     description: 'Run with verbose logging'
   })
-  .argv
+  .parse()
 ```
 
 Run the example above with `--help` to see the help for the application.
@@ -138,7 +138,7 @@ yargs(Deno.args)
   })
   .strictCommands()
   .demandCommand(1)
-  .argv
+  .parse()
 ```
 
 ### ESM
@@ -154,7 +154,7 @@ yargs(hideBin(process.argv))
     console.info(argv)
   })
   .demandCommand(1)
-  .argv
+  .parse()
 ```
 
 ### Usage in Browser
