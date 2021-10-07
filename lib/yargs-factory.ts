@@ -124,6 +124,7 @@ const kRunYargsParserAndExecuteCommands = Symbol(
 );
 const kRunValidation = Symbol('runValidation');
 const kSetHasOutput = Symbol('setHasOutput');
+const kTrackManuallySetKeys = Symbol('kTrackManuallySetKeys');
 export interface YargsInternalMethods {
   getCommandInstance(): CommandInstance;
   getContext(): Context;
@@ -283,11 +284,13 @@ export class YargsInstance {
   array(keys: string | string[]): YargsInstance {
     argsert('<array|string>', [keys], arguments.length);
     this[kPopulateParserHintArray]('array', keys);
+    this[kTrackManuallySetKeys](keys);
     return this;
   }
   boolean(keys: string | string[]): YargsInstance {
     argsert('<array|string>', [keys], arguments.length);
     this[kPopulateParserHintArray]('boolean', keys);
+    this[kTrackManuallySetKeys](keys);
     return this;
   }
   check(f: (argv: Arguments) => any, global?: boolean): YargsInstance {
@@ -530,6 +533,7 @@ export class YargsInstance {
   count(keys: string | string[]): YargsInstance {
     argsert('<array|string>', [keys], arguments.length);
     this[kPopulateParserHintArray]('count', keys);
+    this[kTrackManuallySetKeys](keys);
     return this;
   }
   default(
@@ -890,6 +894,7 @@ export class YargsInstance {
   number(keys: string | string[]): YargsInstance {
     argsert('<array|string>', [keys], arguments.length);
     this[kPopulateParserHintArray]('number', keys);
+    this[kTrackManuallySetKeys](keys);
     return this;
   }
   option(
@@ -905,6 +910,8 @@ export class YargsInstance {
       if (typeof opt !== 'object') {
         opt = {};
       }
+
+      this[kTrackManuallySetKeys](key);
 
       // Warn about version name collision
       // Addresses: https://github.com/yargs/yargs/issues/1979
@@ -1327,9 +1334,10 @@ export class YargsInstance {
     this.#strictOptions = enabled !== false;
     return this;
   }
-  string(key: string | string[]): YargsInstance {
-    argsert('<array|string>', [key], arguments.length);
-    this[kPopulateParserHintArray]('string', key);
+  string(keys: string | string[]): YargsInstance {
+    argsert('<array|string>', [keys], arguments.length);
+    this[kPopulateParserHintArray]('string', keys);
+    this[kTrackManuallySetKeys](keys);
     return this;
   }
   terminalWidth(): number | null {
@@ -2205,6 +2213,15 @@ export class YargsInstance {
   }
   [kSetHasOutput]() {
     this.#hasOutput = true;
+  }
+  [kTrackManuallySetKeys](keys: string | string[]) {
+    if (typeof keys === 'string') {
+      this.#options.key[keys] = true;
+    } else {
+      for (const k of keys) {
+        this.#options.key[k] = true;
+      }
+    }
   }
 }
 

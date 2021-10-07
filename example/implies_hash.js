@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-
 var argv = require('yargs/yargs')(process.argv.slice(2))
     .usage('Usage: $0 -x [num] -y [num] -w [msg] -h [msg]')
     .implies({

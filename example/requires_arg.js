@@ -1,16 +1,17 @@
+#!/usr/bin/env node
 var yargs = require('yargs/yargs')(process.argv.slice(2));
 
-var argv = yargs.usage('This is my awesome program', {
-  'input': {
+var argv = yargs.usage('This is my awesome program').options({
+  input: {
     description: 'Input file name',
     requiresArg: true,
-    short: 'i',
+    alias: 'i',
   },
-  'output': {
+  output: {
     description: 'Output file name',
     requiresArg: true,
-    short: 'o'
-  }
+    alias: 'o',
+  },
 }).argv;
 
 yargs.showHelp();

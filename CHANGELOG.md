@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [17.2.1](https://www.github.com/yargs/yargs/compare/v17.2.0...v17.2.1) (2021-09-25)
+
+
+### Bug Fixes
+
+* **docs:** stop advertising .argv property ([#2036](https://www.github.com/yargs/yargs/issues/2036)) ([4f5ecc1](https://www.github.com/yargs/yargs/commit/4f5ecc1427ed6c83f23ea90ee6da75ce0c332f7a)), closes [#2035](https://www.github.com/yargs/yargs/issues/2035)
+
+## [17.2.0](https://www.github.com/yargs/yargs/compare/v17.1.1...v17.2.0) (2021-09-23)
+
+
+### Features
+
+* autocomplete choices for options ([#2018](https://www.github.com/yargs/yargs/issues/2018)) ([01b2c6a](https://www.github.com/yargs/yargs/commit/01b2c6a99167d826d3d1e6f6b94f18382a17d47e))
+* **locales:** Added Uzbek translation ([#2024](https://www.github.com/yargs/yargs/issues/2024)) ([ee047b9](https://www.github.com/yargs/yargs/commit/ee047b9cd6260ce90d845e7e687228e617c8a30d))
+
+
+### Bug Fixes
+
+* boolean option should work with strict ([#1996](https://www.github.com/yargs/yargs/issues/1996)) ([e9379e2](https://www.github.com/yargs/yargs/commit/e9379e27d49820f4db842f22cda6410bbe2bff10))
+* cast error types as TypeScript 4.4 infers them as unknown instead of any ([#2016](https://www.github.com/yargs/yargs/issues/2016)) ([01b2c6a](https://www.github.com/yargs/yargs/commit/01b2c6a99167d826d3d1e6f6b94f18382a17d47e))
+* conflicts and strip-dashed ([#1998](https://www.github.com/yargs/yargs/issues/1998)) ([59a86fb](https://www.github.com/yargs/yargs/commit/59a86fb83cfeb8533c6dd446c73cf4166cc455f2))
+* emit warning on version name collision ([#1986](https://www.github.com/yargs/yargs/issues/1986)) ([d0e8292](https://www.github.com/yargs/yargs/commit/d0e829239580bd44873bbde65de2ed7671aa2ab0))
+* help command spacing when scriptName is empty ([#1994](https://www.github.com/yargs/yargs/issues/1994)) ([d33e997](https://www.github.com/yargs/yargs/commit/d33e9972291406490cd8fdad0b3589be234e0f12))
+
 ### [17.1.1](https://www.github.com/yargs/yargs/compare/v17.1.0...v17.1.1) (2021-08-13)
 
 

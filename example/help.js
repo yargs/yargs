@@ -1,5 +1,4 @@
-var yargs = require('../index');
-
+#!/usr/bin/env node
 var argv = require('yargs/yargs')(process.argv.slice(2))
   .usage('This is my awesome program\n\nUsage: $0 [options]')
   .help('help').alias('help', 'h')
