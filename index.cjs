@@ -15,6 +15,20 @@ function Argv(processArgs, cwd) {
   return argv;
 }
 
+function defineGetter(obj, key, getter) {
+  Object.defineProperty(obj, key, {
+    configurable: true,
+    enumerable: true,
+    get: getter,
+  });
+}
+function lookupGetter(obj, key) {
+  const desc = Object.getOwnPropertyDescriptor(obj, key);
+  if (typeof desc !== 'undefined') {
+    return desc.get;
+  }
+}
+
 /*  Hack an instance of Argv with process.argv into Argv
     so people can do
     require('yargs')(['--beeble=1','-z','zizzle']).argv
@@ -28,16 +42,12 @@ function singletonify(inst) {
     ...Object.getOwnPropertyNames(inst.constructor.prototype),
   ].forEach(key => {
     if (key === 'argv') {
-      Argv.__defineGetter__(key, inst.__lookupGetter__(key));
+      defineGetter(Argv, key, lookupGetter(inst, key));
     } else if (typeof inst[key] === 'function') {
       Argv[key] = inst[key].bind(inst);
     } else {
-      Argv.__defineGetter__('$0', () => {
-        return inst.$0;
-      });
-      Argv.__defineGetter__('parsed', () => {
-        return inst.parsed;
-      });
+      defineGetter(Argv, '$0', () => inst.$0);
+      defineGetter(Argv, 'parsed', () => inst.parsed);
     }
   });
 }
