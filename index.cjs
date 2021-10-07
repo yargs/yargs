@@ -23,15 +23,9 @@ function defineGetter(obj, key, getter) {
   });
 }
 function lookupGetter(obj, key) {
-  while (obj) {
-    const desc = Object.getOwnPropertyDescriptor(obj, key);
-    if (typeof desc !== 'undefined') {
-      if (desc.get) {
-        return desc.get;
-      }
-      return undefined;
-    }
-    obj = Object.getPrototypeOf(obj);
+  const desc = Object.getOwnPropertyDescriptor(obj, key);
+  if (typeof desc !== 'undefined') {
+    return desc.get;
   }
 }
 
