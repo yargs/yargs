@@ -24,7 +24,7 @@ _{{app_name}}_yargs_completions()
 
     return 0
 }
-complete -o default -F _{{app_name}}_yargs_completions {{app_name}}
+complete -o bashdefault -o default -F _{{app_name}}_yargs_completions {{app_name}}
 ###-end-{{app_name}}-completions-###
 `;
 
