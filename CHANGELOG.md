@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [17.2.2](https://www.github.com/yargs/yargs/compare/v17.2.1...v17.2.2) (2021-11-09)
+
+
+### Bug Fixes
+
+* avoid legacy accessors ([#2013](https://www.github.com/yargs/yargs/issues/2013)) ([adb0d11](https://www.github.com/yargs/yargs/commit/adb0d11e02c613af3d9427b3028cc192703a3869))
+
 ### [17.2.1](https://www.github.com/yargs/yargs/compare/v17.2.0...v17.2.1) (2021-09-25)
 
 
