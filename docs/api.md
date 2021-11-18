@@ -1,7 +1,7 @@
 Additional documentation
 ===
 
-For more details refer to the offical [API reference](https://yargs.js.org/docs/#api-reference) 
+For more details refer to the official [API reference](https://yargs.js.org/docs/#api-reference)
 document on the yargs.js.org website.
 
 This document is the Yargs API reference. There are more documentation files in
