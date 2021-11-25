@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [17.3.0](https://www.github.com/yargs/yargs/compare/v17.2.1...v17.3.0) (2021-11-25)
+
+
+### Features
+
+* fallback to default bash completion ([74c0ba5](https://www.github.com/yargs/yargs/commit/74c0ba5cfcc59afa5538de821fad70e1a76a354e))
+
+
+### Bug Fixes
+
+* avoid legacy accessors ([#2013](https://www.github.com/yargs/yargs/issues/2013)) ([adb0d11](https://www.github.com/yargs/yargs/commit/adb0d11e02c613af3d9427b3028cc192703a3869))
+* **deps:** update dependency yargs-parser to v21 ([#2063](https://www.github.com/yargs/yargs/issues/2063)) ([76c1951](https://www.github.com/yargs/yargs/commit/76c19518d74ca94c0edcd450e5c0ef9efeee369d))
+
 ### [17.2.1](https://www.github.com/yargs/yargs/compare/v17.2.0...v17.2.1) (2021-09-25)
 
 
