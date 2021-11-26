@@ -102,10 +102,7 @@ export function applyMiddleware(
       if (isPromise(acc)) {
         return acc
           .then(initialObj =>
-            Promise.all<Arguments, Partial<Arguments>>([
-              initialObj,
-              middleware(initialObj, yargs),
-            ])
+            Promise.all([initialObj, middleware(initialObj, yargs)])
           )
           .then(([initialObj, middlewareObj]) =>
             Object.assign(initialObj, middlewareObj)
