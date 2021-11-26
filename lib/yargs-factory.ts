@@ -293,7 +293,10 @@ export class YargsInstance {
     this[kTrackManuallySetKeys](keys);
     return this;
   }
-  check(f: (argv: Arguments) => any, global?: boolean): YargsInstance {
+  check(
+    f: (argv: Arguments, options: Options) => any,
+    global?: boolean
+  ): YargsInstance {
     argsert('<function> [boolean]', [f, global], arguments.length);
     this.middleware(
       (
@@ -304,7 +307,7 @@ export class YargsInstance {
           Partial<Arguments> | Promise<Partial<Arguments>> | any
         >(
           () => {
-            return f(argv);
+            return f(argv, _yargs.getOptions());
           },
           (result: any): Partial<Arguments> | Promise<Partial<Arguments>> => {
             if (!result) {
