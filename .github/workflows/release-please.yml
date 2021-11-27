@@ -17,6 +17,7 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: 14
+      - run: npm install npm@latest -g
       - run: npm install
       - run: npm run compile
       - name: push Deno release

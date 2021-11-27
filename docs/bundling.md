@@ -66,3 +66,21 @@ In a new project (see: [npm-init](https://docs.npmjs.com/cli/v7/commands/npm-ini
     ```
 4. Run: `npx webpack@5 --config webpack.config.js`.
 5. You can now execute `dist/bundle.js`.
+
+## esbuild
+The following is tested with esbuild@0.13
+In a new project (see: [npm-init](https://docs.npmjs.com/cli/v7/commands/npm-init)):
+1. `npm install esbuild yargs`
+2. Create the following **index.js**
+```js
+const yargs = require('yargs')
+const argv = yargs(process.argv).argv
+
+if (argv.ships > 3 && argv.distance < 53.5) {
+  console.log('Plunder more riffiwobbles!')
+} else {
+  console.log('Retreat from the xupptumblers!')
+}
+```
+3. Runt `npx esbuild index.js --bundle --outfile=bundle.js --platform=node --target=node12`
+4. You can now execute `node bundle.js`.
