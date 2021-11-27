@@ -15,7 +15,7 @@ describe('validation tests', () => {
   });
 
   describe('check', () => {
-    it('fails if error is thrown in check callback', () => {
+    it('fails if error is thrown in check callback', done => {
       yargs
         .command(
           '$0',
@@ -38,6 +38,9 @@ describe('validation tests', () => {
             expect.fail();
           }
         )
+        .fail(() => {
+          return done();
+        })
         .parse('--name');
     });
 
@@ -81,8 +84,14 @@ describe('validation tests', () => {
                 alias: 'n',
               })
               .check((_, options) => {
-                if (!Object.isObject(options)) {
-                  expect.fail();
+                if (
+                  typeof options !== 'object' ||
+                  !Object.prototype.hasOwnProperty.call(options, 'string') ||
+                  !options.string.includes('name')
+                ) {
+                  throw new Error(
+                    'Check callback should have access to options'
+                  );
                 }
                 return true;
               }),
