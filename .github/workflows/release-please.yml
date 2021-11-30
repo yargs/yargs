@@ -7,7 +7,7 @@ jobs:
   release-please:
     runs-on: ubuntu-latest
     steps:
-      - uses: google-github-actions/release-please-action@e2673a0324ea6d91ed9c6438369b53e2fe7e7360
+      - uses: google-github-actions/release-please-action@a4578e0d8575662554aa01d055f7f762c9e3f8bc
         id: release
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
