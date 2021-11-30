@@ -14,6 +14,96 @@ describe('validation tests', () => {
     yargs.getInternalMethods().reset();
   });
 
+  describe('check', () => {
+    it('fails if error is thrown in check callback', done => {
+      yargs
+        .command(
+          '$0',
+          'default command desc',
+          yargs =>
+            yargs
+              .option('name', {
+                describe: 'name desc',
+                type: 'string',
+                alias: 'n',
+              })
+              .check(argv => {
+                const {name} = argv;
+                if (typeof name !== 'string' || !name.length) {
+                  throw new Error('Option "name" must be a non-empty string');
+                }
+                return true;
+              }),
+          () => {
+            expect.fail();
+          }
+        )
+        .fail(() => {
+          return done();
+        })
+        .parse('--name');
+    });
+
+    it('does not fail if error is not thrown in check callback, and true is returned', () => {
+      yargs
+        .command(
+          '$0',
+          'default command desc',
+          yargs =>
+            yargs
+              .option('name', {
+                describe: 'version desc',
+                type: 'string',
+                alias: 'n',
+              })
+              .check(argv => {
+                const {name} = argv;
+                if (typeof name !== 'string' || !name.length) {
+                  throw new Error('Option "name" must be a non-empty string');
+                }
+                return true;
+              }),
+          argv => argv
+        )
+        .fail(() => {
+          expect.fail();
+        })
+        .parse('--name Itachi');
+    });
+
+    it('callback has access to options', () => {
+      yargs
+        .command(
+          '$0',
+          'default command desc',
+          yargs =>
+            yargs
+              .option('name', {
+                describe: 'name desc',
+                type: 'string',
+                alias: 'n',
+              })
+              .check((_, options) => {
+                if (
+                  typeof options !== 'object' ||
+                  !Object.prototype.hasOwnProperty.call(options, 'string') ||
+                  !options.string.includes('name')
+                ) {
+                  throw new Error(
+                    'Check callback should have access to options'
+                  );
+                }
+                return true;
+              }),
+          argv => argv
+        )
+        .fail(() => {
+          expect.fail();
+        })
+        .parse('--name Itachi');
+    });
+  });
+
   describe('implies', () => {
     const implicationsFailedPattern = new RegExp(
       english['Implications failed:']
