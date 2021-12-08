@@ -26,10 +26,8 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
     arg1: boolean | string = true,
     arg2?: string
   ) {
-    function parseFunctionArgs(): [boolean, string?] {
-      return typeof arg1 === 'string' ? [true, arg1] : [arg1, arg2];
-    }
-    const [enabled, message] = parseFunctionArgs();
+    const [enabled, message] =
+      typeof arg1 === 'string' ? [true, arg1] : [arg1, arg2];
     failMessage = message;
     showHelpOnFail = enabled;
     return self;
@@ -683,7 +681,6 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
   self.reset = function reset(localLookup) {
     // do not reset wrap here
     // do not reset fails here
-    failMessage = null;
     failureOutput = false;
     usages = [];
     usageDisabled = false;
