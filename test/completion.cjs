@@ -401,6 +401,125 @@ describe('Completion', () => {
           r.logs.should.not.include('banana');
           r.logs.should.not.include('pear');
         });
+
+        it('completes choices for first positional', () => {
+          process.env.SHELL = '/bin/bash';
+          const r = checkUsage(
+            () =>
+              yargs([...firstArguments, './completion', 'cmd', ''])
+                .help(false)
+                .version(false)
+                .command('cmd [fruit] [fruit2]', 'command', subYargs => {
+                  subYargs
+                    .positional('fruit', {choices: ['apple', 'banana', 'pear']})
+                    .positional('fruit2', {
+                      choices: ['apple2', 'banana2', 'pear2'],
+                    })
+                    .options({amount: {describe: 'amount', type: 'number'}});
+                }).argv
+          );
+
+          r.logs.should.have.length(4);
+          r.logs.should.include('apple');
+          r.logs.should.include('banana');
+          r.logs.should.include('pear');
+          r.logs.should.include('--amount');
+        });
+
+        it('completes choices for positional with prefix', () => {
+          process.env.SHELL = '/bin/bash';
+          const r = checkUsage(
+            () =>
+              yargs([...firstArguments, './completion', 'cmd', 'a'])
+                .help(false)
+                .version(false)
+                .command('cmd [fruit] [fruit2]', 'command', subYargs => {
+                  subYargs
+                    .positional('fruit', {
+                      choices: ['apple1', 'banana1', 'pear1'],
+                    })
+                    .positional('fruit2', {
+                      choices: ['apple2', 'banana2', 'pear2'],
+                    })
+                    .options({amount: {describe: 'amount', type: 'number'}});
+                }).argv
+          );
+
+          r.logs.should.have.length(1);
+          r.logs.should.include('apple1');
+        });
+
+        it('completes choices for second positional after option', () => {
+          process.env.SHELL = '/bin/bash';
+          const r = checkUsage(
+            () =>
+              yargs([
+                ...firstArguments,
+                './completion',
+                'cmd',
+                'apple',
+                '--amount',
+                '1',
+                '',
+              ])
+                .help(false)
+                .version(false)
+                .command('cmd [fruit] [fruit2]', 'command', subYargs => {
+                  subYargs
+                    .positional('fruit', {
+                      choices: ['apple1', 'banana1', 'pear1'],
+                    })
+                    .positional('fruit2', {
+                      choices: ['apple2', 'banana2', 'pear2'],
+                    })
+                    .options({amount: {describe: 'amount', type: 'number'}});
+                }).argv
+          );
+
+          r.logs.should.have.length(3);
+          r.logs.should.include('apple2');
+          r.logs.should.include('banana2');
+          r.logs.should.include('pear2');
+        });
+
+        it('completes choices for nested command', () => {
+          process.env.SHELL = '/bin/bash';
+          const r = checkUsage(
+            () =>
+              yargs([...firstArguments, './completion', 'wrapper', 'cmd', ''])
+                .help(false)
+                .version(false)
+                .command({
+                  command: 'wrapper',
+                  builder: subYargs =>
+                    subYargs.command('cmd [fruit]', 'command', subYargs2 => {
+                      subYargs2.positional('fruit', {choices: ['apple']});
+                    }),
+                }).argv
+          );
+
+          r.logs.should.have.length(1);
+          r.logs.should.include('apple');
+        });
+
+        it('works if positional has no choices', () => {
+          process.env.SHELL = '/bin/bash';
+          const r = checkUsage(
+            () =>
+              yargs([...firstArguments, './completion', 'wrapper', 'cmd', 'a'])
+                .help(false)
+                .version(false)
+                .command({
+                  command: 'wrapper',
+                  builder: subYargs =>
+                    subYargs.command('cmd [fruit]', 'command', subYargs2 => {
+                      subYargs2.positional('fruit', {});
+                    }),
+                }).argv
+          );
+
+          r.logs.should.have.length(0);
+        });
       });
     }
   });
