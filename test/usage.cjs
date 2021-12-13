@@ -1006,7 +1006,7 @@ describe('usage tests', () => {
           '      --version  Show version number  [boolean]',
           '  -f, --foo  [required]',
           '  -b, --bar  [required]',
-          'Unknown argument: baz',
+          'Unknown argument: "baz"',
         ]);
       r.should.have.property('logs').with.length(0);
       r.should.have.property('exit').and.equal(true);
@@ -1104,7 +1104,7 @@ describe('usage tests', () => {
           '      --version  Show version number  [boolean]',
           '  -f, --foo      foo option',
           '  -b, --bar      bar option',
-          'Unknown argument: baz',
+          'Unknown argument: "baz"',
         ]);
       r.should.have.property('logs').with.length(0);
       r.should.have.property('exit').and.equal(true);
@@ -1144,7 +1144,7 @@ describe('usage tests', () => {
           '      --version  Show version number  [boolean]',
           '  -f, --foo      foo option',
           '  -b, --bar      bar option',
-          'Unknown arguments: baz, q',
+          'Unknown arguments: "baz", "q"',
         ]);
       r.should.have.property('logs').with.length(0);
       r.should.have.property('exit').and.equal(true);

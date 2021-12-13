@@ -460,7 +460,7 @@ describe('validation tests', () => {
       yargs
         .strict()
         .fail(msg => {
-          msg.should.equal('Unknown argument: foo');
+          msg.should.equal('Unknown argument: "foo"');
           done();
         })
         .parse('foo');
@@ -471,7 +471,7 @@ describe('validation tests', () => {
       yargs
         .strict()
         .fail(msg => {
-          msg.should.equal('Unknown argument: foo');
+          msg.should.equal('Unknown argument: "foo"');
           done();
         })
         .parse('foo -- hello');
@@ -485,7 +485,7 @@ describe('validation tests', () => {
         .demand(1)
         .strict()
         .fail(msg => {
-          msg.should.equal('Unknown argument: koala');
+          msg.should.equal('Unknown argument: "koala"');
           return done();
         })
         .parse();
@@ -497,7 +497,7 @@ describe('validation tests', () => {
         .command('kangaroo <status>', 'kangaroo handlers')
         .strict()
         .fail(msg => {
-          msg.should.equal('Unknown argument: fast');
+          msg.should.equal('Unknown argument: "fast"');
           return done();
         })
         .parse();
@@ -509,7 +509,7 @@ describe('validation tests', () => {
         .command('$0 <status>', 'kangaroo handlers')
         .strict()
         .fail(msg => {
-          msg.should.equal('Unknown argument: fast');
+          msg.should.equal('Unknown argument: "fast"');
           return done();
         })
         .parse();
@@ -1079,7 +1079,7 @@ describe('validation tests', () => {
         .strict()
         .option('foo', {boolean: true, describe: false})
         .fail(msg => {
-          msg.should.equal('Unknown argument: hey');
+          msg.should.equal('Unknown argument: "hey"');
         })
         .parse();
     });
@@ -1284,7 +1284,7 @@ describe('validation tests', () => {
         .strictCommands()
         .command('foo', 'foo command')
         .fail(msg => {
-          msg.should.equal('Unknown command: blerg');
+          msg.should.equal('Unknown command: "blerg"');
           return done();
         })
         .parse();
@@ -1297,7 +1297,7 @@ describe('validation tests', () => {
           yargs.command('bar');
         })
         .fail(msg => {
-          msg.should.equal('Unknown command: blarg');
+          msg.should.equal('Unknown command: "blarg"');
           return done();
         })
         .parse();
@@ -1320,7 +1320,7 @@ describe('validation tests', () => {
           yargs.command('bar').strictCommands();
         })
         .fail(msg => {
-          msg.should.equal('Unknown command: blarg');
+          msg.should.equal('Unknown command: "blarg"');
           return done();
         })
         .parse();
@@ -1346,7 +1346,7 @@ describe('validation tests', () => {
       yargs()
         .strictOptions()
         .parse('bar -a 10', (err, argv) => {
-          expect(err).to.match(/Unknown argument: a/);
+          expect(err).to.match(/Unknown argument: "a"/);
           argv.a.should.equal(10);
           return done();
         });
@@ -1356,7 +1356,7 @@ describe('validation tests', () => {
       yargs()
         .strictOptions()
         .parse('foo --cool --awesome', err => {
-          expect(err).to.match(/Unknown arguments: cool, awesome/);
+          expect(err).to.match(/Unknown arguments: "cool", "awesome"/);
         });
     });
 
@@ -1370,7 +1370,7 @@ describe('validation tests', () => {
         expect(err).to.equal(null);
       });
       y.parse('--cool --awesome', err => {
-        expect(err).to.match(/Unknown arguments: cool, awesome/);
+        expect(err).to.match(/Unknown arguments: "cool", "awesome"/);
       });
     });
   });
