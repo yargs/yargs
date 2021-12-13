@@ -2,7 +2,7 @@
   "Commands:": "명령:",
   "Options:": "옵션:",
   "Examples:": "예시:",
-  "boolean": "불리언"
+  "boolean": "불리언",
   "count": "개수",
   "string": "문자열",
   "number": "숫자",
