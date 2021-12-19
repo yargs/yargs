@@ -264,6 +264,31 @@ describe('Command', () => {
         .parse('cmd apples cherries grapes');
     });
 
+    it('does not combine config values and provided values', () => {
+      yargs('foo bar baz qux')
+        .command({
+          command: '$0 <arg-1> [arg-2] [arg-3..]',
+          desc: 'default description',
+          builder: yargs =>
+            yargs
+              .option('arg-1', {type: 'string'})
+              .option('arg-2', {type: 'string'})
+              .option('arg-3', {type: 'string'})
+              .config({
+                arg2: 'bar',
+                arg3: ['baz', 'qux'],
+              }),
+          handler: argv => {
+            argv.arg1.should.equal('foo');
+            argv.arg2.should.equal('bar');
+            argv.arg3.should.deep.equal(['baz', 'qux']);
+            argv['arg-3'].should.deep.equal(['baz', 'qux']);
+          },
+        })
+        .strict()
+        .parse();
+    });
+
     it('does not overwrite options in argv if variadic and preserves falsy values', () => {
       yargs
         .command({

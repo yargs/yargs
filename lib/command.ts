@@ -593,17 +593,34 @@ export class CommandInstance {
         positionalKeys.push(...parsed.aliases[key]);
       });
 
-      const defaults = yargs.getOptions().default;
+      const {configObjects, default: defaults} = yargs.getOptions();
+
       Object.keys(parsed.argv).forEach(key => {
         if (positionalKeys.includes(key)) {
           // any new aliases need to be placed in positionalMap, which
           // is used for validation.
           if (!positionalMap[key]) positionalMap[key] = parsed.argv[key];
           // Addresses: https://github.com/yargs/yargs/issues/1637
-          // If both positionals/options provided, no default was set,
+          // If both positionals/options provided,
+          // and no default or config values were set for that key,
           // and if at least one is an array: don't overwrite, combine.
           if (
+            // Check configObject values
+            !configObjects.some(config =>
+              Object.prototype.hasOwnProperty.call(config, key)
+            ) &&
+            !configObjects.some(config =>
+              Object.prototype.hasOwnProperty.call(
+                config,
+                this.shim.Parser.camelCase(key)
+              )
+            ) &&
+            // Check default values
             !Object.prototype.hasOwnProperty.call(defaults, key) &&
+            !Object.prototype.hasOwnProperty.call(
+              defaults,
+              this.shim.Parser.camelCase(key)
+            ) &&
             Object.prototype.hasOwnProperty.call(argv, key) &&
             Object.prototype.hasOwnProperty.call(parsed.argv, key) &&
             (Array.isArray(argv[key]) || Array.isArray(parsed.argv[key]))
