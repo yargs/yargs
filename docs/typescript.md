@@ -123,16 +123,13 @@ interface Arguments {
 
 # More specific typing for choices()
 
-To improve the `choices` option typing you can also specify its types:
+To improve the `choices` option typing you can also specify it as const:
 
 ```typescript
-const difficulties = ["normal", "nightmare", "hell"] as const;
-type Difficulty = typeof difficulties[number];
-
 const argv = yargs.option('difficulty', {
-  choices: difficulties,
+  choices: ["normal", "nightmare", "hell"] as const,
   demandOption: true
 }).argv;
 ```
 
-`argv` will get  type `'normal' | 'nightmare' | 'hell'`.
+`argv.difficulty` will get  type `'normal' | 'nightmare' | 'hell'`.
