@@ -199,6 +199,6 @@ post on why we think this is important](https://medium.com/the-node-js-collectio
 [conventional-commits-url]: https://conventionalcommits.org/
 [slack-image]: http://devtoolscommunity.herokuapp.com/badge.svg
 [slack-url]: http://devtoolscommunity.herokuapp.com
-[type-definitions]: https://github.com/DefinitelyTyped/DefinitelyTyped/tree/main/types/yargs
+[type-definitions]: https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/yargs
 [coverage-image]: https://img.shields.io/nycrc/yargs/yargs
 [coverage-url]: https://github.com/yargs/yargs/blob/main/.nycrc
