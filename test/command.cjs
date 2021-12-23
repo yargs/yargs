@@ -1528,7 +1528,7 @@ describe('Command', () => {
           })
           .parse('hi ben --hello=world', (err, argv, output) => {
             commandRun.should.equal(false);
-            err.message.should.equal('Unknown argument: "hello"');
+            err.message.should.equal('Unknown argument: hello');
             return done();
           });
       });

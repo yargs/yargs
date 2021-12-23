@@ -1006,7 +1006,7 @@ describe('usage tests', () => {
           '      --version  Show version number  [boolean]',
           '  -f, --foo  [required]',
           '  -b, --bar  [required]',
-          'Unknown argument: "baz"',
+          'Unknown argument: baz',
         ]);
       r.should.have.property('logs').with.length(0);
       r.should.have.property('exit').and.equal(true);
@@ -1104,10 +1104,31 @@ describe('usage tests', () => {
           '      --version  Show version number  [boolean]',
           '  -f, --foo      foo option',
           '  -b, --bar      bar option',
-          'Unknown argument: "baz"',
+          'Unknown argument: baz',
         ]);
       r.should.have.property('logs').with.length(0);
       r.should.have.property('exit').and.equal(true);
+    });
+
+    // Addresses: https://github.com/yargs/yargs/issues/2033
+    it('should wrap whitespace in quotes if provided as an unknown argument', () => {
+      const r = checkUsage(() => {
+        return yargs(['--opt1=hello', ' ', '--opt2=world'])
+          .command({
+            command: '$0',
+            desc: 'default description',
+            builder: yargs =>
+              yargs
+                .option('opt1', {type: 'string'})
+                .option('opt2', {type: 'string'}),
+            handler: noop,
+          })
+          .strict()
+          .wrap(null)
+          .parse();
+      });
+
+      r.errors.should.match(/Unknown argument: " "/);
     });
 
     it('should fail given multiple option arguments without corresponding descriptions', () => {
@@ -1144,7 +1165,7 @@ describe('usage tests', () => {
           '      --version  Show version number  [boolean]',
           '  -f, --foo      foo option',
           '  -b, --bar      bar option',
-          'Unknown arguments: "baz", "q"',
+          'Unknown arguments: baz, q',
         ]);
       r.should.have.property('logs').with.length(0);
       r.should.have.property('exit').and.equal(true);

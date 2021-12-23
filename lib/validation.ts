@@ -205,7 +205,7 @@ export function validation(
           'Unknown argument: %s',
           'Unknown arguments: %s',
           unknown.length,
-          unknown.map(s => `"${s}"`).join(', ')
+          unknown.map(s => (s.trim() ? s : `"${s}"`)).join(', ')
         )
       );
     }
@@ -233,7 +233,7 @@ export function validation(
           'Unknown command: %s',
           'Unknown commands: %s',
           unknown.length,
-          unknown.map(s => `"${s}"`).join(', ')
+          unknown.map(s => (s.trim() ? s : `${s}`)).join(', ')
         )
       );
       return true;
