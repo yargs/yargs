@@ -1,6 +1,6 @@
 {
   "name": "yargs",
-  "version": "17.3.0",
+  "version": "17.3.1",
   "description": "yargs the modern, pirate-themed, successor to optimist.",
   "main": "./index.cjs",
   "exports": {
