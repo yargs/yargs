@@ -3840,6 +3840,45 @@ describe('usage tests', () => {
           '  --uuid                                                              [required]',
         ]);
     });
+
+    // Addresses: https://github.com/yargs/yargs/issues/2030
+    it('should display options (with descriptions) on failed default command', () => {
+      const r = checkUsage(() =>
+        yargs('')
+          .command({
+            command: '$0 <arg1>',
+            desc: 'default desc',
+            builder: yargs =>
+              yargs
+                .option('arg1', {
+                  type: 'string',
+                  desc: 'arg1 desc',
+                  demandOption: true,
+                })
+                .option('arg2', {
+                  type: 'string',
+                  desc: 'arg2 desc',
+                }),
+            handler: noop,
+          })
+          .strict()
+          .parse()
+      );
+      console.log(r);
+      r.errors[0]
+        .split('\n')
+        .should.deep.equal([
+          'usage <arg1>',
+          '',
+          'default desc',
+          '',
+          'Options:',
+          '  --help     Show help                                                 [boolean]',
+          '  --version  Show version number                                       [boolean]',
+          '  --arg1     arg1 desc (default command)                     [string] [required]',
+          '  --arg2     arg2 desc (default command)                                [string]',
+        ]);
+    });
   });
 
   describe('positional', () => {
