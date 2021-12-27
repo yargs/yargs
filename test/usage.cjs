@@ -3875,8 +3875,8 @@ describe('usage tests', () => {
           'Options:',
           '  --help     Show help                                                 [boolean]',
           '  --version  Show version number                                       [boolean]',
-          '  --arg1     arg1 desc (default command)                     [string] [required]',
-          '  --arg2     arg2 desc (default command)                                [string]',
+          '  --arg1     arg1 desc                                       [string] [required]',
+          '  --arg2     arg2 desc                                                  [string]',
         ]);
     });
   });
