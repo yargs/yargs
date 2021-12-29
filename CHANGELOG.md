@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [17.3.1](https://github.com/yargs/yargs/compare/v17.3.0...v17.3.1) (2021-12-23)
+
+
+### Bug Fixes
+
+* **translations:** correct Korean translation ([#2095](https://github.com/yargs/yargs/issues/2095)) ([c7c2b9e](https://github.com/yargs/yargs/commit/c7c2b9eb340754ddac7bdd1687c7951332c5ebba))
+
 ## [17.3.0](https://github.com/yargs/yargs/compare/v17.2.1...v17.3.0) (2021-11-30)
 
 
