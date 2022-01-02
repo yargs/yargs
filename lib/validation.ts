@@ -205,7 +205,7 @@ export function validation(
           'Unknown argument: %s',
           'Unknown arguments: %s',
           unknown.length,
-          unknown.join(', ')
+          unknown.map(s => (s.trim() ? s : `"${s}"`)).join(', ')
         )
       );
     }

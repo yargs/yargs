@@ -153,21 +153,33 @@ export class Completion implements CompletionInstance {
     let previousArg = args[args.length - 1];
     let filter = '';
     // use second to last argument if the last one is not an option starting with --
-    if (!previousArg.startsWith('--') && args.length > 1) {
+    if (!previousArg.startsWith('-') && args.length > 1) {
       filter = previousArg; // use last arg as filter for choices
       previousArg = args[args.length - 2];
     }
-    if (!previousArg.startsWith('--')) return; // still no valid arg, abort
-    const previousArgKey = previousArg.replace(/-/g, '');
+    if (!previousArg.startsWith('-')) return; // still no valid arg, abort
+    const previousArgKey = previousArg.replace(/^-+/, '');
 
     const options = this.yargs.getOptions();
-    if (
-      Object.keys(options.key).some(key => key === previousArgKey) &&
-      Array.isArray(options.choices[previousArgKey])
-    ) {
-      return options.choices[previousArgKey].filter(
-        choice => !filter || choice.startsWith(filter)
-      );
+
+    const possibleAliases = [
+      previousArgKey,
+      ...(this.yargs.getAliases()[previousArgKey] || []),
+    ];
+    let choices: string[] | undefined;
+    // Find choices across all possible aliases
+    for (const possibleAlias of possibleAliases) {
+      if (
+        Object.prototype.hasOwnProperty.call(options.key, possibleAlias) &&
+        Array.isArray(options.choices[possibleAlias])
+      ) {
+        choices = options.choices[possibleAlias];
+        break;
+      }
+    }
+
+    if (choices) {
+      return choices.filter(choice => !filter || choice.startsWith(filter));
     }
   }
 

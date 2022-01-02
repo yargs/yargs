@@ -1410,7 +1410,7 @@ should be called in a command's builder function, and is not
 available on the top-level yargs instance.
 
 > _you can describe top-level positional arguments using
-  [default commands](/docs/advanced.md#default-commands)._
+  [default commands](https://github.com/yargs/yargs/blob/main/docs/advanced.md#default-commands)._
 
 ```js
 const argv = require('yargs/yargs')('run --help')
