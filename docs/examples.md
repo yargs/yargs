@@ -302,7 +302,7 @@ s.on('end', function () {
 ```
 
 ***
-    $ node line_count.js 
+    $ node line_count.js
     Usage: line_count.js <command> [options]
 
     Commands:
@@ -319,7 +319,7 @@ s.on('end', function () {
     copyright 2019
 
     Missing required argument: f
-    
+
     $ node line_count.js count
     line_count.js count
 
@@ -337,3 +337,43 @@ s.on('end', function () {
 
     $ node line_count.js count -f line_count.js
     25
+
+Using inquirer for prompting
+---------------------------
+
+```js
+const inquirer = require('inquirer');
+const yargs = require('yargs');
+
+const askName = async () => {
+  const answers = await inquirer.prompt([
+    {
+      message: 'What is your name?',
+      name: 'name',
+      type: 'string'
+    }
+  ]);
+
+  console.log(`Hello, ${answers.name}!`);
+};
+
+const argv = yargs(process.argv.splice(2))
+  .command('ask', 'use inquirer to prompt for your name')
+  .command('sing', 'a classic yargs command without prompting')
+  .demandCommand(1, 1, 'choose a command: ask or sing')
+  .help('h').argv;
+
+const command = argv._[0];
+
+switch (command) {
+  case 'ask':
+    askName();
+    break;
+  case 'sing':
+    console.log('🎵 Oy oy oy');
+    break;
+  default:
+    console.error(`❌ unknown command ${command}\n`);
+    yargs.showHelp();
+}
+```
