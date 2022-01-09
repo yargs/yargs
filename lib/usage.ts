@@ -707,22 +707,31 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
       descriptions,
     });
   };
-  self.unfreeze = function unfreeze() {
+  self.unfreeze = function unfreeze(defaultCommand = false) {
     const frozen = frozens.pop();
     // In the case of running a defaultCommand, we reset
     // usage early to ensure we receive the top level instructions.
     // unfreezing again should just be a noop:
     if (!frozen) return;
-    ({
-      failMessage,
-      failureOutput,
-      usages,
-      usageDisabled,
-      epilogs,
-      examples,
-      commands,
-      descriptions,
-    } = frozen);
+    // Addresses: https://github.com/yargs/yargs/issues/2030
+    if (defaultCommand) {
+      descriptions = {...frozen.descriptions, ...descriptions};
+      commands = [...frozen.commands, ...commands];
+      usages = [...frozen.usages, ...usages];
+      examples = [...frozen.examples, ...examples];
+      epilogs = [...frozen.epilogs, ...epilogs];
+    } else {
+      ({
+        failMessage,
+        failureOutput,
+        usages,
+        usageDisabled,
+        epilogs,
+        examples,
+        commands,
+        descriptions,
+      } = frozen);
+    }
   };
 
   return self;
@@ -759,7 +768,7 @@ export interface UsageInstance {
   showHelpOnFail(enabled?: boolean | string, message?: string): UsageInstance;
   showVersion(level?: 'error' | 'log' | ((message: string) => void)): void;
   stringifiedValues(values?: any[], separator?: string): string;
-  unfreeze(): void;
+  unfreeze(defaultCommand?: boolean): void;
   usage(msg: string | null, description?: string | false): UsageInstance;
   version(ver: any): void;
   wrap(cols: number | null | undefined): void;

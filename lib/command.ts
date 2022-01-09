@@ -312,7 +312,7 @@ export class CommandInstance {
     // if this is the case, we should show the root usage instructions
     // rather than the usage instructions for the nested default command:
     if (isDefaultCommand)
-      innerYargs.getInternalMethods().getUsageInstance().unfreeze();
+      innerYargs.getInternalMethods().getUsageInstance().unfreeze(true);
     if (this.shouldUpdateUsage(innerYargs)) {
       innerYargs
         .getInternalMethods()
