@@ -342,8 +342,10 @@ Using inquirer for prompting
 ---------------------------
 
 ```js
-const inquirer = require('inquirer');
 const yargs = require('yargs');
+const inquirer = require('inquirer');
+
+const sing = () => console.log('🎵 Oy oy oy');
 
 const askName = async () => {
   const answers = await inquirer.prompt([
@@ -358,22 +360,9 @@ const askName = async () => {
 };
 
 const argv = yargs(process.argv.splice(2))
-  .command('ask', 'use inquirer to prompt for your name')
-  .command('sing', 'a classic yargs command without prompting')
+  .command('ask', 'use inquirer to prompt for your name', () => {}, askName)
+  .command('sing', 'a classic yargs command without prompting', () => {}, sing)
   .demandCommand(1, 1, 'choose a command: ask or sing')
+  .strict()
   .help('h').argv;
-
-const command = argv._[0];
-
-switch (command) {
-  case 'ask':
-    askName();
-    break;
-  case 'sing':
-    console.log('🎵 Oy oy oy');
-    break;
-  default:
-    console.error(`❌ unknown command ${command}\n`);
-    yargs.showHelp();
-}
 ```
