@@ -70,7 +70,8 @@ export class Completion implements CompletionInstance {
 
     this.commandCompletions(completions, args, current);
     this.optionCompletions(completions, args, argv, current);
-    this.choicesCompletions(completions, args, argv, current);
+    this.choicesFromOptionsCompletions(completions, args, argv, current);
+    this.choicesFromPositionalsCompletions(completions, args, argv, current);
     done(null, completions);
   }
 
@@ -136,7 +137,7 @@ export class Completion implements CompletionInstance {
     }
   }
 
-  private choicesCompletions(
+  private choicesFromOptionsCompletions(
     completions: string[],
     args: string[],
     argv: Arguments,
@@ -148,7 +149,14 @@ export class Completion implements CompletionInstance {
         completions.push(...choices);
       }
     }
+  }
 
+  private choicesFromPositionalsCompletions(
+    completions: string[],
+    args: string[],
+    argv: Arguments,
+    current: string
+  ) {
     const positionalKeys =
       this.yargs.getGroups()[this.usage.getPositionalGroupName()] || [];
     const offset = Math.max(
