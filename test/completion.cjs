@@ -16,443 +16,512 @@ describe('Completion', () => {
   });
 
   describe('default completion behavior', () => {
-    it('avoids repeating already included commands', () => {
-      process.env.SHELL = '/bin/bash';
-      const r = checkUsage(
-        () =>
-          yargs(['./completion', '--get-yargs-completions', 'apple'])
-            .command('foo', 'bar')
-            .command('apple', 'banana').argv
-      );
+    const firstArgumentOptions = [
+      ['--get-yargs-completions'], // proper args after hideBin is used
+      ['./completion', '--get-yargs-completions'], // yargs is called like this in tests a lot
+    ];
+    for (const firstArguments of firstArgumentOptions) {
+      describe(`calling yargs(${firstArguments.join(', ')}, …)`, () => {
+        it('avoids repeating already included commands', () => {
+          process.env.SHELL = '/bin/bash';
+          const r = checkUsage(
+            () =>
+              yargs([...firstArguments, 'apple'])
+                .command('foo', 'bar')
+                .command('apple', 'banana').argv
+          );
 
-      // should not suggest foo for completion unless foo is subcommand of apple
-      r.logs.should.not.include('apple');
-    });
+          // should not suggest foo for completion unless foo is subcommand of apple
+          r.logs.should.not.include('apple');
+        });
 
-    it('avoids repeating already included options', () => {
-      const r = checkUsage(
-        () =>
-          yargs([
-            './completion',
-            '--get-yargs-completions',
-            './completion',
-            '--foo',
-            '--',
-          ])
-            .options({
-              foo: {describe: 'foo option'},
-              bar: {describe: 'bar option'},
-            })
-            .completion().argv
-      );
-
-      r.logs.should.include('--bar');
-      r.logs.should.not.include('--foo');
-    });
-
-    it('avoids repeating options whose aliases are already included', () => {
-      const r = checkUsage(
-        () =>
-          yargs([
-            './completion',
-            '--get-yargs-completions',
-            './completion',
-            '-f',
-            '--',
-          ])
-            .options({
-              foo: {describe: 'foo option', alias: 'f'},
-              bar: {describe: 'bar option'},
-            })
-            .completion().argv
-      );
-
-      r.logs.should.include('--bar');
-      r.logs.should.not.include('--foo');
-    });
-
-    it('completes short options with a single dash when the user did not already enter two dashes', () => {
-      const r = checkUsage(
-        () =>
-          yargs([
-            './completion',
-            '--get-yargs-completions',
-            './completion',
-            '',
-          ]).options({
-            f: {describe: 'f option', alias: 'foo'},
-          }).argv
-      );
-
-      r.logs.should.include('-f');
-      r.logs.should.not.include('--f');
-    });
-
-    it('completes short options with two dashes when the user already entered two dashes', () => {
-      const r = checkUsage(
-        () =>
-          yargs([
-            './completion',
-            '--get-yargs-completions',
-            './completion',
-            '--',
-          ]).options({
-            f: {describe: 'f option', alias: 'foo'},
-          }).argv
-      );
-
-      r.logs.should.include('--f');
-      r.logs.should.not.include('-f');
-    });
-
-    it('completes single digit options with two dashes', () => {
-      const r = checkUsage(
-        () =>
-          yargs([
-            './completion',
-            '--get-yargs-completions',
-            './completion',
-            '',
-          ]).options({
-            1: {describe: '1 option', alias: 'one'},
-          }).argv
-      );
-
-      r.logs.should.include('--1');
-      r.logs.should.not.include('-1');
-    });
-
-    it('completes with no- prefix flags defaulting to true when boolean-negation is set', () => {
-      const r = checkUsage(
-        () =>
-          yargs(['./completion', '--get-yargs-completions', './completion', ''])
-            .options({
-              foo: {describe: 'foo flag', type: 'boolean', default: true},
-              bar: {describe: 'bar flag', type: 'boolean'},
-            })
-            .parserConfiguration({'boolean-negation': true}).argv
-      );
-
-      r.logs.should.include('--no-foo');
-      r.logs.should.include('--foo');
-      r.logs.should.not.include('--no-bar');
-      r.logs.should.include('--bar');
-    });
-
-    it('avoids repeating flags whose negated counterparts are already included', () => {
-      const r = checkUsage(
-        () =>
-          yargs([
-            './completion',
-            '--get-yargs-completions',
-            './completion',
-            '--no-foo',
-            '--no-bar',
-            '',
-          ])
-            .options({
-              foo: {describe: 'foo flag', type: 'boolean', default: true},
-              bar: {describe: 'bar flag', type: 'boolean'},
-              baz: {describe: 'bar flag', type: 'boolean'},
-            })
-            .parserConfiguration({'boolean-negation': true}).argv
-      );
-
-      r.logs.should.not.include('--no-foo');
-      r.logs.should.not.include('--foo');
-      r.logs.should.not.include('--no-bar');
-      r.logs.should.not.include('--bar');
-      r.logs.should.include('--baz');
-    });
-
-    it('ignores no- prefix flags when boolean-negation is not set', () => {
-      const r = checkUsage(
-        () =>
-          yargs([
-            './completion',
-            '--get-yargs-completions',
-            './completion',
-            '--no-bar',
-            '',
-          ]).options({
-            foo: {describe: 'foo flag', type: 'boolean', default: true},
-            bar: {describe: 'bar flag', type: 'boolean'},
-          }).argv
-      );
-
-      r.logs.should.not.include('--no-foo');
-      r.logs.should.include('--foo');
-      r.logs.should.not.include('--no-bar');
-      r.logs.should.include('--bar');
-    });
-
-    it('completes options for the correct command', () => {
-      process.env.SHELL = '/bin/bash';
-      const r = checkUsage(
-        () =>
-          yargs(['./completion', '--get-yargs-completions', 'cmd2', '--o'])
-            .help(false)
-            .version(false)
-            .command('cmd1', 'first command', subYargs => {
-              subYargs.options({
-                opt1: {
-                  describe: 'first option',
-                },
-              });
-            })
-            .command('cmd2', 'second command', subYargs => {
-              subYargs.options({
-                opt2: {
-                  describe: 'second option',
-                },
-              });
-            })
-            .completion().argv
-      );
-
-      r.logs.should.have.length(1);
-      r.logs.should.include('--opt2');
-    });
-
-    it('ignores positionals for the correct command', () => {
-      process.env.SHELL = '/bin/bash';
-      const r = checkUsage(
-        () =>
-          yargs(['./completion', '--get-yargs-completions', 'cmd', '--o'])
-            .help(false)
-            .version(false)
-            .command('cmd', 'command', subYargs => {
-              subYargs
+        it('avoids repeating already included options', () => {
+          const r = checkUsage(
+            () =>
+              yargs([...firstArguments, './completion', '--foo', '--'])
                 .options({
-                  opt: {
-                    describe: 'option',
-                  },
+                  foo: {describe: 'foo option'},
+                  bar: {describe: 'bar option'},
                 })
-                .positional('pos-opt', {type: 'string'});
-            }).argv
-      );
+                .completion().argv
+          );
 
-      r.logs.should.have.length(1);
-      r.logs.should.include('--opt');
-      r.logs.should.not.include('--pos-opt');
-    });
+          r.logs.should.include('--bar');
+          r.logs.should.not.include('--foo');
+        });
 
-    it('does not complete hidden commands', () => {
-      process.env.SHELL = '/bin/bash';
-      const r = checkUsage(
-        () =>
-          yargs(['./completion', '--get-yargs-completions', 'cmd'])
-            .command('cmd1', 'first command')
-            .command('cmd2', false)
-            .completion('completion', false).argv
-      );
+        it('avoids repeating options whose aliases are already included', () => {
+          const r = checkUsage(
+            () =>
+              yargs([...firstArguments, './completion', '-f', '--'])
+                .options({
+                  foo: {describe: 'foo option', alias: 'f'},
+                  bar: {describe: 'bar option'},
+                })
+                .completion().argv
+          );
 
-      r.logs.should.have.length(1);
-      r.logs.should.include('cmd1');
-    });
+          r.logs.should.include('--bar');
+          r.logs.should.not.include('--foo');
+        });
 
-    it('does not include positional arguments', () => {
-      process.env.SHELL = '/bin/bash';
-      const r = checkUsage(() => {
-        return yargs(['./completion', '--get-yargs-completions', 'cmd'])
-          .command('cmd1 [arg]', 'first command')
-          .command('cmd2 <arg>', 'second command')
-          .completion('completion', false).argv;
+        it('completes short options with a single dash when the user did not already enter two dashes', () => {
+          const r = checkUsage(
+            () =>
+              yargs([...firstArguments, './completion', '']).options({
+                f: {describe: 'f option', alias: 'foo'},
+              }).argv
+          );
+
+          r.logs.should.include('-f');
+          r.logs.should.not.include('--f');
+        });
+
+        it('completes short options with two dashes when the user already entered two dashes', () => {
+          const r = checkUsage(
+            () =>
+              yargs([...firstArguments, './completion', '--']).options({
+                f: {describe: 'f option', alias: 'foo'},
+              }).argv
+          );
+
+          r.logs.should.include('--f');
+          r.logs.should.not.include('-f');
+        });
+
+        it('completes single digit options with two dashes', () => {
+          const r = checkUsage(
+            () =>
+              yargs([...firstArguments, './completion', '']).options({
+                1: {describe: '1 option', alias: 'one'},
+              }).argv
+          );
+
+          r.logs.should.include('--1');
+          r.logs.should.not.include('-1');
+        });
+
+        it('completes with no- prefix flags defaulting to true when boolean-negation is set', () => {
+          const r = checkUsage(
+            () =>
+              yargs([...firstArguments, './completion', ''])
+                .options({
+                  foo: {describe: 'foo flag', type: 'boolean', default: true},
+                  bar: {describe: 'bar flag', type: 'boolean'},
+                })
+                .parserConfiguration({'boolean-negation': true}).argv
+          );
+
+          r.logs.should.include('--no-foo');
+          r.logs.should.include('--foo');
+          r.logs.should.not.include('--no-bar');
+          r.logs.should.include('--bar');
+        });
+
+        it('avoids repeating flags whose negated counterparts are already included', () => {
+          const r = checkUsage(
+            () =>
+              yargs([
+                ...firstArguments,
+                './completion',
+                '--no-foo',
+                '--no-bar',
+                '',
+              ])
+                .options({
+                  foo: {describe: 'foo flag', type: 'boolean', default: true},
+                  bar: {describe: 'bar flag', type: 'boolean'},
+                  baz: {describe: 'bar flag', type: 'boolean'},
+                })
+                .parserConfiguration({'boolean-negation': true}).argv
+          );
+
+          r.logs.should.not.include('--no-foo');
+          r.logs.should.not.include('--foo');
+          r.logs.should.not.include('--no-bar');
+          r.logs.should.not.include('--bar');
+          r.logs.should.include('--baz');
+        });
+
+        it('ignores no- prefix flags when boolean-negation is not set', () => {
+          const r = checkUsage(
+            () =>
+              yargs([
+                ...firstArguments,
+                './completion',
+                '--no-bar',
+                '',
+              ]).options({
+                foo: {describe: 'foo flag', type: 'boolean', default: true},
+                bar: {describe: 'bar flag', type: 'boolean'},
+              }).argv
+          );
+
+          r.logs.should.not.include('--no-foo');
+          r.logs.should.include('--foo');
+          r.logs.should.not.include('--no-bar');
+          r.logs.should.include('--bar');
+        });
+
+        it('completes options for the correct command', () => {
+          process.env.SHELL = '/bin/bash';
+          const r = checkUsage(
+            () =>
+              yargs([...firstArguments, 'cmd2', '--o'])
+                .help(false)
+                .version(false)
+                .command('cmd1', 'first command', subYargs => {
+                  subYargs.options({
+                    opt1: {
+                      describe: 'first option',
+                    },
+                  });
+                })
+                .command('cmd2', 'second command', subYargs => {
+                  subYargs.options({
+                    opt2: {
+                      describe: 'second option',
+                    },
+                  });
+                })
+                .completion().argv
+          );
+
+          r.logs.should.have.length(1);
+          r.logs.should.include('--opt2');
+        });
+
+        it('ignores positionals for the correct command', () => {
+          process.env.SHELL = '/bin/bash';
+          const r = checkUsage(
+            () =>
+              yargs([...firstArguments, 'cmd', '--o'])
+                .help(false)
+                .version(false)
+                .command('cmd', 'command', subYargs => {
+                  subYargs
+                    .options({
+                      opt: {
+                        describe: 'option',
+                      },
+                    })
+                    .positional('pos-opt', {type: 'string'});
+                }).argv
+          );
+
+          r.logs.should.have.length(1);
+          r.logs.should.include('--opt');
+          r.logs.should.not.include('--pos-opt');
+        });
+
+        it('does not complete hidden commands', () => {
+          process.env.SHELL = '/bin/bash';
+          const r = checkUsage(
+            () =>
+              yargs([...firstArguments, 'cmd'])
+                .command('cmd1', 'first command')
+                .command('cmd2', false)
+                .completion('completion', false).argv
+          );
+
+          r.logs.should.have.length(1);
+          r.logs.should.include('cmd1');
+        });
+
+        it('does not include positional arguments', () => {
+          process.env.SHELL = '/bin/bash';
+          const r = checkUsage(() => {
+            return yargs([...firstArguments, 'cmd'])
+              .command('cmd1 [arg]', 'first command')
+              .command('cmd2 <arg>', 'second command')
+              .completion('completion', false).argv;
+          });
+
+          r.logs.should.have.length(2);
+          r.logs.should.include('cmd1');
+          r.logs.should.include('cmd2');
+        });
+
+        it('works if command has no options', () => {
+          process.env.SHELL = '/bin/bash';
+          const r = checkUsage(
+            () =>
+              yargs([...firstArguments, 'foo', '--b'])
+                .help(false)
+                .version(false)
+                .command('foo', 'foo command', subYargs => {
+                  return subYargs.completion().parse();
+                })
+                .completion().argv
+          );
+
+          r.logs.should.have.length(0);
+        });
+
+        it("returns arguments as completion suggestion, if next contains '-'", () => {
+          process.env.SHELL = '/bin/basg';
+          const r = checkUsage(
+            () =>
+              yargs([...firstArguments, '-f'])
+                .option('foo', {
+                  describe: 'foo option',
+                })
+                .command('bar', 'bar command')
+                .completion().argv
+          );
+
+          r.logs.should.include('--foo');
+          r.logs.should.not.include('bar');
+        });
+
+        it('completes choices if previous option requires a choice', () => {
+          process.env.SHELL = '/bin/bash';
+          const r = checkUsage(() => {
+            return yargs([...firstArguments, './completion', '--fruit'])
+              .options({
+                fruit: {
+                  describe: 'fruit option',
+                  choices: ['apple', 'banana', 'pear'],
+                },
+                amount: {describe: 'amount', type: 'number'},
+              })
+              .completion('completion', false).argv;
+          });
+
+          r.logs.should.have.length(3);
+          r.logs.should.include('apple');
+          r.logs.should.include('banana');
+          r.logs.should.include('pear');
+        });
+
+        it('completes choices if previous option requires a choice and space has been entered', () => {
+          process.env.SHELL = '/bin/bash';
+          const r = checkUsage(() => {
+            return yargs([...firstArguments, './completion', '--fruit', ''])
+              .options({
+                fruit: {
+                  describe: 'fruit option',
+                  choices: ['apple', 'banana', 'pear'],
+                },
+                amount: {describe: 'amount', type: 'number'},
+              })
+              .completion('completion', false).argv;
+          });
+
+          r.logs.should.have.length(3);
+          r.logs.should.include('apple');
+          r.logs.should.include('banana');
+          r.logs.should.include('pear');
+        });
+
+        it('completes choices if previous option requires a choice and a partial choice has been entered', () => {
+          process.env.SHELL = '/bin/bash';
+          const r = checkUsage(() => {
+            return yargs([...firstArguments, './completion', '--fruit', 'ap'])
+              .options({
+                fruit: {
+                  describe: 'fruit option',
+                  choices: ['apple', 'banana', 'pear'],
+                },
+                amount: {describe: 'amount', type: 'number'},
+              })
+              .completion('completion', false).argv;
+          });
+
+          r.logs.should.have.length(1);
+          r.logs.should.include('apple');
+          r.logs.should.not.include('banana');
+          r.logs.should.not.include('pear');
+        });
+
+        it('completes choices if previous option or one of its aliases requires a choice', () => {
+          process.env.SHELL = '/bin/bash';
+          const r = checkUsage(() => {
+            return yargs([...firstArguments, './completion', '-f'])
+              .options({
+                fruit: {
+                  alias: ['f', 'not-a-vegetable'],
+                  describe: 'fruit option',
+                  choices: ['apple', 'banana', 'pear'],
+                },
+                amount: {describe: 'amount', type: 'number'},
+              })
+              .completion('completion', false).argv;
+          });
+
+          r.logs.should.have.length(3);
+          r.logs.should.include('apple');
+          r.logs.should.include('banana');
+          r.logs.should.include('pear');
+        });
+
+        it('completes choices if previous option or one of its aliases requires a choice and space has been entered', () => {
+          process.env.SHELL = '/bin/bash';
+          const r = checkUsage(() => {
+            return yargs([
+              ...firstArguments,
+              './completion',
+              '--not-a-vegetable',
+              '',
+            ])
+              .options({
+                fruit: {
+                  alias: ['f', 'not-a-vegetable'],
+                  describe: 'fruit option',
+                  choices: ['apple', 'banana', 'pear'],
+                },
+                amount: {describe: 'amount', type: 'number'},
+              })
+              .completion('completion', false).argv;
+          });
+
+          r.logs.should.have.length(3);
+          r.logs.should.include('apple');
+          r.logs.should.include('banana');
+          r.logs.should.include('pear');
+        });
+
+        it('completes choices if previous option or one of its aliases requires a choice and a partial choice has been entered', () => {
+          process.env.SHELL = '/bin/bash';
+          const r = checkUsage(() => {
+            return yargs([...firstArguments, './completion', '-f', 'ap'])
+              .options({
+                fruit: {
+                  alias: 'f',
+                  describe: 'fruit option',
+                  choices: ['apple', 'banana', 'pear'],
+                },
+                amount: {describe: 'amount', type: 'number'},
+              })
+              .completion('completion', false).argv;
+          });
+
+          r.logs.should.have.length(1);
+          r.logs.should.include('apple');
+          r.logs.should.not.include('banana');
+          r.logs.should.not.include('pear');
+        });
+
+        it('completes choices for first positional', () => {
+          process.env.SHELL = '/bin/bash';
+          const r = checkUsage(
+            () =>
+              yargs([...firstArguments, './completion', 'cmd', ''])
+                .help(false)
+                .version(false)
+                .command('cmd [fruit] [fruit2]', 'command', subYargs => {
+                  subYargs
+                    .positional('fruit', {choices: ['apple', 'banana', 'pear']})
+                    .positional('fruit2', {
+                      choices: ['apple2', 'banana2', 'pear2'],
+                    })
+                    .options({amount: {describe: 'amount', type: 'number'}});
+                }).argv
+          );
+
+          r.logs.should.have.length(4);
+          r.logs.should.include('apple');
+          r.logs.should.include('banana');
+          r.logs.should.include('pear');
+          r.logs.should.include('--amount');
+        });
+
+        it('completes choices for positional with prefix', () => {
+          process.env.SHELL = '/bin/bash';
+          const r = checkUsage(
+            () =>
+              yargs([...firstArguments, './completion', 'cmd', 'a'])
+                .help(false)
+                .version(false)
+                .command('cmd [fruit] [fruit2]', 'command', subYargs => {
+                  subYargs
+                    .positional('fruit', {
+                      choices: ['apple1', 'banana1', 'pear1'],
+                    })
+                    .positional('fruit2', {
+                      choices: ['apple2', 'banana2', 'pear2'],
+                    })
+                    .options({amount: {describe: 'amount', type: 'number'}});
+                }).argv
+          );
+
+          r.logs.should.have.length(1);
+          r.logs.should.include('apple1');
+        });
+
+        it('completes choices for second positional after option', () => {
+          process.env.SHELL = '/bin/bash';
+          const r = checkUsage(
+            () =>
+              yargs([
+                ...firstArguments,
+                './completion',
+                'cmd',
+                'apple',
+                '--amount',
+                '1',
+                '',
+              ])
+                .help(false)
+                .version(false)
+                .command('cmd [fruit] [fruit2]', 'command', subYargs => {
+                  subYargs
+                    .positional('fruit', {
+                      choices: ['apple1', 'banana1', 'pear1'],
+                    })
+                    .positional('fruit2', {
+                      choices: ['apple2', 'banana2', 'pear2'],
+                    })
+                    .options({amount: {describe: 'amount', type: 'number'}});
+                }).argv
+          );
+
+          r.logs.should.have.length(3);
+          r.logs.should.include('apple2');
+          r.logs.should.include('banana2');
+          r.logs.should.include('pear2');
+        });
+
+        it('completes choices for nested command', () => {
+          process.env.SHELL = '/bin/bash';
+          const r = checkUsage(
+            () =>
+              yargs([...firstArguments, './completion', 'wrapper', 'cmd', ''])
+                .help(false)
+                .version(false)
+                .command({
+                  command: 'wrapper',
+                  builder: subYargs =>
+                    subYargs.command('cmd [fruit]', 'command', subYargs2 => {
+                      subYargs2.positional('fruit', {choices: ['apple']});
+                    }),
+                }).argv
+          );
+
+          r.logs.should.have.length(1);
+          r.logs.should.include('apple');
+        });
+
+        it('works if positional has no choices', () => {
+          process.env.SHELL = '/bin/bash';
+          const r = checkUsage(
+            () =>
+              yargs([...firstArguments, './completion', 'wrapper', 'cmd', 'a'])
+                .help(false)
+                .version(false)
+                .command({
+                  command: 'wrapper',
+                  builder: subYargs =>
+                    subYargs.command('cmd [fruit]', 'command', subYargs2 => {
+                      subYargs2.positional('fruit', {});
+                    }),
+                }).argv
+          );
+
+          r.logs.should.have.length(0);
+        });
       });
-
-      r.logs.should.have.length(2);
-      r.logs.should.include('cmd1');
-      r.logs.should.include('cmd2');
-    });
-
-    it('works if command has no options', () => {
-      process.env.SHELL = '/bin/bash';
-      const r = checkUsage(
-        () =>
-          yargs(['./completion', '--get-yargs-completions', 'foo', '--b'])
-            .help(false)
-            .version(false)
-            .command('foo', 'foo command', subYargs => {
-              return subYargs.completion().parse();
-            })
-            .completion().argv
-      );
-
-      r.logs.should.have.length(0);
-    });
-
-    it("returns arguments as completion suggestion, if next contains '-'", () => {
-      process.env.SHELL = '/bin/basg';
-      const r = checkUsage(
-        () =>
-          yargs(['./usage', '--get-yargs-completions', '-f'])
-            .option('foo', {
-              describe: 'foo option',
-            })
-            .command('bar', 'bar command')
-            .completion().argv
-      );
-
-      r.logs.should.include('--foo');
-      r.logs.should.not.include('bar');
-    });
-
-    it('completes choices if previous option requires a choice', () => {
-      process.env.SHELL = '/bin/bash';
-      const r = checkUsage(() => {
-        return yargs([
-          './completion',
-          '--get-yargs-completions',
-          './completion',
-          '--fruit',
-        ])
-          .options({
-            fruit: {
-              describe: 'fruit option',
-              choices: ['apple', 'banana', 'pear'],
-            },
-            amount: {describe: 'amount', type: 'number'},
-          })
-          .completion('completion', false).argv;
-      });
-
-      r.logs.should.have.length(3);
-      r.logs.should.include('apple');
-      r.logs.should.include('banana');
-      r.logs.should.include('pear');
-    });
-
-    it('completes choices if previous option requires a choice and space has been entered', () => {
-      process.env.SHELL = '/bin/bash';
-      const r = checkUsage(() => {
-        return yargs([
-          './completion',
-          '--get-yargs-completions',
-          './completion',
-          '--fruit',
-          '',
-        ])
-          .options({
-            fruit: {
-              describe: 'fruit option',
-              choices: ['apple', 'banana', 'pear'],
-            },
-            amount: {describe: 'amount', type: 'number'},
-          })
-          .completion('completion', false).argv;
-      });
-
-      r.logs.should.have.length(3);
-      r.logs.should.include('apple');
-      r.logs.should.include('banana');
-      r.logs.should.include('pear');
-    });
-
-    it('completes choices if previous option requires a choice and a partial choice has been entered', () => {
-      process.env.SHELL = '/bin/bash';
-      const r = checkUsage(() => {
-        return yargs([
-          './completion',
-          '--get-yargs-completions',
-          './completion',
-          '--fruit',
-          'ap',
-        ])
-          .options({
-            fruit: {
-              describe: 'fruit option',
-              choices: ['apple', 'banana', 'pear'],
-            },
-            amount: {describe: 'amount', type: 'number'},
-          })
-          .completion('completion', false).argv;
-      });
-
-      r.logs.should.have.length(1);
-      r.logs.should.include('apple');
-      r.logs.should.not.include('banana');
-      r.logs.should.not.include('pear');
-    });
-
-    it('completes choices if previous option or one of its aliases requires a choice', () => {
-      process.env.SHELL = '/bin/bash';
-      const r = checkUsage(() => {
-        return yargs([
-          './completion',
-          '--get-yargs-completions',
-          './completion',
-          '-f',
-        ])
-          .options({
-            fruit: {
-              alias: ['f', 'not-a-vegetable'],
-              describe: 'fruit option',
-              choices: ['apple', 'banana', 'pear'],
-            },
-            amount: {describe: 'amount', type: 'number'},
-          })
-          .completion('completion', false).argv;
-      });
-
-      r.logs.should.have.length(3);
-      r.logs.should.include('apple');
-      r.logs.should.include('banana');
-      r.logs.should.include('pear');
-    });
-
-    it('completes choices if previous option or one of its aliases requires a choice and space has been entered', () => {
-      process.env.SHELL = '/bin/bash';
-      const r = checkUsage(() => {
-        return yargs([
-          './completion',
-          '--get-yargs-completions',
-          './completion',
-          '--not-a-vegetable',
-          '',
-        ])
-          .options({
-            fruit: {
-              alias: ['f', 'not-a-vegetable'],
-              describe: 'fruit option',
-              choices: ['apple', 'banana', 'pear'],
-            },
-            amount: {describe: 'amount', type: 'number'},
-          })
-          .completion('completion', false).argv;
-      });
-
-      r.logs.should.have.length(3);
-      r.logs.should.include('apple');
-      r.logs.should.include('banana');
-      r.logs.should.include('pear');
-    });
-
-    it('completes choices if previous option or one of its aliases requires a choice and a partial choice has been entered', () => {
-      process.env.SHELL = '/bin/bash';
-      const r = checkUsage(() => {
-        return yargs([
-          './completion',
-          '--get-yargs-completions',
-          './completion',
-          '-f',
-          'ap',
-        ])
-          .options({
-            fruit: {
-              alias: 'f',
-              describe: 'fruit option',
-              choices: ['apple', 'banana', 'pear'],
-            },
-            amount: {describe: 'amount', type: 'number'},
-          })
-          .completion('completion', false).argv;
-      });
-
-      r.logs.should.have.length(1);
-      r.logs.should.include('apple');
-      r.logs.should.not.include('banana');
-      r.logs.should.not.include('pear');
-    });
+    }
   });
 
   describe('generateCompletionScript()', () => {
