@@ -127,6 +127,7 @@ export class Completion implements CompletionInstance {
         // If the key is not positional and its aliases aren't in 'args', add the key to 'completions'
         if (
           !isPositionalKey &&
+          !options.hiddenOptions.includes(key) &&
           !this.argsContainKey(args, argv, key, negable)
         ) {
           this.completeOptionKey(key, completions, current);
