@@ -133,3 +133,48 @@ const argv = yargs.option('difficulty', {
 ```
 
 `argv.difficulty` will get  type `'normal' | 'nightmare' | 'hell'`.
+
+# Advanced example
+
+```typescript
+import yargs from 'yargs';
+import fs from 'fs';
+
+const args = yargs(process.argv.slice(2))
+    .scriptName('example-cli-program')
+    .epilog('Copyright (C) 2022 CREATOR')
+    .usage('$0 <file> [options]')
+    .showHelpOnFail(true)
+    .example([
+      ['$ node $0/dist/cli.js file.json -fv true -d output/'],
+      ['$ node $0/dist/cli.js file.xml -v true -f false -d output/']
+      ['$ node $0/dist/cli.js -d output/ file.xml']
+    ])
+    .env('EXAMPLE_CLI')
+    .positional('file', {type: 'string', describe: 'File to be handled'})
+    .options({
+      v: {type: 'boolean', default: false, alias: 'validate', describe: 'Validate file'},
+      f: {type: 'boolean', default: false, alias: 'fix', describe: 'Validate & fix file'},
+      d: {type: 'string', alias: 'outputDirectory', describe: 'Output directory'}
+    })
+    .check((args) => {
+      const [file] = args._;
+      if (file === undefined) {
+        throw new Error('No file argument given');
+      }
+
+      if (!fs.existsSync(file)) {
+        throw new Error(`File ${file} does not exist`);
+      }
+
+      return true;
+    })
+    .parseSync();
+
+const [file] = args._;
+console.log(JSON.stringify(args));
+console.log(`Params given:\nfile: ${file}\nfix: ${args.fix}\nvalidate: ${args.validate}\noutputDirectory: ${args.outputDirectory}`);
+```
+* `file` will get first positional argument
+  * If file argument is not given or file does not exists `--help` will be shown based on `-showHelpOnFail(true)` option
+* `EXAMPLE_CLI_VALIDATE=true` enviromental variable could be used to replace commandline argument`-v` or `-validate`
