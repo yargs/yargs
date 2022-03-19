@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [17.4.0](https://github.com/yargs/yargs/compare/v17.3.1...v17.4.0) (2022-03-19)
+
+
+### Features
+
+* **completion:** choices will now work for all possible aliases of an option and not just the default long option ([30edd50](https://github.com/yargs/yargs/commit/30edd5067111b2b59387dcc47f4e7af93b9054f3))
+* **completion:** positional arguments completion ([#2090](https://github.com/yargs/yargs/issues/2090)) ([00e4ebb](https://github.com/yargs/yargs/commit/00e4ebbe3acd438e73fdb101e75b4f879eb6d345))
+
+
+### Bug Fixes
+
+* **completion:** changed the check for option arguments to match options that begin with '-', instead of '--', to include short options ([30edd50](https://github.com/yargs/yargs/commit/30edd5067111b2b59387dcc47f4e7af93b9054f3))
+* **completion:** fix for completions that contain non-leading hyphens ([30edd50](https://github.com/yargs/yargs/commit/30edd5067111b2b59387dcc47f4e7af93b9054f3))
+* failed command usage string is missing arg descriptions and optional args ([#2105](https://github.com/yargs/yargs/issues/2105)) ([d6e342d](https://github.com/yargs/yargs/commit/d6e342d8ef2c488f438c32770ba2209cf8223342))
+* wrap unknown args in quotes ([#2092](https://github.com/yargs/yargs/issues/2092)) ([6a29778](https://github.com/yargs/yargs/commit/6a2977867bd58dbd8bb550f7b0b4c4c298835597))
+
 ### [17.3.1](https://github.com/yargs/yargs/compare/v17.3.0...v17.3.1) (2021-12-23)
 
 
