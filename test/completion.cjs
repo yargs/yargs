@@ -813,6 +813,34 @@ describe('Completion', () => {
       r.logs.should.include('--help');
     });
 
+    it('does not complete hidden options for command', () => {
+      process.env.SHELL = '/bin/bash';
+      const r = checkUsage(
+        () =>
+          yargs(['./completion', '--get-yargs-completions', 'foo', '--b'])
+            .command('foo', 'foo command', subYargs =>
+              subYargs
+                .options({
+                  bar: {
+                    describe: 'bar option',
+                  },
+                  buz: {
+                    describe: 'buz option',
+                    hidden: true,
+                  },
+                })
+                .help(true)
+                .version(false)
+            )
+            .completion().argv
+      );
+
+      r.logs.should.have.length(2);
+      r.logs.should.include('--bar');
+      r.logs.should.not.include('--buz');
+      r.logs.should.include('--help');
+    });
+
     describe('generateCompletionScript()', () => {
       it('replaces application variable with $0 in script', () => {
         process.env.SHELL = '/bin/bash';
