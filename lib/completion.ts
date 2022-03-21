@@ -158,6 +158,14 @@ export class Completion implements CompletionInstance {
     argv: Arguments,
     current: string
   ) {
+    if (
+      current === '' &&
+      completions.length > 0 &&
+      this.previousArgHasChoices(args)
+    ) {
+      return;
+    }
+
     const positionalKeys =
       this.yargs.getGroups()[this.usage.getPositionalGroupName()] || [];
     const offset = Math.max(
@@ -165,13 +173,12 @@ export class Completion implements CompletionInstance {
       this.yargs.getInternalMethods().getContext().commands.length +
         /* name of the script is first param */ 1
     );
-    const positionalValues = argv._.slice(offset);
 
-    const positionalKey = positionalKeys[positionalValues.length - 1];
-
+    const positionalKey = positionalKeys[argv._.length - offset - 1];
     if (!positionalKey) {
       return;
     }
+
     const choices = this.yargs.getOptions().choices[positionalKey] || [];
     for (const choice of choices) {
       if (choice.startsWith(current)) {
