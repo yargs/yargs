@@ -147,7 +147,7 @@ export class Completion implements CompletionInstance {
     if (this.previousArgHasChoices(args)) {
       const choices = this.getPreviousArgChoices(args);
       if (choices && choices.length > 0) {
-        completions.push(...choices);
+        completions.push(...choices.map(c => c.replace(/:/g, '\\:')));
       }
     }
   }
@@ -182,7 +182,7 @@ export class Completion implements CompletionInstance {
     const choices = this.yargs.getOptions().choices[positionalKey] || [];
     for (const choice of choices) {
       if (choice.startsWith(current)) {
-        completions.push(choice);
+        completions.push(choice.replace(/:/g, '\\:'));
       }
     }
   }
