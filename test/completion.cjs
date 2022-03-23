@@ -426,6 +426,36 @@ describe('Completion', () => {
           r.logs.should.include('--amount');
         });
 
+        it('options choices should not be display with positional choices', () => {
+          process.env.SHELL = '/bin/bash';
+          const r = checkUsage(
+            () =>
+              yargs([
+                ...firstArguments,
+                './completion',
+                'cmd',
+                'apple',
+                '--foo',
+                '',
+              ])
+                .help(false)
+                .version(false)
+                .command('cmd [fruit]', 'command', subYargs => {
+                  subYargs
+                    .positional('fruit', {choices: ['apple', 'banana', 'pear']})
+                    .options('foo', {
+                      choices: ['bar', 'buz'],
+                    })
+                    .options({amount: {describe: 'amount', type: 'number'}});
+                }).argv
+          );
+
+          r.logs.should.have.length(2);
+          r.logs.should.include('bar');
+          r.logs.should.include('buz');
+          r.logs.should.not.include('apple');
+        });
+
         it('completes choices for positional with prefix', () => {
           process.env.SHELL = '/bin/bash';
           const r = checkUsage(
