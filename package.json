@@ -18,6 +18,7 @@
     },
     "./yargs": [
       {
+        "import": "./yargs.mjs",
         "require": "./yargs"
       },
       "./yargs"
