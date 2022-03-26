@@ -299,7 +299,7 @@ yargs
 ```
 
 `builder` can also be a function. This function is executed
-with a `yargs` instance, which can be used to provide command specific
+with a `yargs` instance, which can be used to provide command-specific
 configuration, and the boolean `helpOrVersionSet`, which indicates whether or
 not the `--help` or `--version` flag was set prior to calling the
 builder.
