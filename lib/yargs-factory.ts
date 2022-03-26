@@ -172,7 +172,7 @@ export class YargsInstance {
   #completion: CompletionInstance | null = null;
   #completionCommand: string | null = null;
   #defaultShowHiddenOpt = 'show-hidden';
-  #exitError: YError | string | undefined | null = null;
+  #exitError: YError | string | nil = null;
   #detectLocale = true;
   #emittedWarnings: Dictionary<boolean> = {};
   #exitProcess = true;
@@ -2228,6 +2228,8 @@ export class YargsInstance {
   }
 }
 
+export type nil = undefined | null;
+
 export function isYargsInstance(y: YargsInstance | void): y is YargsInstance {
   return !!y && typeof y.getInternalMethods === 'function';
 }
@@ -2344,7 +2346,7 @@ interface FrozenYargsInstance {
   strictOptions: boolean;
   completionCommand: string | null;
   output: string;
-  exitError: YError | string | undefined | null;
+  exitError: YError | string | nil;
   hasOutput: boolean;
   parsed: DetailedArguments | false;
   parseFn: ParseCallback | null;
@@ -2352,11 +2354,7 @@ interface FrozenYargsInstance {
 }
 
 interface ParseCallback {
-  (
-    err: YError | string | undefined | null,
-    argv: Arguments,
-    output: string
-  ): void;
+  (err: YError | string | nil, argv: Arguments, output: string): void;
 }
 
 interface Aliases {
