@@ -1682,7 +1682,7 @@ describe('usage tests', () => {
   });
 
   describe('showHelpOnFail', () => {
-    it('should display user supplied message (command usage)', () => {
+    it('should display user supplied message', () => {
       const opts = {
         foo: {desc: 'foo option', alias: 'f'},
         bar: {desc: 'bar option', alias: 'b'},
