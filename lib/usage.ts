@@ -1,8 +1,8 @@
 // this file handles outputting usage instructions,
 // failures, etc. keeps logging in one place.
-import {Dictionary, PlatformShim} from './typings/common-types.js';
+import {Dictionary, PlatformShim, nil} from './typings/common-types.js';
 import {objFilter} from './utils/obj-filter.js';
-import {YargsInstance, nil} from './yargs-factory.js';
+import {YargsInstance} from './yargs-factory.js';
 import {YError} from './yerror.js';
 import {DetailedArguments} from './typings/yargs-parser-types.js';
 import setBlocking from './utils/set-blocking.js';
@@ -157,7 +157,7 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
   };
 
   let wrapSet = false;
-  let wrap: number | null | undefined;
+  let wrap: number | nil;
   self.wrap = cols => {
     wrapSet = true;
     wrap = cols;
@@ -778,7 +778,7 @@ export interface UsageInstance {
   unfreeze(defaultCommand?: boolean): void;
   usage(msg: string | null, description?: string | false): UsageInstance;
   version(ver: any): void;
-  wrap(cols: number | null | undefined): void;
+  wrap(cols: number | nil): void;
 }
 
 export interface FailureFunction {

@@ -22,6 +22,7 @@ import type {
   RequireDirectoryOptions,
   PlatformShim,
   RequireType,
+  nil,
 } from './typings/common-types.js';
 import {
   assertNotStrictEqual,
@@ -1423,7 +1424,7 @@ export class YargsInstance {
     this.describe(this.#versionOpt, msg);
     return this;
   }
-  wrap(cols: number | null | undefined): YargsInstance {
+  wrap(cols: number | nil): YargsInstance {
     argsert('<number|null|undefined>', [cols], arguments.length);
     this.#usage.wrap(cols);
     return this;
@@ -2227,8 +2228,6 @@ export class YargsInstance {
     }
   }
 }
-
-export type nil = undefined | null;
 
 export function isYargsInstance(y: YargsInstance | void): y is YargsInstance {
   return !!y && typeof y.getInternalMethods === 'function';
