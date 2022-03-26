@@ -32,6 +32,7 @@ export class Completion implements CompletionInstance {
 
   private aliases: DetailedArguments['aliases'] | null = null;
   private customCompletionFunction: CompletionFunction | null = null;
+  private indexAfterLastReset = 0;
   private readonly zshShell: boolean;
 
   constructor(
@@ -57,6 +58,7 @@ export class Completion implements CompletionInstance {
       if (handlers[args[i]] && handlers[args[i]].builder) {
         const builder = handlers[args[i]].builder;
         if (isCommandBuilderCallback(builder)) {
+          this.indexAfterLastReset = i + 1;
           const y = this.yargs.getInternalMethods().reset();
           builder(y, true);
           return y.argv;
@@ -68,7 +70,8 @@ export class Completion implements CompletionInstance {
 
     this.commandCompletions(completions, args, current);
     this.optionCompletions(completions, args, argv, current);
-    this.choicesCompletions(completions, args, argv, current);
+    this.choicesFromOptionsCompletions(completions, args, argv, current);
+    this.choicesFromPositionalsCompletions(completions, args, argv, current);
     done(null, completions);
   }
 
@@ -124,6 +127,7 @@ export class Completion implements CompletionInstance {
         // If the key is not positional and its aliases aren't in 'args', add the key to 'completions'
         if (
           !isPositionalKey &&
+          !options.hiddenOptions.includes(key) &&
           !this.argsContainKey(args, argv, key, negable)
         ) {
           this.completeOptionKey(key, completions, current);
@@ -134,7 +138,7 @@ export class Completion implements CompletionInstance {
     }
   }
 
-  private choicesCompletions(
+  private choicesFromOptionsCompletions(
     completions: string[],
     args: string[],
     argv: Arguments,
@@ -143,7 +147,42 @@ export class Completion implements CompletionInstance {
     if (this.previousArgHasChoices(args)) {
       const choices = this.getPreviousArgChoices(args);
       if (choices && choices.length > 0) {
-        completions.push(...choices);
+        completions.push(...choices.map(c => c.replace(/:/g, '\\:')));
+      }
+    }
+  }
+
+  private choicesFromPositionalsCompletions(
+    completions: string[],
+    args: string[],
+    argv: Arguments,
+    current: string
+  ) {
+    if (
+      current === '' &&
+      completions.length > 0 &&
+      this.previousArgHasChoices(args)
+    ) {
+      return;
+    }
+
+    const positionalKeys =
+      this.yargs.getGroups()[this.usage.getPositionalGroupName()] || [];
+    const offset = Math.max(
+      this.indexAfterLastReset,
+      this.yargs.getInternalMethods().getContext().commands.length +
+        /* name of the script is first param */ 1
+    );
+
+    const positionalKey = positionalKeys[argv._.length - offset - 1];
+    if (!positionalKey) {
+      return;
+    }
+
+    const choices = this.yargs.getOptions().choices[positionalKey] || [];
+    for (const choice of choices) {
+      if (choice.startsWith(current)) {
+        completions.push(choice.replace(/:/g, '\\:'));
       }
     }
   }
