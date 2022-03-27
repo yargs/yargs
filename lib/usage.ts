@@ -443,7 +443,8 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
           desc
         );
 
-        if (extra) ui.div({text: extra, padding: [0, 0, 0, 2], align: 'right'});
+        if (extra && !shouldHideOptionExtras)
+          ui.div({text: extra, padding: [0, 0, 0, 2], align: 'right'});
         else ui.div();
       });
 
@@ -734,6 +735,11 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
     }
   };
 
+  let shouldHideOptionExtras = false;
+  self.hideOptionExtras = function hideOptionExtras() {
+    shouldHideOptionExtras = true;
+  };
+
   return self;
 }
 
@@ -763,6 +769,7 @@ export interface UsageInstance {
   getUsage(): [string, string][];
   getUsageDisabled(): boolean;
   help(): string;
+  hideOptionExtras(): void;
   reset(localLookup: Dictionary<boolean>): UsageInstance;
   showHelp(level?: 'error' | 'log' | ((message: string) => void)): void;
   showHelpOnFail(enabled?: boolean | string, message?: string): UsageInstance;

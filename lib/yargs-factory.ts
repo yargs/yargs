@@ -843,6 +843,10 @@ export class YargsInstance {
     this.#options.hiddenOptions.push(key);
     return this;
   }
+  hideOptionExtras(): YargsInstance {
+    this.#usage.hideOptionExtras();
+    return this;
+  }
   implies(
     key: string | Dictionary<KeyOrPos | KeyOrPos[]>,
     value?: KeyOrPos | KeyOrPos[]
