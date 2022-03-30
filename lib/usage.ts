@@ -443,6 +443,10 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
           desc
         );
 
+        const shouldHideOptionExtras =
+          yargs.getInternalMethods().getUsageConfiguration()['hide-types'] ===
+          true;
+
         if (extra && !shouldHideOptionExtras)
           ui.div({text: extra, padding: [0, 0, 0, 2], align: 'right'});
         else ui.div();
@@ -733,11 +737,6 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
         descriptions,
       } = frozen);
     }
-  };
-
-  let shouldHideOptionExtras = false;
-  self.hideOptionExtras = function hideOptionExtras() {
-    shouldHideOptionExtras = true;
   };
 
   return self;

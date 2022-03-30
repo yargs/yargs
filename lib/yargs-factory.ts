@@ -92,6 +92,7 @@ const kEmitWarning = Symbol('emitWarning');
 const kFreeze = Symbol('freeze');
 const kGetDollarZero = Symbol('getDollarZero');
 const kGetParserConfiguration = Symbol('getParserConfiguration');
+const kGetUsageConfiguration = Symbol('getUsageConfiguration');
 const kGuessLocale = Symbol('guessLocale');
 const kGuessVersion = Symbol('guessVersion');
 const kParsePositionalNumbers = Symbol('parsePositionalNumbers');
@@ -132,6 +133,7 @@ export interface YargsInternalMethods {
   getLoggerInstance(): LoggerInstance;
   getParseContext(): Object;
   getParserConfiguration(): Configuration;
+  getUsageConfiguration(): UsageConfiguration;
   getUsageInstance(): UsageInstance;
   getValidationInstance(): ValidationInstance;
   hasParseCallback(): boolean;
@@ -197,6 +199,7 @@ export class YargsInstance {
   #strictCommands = false;
   #strictOptions = false;
   #usage: UsageInstance;
+  #usageConfig: UsageConfiguration = {};
   #versionOpt: string | null = null;
   #validation: ValidationInstance;
 
@@ -843,10 +846,6 @@ export class YargsInstance {
     this.#options.hiddenOptions.push(key);
     return this;
   }
-  hideOptionExtras(): YargsInstance {
-    this.#usage.hideOptionExtras();
-    return this;
-  }
   implies(
     key: string | Dictionary<KeyOrPos | KeyOrPos[]>,
     value?: KeyOrPos | KeyOrPos[]
@@ -1388,6 +1387,11 @@ export class YargsInstance {
       return this;
     }
   }
+  usageConfiguration(config: UsageConfiguration) {
+    argsert('<object>', [config], arguments.length);
+    this.#usageConfig = config;
+    return this;
+  }
   version(opt?: string | false, msg?: string, ver?: string): YargsInstance {
     const defaultVersionOpt = 'version';
     argsert(
@@ -1550,6 +1554,9 @@ export class YargsInstance {
   }
   [kGetParserConfiguration](): Configuration {
     return this.#parserConfig;
+  }
+  [kGetUsageConfiguration](): UsageConfiguration {
+    return this.#usageConfig;
   }
   [kGuessLocale]() {
     if (!this.#detectLocale) return;
@@ -1761,6 +1768,7 @@ export class YargsInstance {
       getLoggerInstance: this[kGetLoggerInstance].bind(this),
       getParseContext: this[kGetParseContext].bind(this),
       getParserConfiguration: this[kGetParserConfiguration].bind(this),
+      getUsageConfiguration: this[kGetUsageConfiguration].bind(this),
       getUsageInstance: this[kGetUsageInstance].bind(this),
       getValidationInstance: this[kGetValidationInstance].bind(this),
       hasParseCallback: this[kHasParseCallback].bind(this),
@@ -2282,6 +2290,11 @@ export interface Configuration extends Partial<ParserConfiguration> {
   'deep-merge-config'?: boolean;
   /** Should commands be sorted in help? */
   'sort-commands'?: boolean;
+}
+
+export interface UsageConfiguration {
+  /** Should types be hideen when usage is displayed */
+  'hide-types'?: boolean;
 }
 
 export interface OptionDefinition {
