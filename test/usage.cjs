@@ -4773,7 +4773,6 @@ describe('usage tests', () => {
               }),
             argv => console.log(argv)
           )
-          // .hideOptionExtras()
           .usageConfiguration({'hide-types': true})
           .strict()
           .parse()
