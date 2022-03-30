@@ -768,7 +768,6 @@ export interface UsageInstance {
   getUsage(): [string, string][];
   getUsageDisabled(): boolean;
   help(): string;
-  hideOptionExtras(): void;
   reset(localLookup: Dictionary<boolean>): UsageInstance;
   showHelp(level?: 'error' | 'log' | ((message: string) => void)): void;
   showHelpOnFail(enabled?: boolean | string, message?: string): UsageInstance;
