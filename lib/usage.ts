@@ -32,7 +32,7 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
 
     // If global context, set globalFailMessage
     // Addresses: https://github.com/yargs/yargs/issues/2085
-    if (yargs.getInternalMethods().getContext().commands.length === 0) {
+    if (yargs.getInternalMethods().isGlobalContext()) {
       globalFailMessage = message;
     }
 

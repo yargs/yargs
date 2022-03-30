@@ -117,6 +117,7 @@ const kGetParseContext = Symbol('getParseContext');
 const kGetUsageInstance = Symbol('getUsageInstance');
 const kGetValidationInstance = Symbol('getValidationInstance');
 const kHasParseCallback = Symbol('hasParseCallback');
+const kIsGlobalContext = Symbol('isGlobalContext');
 const kPostProcess = Symbol('postProcess');
 const kRebase = Symbol('rebase');
 const kReset = Symbol('reset');
@@ -136,6 +137,7 @@ export interface YargsInternalMethods {
   getUsageInstance(): UsageInstance;
   getValidationInstance(): ValidationInstance;
   hasParseCallback(): boolean;
+  isGlobalContext(): boolean;
   postProcess<T extends Arguments | Promise<Arguments>>(
     argv: Arguments | Promise<Arguments>,
     populateDoubleDash: boolean,
@@ -182,6 +184,7 @@ export class YargsInstance {
   #groups: Dictionary<string[]> = {};
   #hasOutput = false;
   #helpOpt: string | null = null;
+  #isGlobalContext = true;
   #logger: LoggerInstance;
   #output = '';
   #options: Options;
@@ -1761,6 +1764,7 @@ export class YargsInstance {
       getUsageInstance: this[kGetUsageInstance].bind(this),
       getValidationInstance: this[kGetValidationInstance].bind(this),
       hasParseCallback: this[kHasParseCallback].bind(this),
+      isGlobalContext: this[kIsGlobalContext].bind(this),
       postProcess: this[kPostProcess].bind(this),
       reset: this[kReset].bind(this),
       runValidation: this[kRunValidation].bind(this),
@@ -1792,6 +1796,9 @@ export class YargsInstance {
   }
   [kHasParseCallback](): boolean {
     return !!this.#parseFn;
+  }
+  [kIsGlobalContext](): boolean {
+    return this.#isGlobalContext;
   }
   [kPostProcess]<T extends Arguments | Promise<Arguments>>(
     argv: Arguments | Promise<Arguments>,
@@ -2012,6 +2019,8 @@ export class YargsInstance {
           helpOptSet = true;
         }
       }
+
+      this.#isGlobalContext = false;
 
       const handlerKeys = this.#command.getCommands();
       const requestCompletions = this.#completion!.completionKey in argv;
