@@ -2293,7 +2293,7 @@ export interface Configuration extends Partial<ParserConfiguration> {
 }
 
 export interface UsageConfiguration {
-  /** Should types be hideen when usage is displayed */
+  /** Should types be hidden when usage is displayed */
   'hide-types'?: boolean;
 }
 
