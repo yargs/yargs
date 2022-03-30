@@ -4771,7 +4771,7 @@ describe('usage tests', () => {
                 required: true,
                 description: 'A long description that might break formatting',
               }),
-            argv => console.log(argv)
+            () => {}
           )
           .usageConfiguration({'hide-types': true})
           .strict()
