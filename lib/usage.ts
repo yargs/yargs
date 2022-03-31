@@ -1,6 +1,6 @@
 // this file handles outputting usage instructions,
 // failures, etc. keeps logging in one place.
-import {Dictionary, PlatformShim} from './typings/common-types.js';
+import {Dictionary, PlatformShim, nil} from './typings/common-types.js';
 import {objFilter} from './utils/obj-filter.js';
 import {YargsInstance} from './yargs-factory.js';
 import {YError} from './yerror.js';
@@ -20,16 +20,22 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
   self.failFn = function failFn(f) {
     fails.push(f);
   };
-  let failMessage: string | undefined | null = null;
+  let failMessage: string | nil = null;
+  let globalFailMessage: string | nil = null;
   let showHelpOnFail = true;
   self.showHelpOnFail = function showHelpOnFailFn(
     arg1: boolean | string = true,
     arg2?: string
   ) {
-    function parseFunctionArgs(): [boolean, string?] {
-      return typeof arg1 === 'string' ? [true, arg1] : [arg1, arg2];
+    const [enabled, message] =
+      typeof arg1 === 'string' ? [true, arg1] : [arg1, arg2];
+
+    // If global context, set globalFailMessage
+    // Addresses: https://github.com/yargs/yargs/issues/2085
+    if (yargs.getInternalMethods().isGlobalContext()) {
+      globalFailMessage = message;
     }
-    const [enabled, message] = parseFunctionArgs();
+
     failMessage = message;
     showHelpOnFail = enabled;
     return self;
@@ -60,9 +66,10 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
           logger.error();
         }
         if (msg || err) logger.error(msg || err);
-        if (failMessage) {
+        const globalOrCommandFailMessage = failMessage || globalFailMessage;
+        if (globalOrCommandFailMessage) {
           if (msg || err) logger.error('');
-          logger.error(failMessage);
+          logger.error(globalOrCommandFailMessage);
         }
       }
 
@@ -150,7 +157,7 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
   };
 
   let wrapSet = false;
-  let wrap: number | null | undefined;
+  let wrap: number | nil;
   self.wrap = cols => {
     wrapSet = true;
     wrap = cols;
@@ -771,19 +778,19 @@ export interface UsageInstance {
   unfreeze(defaultCommand?: boolean): void;
   usage(msg: string | null, description?: string | false): UsageInstance;
   version(ver: any): void;
-  wrap(cols: number | null | undefined): void;
+  wrap(cols: number | nil): void;
 }
 
 export interface FailureFunction {
   (
-    msg: string | undefined | null,
+    msg: string | nil,
     err: YError | string | undefined,
     usage: UsageInstance
   ): void;
 }
 
 export interface FrozenUsageInstance {
-  failMessage: string | undefined | null;
+  failMessage: string | nil;
   failureOutput: boolean;
   usages: [string, string][];
   usageDisabled: boolean;
