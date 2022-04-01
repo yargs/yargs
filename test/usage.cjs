@@ -1711,6 +1711,89 @@ describe('usage tests', () => {
           'Specify --help for available options',
         ]);
     });
+
+    describe('should handle being chained both globally and on a command ', () => {
+      const options = {
+        opt1: {
+          alias: 'o',
+          demandOption: true,
+        },
+      };
+      const cmdMessage = 'What have you done (command)????';
+      const globalMessage = 'What have you done (global)????';
+      const errorMessage = 'Unknown argument: extraOpt';
+
+      it('chained on to command', () => {
+        const r = checkUsage(() =>
+          yargs('cmd1 --opt1 hello --extraOpt oops')
+            .command(
+              'cmd1',
+              'cmd1 desc',
+              yargs => yargs.options(options).showHelpOnFail(false, cmdMessage),
+              argv => console.log(argv)
+            )
+            .strict()
+            .parse()
+        );
+        r.should.have.property('result');
+        r.result.should.have.property('_').with.length(1);
+        r.should.have.property('errors');
+        r.should.have.property('logs').with.length(0);
+        r.should.have.property('exit').and.equal(true);
+        r.errors
+          .join('\n')
+          .split(/\n/)
+          .should.deep.equal([errorMessage, '', cmdMessage]);
+      });
+
+      it('chained on globally', () => {
+        const r = checkUsage(() =>
+          yargs('cmd1 --opt1 hello --extraOpt oops')
+            .command(
+              'cmd1',
+              'cmd1 desc',
+              yargs => yargs.option(options),
+              argv => console.log(argv)
+            )
+            .showHelpOnFail(false, globalMessage)
+            .strict()
+            .parse()
+        );
+        r.should.have.property('result');
+        r.result.should.have.property('_').with.length(1);
+        r.should.have.property('errors');
+        r.should.have.property('logs').with.length(0);
+        r.should.have.property('exit').and.equal(true);
+        r.errors
+          .join('\n')
+          .split(/\n/)
+          .should.deep.equal([errorMessage, '', globalMessage]);
+      });
+
+      it('chained on command and globally (priority given to command message)', () => {
+        const r = checkUsage(() =>
+          yargs('cmd1 --opt1 hello --extraOpt oops')
+            .command(
+              'cmd1',
+              'cmd1 desc',
+              yargs => yargs.option(options).showHelpOnFail(false, cmdMessage),
+              argv => console.log(argv)
+            )
+            .showHelpOnFail(false, globalMessage)
+            .strict()
+            .parse()
+        );
+        r.should.have.property('result');
+        r.result.should.have.property('_').with.length(1);
+        r.should.have.property('errors');
+        r.should.have.property('logs').with.length(0);
+        r.should.have.property('exit').and.equal(true);
+        r.errors
+          .join('\n')
+          .split(/\n/)
+          .should.deep.equal([errorMessage, '', cmdMessage]);
+      });
+    });
   });
 
   describe('exitProcess', () => {
