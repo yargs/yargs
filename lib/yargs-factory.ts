@@ -383,6 +383,14 @@ export class YargsInstance {
         yargs: YargsInstance
       ): Partial<Arguments> | Promise<Partial<Arguments>> => {
         let aliases: Dictionary<string[]>;
+
+        // Skip coerce logic if related arg was not provided
+        // Addresses: https://github.com/yargs/yargs/issues/2130
+        const shouldCoerce = Object.prototype.hasOwnProperty.call(argv, keys);
+        if (!shouldCoerce) {
+          return argv;
+        }
+
         return maybeAsyncResult<
           Partial<Arguments> | Promise<Partial<Arguments>> | any
         >(

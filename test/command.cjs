@@ -1647,6 +1647,35 @@ describe('Command', () => {
         argv.rest.should.equal('bar baz');
         coerceExecutionCount.should.equal(1);
       });
+
+      // Addresses: https://github.com/yargs/yargs/issues/2130
+      it('should not run or set new properties on argv when related argument is not passed', () => {
+        yargs('cmd1')
+          .command(
+            'cmd1',
+            'cmd1 desc',
+            yargs =>
+              yargs
+                .option('foo', {alias: 'f', type: 'string'})
+                .option('bar', {
+                  alias: 'b',
+                  type: 'string',
+                  implies: 'f',
+                  coerce: () => expect.fail(), // Should not be called
+                })
+                .fail(() => {
+                  expect.fail(); // Should not fail because of implies
+                }),
+            argv => {
+              // eslint-disable-next-line no-prototype-builtins
+              if (Object.prototype.hasOwnProperty(argv, 'b')) {
+                expect.fail(); // 'b' was not provided, coerce should not set it
+              }
+            }
+          )
+          .strict()
+          .parse();
+      });
     });
 
     describe('defaults', () => {
