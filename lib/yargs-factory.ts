@@ -404,7 +404,10 @@ export class YargsInstance {
           },
           (result: any): Partial<Arguments> => {
             argv[keys] = result;
-            if (aliases[keys]) {
+            const stripAliased = yargs
+              .getInternalMethods()
+              .getParserConfiguration()['strip-aliased'];
+            if (aliases[keys] && stripAliased !== true) {
               for (const alias of aliases[keys]) {
                 argv[alias] = result;
               }

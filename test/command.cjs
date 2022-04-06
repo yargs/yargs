@@ -1676,6 +1676,29 @@ describe('Command', () => {
           .strict()
           .parse();
       });
+
+      it('should not add aliases to argv if strip-aliased config is true', () => {
+        yargs('cmd1 -f hello -b world')
+          .parserConfiguration({'strip-aliased': true})
+          .command(
+            'cmd1',
+            'cmd1 desc',
+            yargs =>
+              yargs.option('foo', {alias: 'f', type: 'string'}).option('bar', {
+                type: 'string',
+                alias: 'b',
+                coerce: val => val,
+              }),
+            argv => {
+              // eslint-disable-next-line no-prototype-builtins
+              if (Object.prototype.hasOwnProperty(argv, 'b')) {
+                expect.fail(); // 'b' is an alias, it should not be in argv
+              }
+            }
+          )
+          .strict()
+          .parse();
+      });
     });
 
     describe('defaults', () => {
