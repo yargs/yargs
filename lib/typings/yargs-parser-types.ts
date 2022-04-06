@@ -1,6 +1,6 @@
 // Taken from yargs-parser@19.0.1
 // TODO: update this file periodically.
-import type {Dictionary, ValueOf} from './common-types.js';
+import type {Dictionary, ValueOf, nil} from './common-types.js';
 
 type KeyOf<T> = {
   [K in keyof T]: string extends K ? never : number extends K ? never : K;
@@ -142,7 +142,7 @@ export interface Parser {
   detailed(args: ArgsInput, opts?: Partial<Options>): DetailedArguments;
   camelCase(str: string): string;
   decamelize(str: string, joinString?: string): string;
-  looksLikeNumber(x: null | undefined | number | string): boolean;
+  looksLikeNumber(x: nil | number | string): boolean;
 }
 export declare type StringFlag = Dictionary<string[]>;
 export declare type BooleanFlag = Dictionary<boolean>;

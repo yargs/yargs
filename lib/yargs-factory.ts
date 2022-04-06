@@ -22,6 +22,7 @@ import type {
   RequireDirectoryOptions,
   PlatformShim,
   RequireType,
+  nil,
 } from './typings/common-types.js';
 import {
   assertNotStrictEqual,
@@ -116,6 +117,7 @@ const kGetParseContext = Symbol('getParseContext');
 const kGetUsageInstance = Symbol('getUsageInstance');
 const kGetValidationInstance = Symbol('getValidationInstance');
 const kHasParseCallback = Symbol('hasParseCallback');
+const kIsGlobalContext = Symbol('isGlobalContext');
 const kPostProcess = Symbol('postProcess');
 const kRebase = Symbol('rebase');
 const kReset = Symbol('reset');
@@ -135,6 +137,7 @@ export interface YargsInternalMethods {
   getUsageInstance(): UsageInstance;
   getValidationInstance(): ValidationInstance;
   hasParseCallback(): boolean;
+  isGlobalContext(): boolean;
   postProcess<T extends Arguments | Promise<Arguments>>(
     argv: Arguments | Promise<Arguments>,
     populateDoubleDash: boolean,
@@ -172,7 +175,7 @@ export class YargsInstance {
   #completion: CompletionInstance | null = null;
   #completionCommand: string | null = null;
   #defaultShowHiddenOpt = 'show-hidden';
-  #exitError: YError | string | undefined | null = null;
+  #exitError: YError | string | nil = null;
   #detectLocale = true;
   #emittedWarnings: Dictionary<boolean> = {};
   #exitProcess = true;
@@ -181,6 +184,7 @@ export class YargsInstance {
   #groups: Dictionary<string[]> = {};
   #hasOutput = false;
   #helpOpt: string | null = null;
+  #isGlobalContext = true;
   #logger: LoggerInstance;
   #output = '';
   #options: Options;
@@ -1431,7 +1435,7 @@ export class YargsInstance {
     this.describe(this.#versionOpt, msg);
     return this;
   }
-  wrap(cols: number | null | undefined): YargsInstance {
+  wrap(cols: number | nil): YargsInstance {
     argsert('<number|null|undefined>', [cols], arguments.length);
     this.#usage.wrap(cols);
     return this;
@@ -1768,6 +1772,7 @@ export class YargsInstance {
       getUsageInstance: this[kGetUsageInstance].bind(this),
       getValidationInstance: this[kGetValidationInstance].bind(this),
       hasParseCallback: this[kHasParseCallback].bind(this),
+      isGlobalContext: this[kIsGlobalContext].bind(this),
       postProcess: this[kPostProcess].bind(this),
       reset: this[kReset].bind(this),
       runValidation: this[kRunValidation].bind(this),
@@ -1799,6 +1804,9 @@ export class YargsInstance {
   }
   [kHasParseCallback](): boolean {
     return !!this.#parseFn;
+  }
+  [kIsGlobalContext](): boolean {
+    return this.#isGlobalContext;
   }
   [kPostProcess]<T extends Arguments | Promise<Arguments>>(
     argv: Arguments | Promise<Arguments>,
@@ -2019,6 +2027,8 @@ export class YargsInstance {
           helpOptSet = true;
         }
       }
+
+      this.#isGlobalContext = false;
 
       const handlerKeys = this.#command.getCommands();
       const requestCompletions = this.#completion!.completionKey in argv;
@@ -2352,7 +2362,7 @@ interface FrozenYargsInstance {
   strictOptions: boolean;
   completionCommand: string | null;
   output: string;
-  exitError: YError | string | undefined | null;
+  exitError: YError | string | nil;
   hasOutput: boolean;
   parsed: DetailedArguments | false;
   parseFn: ParseCallback | null;
@@ -2360,11 +2370,7 @@ interface FrozenYargsInstance {
 }
 
 interface ParseCallback {
-  (
-    err: YError | string | undefined | null,
-    argv: Arguments,
-    output: string
-  ): void;
+  (err: YError | string | nil, argv: Arguments, output: string): void;
 }
 
 interface Aliases {
