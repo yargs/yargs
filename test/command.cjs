@@ -1677,6 +1677,7 @@ describe('Command', () => {
           .parse();
       });
 
+      // Addresses: https://github.com/yargs/yargs/issues/2159
       it('should not add aliases to argv if strip-aliased config is true', () => {
         yargs('cmd1 -f hello -b world')
           .parserConfiguration({'strip-aliased': true})
