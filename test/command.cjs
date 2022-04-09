@@ -1647,6 +1647,59 @@ describe('Command', () => {
         argv.rest.should.equal('bar baz');
         coerceExecutionCount.should.equal(1);
       });
+
+      // Addresses: https://github.com/yargs/yargs/issues/2130
+      it('should not run or set new properties on argv when related argument is not passed', () => {
+        yargs('cmd1')
+          .command(
+            'cmd1',
+            'cmd1 desc',
+            yargs =>
+              yargs
+                .option('foo', {alias: 'f', type: 'string'})
+                .option('bar', {
+                  alias: 'b',
+                  type: 'string',
+                  implies: 'f',
+                  coerce: () => expect.fail(), // Should not be called
+                })
+                .fail(() => {
+                  expect.fail(); // Should not fail because of implies
+                }),
+            argv => {
+              // eslint-disable-next-line no-prototype-builtins
+              if (Object.prototype.hasOwnProperty(argv, 'b')) {
+                expect.fail(); // 'b' was not provided, coerce should not set it
+              }
+            }
+          )
+          .strict()
+          .parse();
+      });
+
+      // Addresses: https://github.com/yargs/yargs/issues/2159
+      it('should not add aliases to argv if strip-aliased config is true', () => {
+        yargs('cmd1 -f hello -b world')
+          .parserConfiguration({'strip-aliased': true})
+          .command(
+            'cmd1',
+            'cmd1 desc',
+            yargs =>
+              yargs.option('foo', {alias: 'f', type: 'string'}).option('bar', {
+                type: 'string',
+                alias: 'b',
+                coerce: val => val,
+              }),
+            argv => {
+              // eslint-disable-next-line no-prototype-builtins
+              if (Object.prototype.hasOwnProperty(argv, 'b')) {
+                expect.fail(); // 'b' is an alias, it should not be in argv
+              }
+            }
+          )
+          .strict()
+          .parse();
+      });
     });
 
     describe('defaults', () => {
