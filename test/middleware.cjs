@@ -281,6 +281,34 @@ describe('middleware', () => {
       }
     });
 
+    // Addresses: https://github.com/yargs/yargs/issues/2124
+    // This test will fail if the result of async middleware is not treated like a promise
+    // eslint-disable-next-line no-restricted-properties
+    it.only('treats result of async middleware as promise', done => {
+      const input = 'cmd1 -f Hello -b world';
+      yargs(input)
+        .command(
+          'cmd1',
+          'cmd1 desc',
+          yargs =>
+            yargs
+              .option('foo', {type: 'string', alias: 'f', required: true})
+              .option('bar', {type: 'string', alias: 'b', required: true})
+              .middleware(async argv => {
+                await new Promise(r => setTimeout(r, 5));
+                return argv;
+              }, true),
+          _argv => {
+            done();
+          }
+        )
+        .fail(msg => {
+          done(new Error(msg));
+        })
+        .strict()
+        .parse();
+    });
+
     it('runs before validation, when middleware is added in builder', done => {
       yargs(['mw'])
         .command(
