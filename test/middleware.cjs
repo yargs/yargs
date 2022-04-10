@@ -283,8 +283,7 @@ describe('middleware', () => {
 
     // Addresses: https://github.com/yargs/yargs/issues/2124
     // This test will fail if the result of async middleware is not treated like a promise
-    // eslint-disable-next-line no-restricted-properties
-    it.only('treats result of async middleware as promise', done => {
+    it('treats result of async middleware as promise', done => {
       const input = 'cmd1 -f Hello -b world';
       yargs(input)
         .command(
