@@ -603,9 +603,9 @@ export class CommandInstance {
           // If both positionals/options provided, no default was set,
           // and if at least one is an array: don't overwrite, combine.
           if (
-            !Object.hasOwnProperty.call(defaults, key) &&
-            Object.hasOwnProperty.call(argv, key) &&
-            Object.hasOwnProperty.call(parsed.argv, key) &&
+            !Object.prototype.hasOwnProperty.call(defaults, key) &&
+            Object.prototype.hasOwnProperty.call(argv, key) &&
+            Object.prototype.hasOwnProperty.call(parsed.argv, key) &&
             (Array.isArray(argv[key]) || Array.isArray(parsed.argv[key]))
           ) {
             argv[key] = ([] as string[]).concat(argv[key], parsed.argv[key]);
