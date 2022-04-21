@@ -282,21 +282,14 @@ describe('middleware', () => {
     });
 
     // Addresses: https://github.com/yargs/yargs/issues/2124
-    // This test will fail if the result of async middleware is not treated like a promise
-    it('treats result of async middleware as promise', done => {
-      const input = 'cmd1 -f Hello -b world';
+    // This test will fail if result of async middleware is not handled like a promise
+    it('does not cause an unexpected error when async middleware and strict are both used', done => {
+      const input = 'cmd1';
       yargs(input)
         .command(
           'cmd1',
           'cmd1 desc',
-          yargs =>
-            yargs
-              .option('foo', {type: 'string', alias: 'f', required: true})
-              .option('bar', {type: 'string', alias: 'b', required: true})
-              .middleware(async argv => {
-                await new Promise(r => setTimeout(r, 5));
-                return argv;
-              }, true),
+          yargs => yargs.middleware(async argv => argv, true),
           _argv => {
             done();
           }
