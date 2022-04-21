@@ -16,6 +16,10 @@
       "import": "./helpers/helpers.mjs",
       "require": "./helpers/index.js"
     },
+    "./browser": {
+      "import": "./browser.mjs",
+      "types": "./browser.d.ts"
+    },
     "./yargs": [
       {
         "require": "./yargs"

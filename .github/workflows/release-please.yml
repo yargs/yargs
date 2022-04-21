@@ -3,8 +3,13 @@ on:
      branches:
        - main
 name: release-please
+permissions:
+  contents: read
+
 jobs:
   release-please:
+    permissions:
+      contents: write  # for google-github-actions/release-please-action to create release PR's and commit message
     runs-on: ubuntu-latest
     steps:
       - uses: google-github-actions/release-please-action@v3
