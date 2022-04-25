@@ -128,7 +128,7 @@ export class Completion implements CompletionInstance {
         if (
           !isPositionalKey &&
           !options.hiddenOptions.includes(key) &&
-          !this.argsContainKey(args, argv, key, negable)
+          !this.argsContainKey(args, key, negable)
         ) {
           this.completeOptionKey(key, completions, current);
           if (negable && !!options.default[key])
@@ -229,17 +229,16 @@ export class Completion implements CompletionInstance {
 
   private argsContainKey(
     args: string[],
-    argv: Arguments,
     key: string,
     negable: boolean
   ): boolean {
-    if (args.indexOf(`--${key}`) !== -1) return true;
-    if (negable && args.indexOf(`--no-${key}`) !== -1) return true;
+    const argsContains = (s: string) =>
+      args.indexOf((/^[^0-9]$/.test(s) ? '-' : '--') + s) !== -1;
+    if (argsContains(key)) return true;
+    if (negable && argsContains(`no-${key}`)) return true;
     if (this.aliases) {
-      // search for aliases in parsed argv
-      // can't do the same thing for main option names because argv can contain default values
       for (const alias of this.aliases[key]) {
-        if (argv[alias] !== undefined) return true;
+        if (argsContains(alias)) return true;
       }
     }
     return false;
