@@ -1044,7 +1044,11 @@ export class YargsInstance {
       }
 
       const desc = opt.describe || opt.description || opt.desc;
-      this.describe(key, desc);
+      const existingDesc = this.#usage.getDescriptions()[key];
+      if (!existingDesc || typeof desc === 'string') {
+        this.describe(key, desc);
+      }
+
       if (opt.hidden) {
         this.hide(key);
       }
