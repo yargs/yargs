@@ -871,7 +871,7 @@ export class YargsInstance {
   }
   locale(locale?: string): YargsInstance | string {
     argsert('[string]', [locale], arguments.length);
-    if (!locale) {
+    if (locale === undefined) {
       this[kGuessLocale]();
       return this.#shim.y18n.getLocale();
     }
