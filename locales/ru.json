@@ -46,6 +46,6 @@
   "Arguments %s and %s are mutually exclusive": "Аргументы %s и %s являются взаимоисключающими",
   "Positionals:": "Позиционные аргументы:",
   "command": "команда",
-  "deprecated": "устаревшая",
-  "deprecated: %s": "устаревшая: %s"
+  "deprecated": "устар.",
+  "deprecated: %s": "устар.: %s"
 }
