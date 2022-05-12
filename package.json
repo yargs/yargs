@@ -38,6 +38,7 @@
   ],
   "files": [
     "browser.mjs",
+    "browser.d.ts",
     "index.cjs",
     "helpers/*.js",
     "helpers/*",
