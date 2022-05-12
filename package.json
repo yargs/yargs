@@ -43,6 +43,7 @@
     "helpers/*",
     "index.mjs",
     "yargs",
+    "yargs.mjs",
     "build",
     "locales",
     "LICENSE",
