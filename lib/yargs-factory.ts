@@ -390,6 +390,13 @@ export class YargsInstance {
         yargs: YargsInstance
       ): Partial<Arguments> | Promise<Partial<Arguments>> => {
         let aliases: Dictionary<string[]>;
+
+        // Skip coerce logic if related arg was not provided
+        const shouldCoerce = Object.hasOwnProperty.call(argv, keys);
+        if (!shouldCoerce) {
+          return argv;
+        }
+
         return maybeAsyncResult<
           Partial<Arguments> | Promise<Partial<Arguments>> | any
         >(
@@ -399,7 +406,10 @@ export class YargsInstance {
           },
           (result: any): Partial<Arguments> => {
             argv[keys] = result;
-            if (aliases[keys]) {
+            const stripAliased = yargs
+              .getInternalMethods()
+              .getParserConfiguration()['strip-aliased'];
+            if (aliases[keys] && stripAliased !== true) {
               for (const alias of aliases[keys]) {
                 argv[alias] = result;
               }

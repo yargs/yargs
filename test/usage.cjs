@@ -3968,7 +3968,6 @@ describe('usage tests', () => {
           .strict()
           .parse()
       );
-      console.log(r);
       r.errors[0]
         .split('\n')
         .should.deep.equal([

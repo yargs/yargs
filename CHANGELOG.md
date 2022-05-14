@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [17.5.0](https://github.com/yargs/yargs/compare/v17.4.1...v17.5.0) (2022-05-11)
+
+
+### Features
+
+* add browser.d.ts and check for existence of Error.captureStackTrace() ([#2144](https://github.com/yargs/yargs/issues/2144)) ([6192990](https://github.com/yargs/yargs/commit/6192990509cf793c4b10b88884d626893dee89df))
+
+
+### Bug Fixes
+
+* **completion:** support for default flags ([db35423](https://github.com/yargs/yargs/commit/db354232705623bbcd8fad362f6a4d6d59650be5))
+* import yargs/yargs in esm projects ([#2151](https://github.com/yargs/yargs/issues/2151)) ([95aed1c](https://github.com/yargs/yargs/commit/95aed1c175ec82e585003883bda1b6b75d5493ce))
+
+### [17.4.1](https://github.com/yargs/yargs/compare/v17.4.0...v17.4.1) (2022-04-09)
+
+
+### Bug Fixes
+
+* coerce pollutes argv ([#2161](https://github.com/yargs/yargs/issues/2161)) ([2d1136d](https://github.com/yargs/yargs/commit/2d1136d303ea805685a973ded62f52efd49b78b9))
+* **completion:** don't show positional args choices with option choices ([#2148](https://github.com/yargs/yargs/issues/2148)) ([b58b5bc](https://github.com/yargs/yargs/commit/b58b5bc2cda7fc15acf559ae4a6a0eda0be06044))
+* hide hidden options from completion ([#2143](https://github.com/yargs/yargs/issues/2143)) ([e086dfa](https://github.com/yargs/yargs/commit/e086dfad7ff11956b1e8779c00cf2351a4cc3b03)), closes [#2142](https://github.com/yargs/yargs/issues/2142)
+* show message when showHelpOnFail is chained globally ([#2154](https://github.com/yargs/yargs/issues/2154)) ([ad9fcac](https://github.com/yargs/yargs/commit/ad9fcacb001a7eb842924408f3a06865a7c7a3b6))
+
 ## [17.4.0](https://github.com/yargs/yargs/compare/v17.3.1...v17.4.0) (2022-03-19)
 
 
