@@ -38,11 +38,13 @@
   ],
   "files": [
     "browser.mjs",
+    "browser.d.ts",
     "index.cjs",
     "helpers/*.js",
     "helpers/*",
     "index.mjs",
     "yargs",
+    "yargs.mjs",
     "build",
     "locales",
     "LICENSE",
