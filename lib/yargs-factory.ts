@@ -869,6 +869,30 @@ export class YargsInstance {
     this.#validation.implies(key, value);
     return this;
   }
+  // Check defaults for key (and camel case version of key)
+  isDefaulted(key: string): boolean {
+    const {default: defaults} = this.getOptions();
+    return (
+      Object.prototype.hasOwnProperty.call(defaults, key) ||
+      Object.prototype.hasOwnProperty.call(
+        defaults,
+        this.#shim.Parser.camelCase(key)
+      )
+    );
+  }
+  // Check each config for key (and camel case version of key)
+  isInConfigs(key: string): boolean {
+    const {configObjects} = this.getOptions();
+    return (
+      configObjects.some(c => Object.prototype.hasOwnProperty.call(c, key)) ||
+      configObjects.some(c =>
+        Object.prototype.hasOwnProperty.call(
+          c,
+          this.#shim.Parser.camelCase(key)
+        )
+      )
+    );
+  }
   locale(locale?: string): YargsInstance | string {
     argsert('[string]', [locale], arguments.length);
     if (locale === undefined) {
