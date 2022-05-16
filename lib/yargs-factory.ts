@@ -389,7 +389,7 @@ export class YargsInstance {
         let aliases: Dictionary<string[]>;
 
         // Skip coerce logic if related arg was not provided
-        const shouldCoerce = Object.hasOwnProperty.call(argv, keys);
+        const shouldCoerce = Object.prototype.hasOwnProperty.call(argv, keys);
         if (!shouldCoerce) {
           return argv;
         }
