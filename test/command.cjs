@@ -246,7 +246,7 @@ describe('Command', () => {
     });
 
     it('does not combine positional default and provided values', () => {
-      yargs()
+      yargs('cmd apples cherries grapes')
         .command({
           command: 'cmd [foods..]',
           desc: 'cmd desc',
@@ -261,7 +261,7 @@ describe('Command', () => {
             argv.foods.should.not.include('pizza');
           },
         })
-        .parse('cmd apples cherries grapes');
+        .parse();
     });
 
     it('does not combine config values and provided values', () => {
@@ -273,7 +273,7 @@ describe('Command', () => {
             yargs
               .option('arg-1', {type: 'string'})
               .option('arg-2', {type: 'string'})
-              .option('arg-3', {type: 'string'})
+              .option('arg-3', {type: 'array'})
               .config({
                 arg2: 'bar',
                 arg3: ['baz', 'qux'],
@@ -285,6 +285,39 @@ describe('Command', () => {
             argv['arg-3'].should.deep.equal(['baz', 'qux']);
           },
         })
+        .strict()
+        .parse();
+    });
+
+    it('correctly combines config values and provided values when combine-arrays is true', () => {
+      yargs('cmd1 a b2 c3 c4 --arg-3 c5 --arg-3 c6')
+        .command(
+          'cmd1 <arg-1> [arg-2] [arg-3..]',
+          'cmd1 description',
+          yargs =>
+            yargs
+              .parserConfiguration({
+                'combine-arrays': true,
+              })
+              .option('arg-1', {type: 'string'})
+              .option('arg-2', {type: 'string'})
+              .option('arg-3', {type: 'array', default: ['c0']})
+              .config({
+                arg2: 'b1',
+                arg3: ['c1', 'c2'],
+              }),
+          argv => {
+            argv.arg1.should.equal('a');
+            argv['arg-1'].should.equal('a');
+
+            argv.arg2.should.equal('b2');
+            argv['arg-2'].should.equal('b2');
+
+            const arrayValues = ['c5', 'c6', 'c1', 'c2', 'c3', 'c4'];
+            argv.arg3.should.deep.equal(arrayValues);
+            argv['arg-3'].should.deep.equal(arrayValues);
+          }
+        )
         .strict()
         .parse();
     });

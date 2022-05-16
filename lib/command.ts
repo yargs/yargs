@@ -638,17 +638,31 @@ export class CommandInstance {
           // any new aliases need to be placed in positionalMap, which
           // is used for validation.
           if (!positionalMap[key]) positionalMap[key] = parsed.argv[key];
+
           // Addresses: https://github.com/yargs/yargs/issues/1637
-          // If both positionals/options provided,
-          // and no default or config values were set for that key,
-          // and if at least one is an array: don't overwrite, combine.
+          // In most cases, positionals will overwrite existing values on argv.
+          // They will be combined if both positionals/options are provided, and at least one is array type
           if (
-            !this.isInConfigs(yargs, key) &&
-            !this.isDefaulted(yargs, key) &&
             Object.prototype.hasOwnProperty.call(argv, key) &&
             Object.prototype.hasOwnProperty.call(parsed.argv, key) &&
             (Array.isArray(argv[key]) || Array.isArray(parsed.argv[key]))
           ) {
+            if (this.isInConfigs(yargs, key)) {
+              const shouldCombineArrays =
+                yargs.getInternalMethods().getParserConfiguration()[
+                  'combine-arrays'
+                ] === true;
+              if (shouldCombineArrays) {
+                // TODO: remove config values from argv[key] and parsed.argv[key], then re-add one set
+              } else {
+                // TODO: remove config values from argv[key] and parsed.argv[key],
+                // unless those values were specifically passed as options/positionals.
+              }
+            }
+            if (!this.isDefaulted(yargs, key)) {
+              // TODO: remove default values from argv[key] and parsed.argv[key],
+              // unless those values were specifically passed as options/positionals
+            }
             argv[key] = ([] as string[]).concat(argv[key], parsed.argv[key]);
           } else {
             argv[key] = parsed.argv[key];
