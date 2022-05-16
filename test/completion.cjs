@@ -163,6 +163,50 @@ describe('Completion', () => {
           r.logs.should.include('--bar');
         });
 
+        it('includes flags that have default', () => {
+          const r = checkUsage(
+            () =>
+              yargs([
+                './completion',
+                '--get-yargs-completions',
+                '--used',
+                '--no-usedwithnegation',
+                '-x',
+                '',
+              ])
+                .help(false)
+                .version(false)
+                .options({
+                  used: {type: 'boolean', default: true},
+                  usedwithnegation: {type: 'boolean', default: true},
+                  usedwithalias: {
+                    type: 'boolean',
+                    alias: ['x', 'y'],
+                    default: true,
+                  },
+                  somebool: {type: 'boolean', default: false},
+                  somebool2: {type: 'boolean', default: true},
+                  somestringwithalias: {
+                    type: 'string',
+                    alias: 's',
+                    default: 'foo',
+                  },
+                })
+                .help(false)
+                .parserConfiguration({'boolean-negation': true}).argv
+          );
+
+          r.logs
+            .sort()
+            .should.deep.eq([
+              '--no-somebool2',
+              '--somebool',
+              '--somebool2',
+              '--somestringwithalias',
+              '-s',
+            ]);
+        });
+
         it('completes options for the correct command', () => {
           process.env.SHELL = '/bin/bash';
           const r = checkUsage(
