@@ -1,6 +1,11 @@
 import {Parser} from './yargs-parser-types.js';
 
 /**
+ * A type that represents undefined or null
+ */
+export type nil = undefined | null;
+
+/**
  * An object whose all properties have the same type.
  */
 export type Dictionary<T = any> = {[key: string]: T};

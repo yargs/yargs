@@ -281,6 +281,26 @@ describe('middleware', () => {
       }
     });
 
+    // Addresses: https://github.com/yargs/yargs/issues/2124
+    // This test will fail if result of async middleware is not handled like a promise
+    it('does not cause an unexpected error when async middleware and strict are both used', done => {
+      const input = 'cmd1';
+      yargs(input)
+        .command(
+          'cmd1',
+          'cmd1 desc',
+          yargs => yargs.middleware(async argv => argv, true),
+          _argv => {
+            done();
+          }
+        )
+        .fail(msg => {
+          done(new Error(msg));
+        })
+        .strict()
+        .parse();
+    });
+
     it('runs before validation, when middleware is added in builder', done => {
       yargs(['mw'])
         .command(

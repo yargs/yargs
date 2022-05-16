@@ -264,6 +264,31 @@ describe('Command', () => {
         .parse('cmd apples cherries grapes');
     });
 
+    it('does not combine config values and provided values', () => {
+      yargs('foo bar baz qux')
+        .command({
+          command: '$0 <arg-1> [arg-2] [arg-3..]',
+          desc: 'default description',
+          builder: yargs =>
+            yargs
+              .option('arg-1', {type: 'string'})
+              .option('arg-2', {type: 'string'})
+              .option('arg-3', {type: 'string'})
+              .config({
+                arg2: 'bar',
+                arg3: ['baz', 'qux'],
+              }),
+          handler: argv => {
+            argv.arg1.should.equal('foo');
+            argv.arg2.should.equal('bar');
+            argv.arg3.should.deep.equal(['baz', 'qux']);
+            argv['arg-3'].should.deep.equal(['baz', 'qux']);
+          },
+        })
+        .strict()
+        .parse();
+    });
+
     it('does not overwrite options in argv if variadic and preserves falsy values', () => {
       yargs
         .command({
@@ -1646,6 +1671,59 @@ describe('Command', () => {
 
         argv.rest.should.equal('bar baz');
         coerceExecutionCount.should.equal(1);
+      });
+
+      // Addresses: https://github.com/yargs/yargs/issues/2130
+      it('should not run or set new properties on argv when related argument is not passed', () => {
+        yargs('cmd1')
+          .command(
+            'cmd1',
+            'cmd1 desc',
+            yargs =>
+              yargs
+                .option('foo', {alias: 'f', type: 'string'})
+                .option('bar', {
+                  alias: 'b',
+                  type: 'string',
+                  implies: 'f',
+                  coerce: () => expect.fail(), // Should not be called
+                })
+                .fail(() => {
+                  expect.fail(); // Should not fail because of implies
+                }),
+            argv => {
+              // eslint-disable-next-line no-prototype-builtins
+              if (Object.prototype.hasOwnProperty(argv, 'b')) {
+                expect.fail(); // 'b' was not provided, coerce should not set it
+              }
+            }
+          )
+          .strict()
+          .parse();
+      });
+
+      // Addresses: https://github.com/yargs/yargs/issues/2159
+      it('should not add aliases to argv if strip-aliased config is true', () => {
+        yargs('cmd1 -f hello -b world')
+          .parserConfiguration({'strip-aliased': true})
+          .command(
+            'cmd1',
+            'cmd1 desc',
+            yargs =>
+              yargs.option('foo', {alias: 'f', type: 'string'}).option('bar', {
+                type: 'string',
+                alias: 'b',
+                coerce: val => val,
+              }),
+            argv => {
+              // eslint-disable-next-line no-prototype-builtins
+              if (Object.prototype.hasOwnProperty(argv, 'b')) {
+                expect.fail(); // 'b' is an alias, it should not be in argv
+              }
+            }
+          )
+          .strict()
+          .parse();
       });
     });
 

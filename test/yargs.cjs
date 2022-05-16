@@ -757,6 +757,38 @@ describe('yargs dsl tests', () => {
       r.logs.join(' ').should.match(/Parlay this here code of conduct/);
     });
 
+    // Addresses: https://github.com/yargs/yargs/issues/2178
+    it('does not enter infinite loop when locale is invalid', () => {
+      // Save env vars
+      const lcAll = process.env.LC_ALL;
+      const lcMessages = process.env.LC_MESSAGES;
+      const lang = process.env.LANG;
+      const language = process.env.LANGUAGE;
+      // Change
+      delete process.env.LC_ALL;
+      delete process.env.LC_MESSAGES;
+      process.env.LANG = '.UTF-8';
+      delete process.env.LANGUAGE;
+      try {
+        yargs
+          .command({
+            command: 'cmd1',
+            desc: 'cmd1 desc',
+            builder: () => {},
+            handler: _argv => {},
+          })
+          .parse();
+      } catch {
+        expect.fail();
+      } finally {
+        // Restore
+        process.env.LC_ALL = lcAll;
+        process.env.LC_MESSAGES = lcMessages;
+        process.env.LANG = lang;
+        process.env.LANGUAGE = language;
+      }
+    });
+
     describe('updateLocale', () => {
       it('allows you to override the default locale strings', () => {
         const r = checkOutput(() => {
