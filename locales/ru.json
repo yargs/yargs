@@ -42,5 +42,10 @@
   "Path to JSON config file": "Путь к файлу конфигурации JSON",
   "Show help": "Показать помощь",
   "Show version number": "Показать номер версии",
-  "Did you mean %s?": "Вы имели в виду %s?"
+  "Did you mean %s?": "Вы имели в виду %s?",
+  "Arguments %s and %s are mutually exclusive": "Аргументы %s и %s являются взаимоисключающими",
+  "Positionals:": "Позиционные аргументы:",
+  "command": "команда",
+  "deprecated": "устар.",
+  "deprecated: %s": "устар.: %s"
 }
