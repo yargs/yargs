@@ -643,8 +643,8 @@ export class CommandInstance {
           // and no default or config values were set for that key,
           // and if at least one is an array: don't overwrite, combine.
           if (
-            !yargs.isInConfigs(key) &&
-            !yargs.isDefaulted(key) &&
+            !this.isInConfigs(yargs, key) &&
+            !this.isDefaulted(yargs, key) &&
             Object.prototype.hasOwnProperty.call(argv, key) &&
             Object.prototype.hasOwnProperty.call(parsed.argv, key) &&
             (Array.isArray(argv[key]) || Array.isArray(parsed.argv[key]))
@@ -656,6 +656,27 @@ export class CommandInstance {
         }
       });
     }
+  }
+  // Check defaults for key (and camel case version of key)
+  isDefaulted(yargs: YargsInstance, key: string): boolean {
+    const {default: defaults} = yargs.getOptions();
+    return (
+      Object.prototype.hasOwnProperty.call(defaults, key) ||
+      Object.prototype.hasOwnProperty.call(
+        defaults,
+        this.shim.Parser.camelCase(key)
+      )
+    );
+  }
+  // Check each config for key (and camel case version of key)
+  isInConfigs(yargs: YargsInstance, key: string): boolean {
+    const {configObjects} = yargs.getOptions();
+    return (
+      configObjects.some(c => Object.prototype.hasOwnProperty.call(c, key)) ||
+      configObjects.some(c =>
+        Object.prototype.hasOwnProperty.call(c, this.shim.Parser.camelCase(key))
+      )
+    );
   }
   runDefaultBuilderOn(yargs: YargsInstance): unknown | Promise<unknown> {
     if (!this.defaultCommand) return;
