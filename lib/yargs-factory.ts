@@ -1068,8 +1068,11 @@ export class YargsInstance {
       }
 
       const desc = opt.describe || opt.description || opt.desc;
-      const existingDesc = this.#usage.getDescriptions()[key];
-      if (!existingDesc || typeof desc === 'string') {
+      const descriptions = this.#usage.getDescriptions();
+      if (
+        !Object.prototype.hasOwnProperty.call(descriptions, key) ||
+        typeof desc === 'string'
+      ) {
         this.describe(key, desc);
       }
 
