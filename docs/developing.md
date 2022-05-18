@@ -32,7 +32,7 @@ in the root of the project and in this directory add these files:
 
 `Dockerfile`
 
-```docker
+```dockerfile
 ARG VARIANT="16"
 FROM mcr.microsoft.com/vscode/devcontainers/typescript-node:0-${VARIANT}
 ```
