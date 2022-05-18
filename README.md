@@ -184,6 +184,7 @@ Having problems? want to contribute? join our [community slack](http://devtoolsc
   * [Customizing Yargs' Parser](/docs/advanced.md#customizing)
   * [Bundling yargs](/docs/bundling.md)
 * [Contributing](/contributing.md)
+* [Developing](/docs/developing.md)
 
 ## Supported Node.js Versions
 
