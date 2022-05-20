@@ -364,34 +364,16 @@ export class CommandInstance {
     pc.push(c);
     return `$0 ${pc.join(' ')}`;
   }
-  private applyMiddlewareAndGetResult(
+  private handleValidationAndGetResult(
     isDefaultCommand: boolean,
     commandHandler: CommandHandler,
     innerArgv: Arguments | Promise<Arguments>,
     currentContext: Context,
-    helpOnly: boolean,
     aliases: Dictionary<string[]>,
-    yargs: YargsInstance
-  ): Arguments | Promise<Arguments> {
-    let positionalMap: Dictionary<string[]> = {};
-    // If showHelp() or getHelp() is being run, we should not
-    // execute middleware or handlers (these may perform expensive operations
-    // like creating a DB connection).
-    if (helpOnly) return innerArgv;
-    if (!yargs.getInternalMethods().getHasOutput()) {
-      positionalMap = this.populatePositionals(
-        commandHandler,
-        innerArgv as Arguments,
-        currentContext,
-        yargs
-      );
-    }
-    const middlewares = this.globalMiddleware
-      .getMiddleware()
-      .slice(0)
-      .concat(commandHandler.middlewares);
-    innerArgv = applyMiddleware(innerArgv, yargs, middlewares, true);
-
+    yargs: YargsInstance,
+    middlewares: Middleware[],
+    positionalMap: Dictionary<string[]>
+  ) {
     // we apply validation post-hoc, so that custom
     // checks get passed populated positional arguments.
     if (!yargs.getInternalMethods().getHasOutput()) {
@@ -452,6 +434,64 @@ export class CommandInstance {
     }
 
     return innerArgv;
+  }
+  private applyMiddlewareAndGetResult(
+    isDefaultCommand: boolean,
+    commandHandler: CommandHandler,
+    innerArgv: Arguments,
+    currentContext: Context,
+    helpOnly: boolean,
+    aliases: Dictionary<string[]>,
+    yargs: YargsInstance
+  ): Arguments | Promise<Arguments> {
+    let positionalMap: Dictionary<string[]> = {};
+    // If showHelp() or getHelp() is being run, we should not
+    // execute middleware or handlers (these may perform expensive operations
+    // like creating a DB connection).
+    if (helpOnly) return innerArgv;
+    if (!yargs.getInternalMethods().getHasOutput()) {
+      positionalMap = this.populatePositionals(
+        commandHandler,
+        innerArgv as Arguments,
+        currentContext,
+        yargs
+      );
+    }
+    const middlewares = this.globalMiddleware
+      .getMiddleware()
+      .slice(0)
+      .concat(commandHandler.middlewares);
+
+    const maybePromiseArgv = applyMiddleware(
+      innerArgv,
+      yargs,
+      middlewares,
+      true
+    );
+
+    return isPromise(maybePromiseArgv)
+      ? maybePromiseArgv.then(resolvedInnerArgv =>
+          this.handleValidationAndGetResult(
+            isDefaultCommand,
+            commandHandler,
+            resolvedInnerArgv,
+            currentContext,
+            aliases,
+            yargs,
+            middlewares,
+            positionalMap
+          )
+        )
+      : this.handleValidationAndGetResult(
+          isDefaultCommand,
+          commandHandler,
+          maybePromiseArgv,
+          currentContext,
+          aliases,
+          yargs,
+          middlewares,
+          positionalMap
+        );
   }
   // transcribe all positional arguments "command <foo> <bar> [apple]"
   // onto argv.
@@ -593,19 +633,20 @@ export class CommandInstance {
         positionalKeys.push(...parsed.aliases[key]);
       });
 
-      const defaults = yargs.getOptions().default;
       Object.keys(parsed.argv).forEach(key => {
         if (positionalKeys.includes(key)) {
           // any new aliases need to be placed in positionalMap, which
           // is used for validation.
           if (!positionalMap[key]) positionalMap[key] = parsed.argv[key];
           // Addresses: https://github.com/yargs/yargs/issues/1637
-          // If both positionals/options provided, no default was set,
+          // If both positionals/options provided,
+          // and no default or config values were set for that key,
           // and if at least one is an array: don't overwrite, combine.
           if (
-            !Object.hasOwnProperty.call(defaults, key) &&
-            Object.hasOwnProperty.call(argv, key) &&
-            Object.hasOwnProperty.call(parsed.argv, key) &&
+            !this.isInConfigs(yargs, key) &&
+            !this.isDefaulted(yargs, key) &&
+            Object.prototype.hasOwnProperty.call(argv, key) &&
+            Object.prototype.hasOwnProperty.call(parsed.argv, key) &&
             (Array.isArray(argv[key]) || Array.isArray(parsed.argv[key]))
           ) {
             argv[key] = ([] as string[]).concat(argv[key], parsed.argv[key]);
@@ -615,6 +656,27 @@ export class CommandInstance {
         }
       });
     }
+  }
+  // Check defaults for key (and camel case version of key)
+  isDefaulted(yargs: YargsInstance, key: string): boolean {
+    const {default: defaults} = yargs.getOptions();
+    return (
+      Object.prototype.hasOwnProperty.call(defaults, key) ||
+      Object.prototype.hasOwnProperty.call(
+        defaults,
+        this.shim.Parser.camelCase(key)
+      )
+    );
+  }
+  // Check each config for key (and camel case version of key)
+  isInConfigs(yargs: YargsInstance, key: string): boolean {
+    const {configObjects} = yargs.getOptions();
+    return (
+      configObjects.some(c => Object.prototype.hasOwnProperty.call(c, key)) ||
+      configObjects.some(c =>
+        Object.prototype.hasOwnProperty.call(c, this.shim.Parser.camelCase(key))
+      )
+    );
   }
   runDefaultBuilderOn(yargs: YargsInstance): unknown | Promise<unknown> {
     if (!this.defaultCommand) return;

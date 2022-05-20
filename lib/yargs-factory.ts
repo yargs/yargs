@@ -392,7 +392,7 @@ export class YargsInstance {
         let aliases: Dictionary<string[]>;
 
         // Skip coerce logic if related arg was not provided
-        const shouldCoerce = Object.hasOwnProperty.call(argv, keys);
+        const shouldCoerce = Object.prototype.hasOwnProperty.call(argv, keys);
         if (!shouldCoerce) {
           return argv;
         }
@@ -874,7 +874,7 @@ export class YargsInstance {
   }
   locale(locale?: string): YargsInstance | string {
     argsert('[string]', [locale], arguments.length);
-    if (!locale) {
+    if (locale === undefined) {
       this[kGuessLocale]();
       return this.#shim.y18n.getLocale();
     }

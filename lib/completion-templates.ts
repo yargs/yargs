@@ -34,7 +34,7 @@ export const completionZshTemplate = `#compdef {{app_name}}
 # yargs command completion script
 #
 # Installation: {{app_path}} {{completion_command}} >> ~/.zshrc
-#    or {{app_path}} {{completion_command}} >> ~/.zsh_profile on OSX.
+#    or {{app_path}} {{completion_command}} >> ~/.zprofile on OSX.
 #
 _{{app_name}}_yargs_completions()
 {

@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [17.5.1](https://github.com/yargs/yargs/compare/v17.5.0...v17.5.1) (2022-05-16)
+
+
+### Bug Fixes
+
+* add missing entries to published files ([#2185](https://github.com/yargs/yargs/issues/2185)) ([5685382](https://github.com/yargs/yargs/commit/5685382d18dc05f2ec66098d90ab16f31b622753))
+* address bug when strict and async middleware used together ([#2164](https://github.com/yargs/yargs/issues/2164)) ([cbc2eb7](https://github.com/yargs/yargs/commit/cbc2eb726efc1d688ad484e8cbe4d233b212a046))
+* **completion:** correct zsh installation instructions ([22e9af2](https://github.com/yargs/yargs/commit/22e9af28bb7a7101aeeac80b5bfd0c18f7e6226f))
+* handle multiple node_modules folders determining mainFilename for ESM ([#2123](https://github.com/yargs/yargs/issues/2123)) ([e0823dd](https://github.com/yargs/yargs/commit/e0823dd7e6ced7eaf1d7d1e67f77374f4ef5cbce))
+* **lang:** add missing terms to Russian translation ([#2181](https://github.com/yargs/yargs/issues/2181)) ([1c331f2](https://github.com/yargs/yargs/commit/1c331f22c71496e3d50cf103a1b21f4a05d97aac))
+* prevent infinite loop with empty locale ([#2179](https://github.com/yargs/yargs/issues/2179)) ([b672e70](https://github.com/yargs/yargs/commit/b672e709e4fc45f50d77f54e42025a5fa7c66a42))
+* veriadic arguments override array provided in config (the same as multiple dash arguments). ([4dac5b8](https://github.com/yargs/yargs/commit/4dac5b8c2f03488c31d40f075075d2ac43134412))
+
 ## [17.5.0](https://github.com/yargs/yargs/compare/v17.4.1...v17.5.0) (2022-05-11)
 
 
