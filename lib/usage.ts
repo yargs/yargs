@@ -1,10 +1,10 @@
 // this file handles outputting usage instructions,
 // failures, etc. keeps logging in one place.
-import { Dictionary, PlatformShim, nil } from './typings/common-types.js';
-import { objFilter } from './utils/obj-filter.js';
-import { YargsInstance } from './yargs-factory.js';
-import { YError } from './yerror.js';
-import { DetailedArguments } from './typings/yargs-parser-types.js';
+import {Dictionary, PlatformShim, nil} from './typings/common-types.js';
+import {objFilter} from './utils/obj-filter.js';
+import {YargsInstance} from './yargs-factory.js';
+import {YError} from './yerror.js';
+import {DetailedArguments} from './typings/yargs-parser-types.js';
 import setBlocking from './utils/set-blocking.js';
 
 function isBoolean(fail: FailureFunction | boolean): fail is boolean {
@@ -216,9 +216,9 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
       if (usages.length) {
         // user-defined usage.
         usages.forEach(usage => {
-          ui.div({ text: `${usage[0].replace(/\$0/g, base$0)}` });
+          ui.div({text: `${usage[0].replace(/\$0/g, base$0)}`});
           if (usage[1]) {
-            ui.div({ text: `${usage[1]}`, padding: [1, 0, 0, 0] });
+            ui.div({text: `${usage[1]}`, padding: [1, 0, 0, 0]});
           }
         });
         ui.div();
@@ -270,7 +270,7 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
             width:
               maxWidth(commands, theWrap, `${base$0}${parentCommands}`) + 4,
           },
-          { text: command[1] }
+          {text: command[1]}
         );
         const hints = [];
         if (command[2]) hints.push(`[${__('default')}]`);
@@ -341,10 +341,10 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
             return key;
           });
 
-        return { groupName, normalizedKeys };
+        return {groupName, normalizedKeys};
       })
-      .filter(({ normalizedKeys }) => normalizedKeys.length > 0)
-      .map(({ groupName, normalizedKeys }) => {
+      .filter(({normalizedKeys}) => normalizedKeys.length > 0)
+      .map(({groupName, normalizedKeys}) => {
         // actually generate the switches string --foo, -f, --bar.
         const switches: Dictionary<string | IndentedText> =
           normalizedKeys.reduce((acc, key) => {
@@ -363,8 +363,8 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
                         ? '-'
                         : '--'
                       : sw.length > 1
-                        ? '--'
-                        : '-') + sw
+                      ? '--'
+                      : '-') + sw
                   );
                 }
               })
@@ -373,29 +373,29 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
                 isLongSwitch(sw1) === isLongSwitch(sw2)
                   ? 0
                   : isLongSwitch(sw1)
-                    ? 1
-                    : -1
+                  ? 1
+                  : -1
               )
               .join(', ');
 
             return acc;
           }, {} as Dictionary<string>);
 
-        return { groupName, normalizedKeys, switches };
+        return {groupName, normalizedKeys, switches};
       });
 
     // if some options use short switches, indent long-switches only options (see #1403)
     const shortSwitchesUsed = displayedGroups
-      .filter(({ groupName }) => groupName !== self.getPositionalGroupName())
+      .filter(({groupName}) => groupName !== self.getPositionalGroupName())
       .some(
-        ({ normalizedKeys, switches }) =>
+        ({normalizedKeys, switches}) =>
           !normalizedKeys.every(key => isLongSwitch(switches[key]))
       );
 
     if (shortSwitchesUsed) {
       displayedGroups
-        .filter(({ groupName }) => groupName !== self.getPositionalGroupName())
-        .forEach(({ normalizedKeys, switches }) => {
+        .filter(({groupName}) => groupName !== self.getPositionalGroupName())
+        .forEach(({normalizedKeys, switches}) => {
           normalizedKeys.forEach(key => {
             if (isLongSwitch(switches[key])) {
               switches[key] = addIndentation(switches[key], '-x, '.length);
@@ -405,7 +405,7 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
     }
 
     // display 'Options:' table along with any custom tables:
-    displayedGroups.forEach(({ groupName, normalizedKeys, switches }) => {
+    displayedGroups.forEach(({groupName, normalizedKeys, switches}) => {
       ui.div(groupName);
 
       normalizedKeys.forEach(key => {
@@ -436,8 +436,8 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
           key in demandedOptions ? `[${__('required')}]` : null,
           options.choices && options.choices[key]
             ? `[${__('choices:')} ${self.stringifiedValues(
-              options.choices[key]
-            )}]`
+                options.choices[key]
+              )}]`
             : null,
           defaultString(options.default[key], options.defaultDescription[key]),
         ]
@@ -453,7 +453,7 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
           desc
         );
 
-        if (extra) ui.div({ text: extra, padding: [0, 0, 0, 2], align: 'right' });
+        if (extra) ui.div({text: extra, padding: [0, 0, 0, 2], align: 'right'});
         else ui.div();
       });
 
@@ -725,7 +725,7 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
     if (!frozen) return;
     // Addresses: https://github.com/yargs/yargs/issues/2030
     if (defaultCommand) {
-      descriptions = { ...frozen.descriptions, ...descriptions };
+      descriptions = {...frozen.descriptions, ...descriptions};
       commands = [...frozen.commands, ...commands];
       usages = [...frozen.usages, ...usages];
       examples = [...frozen.examples, ...examples];
@@ -766,7 +766,7 @@ export interface UsageInstance {
   fail(msg?: string | null, err?: YError | string): void;
   failFn(f: FailureFunction | boolean): void;
   freeze(): void;
-  functionDescription(fn: { name?: string }): string;
+  functionDescription(fn: {name?: string}): string;
   getCommands(): [string, string, boolean, string[], boolean][];
   getDescriptions(): Dictionary<string | undefined>;
   getPositionalGroupName(): string;
@@ -817,8 +817,8 @@ function addIndentation(
   indent: number
 ): IndentedText {
   return isIndentedText(text)
-    ? { text: text.text, indentation: text.indentation + indent }
-    : { text, indentation: indent };
+    ? {text: text.text, indentation: text.indentation + indent}
+    : {text, indentation: indent};
 }
 
 function getIndentation(text: string | IndentedText): number {
