@@ -6,11 +6,11 @@ const checkUsage = require('./helpers/utils.cjs').checkOutput;
 const chalk = require('chalk');
 const yargs = require('../index.cjs');
 const expect = require('chai').expect;
-const {YError} = require('../build/index.cjs');
+const { YError } = require('../build/index.cjs');
 
 const should = require('chai').should();
 
-const noop = () => {};
+const noop = () => { };
 async function wait(n = 10) {
   return new Promise(resolve => {
     setTimeout(resolve, n);
@@ -365,22 +365,22 @@ describe('usage tests', () => {
     describe('using .option(x, {deprecate: [boolean|string]})', () => {
       it('{deprecated: true} should show [deprecated]', () => {
         const r = checkUsage(() =>
-          yargs('--help').option('x', {deprecated: true}).wrap(null).parse()
+          yargs('--help').option('x', { deprecated: true }).wrap(null).parse()
         );
         r.logs[0].should.include('  -x  [deprecated]');
       });
       it('{deprecated: string} should show [deprecated: string]', () => {
         const r = checkUsage(() =>
-          yargs('--help').option('x', {deprecated: 'string'}).wrap(null).parse()
+          yargs('--help').option('x', { deprecated: 'string' }).wrap(null).parse()
         );
         r.logs[0].should.include('  -x  [deprecated: string]');
       });
       it('{deprecated: boolean} in sub-command', () => {
         const r = checkUsage(() =>
           yargs('command --help')
-            .option('x', {deprecated: true})
+            .option('x', { deprecated: true })
             .command('command', 'command', yargs =>
-              yargs.option('y', {deprecated: true})
+              yargs.option('y', { deprecated: true })
             )
             .wrap(null)
             .parse()
@@ -391,9 +391,9 @@ describe('usage tests', () => {
       it('{deprecated: string} in sub-command', () => {
         const r = checkUsage(() =>
           yargs('command --help')
-            .option('x', {deprecated: 'string'})
+            .option('x', { deprecated: 'string' })
             .command('command', 'command', yargs =>
-              yargs.option('y', {deprecated: 'string'})
+              yargs.option('y', { deprecated: 'string' })
             )
             .wrap(null)
             .parse()
@@ -572,10 +572,10 @@ describe('usage tests', () => {
       .join('\n')
       .should.equal(
         'Usage: usage -x NUM -y NUM\n' +
-          'Options:\n' +
-          '  --help     Show help  [boolean]\n' +
-          '  --version  Show version number  [boolean]\n' +
-          `Argument check failed: ${checker.toString()}`
+        'Options:\n' +
+        '  --help     Show help  [boolean]\n' +
+        '  --version  Show version number  [boolean]\n' +
+        `Argument check failed: ${checker.toString()}`
       );
   });
 
@@ -845,7 +845,7 @@ describe('usage tests', () => {
 
   it('should allow you to set default values for a hash of options', () => {
     const r = checkUsage(() =>
-      yargs('--foo 50 --baz 70').default({foo: 10, bar: 20, quux: 30}).parse()
+      yargs('--foo 50 --baz 70').default({ foo: 10, bar: 20, quux: 30 }).parse()
     );
     r.should.have.property('result');
     r.result.should.have.property('_').with.length(0);
@@ -860,8 +860,8 @@ describe('usage tests', () => {
       it('should show a failure message if a required option is missing', () => {
         const r = checkUsage(() => {
           const opts = {
-            foo: {description: 'foo option', alias: 'f', requiresArg: true},
-            bar: {description: 'bar option', alias: 'b', requiresArg: true},
+            foo: { description: 'foo option', alias: 'f', requiresArg: true },
+            bar: { description: 'bar option', alias: 'b', requiresArg: true },
           };
 
           return yargs('-f --bar 20')
@@ -892,8 +892,8 @@ describe('usage tests', () => {
       it('should show a failure message if more than one required option is missing', () => {
         const r = checkUsage(() => {
           const opts = {
-            foo: {description: 'foo option', alias: 'f', requiresArg: true},
-            bar: {description: 'bar option', alias: 'b', requiresArg: true},
+            foo: { description: 'foo option', alias: 'f', requiresArg: true },
+            bar: { description: 'bar option', alias: 'b', requiresArg: true },
           };
 
           return yargs('-f --bar')
@@ -926,8 +926,8 @@ describe('usage tests', () => {
       it('should show a failure message if a required option is missing', () => {
         const r = checkUsage(() => {
           const opts = {
-            foo: {description: 'foo option', alias: 'f'},
-            bar: {description: 'bar option', alias: 'b'},
+            foo: { description: 'foo option', alias: 'f' },
+            bar: { description: 'bar option', alias: 'b' },
           };
 
           return yargs('-f --bar 20')
@@ -976,8 +976,8 @@ describe('usage tests', () => {
     it('should fail given an option argument that is not demanded', () => {
       const r = checkUsage(() => {
         const opts = {
-          foo: {demand: 'foo option', alias: 'f'},
-          bar: {demand: 'bar option', alias: 'b'},
+          foo: { demand: 'foo option', alias: 'f' },
+          bar: { demand: 'bar option', alias: 'b' },
         };
 
         return yargs('-f 10 --bar 20 --baz 30')
@@ -1024,8 +1024,8 @@ describe('usage tests', () => {
       it('accepts valid options', () => {
         const r = checkUsage(() => {
           const opts = {
-            '--foo-bar': {description: 'foo bar option'},
-            '--bar-baz': {description: 'bar baz option'},
+            '--foo-bar': { description: 'foo bar option' },
+            '--bar-baz': { description: 'bar baz option' },
           };
 
           return yargs('--foo-bar --bar-baz').options(opts).strict().parse();
@@ -1040,8 +1040,8 @@ describe('usage tests', () => {
       it('works with aliases', () => {
         const r = checkUsage(() => {
           const opts = {
-            '--foo-bar': {description: 'foo bar option', alias: 'f'},
-            '--bar-baz': {description: 'bar baz option', alias: 'b'},
+            '--foo-bar': { description: 'foo bar option', alias: 'f' },
+            '--bar-baz': { description: 'bar baz option', alias: 'b' },
           };
 
           return yargs('--foo-bar -b').options(opts).strict().parse();
@@ -1058,8 +1058,8 @@ describe('usage tests', () => {
       it('accepts mixed options with values', () => {
         const r = checkUsage(() => {
           const opts = {
-            '--foo-bar': {description: 'foo bar option', demand: true},
-            '--baz': {description: 'baz option', demand: true},
+            '--foo-bar': { description: 'foo bar option', demand: true },
+            '--baz': { description: 'baz option', demand: true },
           };
 
           return yargs('--foo-bar 150 --baz').options(opts).strict().parse();
@@ -1074,8 +1074,8 @@ describe('usage tests', () => {
     it('should fail given an option argument without a corresponding description', () => {
       const r = checkUsage(() => {
         const opts = {
-          foo: {description: 'foo option', alias: 'f'},
-          bar: {description: 'bar option', alias: 'b'},
+          foo: { description: 'foo option', alias: 'f' },
+          bar: { description: 'bar option', alias: 'b' },
         };
 
         return yargs('-f 10 --bar 20 --baz 30')
@@ -1119,8 +1119,8 @@ describe('usage tests', () => {
             desc: 'default description',
             builder: yargs =>
               yargs
-                .option('opt1', {type: 'string'})
-                .option('opt2', {type: 'string'}),
+                .option('opt1', { type: 'string' })
+                .option('opt2', { type: 'string' }),
             handler: noop,
           })
           .strict()
@@ -1134,8 +1134,8 @@ describe('usage tests', () => {
     it('should fail given multiple option arguments without corresponding descriptions', () => {
       const r = checkUsage(() => {
         const opts = {
-          foo: {description: 'foo option', alias: 'f'},
-          bar: {description: 'bar option', alias: 'b'},
+          foo: { description: 'foo option', alias: 'f' },
+          bar: { description: 'bar option', alias: 'b' },
         };
 
         return yargs('-f 10 --bar 20 --baz 30 -q 40')
@@ -1174,8 +1174,8 @@ describe('usage tests', () => {
     it('should pass given option arguments with corresponding descriptions', () => {
       const r = checkUsage(() => {
         const opts = {
-          foo: {description: 'foo option'},
-          bar: {description: 'bar option'},
+          foo: { description: 'foo option' },
+          bar: { description: 'bar option' },
         };
 
         return yargs('--foo 10 --bar 20')
@@ -1262,8 +1262,8 @@ describe('usage tests', () => {
           yargs('-y 10 -z 20')
             .usage('Usage: $0 -x NUM [-y NUM]')
             .options({
-              x: {description: 'an option', demand: true},
-              y: {description: 'another option', demand: false},
+              x: { description: 'an option', demand: true },
+              y: { description: 'another option', demand: false },
             })
             .wrap(null)
             .parse()
@@ -1296,8 +1296,8 @@ describe('usage tests', () => {
           yargs('-y 10 -z 20')
             .usage('Usage: $0 -x NUM [-y NUM]')
             .options({
-              x: {description: 'an option', required: true},
-              y: {description: 'another option', required: false},
+              x: { description: 'an option', required: true },
+              y: { description: 'another option', required: false },
             })
             .wrap(null)
             .parse()
@@ -1329,8 +1329,8 @@ describe('usage tests', () => {
         yargs('-w 10')
           .usage('Usage: $0 --width NUM [--height NUM]')
           .options({
-            width: {description: 'Width', alias: 'w', demand: true},
-            height: {description: 'Height', alias: 'h', demand: false},
+            width: { description: 'Width', alias: 'w', demand: true },
+            height: { description: 'Height', alias: 'h', demand: false },
           })
           .wrap(null)
           .parse()
@@ -1684,8 +1684,8 @@ describe('usage tests', () => {
   describe('showHelpOnFail', () => {
     it('should display user supplied message', () => {
       const opts = {
-        foo: {desc: 'foo option', alias: 'f'},
-        bar: {desc: 'bar option', alias: 'b'},
+        foo: { desc: 'foo option', alias: 'f' },
+        bar: { desc: 'bar option', alias: 'b' },
       };
 
       const r = checkUsage(() =>
@@ -1799,7 +1799,7 @@ describe('usage tests', () => {
   describe('exitProcess', () => {
     it('should not call process.exit on error if disabled', () => {
       const opts = {
-        foo: {desc: 'foo option', alias: 'f'},
+        foo: { desc: 'foo option', alias: 'f' },
       };
 
       const r = checkUsage(() =>
@@ -1912,7 +1912,33 @@ describe('usage tests', () => {
 
       // the long description should cause several line
       // breaks when wrapped.
-      r.errors[0].split('\n').length.should.gte(4);
+      r.errors[0].split('\n').length.should.gte(5);
+    });
+
+    it('should not wrap when YARGS_DISABLED_WRAP is provided', function () {
+      if (!process.stdout.isTTY) {
+        return this.skip();
+      }
+
+      const width = process.stdout.columns;
+      process.env.YARGS_DISABLE_WRAP = 'true';
+
+      const r = checkUsage(() =>
+        yargs([])
+          .option('fairly-long-option', {
+            alias: 'f',
+            // create a giant string that should not wrap.
+            description: new Array((width + 1) * 5).join('s'),
+          })
+          .demand('foo')
+          .parse()
+      );
+
+      delete process.env.YARGS_DISABLE_WRAP;
+
+      // the long description should not cause several line
+      // breaks when using YARGS_DISABLED_WRAP.
+      r.errors[0].split('\n').length.should.eql(5);
     });
 
     it('should not raise an exception when long default and description are provided', () =>
@@ -2181,7 +2207,7 @@ describe('usage tests', () => {
           type: 'boolean',
         },
       };
-      const uploadHandler = argv => {};
+      const uploadHandler = argv => { };
 
       const generalHelp = checkUsage(() =>
         yargs('--help')
@@ -2232,7 +2258,7 @@ describe('usage tests', () => {
             type: 'boolean',
           })
           .wrap(46);
-      const uploadHandler = argv => {};
+      const uploadHandler = argv => { };
 
       const generalHelp = checkUsage(() =>
         yargs('--help')
@@ -2533,7 +2559,7 @@ describe('usage tests', () => {
             builder(yargs) {
               return yargs;
             },
-            handler(argv) {},
+            handler(argv) { },
           })
           .wrap(null)
           .parse()
@@ -2562,7 +2588,7 @@ describe('usage tests', () => {
                 .usage('Usage: program upload <something> [opts]')
                 .demand(1);
             },
-            handler(argv) {},
+            handler(argv) { },
           })
           .wrap(null)
           .parse()
@@ -2586,7 +2612,7 @@ describe('usage tests', () => {
             'upload',
             'upload something',
             yargs => yargs.usage(null),
-            argv => {}
+            argv => { }
           )
           .wrap(null)
           .parse()
@@ -2607,8 +2633,8 @@ describe('usage tests', () => {
           .command(
             'one <sub>',
             'level one, requires subcommand',
-            yargs => yargs.command('two [next]', 'level two', {}, argv => {}),
-            argv => {}
+            yargs => yargs.command('two [next]', 'level two', {}, argv => { }),
+            argv => { }
           )
           .wrap(null)
           .parse()
@@ -2638,9 +2664,9 @@ describe('usage tests', () => {
                 'two [next]',
                 'level two',
                 yargs => yargs,
-                argv => {}
+                argv => { }
               ),
-            argv => {}
+            argv => { }
           )
           .wrap(null)
           .parse()
@@ -2713,7 +2739,7 @@ describe('usage tests', () => {
               yargs
                 .usage('$0 upload [something]')
                 .usage('$0 upload [something else]'),
-            argv => {}
+            argv => { }
           )
           .wrap(null)
           .parse()
@@ -2742,7 +2768,7 @@ describe('usage tests', () => {
                 .usage('$0 upload [something]')
                 .usage('$0 upload [something else]')
                 .usage(null),
-            argv => {}
+            argv => { }
           )
           .wrap(null)
           .parse()
@@ -2907,7 +2933,7 @@ describe('usage tests', () => {
           .help('h')
           .default('a', [])
           .default('a2', [3])
-          .default('o', {a: '33'})
+          .default('o', { a: '33' })
           .wrap(null)
           .parse()
       );
@@ -3331,7 +3357,7 @@ describe('usage tests', () => {
         .command(
           'foo',
           'foo command',
-          () => {},
+          () => { },
           () => {
             commandRun = true;
           }
@@ -3822,7 +3848,7 @@ describe('usage tests', () => {
           )
           .command('get <key>', 'Get value for key', {}, noop)
           .command('set <key> [value]', 'Set value for key', {}, noop)
-          .parserConfiguration({'sort-commands': true})
+          .parserConfiguration({ 'sort-commands': true })
           .parse()
       );
 
@@ -3918,7 +3944,7 @@ describe('usage tests', () => {
           .command(
             '* [pattern]',
             'List key-value pairs for pattern',
-            {uuid: {required: true}},
+            { uuid: { required: true } },
             noop
           )
           .command('get <key>', 'Get value for key', {}, noop)
@@ -4603,8 +4629,8 @@ describe('usage tests', () => {
             .scriptName('usage')
             .usage('Hello, world!')
             .commands([
-              {command: '*', desc: 'Default command description'},
-              {command: 'foo', desc: 'Foo command description'},
+              { command: '*', desc: 'Default command description' },
+              { command: 'foo', desc: 'Foo command description' },
             ])
             .parse()
         );
@@ -4617,8 +4643,8 @@ describe('usage tests', () => {
             .scriptName('usage')
             .usage('Hello, world!')
             .commands([
-              {command: '*', desc: 'Default command description'},
-              {command: 'foo', desc: 'Foo command description'},
+              { command: '*', desc: 'Default command description' },
+              { command: 'foo', desc: 'Foo command description' },
             ])
             .parse();
           yargs.showHelp('log');
@@ -4638,7 +4664,7 @@ describe('usage tests', () => {
                   desc: 'Default command description',
                   handler: _ => yargs.showHelp('log'),
                 },
-                {command: 'foo', desc: 'Foo command description'},
+                { command: 'foo', desc: 'Foo command description' },
               ]).argv
         );
         r.logs[0].split('\n').should.deep.equal(expected);
@@ -4652,9 +4678,9 @@ describe('usage tests', () => {
             {
               command: '*',
               desc: 'Default command description',
-              handler: () => {},
+              handler: () => { },
             },
-            {command: 'foo', desc: 'Foo command description'},
+            { command: 'foo', desc: 'Foo command description' },
           ]);
         const help = await y.getHelp();
         help.split('\n').should.deep.equal(expected);
@@ -4673,7 +4699,7 @@ describe('usage tests', () => {
                 help = await y.getHelp();
               },
             },
-            {command: 'foo', desc: 'Foo command description'},
+            { command: 'foo', desc: 'Foo command description' },
           ]);
         await y.argv;
         help.split('\n').should.deep.equal(expected);
@@ -4705,7 +4731,7 @@ describe('usage tests', () => {
                 describe: 'foo parameter',
               });
             })
-            .commands([{command: 'foo', desc: 'Foo command description'}])
+            .commands([{ command: 'foo', desc: 'Foo command description' }])
             .parse()
         );
         r.logs[0].split('\n').should.deep.equal(expected);
@@ -4720,7 +4746,7 @@ describe('usage tests', () => {
                 describe: 'foo parameter',
               });
             })
-            .commands([{command: 'foo', desc: 'Foo command description'}]);
+            .commands([{ command: 'foo', desc: 'Foo command description' }]);
           y.parse();
           y.showHelp('log');
         });
@@ -4794,7 +4820,7 @@ describe('usage tests', () => {
                 describe: 'foo parameter',
               });
             })
-            .commands([{command: 'foo', desc: 'Foo command description'}])
+            .commands([{ command: 'foo', desc: 'Foo command description' }])
             .parse();
           return wait(20);
         });
@@ -4810,7 +4836,7 @@ describe('usage tests', () => {
               describe: 'foo parameter',
             });
           })
-          .commands([{command: 'foo', desc: 'Foo command description'}]);
+          .commands([{ command: 'foo', desc: 'Foo command description' }]);
         await y.parse('');
         await wait();
         const help = await y.getHelp();
