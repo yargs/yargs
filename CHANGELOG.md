@@ -269,4 +269,4 @@ All notable changes to this project will be documented in this file. See [standa
 
 * **yargs:** add missing command(module) signature ([#1707](https://www.github.com/yargs/yargs/issues/1707)) ([0f81024](https://www.github.com/yargs/yargs/commit/0f810245494ccf13a35b7786d021b30fc95ecad5)), closes [#1704](https://www.github.com/yargs/yargs/issues/1704)
 
-[Older CHANGELOG Entries](https://github.com/yargs/yargs/blob/master/docs/CHANGELOG-historical.md)
+[Older CHANGELOG Entries](https://github.com/yargs/yargs/blob/main/docs/CHANGELOG-historical.md)

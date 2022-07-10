@@ -5,14 +5,14 @@ For more details refer to the official [API reference](https://yargs.js.org/docs
 document on the yargs.js.org website.
 
 This document is the Yargs API reference. There are more documentation files in
-[`docs` in the Yargs source tree](https://github.com/yargs/yargs/tree/master/docs):
+[`docs` in the Yargs source tree](https://github.com/yargs/yargs/tree/main/docs):
 
-- [Examples](https://github.com/yargs/yargs/blob/master/docs/examples.md)
-- [Advanced Topics](https://github.com/yargs/yargs/blob/master/docs/advanced.md)
-- [TypeScript usage examples](https://github.com/yargs/yargs/blob/master/docs/typescript.md)
-- [Browser usage example](https://github.com/yargs/yargs/blob/master/docs/browser.md)
-- [Bundling](https://github.com/yargs/yargs/blob/master/docs/bundling.md)
-- [Parsing Tricks](https://github.com/yargs/yargs/blob/master/docs/tricks.md)
+- [Examples](https://github.com/yargs/yargs/blob/main/docs/examples.md)
+- [Advanced Topics](https://github.com/yargs/yargs/blob/main/docs/advanced.md)
+- [TypeScript usage examples](https://github.com/yargs/yargs/blob/main/docs/typescript.md)
+- [Browser usage example](https://github.com/yargs/yargs/blob/main/docs/browser.md)
+- [Bundling](https://github.com/yargs/yargs/blob/main/docs/bundling.md)
+- [Parsing Tricks](https://github.com/yargs/yargs/blob/main/docs/tricks.md)
 
 
 API reference
@@ -340,7 +340,7 @@ yargs
 
 ***Note:*** `.parse()` and `.argv` should only be used at the top level, not inside a command's builder function.
 
-Please see [Advanced Topics: Commands](https://github.com/yargs/yargs/blob/master/docs/advanced.md#commands) for a thorough
+Please see [Advanced Topics: Commands](https://github.com/yargs/yargs/blob/main/docs/advanced.md#commands) for a thorough
 discussion of the advanced features exposed in the Command API.
 
 .completion([cmd], [description], [fn])
@@ -1368,7 +1368,7 @@ builder, handler, or middleware is used.
 If the arguments have not been parsed, this property is `false`.
 
 If the arguments have been parsed, this contain detailed parsed arguments. See
-the documentation in [yargs-parser `.detailed()`](https://github.com/yargs/yargs-parser/blob/master/README.md#requireyargs-parserdetailedargs-opts)
+the documentation in [yargs-parser `.detailed()`](https://github.com/yargs/yargs-parser/blob/main/README.md#requireyargs-parserdetailedargs-opts)
 for details of this object
 
 <a name="parserConfiguration"></a>.parserConfiguration(obj)

@@ -2,7 +2,7 @@
 
 See the [Example Folder](/example) for more demonstrations of
 Yargs in the wild. We would love fixes to old examples and pull
-requests for fancy new examples, [help contribute!](https://github.com/yargs/yargs/blob/master/contributing.md).
+requests for fancy new examples, [help contribute!](https://github.com/yargs/yargs/blob/main/contributing.md).
 
 With yargs, the options be just a hash!
 -------------------------------------------------------------------
