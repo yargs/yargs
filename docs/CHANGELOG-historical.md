@@ -293,7 +293,7 @@ cript import to prevent a future major release warning ([#1441](https://www.gith
 
 * options with leading '+' or '0' now parse as strings
 * dropping Node 6 which hits end of life in April 2019
-* see [yargs-parser@12.0.0 CHANGELOG](https://github.com/yargs/yargs-parser/blob/master/CHANGELOG.md#breaking-changes)
+* see [yargs-parser@12.0.0 CHANGELOG](https://github.com/yargs/yargs-parser/blob/main/CHANGELOG.md#breaking-changes)
 * we now warn if the yargs stanza package.json is used.
 
 <a name="12.0.5"></a>

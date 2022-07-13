@@ -6,7 +6,7 @@ standalone distributions.
 ### You might not need to bundle
 
 Newer releases of yargs can run directly in modern browsers, take a look at
-[Running yargs in the browser](https://github.com/yargs/yargs/blob/master/docs/browser.md).
+[Running yargs in the browser](https://github.com/yargs/yargs/blob/main/docs/browser.md).
 
 ## ncc
 
