@@ -164,7 +164,7 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
   };
 
   function getWrap() {
-    if (process.env.YARGS_DISABLE_WRAP) {
+    if (shim.getEnv('YARGS_DISABLE_WRAP')) {
       return null;
     }
     if (!wrapSet) {
