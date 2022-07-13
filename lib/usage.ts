@@ -163,7 +163,7 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
     wrap = cols;
   };
 
-  function getWrap() {
+  self.getWrap = () => {
     if (shim.getEnv('YARGS_DISABLE_WRAP')) {
       return null;
     }
@@ -173,7 +173,7 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
     }
 
     return wrap;
-  }
+  };
 
   const deferY18nLookupPrefix = '__yargsString__:';
   self.deferY18nLookup = str => deferY18nLookupPrefix + str;
@@ -205,7 +205,7 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
       }, {} as Dictionary<boolean>)
     );
 
-    const theWrap = getWrap();
+    const theWrap = self.getWrap();
     const ui = shim.cliui({
       width: theWrap,
       wrap: !!theWrap,
@@ -772,6 +772,7 @@ export interface UsageInstance {
   getPositionalGroupName(): string;
   getUsage(): [string, string][];
   getUsageDisabled(): boolean;
+  getWrap(): number | nil;
   help(): string;
   reset(localLookup: Dictionary<boolean>): UsageInstance;
   showHelp(level?: 'error' | 'log' | ((message: string) => void)): void;

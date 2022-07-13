@@ -1915,30 +1915,13 @@ describe('usage tests', () => {
       r.errors[0].split('\n').length.should.gte(5);
     });
 
-    it('should not wrap when YARGS_DISABLED_WRAP is provided', function () {
-      if (!process.stdout.isTTY) {
-        return this.skip();
-      }
-
-      const width = process.stdout.columns;
+    it('should not wrap when YARGS_DISABLED_WRAP is provided', () => {
+      const yargsInstance = yargs().wrap(99);
       process.env.YARGS_DISABLE_WRAP = 'true';
-
-      const r = checkUsage(() =>
-        yargs([])
-          .option('fairly-long-option', {
-            alias: 'f',
-            // create a giant string that should not wrap.
-            description: new Array((width + 1) * 5).join('s'),
-          })
-          .demand('foo')
-          .parse()
-      );
-
+      expect(
+        yargsInstance.getInternalMethods().getUsageInstance().getWrap()
+      ).to.equal(null);
       delete process.env.YARGS_DISABLE_WRAP;
-
-      // the long description should not cause several line
-      // breaks when using YARGS_DISABLED_WRAP.
-      r.errors[0].split('\n').length.should.eql(5);
     });
 
     it('should not raise an exception when long default and description are provided', () =>
