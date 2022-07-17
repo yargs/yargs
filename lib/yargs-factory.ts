@@ -45,6 +45,7 @@ import {
   CompletionInstance,
   CompletionFunction,
 } from './completion.js';
+import {FigCompletion} from './fig-completion.js';
 import {
   validation as Validation,
   ValidationInstance,
@@ -116,6 +117,8 @@ const kGetLoggerInstance = Symbol('getLoggerInstance');
 const kGetParseContext = Symbol('getParseContext');
 const kGetUsageInstance = Symbol('getUsageInstance');
 const kGetValidationInstance = Symbol('getValidationInstance');
+const kGetHelpOpt = Symbol('getHelpOpt');
+const kGetVersionOpt = Symbol('getVersionOpt');
 const kHasParseCallback = Symbol('hasParseCallback');
 const kIsGlobalContext = Symbol('isGlobalContext');
 const kPostProcess = Symbol('postProcess');
@@ -136,6 +139,8 @@ export interface YargsInternalMethods {
   getParserConfiguration(): Configuration;
   getUsageInstance(): UsageInstance;
   getValidationInstance(): ValidationInstance;
+  getVersionOpt(): string | null;
+  getHelpOpt(): string | null;
   hasParseCallback(): boolean;
   isGlobalContext(): boolean;
   postProcess<T extends Arguments | Promise<Arguments>>(
@@ -173,6 +178,7 @@ export class YargsInstance {
   // submodules should modify and check the state of context as necessary:
   #context: Context = {commands: [], fullCommands: []};
   #completion: CompletionInstance | null = null;
+  #figCompletion: FigCompletion | null = null;
   #completionCommand: string | null = null;
   #defaultShowHiddenOpt = 'show-hidden';
   #exitError: YError | string | nil = null;
@@ -501,6 +507,26 @@ export class YargsInstance {
 
     return this;
   }
+  figCompletion(cmd?: string, desc?: string | false): YargsInstance {
+    argsert('[string] [string|boolean]', [cmd, desc], arguments.length);
+    const command = cmd || 'generate-fig-spec';
+    if (!desc && desc !== false) {
+      desc = 'generate fig completion spec';
+    }
+
+    this.command(
+      command,
+      desc,
+      () => {},
+      () => {
+        this.#logger.log(
+          this.#figCompletion?.generateCompletionSpec(this.$0, command)
+        );
+      }
+    );
+    return this;
+  }
+
   command(
     cmd: string | CommandHandlerDefinition | DefinitionOrCommandName[],
     description?: CommandHandler['description'],
@@ -1780,6 +1806,8 @@ export class YargsInstance {
       getParserConfiguration: this[kGetParserConfiguration].bind(this),
       getUsageInstance: this[kGetUsageInstance].bind(this),
       getValidationInstance: this[kGetValidationInstance].bind(this),
+      getHelpOpt: this[kGetHelpOpt].bind(this),
+      getVersionOpt: this[kGetVersionOpt].bind(this),
       hasParseCallback: this[kHasParseCallback].bind(this),
       isGlobalContext: this[kIsGlobalContext].bind(this),
       postProcess: this[kPostProcess].bind(this),
@@ -1810,6 +1838,12 @@ export class YargsInstance {
   }
   [kGetValidationInstance](): ValidationInstance {
     return this.#validation;
+  }
+  [kGetHelpOpt](): string | null {
+    return this.#helpOpt;
+  }
+  [kGetVersionOpt](): string | null {
+    return this.#versionOpt;
   }
   [kHasParseCallback](): boolean {
     return !!this.#parseFn;
@@ -1941,6 +1975,8 @@ export class YargsInstance {
         this.#command,
         this.#shim
       );
+    if (!this.#figCompletion)
+      this.#figCompletion = new FigCompletion(this, this.#shim, this.#usage);
     this.#globalMiddleware.reset();
 
     this.#completionCommand = null;

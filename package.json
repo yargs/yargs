@@ -65,6 +65,7 @@
     "@types/chai": "^4.2.11",
     "@types/mocha": "^9.0.0",
     "@types/node": "^16.11.4",
+    "@withfig/autocomplete-types": "^1.17.1",
     "c8": "^7.7.0",
     "chai": "^4.2.0",
     "chalk": "^4.0.0",

@@ -842,7 +842,7 @@ interface Positionals extends Pick<Options, 'alias' | 'array' | 'default'> {
   demand: Dictionary<boolean>;
 }
 
-type FrozenCommandInstance = {
+export type FrozenCommandInstance = {
   handlers: Dictionary<CommandHandler>;
   aliasMap: Dictionary<string>;
   defaultCommand: CommandHandler | undefined;
