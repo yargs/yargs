@@ -1912,7 +1912,16 @@ describe('usage tests', () => {
 
       // the long description should cause several line
       // breaks when wrapped.
-      r.errors[0].split('\n').length.should.gte(4);
+      r.errors[0].split('\n').length.should.gte(5);
+    });
+
+    it('should not wrap when YARGS_DISABLED_WRAP is provided', () => {
+      const yargsInstance = yargs().wrap(99);
+      process.env.YARGS_DISABLE_WRAP = 'true';
+      expect(
+        yargsInstance.getInternalMethods().getUsageInstance().getWrap()
+      ).to.equal(null);
+      delete process.env.YARGS_DISABLE_WRAP;
     });
 
     it('should not raise an exception when long default and description are provided', () =>
