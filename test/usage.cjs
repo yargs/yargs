@@ -4846,4 +4846,23 @@ describe('usage tests', () => {
         '  -v, --version  Custom version description                            [boolean]',
       ]);
   });
+
+  // https://github.com/yargs/yargs/issues/2169
+  it('allows multiple option calls to not clobber description', () => {
+    const r = checkUsage(() =>
+      yargs('--help')
+        .options({
+          arg: {desc: 'Old description', type: 'string', default: 'old'},
+        })
+        .options({arg: {default: 'new'}})
+        .wrap(null)
+        .parse()
+    );
+    r.logs[0]
+      .split('\n')
+      .slice(-1)[0]
+      .replace(/\s+/g, ' ')
+      .trim()
+      .should.equal('--arg Old description [string] [default: "new"]');
+  });
 });
