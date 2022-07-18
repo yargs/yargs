@@ -135,7 +135,7 @@ export class CommandInstance {
     }
 
     // The 'cmd' provided was a string, we apply the command DSL:
-    // https://github.com/yargs/yargs/blob/master/docs/advanced.md#advanced-topics
+    // https://github.com/yargs/yargs/blob/main/docs/advanced.md#advanced-topics
     if (typeof cmd === 'string') {
       // parse positionals out of cmd string
       const parsedCommand = parseCommand(cmd);
