@@ -179,6 +179,7 @@ export class YargsInstance {
   #context: Context = {commands: [], fullCommands: []};
   #completion: CompletionInstance | null = null;
   #figCompletion: FigCompletion | null = null;
+  #figCompletionCommand: string | null = null;
   #completionCommand: string | null = null;
   #defaultShowHiddenOpt = 'show-hidden';
   #exitError: YError | string | nil = null;
@@ -509,21 +510,15 @@ export class YargsInstance {
   }
   figCompletion(cmd?: string, desc?: string | false): YargsInstance {
     argsert('[string] [string|boolean]', [cmd, desc], arguments.length);
+
     const command = cmd || 'generate-fig-spec';
+    this.#figCompletionCommand = command;
+
     if (!desc && desc !== false) {
       desc = 'generate fig completion spec';
     }
 
-    this.command(
-      command,
-      desc,
-      () => {},
-      () => {
-        this.#logger.log(
-          this.#figCompletion?.generateCompletionSpec(this.$0, command)
-        );
-      }
-    );
+    this.command(command, desc);
     return this;
   }
 
@@ -1301,6 +1296,15 @@ export class YargsInstance {
     }
     return this;
   }
+  showFigCompletion(): YargsInstance {
+    this.#logger.log(
+      this.#figCompletion!.generateCompletionSpec(
+        this.$0,
+        this.#figCompletionCommand
+      )
+    );
+    return this;
+  }
   showCompletionScript($0?: string, cmd?: string): YargsInstance {
     argsert('[string] [string]', [$0, cmd], arguments.length);
     $0 = $0 || this.$0;
@@ -1979,6 +1983,7 @@ export class YargsInstance {
       this.#figCompletion = new FigCompletion(this, this.#shim, this.#usage);
     this.#globalMiddleware.reset();
 
+    this.#figCompletionCommand = null;
     this.#completionCommand = null;
     this.#output = '';
     this.#exitError = null;
@@ -2078,12 +2083,17 @@ export class YargsInstance {
       const handlerKeys = this.#command.getCommands();
       const requestCompletions = this.#completion!.completionKey in argv;
       const skipRecommendation = helpOptSet || requestCompletions || helpOnly;
+
       if (argv._.length) {
         if (handlerKeys.length) {
           let firstUnknownCommand;
           for (let i = commandIndex || 0, cmd; argv._[i] !== undefined; i++) {
             cmd = String(argv._[i]);
-            if (handlerKeys.includes(cmd) && cmd !== this.#completionCommand) {
+            if (
+              handlerKeys.includes(cmd) &&
+              cmd !== this.#completionCommand &&
+              cmd !== this.#figCompletionCommand
+            ) {
               // commands are executed using a recursive algorithm that executes
               // the deepest command first; we keep track of the position in the
               // argv._ array that is currently being executed.
@@ -2105,7 +2115,8 @@ export class YargsInstance {
               );
             } else if (
               !firstUnknownCommand &&
-              cmd !== this.#completionCommand
+              cmd !== this.#completionCommand &&
+              cmd !== this.#figCompletionCommand
             ) {
               firstUnknownCommand = cmd;
               break;
@@ -2135,6 +2146,19 @@ export class YargsInstance {
           if (this.#exitProcess) setBlocking(true);
           this.showCompletionScript();
           this.exit(0);
+        } else if (
+          this.#figCompletionCommand &&
+          argv._.includes(this.#figCompletionCommand)
+        ) {
+          if (this.#exitProcess) setBlocking(true);
+          this.showFigCompletion();
+          this.exit(0);
+          return this[kPostProcess](
+            argv,
+            populateDoubleDash,
+            !!calledFromCommand,
+            false
+          );
         }
       }
 

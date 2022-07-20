@@ -1,5 +1,9 @@
-import {cachedDataVersionTag} from 'v8';
-import {CommandHandler, isCommandBuilderCallback} from './command.js';
+import {
+  CommandHandler,
+  CommandInstance,
+  FrozenCommandInstance,
+  isCommandBuilderCallback,
+} from './command.js';
 import {completionFigTemplate} from './completion-templates.js';
 import {Positional} from './parse-command.js';
 import {
@@ -33,7 +37,7 @@ function toArray<T>(v: T | T[]): T[] {
 
 export class FigCompletion {
   /* The command to run to generate the spec */
-  declare command: string;
+  declare command: string | null;
 
   constructor(
     private readonly yargs: YargsInstance,
@@ -195,7 +199,12 @@ export class FigCompletion {
     if (type === 'boolean' && (!nargs || nargs === 1)) {
       // if option only has one bool argument we consider it as argument less but we add both --opt and --no-opt
       let negatedOption: Fig.Option | undefined = undefined;
-      if (this.yargs.getOptions().configuration['boolean-negation'] ?? true) {
+      if (
+        this.yargs.getInternalMethods().getParserConfiguration()[
+          'boolean-negation'
+        ] ??
+        true
+      ) {
         negatedOption = this.negateOption(mainOption);
         mainOption['exclusiveOn'] = (
           negatedOption.name as NotEmptyArray<string>
@@ -339,16 +348,22 @@ export class FigCompletion {
     return figSubcommands;
   }
 
-  generateCompletionSpec($0: string, command: string): string {
+  generateCompletionSpec($0: string, command: string | null): string {
     this.command = command;
     const template = completionFigTemplate;
     const name = this.shim.path.basename($0);
     const internalMethods = this.yargs.getInternalMethods();
-    const frozenInstance = internalMethods.getCommandInstance().frozens.at(-1);
+    let baseCommandInstance:
+      | CommandInstance
+      | FrozenCommandInstance
+      | undefined = internalMethods.getCommandInstance();
+    if (this.command !== null) {
+      baseCommandInstance = internalMethods.getCommandInstance().frozens.at(-1);
+    }
     const spec: Fig.Spec = {
       name,
     };
-    if (frozenInstance) {
+    if (baseCommandInstance) {
       /* there are two places where commands may be added, under an imported yargs instance
        * e.g. yargs
        *        .command(...)
@@ -358,7 +373,7 @@ export class FigCompletion {
        *          return y.command(...)
        *    }, () => {})
        */
-      const {handlers, aliasMap, defaultCommand} = frozenInstance;
+      const {handlers, aliasMap, defaultCommand} = baseCommandInstance;
       const subcommands = this.generateSubcommands(handlers, aliasMap);
       // All I have to do is to use $0 as base, merge generateFromHandler in it
       if (defaultCommand) {
