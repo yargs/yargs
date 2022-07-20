@@ -10,6 +10,21 @@ import {
 import {UsageInstance} from './usage.js';
 import {YargsInstance, Options, OptionDefinition} from './yargs-factory.js';
 
+type CompactOptionDefinition = Omit<
+  OptionDefinition,
+  | 'boolean'
+  | 'string'
+  | 'number'
+  | 'count'
+  | 'array'
+  | 'describe'
+  | 'description'
+  | 'deprecated'
+  | 'demandOption'
+  | 'require'
+  | 'required'
+>;
+
 function toArray<T>(v: T | T[]): T[] {
   return Array.isArray(v) ? v : [v];
 }
@@ -43,10 +58,32 @@ export class FigCompletion {
     };
   }
 
-  private generateOptionDefinitionsFromOptions(
+  private compactOptionDefinition(
+    def: OptionDefinition
+  ): CompactOptionDefinition {
+    return {
+      ...def,
+      desc: def.desc || def.describe || def.description,
+      type:
+        def.type ||
+        (def.boolean
+          ? 'boolean'
+          : def.count
+          ? 'count'
+          : def.array
+          ? 'array'
+          : def.number
+          ? 'number'
+          : 'string'),
+      demand: def.demand || def.demandOption || def.require || def.required,
+      deprecate: def.deprecate || def.deprecated,
+    };
+  }
+
+  private generateCompactOptionDefinitionsFromOptions(
     y: YargsInstance,
     options: Options
-  ): Dictionary<OptionDefinition> {
+  ): Dictionary<CompactOptionDefinition> {
     const {
       key,
       alias,
@@ -85,13 +122,13 @@ export class FigCompletion {
         number: number.includes(option),
         string: string.includes(option),
       };
-      definitions[option] = definition;
+      definitions[option] = this.compactOptionDefinition(definition);
     }
     return definitions;
   }
 
-  private generateFigOptionsFromOptionDefinitions(
-    definitions: Dictionary<OptionDefinition>,
+  private generateFigOptionsFromCompactOptionDefinitions(
+    definitions: Dictionary<CompactOptionDefinition>,
     excludingPositionals: string[],
     helpOption: string | null,
     versionOption: string | null
@@ -101,7 +138,7 @@ export class FigCompletion {
     for (const [option, definition] of Object.entries(definitions)) {
       if (argNames.has(option)) continue;
       figOptions.push(
-        ...this.generateFigOptionsFromOptionDefinition(
+        ...this.generateFigOptionsFromCompactOptionDefinition(
           option,
           definition,
           option === helpOption || option === versionOption
@@ -111,39 +148,31 @@ export class FigCompletion {
     return figOptions;
   }
 
-  private generateOptionArgs(definition: OptionDefinition): Fig.Arg[] {
-    const {number, string, boolean, array, nargs, choices} = definition;
+  private generateOptionArgs(definition: CompactOptionDefinition): Fig.Arg[] {
+    const {type, nargs, choices} = definition;
     const argCount = typeof nargs !== 'undefined' ? nargs : 1;
     const arg: Fig.Arg = {
-      ...((number || string || boolean) && {
-        name: boolean ? 'boolean' : number ? 'number' : 'string',
-      }),
-      ...(array && typeof nargs !== 'undefined' && {isVariadic: true}),
+      ...(type &&
+        ['number', 'string', 'boolean'].includes(type) && {
+          name: type,
+        }),
+      ...(type === 'array' && argCount === 1 && {isVariadic: true}),
     };
     if (choices) {
       arg.suggestions = toArray(choices);
-    } else if (boolean) {
+    } else if (type === 'boolean') {
       arg.suggestions = ['true', 'false'];
     }
     return Array(argCount).fill(arg);
   }
 
-  private generateFigOptionsFromOptionDefinition(
+  private generateFigOptionsFromCompactOptionDefinition(
     name: string,
-    definition: OptionDefinition,
+    definition: CompactOptionDefinition,
     isHelpOrVersion: boolean
   ): Fig.Option[] {
-    const {
-      demand,
-      require,
-      nargs,
-      boolean,
-      alias,
-      hidden,
-      deprecate,
-      desc,
-      count,
-    } = definition;
+    const {demand, nargs, alias, hidden, deprecate, desc, type, choices} =
+      definition;
     const mainOption: Fig.Option = {
       name: [name, ...toArray(alias ?? [])],
       ...(desc && {
@@ -154,26 +183,36 @@ export class FigCompletion {
         deprecated:
           typeof deprecate === 'string' ? {description: deprecate} : true,
       }),
-      ...(require && {isRequired: true}),
       ...(hidden && {hidden: true}),
-      ...(count && {isRepeatable: true}),
+      ...(type === 'count' && {isRepeatable: true}),
     };
     if (isHelpOrVersion) return [this.prefixOption(mainOption)];
-    if (boolean && (!nargs || nargs === 1)) {
+
+    if (type === 'boolean' && (!nargs || nargs === 1)) {
       // if option only has one bool argument we consider it as argument less but we add both --opt and --no-opt
-      const negatedOption = this.negateOption(mainOption);
-      mainOption['exclusiveOn'] = (
-        negatedOption.name as NotEmptyArray<string>
-      ).slice(0, 1);
+      let negatedOption: Fig.Option | undefined = undefined;
+      if (this.yargs.getOptions().configuration['boolean-negation'] ?? true) {
+        negatedOption = this.negateOption(mainOption);
+        mainOption['exclusiveOn'] = (
+          negatedOption.name as NotEmptyArray<string>
+        ).slice(0, 1);
+      }
       mainOption.args = {
         name: 'boolean',
         suggestions: ['true', 'false'],
         isOptional: true,
       };
-      return [mainOption, negatedOption].map(this.prefixOption);
+      const returnedOptions = [mainOption];
+      if (negatedOption) returnedOptions.push(negatedOption);
+      return returnedOptions.map(this.prefixOption);
     }
-    const {array, string, number, choices} = definition;
-    if (nargs || [array, string, number, choices].some(v => !!v)) {
+
+    if (
+      nargs ||
+      choices ||
+      (definition.type &&
+        ['array', 'string', 'number'].includes(definition.type))
+    ) {
       // then we have at least one argument
       mainOption.args = this.generateOptionArgs(definition);
     }
@@ -192,7 +231,7 @@ export class FigCompletion {
   private generateCommandArgs(
     demanded: Positional[],
     optional: Positional[],
-    options?: Dictionary<OptionDefinition>
+    options?: Dictionary<CompactOptionDefinition>
   ): Fig.Arg[] {
     const allPositionals = [...demanded, ...optional];
     const figArgs: Fig.Arg[] = [];
@@ -237,16 +276,14 @@ export class FigCompletion {
       builder(y, true);
       const internalMethods = y.getInternalMethods();
       const subcommandInstance = internalMethods.getCommandInstance();
-      const optionDefinitions = this.generateOptionDefinitionsFromOptions(
-        y,
-        y.getOptions()
-      );
+      const optionDefinitions =
+        this.generateCompactOptionDefinitionsFromOptions(y, y.getOptions());
       Object.assign(figCommand, {
         subcommands: this.generateSubcommands(
           subcommandInstance.handlers,
           subcommandInstance.aliasMap
         ),
-        options: this.generateFigOptionsFromOptionDefinitions(
+        options: this.generateFigOptionsFromCompactOptionDefinitions(
           optionDefinitions,
           y.getGroups()[this.usage.getPositionalGroupName()],
           internalMethods.getHelpOpt(),
@@ -260,11 +297,11 @@ export class FigCompletion {
       }
     } else {
       const figOptions: Fig.Option[] = [];
-      for (const [option, properties] of Object.entries(builder)) {
+      for (const [option, optionDefinition] of Object.entries(builder)) {
         figOptions.push(
-          ...this.generateFigOptionsFromOptionDefinition(
+          ...this.generateFigOptionsFromCompactOptionDefinition(
             option,
-            properties,
+            this.compactOptionDefinition(optionDefinition),
             false
           )
         );
