@@ -450,26 +450,44 @@ describe('FigCompletion', () => {
       ]);
   });
 
-  it('Options added under default builder and under default yargs instance', () => {
+  it('CLI 2', () => {
     const o = checkOutput(() =>
       yargs('generate-fig-spec')
+        .scriptName('area')
         .command(
-          '$0 [bar]',
-          'Do something',
-          yargs => {
-            return yargs.option('other-opt', {
-              default: 1,
-              nargs: 3,
-              type: 'number',
-            });
+          '$0',
+          '',
+          y => {
+            return y
+              .usage('Usage: $0 -w num -h num')
+              .example(
+                '$0 -w 5 -h 6',
+                'Returns the area (30) by multiplying the width with the height.'
+              )
+              .option('w', {
+                alias: 'width',
+                describe: 'The width of the area.',
+                demandOption: 'The width is required.',
+                type: 'number',
+                nargs: 1,
+              })
+              .option('h', {
+                alias: 'height',
+                describe: 'The height of the area.',
+                demandOption: 'The height is required.',
+                type: 'number',
+                nargs: 1,
+              })
+              .demand(['w', 'h'])
+              .describe('help', 'Show help.')
+              .describe('version', 'Show version number.')
+              .epilog('copyright 2019');
           },
           () => {}
         )
-        .option('opt', {default: 'foo', nargs: 3, type: 'string'})
         .figCompletion()
         .parse()
     );
-    console.log(o);
     o.exitCode.should.equal(0);
     o.errors.length.should.equal(0);
     o.logs[0]
@@ -479,60 +497,67 @@ describe('FigCompletion', () => {
         '',
         'const completionSpec: Fig.Spec = {',
         '  "name": [',
-        '    "usage"',
+        '    "area"',
         '  ],',
-        '  "description": "Do something",',
         '  "subcommands": [],',
         '  "options": [',
         '    {',
         '      "name": [',
         '        "--help"',
         '      ],',
-        '      "description": "Show help"',
+        '      "description": "Show help."',
         '    },',
         '    {',
         '      "name": [',
         '        "--version"',
         '      ],',
-        '      "description": "Show version number"',
+        '      "description": "Show version number."',
         '    },',
         '    {',
         '      "name": [',
-        '        "--opt"',
+        '        "-w",',
+        '        "--width"',
         '      ],',
+        '      "description": "The width of the area.",',
+        '      "isRequired": true,',
         '      "args": [',
         '        {',
-        '          "name": "string"',
-        '        },',
-        '        {',
-        '          "name": "string"',
-        '        },',
-        '        {',
-        '          "name": "string"',
+        '          "name": "number"',
         '        }',
         '      ]',
         '    },',
         '    {',
         '      "name": [',
-        '        "--other-opt"',
+        '        "--width"',
         '      ],',
         '      "args": [',
         '        {',
         '          "name": "number"',
-        '        },',
-        '        {',
-        '          "name": "number"',
-        '        },',
+        '        }',
+        '      ]',
+        '    },',
+        '    {',
+        '      "name": [',
+        '        "-h",',
+        '        "--height"',
+        '      ],',
+        '      "description": "The height of the area.",',
+        '      "isRequired": true,',
+        '      "args": [',
         '        {',
         '          "name": "number"',
         '        }',
         '      ]',
-        '    }',
-        '  ],',
-        '  "args": [',
+        '    },',
         '    {',
-        '      "name": "bar",',
-        '      "isOptional": true',
+        '      "name": [',
+        '        "--height"',
+        '      ],',
+        '      "args": [',
+        '        {',
+        '          "name": "number"',
+        '        }',
+        '      ]',
         '    }',
         '  ]',
         '};',
