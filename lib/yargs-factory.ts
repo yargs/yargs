@@ -2151,14 +2151,9 @@ export class YargsInstance {
           argv._.includes(this.#figCompletionCommand)
         ) {
           if (this.#exitProcess) setBlocking(true);
+          skipValidation = true;
           this.showFigCompletion();
           this.exit(0);
-          return this[kPostProcess](
-            argv,
-            populateDoubleDash,
-            !!calledFromCommand,
-            false
-          );
         }
       }
 

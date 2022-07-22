@@ -285,7 +285,7 @@ describe('FigCompletion', () => {
 
   // TODO: this is not working properly
   it('.figCompletion() should not print parent commands when nested', () => {
-    const o = checkOutput(() =>
+    const o = checkOutput(() => {
       yargs('cmd1 cmd2 generate-fig-spec')
         .command(
           '$0',
@@ -311,8 +311,8 @@ describe('FigCompletion', () => {
           },
           () => {}
         )
-        .parse()
-    );
+        .parse();
+    });
     o.exitCode.should.equal(0);
     o.errors.length.should.equal(0);
     o.logs[0]
@@ -322,7 +322,7 @@ describe('FigCompletion', () => {
         '',
         'const completionSpec: Fig.Spec = {',
         '  "name": [',
-        '    "usage"',
+        '    "cli.js"',
         '  ],',
         '  "description": "Won\'t get printed",',
         '  "subcommands": [',
@@ -520,11 +520,11 @@ describe('FigCompletion', () => {
       ]);
   });
 
-  it('cli 1', () => {
+  it('it should work with * as main command', () => {
     const o = checkOutput(() =>
       yargs('generate-fig-spec')
         .command(
-          '$0 [foo]',
+          '* [foo]',
           'Do something',
           y => {
             return y
@@ -760,38 +760,40 @@ describe('FigCompletion', () => {
       ]);
   });
 
-  it('cli 2', () => {
+  it('it should support async builders', () => {
     const o = checkOutput(() =>
       yargs('generate-fig-spec')
         .scriptName('area')
         .command(
           '$0',
           '',
-          y => {
-            return y
-              .usage('Usage: $0 -w num -h num')
-              .example(
-                '$0 -w 5 -h 6',
-                'Returns the area (30) by multiplying the width with the height.'
-              )
-              .option('w', {
-                alias: 'width',
-                describe: 'The width of the area.',
-                demandOption: 'The width is required.',
-                type: 'number',
-                nargs: 1,
-              })
-              .option('h', {
-                alias: 'height',
-                describe: 'The height of the area.',
-                demandOption: 'The height is required.',
-                type: 'number',
-                nargs: 1,
-              })
-              .demand(['w', 'h'])
-              .describe('help', 'Show help.')
-              .describe('version', 'Show version number.')
-              .epilog('copyright 2019');
+          async y => {
+            return Promise.resolve(
+              y
+                .usage('Usage: $0 -w num -h num')
+                .example(
+                  '$0 -w 5 -h 6',
+                  'Returns the area (30) by multiplying the width with the height.'
+                )
+                .option('w', {
+                  alias: 'width',
+                  describe: 'The width of the area.',
+                  demandOption: 'The width is required.',
+                  type: 'number',
+                  nargs: 1,
+                })
+                .option('h', {
+                  alias: 'height',
+                  describe: 'The height of the area.',
+                  demandOption: 'The height is required.',
+                  type: 'number',
+                  nargs: 1,
+                })
+                .demand(['w', 'h'])
+                .describe('help', 'Show help.')
+                .describe('version', 'Show version number.')
+                .epilog('copyright 2019')
+            );
           },
           () => {}
         )
@@ -912,7 +914,6 @@ describe('FigCompletion', () => {
         .figCompletion()
         .parse()
     );
-    console.log(o);
     o.exitCode.should.equal(0);
     o.errors.length.should.equal(0);
     o.logs[0]
