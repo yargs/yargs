@@ -322,7 +322,7 @@ describe('FigCompletion', () => {
         '',
         'const completionSpec: Fig.Spec = {',
         '  "name": [',
-        '    "cli.js"',
+        '    "usage"',
         '  ],',
         '  "description": "Won\'t get printed",',
         '  "subcommands": [',

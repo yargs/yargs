@@ -358,7 +358,8 @@ export class FigCompletion {
       | FrozenCommandInstance
       | undefined = internalMethods.getCommandInstance();
     if (this.command !== null) {
-      baseCommandInstance = internalMethods.getCommandInstance().frozens.at(-1);
+      const {frozens} = internalMethods.getCommandInstance();
+      baseCommandInstance = frozens[frozens.length - 1];
     }
     const spec: Fig.Spec = {
       name,
