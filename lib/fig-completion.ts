@@ -84,10 +84,17 @@ export class FigCompletion {
     };
   }
 
-  private generateCompactOptionDefinitionsFromOptions(
-    y: YargsInstance,
-    options: Options
+  private generateCompactOptionDefinitionsFromInstance(
+    y: YargsInstance
   ): Dictionary<CompactOptionDefinition> {
+    const options = y.getOptions();
+    // aliased options get added later to the fig option
+    const aliases = new Set(
+      Object.values(options.alias).reduce<string[]>(
+        (p, c) => [...p, ...toArray(c)],
+        []
+      )
+    );
     const {
       key,
       alias,
@@ -111,6 +118,7 @@ export class FigCompletion {
 
     const definitions: Dictionary<OptionDefinition> = {};
     for (const option of Object.keys(key)) {
+      if (aliases.has(option)) continue;
       const definition: OptionDefinition = {
         alias: alias[option],
         desc: descriptions[option],
@@ -290,7 +298,7 @@ export class FigCompletion {
       const internalMethods = y.getInternalMethods();
       const subcommandInstance = internalMethods.getCommandInstance();
       const optionDefinitions =
-        this.generateCompactOptionDefinitionsFromOptions(y, y.getOptions());
+        this.generateCompactOptionDefinitionsFromInstance(y);
       Object.assign(figCommand, {
         subcommands: this.generateSubcommands(
           subcommandInstance.handlers,
@@ -375,13 +383,23 @@ export class FigCompletion {
        *    }, () => {})
        */
       const {handlers, aliasMap, defaultCommand} = baseCommandInstance;
+      const optionDefinitions =
+        this.generateCompactOptionDefinitionsFromInstance(this.yargs);
       const subcommands = this.generateSubcommands(handlers, aliasMap);
-      // All I have to do is to use $0 as base, merge generateFromHandler in it
       if (defaultCommand) {
         Object.assign(
           spec,
           this.generateCommandFromHandler([name], defaultCommand)
         );
+      } else {
+        const options = this.generateFigOptionsFromCompactOptionDefinitions(
+          optionDefinitions,
+          [],
+          internalMethods.getHelpOpt(),
+          internalMethods.getVersionOpt()
+        );
+        spec.options = options;
+        spec.subcommands = subcommands;
       }
       if (spec.subcommands) {
         spec.subcommands.push(...subcommands);
