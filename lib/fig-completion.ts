@@ -33,8 +33,6 @@ function toArray<T>(v: T | T[]): T[] {
   return Array.isArray(v) ? v : [v];
 }
 
-// TODO(fedeci): implement implies and conflicts support
-
 export class FigCompletion {
   /* The command to run to generate the spec */
   declare command: string | null;
@@ -51,15 +49,21 @@ export class FigCompletion {
       ...base,
       name: toArray(base.name).map(prefixer),
       exclusiveOn: base.exclusiveOn?.map(prefixer),
+      dependsOn: base.dependsOn?.map(prefixer),
     };
   }
 
   private negateOption(base: Fig.Option): Fig.Option {
-    return {
+    const negated = {
       ...base,
       name: toArray(base.name).map(v => (v.length > 1 ? `no-${v}` : v)),
-      exclusiveOn: [(base.name as NotEmptyArray<string>)[0]],
     };
+    negated.exclusiveOn = [
+      ...(negated.exclusiveOn ?? []),
+      (base.name as NotEmptyArray<string>)[0],
+    ];
+
+    return negated;
   }
 
   private compactOptionDefinition(
@@ -111,6 +115,10 @@ export class FigCompletion {
       string,
     } = options;
 
+    const validation = y.getInternalMethods().getValidationInstance();
+    const conflicting = validation.getConflicting();
+    const implied = validation.getImplied();
+
     const descriptions = y
       .getInternalMethods()
       .getUsageInstance()
@@ -137,6 +145,10 @@ export class FigCompletion {
         hidden: hiddenOptions.includes(option),
         number: number.includes(option),
         string: string.includes(option),
+        implies: implied[option] ?? [],
+        conflicts: (conflicting[option] ?? []).filter(
+          (v): v is string => v !== undefined
+        ),
       };
       definitions[option] = this.compactOptionDefinition(definition);
     }
@@ -157,7 +169,8 @@ export class FigCompletion {
         ...this.generateFigOptionsFromCompactOptionDefinition(
           option,
           definition,
-          option === helpOption || option === versionOption
+          option === helpOption || option === versionOption,
+          argNames
         )
       );
     }
@@ -185,10 +198,26 @@ export class FigCompletion {
   private generateFigOptionsFromCompactOptionDefinition(
     name: string,
     definition: CompactOptionDefinition,
-    isHelpOrVersion: boolean
+    isHelpOrVersion: boolean,
+    argNames: Set<string>
   ): Fig.Option[] {
-    const {demand, nargs, alias, hidden, deprecate, desc, type, choices} =
-      definition;
+    const {
+      demand,
+      nargs,
+      alias,
+      hidden,
+      deprecate,
+      desc,
+      type,
+      choices,
+      implies,
+      conflicts,
+    } = definition;
+
+    const conflicting = toArray(conflicts ?? []).filter(v => !argNames.has(v));
+    const implied = toArray(implies ?? []).filter(
+      (v): v is string => typeof v !== 'number' && !argNames.has(v)
+    );
     const mainOption: Fig.Option = {
       name: [name, ...toArray(alias ?? [])],
       ...(desc && {
@@ -201,6 +230,8 @@ export class FigCompletion {
       }),
       ...(hidden && {hidden: true}),
       ...(type === 'count' && {isRepeatable: true}),
+      ...(conflicting.length && {exclusiveOn: conflicting}),
+      ...(implied.length && {dependsOn: implied}),
     };
     if (isHelpOrVersion) return [this.prefixOption(mainOption)];
 
@@ -214,9 +245,12 @@ export class FigCompletion {
         true
       ) {
         negatedOption = this.negateOption(mainOption);
-        mainOption['exclusiveOn'] = (
-          negatedOption.name as NotEmptyArray<string>
-        ).slice(0, 1);
+        if (!mainOption.exclusiveOn) {
+          mainOption.exclusiveOn = [];
+        }
+        mainOption.exclusiveOn.push(
+          (negatedOption.name as NotEmptyArray<string>)[0]
+        );
       }
       mainOption.args = {
         name: 'boolean',
@@ -323,7 +357,8 @@ export class FigCompletion {
           ...this.generateFigOptionsFromCompactOptionDefinition(
             option,
             this.compactOptionDefinition(optionDefinition),
-            false
+            false,
+            new Set()
           )
         );
       }
@@ -399,7 +434,6 @@ export class FigCompletion {
           internalMethods.getVersionOpt()
         );
         spec.options = options;
-        spec.subcommands = subcommands;
       }
       if (spec.subcommands) {
         spec.subcommands.push(...subcommands);
