@@ -91,7 +91,7 @@ export default {
       }
     },
     exit: Deno.exit,
-    nextTick: window.queueMicrotask,
+    nextTick: globalThis.queueMicrotask,
     stdColumns: columns ?? null,
   },
   readFileSync: Deno.readTextFileSync,
