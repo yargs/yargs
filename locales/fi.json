@@ -30,7 +30,7 @@
     "other": "Pakollisia argumentteja puuttuu: %s"
   },
   "Unknown argument: %s": {
-    "one": "Tuntematon argumenttn: %s",
+    "one": "Tuntematon argumentti: %s",
     "other": "Tuntemattomia argumentteja: %s"
   },
   "Invalid values:": "Virheelliset arvot:",
