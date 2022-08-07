@@ -12,7 +12,7 @@ import {
   PlatformShim,
 } from './typings/common-types.js';
 import {UsageInstance} from './usage.js';
-import {YargsInstance, Options, OptionDefinition} from './yargs-factory.js';
+import {YargsInstance, OptionDefinition} from './yargs-factory.js';
 
 type CompactOptionDefinition = Omit<
   OptionDefinition,
@@ -56,7 +56,7 @@ export class FigCompletion {
   private negateOption(base: Fig.Option): Fig.Option {
     const negated = {
       ...base,
-      name: toArray(base.name).map(v => (v.length > 1 ? `no-${v}` : v)),
+      name: toArray(base.name).map(v => `no-${v}`),
     };
     negated.exclusiveOn = [
       ...(negated.exclusiveOn ?? []),
