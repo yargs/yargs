@@ -136,9 +136,7 @@ export class FigCompletion {
         choices: choices[option],
         count: count.includes(option),
         default: defaultValue[option],
-        demand: Object.keys(demandedOptions).includes(option)
-          ? demandedOptions[option] ?? true
-          : undefined,
+        demand: Object.keys(demandedOptions).includes(option) || undefined,
         deprecate: Object.keys(deprecatedOptions).includes(option)
           ? deprecatedOptions[option] ?? true
           : undefined,
