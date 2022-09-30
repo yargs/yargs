@@ -61,7 +61,7 @@ export function assertSingleKey(
 /**
  * Typing wrapper around Object.keys()
  */
-export function objectKeys<T>(object: T) {
+export function objectKeys<T extends object>(object: T) {
   return Object.keys(object) as (keyof T)[];
 }
 
