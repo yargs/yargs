@@ -80,7 +80,7 @@
     "rollup": "^2.23.0",
     "rollup-plugin-cleanup": "^3.1.1",
     "rollup-plugin-terser": "^7.0.2",
-    "rollup-plugin-ts": "^2.0.4",
+    "rollup-plugin-ts": "^3.0.0",
     "typescript": "^4.0.2",
     "which": "^2.0.0",
     "yargs-test-extends": "^1.0.1"
