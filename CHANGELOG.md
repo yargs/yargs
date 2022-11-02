@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [17.6.1](https://github.com/yargs/yargs/compare/v17.6.0...v17.6.1) (2022-11-02)
+
+
+### Bug Fixes
+
+* **lang:** fix "Not enough non-option arguments" message for the Czech language ([#2242](https://github.com/yargs/yargs/issues/2242)) ([3987b13](https://github.com/yargs/yargs/commit/3987b13e31f669d79836cc6ed84105e9be0f9482))
+
 ## [17.6.0](https://github.com/yargs/yargs/compare/v17.5.1...v17.6.0) (2022-10-01)
 
 
