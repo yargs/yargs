@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [17.6.2](https://github.com/yargs/yargs/compare/v17.6.1...v17.6.2) (2022-11-03)
+
+
+### Bug Fixes
+
+* **deps:** update dependency yargs-parser to v21.1.1 ([#2231](https://github.com/yargs/yargs/issues/2231)) ([75b4d52](https://github.com/yargs/yargs/commit/75b4d5222f8f0152790b9ca0718fa5314c9a1c6b))
+* **lang:** typo in Finnish unknown argument singular form ([#2222](https://github.com/yargs/yargs/issues/2222)) ([a6dfd0a](https://github.com/yargs/yargs/commit/a6dfd0a8f7f2c58a2e8b7dde0142cc1a12c4e027))
+
 ## [17.6.1](https://github.com/yargs/yargs/compare/v17.6.0...v17.6.1) (2022-11-02)
 
 
