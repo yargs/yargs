@@ -1055,6 +1055,27 @@ describe('Completion', () => {
       r.logs.should.include('--help:Show help');
     });
 
+    it('completes options and alias with the same description', () => {
+      process.env.SHELL = '/bin/zsh';
+      const r = checkUsage(
+        () =>
+          yargs(['./completion', '--get-yargs-completions', '-'])
+            .options({
+              foo: {describe: 'Foo option', alias: 'f', type: 'string'},
+              bar: {describe: 'Bar option', alias: 'b', type: 'string'},
+            })
+            .help(false)
+            .version(false)
+            .completion().argv
+      );
+
+      r.logs.should.have.length(4);
+      r.logs.should.include('--foo:Foo option');
+      r.logs.should.include('-f:Foo option');
+      r.logs.should.include('--bar:Bar option');
+      r.logs.should.include('-b:Bar option');
+    });
+
     it('replaces application variable with $0 in script', () => {
       process.env.SHELL = '/bin/zsh';
       const r = checkUsage(() => yargs([]).showCompletionScript(), ['ndm']);
