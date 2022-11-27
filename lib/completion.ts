@@ -261,7 +261,9 @@ export class Completion implements CompletionInstance {
       const desc = descs[key] || '';
       completions.push(
         dashes +
-          `${key.replace(/:/g, '\\:')}:${desc.replace('__yargsString__:', '')}`
+          `${key.replace(/:/g, '\\:')}:${desc
+            .replace('__yargsString__:', '')
+            .replace(/(\r\n|\n|\r)/gm, ' ')}`
       );
     }
   }
