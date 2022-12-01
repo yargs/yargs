@@ -1062,18 +1062,19 @@ describe('Completion', () => {
           yargs(['./completion', '--get-yargs-completions', '-'])
             .options({
               foo: {describe: 'Foo option', alias: 'f', type: 'string'},
-              bar: {describe: 'Bar option', alias: 'b', type: 'string'},
+              bar: {describe: 'Bar option', alias: ['b', 'B'], type: 'string'},
             })
             .help(false)
             .version(false)
             .completion().argv
       );
 
-      r.logs.should.have.length(4);
+      r.logs.should.have.length(5);
       r.logs.should.include('--foo:Foo option');
       r.logs.should.include('-f:Foo option');
       r.logs.should.include('--bar:Bar option');
       r.logs.should.include('-b:Bar option');
+      r.logs.should.include('-B:Bar option');
     });
 
     it('replaces application variable with $0 in script', () => {

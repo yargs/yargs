@@ -258,7 +258,10 @@ export class Completion implements CompletionInstance {
     if (!this.zshShell) {
       completions.push(dashes + key);
     } else {
-      const aliasKey = this?.aliases?.[key]?.[0];
+      const aliasKey = this?.aliases?.[key].find(alias => {
+        const desc = descs[alias];
+        return typeof desc === 'string' && desc.length > 0;
+      });
       const descFromAlias = aliasKey ? descs[aliasKey] : undefined;
       const desc = descs[key] ?? descFromAlias ?? '';
       completions.push(
