@@ -18,12 +18,16 @@ type CompletionCallback = (
 /** Instance of the completion module. */
 export interface CompletionInstance {
   completionKey: string;
+
   generateCompletionScript($0: string, cmd: string): string;
+
   getCompletion(
     args: string[],
     done: (err: Error | null, completions: string[] | undefined) => void
   ): any;
+
   registerFunction(fn: CompletionFunction): void;
+
   setParsed(parsed: DetailedArguments): void;
 }
 
@@ -34,6 +38,8 @@ export class Completion implements CompletionInstance {
   private customCompletionFunction: CompletionFunction | null = null;
   private indexAfterLastReset = 0;
   private readonly zshShell: boolean;
+  private readonly fishShell: boolean;
+  private readonly bashShell: boolean;
 
   constructor(
     private readonly yargs: YargsInstance,
@@ -45,6 +51,10 @@ export class Completion implements CompletionInstance {
       (this.shim.getEnv('SHELL')?.includes('zsh') ||
         this.shim.getEnv('ZSH_NAME')?.includes('zsh')) ??
       false;
+    this.fishShell = this.shim.getEnv('SHELL')?.includes('fish') ?? false;
+    this.bashShell =
+      this.shim.getEnv('SHELL')?.includes('bash') ??
+      (!this.zshShell && !this.fishShell);
   }
 
   private defaultCompletion(
@@ -92,8 +102,11 @@ export class Completion implements CompletionInstance {
       this.usage.getCommands().forEach(usageCommand => {
         const commandName = parseCommand(usageCommand[0]).cmd;
         if (args.indexOf(commandName) === -1) {
-          if (!this.zshShell) {
+          if (this.bashShell) {
             completions.push(commandName);
+          } else if (this.fishShell) {
+            const desc = usageCommand[1] || '';
+            completions.push(commandName.replace(/:/g, '\\:') + '\t' + desc);
           } else {
             const desc = usageCommand[1] || '';
             completions.push(commandName.replace(/:/g, '\\:') + ':' + desc);
@@ -107,7 +120,7 @@ export class Completion implements CompletionInstance {
   private optionCompletions(
     completions: string[],
     args: string[],
-    argv: Arguments,
+    _argv: Arguments,
     current: string
   ) {
     if (
@@ -119,7 +132,7 @@ export class Completion implements CompletionInstance {
         this.yargs.getGroups()[this.usage.getPositionalGroupName()] || [];
 
       Object.keys(options.key).forEach(key => {
-        const negable =
+        const negatable =
           !!options.configuration['boolean-negation'] &&
           options.boolean.includes(key);
         const isPositionalKey = positionalKeys.includes(key);
@@ -128,11 +141,12 @@ export class Completion implements CompletionInstance {
         if (
           !isPositionalKey &&
           !options.hiddenOptions.includes(key) &&
-          !this.argsContainKey(args, key, negable)
+          !this.argsContainKey(args, key, negatable)
         ) {
           this.completeOptionKey(key, completions, current);
-          if (negable && !!options.default[key])
+          if (negatable && !!options.default[key]) {
             this.completeOptionKey(`no-${key}`, completions, current);
+          }
         }
       });
     }
@@ -188,7 +202,9 @@ export class Completion implements CompletionInstance {
   }
 
   private getPreviousArgChoices(args: string[]): string[] | void {
-    if (args.length < 1) return; // no args
+    if (args.length < 1) {
+      return;
+    } // no args
     let previousArg = args[args.length - 1];
     let filter = '';
     // use second to last argument if the last one is not an option starting with --
@@ -196,7 +212,9 @@ export class Completion implements CompletionInstance {
       filter = previousArg; // use last arg as filter for choices
       previousArg = args[args.length - 2];
     }
-    if (!previousArg.startsWith('-')) return; // still no valid arg, abort
+    if (!previousArg.startsWith('-')) {
+      return;
+    } // still no valid arg, abort
     const previousArgKey = previousArg.replace(/^-+/, '');
 
     const options = this.yargs.getOptions();
@@ -230,15 +248,21 @@ export class Completion implements CompletionInstance {
   private argsContainKey(
     args: string[],
     key: string,
-    negable: boolean
+    negatable: boolean
   ): boolean {
     const argsContains = (s: string) =>
       args.indexOf((/^[^0-9]$/.test(s) ? '-' : '--') + s) !== -1;
-    if (argsContains(key)) return true;
-    if (negable && argsContains(`no-${key}`)) return true;
+    if (argsContains(key)) {
+      return true;
+    }
+    if (negatable && argsContains(`no-${key}`)) {
+      return true;
+    }
     if (this.aliases) {
       for (const alias of this.aliases[key]) {
-        if (argsContains(alias)) return true;
+        if (argsContains(alias)) {
+          return true;
+        }
       }
     }
     return false;
@@ -255,8 +279,14 @@ export class Completion implements CompletionInstance {
     const isShortOption = (s: string) => /^[^0-9]$/.test(s);
     const dashes =
       !startsByTwoDashes(current) && isShortOption(key) ? '-' : '--';
-    if (!this.zshShell) {
+    if (this.bashShell) {
       completions.push(dashes + key);
+    } else if (this.fishShell) {
+      const desc = descs[key] || '';
+      completions.push(
+        dashes +
+          `${key.replace(/:/g, '\\:')}\t${desc.replace('__yargsString__:', '')}`
+      );
     } else {
       const desc = descs[key] || '';
       completions.push(
@@ -333,17 +363,22 @@ export class Completion implements CompletionInstance {
 
   // generate the completion script to add to your .bashrc.
   generateCompletionScript($0: string, cmd: string): string {
-    let script = this.zshShell
+    const script = this.zshShell
       ? templates.completionZshTemplate
+      : this.fishShell
+      ? templates.completionFishTemplate
       : templates.completionShTemplate;
     const name = this.shim.path.basename($0);
 
     // add ./ to applications not yet installed as bin.
-    if ($0.match(/\.js$/)) $0 = `./${$0}`;
+    if ($0.match(/\.js$/)) {
+      $0 = `./${$0}`;
+    }
 
-    script = script.replace(/{{app_name}}/g, name);
-    script = script.replace(/{{completion_command}}/g, cmd);
-    return script.replace(/{{app_path}}/g, $0);
+    return script
+      .replace(/{{app_name}}/g, name)
+      .replace(/{{completion_command}}/g, cmd)
+      .replace(/{{app_path}}/g, $0);
   }
 
   // register a function to perform your own custom
