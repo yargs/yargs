@@ -55,8 +55,14 @@ export const completionFishTemplate = `### {{app_name}} completion - begin. gene
 # Installation: {{app_name}} {{completion_command}} >> ~/.config/fish/config.fish.
 #
 function _{{app_name}}_yargs_completion
-  set -l cmdCurrent (commandline -pt) (commandline -pb)
-  {{app_name}} --get-yargs-completions "$cmdCurrent"
+  set cmd (commandline -b)
+  for arg in (string split " " $cmd)
+      set -a args "'$arg'"
+  end
+  set completions (eval {{app_name}} --get-yargs-completions $args)
+  for completion in $completions
+    echo -e $completion
+  end
 end
 complete -f -c {{app_name}} -a '(_{{app_name}}_yargs_completion)'
 ### {{app_name}} completion - end ###
