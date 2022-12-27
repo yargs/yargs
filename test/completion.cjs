@@ -1055,7 +1055,7 @@ describe('Completion', () => {
       r.logs.should.include('--help:Show help');
     });
 
-    it('completes options and alias with the same description', () => {
+    it('completes options and aliases with the same description', () => {
       process.env.SHELL = '/bin/zsh';
       const r = checkUsage(
         () =>
