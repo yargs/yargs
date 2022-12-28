@@ -121,6 +121,23 @@ interface Arguments {
 }
 ```
 
+If you need to use [`.wrap()`](https://yargs.js.org/docs/#api-reference-wrapcolumns) with `.terminalWidth()`, you may need to create instance first:
+
+```ts
+import yargs from 'yargs';
+import { hideBin } from 'yargs/helpers';
+
+// ...
+
+const yargsInstance = yargs(hideBin(process.argv));
+
+cosnt args = yargsInstance
+  .wrap(myYargs.terminalWidth())
+  // .otherMethods(...)
+  .argv
+  
+```
+
 # More specific typing for choices()
 
 To improve the `choices` option typing you can also specify it as const:

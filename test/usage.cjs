@@ -1912,7 +1912,16 @@ describe('usage tests', () => {
 
       // the long description should cause several line
       // breaks when wrapped.
-      r.errors[0].split('\n').length.should.gte(4);
+      r.errors[0].split('\n').length.should.gte(5);
+    });
+
+    it('should not wrap when YARGS_DISABLED_WRAP is provided', () => {
+      const yargsInstance = yargs().wrap(99);
+      process.env.YARGS_DISABLE_WRAP = 'true';
+      expect(
+        yargsInstance.getInternalMethods().getUsageInstance().getWrap()
+      ).to.equal(null);
+      delete process.env.YARGS_DISABLE_WRAP;
     });
 
     it('should not raise an exception when long default and description are provided', () =>
@@ -4877,5 +4886,24 @@ describe('usage tests', () => {
           '  -o, --opt1     A long description that might break formatting',
         ]);
     });
+  });
+
+  // https://github.com/yargs/yargs/issues/2169
+  it('allows multiple option calls to not clobber description', () => {
+    const r = checkUsage(() =>
+      yargs('--help')
+        .options({
+          arg: {desc: 'Old description', type: 'string', default: 'old'},
+        })
+        .options({arg: {default: 'new'}})
+        .wrap(null)
+        .parse()
+    );
+    r.logs[0]
+      .split('\n')
+      .slice(-1)[0]
+      .replace(/\s+/g, ' ')
+      .trim()
+      .should.equal('--arg Old description [string] [default: "new"]');
   });
 });

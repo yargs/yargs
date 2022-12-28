@@ -5,6 +5,9 @@ on:
   pull_request:
     types: [ assigned, opened, synchronize, reopened, labeled ]
 name: ci
+permissions:
+  contents: read # to fetch code (actions/checkout)
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -16,7 +19,7 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node }}
-      - run: npm install -g npm@latest
+      - run: npm install -g npm@7
       - run: node --version
       - run: npm install --engine-strict
       - run: npm test
@@ -27,7 +30,7 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: 12
-      - run: npm install -g npm@latest
+      - run: npm install -g npm@7
       - run: npm install
       - run: npm test
   esm:
@@ -40,7 +43,7 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node }}
-      - run: npm install -g npm@latest
+      - run: npm install -g npm@7
       - run: node --version
       - run: npm install --engine-strict
       - run: npm run test:esm
@@ -51,7 +54,7 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: 14
-      - run: npm install -g npm@latest
+      - run: npm install -g npm@7
       - run: npm install
       - run: npm run compile
       - uses: denoland/setup-deno@v1
@@ -67,7 +70,7 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: 15
-      - run: npm install -g npm@latest
+      - run: npm install -g npm@7
       - run: npm install
       - run: npm test
       - run: npm run coverage

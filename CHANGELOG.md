@@ -2,6 +2,37 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [17.6.2](https://github.com/yargs/yargs/compare/v17.6.1...v17.6.2) (2022-11-03)
+
+
+### Bug Fixes
+
+* **deps:** update dependency yargs-parser to v21.1.1 ([#2231](https://github.com/yargs/yargs/issues/2231)) ([75b4d52](https://github.com/yargs/yargs/commit/75b4d5222f8f0152790b9ca0718fa5314c9a1c6b))
+* **lang:** typo in Finnish unknown argument singular form ([#2222](https://github.com/yargs/yargs/issues/2222)) ([a6dfd0a](https://github.com/yargs/yargs/commit/a6dfd0a8f7f2c58a2e8b7dde0142cc1a12c4e027))
+
+## [17.6.1](https://github.com/yargs/yargs/compare/v17.6.0...v17.6.1) (2022-11-02)
+
+
+### Bug Fixes
+
+* **lang:** fix "Not enough non-option arguments" message for the Czech language ([#2242](https://github.com/yargs/yargs/issues/2242)) ([3987b13](https://github.com/yargs/yargs/commit/3987b13e31f669d79836cc6ed84105e9be0f9482))
+
+## [17.6.0](https://github.com/yargs/yargs/compare/v17.5.1...v17.6.0) (2022-10-01)
+
+
+### Features
+
+* **lang:** Czech locale ([#2220](https://github.com/yargs/yargs/issues/2220)) ([5895cf1](https://github.com/yargs/yargs/commit/5895cf1ba1dcd5158d284d0c589f5f0caff8b739))
+* **usage:** add YARGS_DISABLE_WRAP env variable to disable wrap ([#2210](https://github.com/yargs/yargs/issues/2210)) ([b680ace](https://github.com/yargs/yargs/commit/b680ace2994dcf14d1a1a928aefd3fe8006b2198))
+
+
+### Bug Fixes
+
+* **deno:** use 'globalThis' instead of 'window' ([#2186](https://github.com/yargs/yargs/issues/2186)) ([#2215](https://github.com/yargs/yargs/issues/2215)) ([561fc7a](https://github.com/yargs/yargs/commit/561fc7a787228b226e0ba76ab674456cbd30cd37))
+* **deps:** cliui with forced strip-ansi update ([#2241](https://github.com/yargs/yargs/issues/2241)) ([38e8df1](https://github.com/yargs/yargs/commit/38e8df10f0f020ae794329610354521f8458fc41))
+* dont clobber description for multiple option calls ([#2171](https://github.com/yargs/yargs/issues/2171)) ([f91d9b3](https://github.com/yargs/yargs/commit/f91d9b334ad9cfce79a89c08ff210c622b7c528f))
+* **typescript:** address warning with objectKeys ([394f5f8](https://github.com/yargs/yargs/commit/394f5f86d15a9bb319276518d36cb560d7cb6322))
+
 ### [17.5.1](https://github.com/yargs/yargs/compare/v17.5.0...v17.5.1) (2022-05-16)
 
 
@@ -269,4 +300,4 @@ All notable changes to this project will be documented in this file. See [standa
 
 * **yargs:** add missing command(module) signature ([#1707](https://www.github.com/yargs/yargs/issues/1707)) ([0f81024](https://www.github.com/yargs/yargs/commit/0f810245494ccf13a35b7786d021b30fc95ecad5)), closes [#1704](https://www.github.com/yargs/yargs/issues/1704)
 
-[Older CHANGELOG Entries](https://github.com/yargs/yargs/blob/master/docs/CHANGELOG-historical.md)
+[Older CHANGELOG Entries](https://github.com/yargs/yargs/blob/main/docs/CHANGELOG-historical.md)

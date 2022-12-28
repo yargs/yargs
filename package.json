@@ -1,6 +1,6 @@
 {
   "name": "yargs",
-  "version": "17.5.1",
+  "version": "17.6.2",
   "description": "yargs the modern, pirate-themed, successor to optimist.",
   "main": "./index.cjs",
   "exports": {
@@ -53,18 +53,18 @@
     "!**/*.d.ts"
   ],
   "dependencies": {
-    "cliui": "^7.0.2",
+    "cliui": "^8.0.1",
     "escalade": "^3.1.1",
     "get-caller-file": "^2.0.5",
     "require-directory": "^2.1.1",
     "string-width": "^4.2.3",
     "y18n": "^5.0.5",
-    "yargs-parser": "^21.0.0"
+    "yargs-parser": "^21.1.1"
   },
   "devDependencies": {
     "@types/chai": "^4.2.11",
     "@types/mocha": "^9.0.0",
-    "@types/node": "^16.11.4",
+    "@types/node": "^18.0.0",
     "c8": "^7.7.0",
     "chai": "^4.2.0",
     "chalk": "^4.0.0",

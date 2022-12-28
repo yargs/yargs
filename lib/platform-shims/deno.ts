@@ -21,22 +21,21 @@ const REQUIRE_ERROR = 'require is not supported by ESM';
 const REQUIRE_DIRECTORY_ERROR =
   'loading a directory of commands is not supported yet for ESM';
 
+const DENO_ENV_PERMITTED: boolean =
+  (await Deno.permissions.query({name: 'env'})).state === 'granted';
+const DENO_READ_CWD_PERMITTED: boolean =
+  (await Deno.permissions.query({name: 'read', path: '.'})).state === 'granted';
+
 // Deno removes argv[0] and argv[1] from Deno.args:
 const argv = ['deno run', ...Deno.args];
 const __dirname = new URL('.', import.meta.url).pathname;
 
 // Yargs supports environment variables with prefixes, e.g., MY_APP_FOO,
 // MY_APP_BAR. Environment variables are also used to detect locale.
-let cwd = '';
-let env: {[key: string]: string} = {};
-try {
-  env = Deno.env.toObject();
-  cwd = Deno.cwd();
-} catch (err) {
-  if (err.name !== 'PermissionDenied') {
-    throw err;
-  }
-}
+const cwd = DENO_READ_CWD_PERMITTED ? Deno.cwd() : '';
+const env: {[key: string]: string} = DENO_ENV_PERMITTED
+  ? Deno.env.toObject()
+  : {};
 
 const path = {
   basename: basename,
@@ -91,7 +90,7 @@ export default {
       }
     },
     exit: Deno.exit,
-    nextTick: window.queueMicrotask,
+    nextTick: globalThis.queueMicrotask,
     stdColumns: columns ?? null,
   },
   readFileSync: Deno.readTextFileSync,
