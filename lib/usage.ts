@@ -453,7 +453,12 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
           desc
         );
 
-        if (extra) ui.div({text: extra, padding: [0, 0, 0, 2], align: 'right'});
+        const shouldHideOptionExtras =
+          yargs.getInternalMethods().getUsageConfiguration()['hide-types'] ===
+          true;
+
+        if (extra && !shouldHideOptionExtras)
+          ui.div({text: extra, padding: [0, 0, 0, 2], align: 'right'});
         else ui.div();
       });
 
