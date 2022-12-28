@@ -33,6 +33,10 @@
     "one": "Unknown argument: %s",
     "other": "Unknown arguments: %s"
   },
+  "Unknown command: %s": {
+    "one": "Unknown command: %s",
+    "other": "Unknown commands: %s"
+  },
   "Invalid values:": "Invalid values:",
   "Argument: %s, Given: %s, Choices: %s": "Argument: %s, Given: %s, Choices: %s",
   "Argument check failed: %s": "Argument check failed: %s",
