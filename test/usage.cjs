@@ -4847,6 +4847,47 @@ describe('usage tests', () => {
       ]);
   });
 
+  describe('usage configuration', () => {
+    it('allows extras to be disabled when "hide-types" is true', () => {
+      const r = checkUsage(() =>
+        yargs('cmd1 --help')
+          .command(
+            'cmd1',
+            'cmd1 desc',
+            yargs =>
+              yargs.option('opt1', {
+                type: 'string',
+                choices: ['foo', 'bar', 'baz'],
+                alias: 'o',
+                required: true,
+                description: 'A long description that might break formatting',
+              }),
+            () => {}
+          )
+          .usageConfiguration({'hide-types': true})
+          .strict()
+          .parse()
+      );
+      r.should.have.property('result');
+      r.result.should.have.property('_').with.length(1);
+      r.should.have.property('errors');
+      r.should.have.property('logs').with.length(1);
+      r.should.have.property('exit').and.equal(true);
+      r.logs[0]
+        .split(/\n/)
+        .should.deep.equal([
+          'usage cmd1',
+          '',
+          'cmd1 desc',
+          '',
+          'Options:',
+          '      --help     Show help',
+          '      --version  Show version number',
+          '  -o, --opt1     A long description that might break formatting',
+        ]);
+    });
+  });
+
   // https://github.com/yargs/yargs/issues/2169
   it('allows multiple option calls to not clobber description', () => {
     const r = checkUsage(() =>
