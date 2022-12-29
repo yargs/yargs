@@ -1,4 +1,5 @@
 .idea/
+.run/
 build/
 node_modules/
 .nyc_output/

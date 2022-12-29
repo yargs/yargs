@@ -303,7 +303,7 @@ describe('Completion', () => {
         });
 
         it("returns arguments as completion suggestion, if next contains '-'", () => {
-          process.env.SHELL = '/bin/basg';
+          process.env.SHELL = '/bin/bash';
           const r = checkUsage(
             () =>
               yargs([...firstArguments, '-f'])

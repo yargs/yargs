@@ -281,12 +281,6 @@ export class Completion implements CompletionInstance {
       !startsByTwoDashes(current) && isShortOption(key) ? '-' : '--';
     if (this.bashShell) {
       completions.push(dashes + key);
-    } else if (this.fishShell) {
-      const desc = descs[key] || '';
-      completions.push(
-        dashes +
-          `${key.replace(/:/g, '\\:')}\t${desc.replace('__yargsString__:', '')}`
-      );
     } else {
       const aliasKey = this?.aliases?.[key].find(alias => {
         const desc = descs[alias];
@@ -296,7 +290,9 @@ export class Completion implements CompletionInstance {
       const desc = descs[key] ?? descFromAlias ?? '';
       completions.push(
         dashes +
-          `${key.replace(/:/g, '\\:')}:${desc.replace('__yargsString__:', '')}`
+          `${key.replace(/:/g, '\\:')}${
+            this.fishShell ? '\t' : ':'
+          }${desc.replace('__yargsString__:', '')}`
       );
     }
   }
