@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [17.7.0](https://github.com/yargs/yargs/compare/v17.6.2...v17.7.0) (2023-02-13)
+
+
+### Features
+
+* add method to hide option extras ([#2156](https://github.com/yargs/yargs/issues/2156)) ([2c144c4](https://github.com/yargs/yargs/commit/2c144c4ea534646df26d6177f73ce917105c6c09))
+* convert line break to whitespace for the description of the option ([#2271](https://github.com/yargs/yargs/issues/2271)) ([4cb41dc](https://github.com/yargs/yargs/commit/4cb41dc80aaa730a2abd15bd3118ecd9f4ebe876))
+
+
+### Bug Fixes
+
+* copy the description of the option to its alias in completion ([#2269](https://github.com/yargs/yargs/issues/2269)) ([f37ee6f](https://github.com/yargs/yargs/commit/f37ee6f7da386a1244bf0a0c21b9572f2bb3131b))
+
 ## [17.6.2](https://github.com/yargs/yargs/compare/v17.6.1...v17.6.2) (2022-11-03)
 
 
