@@ -76,9 +76,9 @@ describe('integration tests', () => {
       return this.skip();
     }
 
-    testCmd('./issue-497.js', ['--help'], (code, stdout) => {
+    testCmd('./issue-497.js', ['--help'], (code, stdout, stderr) => {
       if (code) {
-        done(new Error(`cmd exited with code ${code}`));
+        done(new Error(`cmd exited with code ${code}:\n${stderr}`));
         return;
       }
 

@@ -1,4 +1,5 @@
 .idea/
+.run/
 build/
 node_modules/
 .nyc_output/
@@ -9,3 +10,4 @@ package-lock.json
 example.*
 .DS_Store
 .npmrc
+*.tgz
