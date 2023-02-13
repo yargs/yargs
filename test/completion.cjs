@@ -1077,6 +1077,23 @@ describe('Completion', () => {
       r.logs.should.include('-B:Bar option');
     });
 
+    it('completes options with line break', () => {
+      process.env.SHELL = '/bin/zsh';
+      const r = checkUsage(
+        () =>
+          yargs(['./completion', '--get-yargs-completions', '-'])
+            .options({
+              foo: {describe: 'Foo option\nFoo option', type: 'string'},
+            })
+            .help(false)
+            .version(false)
+            .completion().argv
+      );
+
+      r.logs.should.have.length(1);
+      r.logs.should.include('--foo:Foo option Foo option');
+    });
+
     it('replaces application variable with $0 in script', () => {
       process.env.SHELL = '/bin/zsh';
       const r = checkUsage(() => yargs([]).showCompletionScript(), ['ndm']);
