@@ -5,6 +5,7 @@
 // pretend we are a TTY
 process.stdout.isTTY = true;
 process.stderr.isTTY = true;
+process.stderr.hasColors = () => true;
 
 const yargs = require('../../');
 const y = yargs
