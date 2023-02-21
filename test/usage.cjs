@@ -3993,7 +3993,7 @@ describe('usage tests', () => {
     });
 
     // See: https://github.com/yargs/yargs/issues/2291
-    it('should display help output nested default command on failure', () => {
+    it('should display help output for nested default command on failure', () => {
       const r = checkUsage(() =>
         yargs()
           .command(
