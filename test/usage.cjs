@@ -3991,6 +3991,57 @@ describe('usage tests', () => {
           '  --arg2     arg2 desc                                                  [string]',
         ]);
     });
+
+    // See: https://github.com/yargs/yargs/issues/2291
+    it('should display help output nested default command on failure', () => {
+      const r = checkUsage(() =>
+        yargs()
+          .command(
+            'root',
+            'root command',
+            y => {
+              y.command({
+                command: 'nested',
+                desc: 'nested command',
+                builder: y => {
+                  y.command({
+                    command: 'deep-a',
+                    aliases: ['$0'],
+                    desc: 'deeply nested default',
+                    builder: noop,
+                    handler: noop,
+                  }).command({
+                    command: 'deep-b',
+                    desc: 'a deeply nested command',
+                    builder: noop,
+                    handler: noop,
+                  });
+                },
+                handler: noop,
+              });
+            },
+            () => {}
+          )
+          .strict()
+          .demandCommand()
+          .parse(['root', 'nested', 'bloop'])
+      );
+      r.errors[0]
+        .split('\n')
+        .should.deep.equal([
+          'usage root nested',
+          '',
+          'nested command',
+          '',
+          'Commands:',
+          '  usage root nested deep-a  deeply nested default                      [default]',
+          '  usage root nested deep-b  a deeply nested command',
+          '',
+          'Options:',
+          '  --help     Show help                                                 [boolean]',
+          '  --version  Show version number                                       [boolean]',
+        ]);
+    });
   });
 
   describe('positional', () => {

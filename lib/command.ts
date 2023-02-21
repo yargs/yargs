@@ -263,6 +263,7 @@ export class CommandInstance {
     if (isCommandBuilderCallback(builder)) {
       // A function can be provided, which builds
       // up a yargs chain and possibly returns it.
+      yargs.getInternalMethods().getUsageInstance().freeze();
       const builderOutput = builder(
         yargs.getInternalMethods().reset(aliases),
         helpOrVersionSet
@@ -284,6 +285,7 @@ export class CommandInstance {
     } else if (isCommandBuilderOptionDefinitions(builder)) {
       // as a short hand, an object can instead be provided, specifying
       // the options that a command takes.
+      yargs.getInternalMethods().getUsageInstance().freeze();
       innerYargs = yargs.getInternalMethods().reset(aliases);
       Object.keys(commandHandler.builder).forEach(key => {
         innerYargs.option(key, builder[key]);
