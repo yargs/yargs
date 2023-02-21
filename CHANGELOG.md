@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [17.7.1](https://github.com/yargs/yargs/compare/v17.7.0...v17.7.1) (2023-02-21)
+
+
+### Bug Fixes
+
+* address display bug with default sub-commands ([#2303](https://github.com/yargs/yargs/issues/2303)) ([9aa2490](https://github.com/yargs/yargs/commit/9aa24908ae4e857161d5084613a402f9dc4895a7))
+
 ## [17.7.0](https://github.com/yargs/yargs/compare/v17.6.2...v17.7.0) (2023-02-13)
 
 
