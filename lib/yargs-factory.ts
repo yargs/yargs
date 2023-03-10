@@ -384,7 +384,7 @@ export class YargsInstance {
     // Handled multiple above, down to one key.
     const coerceKey = keys;
     // This noop tells yargs-parser about the existence of the option
-    // represented by "key", so that it can apply camel case expansion
+    // represented by "coerceKey", so that it can apply camel case expansion
     // if needed:
     this.#options.key[coerceKey] = true;
     this.#globalMiddleware.addCoerceMiddleware(
