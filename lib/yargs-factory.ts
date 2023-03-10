@@ -406,12 +406,12 @@ export class YargsInstance {
           },
           (result: any): Partial<Arguments> => {
             argv[keys] = result;
-            const stripAliased = yargs
-              .getInternalMethods()
-              .getParserConfiguration()['strip-aliased'];
-            if (aliases[keys] && stripAliased !== true) {
+            // yargs-parser takes into account the parser options like strip-aliased and strip-dashed and camel-case expansion.
+            // Update any naming variations returned by yargs-parser with the coerced value.
+            if (aliases[keys]) {
               for (const alias of aliases[keys]) {
-                argv[alias] = result;
+                if (Object.prototype.hasOwnProperty.call(argv, alias))
+                  argv[alias] = result;
               }
             }
             return argv;

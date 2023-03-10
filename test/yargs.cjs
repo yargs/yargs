@@ -2434,6 +2434,22 @@ describe('yargs dsl tests', () => {
       argv.doGooder.should.equal('BATMAN');
     });
 
+    // Addresses: https://github.com/yargs/yargs/issues/2307
+    it('when use strip-aliased then coerce should still work with camelcase', () => {
+      const argv = yargs('--max-size 1')
+        .option('max-size', {
+          type: 'number',
+          coerce: n => n + 100,
+          alias: 'max-alias',
+        })
+        .parserConfiguration({'strip-aliased': true})
+        .parse();
+      argv['max-size'].should.equal(101); // coerce original
+      argv['maxSize'].should.equal(101); // coerce camel-case
+      expect(argv['max-alias']).to.equal(undefined); // strip-alias
+      expect(argv['maxAlias']).to.equal(undefined); // strip-alias
+    });
+
     it('allows a boolean type to be specified', () => {
       const argv = yargs('cmd false')
         .command('cmd [run]', 'a command', yargs => {
