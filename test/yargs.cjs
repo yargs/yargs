@@ -2238,6 +2238,76 @@ describe('yargs dsl tests', () => {
         .getHelp();
       help.should.match(/option2 description/);
     });
+
+    it('argv includes coerced aliases', () => {
+      const argv = yargs('--foo bar')
+        .option('foo', {
+          coerce: s => s.toUpperCase(),
+          alias: 'f',
+        })
+        .parse();
+      argv['foo'].should.equal('BAR');
+      argv['f'].should.equal('BAR');
+    });
+
+    it('argv includes coerced camelCase', () => {
+      const argv = yargs('--foo-foo bar')
+        .option('foo-foo', {
+          coerce: s => s.toUpperCase(),
+        })
+        .parse();
+      argv['foo-foo'].should.equal('BAR');
+      argv['fooFoo'].should.equal('BAR');
+    });
+
+    it('coerce still works when key used for coerce is not explicitly present in argv', () => {
+      const argv = yargs('--foo-foo bar')
+        .option('foo-foo')
+        .coerce('foo-foo', s => s.toUpperCase())
+        .parserConfiguration({'strip-dashed': true})
+        .parse();
+      expect(argv['foo-foo']).to.equal(undefined);
+      argv['fooFoo'].should.equal('BAR');
+    });
+
+    it('argv does not include stripped aliases', () => {
+      const argv = yargs('-f bar')
+        .option('foo-foo', {
+          coerce: s => s.toUpperCase(),
+          alias: 'f',
+        })
+        .parserConfiguration({'strip-aliased': true})
+        .parse();
+      argv['foo-foo'].should.equal('BAR');
+      argv['fooFoo'].should.equal('BAR');
+      expect(argv['f']).to.equal(undefined);
+    });
+
+    it('argv does not include stripped dashes', () => {
+      const argv = yargs('-f bar')
+        .option('foo-foo', {
+          coerce: s => s.toUpperCase(),
+          alias: 'f',
+        })
+        .parserConfiguration({'strip-dashed': true})
+        .parse();
+      expect(argv['foo-foo']).to.equal(undefined);
+      argv['fooFoo'].should.equal('BAR');
+      argv['f'].should.equal('BAR');
+    });
+
+    it('argv does not include disabled camel-case-expansion', () => {
+      const argv = yargs('-f bar')
+        .option('foo-foo', {
+          coerce: s => s.toUpperCase(),
+          alias: 'f',
+        })
+        .parserConfiguration({'camel-case-expansion': false})
+        .parse();
+      argv['foo-foo'].should.equal('BAR');
+      expect(argv['fooFoo']).to.equal(undefined);
+      argv['f'].should.equal('BAR');
+    });
   });
 
   describe('stop parsing', () => {
@@ -2432,22 +2502,6 @@ describe('yargs dsl tests', () => {
         .parse();
       argv.hero.should.equal('BATMAN');
       argv.doGooder.should.equal('BATMAN');
-    });
-
-    // Addresses: https://github.com/yargs/yargs/issues/2307
-    it('when use strip-aliased then coerce should still work with camelcase', () => {
-      const argv = yargs('--max-size 1')
-        .option('max-size', {
-          type: 'number',
-          coerce: n => n + 100,
-          alias: 'max-alias',
-        })
-        .parserConfiguration({'strip-aliased': true})
-        .parse();
-      argv['max-size'].should.equal(101); // coerce original
-      argv['maxSize'].should.equal(101); // coerce camel-case
-      expect(argv['max-alias']).to.equal(undefined); // strip-alias
-      expect(argv['maxAlias']).to.equal(undefined); // strip-alias
     });
 
     it('allows a boolean type to be specified', () => {
