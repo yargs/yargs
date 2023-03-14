@@ -1317,8 +1317,8 @@ export class YargsInstance {
       if (isPromise(builderResponse)) {
         builderResponse.then(() => {
           this.#usage.showHelp(level);
+          return this;
         });
-        return this;
       }
     }
     this.#usage.showHelp(level);
