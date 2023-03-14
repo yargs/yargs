@@ -1293,7 +1293,7 @@ export class YargsInstance {
     level: 'error' | 'log' | ((message: string) => void),
     callback = () => {}
   ): YargsInstance {
-    argsert('[string|function]', [level], arguments.length);
+    argsert('[string|function] [function]', [level, callback], arguments.length);
     this.#hasOutput = true;
     if (!this.#usage.hasCachedHelpMessage()) {
       if (!this.parsed) {
