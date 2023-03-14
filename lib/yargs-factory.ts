@@ -1309,7 +1309,7 @@ export class YargsInstance {
         if (isPromise(parse)) {
           parse.then(() => {
             this.#usage.showHelp(level);
-            callback()
+            callback();
           });
           return this;
         }
@@ -1319,13 +1319,13 @@ export class YargsInstance {
       if (isPromise(builderResponse)) {
         builderResponse.then(() => {
           this.#usage.showHelp(level);
-          callback()
+          callback();
         });
         return this;
       }
     }
     this.#usage.showHelp(level);
-    callback()
+    callback();
     return this;
   }
   scriptName(scriptName: string): YargsInstance {
