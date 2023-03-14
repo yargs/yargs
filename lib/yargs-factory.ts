@@ -1290,7 +1290,8 @@ export class YargsInstance {
     return this;
   }
   showHelp(
-    level: 'error' | 'log' | ((message: string) => void)
+    level: 'error' | 'log' | ((message: string) => void),
+    callback = () => {}
   ): YargsInstance {
     argsert('[string|function]', [level], arguments.length);
     this.#hasOutput = true;
@@ -1308,6 +1309,7 @@ export class YargsInstance {
         if (isPromise(parse)) {
           parse.then(() => {
             this.#usage.showHelp(level);
+            callback()
           });
           return this;
         }
@@ -1317,11 +1319,13 @@ export class YargsInstance {
       if (isPromise(builderResponse)) {
         builderResponse.then(() => {
           this.#usage.showHelp(level);
-          return this;
+          callback()
         });
+        return this;
       }
     }
     this.#usage.showHelp(level);
+    callback()
     return this;
   }
   scriptName(scriptName: string): YargsInstance {
@@ -2163,8 +2167,10 @@ export class YargsInstance {
         if (helpOptSet) {
           if (this.#exitProcess) setBlocking(true);
           skipValidation = true;
-          this.showHelp('log');
-          this.exit(0);
+          this.showHelp('log', () => {
+            this.exit(0);
+          });
+          
         } else if (versionOptSet) {
           if (this.#exitProcess) setBlocking(true);
           skipValidation = true;
