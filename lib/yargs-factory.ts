@@ -1290,14 +1290,9 @@ export class YargsInstance {
     return this;
   }
   showHelp(
-    level: 'error' | 'log' | ((message: string) => void),
-    callback = () => {}
+    level: 'error' | 'log' | ((message: string) => void)
   ): YargsInstance {
-    argsert(
-      '[string|function] [function]',
-      [level, callback],
-      arguments.length
-    );
+    argsert('[string|function]', [level], arguments.length);
     this.#hasOutput = true;
     if (!this.#usage.hasCachedHelpMessage()) {
       if (!this.parsed) {
@@ -1313,7 +1308,6 @@ export class YargsInstance {
         if (isPromise(parse)) {
           parse.then(() => {
             this.#usage.showHelp(level);
-            callback();
           });
           return this;
         }
@@ -1323,13 +1317,11 @@ export class YargsInstance {
       if (isPromise(builderResponse)) {
         builderResponse.then(() => {
           this.#usage.showHelp(level);
-          callback();
         });
         return this;
       }
     }
     this.#usage.showHelp(level);
-    callback();
     return this;
   }
   scriptName(scriptName: string): YargsInstance {
@@ -2171,7 +2163,8 @@ export class YargsInstance {
         if (helpOptSet) {
           if (this.#exitProcess) setBlocking(true);
           skipValidation = true;
-          this.showHelp('log', () => {
+          this.showHelp(message => {
+            this.#logger.log(message);
             this.exit(0);
           });
         } else if (versionOptSet) {
