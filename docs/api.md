@@ -198,9 +198,10 @@ all other modifications, such as [`.normalize()`](#normalize).
 _Examples:_
 
 ```js
+var fs = require('fs').promises
 var argv = require('yargs/yargs')(process.argv.slice(2))
-  .coerce('file', function (arg) {
-    return await require('fs').promises.readFile(arg, 'utf8')
+  .coerce('file', arg => {
+    return fs.readFile(arg, 'utf8')
   })
   .argv
 ```
