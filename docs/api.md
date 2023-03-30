@@ -199,7 +199,7 @@ _Examples:_
 
 ```js
 var fs = require('fs').promises
-var argv = require('yargs/yargs')(process.argv.slice(2))
+var argv = await require('yargs/yargs')(process.argv.slice(2))
   .coerce('file', async (arg) => {
     var content = await fs.readFile(arg, 'utf8')
     return content
