@@ -7,6 +7,7 @@ const chalk = require('chalk');
 const yargs = require('../index.cjs');
 const expect = require('chai').expect;
 const {YError} = require('../build/index.cjs');
+const assert = require('assert');
 
 const should = require('chai').should();
 
@@ -4876,6 +4877,33 @@ describe('usage tests', () => {
         const help = await y.getHelp();
         help.split('\n').should.deep.equal(expected);
       });
+    });
+
+    it('help is displayed before exit is called with async default command', async () => {
+      // https://github.com/yargs/yargs/issues/2312
+      const _exit = process.exit;
+      const _log = console.log;
+      let callCount = 0;
+      let logCall = 0;
+      let exitCall = 0;
+      process.exit = () => {
+        exitCall = ++callCount;
+      };
+      console.log = () => {
+        logCall = ++callCount;
+      };
+      await yargs(['--help'])
+        .command('$0', 'a test command', async yargs => {
+          await wait();
+        })
+        .parseAsync();
+      // The async help is dangling, so wait for it to fire!
+      await wait();
+      assert.ok(exitCall > 0, 'exit never called'); // sanity check
+      assert.ok(logCall > 0, 'log never called'); // sanity check
+      assert.ok(exitCall > logCall, 'exit called before help displayed');
+      console.log = _log;
+      process.exit = _exit;
     });
   });
 
