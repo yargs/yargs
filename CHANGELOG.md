@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [17.7.2](https://github.com/yargs/yargs/compare/v17.7.1...v17.7.2) (2023-04-27)
+
+
+### Bug Fixes
+
+* do not crash completion when having negated options ([#2322](https://github.com/yargs/yargs/issues/2322)) ([7f42848](https://github.com/yargs/yargs/commit/7f428485e75e9b1b0db1320216d1c31469770563))
+
 ## [17.7.1](https://github.com/yargs/yargs/compare/v17.7.0...v17.7.1) (2023-02-21)
 
 
