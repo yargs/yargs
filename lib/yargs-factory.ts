@@ -2162,8 +2162,10 @@ export class YargsInstance {
         if (helpOptSet) {
           if (this.#exitProcess) setBlocking(true);
           skipValidation = true;
-          this.showHelp('log');
-          this.exit(0);
+          this.showHelp(message => {
+            this.#logger.log(message);
+            this.exit(0);
+          });
         } else if (versionOptSet) {
           if (this.#exitProcess) setBlocking(true);
           skipValidation = true;
