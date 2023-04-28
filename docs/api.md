@@ -198,11 +198,14 @@ all other modifications, such as [`.normalize()`](#normalize).
 _Examples:_
 
 ```js
-var argv = require('yargs/yargs')(process.argv.slice(2))
-  .coerce('file', function (arg) {
-    return await require('fs').promises.readFile(arg, 'utf8')
+import { readFile } from 'node:fs/promises';
+import yargs from 'yargs';
+const argv = await yargs(process.argv.slice(2))
+  .coerce('file', async (arg) => {
+    const content = await readFile(arg, 'utf8');
+    return JSON.parse(content);
   })
-  .argv
+  .parseAsync();
 ```
 
 Optionally `.coerce()` can take an object that maps several keys to their
