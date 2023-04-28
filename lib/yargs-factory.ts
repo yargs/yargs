@@ -380,20 +380,26 @@ export class YargsInstance {
     if (!value) {
       throw new YError('coerce callback must be provided');
     }
+
+    // Handled multiple above, down to one key.
+    const coerceKey = keys;
     // This noop tells yargs-parser about the existence of the option
-    // represented by "keys", so that it can apply camel case expansion
+    // represented by "coerceKey", so that it can apply camel case expansion
     // if needed:
-    this.#options.key[keys] = true;
+    this.#options.key[coerceKey] = true;
     this.#globalMiddleware.addCoerceMiddleware(
       (
         argv: Arguments,
         yargs: YargsInstance
       ): Partial<Arguments> | Promise<Partial<Arguments>> => {
-        let aliases: Dictionary<string[]>;
+        // Narrow down the possible keys to the ones present in argv.
+        const coerceKeyAliases = yargs.getAliases()[coerceKey] ?? [];
+        const argvKeys = [coerceKey, ...coerceKeyAliases].filter(key =>
+          Object.prototype.hasOwnProperty.call(argv, key)
+        );
 
-        // Skip coerce logic if related arg was not provided
-        const shouldCoerce = Object.prototype.hasOwnProperty.call(argv, keys);
-        if (!shouldCoerce) {
+        // Skip coerce if nothing to coerce.
+        if (argvKeys.length === 0) {
           return argv;
         }
 
@@ -401,19 +407,12 @@ export class YargsInstance {
           Partial<Arguments> | Promise<Partial<Arguments>> | any
         >(
           () => {
-            aliases = yargs.getAliases();
-            return value(argv[keys]);
+            return value(argv[argvKeys[0]]);
           },
           (result: any): Partial<Arguments> => {
-            argv[keys] = result;
-            const stripAliased = yargs
-              .getInternalMethods()
-              .getParserConfiguration()['strip-aliased'];
-            if (aliases[keys] && stripAliased !== true) {
-              for (const alias of aliases[keys]) {
-                argv[alias] = result;
-              }
-            }
+            argvKeys.forEach(key => {
+              argv[key] = result;
+            });
             return argv;
           },
           (err: Error): Partial<Arguments> | Promise<Partial<Arguments>> => {
@@ -421,7 +420,7 @@ export class YargsInstance {
           }
         );
       },
-      keys
+      coerceKey
     );
     return this;
   }
