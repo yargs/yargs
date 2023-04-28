@@ -130,9 +130,12 @@ export class Completion implements CompletionInstance {
           !options.hiddenOptions.includes(key) &&
           !this.argsContainKey(args, key, negable)
         ) {
-          this.completeOptionKey(key, completions, current);
-          if (negable && !!options.default[key])
-            this.completeOptionKey(`no-${key}`, completions, current);
+          this.completeOptionKey(
+            key,
+            completions,
+            current,
+            negable && !!options.default[key]
+          );
         }
       });
     }
@@ -248,28 +251,31 @@ export class Completion implements CompletionInstance {
   private completeOptionKey(
     key: string,
     completions: string[],
-    current: string
+    current: string,
+    negable: boolean
   ) {
-    const descs = this.usage.getDescriptions();
-    const startsByTwoDashes = (s: string) => /^--/.test(s);
-    const isShortOption = (s: string) => /^[^0-9]$/.test(s);
-    const dashes =
-      !startsByTwoDashes(current) && isShortOption(key) ? '-' : '--';
-    if (!this.zshShell) {
-      completions.push(dashes + key);
-    } else {
-      const aliasKey = this?.aliases?.[key].find(alias => {
+    let keyWithDesc = key;
+    if (this.zshShell) {
+      const descs = this.usage.getDescriptions();
+      const aliasKey = this?.aliases?.[key]?.find(alias => {
         const desc = descs[alias];
         return typeof desc === 'string' && desc.length > 0;
       });
       const descFromAlias = aliasKey ? descs[aliasKey] : undefined;
       const desc = descs[key] ?? descFromAlias ?? '';
-      completions.push(
-        dashes +
-          `${key.replace(/:/g, '\\:')}:${desc
-            .replace('__yargsString__:', '')
-            .replace(/(\r\n|\n|\r)/gm, ' ')}`
-      );
+      keyWithDesc = `${key.replace(/:/g, '\\:')}:${desc
+        .replace('__yargsString__:', '')
+        .replace(/(\r\n|\n|\r)/gm, ' ')}`;
+    }
+
+    const startsByTwoDashes = (s: string) => /^--/.test(s);
+    const isShortOption = (s: string) => /^[^0-9]$/.test(s);
+    const dashes =
+      !startsByTwoDashes(current) && isShortOption(key) ? '-' : '--';
+
+    completions.push(dashes + keyWithDesc);
+    if (negable) {
+      completions.push(dashes + 'no-' + keyWithDesc);
     }
   }
 
