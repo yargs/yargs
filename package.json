@@ -68,7 +68,7 @@
     "c8": "^7.7.0",
     "chai": "^4.2.0",
     "chalk": "^4.0.0",
-    "concurrently": "^7.6.0",
+    "concurrently": "^8.0.0",
     "coveralls": "^3.0.9",
     "cpr": "^3.0.1",
     "cross-env": "^7.0.2",
