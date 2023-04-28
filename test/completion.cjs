@@ -1139,6 +1139,28 @@ describe('Completion', () => {
       r.logs.should.include('--foo:bar');
     });
 
+    it('completes with no- prefix flags defaulting to true when boolean-negation is set', () => {
+      process.env.SHELL = '/bin/zsh';
+
+      const r = checkUsage(
+        () =>
+          yargs(['./completion', '--get-yargs-completions', '--'])
+            .options({
+              foo: {describe: 'foo flag', type: 'boolean', default: true},
+              bar: {describe: 'bar flag', type: 'boolean'},
+            })
+            .parserConfiguration({'boolean-negation': true}).argv
+      );
+
+      r.logs.should.eql([
+        '--help:Show help',
+        '--version:Show version number',
+        '--foo:foo flag',
+        '--no-foo:foo flag',
+        '--bar:bar flag',
+      ]);
+    });
+
     it('bails out early when full command matches', () => {
       process.env.SHELL = '/bin/zsh';
       const r = checkUsage(() => {
