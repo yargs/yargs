@@ -17,8 +17,8 @@
       "require": "./helpers/index.js"
     },
     "./browser": {
-      "import": "./browser.mjs",
-      "types": "./browser.d.ts"
+      "types": "./browser.d.ts",
+      "import": "./browser.mjs"
     },
     "./yargs": [
       {
