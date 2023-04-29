@@ -69,7 +69,6 @@
     "chai": "^4.2.0",
     "chalk": "^4.0.0",
     "concurrently": "^7.6.0",
-    "coveralls": "^3.0.9",
     "cpr": "^3.0.1",
     "cross-env": "^7.0.2",
     "cross-spawn": "^7.0.0",
