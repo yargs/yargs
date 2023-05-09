@@ -1191,17 +1191,24 @@ describe('Completion', () => {
   });
 
   describe('parser-configuration', () => {
-    it('should support strip-dashed', () => {
-      process.env.SHELL = '/bin/bash';
+    const configurations = [
+      {'strip-dashed': true},
+      {'camel-case-expansion': true, 'strip-aliased': true},
+    ];
 
-      const r = checkUsage(
-        () =>
-          yargs(['--get-yargs-completions', 'a'])
-            .parserConfiguration({'strip-dashed': true})
-            .command('apple', 'banana').argv
-      );
+    for (const configuration of configurations) {
+      it(`should support ${Object.keys(configuration).join(' ')}`, () => {
+        process.env.SHELL = '/bin/bash';
 
-      r.logs.should.include('apple');
-    });
+        const r = checkUsage(
+          () =>
+            yargs(['--get-yargs-completions', 'a'])
+              .parserConfiguration(configuration)
+              .command('apple', 'banana').argv
+        );
+
+        r.logs.should.include('apple');
+      });
+    }
   });
 });

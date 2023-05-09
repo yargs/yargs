@@ -2058,7 +2058,16 @@ export class YargsInstance {
       this.#isGlobalContext = false;
 
       const handlerKeys = this.#command.getCommands();
-      const requestCompletions = this.#completion!.completionKey in argv;
+
+      const requestCompletions = this.#completion?.completionKey
+        ? [
+            this.#completion?.completionKey,
+            ...(this.getAliases()[this.#completion?.completionKey] ?? []),
+          ].some((key: string) =>
+            Object.prototype.hasOwnProperty.call(argv, key)
+          )
+        : false;
+
       const skipRecommendation = helpOptSet || requestCompletions || helpOnly;
       if (argv._.length) {
         if (handlerKeys.length) {
