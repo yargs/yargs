@@ -1189,4 +1189,19 @@ describe('Completion', () => {
       });
     });
   });
+
+  describe('parser-configuration', () => {
+    it('should support strip-dashed', () => {
+      process.env.SHELL = '/bin/bash';
+
+      const r = checkUsage(
+        () =>
+          yargs(['--get-yargs-completions', 'a'])
+            .parserConfiguration({'strip-dashed': true})
+            .command('apple', 'banana').argv
+      );
+
+      r.logs.should.include('apple');
+    });
+  });
 });
