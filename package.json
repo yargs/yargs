@@ -68,6 +68,7 @@
     "c8": "^7.7.0",
     "chai": "^4.2.0",
     "chalk": "^4.0.0",
+    "concurrently": "^7.6.0",
     "coveralls": "^3.0.9",
     "cpr": "^3.0.1",
     "cross-env": "^7.0.2",
@@ -100,7 +101,10 @@
     "postbuild:cjs": "rimraf ./build/index.cjs.d.ts",
     "check": "gts lint && npm run check:js",
     "check:js": "eslint . --ext cjs --ext mjs --ext js",
-    "clean": "gts clean"
+    "clean": "gts clean",
+    "watch": "rimraf build && tsc && concurrently npm:watch:tsc npm:watch:cjs",
+    "watch:cjs": "rollup -w -c rollup.config.cjs",
+    "watch:tsc": "tsc --watch"
   },
   "repository": {
     "type": "git",
