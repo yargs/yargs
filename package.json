@@ -102,9 +102,9 @@
     "check": "gts lint && npm run check:js",
     "check:js": "eslint . --ext cjs --ext mjs --ext js",
     "clean": "gts clean",
-    "watch": "rimraf build && tsc && concurrently npm:watch:tsc npm:watch:cjs",
-    "watch:cjs": "rollup -w -c rollup.config.cjs",
-    "watch:tsc": "tsc --watch"
+    "watch": "rimraf build && tsc -p tsconfig.test.json && concurrently npm:watch:tsc npm:watch:cjs",
+    "watch:cjs": "cross-env NODE_ENV=test rollup -w -c rollup.config.cjs",
+    "watch:tsc": "tsc -p tsconfig.test.json --watch"
   },
   "repository": {
     "type": "git",
