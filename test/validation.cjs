@@ -191,6 +191,19 @@ describe('validation tests', () => {
       failCalled.should.equal(true);
     });
 
+    it("doesn't fail if implied key exists with value undefined", () => {
+      yargs()
+        .option('foo', {
+          type: 'string',
+          default: undefined,
+        })
+        .implies('foo', 'bar')
+        .fail(() => {
+          expect.fail();
+        })
+        .parse();
+    });
+
     it("doesn't fail if implied key exists with value 0", () => {
       yargs('--foo --bar 0')
         .implies('foo', 'bar')

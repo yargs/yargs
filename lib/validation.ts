@@ -328,7 +328,7 @@ export function validation(
     return implied;
   };
 
-  function keyExists(argv: Arguments, val: any): any {
+  function keyDefined(argv: Arguments, val: any): any {
     // convert string '1' to number 1
     const num = Number(val);
     val = isNaN(num) ? val : num;
@@ -339,10 +339,14 @@ export function validation(
     } else if (val.match(/^--no-.+/)) {
       // check if key/value doesn't exist
       val = val.match(/^--no-(.+)/)[1];
-      val = !Object.prototype.hasOwnProperty.call(argv, val);
+      val =
+        !Object.prototype.hasOwnProperty.call(argv, val) ||
+        argv[val] === undefined;
     } else {
       // check if key/value exists
-      val = Object.prototype.hasOwnProperty.call(argv, val);
+      val =
+        Object.prototype.hasOwnProperty.call(argv, val) &&
+        argv[val] !== undefined;
     }
     return val;
   }
@@ -355,8 +359,8 @@ export function validation(
       (implied[key] || []).forEach(value => {
         let key = origKey;
         const origValue = value;
-        key = keyExists(argv, key);
-        value = keyExists(argv, value);
+        key = keyDefined(argv, key);
+        value = keyDefined(argv, value);
 
         if (key && !value) {
           implyFail.push(` ${origKey} -> ${origValue}`);
