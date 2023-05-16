@@ -1,0 +1,3 @@
+build/
+coverage/
+test/fixtures/broken-json/
