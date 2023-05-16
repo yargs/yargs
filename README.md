@@ -16,12 +16,13 @@
 [![Slack][slack-image]][slack-url]
 
 ## Description
+
 Yargs helps you build interactive command line tools, by parsing arguments and generating an elegant user interface.
 
 It gives you:
 
-* commands and (grouped) options (`my-program.js serve --port=5000`).
-* a dynamically generated help menu based on your arguments:
+- commands and (grouped) options (`my-program.js serve --port=5000`).
+- a dynamically generated help menu based on your arguments:
 
 ```
 mocha [spec..]
@@ -38,17 +39,19 @@ Rules & Behavior
                              return a Promise                          [boolean]
 ```
 
-* bash-completion shortcuts for commands and options.
-* and [tons more](/docs/api.md).
+- bash-completion shortcuts for commands and options.
+- and [tons more](/docs/api.md).
 
 ## Installation
 
 Stable version:
+
 ```bash
 npm i yargs
 ```
 
 Bleeding edge version with the most recent features:
+
 ```bash
 npm i yargs@next
 ```
@@ -59,14 +62,14 @@ npm i yargs@next
 
 ```javascript
 #!/usr/bin/env node
-const yargs = require('yargs/yargs')
-const { hideBin } = require('yargs/helpers')
-const argv = yargs(hideBin(process.argv)).argv
+const yargs = require('yargs/yargs');
+const {hideBin} = require('yargs/helpers');
+const argv = yargs(hideBin(process.argv)).argv;
 
 if (argv.ships > 3 && argv.distance < 53.5) {
-  console.log('Plunder more riffiwobbles!')
+  console.log('Plunder more riffiwobbles!');
 } else {
-  console.log('Retreat from the xupptumblers!')
+  console.log('Retreat from the xupptumblers!');
 }
 ```
 
@@ -84,26 +87,30 @@ Retreat from the xupptumblers!
 
 ```javascript
 #!/usr/bin/env node
-const yargs = require('yargs/yargs')
-const { hideBin } = require('yargs/helpers')
+const yargs = require('yargs/yargs');
+const {hideBin} = require('yargs/helpers');
 
 yargs(hideBin(process.argv))
-  .command('serve [port]', 'start the server', (yargs) => {
-    return yargs
-      .positional('port', {
+  .command(
+    'serve [port]',
+    'start the server',
+    yargs => {
+      return yargs.positional('port', {
         describe: 'port to bind on',
-        default: 5000
-      })
-  }, (argv) => {
-    if (argv.verbose) console.info(`start server on :${argv.port}`)
-    serve(argv.port)
-  })
+        default: 5000,
+      });
+    },
+    argv => {
+      if (argv.verbose) console.info(`start server on :${argv.port}`);
+      serve(argv.port);
+    }
+  )
   .option('verbose', {
     alias: 'v',
     type: 'boolean',
-    description: 'Run with verbose logging'
+    description: 'Run with verbose logging',
   })
-  .parse()
+  .parse();
 ```
 
 Run the example above with `--help` to see the help for the application.
@@ -125,20 +132,25 @@ See usage examples in [docs](/docs/typescript.md).
 As of `v16`, `yargs` supports [Deno](https://github.com/denoland/deno):
 
 ```typescript
-import yargs from 'https://deno.land/x/yargs/deno.ts'
-import { Arguments } from 'https://deno.land/x/yargs/deno-types.ts'
+import yargs from 'https://deno.land/x/yargs/deno.ts';
+import {Arguments} from 'https://deno.land/x/yargs/deno-types.ts';
 
 yargs(Deno.args)
-  .command('download <files...>', 'download a list of files', (yargs: any) => {
-    return yargs.positional('files', {
-      describe: 'a list of files to do something with'
-    })
-  }, (argv: Arguments) => {
-    console.info(argv)
-  })
+  .command(
+    'download <files...>',
+    'download a list of files',
+    (yargs: any) => {
+      return yargs.positional('files', {
+        describe: 'a list of files to do something with',
+      });
+    },
+    (argv: Arguments) => {
+      console.info(argv);
+    }
+  )
   .strictCommands()
   .demandCommand(1)
-  .parse()
+  .parse();
 ```
 
 ### ESM
@@ -146,15 +158,20 @@ yargs(Deno.args)
 As of `v16`,`yargs` supports ESM imports:
 
 ```js
-import yargs from 'yargs'
-import { hideBin } from 'yargs/helpers'
+import yargs from 'yargs';
+import {hideBin} from 'yargs/helpers';
 
 yargs(hideBin(process.argv))
-  .command('curl <url>', 'fetch the contents of the URL', () => {}, (argv) => {
-    console.info(argv)
-  })
+  .command(
+    'curl <url>',
+    'fetch the contents of the URL',
+    () => {},
+    argv => {
+      console.info(argv);
+    }
+  )
   .demandCommand(1)
-  .parse()
+  .parse();
 ```
 
 ### Usage in Browser
@@ -169,21 +186,21 @@ Having problems? want to contribute? join our [community slack](http://devtoolsc
 
 ### Table of Contents
 
-* [Yargs' API](/docs/api.md)
-* [Examples](/docs/examples.md)
-* [Parsing Tricks](/docs/tricks.md)
-  * [Stop the Parser](/docs/tricks.md#stop)
-  * [Negating Boolean Arguments](/docs/tricks.md#negate)
-  * [Numbers](/docs/tricks.md#numbers)
-  * [Arrays](/docs/tricks.md#arrays)
-  * [Objects](/docs/tricks.md#objects)
-  * [Quotes](/docs/tricks.md#quotes)
-* [Advanced Topics](/docs/advanced.md)
-  * [Composing Your App Using Commands](/docs/advanced.md#commands)
-  * [Building Configurable CLI Apps](/docs/advanced.md#configuration)
-  * [Customizing Yargs' Parser](/docs/advanced.md#customizing)
-  * [Bundling yargs](/docs/bundling.md)
-* [Contributing](/contributing.md)
+- [Yargs' API](/docs/api.md)
+- [Examples](/docs/examples.md)
+- [Parsing Tricks](/docs/tricks.md)
+  - [Stop the Parser](/docs/tricks.md#stop)
+  - [Negating Boolean Arguments](/docs/tricks.md#negate)
+  - [Numbers](/docs/tricks.md#numbers)
+  - [Arrays](/docs/tricks.md#arrays)
+  - [Objects](/docs/tricks.md#objects)
+  - [Quotes](/docs/tricks.md#quotes)
+- [Advanced Topics](/docs/advanced.md)
+  - [Composing Your App Using Commands](/docs/advanced.md#commands)
+  - [Building Configurable CLI Apps](/docs/advanced.md#configuration)
+  - [Customizing Yargs' Parser](/docs/advanced.md#customizing)
+  - [Bundling yargs](/docs/bundling.md)
+- [Contributing](/contributing.md)
 
 ## Supported Node.js Versions
 

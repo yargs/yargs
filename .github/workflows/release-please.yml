@@ -1,7 +1,7 @@
 on:
-   push:
-     branches:
-       - main
+  push:
+    branches:
+      - main
 name: release-please
 permissions: {}
 jobs:

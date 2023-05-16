@@ -47,7 +47,7 @@
   "Show help": "Affiche l'aide",
   "Show version number": "Affiche le numéro de version",
   "Did you mean %s?": "Vouliez-vous dire %s ?",
-  "Arguments %s and %s are mutually exclusive" : "Les arguments %s et %s sont mutuellement exclusifs",
+  "Arguments %s and %s are mutually exclusive": "Les arguments %s et %s sont mutuellement exclusifs",
   "Positionals:": "Arguments positionnels :",
   "command": "commande"
 }

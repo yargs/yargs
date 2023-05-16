@@ -2,7 +2,7 @@
 var argv = require('yargs/yargs')(process.argv.slice(2)).argv;
 
 if (argv.rif - 5 * argv.xup > 7.138) {
-    console.log('Buy more riffiwobbles');
+  console.log('Buy more riffiwobbles');
 } else {
-    console.log('Sell the xupptumblers');
+  console.log('Sell the xupptumblers');
 }

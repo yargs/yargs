@@ -1,13 +1,7 @@
 {
-  "exclude": [
-    "build/test/**",
-    "test/**"
-  ],
+  "exclude": ["build/test/**", "test/**"],
   "exclude-after-remap": true,
-  "reporter": [
-    "html",
-    "text"
-  ],
+  "reporter": ["html", "text"],
   "lines": 100,
   "branches": "96",
   "statements": "100"

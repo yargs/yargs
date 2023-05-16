@@ -29,12 +29,12 @@ The following `.options()` definition:
 import yargs from 'yargs/yargs';
 
 const argv = yargs(process.argv.slice(2)).options({
-  a: { type: 'boolean', default: false },
-  b: { type: 'string', demandOption: true },
-  c: { type: 'number', alias: 'chill' },
-  d: { type: 'array' },
-  e: { type: 'count' },
-  f: { choices: ['1', '2', '3'] }
+  a: {type: 'boolean', default: false},
+  b: {type: 'string', demandOption: true},
+  c: {type: 'number', alias: 'chill'},
+  d: {type: 'array'},
+  e: {type: 'count'},
+  f: {choices: ['1', '2', '3']},
 }).argv;
 ```
 
@@ -135,7 +135,7 @@ cosnt args = yargsInstance
   .wrap(myYargs.terminalWidth())
   // .otherMethods(...)
   .argv
-  
+
 ```
 
 # More specific typing for choices()
@@ -144,9 +144,9 @@ To improve the `choices` option typing you can also specify it as const:
 
 ```typescript
 const argv = yargs.option('difficulty', {
-  choices: ["normal", "nightmare", "hell"] as const,
-  demandOption: true
+  choices: ['normal', 'nightmare', 'hell'] as const,
+  demandOption: true,
 }).argv;
 ```
 
-`argv.difficulty` will get  type `'normal' | 'nightmare' | 'hell'`.
+`argv.difficulty` will get type `'normal' | 'nightmare' | 'hell'`.

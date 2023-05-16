@@ -1,4 +1,5 @@
-<!doctype html>
+<!DOCTYPE html>
+<html>
   <header>
     <style>
       #output {
@@ -13,19 +14,33 @@
     </style>
   </header>
   <body>
-    <textarea id="output" placeholder="type '--help' and hit [enter] to get started" readonly="readonly"></textarea>
+    <textarea
+      id="output"
+      placeholder="type '--help' and hit [enter] to get started"
+      readonly="readonly"
+    ></textarea>
     <input type="text" placeholder=">" id="input" autocomplete="off" />
     <script type="module">
       // Import the ESM version of the yargs module:
       import Yargs from 'https://unpkg.com/yargs@16.0.0-beta.1/browser.mjs';
       const yargs = Yargs()
         .scriptName('>')
-        .command('clear', 'clear the output window', () => {}, () => {
-          output.value = '';
-        })
-        .command('alert <message...>', 'display an alert', () => {}, (argv) => {
-          alert(argv.message.join(' '))
-        })
+        .command(
+          'clear',
+          'clear the output window',
+          () => {},
+          () => {
+            output.value = '';
+          }
+        )
+        .command(
+          'alert <message...>',
+          'display an alert',
+          () => {},
+          argv => {
+            alert(argv.message.join(' '));
+          }
+        )
         .wrap(null)
         .strict()
         .demandCommand(1)
@@ -35,7 +50,12 @@
       const input = document.getElementById('input');
       const output = document.getElementById('output');
       input.addEventListener('keydown', event => {
-        if (event.key === "Enter" || event.code === "Enter" || event.keyCode === 13) { // Enter.
+        if (
+          event.key === 'Enter' ||
+          event.code === 'Enter' ||
+          event.keyCode === 13
+        ) {
+          // Enter.
           const argv = yargs.parse(input.value, (err, argv, _output) => {
             if (output) {
               output.value += `\n${_output}`;

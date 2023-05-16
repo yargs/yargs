@@ -2693,14 +2693,21 @@ describe('yargs dsl tests', () => {
         '--__proto__',
         '200',
       ]);
-      Object.keys({}.__proto__).length.should.equal(0) // eslint-disable-line
+      Object.keys({}.__proto__).length.should.equal(0); // eslint-disable-line
       expect({}.foo).to.equal(undefined);
       expect({}.bar).to.equal(undefined);
     });
 
     it('does not pollute, when .argv is called', () => {
-      yargs(['-f.__proto__.foo', '99', '-x.y.__proto__.bar', '100', '--__proto__', '200']).argv // eslint-disable-line
-      Object.keys({}.__proto__).length.should.equal(0) // eslint-disable-line
+      yargs([
+        '-f.__proto__.foo',
+        '99',
+        '-x.y.__proto__.bar',
+        '100',
+        '--__proto__',
+        '200',
+      ]).argv; // eslint-disable-line
+      Object.keys({}.__proto__).length.should.equal(0); // eslint-disable-line
       expect({}.foo).to.equal(undefined);
       expect({}.bar).to.equal(undefined);
     });
@@ -2716,7 +2723,7 @@ describe('yargs dsl tests', () => {
         })
         .default('__proto__', {hello: 'world'})
         .parse(['--foo']);
-        Object.keys({}.__proto__).length.should.equal(0) // eslint-disable-line
+      Object.keys({}.__proto__).length.should.equal(0); // eslint-disable-line
     });
   });
 

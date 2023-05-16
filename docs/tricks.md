@@ -2,7 +2,8 @@
 
 <a name="stop"></a>
 Stop Parsing
-------------
+
+---
 
 Use `--` to stop parsing flags and stuff the remainder into `argv._`.
 
@@ -14,7 +15,8 @@ Use `--` to stop parsing flags and stuff the remainder into `argv._`.
 
 <a name="negate"></a>
 Negating Boolean Arguments
--------------
+
+---
 
 If you want to explicitly set a field to false instead of just leaving it
 undefined or to override a default you can do `--no-key`.
@@ -24,7 +26,8 @@ undefined or to override a default you can do `--no-key`.
 
 <a name="numbers"></a>
 Numbers
--------
+
+---
 
 Every argument that looks like a number (`!isNaN(Number(arg))`) is converted to
 one. This way you can just `net.createConnection(argv.port)` and you can add
@@ -36,7 +39,8 @@ or by explicitly specifying [`string`](/docs/api.md/#string) for your flags.
 
 <a name="arrays"></a>
 Arrays
-----------
+
+---
 
 If you specify a flag multiple times it will get turned into an array containing
 all the values in order.
@@ -49,7 +53,8 @@ support arrays of the form `-x 5 6 7 8`.
 
 <a name="objects"></a>
 Objects
-------------
+
+---
 
 When you use dots (`.`s) in argument names, an implicit object path is assumed.
 This lets you organize arguments into nested objects.
@@ -61,8 +66,7 @@ This lets you organize arguments into nested objects.
 
 <a name="quotes"></a>
 
-Quotes
-------------
+## Quotes
 
 When you use string arguments that include dashes (`-`), those will be seen as a separate option by the shell instead of part of the string. The problem is that shells like bash tend to strip quotes. The solution for this is to wrap the string in two sets of quotes.
 
@@ -81,4 +85,3 @@ $ node examples/reflect.js --foo "\"--hello -x=yes -v\""
 { _: [], foo: '--hello -x=yes -v',
   '$0': 'examples/reflect.js' }
 ```
-

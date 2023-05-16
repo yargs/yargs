@@ -2,17 +2,21 @@
 var argv = require('yargs/yargs')(process.argv.slice(2))
   .usage('Usage: $0 <cmd> [options]') // usage string of application.
   .command('install', 'install a package (name@version)') // describe commands available.
-  .command('publish', 'publish the package inside the current working directory')
-  .option('f', { // document options.
+  .command(
+    'publish',
+    'publish the package inside the current working directory'
+  )
+  .option('f', {
+    // document options.
     array: true, // even single values will be wrapped in [].
     description: 'an array of files',
     default: 'test.js',
-    alias: 'file'
+    alias: 'file',
   })
   .alias('f', 'fil')
   .option('h', {
     alias: 'help',
-    description: 'display help message'
+    description: 'display help message',
   })
   .string(['user', 'pass'])
   .implies('user', 'pass') // if 'user' is set 'pass' must be set.
@@ -26,8 +30,7 @@ var argv = require('yargs/yargs')(process.argv.slice(2))
   .epilog('for more information visit https://github.com/chevex/yargs')
   // disable showing help on failures, provide a final message
   // to display for errors.
-  .showHelpOnFail(false, 'whoops, something went wrong! run with --help')
-  .argv;
+  .showHelpOnFail(false, 'whoops, something went wrong! run with --help').argv;
 
 // the parsed data is stored in argv.
 console.log(argv);

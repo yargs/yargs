@@ -43,7 +43,7 @@
   "Show help": "Näytä ohje",
   "Show version number": "Näytä versionumero",
   "Did you mean %s?": "Tarkoititko %s?",
-  "Arguments %s and %s are mutually exclusive" : "Argumentit %s ja %s eivät ole yhteensopivat",
+  "Arguments %s and %s are mutually exclusive": "Argumentit %s ja %s eivät ole yhteensopivat",
   "Positionals:": "Sijaintiparametrit:",
   "command": "komento"
 }
