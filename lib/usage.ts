@@ -151,6 +151,11 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
   };
   self.getDescriptions = () => descriptions;
 
+  let prologs: string[] = [];
+  self.prolog = msg => {
+    prologs.push(msg);
+  };
+
   let epilogs: string[] = [];
   self.epilog = msg => {
     epilogs.push(msg);
@@ -232,6 +237,14 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
         }
         ui.div(`${u}`);
       }
+    }
+
+    // the prolog.
+    if (prologs.length > 0) {
+      const p = prologs
+        .map(prolog => prolog.replace(/\$0/g, base$0))
+        .join('\n');
+      ui.div(`${p}\n`);
     }
 
     // your application's commands, i.e., non-option
@@ -702,6 +715,7 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
     failureOutput = false;
     usages = [];
     usageDisabled = false;
+    prologs = [];
     epilogs = [];
     examples = [];
     commands = [];
@@ -716,6 +730,7 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
       failureOutput,
       usages,
       usageDisabled,
+      prologs,
       epilogs,
       examples,
       commands,
@@ -734,6 +749,7 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
       commands = [...frozen.commands, ...commands];
       usages = [...frozen.usages, ...usages];
       examples = [...frozen.examples, ...examples];
+      prologs = [...frozen.prologs, ...prologs];
       epilogs = [...frozen.epilogs, ...epilogs];
     } else {
       ({
@@ -741,6 +757,7 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
         failureOutput,
         usages,
         usageDisabled,
+        prologs,
         epilogs,
         examples,
         commands,
@@ -779,6 +796,7 @@ export interface UsageInstance {
   getUsageDisabled(): boolean;
   getWrap(): number | nil;
   help(): string;
+  prolog(msg: string): void;
   reset(localLookup: Dictionary<boolean>): UsageInstance;
   showHelp(level?: 'error' | 'log' | ((message: string) => void)): void;
   showHelpOnFail(enabled?: boolean | string, message?: string): UsageInstance;
@@ -803,6 +821,7 @@ export interface FrozenUsageInstance {
   failureOutput: boolean;
   usages: [string, string][];
   usageDisabled: boolean;
+  prologs: string[];
   epilogs: string[];
   examples: [string, string][];
   commands: [string, string, boolean, string[], boolean][];

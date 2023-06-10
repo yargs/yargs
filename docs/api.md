@@ -1442,6 +1442,19 @@ Valid `opt` keys include:
       - `'number'`: synonymous for `number: true`, see [`number()`](#number)
       - `'string'`: synonymous for `string: true`, see [`string()`](#string)
 
+.prolog(str)
+------------
+.prologue(str)
+--------------
+
+A message to print at the beginning of the usage instructions,
+just after the header, e.g.
+
+```js
+var argv = require('yargs/yargs')(process.argv.slice(2))
+  .prologue('HTTP download tool.')
+```
+
 .recommendCommands()
 ---------------------------
 

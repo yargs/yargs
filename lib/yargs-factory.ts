@@ -1236,6 +1236,14 @@ export class YargsInstance {
     this.group(key, this.#usage.getPositionalGroupName());
     return this.option(key, opts);
   }
+  prologue(msg: string): YargsInstance {
+    argsert('<string>', [msg], arguments.length);
+    this.#usage.prolog(msg);
+    return this;
+  }
+  prolog(msg: string): YargsInstance {
+    return this.prologue(msg);
+  }
   recommendCommands(recommend = true): YargsInstance {
     argsert('[boolean]', [recommend], arguments.length);
     this.#recommendCommands = recommend;

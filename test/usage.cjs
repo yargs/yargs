@@ -3241,6 +3241,74 @@ describe('usage tests', () => {
     });
   });
 
+  describe('prologue', () => {
+    it('should display a prolog message at the beginning of the usage instructions', () => {
+      const r = checkUsage(() =>
+        yargs('').prolog('HTTP download tool.').demand('y').wrap(null).parse()
+      );
+
+      r.errors
+        .join('\n')
+        .split(/\n+/)
+        .should.deep.equal([
+          'HTTP download tool.',
+          'Options:',
+          '      --help     Show help  [boolean]',
+          '      --version  Show version number  [boolean]',
+          '  -y  [required]',
+          'Missing required argument: y',
+        ]);
+    });
+
+    it('supports multiple prologs', () => {
+      const r = checkUsage(() =>
+        yargs('')
+          .prolog('HTTP download tool.')
+          .prolog('for bringing the web to you')
+          .prolog('at light speed')
+          .demand('y')
+          .wrap(null)
+          .parse()
+      );
+
+      r.errors
+        .join('\n')
+        .split(/\n+/)
+        .should.deep.equal([
+          'HTTP download tool.',
+          'for bringing the web to you',
+          'at light speed',
+          'Options:',
+          '      --help     Show help  [boolean]',
+          '      --version  Show version number  [boolean]',
+          '  -y  [required]',
+          'Missing required argument: y',
+        ]);
+    });
+
+    it('replaces $0 in prolog string', () => {
+      const r = checkUsage(() =>
+        yargs('')
+          .prolog("Try '$0 --long-help' for more information")
+          .demand('y')
+          .wrap(null)
+          .parse()
+      );
+
+      r.errors
+        .join('\n')
+        .split(/\n+/)
+        .should.deep.equal([
+          "Try 'usage --long-help' for more information",
+          'Options:',
+          '      --help     Show help  [boolean]',
+          '      --version  Show version number  [boolean]',
+          '  -y  [required]',
+          'Missing required argument: y',
+        ]);
+    });
+  });
+
   describe('showHelp', () => {
     // see #143.
     it('should show help regardless of whether argv has been called', () => {
