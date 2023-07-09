@@ -11,8 +11,7 @@ import {
   CommandBuilderDefinition,
   CommandBuilder,
   CommandHandlerCallback,
-  CommandHandlerDefinition,
-  DefinitionOrCommandName,
+  CommandInput,
 } from './command.js';
 import type {
   Dictionary,
@@ -504,7 +503,7 @@ export class YargsInstance {
     return this;
   }
   command(
-    cmd: string | CommandHandlerDefinition | DefinitionOrCommandName[],
+    cmd: CommandInput,
     description?: CommandHandler['description'],
     builder?: CommandBuilderDefinition | CommandBuilder,
     handler?: CommandHandlerCallback,
@@ -527,7 +526,7 @@ export class YargsInstance {
     return this;
   }
   commands(
-    cmd: string | CommandHandlerDefinition | DefinitionOrCommandName[],
+    cmd: CommandInput,
     description?: CommandHandler['description'],
     builder?: CommandBuilderDefinition | CommandBuilder,
     handler?: CommandHandlerCallback,
