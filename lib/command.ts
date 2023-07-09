@@ -29,6 +29,11 @@ import whichModule from './utils/which-module.js';
 
 const DEFAULT_MARKER = /(^\*)|(^\$0)/;
 export type DefinitionOrCommandName = string | CommandHandlerDefinition;
+export type CommandInput =
+  | string
+  | CommandHandlerDefinition
+  | string[]
+  | CommandHandlerDefinition[];
 
 export class CommandInstance {
   shim: PlatformShim;
@@ -84,7 +89,7 @@ export class CommandInstance {
     this.shim.requireDirectory({require: req, filename: callerFile}, dir, opts);
   }
   addHandler(
-    cmd: string | CommandHandlerDefinition | DefinitionOrCommandName[],
+    cmd: CommandInput,
     description?: CommandHandler['description'],
     builder?: CommandBuilderDefinition | CommandBuilder,
     handler?: CommandHandlerCallback,
@@ -99,7 +104,7 @@ export class CommandInstance {
     // each handler individually:
     if (Array.isArray(cmd)) {
       if (isCommandAndAliases(cmd)) {
-        [cmd, ...aliases] = cmd;
+        [cmd, ...aliases] = cmd as [CommandHandlerDefinition, ...string[]];
       } else {
         for (const command of cmd) {
           this.addHandler(command);
