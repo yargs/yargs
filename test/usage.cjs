@@ -1019,8 +1019,7 @@ describe('usage tests', () => {
           .strict()
           .fail(msg => {
             return done();
-          })
-          .parse();
+          }).argv;
       });
 
       it('accepts valid options', () => {
@@ -4397,8 +4396,7 @@ describe('usage tests', () => {
             qux: {
               group: 'Shown:',
             },
-          })
-          .parse()
+          }).argv
       );
 
       r.logs[0]
