@@ -1019,7 +1019,8 @@ describe('usage tests', () => {
           .strict()
           .fail(msg => {
             return done();
-          }).argv;
+          })
+          .parse();
       });
 
       it('accepts valid options', () => {
@@ -4396,7 +4397,8 @@ describe('usage tests', () => {
             qux: {
               group: 'Shown:',
             },
-          }).argv
+          })
+          .parse()
       );
 
       r.logs[0]
@@ -4736,7 +4738,7 @@ describe('usage tests', () => {
             },
             {command: 'foo', desc: 'Foo command description'},
           ]);
-        await y.argv;
+        await y.parse();
         help.split('\n').should.deep.equal(expected);
       });
     });

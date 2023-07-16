@@ -74,7 +74,7 @@ In a new project (see: [npm-init](https://docs.npmjs.com/cli/v7/commands/npm-ini
 2. Create the following **index.js**
 ```js
 const yargs = require('yargs')
-const argv = yargs(process.argv).argv
+const argv = yargs(process.argv).parse()
 
 if (argv.ships > 3 && argv.distance < 53.5) {
   console.log('Plunder more riffiwobbles!')

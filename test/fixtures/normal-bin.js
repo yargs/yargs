@@ -4,5 +4,5 @@
 const argv = require('../../').help('help').version().parserConfiguration({
   'dot-notation': false,
   'boolean-negation': false,
-}).argv;
+}).parse();
 console.log(argv);

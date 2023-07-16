@@ -6,7 +6,7 @@ var argv = require('yargs/yargs')(process.argv.slice(2))
         w: '--no-h',
         1: 'h'
     })
-    .argv;
+    .parse();
 
 if (argv.x) {
     console.log('x / y : ' + (argv.x / argv.y));

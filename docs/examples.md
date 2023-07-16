@@ -11,7 +11,7 @@ plunder.js:
 
 ```javascript
 #!/usr/bin/env node
-var argv = require('yargs/yargs')(process.argv.slice(2)).argv;
+var argv = require('yargs/yargs')(process.argv.slice(2)).parse();
 
 if (argv.ships > 3 && argv.distance < 53.5) {
     console.log('Plunder more riffiwobbles!');
@@ -35,7 +35,7 @@ short.js:
 
 ```javascript
 #!/usr/bin/env node
-var argv = require('yargs/yargs')(process.argv.slice(2)).argv;
+var argv = require('yargs/yargs')(process.argv.slice(2)).parse();
 console.log('(%d,%d)', argv.x, argv.y);
 ```
 
@@ -51,7 +51,7 @@ bool.js:
 
 ```javascript
 #!/usr/bin/env node
-var argv = require('yargs/yargs')(process.argv.slice(2)).argv;
+var argv = require('yargs/yargs')(process.argv.slice(2)).parse();
 
 if (argv.s) {
     process.stdout.write(argv.fr ? 'Le perroquet dit: ' : 'The parrot says: ');
@@ -79,7 +79,7 @@ nonopt.js:
 
 ```javascript
 #!/usr/bin/env node
-var argv = require('yargs/yargs')(process.argv.slice(2)).argv;
+var argv = require('yargs/yargs')(process.argv.slice(2)).parse();
 console.log('(%d,%d)', argv.x, argv.y);
 console.log(argv._);
 ```
@@ -104,7 +104,7 @@ count.js:
 var argv = require('yargs/yargs')(process.argv.slice(2))
     .count('verbose')
     .alias('v', 'verbose')
-    .argv;
+    .parse();
 
 VERBOSE_LEVEL = argv.verbose;
 
@@ -145,7 +145,7 @@ area.js:
 var argv = require('yargs/yargs')(process.argv.slice(2))
     .usage('Usage: $0 -w [num] -h [num]')
     .demandOption(['w','h'])
-    .argv;
+    .parse();
 
 console.log("The area is:", argv.w * argv.h);
 ```
@@ -173,7 +173,7 @@ demand_count.js:
 #!/usr/bin/env node
 var argv = require('yargs/yargs')(process.argv.slice(2))
     .demandCommand(2)
-    .argv;
+    .parse();
 console.dir(argv);
 ```
 
@@ -199,7 +199,7 @@ default_singles.js:
 var argv = require('yargs/yargs')(process.argv.slice(2))
     .default('x', 10)
     .default('y', 10)
-    .argv
+    .parse()
 ;
 console.log(argv.x + argv.y);
 ```
@@ -215,7 +215,7 @@ default_hash.js:
 #!/usr/bin/env node
 var argv = require('yargs/yargs')(process.argv.slice(2))
     .default({ x : 10, y : 10 })
-    .argv
+    .parse()
 ;
 console.log(argv.x + argv.y);
 ```
@@ -234,7 +234,7 @@ boolean_single.js:
 #!/usr/bin/env node
 var argv = require('yargs/yargs')(process.argv.slice(2))
     .boolean(['r','v'])
-    .argv
+    .parse()
 ;
 console.dir([ argv.r, argv.v ]);
 console.dir(argv._);
@@ -253,7 +253,7 @@ boolean_double.js:
 #!/usr/bin/env node
 var argv = require('yargs/yargs')(process.argv.slice(2))
     .boolean(['x','y','z'])
-    .argv
+    .parse()
 ;
 console.dir([ argv.x, argv.y, argv.z ]);
 console.dir(argv._);
@@ -286,7 +286,7 @@ var argv = require('yargs/yargs')(process.argv.slice(2))
     .help('h')
     .alias('h', 'help')
     .epilog('copyright 2019')
-    .argv;
+    .parse();
 
 var fs = require('fs');
 var s = fs.createReadStream(argv.file);
@@ -364,5 +364,6 @@ const argv = yargs(process.argv.splice(2))
   .command('sing', 'a classic yargs command without prompting', () => {}, sing)
   .demandCommand(1, 1, 'choose a command: ask or sing')
   .strict()
-  .help('h').argv;
+  .help('h')
+  .parse();
 ```

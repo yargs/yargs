@@ -2605,11 +2605,13 @@ describe('yargs dsl tests', () => {
 
   // See: https://github.com/yargs/yargs/issues/1098
   it('should allow array and requires arg to be used in conjunction', () => {
-    const argv = yargs(['-i', 'item1', 'item2', 'item3']).option('i', {
-      alias: 'items',
-      type: 'array',
-      requiresArg: true,
-    }).argv;
+    const argv = yargs(['-i', 'item1', 'item2', 'item3'])
+      .option('i', {
+        alias: 'items',
+        type: 'array',
+        requiresArg: true,
+      })
+      .parse();
     argv.items.should.eql(['item1', 'item2', 'item3']);
     argv.i.should.eql(['item1', 'item2', 'item3']);
   });
