@@ -908,8 +908,7 @@ is executed, as an example:
 var argv = require('yargs/yargs')(process.argv.slice(2))
   .option('a', {
     alias: 'all',
-    default: true,
-    global: false
+    default: true
   })
   .option('n', {
     alias: 'none',
