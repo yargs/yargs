@@ -81,7 +81,7 @@
     "rimraf": "^3.0.2",
     "rollup": "^3.29.4",
     "rollup-plugin-cleanup": "^3.2.1",
-    "rollup-plugin-ts": "3.3.0",
+    "rollup-plugin-ts": "3.2.0",
     "typescript": "^5.3.3",
     "which": "^2.0.0",
     "yargs-test-extends": "^1.0.1"
