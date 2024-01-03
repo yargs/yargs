@@ -19,7 +19,7 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node }}
-      - run: npm install -g npm@7
+      - run: npm install -g npm@8
       - run: node --version
       - run: npm install --engine-strict
       - run: npm test
