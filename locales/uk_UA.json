@@ -43,7 +43,7 @@
   "Show help": "Показати довідку",
   "Show version number": "Показати версію",
   "Did you mean %s?": "Можливо, ви мали на увазі %s?",
-  "Arguments %s and %s are mutually exclusive" : "Аргументи %s та %s взаємовиключні",
+  "Arguments %s and %s are mutually exclusive": "Аргументи %s та %s взаємовиключні",
   "Positionals:": "Позиційні:",
   "command": "команда",
   "deprecated": "застарілий",

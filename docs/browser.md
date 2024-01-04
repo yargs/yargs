@@ -9,12 +9,22 @@ the browser:
   import Yargs from 'https://unpkg.com/yargs@16.0.0-beta.1/browser.mjs';
   const yargs = Yargs()
     .scriptName('>')
-    .command('clear', 'clear the output window', () => {}, () => {
-      // ...
-    })
-    .command('alert <message...>', 'display an alert', () => {}, (argv) => {
-      alert(argv.message.join(' '))
-    })
+    .command(
+      'clear',
+      'clear the output window',
+      () => {},
+      () => {
+        // ...
+      }
+    )
+    .command(
+      'alert <message...>',
+      'display an alert',
+      () => {},
+      argv => {
+        alert(argv.message.join(' '));
+      }
+    )
     .wrap(null)
     .strict()
     .demandCommand(1)

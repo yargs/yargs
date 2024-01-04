@@ -43,7 +43,7 @@
   "Show help": "Zobrazit nápovědu",
   "Show version number": "Zobrazit číslo verze",
   "Did you mean %s?": "Měl jste na mysli %s?",
-  "Arguments %s and %s are mutually exclusive" : "Argumenty %s a %s se vzájemně vylučují",
+  "Arguments %s and %s are mutually exclusive": "Argumenty %s a %s se vzájemně vylučují",
   "Positionals:": "Poziční:",
   "command": "příkaz",
   "deprecated": "zastaralé",

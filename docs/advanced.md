@@ -1,6 +1,7 @@
 # Advanced Topics
 
 <a name="commands"></a>
+
 ## Commands
 
 Yargs provides a powerful set of tools for composing modular command-driven-applications.
@@ -14,11 +15,14 @@ commands. tldr; default commands allow you to define the entry point to your
 application using a similar API to subcommands.
 
 ```js
-const argv = require('yargs/yargs')(process.argv.slice(2))
-  .command('$0', 'the default command', () => {}, (argv) => {
-    console.log('this command will be run by default')
-  })
-  .argv
+const argv = require('yargs/yargs')(process.argv.slice(2)).command(
+  '$0',
+  'the default command',
+  () => {},
+  argv => {
+    console.log('this command will be run by default');
+  }
+).argv;
 ```
 
 The command defined above will be executed if the program
@@ -27,11 +31,14 @@ is run with `./my-cli.js --x=22`.
 Default commands can also be used as a command alias, like so:
 
 ```js
-const argv = require('yargs/yargs')(process.argv.slice(2))
-  .command(['serve', '$0'], 'the serve command', () => {}, (argv) => {
-    console.log('this command will be run by default')
-  })
-  .argv
+const argv = require('yargs/yargs')(process.argv.slice(2)).command(
+  ['serve', '$0'],
+  'the serve command',
+  () => {},
+  argv => {
+    console.log('this command will be run by default');
+  }
+).argv;
 ```
 
 The command defined above will be executed if the program
@@ -45,9 +52,7 @@ take the form `[bar]`. The parsed positional arguments will be populated in
 `argv`:
 
 ```js
-yargs.command('get <source> [proxy]', 'make a get HTTP request')
-  .help()
-  .argv
+yargs.command('get <source> [proxy]', 'make a get HTTP request').help().argv;
 ```
 
 #### Positional Argument Aliases
@@ -57,9 +62,12 @@ As an example, suppose our application allows either a username _or_
 an email as the first argument:
 
 ```js
-yargs.command('get <username|email> [password]', 'fetch a user by username or email.')
-  .help()
-  .argv
+yargs
+  .command(
+    'get <username|email> [password]',
+    'fetch a user by username or email.'
+  )
+  .help().argv;
 ```
 
 In this way, both `argv.username` and `argv.email` would be populated with the
@@ -71,9 +79,7 @@ The last positional argument can optionally accept an array of
 values, by using the `..` operator:
 
 ```js
-yargs.command('download <url> [files..]', 'download several files')
-  .help()
-  .argv
+yargs.command('download <url> [files..]', 'download several files').help().argv;
 ```
 
 #### Describing Positional Arguments
@@ -81,17 +87,19 @@ yargs.command('download <url> [files..]', 'download several files')
 You can use the method [`.positional()`](/docs/api.md#positionalkey-opt) in a command's builder function to describe and configure a positional argument:
 
 ```js
-yargs.command('get <source> [proxy]', 'make a get HTTP request', (yargs) => {
-  yargs.positional('source', {
-    describe: 'URL to fetch content from',
-    type: 'string',
-    default: 'http://www.google.com'
-  }).positional('proxy', {
-    describe: 'optional proxy URL'
+yargs
+  .command('get <source> [proxy]', 'make a get HTTP request', yargs => {
+    yargs
+      .positional('source', {
+        describe: 'URL to fetch content from',
+        type: 'string',
+        default: 'http://www.google.com',
+      })
+      .positional('proxy', {
+        describe: 'optional proxy URL',
+      });
   })
-})
-.help()
-.argv
+  .help().argv;
 ```
 
 ### Command Execution
@@ -125,22 +133,21 @@ line, the command will be executed.
 ```js
 #!/usr/bin/env node
 require('yargs/yargs')(process.argv.slice(2))
-  .command(['start [app]', 'run', 'up'], 'Start up an app', {}, (argv) => {
-    console.log('starting up the', argv.app || 'default', 'app')
+  .command(['start [app]', 'run', 'up'], 'Start up an app', {}, argv => {
+    console.log('starting up the', argv.app || 'default', 'app');
   })
   .command({
     command: 'configure <key> [value]',
     aliases: ['config', 'cfg'],
     desc: 'Set a config variable',
-    builder: (yargs) => yargs.default('value', 'true'),
-    handler: (argv) => {
-      console.log(`setting ${argv.key} to ${argv.value}`)
-    }
+    builder: yargs => yargs.default('value', 'true'),
+    handler: argv => {
+      console.log(`setting ${argv.key} to ${argv.value}`);
+    },
   })
   .demandCommand()
   .help()
-  .wrap(72)
-  .argv
+  .wrap(72).argv;
 ```
 
 ```
@@ -164,47 +171,49 @@ starting up the web app
 For complicated commands you can pull the logic into a module. A module
 simply needs to export:
 
-* `exports.command`: string (or array of strings) that executes this command when given on the command line, first string may contain positional args
-* `exports.aliases`: array of strings (or a single string) representing aliases of `exports.command`, positional args defined in an alias are ignored
-* `exports.describe`: string used as the description for the command in help text, use `false` for a hidden command
-* `exports.builder`: object declaring the options the command accepts, or a function accepting and returning a yargs instance
-* `exports.handler`: a function which will be passed the parsed argv.
-* `exports.deprecated`: a boolean (or string) to show deprecation notice.
+- `exports.command`: string (or array of strings) that executes this command when given on the command line, first string may contain positional args
+- `exports.aliases`: array of strings (or a single string) representing aliases of `exports.command`, positional args defined in an alias are ignored
+- `exports.describe`: string used as the description for the command in help text, use `false` for a hidden command
+- `exports.builder`: object declaring the options the command accepts, or a function accepting and returning a yargs instance
+- `exports.handler`: a function which will be passed the parsed argv.
+- `exports.deprecated`: a boolean (or string) to show deprecation notice.
 
 ```js
 // my-module.js
-exports.command = 'get <source> [proxy]'
+exports.command = 'get <source> [proxy]';
 
-exports.describe = 'make a get HTTP request'
+exports.describe = 'make a get HTTP request';
 
 exports.builder = {
   banana: {
-    default: 'cool'
+    default: 'cool',
   },
   batman: {
-    default: 'sad'
-  }
-}
+    default: 'sad',
+  },
+};
 
 exports.handler = function (argv) {
   // do something with argv.
-}
+};
 ```
 
 You then register the module like so:
 
 ```js
-yargs.command(require('my-module'))
-  .help()
-  .argv
+yargs.command(require('my-module')).help().argv;
 ```
 
 Or if the module does not export `command` and `describe` (or if you just want to override them):
 
 ```js
-yargs.command('get <source> [proxy]', 'make a get HTTP request', require('my-module'))
-  .help()
-  .argv
+yargs
+  .command(
+    'get <source> [proxy]',
+    'make a get HTTP request',
+    require('my-module')
+  )
+  .help().argv;
 ```
 
 #### Testing a Command Module
@@ -212,26 +221,25 @@ yargs.command('get <source> [proxy]', 'make a get HTTP request', require('my-mod
 If you want to test a command in its entirety you can test it like this:
 
 ```js
-it("returns help output", async () => {
+it('returns help output', async () => {
   // Initialize parser using the command module
   const parser = yargs.command(require('./my-command-module')).help();
 
   // Run the command module with --help as argument
-  const output = await new Promise((resolve) => {
-    parser.parse("--help", (err, argv, output) => {
+  const output = await new Promise(resolve => {
+    parser.parse('--help', (err, argv, output) => {
       resolve(output);
-    })
+    });
   });
 
   // Verify the output is correct
-  expect(output).toBe(expect.stringContaining("helpful message"));
+  expect(output).toBe(expect.stringContaining('helpful message'));
 });
 ```
 
 This example uses [jest](https://github.com/facebook/jest) as a test runner, but the concept is independent of framework.
 
-.commandDir(directory, [opts])
-------------------------------
+## .commandDir(directory, [opts])
 
 _Note: `commandDir()` does not work with ESM or Deno, see [hierarchy using index.mjs](/docs/advanced.md#esm-hierarchy) for an example of building a complex nested CLI using ESM._
 
@@ -256,26 +264,26 @@ can either move your module to a different directory or use the `exclude` or
 
 - `recurse`: boolean, default `false`
 
-    Look for command modules in all subdirectories and apply them as a flattened
-    (non-hierarchical) list.
+  Look for command modules in all subdirectories and apply them as a flattened
+  (non-hierarchical) list.
 
 - `extensions`: array of strings, default `['js']`
 
-    The types of files to look for when requiring command modules.
+  The types of files to look for when requiring command modules.
 
 - `visit`: function
 
-    A synchronous function called for each command module encountered. Accepts
-    `commandObject`, `pathToFile`, and `filename` as arguments. Returns
-    `commandObject` to include the command; any falsy value to exclude/skip it.
+  A synchronous function called for each command module encountered. Accepts
+  `commandObject`, `pathToFile`, and `filename` as arguments. Returns
+  `commandObject` to include the command; any falsy value to exclude/skip it.
 
 - `include`: RegExp or function
 
-    Allow list certain modules. See [`require-directory`](https://www.npmjs.com/package/require-directory) for details.
+  Allow list certain modules. See [`require-directory`](https://www.npmjs.com/package/require-directory) for details.
 
 - `exclude`: RegExp or function
 
-    Block list certain modules. See [`require-directory`](https://www.npmjs.com/package/require-directory) for details.
+  Block list certain modules. See [`require-directory`](https://www.npmjs.com/package/require-directory) for details.
 
 ### Example command hierarchy using `.commandDir()`
 
@@ -310,59 +318,62 @@ cli.js:
 require('yargs/yargs')(process.argv.slice(2))
   .commandDir('cmds')
   .demandCommand()
-  .help()
-  .argv
+  .help().argv;
 ```
 
 cmds/init.js:
 
 ```js
-exports.command = 'init [dir]'
-exports.desc = 'Create an empty repo'
+exports.command = 'init [dir]';
+exports.desc = 'Create an empty repo';
 exports.builder = {
   dir: {
-    default: '.'
-  }
-}
+    default: '.',
+  },
+};
 exports.handler = function (argv) {
-  console.log('init called for dir', argv.dir)
-}
+  console.log('init called for dir', argv.dir);
+};
 ```
 
 cmds/remote.js:
 
 ```js
-exports.command = 'remote <command>'
-exports.desc = 'Manage set of tracked repos'
+exports.command = 'remote <command>';
+exports.desc = 'Manage set of tracked repos';
 exports.builder = function (yargs) {
-  return yargs.commandDir('remote_cmds')
-}
-exports.handler = function (argv) {}
+  return yargs.commandDir('remote_cmds');
+};
+exports.handler = function (argv) {};
 ```
 
 cmds/remote_cmds/add.js:
 
 ```js
-exports.command = 'add <name> <url>'
-exports.desc = 'Add remote named <name> for repo at url <url>'
-exports.builder = {}
+exports.command = 'add <name> <url>';
+exports.desc = 'Add remote named <name> for repo at url <url>';
+exports.builder = {};
 exports.handler = function (argv) {
-  console.log('adding remote %s at url %s', argv.name, argv.url)
-}
+  console.log('adding remote %s at url %s', argv.name, argv.url);
+};
 ```
 
 cmds/remote_cmds/prune.js:
 
 ```js
-exports.command = 'prune <name> [names..]'
-exports.desc = 'Delete tracked branches gone stale for remotes'
-exports.builder = {}
+exports.command = 'prune <name> [names..]';
+exports.desc = 'Delete tracked branches gone stale for remotes';
+exports.builder = {};
 exports.handler = function (argv) {
-  console.log('pruning remotes %s', [].concat(argv.name).concat(argv.names).join(', '))
-}
+  console.log(
+    'pruning remotes %s',
+    [].concat(argv.name).concat(argv.names).join(', ')
+  );
+};
 ```
 
 <a name="esm-hierarchy"></a>
+
 ### Example command hierarchy using index.mjs
 
 To support creating a complex nested CLI when using ESM, the method
@@ -386,15 +397,14 @@ cli.js:
 #!/usr/bin/env node
 
 import yargs from 'yargs';
-import { hideBin } from 'yargs/helpers';
-import { commands } from './cmds/index.mjs';
+import {hideBin} from 'yargs/helpers';
+import {commands} from './cmds/index.mjs';
 
-yargs(hideBin(process.argv))
-  .command(commands)
-  .argv;
+yargs(hideBin(process.argv)).command(commands).argv;
 ```
 
 <a name="configuration"></a>
+
 ## Building Configurable CLI Apps
 
 One of the goals of yargs has been to examine practices common in the
@@ -409,17 +419,15 @@ allow users to extend and customize their functionality.
 It's common for libraries, e.g., [Babel](https://babeljs.io/docs/usage/babelrc/), [ESLint](https://github.com/eslint/eslint#configuration), to allow you to
 provide configuration by populating a `.rc` file.
 
-Yargs' [`config()`](/docs/api.md#config), combined with the module [find-up](https://www.npmjs.com/package/find-up), makes it  easy to
+Yargs' [`config()`](/docs/api.md#config), combined with the module [find-up](https://www.npmjs.com/package/find-up), makes it easy to
 implement `.rc` functionality:
 
 ```js
-const findUp = require('find-up')
-const fs = require('fs')
-const configPath = findUp.sync(['.myapprc', '.myapprc.json'])
-const config = configPath ? JSON.parse(fs.readFileSync(configPath)) : {}
-const argv = require('yargs/yargs')(process.argv.slice(2))
-  .config(config)
-  .argv
+const findUp = require('find-up');
+const fs = require('fs');
+const configPath = findUp.sync(['.myapprc', '.myapprc.json']);
+const config = configPath ? JSON.parse(fs.readFileSync(configPath)) : {};
+const argv = require('yargs/yargs')(process.argv.slice(2)).config(config).argv;
 ```
 
 ### Providing Configuration in Your package.json
@@ -445,9 +453,7 @@ Yargs gives you this functionality using the [`pkgConf()`](/docs/api.md#config)
 method:
 
 ```js
-const argv = require('yargs/yargs')(process.argv.slice(2))
-  .pkgConf('nyc')
-  .argv
+const argv = require('yargs/yargs')(process.argv.slice(2)).pkgConf('nyc').argv;
 ```
 
 ### Creating a Plugin Architecture
@@ -465,6 +471,7 @@ possible to build plugin architectures similar to [Babel's presets](https://babe
 ```
 
 <a name="customizing"></a>
+
 ## Customizing Yargs' Parser
 
 Not everyone always agrees on how `process.argv` should be interpreted;
@@ -472,13 +479,13 @@ using the [`parserConfiguration()`](/docs/api.md#parserConfiguration) method you
 
 ```js
 yargs.parserConfiguration({
-  "short-option-groups": true,
-  "camel-case-expansion": true,
-  "dot-notation": true,
-  "parse-numbers": true,
-  "boolean-negation": true,
-  "deep-merge-config": false
-})
+  'short-option-groups': true,
+  'camel-case-expansion': true,
+  'dot-notation': true,
+  'parse-numbers': true,
+  'boolean-negation': true,
+  'deep-merge-config': false,
+});
 ```
 
 See the [yargs-parser](https://github.com/yargs/yargs-parser#configuration) module
@@ -506,16 +513,16 @@ In this example, our middleware will check if the `username` and `password` is p
 #### Middleware function
 
 ```js
-const normalizeCredentials = (argv) => {
+const normalizeCredentials = argv => {
   if (!argv.username || !argv.password) {
-    const credentials = JSON.parse(fs.readSync('~/.credentials'))
-    return credentials
+    const credentials = JSON.parse(fs.readSync('~/.credentials'));
+    return credentials;
   }
-  return {}
-}
+  return {};
+};
 
 // Add normalizeCredentials to yargs
-yargs.middleware(normalizeCredentials)
+yargs.middleware(normalizeCredentials);
 ```
 
 ### Example Async Credentials Middleware
@@ -525,18 +532,18 @@ This example is exactly the same however it loads the `username` and `password` 
 #### Middleware function
 
 ```js
-const { promisify } = require('util') // since node 8.0.0
-const readFile = promisify(require('fs').readFile)
+const {promisify} = require('util'); // since node 8.0.0
+const readFile = promisify(require('fs').readFile);
 
-const normalizeCredentials = (argv) => {
+const normalizeCredentials = argv => {
   if (!argv.username || !argv.password) {
-    return readFile('~/.credentials').then(data => JSON.parse(data))
+    return readFile('~/.credentials').then(data => JSON.parse(data));
   }
-  return {}
-}
+  return {};
+};
 
 // Add normalizeCredentials to yargs
-yargs.middleware(normalizeCredentials)
+yargs.middleware(normalizeCredentials);
 ```
 
 #### yargs parsing configuration
@@ -544,15 +551,17 @@ yargs.middleware(normalizeCredentials)
 ```js
 var argv = require('yargs/yargs')(process.argv.slice(2))
   .usage('Usage: $0 <command> [options]')
-  .command('login', 'Authenticate user', (yargs) =>{
-        return yargs.option('username')
-                    .option('password')
-      } ,(argv) => {
-        authenticateUser(argv.username, argv.password)
-      },
-      [normalizeCredentials]
-     )
-  .argv;
+  .command(
+    'login',
+    'Authenticate user',
+    yargs => {
+      return yargs.option('username').option('password');
+    },
+    argv => {
+      authenticateUser(argv.username, argv.password);
+    },
+    [normalizeCredentials]
+  ).argv;
 ```
 
 ## Using Yargs with Async/await
@@ -562,25 +571,31 @@ If you use async middleware or async builders/handlers for commands, `yargs.pars
 parsed arguments object will be returned after the handler completes:
 
 ```js
-import yargs from 'yargs'
-import { hideBin } from 'yargs/helpers'
+import yargs from 'yargs';
+import {hideBin} from 'yargs/helpers';
 
 async function processValue(value) {
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     // Perform some async operation on value.
     setTimeout(() => {
-      return resolve(value)
-    }, 1000)
-  })
+      return resolve(value);
+    }, 1000);
+  });
 }
 
-console.info('start')
+console.info('start');
 await yargs(hideBin(process.argv))
-  .command('add <x> <y>', 'add two eventual values', () => {}, async (argv) => {
-    const sum = await processValue(argv.x) + await processValue(argv.y)
-    console.info(`x + y = ${sum}`)
-  }).parse()
-console.info('finish')
+  .command(
+    'add <x> <y>',
+    'add two eventual values',
+    () => {},
+    async argv => {
+      const sum = (await processValue(argv.x)) + (await processValue(argv.y));
+      console.info(`x + y = ${sum}`);
+    }
+  )
+  .parse();
+console.info('finish');
 ```
 
 ### Handling async errors
@@ -591,29 +606,34 @@ Use `try`/`catch` to perform error handling, you can do so by setting
 `.fail(false)`:
 
 ```js
-import yargs from 'yargs'
-import { hideBin } from 'yargs/helpers'
+import yargs from 'yargs';
+import {hideBin} from 'yargs/helpers';
 
 async function processValue(value) {
   return new Promise((resolve, reject) => {
     // Perform some async operation on value.
     setTimeout(() => {
-      return reject(Error('something went wrong'))
-    }, 1000)
-  })
+      return reject(Error('something went wrong'));
+    }, 1000);
+  });
 }
 
-console.info('start')
+console.info('start');
 const parser = yargs(hideBin(process.argv))
-  .command('add <x> <y>', 'add two eventual values', () => {}, async (argv) => {
-    const sum = await processValue(argv.x) + await processValue(argv.y)
-    console.info(`x + y = ${sum}`)
-  })
-  .fail(false)
+  .command(
+    'add <x> <y>',
+    'add two eventual values',
+    () => {},
+    async argv => {
+      const sum = (await processValue(argv.x)) + (await processValue(argv.y));
+      console.info(`x + y = ${sum}`);
+    }
+  )
+  .fail(false);
 try {
   const argv = await parser.parse();
 } catch (err) {
-  console.info(`${err.message}\n ${await parser.getHelp()}`)
+  console.info(`${err.message}\n ${await parser.getHelp()}`);
 }
-console.info('finish')
+console.info('finish');
 ```

@@ -4,8 +4,7 @@ See the [Example Folder](/example) for more demonstrations of
 Yargs in the wild. We would love fixes to old examples and pull
 requests for fancy new examples, [help contribute!](https://github.com/yargs/yargs/blob/main/contributing.md).
 
-With yargs, the options be just a hash!
--------------------------------------------------------------------
+## With yargs, the options be just a hash!
 
 plunder.js:
 
@@ -14,13 +13,13 @@ plunder.js:
 var argv = require('yargs/yargs')(process.argv.slice(2)).argv;
 
 if (argv.ships > 3 && argv.distance < 53.5) {
-    console.log('Plunder more riffiwobbles!');
+  console.log('Plunder more riffiwobbles!');
 } else {
-    console.log('Retreat from the xupptumblers!');
+  console.log('Retreat from the xupptumblers!');
 }
 ```
 
-***
+---
 
     $ ./plunder.js --ships=4 --distance=22
     Plunder more riffiwobbles!
@@ -28,8 +27,7 @@ if (argv.ships > 3 && argv.distance < 53.5) {
     $ ./plunder.js --ships 12 --distance 98.7
     Retreat from the xupptumblers!
 
-But don't walk the plank just yet! There be more! You can do short options:
--------------------------------------------------
+## But don't walk the plank just yet! There be more! You can do short options:
 
 short.js:
 
@@ -39,13 +37,12 @@ var argv = require('yargs/yargs')(process.argv.slice(2)).argv;
 console.log('(%d,%d)', argv.x, argv.y);
 ```
 
-***
+---
 
     $ ./short.js -x 10 -y 21
     (10,21)
 
-And booleans, both long, short, and even grouped:
-----------------------------------
+## And booleans, both long, short, and even grouped:
 
 bool.js:
 
@@ -54,14 +51,12 @@ bool.js:
 var argv = require('yargs/yargs')(process.argv.slice(2)).argv;
 
 if (argv.s) {
-    process.stdout.write(argv.fr ? 'Le perroquet dit: ' : 'The parrot says: ');
+  process.stdout.write(argv.fr ? 'Le perroquet dit: ' : 'The parrot says: ');
 }
-console.log(
-    (argv.fr ? 'couac' : 'squawk') + (argv.p ? '!' : '')
-);
+console.log((argv.fr ? 'couac' : 'squawk') + (argv.p ? '!' : ''));
 ```
 
-***
+---
 
     $ ./bool.js -s
     The parrot says: squawk
@@ -72,8 +67,7 @@ console.log(
     $ ./bool.js -sp --fr
     Le perroquet dit: couac!
 
-And non-hyphenated options too! Just use `argv._`!
--------------------------------------------------
+## And non-hyphenated options too! Just use `argv._`!
 
 nonopt.js:
 
@@ -84,7 +78,7 @@ console.log('(%d,%d)', argv.x, argv.y);
 console.log(argv._);
 ```
 
-***
+---
 
     $ ./nonopt.js -x 6.82 -y 3.35 rum
     (6.82,3.35)
@@ -94,30 +88,35 @@ console.log(argv._);
     (0.54,1.12)
     [ 'me hearties', 'yo', 'ho' ]
 
-Yargs even counts your booleans!
-----------------------------------------------------------------------
+## Yargs even counts your booleans!
 
 count.js:
 
 ```javascript
 #!/usr/bin/env node
 var argv = require('yargs/yargs')(process.argv.slice(2))
-    .count('verbose')
-    .alias('v', 'verbose')
-    .argv;
+  .count('verbose')
+  .alias('v', 'verbose').argv;
 
 VERBOSE_LEVEL = argv.verbose;
 
-function WARN()  { VERBOSE_LEVEL >= 0 && console.log.apply(console, arguments); }
-function INFO()  { VERBOSE_LEVEL >= 1 && console.log.apply(console, arguments); }
-function DEBUG() { VERBOSE_LEVEL >= 2 && console.log.apply(console, arguments); }
+function WARN() {
+  VERBOSE_LEVEL >= 0 && console.log.apply(console, arguments);
+}
+function INFO() {
+  VERBOSE_LEVEL >= 1 && console.log.apply(console, arguments);
+}
+function DEBUG() {
+  VERBOSE_LEVEL >= 2 && console.log.apply(console, arguments);
+}
 
-WARN("Showing only important stuff");
-INFO("Showing semi-important stuff too");
-DEBUG("Extra chatty mode");
+WARN('Showing only important stuff');
+INFO('Showing semi-important stuff too');
+DEBUG('Extra chatty mode');
 ```
 
-***
+---
+
     $ node count.js
     Showing only important stuff
 
@@ -135,22 +134,20 @@ DEBUG("Extra chatty mode");
     Showing semi-important stuff too
     Extra chatty mode
 
-Tell users how to use your options and make demands.
--------------------------------------------------
+## Tell users how to use your options and make demands.
 
 area.js:
 
 ```javascript
 #!/usr/bin/env node
 var argv = require('yargs/yargs')(process.argv.slice(2))
-    .usage('Usage: $0 -w [num] -h [num]')
-    .demandOption(['w','h'])
-    .argv;
+  .usage('Usage: $0 -w [num] -h [num]')
+  .demandOption(['w', 'h']).argv;
 
-console.log("The area is:", argv.w * argv.h);
+console.log('The area is:', argv.w * argv.h);
 ```
 
-***
+---
 
     $ ./area.js -w 55 -h 11
     The area is: 605
@@ -164,47 +161,41 @@ console.log("The area is:", argv.w * argv.h);
 
     Missing required arguments: h
 
-After your demands have been met, demand more! Ask for non-hyphenated arguments!
------------------------------------------
+## After your demands have been met, demand more! Ask for non-hyphenated arguments!
 
 demand_count.js:
 
 ```javascript
 #!/usr/bin/env node
-var argv = require('yargs/yargs')(process.argv.slice(2))
-    .demandCommand(2)
-    .argv;
+var argv = require('yargs/yargs')(process.argv.slice(2)).demandCommand(2).argv;
 console.dir(argv);
 ```
 
-***
+---
 
-	$ ./demand_count.js a
+    $ ./demand_count.js a
 
-	Not enough non-option arguments: got 1, need at least 2
+    Not enough non-option arguments: got 1, need at least 2
 
-	$ ./demand_count.js a b
-	{ _: [ 'a', 'b' ], '$0': 'demand_count.js' }
+    $ ./demand_count.js a b
+    { _: [ 'a', 'b' ], '$0': 'demand_count.js' }
 
-	$ ./demand_count.js a b c
-	{ _: [ 'a', 'b', 'c' ], '$0': 'demand_count.js' }
+    $ ./demand_count.js a b c
+    { _: [ 'a', 'b', 'c' ], '$0': 'demand_count.js' }
 
-EVEN MORE SHIVER ME TIMBERS!
-------------------
+## EVEN MORE SHIVER ME TIMBERS!
 
 default_singles.js:
 
 ```javascript
 #!/usr/bin/env node
 var argv = require('yargs/yargs')(process.argv.slice(2))
-    .default('x', 10)
-    .default('y', 10)
-    .argv
-;
+  .default('x', 10)
+  .default('y', 10).argv;
 console.log(argv.x + argv.y);
 ```
 
-***
+---
 
     $ ./default_singles.js -x 5
     15
@@ -213,60 +204,58 @@ default_hash.js:
 
 ```javascript
 #!/usr/bin/env node
-var argv = require('yargs/yargs')(process.argv.slice(2))
-    .default({ x : 10, y : 10 })
-    .argv
-;
+var argv = require('yargs/yargs')(process.argv.slice(2)).default({
+  x: 10,
+  y: 10,
+}).argv;
 console.log(argv.x + argv.y);
 ```
 
-***
+---
 
     $ ./default_hash.js -y 7
     17
 
-And if you really want to get all descriptive about it...
----------------------------------------------------------
+## And if you really want to get all descriptive about it...
 
 boolean_single.js:
 
 ```javascript
 #!/usr/bin/env node
-var argv = require('yargs/yargs')(process.argv.slice(2))
-    .boolean(['r','v'])
-    .argv
-;
-console.dir([ argv.r, argv.v ]);
+var argv = require('yargs/yargs')(process.argv.slice(2)).boolean([
+  'r',
+  'v',
+]).argv;
+console.dir([argv.r, argv.v]);
 console.dir(argv._);
 ```
 
-***
+---
 
     $ ./boolean_single.js -r false -v "me hearties" yo ho
     [ false, true ]
     [ 'me hearties', 'yo', 'ho' ]
 
-
 boolean_double.js:
 
 ```javascript
 #!/usr/bin/env node
-var argv = require('yargs/yargs')(process.argv.slice(2))
-    .boolean(['x','y','z'])
-    .argv
-;
-console.dir([ argv.x, argv.y, argv.z ]);
+var argv = require('yargs/yargs')(process.argv.slice(2)).boolean([
+  'x',
+  'y',
+  'z',
+]).argv;
+console.dir([argv.x, argv.y, argv.z]);
 console.dir(argv._);
 ```
 
-***
+---
 
     $ ./boolean_double.js -x -z one two three
     [ true, undefined, true ]
     [ 'one', 'two', 'three' ]
 
-Yargs is here to help you...
----------------------------
+## Yargs is here to help you...
 
 You can describe parameters for help messages and set aliases. Yargs figures
 out how to format a handy help string automatically.
@@ -276,32 +265,32 @@ line_count.js:
 ```javascript
 #!/usr/bin/env node
 var argv = require('yargs/yargs')(process.argv.slice(2))
-    .usage('Usage: $0 <command> [options]')
-    .command('count', 'Count the lines in a file')
-    .example('$0 count -f foo.js', 'count the lines in the given file')
-    .alias('f', 'file')
-    .nargs('f', 1)
-    .describe('f', 'Load a file')
-    .demandOption(['f'])
-    .help('h')
-    .alias('h', 'help')
-    .epilog('copyright 2019')
-    .argv;
+  .usage('Usage: $0 <command> [options]')
+  .command('count', 'Count the lines in a file')
+  .example('$0 count -f foo.js', 'count the lines in the given file')
+  .alias('f', 'file')
+  .nargs('f', 1)
+  .describe('f', 'Load a file')
+  .demandOption(['f'])
+  .help('h')
+  .alias('h', 'help')
+  .epilog('copyright 2019').argv;
 
 var fs = require('fs');
 var s = fs.createReadStream(argv.file);
 
 var lines = 0;
 s.on('data', function (buf) {
-    lines += buf.toString().match(/\n/g).length;
+  lines += buf.toString().match(/\n/g).length;
 });
 
 s.on('end', function () {
-    console.log(lines);
+  console.log(lines);
 });
 ```
 
-***
+---
+
     $ node line_count.js
     Usage: line_count.js <command> [options]
 
@@ -338,8 +327,7 @@ s.on('end', function () {
     $ node line_count.js count -f line_count.js
     25
 
-Using inquirer for prompting
----------------------------
+## Using inquirer for prompting
 
 ```js
 const yargs = require('yargs');
@@ -352,8 +340,8 @@ const askName = async () => {
     {
       message: 'What is your name?',
       name: 'name',
-      type: 'string'
-    }
+      type: 'string',
+    },
   ]);
 
   console.log(`Hello, ${answers.name}!`);

@@ -3,11 +3,6 @@
   "compilerOptions": {
     "sourceMap": true
   },
-  "include": [
-    "lib/**/*.ts"
-  ],
-  "exclude": [
-    "lib/cjs.ts",
-    "lib/platform-shims/*.ts"
-  ]
+  "include": ["lib/**/*.ts"],
+  "exclude": ["lib/cjs.ts", "lib/platform-shims/*.ts"]
 }

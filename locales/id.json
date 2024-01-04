@@ -1,4 +1,3 @@
-
 {
   "Commands:": "Perintah:",
   "Options:": "Pilihan:",
@@ -44,7 +43,7 @@
   "Show help": "Lihat bantuan",
   "Show version number": "Lihat nomor versi",
   "Did you mean %s?": "Maksud Anda: %s?",
-  "Arguments %s and %s are mutually exclusive" : "Argumen %s dan %s saling eksklusif",
+  "Arguments %s and %s are mutually exclusive": "Argumen %s dan %s saling eksklusif",
   "Positionals:": "Posisional-posisional:",
   "command": "perintah"
 }

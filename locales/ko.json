@@ -43,7 +43,7 @@
   "Show help": "도움말 표시",
   "Show version number": "버전 표시",
   "Did you mean %s?": "%s을(를) 찾으시나요?",
-  "Arguments %s and %s are mutually exclusive" : "인수 %s과(와) %s은(는) 동시에 지정할 수 없습니다",
+  "Arguments %s and %s are mutually exclusive": "인수 %s과(와) %s은(는) 동시에 지정할 수 없습니다",
   "Positionals:": "위치:",
   "command": "명령"
 }

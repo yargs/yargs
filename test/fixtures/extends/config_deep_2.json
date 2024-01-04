@@ -1,5 +1,5 @@
 {
- "extends": "./config_deep.json",
+  "extends": "./config_deep.json",
   "a": {
     "b": 12,
     "g": 1
