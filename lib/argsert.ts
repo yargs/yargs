@@ -16,7 +16,7 @@ export function argsert(
   function parseArgs(): [
     Pick<ParsedCommand, 'demanded' | 'optional'>,
     any[],
-    number?
+    number?,
   ] {
     return typeof arg1 === 'object'
       ? [{demanded: [], optional: []}, arg1, arg2 as number | undefined]
