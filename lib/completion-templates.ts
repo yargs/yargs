@@ -42,7 +42,11 @@ _{{app_name}}_yargs_completions()
   local si=$IFS
   IFS=$'\n' reply=($(COMP_CWORD="$((CURRENT-1))" COMP_LINE="$BUFFER" COMP_POINT="$CURSOR" {{app_path}} --get-yargs-completions "\${words[@]}"))
   IFS=$si
-  _describe 'values' reply
+  if [[ \${#reply} -gt 0 ]]; then
+    _describe 'values' reply
+  else
+    _default
+  fi
 }
 compdef _{{app_name}}_yargs_completions {{app_name}}
 ###-end-{{app_name}}-completions-###
