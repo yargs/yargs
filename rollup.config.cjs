@@ -1,6 +1,6 @@
 const cleanup = require('rollup-plugin-cleanup');
 const ts = require('rollup-plugin-ts');
-const {terser} = require('rollup-plugin-terser');
+const terser = require('@rollup/plugin-terser');
 
 const output = {
   format: 'cjs',

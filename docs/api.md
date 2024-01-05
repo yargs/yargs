@@ -1038,10 +1038,13 @@ Ye be havin' to set the followin' argument land lubber: option
 Locales currently supported:
 
 * **be:** Belarusian.
+* **cs:** Czech.
 * **de:** German.
 * **en:** American English.
 * **es:** Spanish.
+* **fi:** Finnish.
 * **fr:** French.
+* **he:** Hebrew.
 * **hi:** Hindi.
 * **hu:** Hungarian.
 * **id:** Indonesian.
@@ -1056,9 +1059,10 @@ Locales currently supported:
 * **pt:** Portuguese.
 * **pt_BR:** Brazilian Portuguese.
 * **ru:** Russian.
-* **uz:** Uzbek.
 * **th:** Thai.
 * **tr:** Turkish.
+* **uk_UA:** Ukrainian (Ukraine).
+* **uz:** Uzbek.
 * **zh_CN:** Chinese (Mainland China).
 * **zh_TW:** Chinese (Taiwan).
 

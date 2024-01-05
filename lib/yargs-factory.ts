@@ -1656,7 +1656,7 @@ export class YargsInstance {
       | Exclude<DictionaryKeyof<Options>, DictionaryKeyof<Options, any[]>>
       | 'default',
     K extends keyof Options[T] & string = keyof Options[T] & string,
-    V extends ValueOf<Options[T]> = ValueOf<Options[T]>
+    V extends ValueOf<Options[T]> = ValueOf<Options[T]>,
   >(
     builder: (key: K, value: V, ...otherArgs: any[]) => YargsInstance,
     type: T,
@@ -1678,7 +1678,7 @@ export class YargsInstance {
     K extends keyof Options[T] & string = keyof Options[T] & string,
     V extends ValueOf<ValueOf<Options[T]>> | ValueOf<ValueOf<Options[T]>>[] =
       | ValueOf<ValueOf<Options[T]>>
-      | ValueOf<ValueOf<Options[T]>>[]
+      | ValueOf<ValueOf<Options[T]>>[],
   >(
     builder: (key: K, value: V, ...otherArgs: any[]) => YargsInstance,
     type: T,
@@ -1700,7 +1700,7 @@ export class YargsInstance {
   [kPopulateParserHintDictionary]<
     T extends keyof Options,
     K extends keyof Options[T],
-    V
+    V,
   >(
     builder: (key: K, value: V, ...otherArgs: any[]) => YargsInstance,
     type: T,
@@ -1876,15 +1876,18 @@ export class YargsInstance {
     // add all groups not set to local to preserved groups
     Object.assign(
       this.#preservedGroups,
-      Object.keys(this.#groups).reduce((acc, groupName) => {
-        const keys = this.#groups[groupName].filter(
-          key => !(key in localLookup)
-        );
-        if (keys.length > 0) {
-          acc[groupName] = keys;
-        }
-        return acc;
-      }, {} as Dictionary<string[]>)
+      Object.keys(this.#groups).reduce(
+        (acc, groupName) => {
+          const keys = this.#groups[groupName].filter(
+            key => !(key in localLookup)
+          );
+          if (keys.length > 0) {
+            acc[groupName] = keys;
+          }
+          return acc;
+        },
+        {} as Dictionary<string[]>
+      )
     );
     // groups can now be reset
     this.#groups = {};

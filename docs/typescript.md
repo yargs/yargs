@@ -131,8 +131,8 @@ import { hideBin } from 'yargs/helpers';
 
 const yargsInstance = yargs(hideBin(process.argv));
 
-cosnt args = yargsInstance
-  .wrap(myYargs.terminalWidth())
+const args = yargsInstance
+  .wrap(yargsInstance.terminalWidth())
   // .otherMethods(...)
   .parse()
   
