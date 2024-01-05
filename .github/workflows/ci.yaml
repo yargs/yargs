@@ -13,13 +13,13 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: [12, 14, 16]
+        node: [16, 18, 20]
     steps:
       - uses: actions/checkout@v1
       - uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node }}
-      - run: npm install -g npm@7
+      - run: npm install -g npm@8
       - run: node --version
       - run: npm install --engine-strict
       - run: npm test
@@ -29,21 +29,21 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
         with:
-          node-version: 12
-      - run: npm install -g npm@7
+          node-version: 20
+      - run: npm install -g npm@8
       - run: npm install
       - run: npm test
   esm:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: [14]
+        node: [20]
     steps:
       - uses: actions/checkout@v1
       - uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node }}
-      - run: npm install -g npm@7
+      - run: npm install -g npm@8
       - run: node --version
       - run: npm install --engine-strict
       - run: npm run test:esm
@@ -53,8 +53,8 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
         with:
-          node-version: 14
-      - run: npm install -g npm@7
+          node-version: 20
+      - run: npm install -g npm@8
       - run: npm install
       - run: npm run compile
       - uses: denoland/setup-deno@v1
@@ -69,8 +69,8 @@ jobs:
       - uses: actions/checkout@v1
       - uses: actions/setup-node@v1
         with:
-          node-version: 15
-      - run: npm install -g npm@7
+          node-version: 20
+      - run: npm install -g npm@8
       - run: npm install
       - run: npm test
       - run: npm run coverage
