@@ -7,5 +7,5 @@ const argv = require('./yargs-symlink')
   .parserConfiguration({
     'dot-notation': false,
     'boolean-negation': false,
-  }).argv;
+  }).parse();
 console.log(argv);

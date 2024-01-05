@@ -22,22 +22,20 @@ You can pass Yargs the `process.argv` without any additional configuration
 and it will do its best to parse it into an object:
 
 ```javascript
-require('yargs/yargs')(process.argv.slice(2)).argv
+require('yargs/yargs')(process.argv.slice(2)).parse()
 ```
 
 You can also pass in an arbitrary array of arguments:
 
 ```javascript
-require('yargs/yargs')([ '-x', '1', '-y', '2' ]).argv
+require('yargs/yargs')([ '-x', '1', '-y', '2' ]).parse()
 ```
 
-or use `.parse()` to do the same thing:
+or pass the arguments to `.parse()` to do the same thing:
 
 ```javascript
 require('yargs/yargs')().parse([ '-x', '1', '-y', '2' ])
 ```
-
-Calling `.parse()` with no arguments is equivalent to calling `.argv`:
 
 ```javascript
 require('yargs/yargs')(process.argv.slice(2)).parse()
@@ -56,10 +54,10 @@ Node, pass `process.argv.slice(2)` to Yargs.
 
 ```javascript
 const { hideBin } = require('yargs/helpers')
-const argv = yargs(hideBin(process.argv)).argv
+const argv = yargs(hideBin(process.argv)).parse()
 ```
 
-The rest of these methods below come in just before the terminating `.argv` or
+The rest of these methods below come in just before the terminating
 terminating `.parse()`.
 
 <a name="alias"></a>.alias(key, alias)
@@ -72,7 +70,7 @@ Optionally `.alias()` can take an object that maps keys to aliases.
 Each key of this object should be the canonical version of the option, and each
 value should be a string or an array of strings.
 
-.argv
+.parse()
 -----
 
 Get the arguments as a plain old object.
@@ -81,13 +79,6 @@ Arguments without a corresponding flag show up in the `argv._` array. Note that 
 
 The script name or node command is available at `argv.$0` similarly to how `$0`
 works in bash or perl.
-
-If `yargs` is executed in an environment that embeds node and there's no script name (e.g.
-[Electron](http://electron.atom.io/) or [nw.js](http://nwjs.io/)), it will ignore the first parameter since it
-expects it to be the script name. In order to override this behavior, use `.parse(process.argv.slice(1))`
-instead of `.argv` and the first parameter won't be ignored.
-
-***Note:*** `.argv` should only be used at the top level, not inside a command's builder function.
 
 <a name="array"></a>.array(key)
 ----------
@@ -141,7 +132,7 @@ const argv = require('yargs/yargs')(process.argv.slice(2))
       return true // tell Yargs that the arguments passed the check
     }
   })
-  .argv
+  .parse()
 ```
 
 <a name="choices"></a>.choices(key, choices)
@@ -156,7 +147,7 @@ var argv = require('yargs/yargs')(process.argv.slice(2))
   .describe('i', 'choose your sandwich ingredients')
   .choices('i', ['peanut-butter', 'jelly', 'banana', 'pickles'])
   .help('help')
-  .argv
+  .parse()
 ```
 
 If this method is called multiple times, all enumerated values will be merged
@@ -175,7 +166,7 @@ var argv = require('yargs/yargs')(process.argv.slice(2))
     describe: 'choose a size',
     choices: ['xs', 's', 'm', 'l', 'xl']
   })
-  .argv
+  .parse()
 ```
 
 <a name="coerce"></a>.coerce(key, fn)
@@ -217,7 +208,7 @@ var argv = require('yargs/yargs')(process.argv.slice(2))
     date: Date.parse,
     json: JSON.parse
   })
-  .argv
+  .parse()
 ```
 
 You can also map the same function to several keys at one time. Just pass an array of keys as the first argument to `.coerce()`:
@@ -226,7 +217,7 @@ You can also map the same function to several keys at one time. Just pass an arr
 var path = require('path')
 var argv = require('yargs/yargs')(process.argv.slice(2))
   .coerce(['src', 'dest'], path.resolve)
-  .argv
+  .parse()
 ```
 
 If you are using dot-notion or arrays, .e.g., `user.email` and `user.password`, coercion will be applied to the final object that has been parsed:
@@ -241,7 +232,7 @@ var argv = require('yargs/yargs')(process.argv.slice(2))
     opt.password = '[SECRET]'
     return opt
   })
-  .argv
+  .parse()
 ```
 
 <a name="commandDir"></a>
@@ -298,7 +289,7 @@ yargs
     }
   })
   .help()
-  .argv
+  .parse()
 ```
 
 `builder` can also be a function. This function is executed
@@ -316,7 +307,7 @@ yargs
     })
   })
   .help()
-  .argv
+  .parse()
 ```
 
 You can also provide a handler function, which will be executed with the
@@ -338,10 +329,10 @@ yargs
     }
   )
   .help()
-  .argv
+  .parse()
 ```
 
-***Note:*** `.parse()` and `.argv` should only be used at the top level, not inside a command's builder function.
+***Note:*** `.parse()` should only be used at the top level, not inside a command's builder function.
 
 Please see [Advanced Topics: Commands](https://github.com/yargs/yargs/blob/main/docs/advanced.md#commands) for a thorough
 discussion of the advanced features exposed in the Command API.
@@ -376,7 +367,7 @@ var argv = require('yargs/yargs')(process.argv.slice(2))
       'bar'
     ];
   })
-  .argv;
+  .parse();
 ```
 
 You can also provide asynchronous completions.
@@ -391,7 +382,7 @@ var argv = require('yargs/yargs')(process.argv.slice(2))
       ]);
     }, 500);
   })
-  .argv;
+  .parse();
 ```
 
 But wait, there's more! You can return an asynchronous promise.
@@ -405,7 +396,7 @@ var argv = require('yargs/yargs')(process.argv.slice(2))
       }, 10)
     })
   })
-  .argv;
+  .parse();
 ```
 
 Using default completions in a custom implementation. When invoked with no arguments, `completionFilter` will fallback to the default completion function. There is no need to call `done` in this case. When provided with a callback function, you can get access to `defaultCompletions` and call `done` with your processed version of them.
@@ -426,7 +417,7 @@ var argv = require('yargs/yargs')(process.argv.slice(2))
       });
     }
   })
-  .argv;
+  .parse();
 ```
 
 <a name="config"></a>.config([key], [description], [parseFn])
@@ -454,7 +445,7 @@ var argv = require('yargs/yargs')(process.argv.slice(2))
   .config('settings', function (configPath) {
     return JSON.parse(fs.readFileSync(configPath, 'utf-8'))
   })
-  .argv
+  .parse()
 ```
 
 You can also pass an explicit configuration `object`, it will be parsed
@@ -463,7 +454,7 @@ and its properties will be set as arguments.
 ```js
 var argv = require('yargs/yargs')(process.argv.slice(2))
   .config({foo: 1, bar: 2})
-  .argv
+  .parse()
 console.log(argv)
 ```
 
@@ -544,7 +535,7 @@ a value. The name of the function will be used in the usage string:
 var argv = require('yargs/yargs')(process.argv.slice(2))
   .default('random', function randomValue() {
     return Math.random() * 256;
-  }).argv;
+  }).parse();
 ```
 
 Optionally, `description` can also be provided and will take precedence over
@@ -589,7 +580,7 @@ require('yargs/yargs')(process.argv.slice(2))
   })
   .demandOption(['run', 'path'], 'Please provide both run and path arguments to work with this tool')
   .help()
-  .argv
+  .parse()
 ```
 which will provide the following output:
 ```bash
@@ -626,7 +617,7 @@ require('yargs/yargs')(process.argv.slice(2))
     }
   })
   .help()
-  .argv
+  .parse()
 ```
 which will provide the following output:
 ```bash
@@ -659,7 +650,7 @@ require('yargs/yargs')(process.argv.slice(2))
   // provide a minimum demand and a minimum demand message
   .demandCommand(1, 'You need at least one command before moving on')
   .help()
-  .argv
+  .parse()
 ```
 
 which will provide the following output:
@@ -759,7 +750,7 @@ var argv = require('yargs/yargs')(process.argv.slice(2))
     alias: 'fruit-thing',
     default: 'apple'
   })
-  .argv
+  .parse()
 console.log(argv)
 ```
 
@@ -863,7 +854,7 @@ var argv = require('yargs/yargs')(process.argv.slice(2))
     console.error('You should be doing', yargs.help())
     process.exit(1)
   })
-  .argv
+  .parse()
 ```
 
 .getCompletion(args, done);
@@ -923,7 +914,7 @@ var argv = require('yargs/yargs')(process.argv.slice(2))
   })
   .help('help')
   .global('a')
-  .argv
+  .parse()
 ```
 
 If the `foo` command is executed the `all` option will remain, but the `none`
@@ -943,7 +934,7 @@ require('yargs/yargs')(['--help'])
   .group('batman', 'Heroes:')
   .describe('batman', "world's greatest detective")
   .wrap(null)
-  .argv
+  .parse()
 ```
 ***
     Heroes:
@@ -980,7 +971,7 @@ Example:
 var yargs = require("yargs")(['--info'])
   .usage("$0 -operand1 number -operand2 number -operation [add|subtract]")
   .help('info')
-  .argv
+  .parse()
 ```
 
 <a name="implies"></a>.implies(x, y)
@@ -1023,7 +1014,7 @@ var argv = require('yargs/yargs')(process.argv.slice(2))
   .help('help')
   .wrap(70)
   .locale('pirate')
-  .argv
+  .parse()
 ```
 
 ***
@@ -1097,7 +1088,7 @@ yargs
   .command('myCommand', 'some command', {}, function(argv){
     console.log('Running myCommand!');
   })
-  .middleware([mwFunc1, mwFunc2]).argv;
+  .middleware([mwFunc1, mwFunc2]).parse();
 ```
 
 When calling `myCommand` from the command line, mwFunc1 gets called first, then mwFunc2, and finally the command's handler.  The console output is:
@@ -1212,7 +1203,7 @@ Note that decimals, hexadecimals, and scientific notation are all accepted.
 var argv = require('yargs/yargs')(process.argv.slice(2))
   .number('n')
   .number(['width', 'height'])
-  .argv
+  .parse()
 ```
 
 <a name="option"></a>.option(key, [opt])
@@ -1235,7 +1226,7 @@ var argv = require('yargs/yargs')(process.argv.slice(2))
         describe: 'x marks the spot',
         type: 'string'
     })
-    .argv
+    .parse()
 ;
 ```
 
@@ -1248,7 +1239,7 @@ var argv = require('yargs/yargs')(process.argv.slice(2))
     .default('f', '/etc/passwd')
     .describe('f', 'x marks the spot')
     .string('f')
-    .argv
+    .parse()
 ;
 ```
 
@@ -1265,7 +1256,7 @@ var argv = require('yargs/yargs')(process.argv.slice(2))
         type: 'string'
       }
     })
-    .argv
+    .parse()
 ;
 ```
 
@@ -1426,7 +1417,7 @@ const argv = require('yargs/yargs')('run --help')
       describe: 'a unique identifier for the server',
       type: 'string'
     })
-  }).argv
+  }).parse()
 console.log(argv)
 ```
 
@@ -1481,7 +1472,7 @@ Example:
 var yargs = require("yargs")
   .scriptName("my-script")
   .help()
-  .argv
+  .parse()
 ```
 
 .showCompletionScript()
@@ -1516,7 +1507,7 @@ If a function is specified, it is called with a single argument - the usage data
 yargs.showHelp(s => myStream.write(s)); //prints to myStream
 ```
 
-Later on, `argv` can be retrieved with `yargs.argv`.
+Later on, `argv` can be retrieved with `yargs.parse()`.
 
 .showVersion([consoleLevel | printCallback])
 ---------------------------
@@ -1543,7 +1534,7 @@ If a function is specified, it is called with a single argument - the version da
 yargs.showVersion(s => myStream.write(s)); //prints to myStream
 ```
 
-Later on, `argv` can be retrieved with `yargs.argv`.
+Later on, `argv` can be retrieved with `yargs.parse()`.
 
 .showHelpOnFail(enable, [message])
 ----------------------------------
@@ -1565,7 +1556,7 @@ var argv = require('yargs/yargs')(process.argv.slice(2))
     .string('f')
     .showHelpOnFail(false, 'Specify --help for available options')
     .help('help')
-    .argv;
+    .parse();
 
 // etc.
 ```
@@ -1599,7 +1590,7 @@ Example:
 ```js
 var yargs = require("yargs")(['--help'])
   .showHidden('show-hidden', 'Show hidden options')
-  .argv
+  .parse()
 ```
 
 <a name="skipValidation"></a>.skipValidation(key)
@@ -1657,7 +1648,7 @@ var argv = require('yargs/yargs')(process.argv.slice(2))
     'Commands:': 'My Commands -->\n'
   })
   .wrap(null)
-  .argv
+  .parse()
 ```
 
 ***
@@ -1693,7 +1684,7 @@ const argv = require('yargs/yargs')(process.argv.slice(2))
       describe: 'the port that your application should bind to',
       type: 'number'
     })
-  }).argv
+  }).parse()
 ```
 
 <a name="version"></a>

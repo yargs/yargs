@@ -35,7 +35,7 @@ const argv = yargs(process.argv.slice(2)).options({
   d: { type: 'array' },
   e: { type: 'count' },
   f: { choices: ['1', '2', '3'] }
-}).argv;
+}).parse();
 ```
 
 Will result in an `argv` that's typed like so:
@@ -67,7 +67,7 @@ Will result in an `argv` that's typed like so:
 As you can see it's a union of the arguments and a promise which resolves to the arguments.
 The reason for this is because in yargs, you can have commands, and those commands can be asynchronous. If they are asynchronous, the parser would resolve after the command is finished.
 
-The reason it's a union is because when you call `.argv`, yargs typing doesn't know if you have any asynchronous commands, so it just gives both of them.
+The reason it's a union is because when you call `.parse()`, yargs typing doesn't know if you have any asynchronous commands, so it just gives both of them.
 
 This might result in some errors when accessing the properties:
 
@@ -75,7 +75,7 @@ This might result in some errors when accessing the properties:
 const argv = yargs(process.argv.slice(2)).options({
   a: { type: 'boolean', default: false },
   ...
-}).argv;
+}).parse();
 
 argv.a // => Property 'a' does not exist on type...
 ```
@@ -101,7 +101,7 @@ const parser = yargs(process.argv.slice(2)).options({
 
 
 (async() => {
-  const argv = await parser.argv;
+  const argv = await parser.parse();
   argv.a // => No error, type: boolean
 })();
 ```
@@ -134,7 +134,7 @@ const yargsInstance = yargs(hideBin(process.argv));
 const args = yargsInstance
   .wrap(yargsInstance.terminalWidth())
   // .otherMethods(...)
-  .argv
+  .parse()
   
 ```
 
@@ -146,7 +146,7 @@ To improve the `choices` option typing you can also specify it as const:
 const argv = yargs.option('difficulty', {
   choices: ["normal", "nightmare", "hell"] as const,
   demandOption: true
-}).argv;
+}).parse();
 ```
 
 `argv.difficulty` will get  type `'normal' | 'nightmare' | 'hell'`.

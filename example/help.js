@@ -17,7 +17,7 @@ var argv = require('yargs/yargs')(process.argv.slice(2))
       required: true
     }
   })
-  .argv;
+  .parse();
 
 console.log('Inspecting options');
 console.dir(argv);
