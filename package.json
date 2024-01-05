@@ -68,7 +68,7 @@
     "@types/node": "^20.0.0",
     "browserslist-generator": "^2.0.1",
     "c8": "^9.0.0",
-    "chai": "^4.2.0",
+    "chai": "^5.0.0",
     "chalk": "^4.0.0",
     "concurrently": "^7.6.0",
     "cpr": "^3.0.1",
