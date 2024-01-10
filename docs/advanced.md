@@ -629,17 +629,17 @@ import yargs from 'yargs/yargs';
 import { hideBin } from 'yargs/helpers';
 import { input } from '@inquirer/prompts';
 
-yargs(hideBin(process.argv))
+await yargs(hideBin(process.argv))
   .command({
     command: 'login [username]',
     describe: 'Log in with defined username',
-    builder: {
-      username: {
-        describe: 'username',
+    builder: (yargs) => {
+      yargs.positional('username', {
+        describe: 'The username used to log in',
         type: 'string',
-      },
+      });
     },
-    handler: async function (argv) {
+    handler: async (argv) => {
       if (!argv.username) {
         argv.username = await input({ message: 'Please enter your username' });
       }
