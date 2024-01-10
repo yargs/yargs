@@ -12,7 +12,7 @@ var argv = yargs.usage('This is my awesome program').options({
     requiresArg: true,
     alias: 'o',
   },
-}).argv;
+}).parse();
 
 yargs.showHelp();
 

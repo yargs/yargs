@@ -13,7 +13,7 @@ var argv = require('yargs/yargs')(process.argv.slice(2))
             default : 10,
         },
     })
-    .argv
+    .parse()
 ;
 
 var fs = require('fs');

@@ -4,7 +4,7 @@ var argv = require('yargs/yargs')(process.argv.slice(2))
     .demand('f')
     .alias('f', 'file')
     .describe('f', 'Load a file')
-    .argv
+    .parse()
 ;
 
 var fs = require('fs');

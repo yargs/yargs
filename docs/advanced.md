@@ -18,7 +18,7 @@ const argv = require('yargs/yargs')(process.argv.slice(2))
   .command('$0', 'the default command', () => {}, (argv) => {
     console.log('this command will be run by default')
   })
-  .argv
+  .parse()
 ```
 
 The command defined above will be executed if the program
@@ -31,7 +31,7 @@ const argv = require('yargs/yargs')(process.argv.slice(2))
   .command(['serve', '$0'], 'the serve command', () => {}, (argv) => {
     console.log('this command will be run by default')
   })
-  .argv
+  .parse()
 ```
 
 The command defined above will be executed if the program
@@ -47,7 +47,7 @@ take the form `[bar]`. The parsed positional arguments will be populated in
 ```js
 yargs.command('get <source> [proxy]', 'make a get HTTP request')
   .help()
-  .argv
+  .parse()
 ```
 
 #### Positional Argument Aliases
@@ -59,7 +59,7 @@ an email as the first argument:
 ```js
 yargs.command('get <username|email> [password]', 'fetch a user by username or email.')
   .help()
-  .argv
+  .parse()
 ```
 
 In this way, both `argv.username` and `argv.email` would be populated with the
@@ -73,7 +73,7 @@ values, by using the `..` operator:
 ```js
 yargs.command('download <url> [files..]', 'download several files')
   .help()
-  .argv
+  .parse()
 ```
 
 #### Describing Positional Arguments
@@ -91,7 +91,7 @@ yargs.command('get <source> [proxy]', 'make a get HTTP request', (yargs) => {
   })
 })
 .help()
-.argv
+.parse()
 ```
 
 ### Command Execution
@@ -140,7 +140,7 @@ require('yargs/yargs')(process.argv.slice(2))
   .demandCommand()
   .help()
   .wrap(72)
-  .argv
+  .parse()
 ```
 
 ```
@@ -196,7 +196,7 @@ You then register the module like so:
 ```js
 yargs.command(require('my-module'))
   .help()
-  .argv
+  .parse()
 ```
 
 Or if the module does not export `command` and `describe` (or if you just want to override them):
@@ -204,7 +204,7 @@ Or if the module does not export `command` and `describe` (or if you just want t
 ```js
 yargs.command('get <source> [proxy]', 'make a get HTTP request', require('my-module'))
   .help()
-  .argv
+  .parse()
 ```
 
 #### Testing a Command Module
@@ -311,7 +311,7 @@ require('yargs/yargs')(process.argv.slice(2))
   .commandDir('cmds')
   .demandCommand()
   .help()
-  .argv
+  .parse()
 ```
 
 cmds/init.js:
@@ -391,7 +391,7 @@ import { commands } from './cmds/index.mjs';
 
 yargs(hideBin(process.argv))
   .command(commands)
-  .argv;
+  .parse();
 ```
 
 <a name="configuration"></a>
@@ -419,7 +419,7 @@ const configPath = findUp.sync(['.myapprc', '.myapprc.json'])
 const config = configPath ? JSON.parse(fs.readFileSync(configPath)) : {}
 const argv = require('yargs/yargs')(process.argv.slice(2))
   .config(config)
-  .argv
+  .parse()
 ```
 
 ### Providing Configuration in Your package.json
@@ -447,7 +447,7 @@ method:
 ```js
 const argv = require('yargs/yargs')(process.argv.slice(2))
   .pkgConf('nyc')
-  .argv
+  .parse()
 ```
 
 ### Creating a Plugin Architecture
@@ -552,13 +552,13 @@ var argv = require('yargs/yargs')(process.argv.slice(2))
       },
       [normalizeCredentials]
      )
-  .argv;
+  .parse();
 ```
 
 ## Using Yargs with Async/await
 
-If you use async middleware or async builders/handlers for commands, `yargs.parse` and
-`yargs.argv` will return a `Promise`. When you `await` this promise the
+If you use async middleware or async builders/handlers for commands, `yargs.parse()`
+will return a `Promise`. When you `await` this promise the
 parsed arguments object will be returned after the handler completes:
 
 ```js

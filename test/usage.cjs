@@ -4736,7 +4736,7 @@ describe('usage tests', () => {
             },
             {command: 'foo', desc: 'Foo command description'},
           ]);
-        await y.argv;
+        await y.parse();
         help.split('\n').should.deep.equal(expected);
       });
     });

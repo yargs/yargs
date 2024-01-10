@@ -12,5 +12,5 @@ console.log(
   parser.parserConfiguration({
     'dot-notation': false,
     'boolean-negation': false,
-  }).argv
+  }).parse()
 );
