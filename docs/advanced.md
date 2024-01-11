@@ -620,7 +620,7 @@ console.info('finish')
 
 ### Using Inquirer to make interactive tools
 
-Using Inquirer together with yargs is a powerful way to make your CLI tools more interactive and responsive to the user.
+Using Inquirer or a similar package with yargs is a powerful way to make your CLI tools more interactive and responsive to the user.
 
 One example would be to use `input` to ensure the user inputs required arguments.
 
@@ -655,7 +655,8 @@ If username is not given as an argument, inquirer will prompt the user with an i
 
 ```
 $ ./app.js login
-? Please enter your username:
+? Please enter your username: yargs
+Welcome back, yargs!
 
 $ ./app.js login yargs
 Welcome back, yargs!
