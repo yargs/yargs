@@ -608,6 +608,14 @@ describe('Completion', () => {
       r.logs[0].should.match(/ndm flintlock >>/);
     });
 
+    it('santizes scriptName ($0) for use in a bash function', () => {
+      const r = checkUsage(
+        () => yargs([]).scriptName("1 test ing").showCompletionScript()
+      );
+
+      r.logs[0].should.match(/_a_test_ing/);
+    });
+
     it('if $0 has a .js extension, a ./ prefix is added', () => {
       const r = checkUsage(() => yargs([]).showCompletionScript(), ['test.js']);
 

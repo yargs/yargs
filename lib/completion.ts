@@ -349,7 +349,15 @@ export class Completion implements CompletionInstance {
     let script = this.zshShell
       ? templates.completionZshTemplate
       : templates.completionShTemplate;
-    const name = this.shim.path.basename($0);
+    let name = this.shim.path.basename($0);
+    // Santize `name` to make sure it is a valid bash function name
+    // first, check if the first character is an alphabetic character or underscore
+    if (!str.match(/^[A-Za-z_]/)) {
+      // If not, prepend name with an underscore
+      name = '_' + name;
+    }
+    // Then, replace any characters that are not alphanumeric or underscore with an underscore
+    name = name.replace(/[^A-Za-z0-9_]/g, '_');
 
     // add ./ to applications not yet installed as bin.
     if ($0.match(/\.js$/)) $0 = `./${$0}`;
