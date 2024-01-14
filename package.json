@@ -62,27 +62,28 @@
     "yargs-parser": "^21.1.1"
   },
   "devDependencies": {
+    "@rollup/plugin-terser": "^0.4.4",
     "@types/chai": "^4.2.11",
     "@types/mocha": "^9.0.0",
-    "@types/node": "^18.0.0",
-    "c8": "^7.7.0",
+    "@types/node": "^20.0.0",
+    "browserslist-generator": "^2.0.1",
+    "c8": "^9.0.0",
     "chai": "^4.2.0",
     "chalk": "^4.0.0",
     "concurrently": "^7.6.0",
-    "coveralls": "^3.0.9",
     "cpr": "^3.0.1",
     "cross-env": "^7.0.2",
     "cross-spawn": "^7.0.0",
-    "eslint": "^7.23.0",
-    "gts": "^3.0.0",
+    "eslint": "^8.56.0",
+    "eslint-plugin-prettier": "^5.1.2",
+    "gts": "^5.2.0",
     "hashish": "0.0.4",
     "mocha": "^9.0.0",
     "rimraf": "^3.0.2",
-    "rollup": "^2.23.0",
-    "rollup-plugin-cleanup": "^3.1.1",
-    "rollup-plugin-terser": "^7.0.2",
-    "rollup-plugin-ts": "^2.0.4",
-    "typescript": "^4.0.2",
+    "rollup": "^3.29.4",
+    "rollup-plugin-cleanup": "^3.2.1",
+    "rollup-plugin-ts": "^3.4.5",
+    "typescript": "^5.3.3",
     "which": "^2.0.0",
     "yargs-test-extends": "^1.0.1"
   },
@@ -122,6 +123,6 @@
   ],
   "license": "MIT",
   "engines": {
-    "node": ">=12"
+    "node": ">=16.15.1"
   }
 }

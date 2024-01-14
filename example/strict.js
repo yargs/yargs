@@ -12,7 +12,7 @@ var argv = yargs.usage('This is my awesome program', {
     boolean: true,
     alias: 'i'
   }
-}).strict().argv;
+}).strict().parse();
 
 yargs.showHelp();
 
