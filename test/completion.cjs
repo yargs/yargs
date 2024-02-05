@@ -613,7 +613,7 @@ describe('Completion', () => {
         () => yargs([]).scriptName("1 test ing").showCompletionScript()
       );
 
-      r.logs[0].should.match(/_a_test_ing/);
+      r.logs[0].should.match(/_1_test_ing/);
     });
 
     it('if $0 has a .js extension, a ./ prefix is added', () => {
