@@ -610,7 +610,7 @@ describe('Completion', () => {
 
     it('santizes scriptName ($0) for use in a bash function', () => {
       const r = checkUsage(
-        () => yargs([]).scriptName("1 test ing").showCompletionScript()
+        () => yargs([]).scriptName('1 test ing').showCompletionScript()
       );
 
       r.logs[0].should.match(/_1_test_ing/);
