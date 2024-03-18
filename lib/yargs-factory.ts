@@ -1660,7 +1660,7 @@ export class YargsInstance {
   >(
     builder: (key: K, value: V, ...otherArgs: any[]) => YargsInstance,
     type: T,
-    key: K | K[] | {[key in K]: V},
+    key: K | K[] | {[key in K]: V | undefined},
     value?: V
   ) {
     this[kPopulateParserHintDictionary]<T, K, V>(
@@ -1704,7 +1704,7 @@ export class YargsInstance {
   >(
     builder: (key: K, value: V, ...otherArgs: any[]) => YargsInstance,
     type: T,
-    key: K | K[] | {[key in K]: V},
+    key: K | K[] | {[key in K]: V | undefined},
     value: V | undefined,
     singleKeyHandler: (type: T, key: K, value?: V) => void
   ) {
