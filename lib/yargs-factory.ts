@@ -1164,7 +1164,7 @@ export class YargsInstance {
   }
   parserConfiguration(config: Configuration) {
     argsert('<object>', [config], arguments.length);
-    this.#parserConfig = config;
+    this.#parserConfig = {...this.#parserConfig, ...config};
     return this;
   }
   pkgConf(key: string, rootPath?: string): YargsInstance {
