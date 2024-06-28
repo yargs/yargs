@@ -18,6 +18,7 @@ type CompletionCallback = (
 /** Instance of the completion module. */
 export interface CompletionInstance {
   completionKey: string;
+  completionKeys: string[];
   generateCompletionScript($0: string, cmd: string): string;
   getCompletion(
     args: string[],
@@ -29,6 +30,10 @@ export interface CompletionInstance {
 
 export class Completion implements CompletionInstance {
   completionKey = 'get-yargs-completions';
+  // we need to handle the completion key in multiple formats because the
+  // `strip-dashed` parser option might remove the hyphenated version from the
+  // parsed arguments
+  completionKeys = [this.completionKey, 'getYargsCompletions'];
 
   private aliases: DetailedArguments['aliases'] | null = null;
   private customCompletionFunction: CompletionFunction | null = null;

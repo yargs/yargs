@@ -594,6 +594,22 @@ describe('Completion', () => {
 
           r.logs.should.have.length(0);
         });
+
+        it('works if strip-dashed is set to `true`', () => {
+          const r = checkUsage(
+            () =>
+              yargs([...firstArguments, './completion', '--foo', '--'])
+                .parserConfiguration({'strip-dashed': true})
+                .options({
+                  foo: {describe: 'foo option'},
+                  bar: {describe: 'bar option'},
+                })
+                .completion().argv
+          );
+
+          r.logs.should.include('--bar');
+          r.logs.should.not.include('--foo');
+        });
       });
     }
   });
