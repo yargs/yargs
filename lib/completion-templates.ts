@@ -5,30 +5,32 @@ export const completionShTemplate = `###-begin-{{app_name}}-completions-###
 # Installation: {{app_path}} {{completion_command}} >> ~/.bashrc
 #    or {{app_path}} {{completion_command}} >> ~/.bash_profile on OSX.
 #
-_{{app_name}}_yargs_completions()
+_{{safe_app_name}}_yargs_completions()
 {
-    local cur_word args type_list
+    if [[ {{app_name_word_check}} ]]; then
+      local cur_word args type_list
 
-    cur_word="\${COMP_WORDS[COMP_CWORD]}"
-    args=("\${COMP_WORDS[@]}")
+      cur_word="\${COMP_WORDS[COMP_CWORD]}"
+      args=("\${COMP_WORDS[@]}")
 
-    # ask yargs to generate completions.
-    type_list=$({{app_path}} --get-yargs-completions "\${args[@]}")
+      # ask yargs to generate completions.
+      type_list=$({{app_path}} --get-yargs-completions "\${args[@]}")
 
-    COMPREPLY=( $(compgen -W "\${type_list}" -- \${cur_word}) )
+      COMPREPLY=( $(compgen -W "\${type_list}" -- \${cur_word}) )
 
-    # if no match was found, fall back to filename completion
-    if [ \${#COMPREPLY[@]} -eq 0 ]; then
-      COMPREPLY=()
+      # if no match was found, fall back to filename completion
+      if [ \${#COMPREPLY[@]} -eq 0 ]; then
+        COMPREPLY=()
+      fi
     fi
 
     return 0
 }
-complete -o bashdefault -o default -F _{{app_name}}_yargs_completions {{app_name}}
+complete -o bashdefault -o default -F _{{safe_app_name}}_yargs_completions {{app_name_first_word}}
 ###-end-{{app_name}}-completions-###
 `;
 
-export const completionZshTemplate = `#compdef {{app_name}}
+export const completionZshTemplate = `#compdef "{{safe_app_name}}"
 ###-begin-{{app_name}}-completions-###
 #
 # yargs command completion script
@@ -36,7 +38,7 @@ export const completionZshTemplate = `#compdef {{app_name}}
 # Installation: {{app_path}} {{completion_command}} >> ~/.zshrc
 #    or {{app_path}} {{completion_command}} >> ~/.zprofile on OSX.
 #
-_{{app_name}}_yargs_completions()
+_{{safe_app_name}}_yargs_completions()
 {
   local reply
   local si=$IFS
@@ -44,6 +46,6 @@ _{{app_name}}_yargs_completions()
   IFS=$si
   _describe 'values' reply
 }
-compdef _{{app_name}}_yargs_completions {{app_name}}
+compdef _{{safe_app_name}}_yargs_completions "{{zsh_app_name}}"
 ###-end-{{app_name}}-completions-###
 `;

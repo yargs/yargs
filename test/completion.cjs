@@ -594,6 +594,22 @@ describe('Completion', () => {
 
           r.logs.should.have.length(0);
         });
+
+        it('works if strip-dashed is set to `true`', () => {
+          const r = checkUsage(
+            () =>
+              yargs([...firstArguments, './completion', '--foo', '--'])
+                .parserConfiguration({'strip-dashed': true})
+                .options({
+                  foo: {describe: 'foo option'},
+                  bar: {describe: 'bar option'},
+                })
+                .completion().argv
+          );
+
+          r.logs.should.include('--bar');
+          r.logs.should.not.include('--foo');
+        });
       });
     }
   });
@@ -606,6 +622,37 @@ describe('Completion', () => {
       );
 
       r.logs[0].should.match(/ndm flintlock >>/);
+    });
+
+    describe('bash shell', () => {
+      it('generates multi-word completion handler', () => {
+        process.env.SHELL = '/bin/bash';
+        const r = checkUsage(() =>
+          yargs([]).scriptName('1 test ing').showCompletionScript()
+        );
+
+        r.logs[0].should.match(
+          /"\${COMP_WORDS\[0]}" == "1" && "\${COMP_WORDS\[1]}" == "test" && "\${COMP_WORDS\[2]}" == "ing"/
+        );
+      });
+
+      it('uses a "safe" app name for the bash completion function name', () => {
+        process.env.SHELL = '/bin/bash';
+        const r = checkUsage(() =>
+          yargs([]).scriptName('1 test ing').showCompletionScript()
+        );
+
+        r.logs[0].should.match(/_1_test_ing/);
+      });
+
+      it('replaces the bash `complete` word with only the first word of the app name', () => {
+        process.env.SHELL = '/bin/bash';
+        const r = checkUsage(() =>
+          yargs([]).scriptName('1 test ing').showCompletionScript()
+        );
+
+        r.logs[0].should.match(/_yargs_completions 1/);
+      });
     });
 
     it('if $0 has a .js extension, a ./ prefix is added', () => {
@@ -1100,6 +1147,24 @@ describe('Completion', () => {
 
       r.logs[0].should.match(/zshrc/);
       r.logs[0].should.match(/ndm --get-yargs-completions/);
+    });
+
+    it('uses a "safe" app name for the bash completion function name', () => {
+      process.env.SHELL = '/bin/zsh';
+      const r = checkUsage(() =>
+        yargs([]).scriptName('1 test ing').showCompletionScript()
+      );
+
+      r.logs[0].should.match(/_1_test_ing/);
+    });
+
+    it('generates multi-word completion handler', () => {
+      process.env.SHELL = '/bin/zsh';
+      const r = checkUsage(() =>
+        yargs([]).scriptName('1 test ing').showCompletionScript()
+      );
+      console.log(r.logs[0]);
+      r.logs[0].should.match(/_yargs_completions "1=test=ing"/);
     });
 
     describe('getCompletion()', () => {

@@ -30,7 +30,7 @@ export default {
       process.emitWarning(warning, type),
     execPath: () => process.execPath,
     exit: (code: number) => {
-      // eslint-disable-next-line no-process-exit
+      // eslint-disable-next-line n/no-process-exit
       process.exit(code);
     },
     nextTick: process.nextTick,

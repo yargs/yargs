@@ -1660,7 +1660,7 @@ export class YargsInstance {
   >(
     builder: (key: K, value: V, ...otherArgs: any[]) => YargsInstance,
     type: T,
-    key: K | K[] | {[key in K]: V},
+    key: K | K[] | {[key in K]: V | undefined},
     value?: V
   ) {
     this[kPopulateParserHintDictionary]<T, K, V>(
@@ -1704,7 +1704,7 @@ export class YargsInstance {
   >(
     builder: (key: K, value: V, ...otherArgs: any[]) => YargsInstance,
     type: T,
-    key: K | K[] | {[key in K]: V},
+    key: K | K[] | {[key in K]: V | undefined},
     value: V | undefined,
     singleKeyHandler: (type: T, key: K, value?: V) => void
   ) {
@@ -2001,11 +2001,17 @@ export class YargsInstance {
 
     let helpOptSet = false;
     let versionOptSet = false;
+    let requestCompletions = false;
     Object.keys(argv).forEach(key => {
       if (key === this.#helpOpt && argv[key]) {
         helpOptSet = true;
       } else if (key === this.#versionOpt && argv[key]) {
         versionOptSet = true;
+      } else if (
+        key in argv &&
+        this.#completion!.completionKeys.includes(key)
+      ) {
+        requestCompletions = true;
       }
     });
 
@@ -2054,7 +2060,6 @@ export class YargsInstance {
       this.#isGlobalContext = false;
 
       const handlerKeys = this.#command.getCommands();
-      const requestCompletions = this.#completion!.completionKey in argv;
       const skipRecommendation = helpOptSet || requestCompletions || helpOnly;
       if (argv._.length) {
         if (handlerKeys.length) {
