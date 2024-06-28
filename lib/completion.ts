@@ -356,9 +356,32 @@ export class Completion implements CompletionInstance {
       : templates.completionShTemplate;
     const name = this.shim.path.basename($0);
 
+    // Sanitize `name` to make sure it is a valid bash function name by
+    // replacing any characters that are not alphanumeric or underscore with an
+    // underscore
+    const safeName = name.replace(/[^A-Za-z0-9_]/g, '_');
+
     // add ./ to applications not yet installed as bin.
     if ($0.match(/\.js$/)) $0 = `./${$0}`;
 
+    // zsh supports multi-word completions by default, but bash needs custom logic
+    const appNameWords = name.split(' ');
+    if (!this.zshShell) {
+      // to support multi-word completion check each word in the app name
+      const appNameFirstWord = name[0];
+      const wordsToCheck = appNameWords
+        .map((word, index) => {
+          return `"\${COMP_WORDS[${index}]}" == "${word}"`;
+        })
+        .join(' && ');
+      script = script.replace(/{{app_name_first_word}}/g, appNameFirstWord);
+      script = script.replace(/{{app_name_word_check}}/g, wordsToCheck);
+    } else {
+      // zsh multi-word completion works by replacing the space with a '='
+      script = script.replace(/{{zsh_app_name}}/g, appNameWords.join('='));
+    }
+
+    script = script.replace(/{{safe_app_name}}/g, safeName);
     script = script.replace(/{{app_name}}/g, name);
     script = script.replace(/{{completion_command}}/g, cmd);
     return script.replace(/{{app_path}}/g, $0);
