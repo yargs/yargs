@@ -343,7 +343,14 @@ discussion of the advanced features exposed in the Command API.
 Enable bash/zsh-completion shortcuts for commands and options.
 
 `cmd`: When present in `argv._`, will result in the `.bashrc` or `.zshrc` completion script
-being outputted. To enable bash/zsh completions, concat the generated script to your
+being outputted.
+
+To enable bash/zsh completions, you can either: 
+1. Write it to a file in `$XDG_DATA_HOME/bash-completion` or
+   `~/.local/share/bash-completion` with the same name as the command (or
+   for Zsh, to a file in your `$fpath` named `_{{app_name}}_yargs_completions()`
+   where `{{app_name}}` is your command name.
+2. concat the generated script to your
 `.bashrc` or `.bash_profile` (or `.zshrc` for zsh).
 
 `description`: Provide a description in your usage instructions for the command

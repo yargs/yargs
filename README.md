@@ -38,7 +38,7 @@ Rules & Behavior
                              return a Promise                          [boolean]
 ```
 
-* bash-completion shortcuts for commands and options.
+* bash-completion (and Zsh completion) shortcuts for commands and options.
 * and [tons more](/docs/api.md).
 
 ## Installation
