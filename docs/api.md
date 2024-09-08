@@ -346,12 +346,18 @@ Enable bash/zsh-completion shortcuts for commands and options.
 being outputted.
 
 To enable bash/zsh completions, you can either: 
-1. Write it to a file in `$XDG_DATA_HOME/bash-completion` or
-   `~/.local/share/bash-completion` with the same name as the command (or
-   for Zsh, to a file in your `$fpath` named `_{{app_name}}_yargs_completions`
-   where `{{app_name}}` is your command name.
-2. concat the generated script to your
-`.bashrc` or `.bash_profile` (or `.zshrc` for zsh).
+1. Concat the generated script to your
+   `.bashrc` or `.bash_profile` (or `.zshrc` for zsh).
+
+   e.g. `./command completion > ~/.bashrc`
+
+2. If you have `bash-completion` installed, write it to a file in
+   `$XDG_DATA_HOME/bash-completion` (or  `~/.local/share/bash-completion`),
+   with the same name as the command (or for Zsh, to a file in your `$fpath`
+   named `_{{app_name}}_yargs_completions` where `{{app_name}}` is your
+   command name.
+
+   e.g. `./command completion > ${XDG_DATA_HOME:-$HOME/.local/share}/bash-completion/command`
 
 `description`: Provide a description in your usage instructions for the command
 that generates the completion scripts.
