@@ -353,11 +353,15 @@ To enable bash/zsh completions, you can either:
 
 2. If you have `bash-completion` installed, write it to a file in
    `$XDG_DATA_HOME/bash-completion` (or  `~/.local/share/bash-completion`),
-   with the same name as the command (or for Zsh, to a file in your `$fpath`
-   named `_{{app_name}}_yargs_completions` where `{{app_name}}` is your
-   command name.
+   with the same name as the command.
 
    e.g. `./command completion > ${XDG_DATA_HOME:-$HOME/.local/share}/bash-completion/command`
+
+3. For Zsh, write it to a file in your `$fpath` named
+   `_{{app_name}}_yargs_completions` where `{{app_name}}` is your
+   command name.
+
+   e.g. `./command completion > /usr/local/share/zsh/site-functions/_command_yargs_completions`
 
 `description`: Provide a description in your usage instructions for the command
 that generates the completion scripts.
