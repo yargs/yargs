@@ -141,6 +141,24 @@ yargs(Deno.args)
   .parse()
 ```
 
+> Note: If you specify version tags in url , you also have to add `-deno` flag, like this:
+```typescript
+import yargs from "https://deno.land/x/yargs@v17.7.2-deno/deno.ts";
+import type { Arguments } from "https://deno.land/x/yargs@v17.7.2-deno/deno-types.ts";
+
+yargs(Deno.args)
+  .command('download <files...>', 'download a list of files', (yargs: any) => {
+    return yargs.positional('files', {
+      describe: 'a list of files to do something with'
+    })
+  }, (argv: Arguments) => {
+    console.info(argv)
+  })
+  .strictCommands()
+  .demandCommand(1)
+  .parse()
+```
+
 ### ESM
 
 As of `v16`,`yargs` supports ESM imports:
