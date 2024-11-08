@@ -141,7 +141,7 @@ yargs(Deno.args)
   .parse()
 ```
 
-> Note: If you define version tags in url , you also have to add `-deno` flag in the end , like `@17.7.2-deno`
+> Note: If you use version tags in url then you also have to add `-deno` flag on the end, like `@17.7.2-deno`
 
 ### ESM
 
