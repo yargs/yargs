@@ -63,11 +63,12 @@
   },
   "devDependencies": {
     "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^12.1.2",
     "@types/chai": "^4.2.11",
     "@types/mocha": "^9.0.0",
     "@types/node": "^20.0.0",
     "browserslist-generator": "^2.0.1",
-    "c8": "^9.0.0",
+    "c8": "^9.1.0",
     "chai": "^4.2.0",
     "chalk": "^4.0.0",
     "concurrently": "^7.6.0",
@@ -82,8 +83,7 @@
     "rimraf": "^3.0.2",
     "rollup": "^3.29.4",
     "rollup-plugin-cleanup": "^3.2.1",
-    "rollup-plugin-ts": "^3.4.5",
-    "typescript": "^5.3.3",
+    "typescript": "^5.7.2",
     "which": "^2.0.0",
     "yargs-test-extends": "^1.0.1"
   },
