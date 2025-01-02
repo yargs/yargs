@@ -1,5 +1,5 @@
 const cleanup = require('rollup-plugin-cleanup');
-const ts = require('rollup-plugin-ts');
+const ts = require('@rollup/plugin-typescript');
 const terser = require('@rollup/plugin-terser');
 
 const output = {
