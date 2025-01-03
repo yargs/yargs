@@ -84,7 +84,7 @@
     "rollup": "^3.29.4",
     "rollup-plugin-cleanup": "^3.2.1",
     "typescript": "^5.7.2",
-    "which": "^2.0.0",
+    "which": "^5.0.0",
     "yargs-test-extends": "^1.0.1"
   },
   "scripts": {
