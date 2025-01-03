@@ -65,7 +65,7 @@
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^12.1.2",
     "@types/chai": "^4.2.11",
-    "@types/mocha": "^9.0.0",
+    "@types/mocha": "^10.0.0",
     "@types/node": "^20.0.0",
     "browserslist-generator": "^2.0.1",
     "c8": "^9.1.0",
