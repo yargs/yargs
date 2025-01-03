@@ -67,7 +67,7 @@
     "@types/chai": "^4.2.11",
     "@types/mocha": "^9.0.0",
     "@types/node": "^20.0.0",
-    "browserslist-generator": "^2.0.1",
+    "browserslist-generator": "^3.0.0",
     "c8": "^9.1.0",
     "chai": "^4.2.0",
     "chalk": "^4.0.0",
