@@ -1870,6 +1870,15 @@ describe('yargs dsl tests', () => {
       argv.noBaz.should.equal(2);
     });
 
+    it('merges over any previously set parser configuration', () => {
+      const argv = yargs('--foo.bar 1 --no-baz 2')
+        .parserConfiguration({'boolean-negation': false, 'dot-notation': true})
+        .parserConfiguration({'dot-notation': false})
+        .parse();
+      expect(argv['foo.bar']).to.equal(1);
+      argv.noBaz.should.equal(2);
+    });
+
     it('supports --unknown-options-as-args', () => {
       const argv = yargs('--foo.bar 1 --no-baz 2')
         .parserConfiguration({'unknown-options-as-args': true})
