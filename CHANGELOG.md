@@ -2,6 +2,31 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [18.0.0](https://github.com/yargs/yargs/compare/v17.7.2...v18.0.0) (2025-01-03)
+
+
+### ⚠ BREAKING CHANGES
+
+* **node:** require Node >= 16.15.1
+
+### Features
+
+* **locale:** adds hebrew translation ([#2357](https://github.com/yargs/yargs/issues/2357)) ([4266485](https://github.com/yargs/yargs/commit/4266485b20e9b0f3a7f196e84c6d8284b04642cd))
+
+
+### Bug Fixes
+
+* **build:** address problems with typescript compilation ([#2445](https://github.com/yargs/yargs/issues/2445)) ([8d72fb3](https://github.com/yargs/yargs/commit/8d72fb3968498447df52e994e259920c9fefc2b5))
+* **build:** update typescript / eslint / rollup deps fixing bundling of yargs ([#2384](https://github.com/yargs/yargs/issues/2384)) ([d92984d](https://github.com/yargs/yargs/commit/d92984def0442b247848e3527527f35f1a2abbbe))
+* coerce should play well with parser configuration ([#2308](https://github.com/yargs/yargs/issues/2308)) ([8343c66](https://github.com/yargs/yargs/commit/8343c66eac10fbe60e85fc17adfe07eadd45cb35))
+* exit after async handler done ([#2313](https://github.com/yargs/yargs/issues/2313)) ([e326cde](https://github.com/yargs/yargs/commit/e326cde53173e82407bf5e79cfdd58a199bcb909))
+* propagate Dictionary including undefined in value type ([#2393](https://github.com/yargs/yargs/issues/2393)) ([2b2f7f5](https://github.com/yargs/yargs/commit/2b2f7f5611ec6b4229ca609041b0fc8ffc393d14))
+
+
+### Build System
+
+* **node:** require Node &gt;= 16.15.1 ([d92984d](https://github.com/yargs/yargs/commit/d92984def0442b247848e3527527f35f1a2abbbe))
+
 ## [17.7.2](https://github.com/yargs/yargs/compare/v17.7.1...v17.7.2) (2023-04-27)
 
 
