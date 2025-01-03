@@ -125,8 +125,8 @@ See usage examples in [docs](/docs/typescript.md).
 As of `v16`, `yargs` supports [Deno](https://github.com/denoland/deno):
 
 ```typescript
-import yargs from 'https://deno.land/x/yargs/deno.ts'
-import { Arguments } from 'https://deno.land/x/yargs/deno-types.ts'
+import yargs from 'https://deno.land/x/yargs@v17.7.2-deno/deno.ts'
+import { Arguments } from 'https://deno.land/x/yargs@v17.7.2-deno/deno-types.ts'
 
 yargs(Deno.args)
   .command('download <files...>', 'download a list of files', (yargs: any) => {
@@ -140,6 +140,8 @@ yargs(Deno.args)
   .demandCommand(1)
   .parse()
 ```
+
+> Note: If you use version tags in url then you also have to add `-deno` flag on the end, like `@17.7.2-deno`
 
 ### ESM
 
