@@ -3,7 +3,6 @@
 'use strict';
 import * as assert from 'assert';
 import yargs from '../index.mjs';
-import * as processArgv from '../build/lib/utils/process-argv.js';
 import {expect, should} from 'chai';
 import {checkOutput} from './helpers/utils.mjs';
 
