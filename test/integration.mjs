@@ -1,14 +1,14 @@
 'use strict';
 /* global describe, it, before, after */
 
-const spawn = require('cross-spawn');
-const path = require('path');
-const which = require('which');
-const rimraf = require('rimraf');
-const cpr = require('cpr');
-const fs = require('fs');
+import {spawn} from 'cross-spawn';
+import * as path from 'path';
+import which from 'which';
+import cpr from 'cpr';
+import * as fs from 'fs';
+import {should} from 'chai';
 
-require('chai').should();
+should();
 
 describe('integration tests', () => {
   it('should run as a shell script with no arguments', done => {
@@ -76,12 +76,11 @@ describe('integration tests', () => {
       return this.skip();
     }
 
-    testCmd('./issue-497.js', ['--help'], (code, stdout) => {
+    testCmd('./issue-497.js', ['--help'], (code, stdout, stderr) => {
       if (code) {
         done(new Error(`cmd exited with code ${code}`));
         return;
       }
-
       stdout.should.match(/--o999/);
       stdout.should.not.match(/never get here/);
       return done();
@@ -217,7 +216,7 @@ describe('integration tests', () => {
       });
 
       after(() => {
-        rimraf.sync('./test/fixtures/yargs');
+        fs.rmSync('./test/fixtures/yargs', {recursive: true});
         fs.unlinkSync('./test/fixtures/yargs-symlink');
       });
     });
@@ -228,7 +227,7 @@ function testCmd(cmd, args, cb) {
   const cmds = cmd.split(' ');
 
   const bin = spawn(cmds[0], cmds.slice(1).concat(args.map(String)), {
-    cwd: path.join(__dirname, '/fixtures'),
+    cwd: path.resolve('./test/fixtures'),
   });
 
   let stdout = '';

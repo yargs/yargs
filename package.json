@@ -2,31 +2,16 @@
   "name": "yargs",
   "version": "17.7.2",
   "description": "yargs the modern, pirate-themed, successor to optimist.",
-  "main": "./index.cjs",
+  "main": "./index.mjs",
   "exports": {
     "./package.json": "./package.json",
-    ".": [
-      {
-        "import": "./index.mjs",
-        "require": "./index.cjs"
-      },
-      "./index.cjs"
-    ],
     "./helpers": {
-      "import": "./helpers/helpers.mjs",
-      "require": "./helpers/index.js"
+      "import": "./helpers/helpers.mjs"
     },
     "./browser": {
       "import": "./browser.mjs",
       "types": "./browser.d.ts"
-    },
-    "./yargs": [
-      {
-        "import": "./yargs.mjs",
-        "require": "./yargs"
-      },
-      "./yargs"
-    ]
+    }
   },
   "type": "module",
   "module": "./index.mjs",
@@ -39,12 +24,9 @@
   "files": [
     "browser.mjs",
     "browser.d.ts",
-    "index.cjs",
     "helpers/*.js",
     "helpers/*",
     "index.mjs",
-    "yargs",
-    "yargs.mjs",
     "build",
     "locales",
     "LICENSE",
@@ -85,18 +67,18 @@
   },
   "scripts": {
     "fix": "gts fix && npm run fix:js",
-    "fix:js": "eslint . --ext cjs --ext mjs --ext js --fix",
+    "fix:js": "eslint . --ext mjs --ext js --fix",
     "posttest": "npm run check",
-    "test": "c8 mocha --enable-source-maps ./test/*.cjs --require ./test/before.cjs --timeout=12000 --check-leaks",
+    "test": "c8 mocha --enable-source-maps ./test/*.mjs --require ./test/before.mjs --timeout=12000 --check-leaks",
     "test:esm": "c8 mocha --enable-source-maps ./test/esm/*.mjs --check-leaks",
     "coverage": "c8 report --check-coverage",
     "prepare": "npm run compile",
     "pretest": "npm run compile -- -p tsconfig.test.json",
     "compile": "rimraf build && tsc",
     "check": "gts lint && npm run check:js",
-    "check:js": "eslint . --ext cjs --ext mjs --ext js",
+    "check:js": "eslint . --ext mjs --ext js",
     "clean": "gts clean",
-    "watch": "rimraf build && tsc && concurrently npm:watch:tsc npm:watch:cjs",
+    "watch": "rimraf build && tsc && concurrently npm:watch:tsc",
     "watch:tsc": "tsc --watch"
   },
   "repository": {
