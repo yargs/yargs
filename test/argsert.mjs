@@ -1,7 +1,7 @@
 /* global describe, it */
-const {argsert} = require('../build/index.cjs');
-const {checkOutput} = require('./helpers/utils.cjs');
-const {expect, should} = require('chai');
+import {argsert} from '../build/lib/argsert.js';
+import {checkOutput} from './helpers/utils.mjs';
+import {expect, should} from 'chai';
 
 should();
 
@@ -189,7 +189,6 @@ describe('Argsert', () => {
     function foo(...args) {
       argsert('<*>', [].slice.call(args));
     }
-
     expect(() => {
       foo('bar', undefined, undefined, 33);
     }).to.throw();

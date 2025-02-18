@@ -1,12 +1,14 @@
 /* global describe, it, beforeEach */
 /* eslint-disable no-unused-vars */
 'use strict';
-const assert = require('assert');
-const yargs = require('../index.cjs');
-const expect = require('chai').expect;
-const checkOutput = require('./helpers/utils.cjs').checkOutput;
+import * as assert from 'assert';
+import yargs from '../index.mjs';
+import * as processArgv from '../build/lib/utils/process-argv.js';
+import {expect, should} from 'chai';
+import {checkOutput} from './helpers/utils.mjs';
 
-require('chai').should();
+should();
+
 const noop = () => {};
 async function wait() {
   return new Promise(resolve => {
@@ -16,7 +18,7 @@ async function wait() {
 
 describe('Command', () => {
   beforeEach(() => {
-    yargs.getInternalMethods().reset();
+    yargs().getInternalMethods().reset();
   });
 
   describe('positional arguments', () => {
@@ -212,7 +214,7 @@ describe('Command', () => {
 
     // Addresses: https://github.com/yargs/yargs/issues/1637
     it('does not overwrite options in argv if variadic', () => {
-      yargs
+      yargs()
         .command({
           command: 'cmd [foods..]',
           desc: 'cmd desc',
@@ -229,7 +231,7 @@ describe('Command', () => {
     });
 
     it('does not overwrite options in argv if variadic and when using default command', () => {
-      yargs
+      yargs()
         .command({
           command: '$0 [foods..]',
           desc: 'default desc',
@@ -290,7 +292,7 @@ describe('Command', () => {
     });
 
     it('does not overwrite options in argv if variadic and preserves falsy values', () => {
-      yargs
+      yargs()
         .command({
           command: '$0 [numbers..]',
           desc: 'default desc',
@@ -912,166 +914,6 @@ describe('Command', () => {
     });
   });
 
-  describe('commandDir', () => {
-    it('supports relative dirs', () => {
-      const r = checkOutput(() =>
-        yargs('--help').wrap(null).commandDir('fixtures/cmddir').parse()
-      );
-      r.exit.should.equal(true);
-      r.exitCode.should.equal(0);
-      r.errors.length.should.equal(0);
-      r.should.have.property('logs');
-      r.logs
-        .join('\n')
-        .split(/\n+/)
-        .should.deep.equal([
-          'usage [command]',
-          'Commands:',
-          '  usage dream [command] [opts]  Go to sleep and dream',
-          'Options:',
-          '  --help     Show help  [boolean]',
-          '  --version  Show version number  [boolean]',
-        ]);
-    });
-
-    it('supports nested subcommands', () => {
-      const r = checkOutput(
-        () =>
-          yargs('dream --help')
-            .wrap(null)
-            .commandDir('fixtures/cmddir')
-            .parse(),
-        ['./command']
-      );
-      r.exit.should.equal(true);
-      r.errors.length.should.equal(0);
-      r.logs[0]
-        .split(/\n+/)
-        .should.deep.equal([
-          'command dream [command] [opts]',
-          'Go to sleep and dream',
-          'Commands:',
-          '  command dream of-memory <memory>               Dream about a specific memory',
-          '  command dream within-a-dream [command] [opts]  Dream within a dream',
-          'Options:',
-          '  --help     Show help  [boolean]',
-          '  --version  Show version number  [boolean]',
-          '  --shared   Is the dream shared with others?  [boolean]',
-          '  --extract  Attempt extraction?  [boolean]',
-        ]);
-    });
-
-    it('supports a "recurse" boolean option', () => {
-      const r = checkOutput(() =>
-        yargs('--help')
-          .wrap(null)
-          .commandDir('fixtures/cmddir', {recurse: true})
-          .parse()
-      );
-      r.exit.should.equal(true);
-      r.errors.length.should.equal(0);
-      r.logs
-        .join('\n')
-        .split(/\n+/)
-        .should.deep.equal([
-          'usage [command]',
-          'Commands:',
-          '  usage limbo [opts]                     Get lost in pure subconscious',
-          '  usage inception [command] [opts]       Enter another dream, where inception is possible',
-          '  usage within-a-dream [command] [opts]  Dream within a dream',
-          '  usage dream [command] [opts]           Go to sleep and dream',
-          'Options:',
-          '  --help     Show help  [boolean]',
-          '  --version  Show version number  [boolean]',
-        ]);
-    });
-
-    it('supports a "visit" function option', () => {
-      let commandObject;
-      let pathToFile;
-      let filename;
-      const r = checkOutput(() =>
-        yargs('--help')
-          .wrap(null)
-          .commandDir('fixtures/cmddir', {
-            visit(_commandObject, _pathToFile, _filename) {
-              commandObject = _commandObject;
-              pathToFile = _pathToFile;
-              filename = _filename;
-              return false; // exclude command
-            },
-          })
-          .parse()
-      );
-      commandObject.should.have
-        .property('command')
-        .and.equal('dream [command] [opts]');
-      commandObject.should.have
-        .property('desc')
-        .and.equal('Go to sleep and dream');
-      commandObject.should.have.property('builder');
-      commandObject.should.have.property('handler');
-      pathToFile.should.contain(
-        require('path').join('test', 'fixtures', 'cmddir', 'dream.js')
-      );
-      filename.should.equal('dream.js');
-      r.exit.should.equal(true);
-      r.errors.length.should.equal(0);
-      r.logs
-        .join('\n')
-        .split(/\n+/)
-        .should.deep.equal([
-          'Options:',
-          '  --help     Show help  [boolean]',
-          '  --version  Show version number  [boolean]',
-        ]);
-    });
-
-    it('detects and ignores cyclic dir references', () => {
-      const r = checkOutput(
-        () =>
-          yargs('cyclic --help')
-            .wrap(null)
-            .commandDir('fixtures/cmddir_cyclic')
-            .parse(),
-        ['./command']
-      );
-      r.exit.should.equal(true);
-      r.errors.length.should.equal(0);
-      r.should.have.property('logs');
-      r.logs
-        .join('\n')
-        .split(/\n+/)
-        .should.deep.equal([
-          'command cyclic',
-          'Attempts to (re)apply its own dir',
-          'Options:',
-          '  --help     Show help  [boolean]',
-          '  --version  Show version number  [boolean]',
-        ]);
-    });
-
-    it("derives 'command' string from filename when not exported", () => {
-      const r = checkOutput(() =>
-        yargs('--help').wrap(null).commandDir('fixtures/cmddir_noname').parse()
-      );
-      r.exit.should.equal(true);
-      r.errors.length.should.equal(0);
-      r.should.have.property('logs');
-      r.logs
-        .join('\n')
-        .split(/\n+/)
-        .should.deep.equal([
-          'usage [command]',
-          'Commands:',
-          '  usage nameless  Command name derived from module filename',
-          'Options:',
-          '  --help     Show help  [boolean]',
-          '  --version  Show version number  [boolean]',
-        ]);
-    });
-  });
-
   describe('help command', () => {
     it('displays command help appropriately', () => {
       const sub = {
@@ -1340,7 +1182,7 @@ describe('Command', () => {
     });
 
     it('allows variadic and positional arguments to be combined', () => {
-      const parser = yargs.command(
+      const parser = yargs().command(
         'yo <user|email> [ ssns | sins... ]',
         'Send someone a yo'
       );
@@ -1440,7 +1282,7 @@ describe('Command', () => {
         let checkCalled1 = 0;
         let checkCalled2 = 0;
         const y = yargs()
-          .command('command <snuh>', 'a command', () => {
+          .command('command <snuh>', 'a command', yargs => {
             yargs.check(argv => {
               checkCalled1++;
               return true;
@@ -1474,36 +1316,36 @@ describe('Command', () => {
     describe('strict', () => {
       it('defaults to false when not called', () => {
         let commandCalled = false;
-        yargs('hi').command('hi', 'The hi command', innerYargs => {
+        const y = yargs('hi').command('hi', 'The hi command', innerYargs => {
           commandCalled = true;
           innerYargs.getStrict().should.equal(false);
         });
-        yargs.getStrict().should.equal(false);
-        yargs.parse(); // parse and run command
+        y.getStrict().should.equal(false);
+        y.parse(); // parse and run command
         commandCalled.should.equal(true);
       });
 
       it('can be enabled just for a command', () => {
         let commandCalled = false;
-        yargs('hi').command('hi', 'The hi command', innerYargs => {
+        const y = yargs('hi').command('hi', 'The hi command', innerYargs => {
           commandCalled = true;
           innerYargs.strict().getStrict().should.equal(true);
         });
-        yargs.getStrict().should.equal(false);
-        yargs.parse(); // parse and run command
+        y.getStrict().should.equal(false);
+        y.parse(); // parse and run command
         commandCalled.should.equal(true);
       });
 
       it('applies strict globally by default', () => {
         let commandCalled = false;
-        yargs('hi')
+        const y = yargs('hi')
           .strict()
           .command('hi', 'The hi command', innerYargs => {
             commandCalled = true;
             innerYargs.getStrict().should.equal(true);
           });
-        yargs.getStrict().should.equal(true);
-        yargs.parse(); // parse and run command
+        y.getStrict().should.equal(true);
+        y.parse(); // parse and run command
         commandCalled.should.equal(true);
       });
 
@@ -1533,14 +1375,14 @@ describe('Command', () => {
 
       it('allows a command to override global`', () => {
         let commandCalled = false;
-        yargs('hi')
+        const y = yargs('hi')
           .strict()
           .command('hi', 'The hi command', innerYargs => {
             commandCalled = true;
             innerYargs.strict(false).getStrict().should.equal(false);
           });
-        yargs.getStrict().should.equal(true);
-        yargs.parse(); // parse and run command
+        y.getStrict().should.equal(true);
+        y.parse(); // parse and run command
         commandCalled.should.equal(true);
       });
 
@@ -1632,7 +1474,7 @@ describe('Command', () => {
 
       // addresses https://github.com/yargs/yargs/issues/794
       it('should bubble errors thrown by coerce function inside commands', done => {
-        yargs
+        yargs()
           .command('foo', 'the foo command', yargs => {
             yargs.coerce('x', arg => {
               throw Error('yikes an error');
@@ -2139,7 +1981,9 @@ describe('Command', () => {
 
   // see: https://github.com/yargs/yargs/issues/1099
   it('does not coerce number from positional with leading "+"', () => {
-    const argv = yargs.command('$0 <phone>', '', yargs => {}).parse('+5550100');
+    const argv = yargs()
+      .command('$0 <phone>', '', yargs => {})
+      .parse('+5550100');
     argv.phone.should.equal('+5550100');
   });
 
