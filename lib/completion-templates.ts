@@ -13,9 +13,10 @@ _{{app_name}}_yargs_completions()
     args=("\${COMP_WORDS[@]}")
 
     # ask yargs to generate completions.
-    type_list=$({{app_path}} --get-yargs-completions "\${args[@]}")
-
-    COMPREPLY=( $(compgen -W "\${type_list}" -- \${cur_word}) )
+    # see https://stackoverflow.com/a/40944195/7080036 for the spaces-handling awk
+    mapfile -t type_list < <({{app_path}} --get-yargs-completions "\${args[@]}")
+    mapfile -t COMPREPLY < <(compgen -W "$( printf '%q ' "\${type_list[@]}" )" -- "\${cur_word}" |
+        awk '/ / { print "\\""$0"\\"" } /^[^ ]+$/ { print $0 }')
 
     # if no match was found, fall back to filename completion
     if [ \${#COMPREPLY[@]} -eq 0 ]; then
