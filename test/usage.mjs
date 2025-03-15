@@ -1,15 +1,15 @@
 'use strict';
-/* global describe, it, beforeEach */
+/* global describe, it */
 /* eslint-disable no-unused-vars */
 
-const checkUsage = require('./helpers/utils.cjs').checkOutput;
-const chalk = require('chalk');
-const yargs = require('../index.cjs');
-const expect = require('chai').expect;
-const {YError} = require('../build/index.cjs');
-const assert = require('assert');
+import {checkOutput} from './helpers/utils.mjs';
+import chalk from 'chalk';
+import yargs from '../index.mjs';
+import {expect, should} from 'chai';
+import {YError} from '../build/lib/yerror.js';
+import assert from 'assert';
 
-const should = require('chai').should();
+should();
 
 const noop = () => {};
 async function wait(n = 10) {
@@ -19,14 +19,10 @@ async function wait(n = 10) {
 }
 
 describe('usage tests', () => {
-  beforeEach(() => {
-    yargs.getInternalMethods().reset();
-  });
-
   describe('demand options', () => {
     describe('using .demand()', () => {
       it('should show an error along with the missing arguments on demand fail', () => {
-        const r = checkUsage(() =>
+        const r = checkOutput(() =>
           yargs('-x 10 -z 20')
             .usage('Usage: $0 -x NUM -y NUM')
             .demand(['x', 'y'])
@@ -53,7 +49,7 @@ describe('usage tests', () => {
       });
 
       it('missing argument message given if one command, but an argument not on the list is provided', () => {
-        const r = checkUsage(() =>
+        const r = checkOutput(() =>
           yargs('wombat -w 10 -y 10')
             .usage('Usage: $0 -w NUM -m NUM')
             .demand(1, ['w', 'm'])
@@ -81,7 +77,7 @@ describe('usage tests', () => {
       });
 
       it('missing command message if all the required arguments exist, but not enough commands are provided', () => {
-        const r = checkUsage(() =>
+        const r = checkOutput(() =>
           yargs('-w 10 -y 10')
             .usage('Usage: $0 -w NUM -m NUM')
             .demand(1, ['w', 'm'])
@@ -109,7 +105,7 @@ describe('usage tests', () => {
       });
 
       it('no failure occurs if the required arguments and the required number of commands are provided', () => {
-        const r = checkUsage(() =>
+        const r = checkOutput(() =>
           yargs('wombat -w 10 -m 10')
             .usage('Usage: $0 -w NUM -m NUM')
             .command('wombat', 'wombat handlers')
@@ -128,7 +124,7 @@ describe('usage tests', () => {
 
       describe('using .require()', () => {
         it('should show an error along with the missing arguments on demand fail', () => {
-          const r = checkUsage(() =>
+          const r = checkOutput(() =>
             yargs('-x 10 -z 20')
               .usage('Usage: $0 -x NUM -y NUM')
               .require(['x', 'y'])
@@ -154,7 +150,7 @@ describe('usage tests', () => {
           r.exit.should.equal(true);
         });
         it('missing argument message given if one command and an argument not on the list are provided', () => {
-          const r = checkUsage(() =>
+          const r = checkOutput(() =>
             yargs('wombat -w 10 -y 10')
               .usage('Usage: $0 -w NUM -m NUM')
               .required(1, ['w', 'm'])
@@ -183,7 +179,7 @@ describe('usage tests', () => {
       });
 
       it('missing command message if all the required arguments exist, but not enough commands are provided', () => {
-        const r = checkUsage(() =>
+        const r = checkOutput(() =>
           yargs('-w 10 -y 10')
             .usage('Usage: $0 -w NUM -m NUM')
             .require(1, ['w', 'm'])
@@ -212,7 +208,7 @@ describe('usage tests', () => {
     });
 
     it('should show an error along with a custom message on demand fail', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs('-z 20')
           .usage('Usage: $0 -x NUM -y NUM')
           .demand(
@@ -242,7 +238,7 @@ describe('usage tests', () => {
     });
 
     it('should return valid values when demand passes', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs('-x 10 -y 20')
           .usage('Usage: $0 -x NUM -y NUM')
           .demand(['x', 'y'])
@@ -259,7 +255,7 @@ describe('usage tests', () => {
     });
 
     it('should not show a custom message if msg is null', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs('').usage('Usage: foo').demand(1, null).wrap(null).parse()
       );
 
@@ -278,7 +274,7 @@ describe('usage tests', () => {
     // see #169.
     describe('min/max demanded count', () => {
       it("does not output an error if '_' count is within the min/max range", () => {
-        const r = checkUsage(() =>
+        const r = checkOutput(() =>
           yargs(['foo', 'bar', 'apple'])
             .usage('Usage: foo')
             .demand(2, 3)
@@ -290,7 +286,7 @@ describe('usage tests', () => {
       });
 
       it("outputs an error if '_' count is above max", () => {
-        const r = checkUsage(() =>
+        const r = checkOutput(() =>
           yargs(['foo', 'bar', 'apple', 'banana'])
             .usage('Usage: foo')
             .demand(2, 3)
@@ -311,7 +307,7 @@ describe('usage tests', () => {
       });
 
       it("outputs an error if '_' count is below min", () => {
-        const r = checkUsage(() =>
+        const r = checkOutput(() =>
           yargs(['foo']).usage('Usage: foo').demand(2, 3).wrap(null).parse()
         );
 
@@ -328,7 +324,7 @@ describe('usage tests', () => {
       });
 
       it('allows a customer error message to be provided', () => {
-        const r = checkUsage(() =>
+        const r = checkOutput(() =>
           yargs(['foo'])
             .usage('Usage: foo')
             .demand(2, 3, 'pork chop sandwiches')
@@ -349,7 +345,7 @@ describe('usage tests', () => {
       });
 
       it("shouldn't interpret the second argument as a max when it is an array", () => {
-        const r = checkUsage(() =>
+        const r = checkOutput(() =>
           yargs(['koala', 'wombat', '--1'])
             .usage('Usage: foo')
             .demand(1, ['1'])
@@ -365,19 +361,19 @@ describe('usage tests', () => {
   describe('deprecate options', () => {
     describe('using .option(x, {deprecate: [boolean|string]})', () => {
       it('{deprecated: true} should show [deprecated]', () => {
-        const r = checkUsage(() =>
+        const r = checkOutput(() =>
           yargs('--help').option('x', {deprecated: true}).wrap(null).parse()
         );
         r.logs[0].should.include('  -x  [deprecated]');
       });
       it('{deprecated: string} should show [deprecated: string]', () => {
-        const r = checkUsage(() =>
+        const r = checkOutput(() =>
           yargs('--help').option('x', {deprecated: 'string'}).wrap(null).parse()
         );
         r.logs[0].should.include('  -x  [deprecated: string]');
       });
       it('{deprecated: boolean} in sub-command', () => {
-        const r = checkUsage(() =>
+        const r = checkOutput(() =>
           yargs('command --help')
             .option('x', {deprecated: true})
             .command('command', 'command', yargs =>
@@ -390,7 +386,7 @@ describe('usage tests', () => {
         r.logs[0].should.include('  -y  [deprecated]');
       });
       it('{deprecated: string} in sub-command', () => {
-        const r = checkUsage(() =>
+        const r = checkOutput(() =>
           yargs('command --help')
             .option('x', {deprecated: 'string'})
             .command('command', 'command', yargs =>
@@ -405,13 +401,13 @@ describe('usage tests', () => {
     });
     describe('using .deprecateOption(x, [string])', () => {
       it('.deprecateOption(x) should show [deprecated]', () => {
-        const r = checkUsage(() =>
+        const r = checkOutput(() =>
           yargs('--help').option('x').deprecateOption('x').wrap(null).parse()
         );
         r.logs[0].should.include('  -x  [deprecated]');
       });
       it('.deprecateOption(x, string) should show [deprecated: string]', () => {
-        const r = checkUsage(() =>
+        const r = checkOutput(() =>
           yargs('--help')
             .option('x')
             .deprecateOption('x', 'string')
@@ -421,7 +417,7 @@ describe('usage tests', () => {
         r.logs[0].should.include('  -x  [deprecated: string]');
       });
       it('.deprecateOption(x) in a sub-command', () => {
-        const r = checkUsage(() =>
+        const r = checkOutput(() =>
           yargs('command --help')
             .option('x')
             .deprecateOption('x')
@@ -435,7 +431,7 @@ describe('usage tests', () => {
         r.logs[0].should.include('  -y  [deprecated]');
       });
       it('.deprecateOption(x, string) in a sub-command', () => {
-        const r = checkUsage(() =>
+        const r = checkOutput(() =>
           yargs('command --help')
             .option('x')
             .deprecateOption('x', 'string')
@@ -452,7 +448,7 @@ describe('usage tests', () => {
   });
 
   it('should return valid values when check passes', () => {
-    const r = checkUsage(() =>
+    const r = checkOutput(() =>
       yargs('-x 10 -y 20')
         .usage('Usage: $0 -x NUM -y NUM')
         .check(argv => {
@@ -472,7 +468,7 @@ describe('usage tests', () => {
   });
 
   it('should display missing arguments when check fails with a thrown exception', () => {
-    const r = checkUsage(() =>
+    const r = checkOutput(() =>
       yargs('-x 10 -z 20')
         .usage('Usage: $0 -x NUM -y NUM')
         .wrap(null)
@@ -501,7 +497,7 @@ describe('usage tests', () => {
   });
 
   it('should display missing arguments when check fails with a return value', () => {
-    const r = checkUsage(() =>
+    const r = checkOutput(() =>
       yargs('-x 10 -z 20')
         .usage('Usage: $0 -x NUM -y NUM')
         .wrap(null)
@@ -534,7 +530,7 @@ describe('usage tests', () => {
     function checker(argv) {
       return 'x' in argv && 'y' in argv;
     }
-    const r = checkUsage(() =>
+    const r = checkOutput(() =>
       yargs('-x 10 -y 20')
         .usage('Usage: $0 -x NUM -y NUM')
         .check(checker)
@@ -553,7 +549,7 @@ describe('usage tests', () => {
     function checker(argv) {
       return 'x' in argv && 'y' in argv;
     }
-    const r = checkUsage(() =>
+    const r = checkOutput(() =>
       yargs('-x 10 -z 20')
         .usage('Usage: $0 -x NUM -y NUM')
         .check(checker)
@@ -583,7 +579,7 @@ describe('usage tests', () => {
   describe('when exitProcess is false', () => {
     describe('when check fails with a thrown exception', () => {
       it('should display missing arguments once', () => {
-        const r = checkUsage(() => {
+        const r = checkOutput(() => {
           try {
             return yargs('-x 10 -z 20')
               .usage('Usage: $0 -x NUM -y NUM')
@@ -614,7 +610,7 @@ describe('usage tests', () => {
     });
     describe('fail()', () => {
       it('is called with the original error message as the first parameter', () => {
-        const r = checkUsage(() => {
+        const r = checkOutput(() => {
           return yargs()
             .fail(message => {
               console.log(message);
@@ -630,7 +626,7 @@ describe('usage tests', () => {
       });
 
       it('is invoked with yargs instance as third argument', () => {
-        const r = checkUsage(() =>
+        const r = checkOutput(() =>
           yargs('foo')
             .command(
               'foo',
@@ -656,7 +652,7 @@ describe('usage tests', () => {
 
       describe('when check() throws error', () => {
         it('fail() is called with the original error object as the second parameter', () => {
-          const r = checkUsage(() => {
+          const r = checkOutput(() => {
             return yargs()
               .fail((message, error) => {
                 console.log(error.message);
@@ -673,7 +669,7 @@ describe('usage tests', () => {
       });
       describe('when command() throws error', () => {
         it('fail() is called with the original error object as the second parameter', () => {
-          const r = checkUsage(() => {
+          const r = checkOutput(() => {
             return yargs('test')
               .fail(() => {
                 console.log('is triggered last');
@@ -736,7 +732,7 @@ describe('usage tests', () => {
   });
 
   it('should return a valid result when demanding a count of non-hyphenated values', () => {
-    const r = checkUsage(() =>
+    const r = checkOutput(() =>
       yargs('1 2 3 --moo')
         .usage('Usage: $0 [x] [y] [z] {OPTIONS}')
         .demand(3)
@@ -751,7 +747,7 @@ describe('usage tests', () => {
   });
 
   it('should return a failure message when not enough non-hyphenated arguments are found after a demand count', () => {
-    const r = checkUsage(() =>
+    const r = checkOutput(() =>
       yargs('1 2 --moo')
         .usage('Usage: $0 [x] [y] [z] {OPTIONS}')
         .demand(3)
@@ -777,7 +773,7 @@ describe('usage tests', () => {
   });
 
   it('should return a custom failure message when not enough non-hyphenated arguments are found after a demand count', () => {
-    const r = checkUsage(() =>
+    const r = checkOutput(() =>
       yargs('src --moo')
         .usage('Usage: $0 [x] [y] [z] {OPTIONS} <src> <dest> [extra_files...]')
         .demand(2, 'src and dest files are both required')
@@ -803,7 +799,7 @@ describe('usage tests', () => {
   });
 
   it('should return a valid result when setting defaults for singles', () => {
-    const r = checkUsage(() =>
+    const r = checkOutput(() =>
       yargs('--foo 50 --baz 70 --powsy')
         .default('foo', 5)
         .default('bar', 6)
@@ -819,7 +815,7 @@ describe('usage tests', () => {
   });
 
   it('should return a valid result when default is set for an alias', () => {
-    const r = checkUsage(() =>
+    const r = checkOutput(() =>
       yargs('').alias('f', 'foo').default('f', 5).parse()
     );
     r.should.have.property('result');
@@ -829,7 +825,7 @@ describe('usage tests', () => {
   });
 
   it('should print a single line when failing and default is set for an alias', () => {
-    const r = checkUsage(() =>
+    const r = checkOutput(() =>
       yargs('').alias('f', 'foo').default('f', 5).demand(1).wrap(null).parse()
     );
     r.errors
@@ -845,7 +841,7 @@ describe('usage tests', () => {
   });
 
   it('should allow you to set default values for a hash of options', () => {
-    const r = checkUsage(() =>
+    const r = checkOutput(() =>
       yargs('--foo 50 --baz 70').default({foo: 10, bar: 20, quux: 30}).parse()
     );
     r.should.have.property('result');
@@ -859,7 +855,7 @@ describe('usage tests', () => {
   describe('required arguments', () => {
     describe('with options object', () => {
       it('should show a failure message if a required option is missing', () => {
-        const r = checkUsage(() => {
+        const r = checkOutput(() => {
           const opts = {
             foo: {description: 'foo option', alias: 'f', requiresArg: true},
             bar: {description: 'bar option', alias: 'b', requiresArg: true},
@@ -891,7 +887,7 @@ describe('usage tests', () => {
       });
 
       it('should show a failure message if more than one required option is missing', () => {
-        const r = checkUsage(() => {
+        const r = checkOutput(() => {
           const opts = {
             foo: {description: 'foo option', alias: 'f', requiresArg: true},
             bar: {description: 'bar option', alias: 'b', requiresArg: true},
@@ -925,7 +921,7 @@ describe('usage tests', () => {
 
     describe('with requiresArg method', () => {
       it('should show a failure message if a required option is missing', () => {
-        const r = checkUsage(() => {
+        const r = checkOutput(() => {
           const opts = {
             foo: {description: 'foo option', alias: 'f'},
             bar: {description: 'bar option', alias: 'b'},
@@ -959,7 +955,7 @@ describe('usage tests', () => {
     });
 
     it("still requires argument if 'type' hints are given", () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs('--foo --bar')
           .requiresArg('foo')
           .string('foo')
@@ -975,7 +971,7 @@ describe('usage tests', () => {
 
   describe('with strict() option set', () => {
     it('should fail given an option argument that is not demanded', () => {
-      const r = checkUsage(() => {
+      const r = checkOutput(() => {
         const opts = {
           foo: {demand: 'foo option', alias: 'f'},
           bar: {demand: 'bar option', alias: 'b'},
@@ -1023,7 +1019,7 @@ describe('usage tests', () => {
       });
 
       it('accepts valid options', () => {
-        const r = checkUsage(() => {
+        const r = checkOutput(() => {
           const opts = {
             '--foo-bar': {description: 'foo bar option'},
             '--bar-baz': {description: 'bar baz option'},
@@ -1039,7 +1035,7 @@ describe('usage tests', () => {
       });
 
       it('works with aliases', () => {
-        const r = checkUsage(() => {
+        const r = checkOutput(() => {
           const opts = {
             '--foo-bar': {description: 'foo bar option', alias: 'f'},
             '--bar-baz': {description: 'bar baz option', alias: 'b'},
@@ -1057,7 +1053,7 @@ describe('usage tests', () => {
       });
 
       it('accepts mixed options with values', () => {
-        const r = checkUsage(() => {
+        const r = checkOutput(() => {
           const opts = {
             '--foo-bar': {description: 'foo bar option', demand: true},
             '--baz': {description: 'baz option', demand: true},
@@ -1073,7 +1069,7 @@ describe('usage tests', () => {
     });
 
     it('should fail given an option argument without a corresponding description', () => {
-      const r = checkUsage(() => {
+      const r = checkOutput(() => {
         const opts = {
           foo: {description: 'foo option', alias: 'f'},
           bar: {description: 'bar option', alias: 'b'},
@@ -1113,7 +1109,7 @@ describe('usage tests', () => {
 
     // Addresses: https://github.com/yargs/yargs/issues/2033
     it('should wrap whitespace in quotes if provided as an unknown argument', () => {
-      const r = checkUsage(() => {
+      const r = checkOutput(() => {
         return yargs(['--opt1=hello', ' ', '--opt2=world'])
           .command({
             command: '$0',
@@ -1133,7 +1129,7 @@ describe('usage tests', () => {
     });
 
     it('should fail given multiple option arguments without corresponding descriptions', () => {
-      const r = checkUsage(() => {
+      const r = checkOutput(() => {
         const opts = {
           foo: {description: 'foo option', alias: 'f'},
           bar: {description: 'bar option', alias: 'b'},
@@ -1173,7 +1169,7 @@ describe('usage tests', () => {
     });
 
     it('should pass given option arguments with corresponding descriptions', () => {
-      const r = checkUsage(() => {
+      const r = checkOutput(() => {
         const opts = {
           foo: {description: 'foo option'},
           bar: {description: 'bar option'},
@@ -1197,7 +1193,7 @@ describe('usage tests', () => {
   });
 
   it('should display example on fail', () => {
-    const r = checkUsage(() =>
+    const r = checkOutput(() =>
       yargs('')
         .example('$0 something', 'description')
         .example('$0 something else', 'other description')
@@ -1226,7 +1222,7 @@ describe('usage tests', () => {
   });
 
   it('should display examples on fail when passing multiple examples at once', () => {
-    const r = checkUsage(() =>
+    const r = checkOutput(() =>
       yargs('')
         .example([
           ['$0 something', 'description'],
@@ -1259,7 +1255,7 @@ describe('usage tests', () => {
   describe('demand option with boolean flag', () => {
     describe('with demand option', () => {
       it('should report missing required arguments', () => {
-        const r = checkUsage(() =>
+        const r = checkOutput(() =>
           yargs('-y 10 -z 20')
             .usage('Usage: $0 -x NUM [-y NUM]')
             .options({
@@ -1293,7 +1289,7 @@ describe('usage tests', () => {
 
     describe('with required option', () => {
       it('should report missing required arguments', () => {
-        const r = checkUsage(() =>
+        const r = checkOutput(() =>
           yargs('-y 10 -z 20')
             .usage('Usage: $0 -x NUM [-y NUM]')
             .options({
@@ -1326,7 +1322,7 @@ describe('usage tests', () => {
     });
 
     it('should not report missing required arguments when given an alias', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs('-w 10')
           .usage('Usage: $0 --width NUM [--height NUM]')
           .options({
@@ -1345,7 +1341,7 @@ describe('usage tests', () => {
 
   describe('help option', () => {
     it('should display usage', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs(['--help']).demand(['y']).wrap(null).parse()
       );
       r.should.have.property('result');
@@ -1365,7 +1361,7 @@ describe('usage tests', () => {
     });
 
     it('should not show both dashed and camelCase aliases', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs(['--help'])
           .usage('Usage: $0 options')
           .describe('some-opt', 'Some option')
@@ -1391,7 +1387,7 @@ describe('usage tests', () => {
     });
 
     it('should use 2 dashes for general 1-digit usage', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs(['--help'])
           .option('1', {
             type: 'string',
@@ -1418,7 +1414,7 @@ describe('usage tests', () => {
     });
 
     it('should use single dashes for 1-digit boolean key usage', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs(['--help'])
           .option('1', {
             type: 'boolean',
@@ -1444,7 +1440,7 @@ describe('usage tests', () => {
     });
 
     it('should use single dashes for 1-digit boolean alias usage', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs(['--help'])
           .option('negativeone', {
             alias: '1',
@@ -1471,7 +1467,7 @@ describe('usage tests', () => {
     });
 
     it('should use 2 dashes for multiple-digit alias usage', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs(['--help'])
           .option('onehundred', {
             alias: '100',
@@ -1499,7 +1495,7 @@ describe('usage tests', () => {
 
     describe('when exitProcess is false', () => {
       it('should not validate arguments (required argument)', () => {
-        const r = checkUsage(() =>
+        const r = checkOutput(() =>
           yargs(['--help'])
             .usage('Usage: $0 options')
             .alias('help', 'h')
@@ -1531,7 +1527,7 @@ describe('usage tests', () => {
       // We need both this and the previous spec because a required argument
       // is a validation error and nargs is a parse error
       it('should not validate arguments (nargs)', () => {
-        const r = checkUsage(() =>
+        const r = checkOutput(() =>
           yargs(['--help', '--some-opt'])
             .usage('Usage: $0 options')
             .alias('help', 'h')
@@ -1565,7 +1561,7 @@ describe('usage tests', () => {
 
   describe('version option', () => {
     it('should display version', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs(['--version'])
           .version('version', 'Show version number', '1.0.1')
           .wrap(null)
@@ -1580,14 +1576,14 @@ describe('usage tests', () => {
     });
 
     it('accepts version option as first argument, and version number as second argument', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs(['--version']).version('version', '1.0.0').wrap(null).parse()
       );
       r.logs[0].should.eql('1.0.0');
     });
 
     it("should default to 'version' as version option", () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs(['--version']).version('1.0.2').wrap(null).parse()
       );
       r.logs[0].should.eql('1.0.2');
@@ -1596,8 +1592,8 @@ describe('usage tests', () => {
     // Addresses: https://github.com/yargs/yargs/issues/1979
     describe('when an option or alias "version" is set', () => {
       it('emits warning if version is not disabled', () => {
-        const r = checkUsage(() =>
-          yargs
+        const r = checkOutput(() =>
+          yargs()
             .command('cmd1', 'cmd1 desc', yargs =>
               yargs.option('v', {
                 alias: 'version',
@@ -1616,7 +1612,7 @@ describe('usage tests', () => {
       });
 
       it('does not emit warning if version is disabled', () => {
-        const r = checkUsage(() =>
+        const r = checkOutput(() =>
           yargs
             .command(
               'cmd1',
@@ -1643,7 +1639,7 @@ describe('usage tests', () => {
 
     describe('when exitProcess is false', () => {
       it('should not validate arguments (required argument)', () => {
-        const r = checkUsage(() =>
+        const r = checkOutput(() =>
           yargs(['--version'])
             .version('version', 'Show version number', '1.0.1')
             .demand('some-opt')
@@ -1663,7 +1659,7 @@ describe('usage tests', () => {
       // We need both this and the previous spec because a required argument
       // is a validation error and nargs is a parse error
       it('should not validate arguments (nargs)', () => {
-        const r = checkUsage(() =>
+        const r = checkOutput(() =>
           yargs(['--version', '--some-opt'])
             .nargs('some-opt', 3)
             .version('version', 'Show version number', '1.0.1')
@@ -1689,7 +1685,7 @@ describe('usage tests', () => {
         bar: {desc: 'bar option', alias: 'b'},
       };
 
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs(['--foo'])
           .usage('Usage: $0 [options]')
           .options(opts)
@@ -1725,7 +1721,7 @@ describe('usage tests', () => {
       const errorMessage = 'Unknown argument: extraOpt';
 
       it('chained on to command', () => {
-        const r = checkUsage(() =>
+        const r = checkOutput(() =>
           yargs('cmd1 --opt1 hello --extraOpt oops')
             .command(
               'cmd1',
@@ -1748,7 +1744,7 @@ describe('usage tests', () => {
       });
 
       it('chained on globally', () => {
-        const r = checkUsage(() =>
+        const r = checkOutput(() =>
           yargs('cmd1 --opt1 hello --extraOpt oops')
             .command(
               'cmd1',
@@ -1772,7 +1768,7 @@ describe('usage tests', () => {
       });
 
       it('chained on command and globally (priority given to command message)', () => {
-        const r = checkUsage(() =>
+        const r = checkOutput(() =>
           yargs('cmd1 --opt1 hello --extraOpt oops')
             .command(
               'cmd1',
@@ -1803,7 +1799,7 @@ describe('usage tests', () => {
         foo: {desc: 'foo option', alias: 'f'},
       };
 
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs(['--foo'])
           .exitProcess(false)
           .usage('Usage: $0 [options]')
@@ -1822,7 +1818,7 @@ describe('usage tests', () => {
 
   describe('scriptName', () => {
     it('should display user supplied scriptName', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs(['--help']).scriptName('custom').command('command').parse()
       );
       r.logs
@@ -1841,7 +1837,7 @@ describe('usage tests', () => {
     });
 
     it('should not alter the user supplied scriptName', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs(['--help']).scriptName('./custom').command('command').parse()
       );
       r.logs
@@ -1861,20 +1857,20 @@ describe('usage tests', () => {
   });
 
   it('should not print usage string if help() is called without arguments', () => {
-    const r = checkUsage(() => yargs([]).usage('foo').help().parse());
+    const r = checkOutput(() => yargs([]).usage('foo').help().parse());
 
     r.logs.length.should.equal(0);
   });
 
   it('should add --help as an option for printing usage text if help() is called without arguments', () => {
-    const r = checkUsage(() => yargs(['--help']).usage('foo').help().parse());
+    const r = checkOutput(() => yargs(['--help']).usage('foo').help().parse());
 
     r.logs.length.should.not.equal(0);
   });
 
   describe('wrap', () => {
     it('should wrap argument descriptions onto multiple lines', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs([])
           .option('fairly-long-option', {
             alias: 'f',
@@ -1900,7 +1896,7 @@ describe('usage tests', () => {
 
       const width = process.stdout.columns;
 
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs([])
           .option('fairly-long-option', {
             alias: 'f',
@@ -1937,7 +1933,7 @@ describe('usage tests', () => {
         .help());
 
     it('should wrap the left-hand-column if it takes up more than 50% of the screen', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs([])
           .example(
             'i am a fairly long example',
@@ -1961,7 +1957,7 @@ describe('usage tests', () => {
     });
 
     it('should not wrap left-hand-column if no description is provided', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs([])
           .example('i am a fairly long example that is like really long woooo')
           .demand('foo')
@@ -1980,7 +1976,7 @@ describe('usage tests', () => {
     });
 
     it('should wrap the usage string', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs([])
           .usage('i am a fairly long usage string look at me go.')
           .demand('foo')
@@ -1995,7 +1991,7 @@ describe('usage tests', () => {
     it('should align span columns when ansi colors are not used in a description', () => {
       const noColorAddedDescr = 'The file to add or remove';
 
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs(['-h'])
           .option('f', {
             alias: 'file',
@@ -2020,10 +2016,11 @@ describe('usage tests', () => {
         ]);
     });
 
-    it('should align span columns when ansi colors are used in a description', () => {
+    // Requires updates to CLIUI.
+    it.skip('should align span columns when ansi colors are used in a description', () => {
       const yellowDescription = chalk.yellow('The file to add or remove');
 
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs(['-h'])
           .option('f', {
             alias: 'file',
@@ -2058,7 +2055,7 @@ describe('usage tests', () => {
         '  --version  Show version number  [boolean]',
       ];
 
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs('--help')
           .usage(
             [
@@ -2077,7 +2074,7 @@ describe('usage tests', () => {
 
   describe('commands', () => {
     it('should output a list of available commands', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs('')
           .command('upload', 'upload something')
           .command('download', 'download something from somewhere')
@@ -2103,7 +2100,7 @@ describe('usage tests', () => {
     });
 
     it('should not show hidden commands', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs('')
           .command('upload', 'upload something')
           .command('secret', false)
@@ -2143,7 +2140,7 @@ describe('usage tests', () => {
     });
 
     it('allows completion command to be hidden', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs('')
           .command('upload', 'upload something')
           .completion('completion', false)
@@ -2193,13 +2190,13 @@ describe('usage tests', () => {
       };
       const uploadHandler = argv => {};
 
-      const generalHelp = checkUsage(() =>
+      const generalHelp = checkOutput(() =>
         yargs('--help')
           .command(uploadCommand, uploadDesc, uploadOpts, uploadHandler)
           .wrap(null)
           .parse()
       );
-      const commandHelp = checkUsage(() =>
+      const commandHelp = checkOutput(() =>
         yargs('upload --help')
           .command(uploadCommand, uploadDesc, uploadOpts, uploadHandler)
           .wrap(null)
@@ -2232,7 +2229,8 @@ describe('usage tests', () => {
         ]);
     });
 
-    it('allows a command to override global wrap()', () => {
+    // Requires updates to CLIUI.
+    it.skip('allows a command to override global wrap()', () => {
       const uploadCommand = 'upload <dest>';
       const uploadDesc = 'Upload cwd';
       const uploadBuilder = yargs =>
@@ -2244,13 +2242,13 @@ describe('usage tests', () => {
           .wrap(46);
       const uploadHandler = argv => {};
 
-      const generalHelp = checkUsage(() =>
+      const generalHelp = checkOutput(() =>
         yargs('--help')
           .command(uploadCommand, uploadDesc, uploadBuilder, uploadHandler)
           .wrap(null)
           .parse()
       );
-      const commandHelp = checkUsage(() =>
+      const commandHelp = checkOutput(() =>
         yargs('upload --help')
           .command(uploadCommand, uploadDesc, uploadBuilder, uploadHandler)
           .wrap(null)
@@ -2269,6 +2267,7 @@ describe('usage tests', () => {
           '  --help     Show help  [boolean]',
           '  --version  Show version number  [boolean]',
         ]);
+
       commandHelp.logs[0]
         .split('\n')
         .should.deep.equal([
@@ -2285,7 +2284,7 @@ describe('usage tests', () => {
     });
 
     it('resets groups for a command handler, respecting order', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs(['upload', '-h'])
           .command('upload', 'upload something', yargs =>
             yargs
@@ -2322,7 +2321,7 @@ describe('usage tests', () => {
     });
 
     it('allows global option to be disabled', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs(['upload', '-h'])
           .command('upload', 'upload something', yargs =>
             yargs
@@ -2367,7 +2366,7 @@ describe('usage tests', () => {
     });
 
     it('can add to preserved groups', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs(['upload', '-h'])
           .command('upload', 'upload something', yargs =>
             yargs
@@ -2405,7 +2404,7 @@ describe('usage tests', () => {
     });
 
     it('can bump up preserved groups', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs(['upload', '-h'])
           .command('upload', 'upload something', yargs =>
             yargs
@@ -2451,7 +2450,7 @@ describe('usage tests', () => {
     });
 
     it('should display global non empty groups for commands', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs(['upload', '-h'])
           .command('upload', 'upload something', yargs =>
             yargs
@@ -2492,7 +2491,7 @@ describe('usage tests', () => {
     });
 
     it('should display global non empty groups for subcommands', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs(['do', 'upload', '-h'])
           .command('do', 'do something', yargs =>
             yargs
@@ -2537,7 +2536,7 @@ describe('usage tests', () => {
     });
 
     it('should list a module command only once', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs('--help')
           .command('upload', 'upload something', {
             builder(yargs) {
@@ -2564,7 +2563,7 @@ describe('usage tests', () => {
     });
 
     it('allows a builder function to override default usage() string', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs('upload --help')
           .command('upload', 'upload something', {
             builder(yargs) {
@@ -2590,7 +2589,7 @@ describe('usage tests', () => {
     });
 
     it('allows a builder function to disable default usage() with null', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs('upload --help')
           .command(
             'upload',
@@ -2612,7 +2611,7 @@ describe('usage tests', () => {
     });
 
     it('displays given command chain with positional args in default usage for subcommand with builder object', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs('one two --help')
           .command(
             'one <sub>',
@@ -2638,7 +2637,7 @@ describe('usage tests', () => {
     });
 
     it('displays given command chain with positional args in default usage for subcommand with builder function', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs('one two --help')
           .command(
             'one <sub>',
@@ -2670,7 +2669,7 @@ describe('usage tests', () => {
     });
 
     it('displays aliases for commands that have them (no wrap)', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs('help')
           .command(['copy <src> [dest]', 'cp', 'dupe'], 'Copy something')
           .wrap(null)
@@ -2692,7 +2691,7 @@ describe('usage tests', () => {
     });
 
     it('displays aliases for commands that have them (with wrap)', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs('help')
           .command(['copy <src> [dest]', 'cp', 'dupe'], 'Copy something')
           .wrap(80)
@@ -2714,7 +2713,7 @@ describe('usage tests', () => {
     });
 
     it('allows a builder to add more than one usage with multiple usage calls', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs('upload --help')
           .command(
             'upload',
@@ -2742,7 +2741,7 @@ describe('usage tests', () => {
     });
 
     it('allows a builder to disable usage with null after mutiple usage calls', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs('upload --help')
           .command(
             'upload',
@@ -2768,7 +2767,7 @@ describe('usage tests', () => {
     });
 
     it('does not display $0 twice when default commands are enabled', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs('-h')
           .usage('$0', 'do something', yargs => {
             yargs.alias('h', 'help');
@@ -2793,7 +2792,7 @@ describe('usage tests', () => {
 
   describe('epilogue', () => {
     it('should display an epilog message at the end of the usage instructions', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs('')
           .epilog('for more info view the manual at http://example.com')
           .demand('y')
@@ -2815,7 +2814,7 @@ describe('usage tests', () => {
     });
 
     it('supports multiple epilogs', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs('')
           .epilog('for more info view the manual at http://example.com')
           .epilog(
@@ -2845,7 +2844,7 @@ describe('usage tests', () => {
     });
 
     it('replaces $0 in epilog string', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs('')
           .epilog("Try '$0 --long-help' for more information")
           .demand('y')
@@ -2869,7 +2868,7 @@ describe('usage tests', () => {
 
   describe('default', () => {
     it('should indicate that the default is a generated-value, if function is provided', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs(['-h'])
           .help('h')
           .default('f', () => 99)
@@ -2881,7 +2880,7 @@ describe('usage tests', () => {
     });
 
     it('if a named function is provided, should use name rather than (generated-value)', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs(['-h'])
           .help('h')
           .default('f', function randomNumber() { // eslint-disable-line
@@ -2894,7 +2893,7 @@ describe('usage tests', () => {
     });
 
     it('default-description take precedence if one is provided', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs(['-h'])
           .help('h')
           .default(
@@ -2912,7 +2911,7 @@ describe('usage tests', () => {
     });
 
     it('serializes object and array defaults', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs(['-h'])
           .help('h')
           .default('a', [])
@@ -2931,7 +2930,7 @@ describe('usage tests', () => {
   describe('defaultDescription', () => {
     describe('using option() without default()', () => {
       it('should output given desc with default value', () => {
-        const r = checkUsage(() =>
+        const r = checkOutput(() =>
           yargs(['-h'])
             .help('h')
             .option('port', {
@@ -2947,7 +2946,7 @@ describe('usage tests', () => {
       });
 
       it('should output given desc without default value', () => {
-        const r = checkUsage(() =>
+        const r = checkOutput(() =>
           yargs(['-h'])
             .help('h')
             .option('port', {
@@ -2962,7 +2961,7 @@ describe('usage tests', () => {
       });
 
       it('should prefer given desc over function desc', () => {
-        const r = checkUsage(() =>
+        const r = checkOutput(() =>
           yargs(['-h'])
             .help('h')
             .option('port', {
@@ -2982,7 +2981,7 @@ describe('usage tests', () => {
 
     describe('using option() with default()', () => {
       it('should prefer default() desc when given last', () => {
-        const r = checkUsage(() =>
+        const r = checkOutput(() =>
           yargs(['-h'])
             .help('h')
             .option('port', {
@@ -2998,7 +2997,7 @@ describe('usage tests', () => {
       });
 
       it('should prefer option() desc when given last', () => {
-        const r = checkUsage(() =>
+        const r = checkOutput(() =>
           yargs(['-h'])
             .help('h')
             .default('port', null, '80 for HTTP and 443 for HTTPS')
@@ -3014,7 +3013,7 @@ describe('usage tests', () => {
       });
 
       it('should prefer option() desc over default() function', () => {
-        const r = checkUsage(() =>
+        const r = checkOutput(() =>
           yargs(['-h'])
             .help('h')
             .option('port', {
@@ -3034,7 +3033,7 @@ describe('usage tests', () => {
 
     describe('using positional() without default()', () => {
       it('should output given desc with default value', () => {
-        const r = checkUsage(() =>
+        const r = checkOutput(() =>
           yargs(['url', '-h'])
             .help('h')
             .command('url', 'Print a URL', yargs => {
@@ -3052,7 +3051,7 @@ describe('usage tests', () => {
       });
 
       it('should output given desc without default value', () => {
-        const r = checkUsage(() =>
+        const r = checkOutput(() =>
           yargs(['url', '-h'])
             .help('h')
             .command('url', 'Print a URL', yargs => {
@@ -3069,7 +3068,7 @@ describe('usage tests', () => {
       });
 
       it('should prefer given desc over function desc', () => {
-        const r = checkUsage(() =>
+        const r = checkOutput(() =>
           yargs(['url', '-h'])
             .help('h')
             .command('url', 'Print a URL', yargs => {
@@ -3091,7 +3090,7 @@ describe('usage tests', () => {
 
     describe('using positional() with default()', () => {
       it('should prefer default() desc when given last', () => {
-        const r = checkUsage(() =>
+        const r = checkOutput(() =>
           yargs(['url', '-h'])
             .help('h')
             .command('url', 'Print a URL', yargs => {
@@ -3110,7 +3109,7 @@ describe('usage tests', () => {
       });
 
       it('should prefer positional() desc when given last', () => {
-        const r = checkUsage(() =>
+        const r = checkOutput(() =>
           yargs(['url', '-h'])
             .help('h')
             .command('url', 'Print a URL', yargs => {
@@ -3129,7 +3128,7 @@ describe('usage tests', () => {
       });
 
       it('should prefer positional() desc over default() function', () => {
-        const r = checkUsage(() =>
+        const r = checkOutput(() =>
           yargs(['url', '-h'])
             .help('h')
             .command('url', 'Print a URL', yargs => {
@@ -3154,7 +3153,7 @@ describe('usage tests', () => {
   describe('normalizeAliases', () => {
     // see #128
     it("should display 'description' string in help message if set for alias", () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs(['-h'])
           .describe('foo', 'foo option')
           .alias('f', 'foo')
@@ -3175,7 +3174,7 @@ describe('usage tests', () => {
     });
 
     it("should display 'required' string in help message if set for alias", () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs(['-h'])
           .demand('foo')
           .alias('f', 'foo')
@@ -3196,7 +3195,7 @@ describe('usage tests', () => {
     });
 
     it("should display 'type' string in help message if set for alias", () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs(['-h'])
           .string('foo')
           .describe('foo', 'bar')
@@ -3218,7 +3217,7 @@ describe('usage tests', () => {
     });
 
     it("should display 'type' number in help message if set for alias", () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs(['-h'])
           .string('foo')
           .describe('foo', 'bar')
@@ -3244,7 +3243,7 @@ describe('usage tests', () => {
   describe('showHelp', () => {
     // see #143.
     it('should show help regardless of whether argv has been called', () => {
-      const r = checkUsage(() => {
+      const r = checkOutput(() => {
         const y = yargs(['--foo'])
           .options('foo', {
             alias: 'f',
@@ -3267,7 +3266,7 @@ describe('usage tests', () => {
     });
 
     it('should print the help using console.error when no arguments were specified', () => {
-      const r = checkUsage(() => {
+      const r = checkOutput(() => {
         const y = yargs(['--foo'])
           .options('foo', {
             alias: 'f',
@@ -3290,7 +3289,7 @@ describe('usage tests', () => {
     });
 
     it('should call the correct console.log method when specified', () => {
-      const r = checkUsage(() => {
+      const r = checkOutput(() => {
         const y = yargs(['--foo'])
           .options('foo', {
             alias: 'f',
@@ -3360,7 +3359,7 @@ describe('usage tests', () => {
     // See: https://github.com/yargs/yargs/issues/1791
     it('should not run default command', done => {
       let executed = false;
-      yargs.command(
+      const y = yargs().command(
         '$0',
         'a default command',
         yargs => yargs,
@@ -3368,7 +3367,7 @@ describe('usage tests', () => {
           executed = true;
         }
       );
-      yargs.showHelp(output => {
+      y.showHelp(output => {
         executed.should.equal(false);
         output.should.match(/a default command/);
         return done();
@@ -3379,7 +3378,7 @@ describe('usage tests', () => {
   describe('showVersion', () => {
     // see #143.
     it('should show version regardless of whether argv has been called', () => {
-      const r = checkUsage(() => {
+      const r = checkOutput(() => {
         const y = yargs().version('1.0.0').wrap(null);
 
         y.showVersion();
@@ -3389,7 +3388,7 @@ describe('usage tests', () => {
     });
 
     it('should call the correct console.log method when specified', () => {
-      const r = checkUsage(() => {
+      const r = checkOutput(() => {
         const y = yargs().version('1.0.0').wrap(null);
 
         y.showVersion('log');
@@ -3516,7 +3515,7 @@ describe('usage tests', () => {
 
   describe('choices', () => {
     it('should output choices when defined for non-hidden options', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs(['--help'])
           .option('answer', {
             describe: 'does this look good?',
@@ -3542,7 +3541,7 @@ describe('usage tests', () => {
     });
 
     it('should not output choices when defined for hidden options', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs(['--help'])
           .option('answer', {
             type: 'string',
@@ -3569,7 +3568,7 @@ describe('usage tests', () => {
 
   describe('count', () => {
     it('should indicate when an option is a count', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs(['--help'])
           .option('verbose', {
             describe: 'verbose level',
@@ -3586,7 +3585,7 @@ describe('usage tests', () => {
 
   describe('array', () => {
     it('should indicate when an option is an array', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs(['--help'])
           .option('arr', {
             describe: 'array option',
@@ -3603,7 +3602,7 @@ describe('usage tests', () => {
 
   describe('group', () => {
     it('allows an an option to be placed in an alternative group', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs(['--help'])
           .option('batman', {
             type: 'string',
@@ -3628,7 +3627,7 @@ describe('usage tests', () => {
     });
 
     it("does not print the 'Options:' group if no keys are in it", () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs(['-h'])
           .string('batman')
           .describe('batman', "not the world's happiest guy")
@@ -3653,7 +3652,7 @@ describe('usage tests', () => {
     });
 
     it('displays alias keys appropriately within a grouping', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs(['-h'])
           .alias('h', 'help')
           .group('help', 'Magic Variable:')
@@ -3672,7 +3671,7 @@ describe('usage tests', () => {
     });
 
     it('allows a group to be provided as the only information about an option', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs(['--help']).group('batman', 'Heroes:').wrap(null).parse()
       );
 
@@ -3689,7 +3688,7 @@ describe('usage tests', () => {
     });
 
     it('allows multiple options to be grouped at the same time', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs(['-h'])
           .help('h')
           .group('h', 'Options:')
@@ -3712,7 +3711,7 @@ describe('usage tests', () => {
     });
 
     it('allows group to be provided in the options object', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs(['-h'])
           .help('h')
           .option('batman', {
@@ -3736,7 +3735,7 @@ describe('usage tests', () => {
     });
 
     it('only displays a duplicated option once per group', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs(['--help'])
           .group(['batman', 'batman'], 'Heroes:')
           .group('robin', 'Heroes:')
@@ -3763,7 +3762,7 @@ describe('usage tests', () => {
 
   describe('cjk', () => {
     it('should calculate width of cjk text correctly', () => {
-      const r = checkUsage(() => {
+      const r = checkOutput(() => {
         const y = yargs()
           .example(
             '안녕하세요 선생님 안녕 친구야',
@@ -3789,7 +3788,7 @@ describe('usage tests', () => {
 
   describe('default command', () => {
     it('should display top-level help with no command given', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs('--help')
           .command(
             ['list [pattern]', 'ls', '*'],
@@ -3822,7 +3821,7 @@ describe('usage tests', () => {
     });
 
     it('should display top-level help with sorting with no command given if sorting enabled', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs('--help')
           .command(
             ['list [pattern]', 'ls', '*'],
@@ -3856,7 +3855,7 @@ describe('usage tests', () => {
     });
 
     it('should display default command as ./$0 if it has no aliases', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs('--help')
           .command('* [pattern]', 'List key-value pairs for pattern', {}, noop)
           .command('get <key>', 'Get value for key', {}, noop)
@@ -3883,7 +3882,7 @@ describe('usage tests', () => {
     });
 
     it('should display positionals that have been configured', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs('--help')
           .command(
             '* [pattern]',
@@ -3923,7 +3922,7 @@ describe('usage tests', () => {
     });
 
     it('should display options that have been configured', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs('--help')
           .command(
             '* [pattern]',
@@ -3957,7 +3956,7 @@ describe('usage tests', () => {
 
     // Addresses: https://github.com/yargs/yargs/issues/2030
     it('should display options (with descriptions) on failed default command', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs('')
           .command({
             command: '$0 <arg1>',
@@ -3995,7 +3994,7 @@ describe('usage tests', () => {
 
     // See: https://github.com/yargs/yargs/issues/2291
     it('should display help output for nested default command on failure', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs()
           .command(
             'root',
@@ -4047,7 +4046,7 @@ describe('usage tests', () => {
 
   describe('positional', () => {
     it('should display help section for positionals', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs('--help list')
           .command(
             'list [pattern]',
@@ -4078,7 +4077,7 @@ describe('usage tests', () => {
     });
 
     it('shows that variadic positional arguments are arrays', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs('--help list')
           .command(
             'list [pattern...]',
@@ -4109,7 +4108,7 @@ describe('usage tests', () => {
     });
 
     it('indicates that <foo> positional arguments are required', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs('--help list')
           .command(
             'list <pattern>',
@@ -4140,7 +4139,7 @@ describe('usage tests', () => {
     });
 
     it('displays aliases appropriately', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs('--help list')
           .command(
             'list [pattern|thingy]',
@@ -4171,7 +4170,7 @@ describe('usage tests', () => {
     });
 
     it('displays type information', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs('--help list')
           .command(
             'list [pattern]',
@@ -4203,7 +4202,7 @@ describe('usage tests', () => {
     });
 
     it('displays choices array', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs('--help list')
           .command(
             'list [pattern]',
@@ -4237,7 +4236,7 @@ describe('usage tests', () => {
 
   describe('hidden options', () => {
     it('--help should display all options except for hidden ones', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs('--help')
           .options({
             foo: {
@@ -4263,7 +4262,7 @@ describe('usage tests', () => {
         ]);
     });
     it('--help should display all options except for hidden ones even with a default', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs('--help')
           .options({
             foo: {
@@ -4291,7 +4290,7 @@ describe('usage tests', () => {
         ]);
     });
     it('--help should display all options except for hidden ones even in a group', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs('--help')
           .options({
             foo: {
@@ -4318,7 +4317,7 @@ describe('usage tests', () => {
         ]);
     });
     it('--help should display all groups except for ones with only hidden options', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs('--help')
           .options({
             foo: {
@@ -4352,7 +4351,7 @@ describe('usage tests', () => {
         ]);
     });
     it('--help should display all options (including hidden ones) with --show-hidden', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs('--help --show-hidden --mama ama')
           .options({
             foo: {
@@ -4379,7 +4378,7 @@ describe('usage tests', () => {
         ]);
     });
     it('--help should display all groups (including ones with only hidden options) with --show-hidden', () => {
-      const r = checkUsage(
+      const r = checkOutput(
         () =>
           yargs('--help --show-hidden').options({
             foo: {
@@ -4416,7 +4415,7 @@ describe('usage tests', () => {
         ]);
     });
     it('--help should display --custom-show-hidden', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs('--help')
           .options({
             foo: {
@@ -4444,7 +4443,7 @@ describe('usage tests', () => {
         ]);
     });
     it('--help should display all options with --custom-show-hidden', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs('--help --custom-show-hidden')
           .options({
             foo: {
@@ -4483,15 +4482,15 @@ describe('usage tests', () => {
         })
         .exitProcess(false);
 
-      checkUsage(
+      checkOutput(
         () => {
           y.parse('cmd');
           setTimeout(() => process.exit(1), 100); // eslint-disable-line
         },
         undefined,
         (err, r) => {
-          should.not.exist(err);
-          should.exist(r.errors[0]);
+          expect(err).to.not.exist;
+          expect(r.errors[0]).exist;
           r.errors[0]
             .split('\n')
             .should.deep.equal([
@@ -4517,7 +4516,7 @@ describe('usage tests', () => {
         .demandCommand(1, 'You need at least one command before moving on')
         .exitProcess(false);
 
-      checkUsage(
+      checkOutput(
         () => {
           y.parse('cmd');
           setTimeout(() => {
@@ -4527,11 +4526,11 @@ describe('usage tests', () => {
         },
         undefined,
         (err, r) => {
-          should.exist(err);
+          expect(err).to.exist;
           err.message.should.equal(
             'You need at least one command before moving on'
           );
-          should.exist(r.errors[0]);
+          expect(r.errors[0]).to.exist;
           r.errors[0]
             .split('\n')
             .should.deep.equal([
@@ -4551,7 +4550,7 @@ describe('usage tests', () => {
   });
 
   it('should allow setting the same description for several keys', () => {
-    const r = checkUsage(() =>
+    const r = checkOutput(() =>
       yargs('--help').describe(['big', 'small'], 'Packet size').parse()
     );
 
@@ -4580,7 +4579,7 @@ describe('usage tests', () => {
       ];
 
       it('should contain the expected output for --help', () => {
-        const r = checkUsage(() =>
+        const r = checkOutput(() =>
           yargs('--help')
             .scriptName('usage')
             .command('*', 'Default command description')
@@ -4590,7 +4589,7 @@ describe('usage tests', () => {
       });
 
       it('should contain the expected output for showhelp', () => {
-        const r = checkUsage(() => {
+        const r = checkOutput(() => {
           const y = yargs()
             .scriptName('usage')
             .command('*', 'Default command description');
@@ -4619,19 +4618,19 @@ describe('usage tests', () => {
       });
 
       it('should contain the expected output for showHelp when called from within handler', () => {
-        const r = checkUsage(() =>
-          yargs()
-            .scriptName('usage')
-            .command('*', 'Default command description', {}, () =>
-              yargs.showHelp('log')
+        const r = checkOutput(() => {
+          const y = yargs();
+          y.scriptName('usage')
+            .command('*', 'Default command description', {}, yargs =>
+              y.showHelp('log')
             )
-            .parse('')
-        );
+            .parse('');
+        });
         r.logs[0].split('\n').should.deep.equal(expected);
       });
 
       it('should contain the expected output for showHelp, when exception occurs', () => {
-        const r = checkUsage(() =>
+        const r = checkOutput(() =>
           yargs()
             .scriptName('usage')
             .command('*', 'Default command description', {}, () =>
@@ -4659,7 +4658,7 @@ describe('usage tests', () => {
         '  --version  Show version number                                       [boolean]',
       ];
       it('should contain the expected output for --help', () => {
-        const r = checkUsage(() =>
+        const r = checkOutput(() =>
           yargs('--help')
             .scriptName('usage')
             .usage('Hello, world!')
@@ -4673,35 +4672,34 @@ describe('usage tests', () => {
       });
 
       it('should contain the expected output for showHelp', () => {
-        const r = checkUsage(() => {
-          yargs()
+        const r = checkOutput(() => {
+          const y = yargs()
             .scriptName('usage')
             .usage('Hello, world!')
             .commands([
               {command: '*', desc: 'Default command description'},
               {command: 'foo', desc: 'Foo command description'},
-            ])
-            .parse();
-          yargs.showHelp('log');
+            ]);
+          y.showHelp('log');
         });
         r.logs[0].split('\n').should.deep.equal(expected);
       });
 
       it('should contain the expected output for showHelp when called from within handler', () => {
-        const r = checkUsage(
-          () =>
-            yargs()
-              .scriptName('usage')
-              .usage('Hello, world!')
-              .commands([
-                {
-                  command: '*',
-                  desc: 'Default command description',
-                  handler: _ => yargs.showHelp('log'),
-                },
-                {command: 'foo', desc: 'Foo command description'},
-              ]).argv
-        );
+        const r = checkOutput(() => {
+          const y = yargs();
+          y
+            .scriptName('usage')
+            .usage('Hello, world!')
+            .commands([
+              {
+                command: '*',
+                desc: 'Default command description',
+                handler: _ => y.showHelp('log'),
+              },
+              {command: 'foo', desc: 'Foo command description'},
+            ]).argv;
+        });
         r.logs[0].split('\n').should.deep.equal(expected);
       });
 
@@ -4757,7 +4755,7 @@ describe('usage tests', () => {
         '  --version  Show version number                                       [boolean]',
       ];
       it('should contain the expected output for --help', () => {
-        const r = checkUsage(() =>
+        const r = checkOutput(() =>
           yargs('--help')
             .scriptName('usage')
             .usage('Hello, world!')
@@ -4772,7 +4770,7 @@ describe('usage tests', () => {
         r.logs[0].split('\n').should.deep.equal(expected);
       });
       it('should contain the expected output for showHelp', () => {
-        const r = checkUsage(() => {
+        const r = checkOutput(() => {
           const y = yargs()
             .scriptName('usage')
             .usage('Hello, world!')
@@ -4794,7 +4792,7 @@ describe('usage tests', () => {
     it('shows appropriate usage instructions for nested command', async () => {
       // With --help flag:
       {
-        const r = await checkUsage(() => {
+        const r = await checkOutput(() => {
           return yargs(['cmd', '--help'])
             .command('cmd <foo>', 'a test command', async yargs => {
               await wait();
@@ -4811,7 +4809,7 @@ describe('usage tests', () => {
       }
       // Using showHelp():
       {
-        const r = await checkUsage(() => {
+        const r = await checkOutput(() => {
           yargs(['cmd'])
             .command('cmd <foo>', 'a test command', async yargs => {
               await wait();
@@ -4845,7 +4843,7 @@ describe('usage tests', () => {
         '  --version  Show version number                                       [boolean]',
       ];
       it('should contain the expected output for --help', async () => {
-        const r = await checkUsage(() => {
+        const r = await checkOutput(() => {
           yargs('--help')
             .scriptName('usage')
             .usage('Hello, world!')
@@ -4909,7 +4907,7 @@ describe('usage tests', () => {
 
   // Refs: https://github.com/yargs/yargs/issues/1820
   it('allows setting help and version with aliases and custom description', () => {
-    const r = checkUsage(() =>
+    const r = checkOutput(() =>
       yargs('--help')
         .describe('help', 'Custom help description')
         .describe('version', 'Custom version description')
@@ -4928,7 +4926,7 @@ describe('usage tests', () => {
 
   describe('usage configuration', () => {
     it('allows extras to be disabled when "hide-types" is true', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs('cmd1 --help')
           .command(
             'cmd1',
@@ -4969,7 +4967,7 @@ describe('usage tests', () => {
 
   // https://github.com/yargs/yargs/issues/2169
   it('allows multiple option calls to not clobber description', () => {
-    const r = checkUsage(() =>
+    const r = checkOutput(() =>
       yargs('--help')
         .options({
           arg: {desc: 'Old description', type: 'string', default: 'old'},

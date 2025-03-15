@@ -1,5 +1,7 @@
 import {Dictionary, PlatformShim} from '../typings/common-types.js';
 import {YError} from '../yerror.js';
+import {createRequire} from 'module';
+const require = createRequire(import.meta.url);
 
 let previouslyVisitedConfigs: string[] = [];
 let shim: PlatformShim;
@@ -18,7 +20,7 @@ export function applyExtends(
     let pathToDefault: string | null = null;
     if (!isPath) {
       try {
-        pathToDefault = require.resolve(config.extends);
+        pathToDefault = import.meta.resolve(config.extends);
       } catch (_err) {
         // maybe the module uses key for some other reason,
         // err on side of caution.

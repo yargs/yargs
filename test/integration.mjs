@@ -76,7 +76,7 @@ describe('integration tests', () => {
       return this.skip();
     }
 
-    testCmd('./issue-497.js', ['--help'], (code, stdout, stderr) => {
+    testCmd('./issue-497.js', ['--help'], (code, stdout) => {
       if (code) {
         done(new Error(`cmd exited with code ${code}`));
         return;
@@ -228,6 +228,13 @@ function testCmd(cmd, args, cb) {
 
   const bin = spawn(cmds[0], cmds.slice(1).concat(args.map(String)), {
     cwd: path.resolve('./test/fixtures'),
+    env: {
+      NODE_OPTIONS: '--experimental-require-module',
+    },
+    // TODO(bcoe): This addresses a problem with my local development
+    // environment where a shell is getting sourced without node in
+    // the path. TODO dig into why this is happening.
+    shell: process.env.SHELL ? process.env.SHELL : false,
   });
 
   let stdout = '';

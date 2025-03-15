@@ -47,6 +47,7 @@
     "@types/chai": "^4.2.11",
     "@types/mocha": "^9.0.0",
     "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.26.1",
     "browserslist-generator": "^2.0.1",
     "c8": "^9.1.0",
     "chai": "^4.2.0",
@@ -55,7 +56,7 @@
     "cpr": "^3.0.1",
     "cross-env": "^7.0.2",
     "cross-spawn": "^7.0.0",
-    "eslint": "^8.56.0",
+    "eslint": "^8.57.1",
     "eslint-plugin-prettier": "^5.1.2",
     "gts": "^5.2.0",
     "hashish": "0.0.4",
@@ -97,6 +98,6 @@
   ],
   "license": "MIT",
   "engines": {
-    "node": ">=16.15.1"
+    "node": ">=20.19.0"
   }
 }
