@@ -53,7 +53,7 @@
     "!**/*.d.ts"
   ],
   "dependencies": {
-    "cliui": "^8.0.1",
+    "cliui": "^9.0.0",
     "escalade": "^3.1.1",
     "get-caller-file": "^2.0.5",
     "require-directory": "^2.1.1",
