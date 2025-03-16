@@ -1,6 +1,6 @@
 import {Dictionary, PlatformShim} from '../typings/common-types.js';
 import {YError} from '../yerror.js';
-import {createRequire} from 'module';
+import {createRequire} from 'node:module';
 const require = createRequire(import.meta.url);
 
 let previouslyVisitedConfigs: string[] = [];
