@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /* eslint-disable no-undef */
 /* eslint-disable node/shebang */
-const {default: yargs} = require('../../');
+const yargs = require('../../');
 const {hideBin} = require('../../helpers/helpers.mjs')
 
 const argv = yargs(hideBin(process.argv)).help('help').version().parserConfiguration({

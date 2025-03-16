@@ -7,7 +7,7 @@ process.stdout.isTTY = true;
 process.stderr.isTTY = true;
 process.stderr.hasColors = () => true;
 
-const {default: yargs} = require('../../');
+const yargs = require('../../');
 const {hideBin} = require('../../helpers/helpers.mjs')
 const y = yargs(hideBin(process.argv))
   .command('download <url> <files..>', 'make a get HTTP request')

@@ -6,7 +6,7 @@
 // for some unknown reason, a test environment has decided to omit require.main
 delete require.main;
 
-const {default: yargs} = require('../../');
+const yargs = require('../../');
 const parser = yargs(process.argv.slice(2), undefined, require);
 
 console.log(

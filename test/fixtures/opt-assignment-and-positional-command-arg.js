@@ -2,7 +2,7 @@
 /* eslint-disable node/shebang */
 /* eslint-disable no-undef */
 
-const {default: yargs} = require('../../');
+const yargs = require('../../');
 const {hideBin} = require('../../helpers/helpers.mjs')
 
 yargs(hideBin(process.argv))

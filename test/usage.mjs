@@ -2017,7 +2017,7 @@ describe('usage tests', () => {
     });
 
     // Requires updates to CLIUI.
-    it.skip('should align span columns when ansi colors are used in a description', () => {
+    it('should align span columns when ansi colors are used in a description', () => {
       const yellowDescription = chalk.yellow('The file to add or remove');
 
       const r = checkOutput(() =>
@@ -2229,8 +2229,7 @@ describe('usage tests', () => {
         ]);
     });
 
-    // Requires updates to CLIUI.
-    it.skip('allows a command to override global wrap()', () => {
+    it('allows a command to override global wrap()', () => {
       const uploadCommand = 'upload <dest>';
       const uploadDesc = 'Upload cwd';
       const uploadBuilder = yargs =>
