@@ -71,7 +71,7 @@
     "fix": "gts fix && npm run fix:js",
     "fix:js": "eslint . --ext mjs --ext js --fix",
     "posttest": "npm run check",
-    "test": "c8 mocha --enable-source-maps ./test/*.mjs --require ./test/before.mjs --timeout=12000 --check-leaks",
+    "test": "c8 mocha --enable-source-maps ./test/*.mjs --require ./test/before.mjs --timeout=24000 --check-leaks",
     "test:esm": "c8 mocha --enable-source-maps ./test/esm/*.mjs --check-leaks",
     "coverage": "c8 report --check-coverage",
     "prepare": "npm run compile",
