@@ -1,7 +1,7 @@
 'use strict';
 /* global describe, it, before, after */
 
-import {spawn} from 'cross-spawn';
+import {spawn} from 'node:child_process';
 import * as path from 'path';
 import which from 'which';
 import cpr from 'cpr';
