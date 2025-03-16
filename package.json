@@ -5,9 +5,7 @@
   "main": "./index.mjs",
   "exports": {
     "./package.json": "./package.json",
-    "./helpers": {
-      "import": "./helpers/helpers.mjs"
-    },
+    "./helpers": "./helpers/helpers.mjs",
     "./browser": {
       "import": "./browser.mjs",
       "types": "./browser.d.ts"
