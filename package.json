@@ -11,7 +11,8 @@
     "./browser": {
       "import": "./browser.mjs",
       "types": "./browser.d.ts"
-    }
+    },
+    ".": "./index.mjs"
   },
   "type": "module",
   "module": "./index.mjs",
