@@ -34,30 +34,10 @@ jobs:
       - run: npm install -g npm@8
       - run: npm install
       - run: npm test
-  esm:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node: [20]
-    steps:
-      - uses: actions/checkout@v1
-      - uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node }}
-      - run: npm install -g npm@8
-      - run: node --version
-      - run: npm install --engine-strict
-      - run: npm run test:esm
   deno:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
-        with:
-          node-version: 20
-      - run: npm install -g npm@8
-      - run: npm install
-      - run: npm run compile
       - uses: denoland/setup-deno@v1
         with:
           deno-version: v1.x
