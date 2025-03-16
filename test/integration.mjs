@@ -234,7 +234,7 @@ function testCmd(cmd, args, cb) {
     // TODO(bcoe): This addresses a problem with my local development
     // environment where a shell is getting sourced without node in
     // the path. TODO dig into why this is happening.
-    shell: process.env.SHELL ? process.env.SHELL : false,
+    // shell: process.env.SHELL ? process.env.SHELL : false,
   });
 
   let stdout = '';
