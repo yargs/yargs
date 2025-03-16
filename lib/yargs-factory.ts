@@ -550,12 +550,6 @@ export class YargsInstance {
       deprecated
     );
   }
-  commandDir(dir: string, opts?: RequireDirectoryOptions): YargsInstance {
-    argsert('<string> [object]', [dir, opts], arguments.length);
-    const req = this.#parentRequire || this.#shim.require;
-    this.#command.addDirectory(dir, req, this.#shim.getCallerFile(), opts);
-    return this;
-  }
   count(keys: string | string[]): YargsInstance {
     argsert('<array|string>', [keys], arguments.length);
     this[kPopulateParserHintArray]('count', keys);

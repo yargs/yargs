@@ -25,7 +25,6 @@ import {
   DetailedArguments,
 } from './yargs-factory.js';
 import {maybeAsyncResult} from './utils/maybe-async-result.js';
-import whichModule from './utils/which-module.js';
 
 const DEFAULT_MARKER = /(^\*)|(^\$0)/;
 export type DefinitionOrCommandName = string | CommandHandlerDefinition;
@@ -54,35 +53,6 @@ export class CommandInstance {
     this.globalMiddleware = globalMiddleware;
     this.validation = validation;
   }
-  addDirectory(
-    dir: string,
-    req: Function,
-    callerFile: string,
-    opts?: RequireDirectoryOptions
-  ): void {
-    opts = opts || {};
-
-    // disable recursion to support nested directories of subcommands
-    if (typeof opts.recurse !== 'boolean') opts.recurse = false;
-    // exclude 'json', 'coffee' from require-directory defaults
-    if (!Array.isArray(opts.extensions)) opts.extensions = ['js'];
-    // allow consumer to define their own visitor function
-    const parentVisit =
-      typeof opts.visit === 'function' ? opts.visit : (o: any) => o;
-    // call addHandler via visitor function
-    opts.visit = (obj, joined, filename) => {
-      const visited = parentVisit(obj, joined, filename);
-      // allow consumer to skip modules with their own visitor
-      if (visited) {
-        // check for cyclic reference:
-        if (this.requireCache.has(joined)) return visited;
-        else this.requireCache.add(joined);
-        this.addHandler(visited);
-      }
-      return visited;
-    };
-    this.shim.requireDirectory({require: req, filename: callerFile}, dir, opts);
-  }
   addHandler(
     cmd: string | CommandHandlerDefinition | DefinitionOrCommandName[],
     description?: CommandHandler['description'],
@@ -109,7 +79,12 @@ export class CommandInstance {
       let command =
         Array.isArray(cmd.command) || typeof cmd.command === 'string'
           ? cmd.command
-          : this.moduleName(cmd);
+          : null;
+      if (command === null) {
+        throw new Error(
+          `No command name given for module: ${this.shim.inspect(cmd)}`
+        );
+      }
       if (cmd.aliases)
         command = ([] as string[]).concat(command).concat(cmd.aliases);
       this.addHandler(
@@ -701,20 +676,6 @@ export class CommandInstance {
       });
     }
     return undefined;
-  }
-  // lookup module object from require()d command and derive name
-  // if module was not require()d and no name given, throw error
-  private moduleName(obj: CommandHandlerDefinition) {
-    const mod = whichModule(obj);
-    if (!mod)
-      throw new Error(
-        `No command name given for module: ${this.shim.inspect(obj)}`
-      );
-    return this.commandFromFilename(mod.filename);
-  }
-
-  private commandFromFilename(filename: string) {
-    return this.shim.path.basename(filename, this.shim.path.extname(filename));
   }
 
   private extractDesc({describe, description, desc}: CommandHandlerDefinition) {

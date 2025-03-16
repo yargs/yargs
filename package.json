@@ -44,6 +44,8 @@
     "yargs-parser": "^21.1.1"
   },
   "devDependencies": {
+    "@babel/eslint-parser": "^7.26.10",
+    "@babel/preset-typescript": "^7.26.0",
     "@types/chai": "^4.2.11",
     "@types/mocha": "^9.0.0",
     "@types/node": "^20.0.0",

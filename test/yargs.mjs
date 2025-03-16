@@ -13,6 +13,9 @@ import {YError} from '../build/lib/yerror.js';
 import {readFileSync} from 'fs';
 const english = JSON.parse(readFileSync('./locales/en.json'));
 
+import {createRequire} from 'node:module';
+const require = createRequire(import.meta.url);
+
 should();
 
 const noop = () => {};
@@ -518,12 +521,12 @@ describe('yargs dsl tests', () => {
     });
 
     // TODO: figure out replacement for require('./fixtures/command');
-    it.skip("accepts a module with a 'builder' and 'handler' key", () => {
+    it("accepts a module with a 'builder' and 'handler' key", () => {
       const argv = yargs(['blerg', 'bar'])
         .command(
           'blerg <foo>',
-          'handle blerg things'
-          // require('./fixtures/command')
+          'handle blerg things',
+          require('./fixtures/command')
         )
         .parse();
 
@@ -537,24 +540,9 @@ describe('yargs dsl tests', () => {
       delete global.commandHandlerCalledWith;
     });
 
-    it.skip("accepts a module with a keys 'command', 'describe', 'builder', and 'handler'", () => {
+    it("accepts a module with a keys 'command', 'describe', 'builder', and 'handler'", () => {
       const argv = yargs(['blerg', 'bar'])
-        // .command(require('./fixtures/command-module'))
-        .parse();
-
-      argv.banana.should.equal('cool');
-      argv.batman.should.equal('sad');
-      argv.foo.should.equal('bar');
-
-      global.commandHandlerCalledWith.banana.should.equal('cool');
-      global.commandHandlerCalledWith.batman.should.equal('sad');
-      global.commandHandlerCalledWith.foo.should.equal('bar');
-      delete global.commandHandlerCalledWith;
-    });
-
-    it.skip("derives 'command' string from filename when missing", () => {
-      const argv = yargs('nameless --foo bar')
-        // .command(require('./fixtures/cmddir_noname/nameless'))
+        .command(require('./fixtures/command-module'))
         .parse();
 
       argv.banana.should.equal('cool');
@@ -1168,34 +1156,6 @@ describe('yargs dsl tests', () => {
         argv.state.should.equal('grumpy but rich');
         argv['api-token'].should.equal('robin');
         argv.what.should.equal(true);
-      });
-
-      // TODO: investigate making commnand-dir work with ESM. Perhaps using
-      // dyamic import rather than require().
-      it.skip('allows nested sub-commands to be invoked multiple times', () => {
-        const context = {counter: 0};
-
-        checkOutput(() => {
-          const parser = yargs().commandDir('fixtures/cmddir');
-
-          parser.parse(
-            'dream within-a-dream --what',
-            {context},
-            (_err, argv, _output) => {}
-          );
-          parser.parse(
-            'dream within-a-dream --what',
-            {context},
-            (_err, argv, _output) => {}
-          );
-          parser.parse(
-            'dream within-a-dream --what',
-            {context},
-            (_err, argv, _output) => {}
-          );
-        });
-
-        context.counter.should.equal(3);
       });
 
       it('overwrites the prior context object, when parse is called multiple times', () => {

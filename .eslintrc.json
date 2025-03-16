@@ -11,5 +11,14 @@
         "@typescript-eslint/no-empty-object-type": "off"
       }
     }
-  ]
+  ],
+  "parser": "@babel/eslint-parser",
+  "parserOptions": {
+    "requireConfigFile": false,
+    "babelOptions": {
+      "babelrc": false,
+      "configFile": false,
+      "presets": ["@babel/preset-typescript"]
+    }
+  }
 }
