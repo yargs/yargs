@@ -1,7 +1,7 @@
 'use strict';
 /* global describe, it, before, after */
 
-import {spawn} from 'node:child_process';
+import {spawn} from 'cross-spawn';
 import * as path from 'path';
 import which from 'which';
 import cpr from 'cpr';
@@ -229,12 +229,11 @@ function testCmd(cmd, args, cb) {
   const bin = spawn(cmds[0], cmds.slice(1).concat(args.map(String)), {
     cwd: path.resolve('./test/fixtures'),
     env: {
-      NODE_OPTIONS: '--experimental-require-module',
+      ...process.env,
+      ...{
+        NODE_OPTIONS: '--experimental-require-module',
+      },
     },
-    // TODO(bcoe): This addresses a problem with my local development
-    // environment where a shell is getting sourced without node in
-    // the path. TODO dig into why this is happening.
-    // shell: process.env.SHELL ? process.env.SHELL : false,
   });
 
   let stdout = '';
