@@ -2,7 +2,7 @@
 
 'use strict'
 
-const {default: yargs} = require('../../');
+const yargs = require('../../');
 var parser = yargs(process.argv.slice(2))
 
 console.log(parser.parserConfiguration({
