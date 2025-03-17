@@ -1833,7 +1833,7 @@ describe('yargs dsl tests', () => {
       r.logs[0].should.not.equal('9.9.9'); // breaks when yargs gets to this version
     });
 
-    it('gracefully handles a missing package.json', () => {
+    it('gracefully handles a missing package.json', function () {
       if (process.platform === 'win32') {
         // Doesn’t work in CI for some reason.
         return this.skip();
