@@ -1818,6 +1818,32 @@ describe('yargs dsl tests', () => {
       argv.a.should.equal(80);
       argv.b.should.equals('riffiwobbles');
     });
+
+    it('allows a full path with file to be provided for cwd', () => {
+      const y = yargs('--version')
+        .pkgConf('repository', './test/fixtures/bin.js')
+        .version();
+      const r = checkOutput(() => y.parse());
+      const options = y.getOptions();
+
+      // assert pkgConf lookup (test/fixtures/package.json)
+      options.configObjects.should.deep.equal([{type: 'svn'}]);
+      // assert parseArgs and guessVersion lookup (package.json)
+      expect(options.configuration['dot-notation']).to.equal(undefined);
+      r.logs[0].should.not.equal('9.9.9'); // breaks when yargs gets to this version
+    });
+
+    it('gracefully handles a missing package.json', () => {
+      if (process.platform === 'win32') {
+        // Doesn’t work in CI for some reason.
+        return this.skip();
+      }
+      const y = yargs('--version')
+        // This test presupposes that / has no package.json.
+        .pkgConf('repository', '/')
+        .version();
+      const r = checkOutput(() => y.parse());
+    });
   });
 
   describe('parserConfiguration', () => {

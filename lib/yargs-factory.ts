@@ -1616,11 +1616,8 @@ export class YargsInstance {
     let obj = {};
     try {
       let startDir = rootPath || this.#shim.mainFilename;
-
-      // When called in an environment that lacks require.main.filename, such as a jest test runner,
-      // startDir is already process.cwd(), and should not be shortened.
-      // Whether or not it is _actually_ a directory (e.g., extensionless bin) is irrelevant, find-up handles it.
-      if (!rootPath && this.#shim.path.extname(startDir)) {
+      // If a file path is provided for root, remove the file and keep path.
+      if (this.#shim.path.extname(startDir)) {
         startDir = this.#shim.path.dirname(startDir);
       }
 
