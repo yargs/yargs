@@ -13,8 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        # TODO: Add version 22 it's >=20.19.0
-        node: [23]
+        node: [22, 23]
     steps:
       - uses: actions/checkout@v1
       - uses: actions/setup-node@v1
