@@ -5,6 +5,7 @@ import * as assert from 'assert';
 import yargs from '../index.mjs';
 import {expect, should} from 'chai';
 import {checkOutput} from './helpers/utils.mjs';
+import {join} from 'node:path';
 
 should();
 
@@ -2286,6 +2287,7 @@ describe('Command', () => {
         .and.equal('Go to sleep and dream');
       commandObject.should.have.property('builder');
       commandObject.should.have.property('handler');
+      pathToFile.should.contain(join('test', 'fixtures', 'cmddir', 'dream.js'));
       pathToFile.should.contain('test/fixtures/cmddir/dream.js');
       filename.should.equal('dream.js');
       r.exit.should.equal(true);
