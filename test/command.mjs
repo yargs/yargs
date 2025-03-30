@@ -2324,5 +2324,25 @@ describe('Command', () => {
           '  --version  Show version number  [boolean]',
         ]);
     });
+
+    it("derives 'command' string from filename when not exported", () => {
+      const r = checkOutput(() =>
+        yargs('--help').wrap(null).commandDir('fixtures/cmddir_noname').parse()
+      );
+      r.exit.should.equal(true);
+      r.errors.length.should.equal(0);
+      r.should.have.property('logs');
+      r.logs
+        .join('\n')
+        .split(/\n+/)
+        .should.deep.equal([
+          'usage [command]',
+          'Commands:',
+          '  usage nameless  Command name derived from module filename',
+          'Options:',
+          '  --help     Show help  [boolean]',
+          '  --version  Show version number  [boolean]',
+        ]);
+    });
   });
 });

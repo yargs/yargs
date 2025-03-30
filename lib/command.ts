@@ -84,6 +84,13 @@ export class CommandInstance {
         if (visited) {
           if (this.requireCache.has(joined)) continue;
           else this.requireCache.add(joined);
+          // Infer command from directory structure if none is given:
+          if (!module.command) {
+            module.command = this.shim.path.basename(
+              joined,
+              this.shim.path.extname(joined)
+            );
+          }
           this.addHandler(module);
         }
       }

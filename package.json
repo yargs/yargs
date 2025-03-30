@@ -10,7 +10,8 @@
       "import": "./browser.mjs",
       "types": "./browser.d.ts"
     },
-    ".": "./index.mjs"
+    ".": "./index.mjs",
+    "./yargs": "./index.mjs"
   },
   "type": "module",
   "module": "./index.mjs",
