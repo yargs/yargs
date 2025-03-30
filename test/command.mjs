@@ -2288,7 +2288,6 @@ describe('Command', () => {
       commandObject.should.have.property('builder');
       commandObject.should.have.property('handler');
       pathToFile.should.contain(join('test', 'fixtures', 'cmddir', 'dream.js'));
-      pathToFile.should.contain('test/fixtures/cmddir/dream.js');
       filename.should.equal('dream.js');
       r.exit.should.equal(true);
       r.errors.length.should.equal(0);
