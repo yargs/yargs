@@ -233,7 +233,7 @@ This example uses [jest](https://github.com/facebook/jest) as a test runner, but
 .commandDir(directory, [opts])
 ------------------------------
 
-_Note: `commandDir()` does not work with ESM or Deno, see [hierarchy using index.mjs](/docs/advanced.md#esm-hierarchy) for an example of building a complex nested CLI using ESM._
+_Note: `commandDir()` does not work with Deno, see [hierarchy using index.mjs](/docs/advanced.md#esm-hierarchy) for an example of building a complex nested CLI using ESM._
 
 Apply command modules from a directory relative to the module calling this method.
 

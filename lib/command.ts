@@ -25,6 +25,8 @@ import {
   DetailedArguments,
 } from './yargs-factory.js';
 import {maybeAsyncResult} from './utils/maybe-async-result.js';
+import {readdirSync} from 'node:fs';
+import {join, dirname} from 'node:path';
 
 const DEFAULT_MARKER = /(^\*)|(^\$0)/;
 export type DefinitionOrCommandName = string | CommandHandlerDefinition;
@@ -52,6 +54,40 @@ export class CommandInstance {
     this.usage = usage;
     this.globalMiddleware = globalMiddleware;
     this.validation = validation;
+  }
+  addDirectory(
+    dir: string,
+    req: Function,
+    callerFile: string,
+    opts?: RequireDirectoryOptions
+  ): void {
+    opts = opts || {};
+    this.requireCache.add(callerFile);
+    const fullDirPath = join(dirname(callerFile), dir);
+    const files = readdirSync(fullDirPath, {
+      recursive: opts.recurse ? true : false,
+    });
+    // exclude 'json', 'coffee' from require-directory defaults
+    if (!Array.isArray(opts.extensions)) opts.extensions = ['js'];
+    // allow consumer to define their own visitor function
+    const visit = typeof opts.visit === 'function' ? opts.visit : (o: any) => o;
+    for (const fileb of files) {
+      const file = fileb.toString('utf8');
+      let supportedExtension = false;
+      for (const ext of opts.extensions) {
+        if (file.endsWith(ext)) supportedExtension = true;
+      }
+      if (supportedExtension) {
+        const joined = join(fullDirPath, file);
+        const module = req(joined);
+        const visited = visit(module, joined, file);
+        if (visited) {
+          if (this.requireCache.has(joined)) continue;
+          else this.requireCache.add(joined);
+          this.addHandler(module);
+        }
+      }
+    }
   }
   addHandler(
     cmd: string | CommandHandlerDefinition | DefinitionOrCommandName[],

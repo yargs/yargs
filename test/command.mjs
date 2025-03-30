@@ -2186,4 +2186,142 @@ describe('Command', () => {
       });
     });
   });
+
+  describe('commandDir', () => {
+    it('supports relative dirs', () => {
+      const r = checkOutput(() =>
+        yargs('--help').wrap(null).commandDir('fixtures/cmddir').parse()
+      );
+      r.exit.should.equal(true);
+      r.exitCode.should.equal(0);
+      r.errors.length.should.equal(0);
+      r.should.have.property('logs');
+      r.logs
+        .join('\n')
+        .split(/\n+/)
+        .should.deep.equal([
+          'usage [command]',
+          'Commands:',
+          '  usage dream [command] [opts]  Go to sleep and dream',
+          'Options:',
+          '  --help     Show help  [boolean]',
+          '  --version  Show version number  [boolean]',
+        ]);
+    });
+
+    it('supports nested subcommands', () => {
+      const r = checkOutput(
+        () =>
+          yargs('dream --help')
+            .wrap(null)
+            .commandDir('fixtures/cmddir')
+            .parse(),
+        ['./command']
+      );
+      r.exit.should.equal(true);
+      r.errors.length.should.equal(0);
+      r.logs[0]
+        .split(/\n+/)
+        .should.deep.equal([
+          'command dream [command] [opts]',
+          'Go to sleep and dream',
+          'Commands:',
+          '  command dream of-memory <memory>               Dream about a specific memory',
+          '  command dream within-a-dream [command] [opts]  Dream within a dream',
+          'Options:',
+          '  --help     Show help  [boolean]',
+          '  --version  Show version number  [boolean]',
+          '  --shared   Is the dream shared with others?  [boolean]',
+          '  --extract  Attempt extraction?  [boolean]',
+        ]);
+    });
+
+    it('supports a "recurse" boolean option', () => {
+      const r = checkOutput(() =>
+        yargs('--help')
+          .wrap(null)
+          .commandDir('fixtures/cmddir', {recurse: true})
+          .parse()
+      );
+      r.exit.should.equal(true);
+      r.errors.length.should.equal(0);
+      r.logs
+        .join('\n')
+        .split(/\n+/)
+        .should.deep.equal([
+          'usage [command]',
+          'Commands:',
+          '  usage dream [command] [opts]           Go to sleep and dream',
+          '  usage within-a-dream [command] [opts]  Dream within a dream',
+          '  usage inception [command] [opts]       Enter another dream, where inception is possible',
+          '  usage limbo [opts]                     Get lost in pure subconscious',
+          'Options:',
+          '  --help     Show help  [boolean]',
+          '  --version  Show version number  [boolean]',
+        ]);
+    });
+
+    it('supports a "visit" function option', () => {
+      let commandObject;
+      let pathToFile;
+      let filename;
+      const r = checkOutput(() =>
+        yargs('--help')
+          .wrap(null)
+          .commandDir('fixtures/cmddir', {
+            visit(_commandObject, _pathToFile, _filename) {
+              commandObject = _commandObject;
+              pathToFile = _pathToFile;
+              filename = _filename;
+              return false; // exclude command
+            },
+          })
+          .parse()
+      );
+      commandObject.should.have
+        .property('command')
+        .and.equal('dream [command] [opts]');
+      commandObject.should.have
+        .property('desc')
+        .and.equal('Go to sleep and dream');
+      commandObject.should.have.property('builder');
+      commandObject.should.have.property('handler');
+      pathToFile.should.contain('test/fixtures/cmddir/dream.js');
+      filename.should.equal('dream.js');
+      r.exit.should.equal(true);
+      r.errors.length.should.equal(0);
+      r.logs
+        .join('\n')
+        .split(/\n+/)
+        .should.deep.equal([
+          'Options:',
+          '  --help     Show help  [boolean]',
+          '  --version  Show version number  [boolean]',
+        ]);
+    });
+
+    it('detects and ignores cyclic dir references', () => {
+      const r = checkOutput(
+        () =>
+          yargs('cyclic --help')
+            .wrap(null)
+            .commandDir('fixtures/cmddir_cyclic')
+            .parse(),
+        ['./command']
+      );
+      r.exit.should.equal(true);
+      r.errors.length.should.equal(0);
+      r.should.have.property('logs');
+      r.logs
+        .join('\n')
+        .split(/\n+/)
+        .should.deep.equal([
+          'command cyclic',
+          'Attempts to (re)apply its own dir',
+          'Options:',
+          '  --help     Show help  [boolean]',
+          '  --version  Show version number  [boolean]',
+        ]);
+    });
+  });
 });
