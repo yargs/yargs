@@ -168,7 +168,6 @@ Having problems? want to contribute? join our [community slack](http://devtoolsc
   * [Composing Your App Using Commands](/docs/advanced.md#commands)
   * [Building Configurable CLI Apps](/docs/advanced.md#configuration)
   * [Customizing Yargs' Parser](/docs/advanced.md#customizing)
-  * [Bundling yargs](/docs/bundling.md)
 * [Contributing](/contributing.md)
 
 ## Supported Node.js Versions

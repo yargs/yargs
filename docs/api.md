@@ -11,7 +11,6 @@ This document is the Yargs API reference. There are more documentation files in
 - [Advanced Topics](https://github.com/yargs/yargs/blob/main/docs/advanced.md)
 - [TypeScript usage examples](https://github.com/yargs/yargs/blob/main/docs/typescript.md)
 - [Browser usage example](https://github.com/yargs/yargs/blob/main/docs/browser.md)
-- [Bundling](https://github.com/yargs/yargs/blob/main/docs/bundling.md)
 - [Parsing Tricks](https://github.com/yargs/yargs/blob/main/docs/tricks.md)
 
 
