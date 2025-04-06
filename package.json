@@ -38,7 +38,6 @@
     "cliui": "^9.0.1",
     "escalade": "^3.1.1",
     "get-caller-file": "^2.0.5",
-    "require-directory": "^2.1.1",
     "string-width": "^7.2.0",
     "y18n": "^5.0.5",
     "yargs-parser": "^21.1.1"
@@ -54,7 +53,6 @@
     "c8": "^9.1.0",
     "chai": "^4.2.0",
     "chalk": "^4.0.0",
-    "concurrently": "^7.6.0",
     "cpr": "^3.0.1",
     "cross-env": "^7.0.2",
     "cross-spawn": "^7.0.6",
