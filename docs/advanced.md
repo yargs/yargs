@@ -14,11 +14,13 @@ commands. tldr; default commands allow you to define the entry point to your
 application using a similar API to subcommands.
 
 ```js
-const argv = require('yargs')(process.argv.slice(2))
+import yargs from 'yargs';
+import { hideBin } from 'yargs/helpers';
+const argv = yargs(hideBin(process.argv))
   .command('$0', 'the default command', () => {}, (argv) => {
     console.log('this command will be run by default')
   })
-  .parse(process.argv.slice(2))
+  .parse();
 ```
 
 The command defined above will be executed if the program
@@ -27,11 +29,13 @@ is run with `./my-cli.js --x=22`.
 Default commands can also be used as a command alias, like so:
 
 ```js
-const argv = require('yargs')(process.argv.slice(2))
+import yargs from 'yargs';
+import { hideBin } from 'yargs/helpers';
+const argv = yargs(hideBin(process.argv))
   .command(['serve', '$0'], 'the serve command', () => {}, (argv) => {
     console.log('this command will be run by default')
   })
-  .parse(process.argv.slice(2))
+  .parse();
 ```
 
 The command defined above will be executed if the program
@@ -45,10 +49,11 @@ take the form `[bar]`. The parsed positional arguments will be populated in
 `argv`:
 
 ```js
-const yargs = require('yargs')
+import yargs from 'yargs';
+import { hideBin } from 'yargs/helpers';
 yargs().command('get <source> [proxy]', 'make a get HTTP request')
   .help()
-  .parse(process.argv.slice(2))
+  .parse(hideBin(process.argv));
 ```
 
 #### Positional Argument Aliases
@@ -58,10 +63,11 @@ As an example, suppose our application allows either a username _or_
 an email as the first argument:
 
 ```js
-const yargs = require('yargs')
+import yargs from 'yargs';
+import { hideBin } from 'yargs/helpers';
 yargs().command('get <username|email> [password]', 'fetch a user by username or email.')
   .help()
-  .parse(process.argv.slice(2))
+  .parse(hideBin(process.argv));
 ```
 
 In this way, both `argv.username` and `argv.email` would be populated with the
@@ -73,10 +79,11 @@ The last positional argument can optionally accept an array of
 values, by using the `..` operator:
 
 ```js
-const yargs = require('yargs')
+import yargs from 'yargs';
+import { hideBin } from 'yargs/helpers';
 yargs().command('download <url> [files..]', 'download several files')
   .help()
-  .parse(process.argv.slice(2))
+  .parse(hideBin(process.argv));
 ```
 
 #### Describing Positional Arguments
@@ -84,7 +91,8 @@ yargs().command('download <url> [files..]', 'download several files')
 You can use the method [`.positional()`](/docs/api.md#positionalkey-opt) in a command's builder function to describe and configure a positional argument:
 
 ```js
-const yargs = require('yargs')
+import yargs from 'yargs';
+import { hideBin } from 'yargs/helpers';
 yargs().command('get <source> [proxy]', 'make a get HTTP request', (yargs) => {
   yargs.positional('source', {
     describe: 'URL to fetch content from',
@@ -95,7 +103,7 @@ yargs().command('get <source> [proxy]', 'make a get HTTP request', (yargs) => {
   })
 })
 .help()
-.parse(process.argv.slice(2))
+.parse(hideBin(process.argv));
 ```
 
 ### Command Execution
@@ -128,7 +136,9 @@ line, the command will be executed.
 
 ```js
 #!/usr/bin/env node
-require('yargs')(process.argv.slice(2))
+import yargs from 'yargs';
+import { hideBin } from 'yargs/helpers';
+yargs(hideBin(process.argv))
   .command(['start [app]', 'run', 'up'], 'Start up an app', {}, (argv) => {
     console.log('starting up the', argv.app || 'default', 'app')
   })
@@ -198,19 +208,21 @@ exports.handler = function (argv) {
 You then register the module like so:
 
 ```js
-const yargs = require('yargs')
+import yargs from 'yargs';
+import { hideBin } from 'yargs/helpers';
 yargs().command(require('my-module'))
   .help()
-  .parse(process.argv.slice(2))
+  .parse(hideBin(process.argv));
 ```
 
 Or if the module does not export `command` and `describe` (or if you just want to override them):
 
 ```js
-const yargs = require('yargs')
-yargs.command('get <source> [proxy]', 'make a get HTTP request', require('my-module'))
+import yargs from 'yargs';
+import { hideBin } from 'yargs/helpers';
+yargs().command('get <source> [proxy]', 'make a get HTTP request', require('my-module'))
   .help()
-  .parse(process.argv.slice(2))
+  .parse(hideBin(process.argv));
 ```
 
 #### Testing a Command Module
@@ -218,7 +230,7 @@ yargs.command('get <source> [proxy]', 'make a get HTTP request', require('my-mod
 If you want to test a command in its entirety you can test it like this:
 
 ```js
-const yargs = require('yargs');
+import yargs from 'yargs';
 it("returns help output", async () => {
   // Initialize parser using the command module
   const parser = yargs().command(require('./my-command-module')).help();
@@ -314,7 +326,9 @@ cli.js:
 
 ```js
 #!/usr/bin/env node
-require('yargs')(process.argv.slice(2))
+import yargs from 'yargs';
+import { hideBin } from 'yargs/helpers';
+yargs(hideBin(process.argv))
   .commandDir('cmds')
   .demandCommand()
   .help()
@@ -339,7 +353,7 @@ exports.handler = function (argv) {
 cmds/remote.js:
 
 ```js
-const yargs = require('yargs')
+import yargs from 'yargs';
 exports.command = 'remote <command>'
 exports.desc = 'Manage set of tracked repos'
 exports.builder = function (yargs) {
@@ -421,13 +435,15 @@ Yargs' [`config()`](/docs/api.md#config), combined with the module [find-up](htt
 implement `.rc` functionality:
 
 ```js
-const findUp = require('find-up')
-const fs = require('fs')
-const configPath = findUp.sync(['.myapprc', '.myapprc.json'])
+import { findUpSync } from 'find-up';
+import * as fs from 'node:fs';
+import yargs from 'yargs';
+import { hideBin } from 'yargs/helpers';
+const configPath = findUpSync(['.myapprc', '.myapprc.json']);
 const config = configPath ? JSON.parse(fs.readFileSync(configPath)) : {}
-const argv = require('yargs')(process.argv.slice(2))
+const argv = yargs(hideBin(process.argv))
   .config(config)
-  .parse()
+  .parse();
 ```
 
 ### Providing Configuration in Your package.json
@@ -453,9 +469,11 @@ Yargs gives you this functionality using the [`pkgConf()`](/docs/api.md#config)
 method:
 
 ```js
-const argv = require('yargs/yargs')(process.argv.slice(2))
+import yargs from 'yargs';
+import { hideBin } from 'yargs/helpers';
+const argv = yargs(hideBin(process.argv))
   .pkgConf('nyc')
-  .parse()
+  .parse();
 ```
 
 ### Creating a Plugin Architecture
@@ -479,7 +497,7 @@ Not everyone always agrees on how `process.argv` should be interpreted;
 using the [`parserConfiguration()`](/docs/api.md#parserConfiguration) method you can turn on and off some of yargs' parsing features:
 
 ```js
-yargs.parserConfiguration({
+yargs().parserConfiguration({
   "short-option-groups": true,
   "camel-case-expansion": true,
   "dot-notation": true,
@@ -533,8 +551,7 @@ This example is exactly the same however it loads the `username` and `password` 
 #### Middleware function
 
 ```js
-const { promisify } = require('util') // since node 8.0.0
-const readFile = promisify(require('fs').readFile)
+import { readFileSync } from 'node:fs';
 
 const normalizeCredentials = (argv) => {
   if (!argv.username || !argv.password) {
@@ -550,7 +567,9 @@ yargs().middleware(normalizeCredentials)
 #### yargs parsing configuration
 
 ```js
-var argv = require('yargs')(process.argv.slice(2))
+import yargs from 'yargs';
+import { hideBin } from 'yargs/helpers';
+const argv = yargs(hideBin(process.argv))
   .usage('Usage: $0 <command> [options]')
   .command('login', 'Authenticate user', (yargs) =>{
         return yargs.option('username')
