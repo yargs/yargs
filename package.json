@@ -81,7 +81,7 @@
     "check": "gts lint && npm run check:js",
     "check:js": "eslint . --ext mjs --ext js",
     "clean": "gts clean",
-    "watch": "rimraf build && tsc && concurrently npm:watch:tsc",
+    "watch": "rimraf build && npm:watch:tsc",
     "watch:tsc": "tsc --watch"
   },
   "repository": {
