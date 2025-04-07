@@ -388,7 +388,7 @@ You can also provide asynchronous completions.
 ```js
 import yargs from 'yargs'
 import { hideBin } from 'yargs/helpers'
-const argv = require('yargs/yargs')(hideBin(process.argv))
+const argv = yargs(hideBin(process.argv))
   .completion('completion', function(current, argv, done) {
     setTimeout(function() {
       done([
@@ -405,7 +405,7 @@ But wait, there's more! You can return an asynchronous promise.
 ```js
 import yargs from 'yargs'
 import { hideBin } from 'yargs/helpers'
-const argv = require('yargs')(hideBin(process.argv))
+const argv = yargs(hideBin(process.argv))
   .completion('completion', function(current, argv) {
     return new Promise(function (resolve, reject) {
       setTimeout(function () {
@@ -421,7 +421,7 @@ Using default completions in a custom implementation. When invoked with no argum
 ```js
 import yargs from 'yargs'
 import { hideBin } from 'yargs/helpers'
-const argv = require('yargs/yargs')(hideBin(process.argv))
+const argv = yargs(hideBin(process.argv))
   .completion('completion', function(current, argv, completionFilter, done) {
     // if 'apple' present return default completions
     if (argv._.includes('apple')) {
@@ -1521,7 +1521,7 @@ Example:
 
 ```js
 import yargs from 'yargs'
-const yargs = require("yargs")
+const yargs = yargs()
   .scriptName("my-script")
   .help()
   .parse(process.argv.slice(2))
