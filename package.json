@@ -62,7 +62,7 @@
     "hashish": "0.0.4",
     "mocha": "^10.8.2",
     "rimraf": "^3.0.2",
-    "typescript": "^5.7.2",
+    "typescript": "^5.8.3",
     "which": "^2.0.0",
     "yargs-test-extends": "^1.0.1"
   },
