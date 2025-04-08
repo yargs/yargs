@@ -1,4 +1,4 @@
-/* global describe, it, beforeEach */
+/* global describe, it */
 /* eslint-disable no-unused-vars */
 'use strict';
 import * as assert from 'assert';
@@ -17,10 +17,6 @@ async function wait() {
 }
 
 describe('Command', () => {
-  beforeEach(() => {
-    yargs().getInternalMethods().reset();
-  });
-
   describe('positional arguments', () => {
     it('parses command string and populates optional and required positional arguments', () => {
       const y = yargs([]).command(

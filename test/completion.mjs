@@ -1,5 +1,5 @@
 'use strict';
-/* global describe, it, before, beforeEach, after */
+/* global describe, it, before */
 /* eslint-disable no-unused-vars */
 import yargs from '../index.mjs';
 import {should} from 'chai';
@@ -8,14 +8,6 @@ import {checkOutput} from './helpers/utils.mjs';
 should();
 
 describe('Completion', () => {
-  beforeEach(() => {
-    yargs().getInternalMethods().reset();
-  });
-
-  after(() => {
-    yargs().getInternalMethods().reset();
-  });
-
   describe('default completion behavior', () => {
     const firstArgumentOptions = [
       ['--get-yargs-completions'], // proper args after hideBin is used
