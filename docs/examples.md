@@ -11,7 +11,8 @@ plunder.js:
 
 ```javascript
 #!/usr/bin/env node
-var argv = require('yargs/yargs')(process.argv.slice(2)).parse();
+import yargs from 'yargs'
+const argv = yargs(process.argv.slice(2)).parse();
 
 if (argv.ships > 3 && argv.distance < 53.5) {
     console.log('Plunder more riffiwobbles!');
@@ -35,7 +36,8 @@ short.js:
 
 ```javascript
 #!/usr/bin/env node
-var argv = require('yargs/yargs')(process.argv.slice(2)).parse();
+import yargs from 'yargs'
+const argv = yargs(process.argv.slice(2)).parse();
 console.log('(%d,%d)', argv.x, argv.y);
 ```
 
@@ -51,7 +53,8 @@ bool.js:
 
 ```javascript
 #!/usr/bin/env node
-var argv = require('yargs/yargs')(process.argv.slice(2)).parse();
+import yargs from 'yargs'
+const argv = yargs(process.argv.slice(2)).parse();
 
 if (argv.s) {
     process.stdout.write(argv.fr ? 'Le perroquet dit: ' : 'The parrot says: ');
@@ -79,7 +82,8 @@ nonopt.js:
 
 ```javascript
 #!/usr/bin/env node
-var argv = require('yargs/yargs')(process.argv.slice(2)).parse();
+import yargs from 'yargs'
+const argv = yargs(process.argv.slice(2)).parse();
 console.log('(%d,%d)', argv.x, argv.y);
 console.log(argv._);
 ```
@@ -101,7 +105,8 @@ count.js:
 
 ```javascript
 #!/usr/bin/env node
-var argv = require('yargs/yargs')(process.argv.slice(2))
+import yargs from 'yargs'
+const argv = yargs(process.argv.slice(2))
     .count('verbose')
     .alias('v', 'verbose')
     .parse();
@@ -142,7 +147,8 @@ area.js:
 
 ```javascript
 #!/usr/bin/env node
-var argv = require('yargs/yargs')(process.argv.slice(2))
+import yargs from 'yargs'
+var argv = yargs(process.argv.slice(2))
     .usage('Usage: $0 -w [num] -h [num]')
     .demandOption(['w','h'])
     .parse();
@@ -171,7 +177,8 @@ demand_count.js:
 
 ```javascript
 #!/usr/bin/env node
-var argv = require('yargs/yargs')(process.argv.slice(2))
+import yargs from 'yargs'
+const argv = yargs(process.argv.slice(2))
     .demandCommand(2)
     .parse();
 console.dir(argv);
@@ -196,7 +203,8 @@ default_singles.js:
 
 ```javascript
 #!/usr/bin/env node
-var argv = require('yargs/yargs')(process.argv.slice(2))
+import yargs from 'yargs'
+const argv = yargs(process.argv.slice(2))
     .default('x', 10)
     .default('y', 10)
     .parse()
@@ -213,7 +221,8 @@ default_hash.js:
 
 ```javascript
 #!/usr/bin/env node
-var argv = require('yargs/yargs')(process.argv.slice(2))
+import yargs from 'yargs'
+const argv = yargs(process.argv.slice(2))
     .default({ x : 10, y : 10 })
     .parse()
 ;
@@ -232,7 +241,8 @@ boolean_single.js:
 
 ```javascript
 #!/usr/bin/env node
-var argv = require('yargs/yargs')(process.argv.slice(2))
+import yargs from 'yargs'
+var argv = yargs(process.argv.slice(2))
     .boolean(['r','v'])
     .parse()
 ;
@@ -251,7 +261,8 @@ boolean_double.js:
 
 ```javascript
 #!/usr/bin/env node
-var argv = require('yargs/yargs')(process.argv.slice(2))
+import yargs from 'yargs'
+const argv = yargs(process.argv.slice(2))
     .boolean(['x','y','z'])
     .parse()
 ;
@@ -275,7 +286,9 @@ line_count.js:
 
 ```javascript
 #!/usr/bin/env node
-var argv = require('yargs/yargs')(process.argv.slice(2))
+import yargs from 'yargs'
+import { createReadStream } from 'node:fs'
+const argv = yargs(process.argv.slice(2))
     .usage('Usage: $0 <command> [options]')
     .command('count', 'Count the lines in a file')
     .example('$0 count -f foo.js', 'count the lines in the given file')
@@ -288,8 +301,7 @@ var argv = require('yargs/yargs')(process.argv.slice(2))
     .epilog('copyright 2019')
     .parse();
 
-var fs = require('fs');
-var s = fs.createReadStream(argv.file);
+var s = createReadStream(argv.file);
 
 var lines = 0;
 s.on('data', function (buf) {
@@ -342,8 +354,8 @@ Using inquirer for prompting
 ---------------------------
 
 ```js
-const yargs = require('yargs');
-const inquirer = require('inquirer');
+import yargs from 'yargs'
+import inquirer from 'inquirer'
 
 const sing = () => console.log('🎵 Oy oy oy');
 
