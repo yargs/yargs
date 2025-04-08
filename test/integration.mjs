@@ -230,9 +230,6 @@ function testCmd(cmd, args, cb) {
     cwd: path.resolve('./test/fixtures'),
     env: {
       ...process.env,
-      ...{
-        NODE_OPTIONS: '--experimental-require-module',
-      },
     },
   });
 
