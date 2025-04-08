@@ -913,7 +913,6 @@ describe('yargs dsl tests', () => {
       const r = checkOutput(() => {
         yargs(['--help']).command('blerg', 'blerg command').wrap(null).parse();
       });
-      console.info(r.logs[0]);
       r.logs[0].should.match(/Commands:[\s\S]*blerg command/);
     });
 
