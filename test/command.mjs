@@ -2340,5 +2340,117 @@ describe('Command', () => {
           '  --version  Show version number  [boolean]',
         ]);
     });
+
+    it('files can be excluded with a callback', () => {
+      const r = checkOutput(() =>
+        yargs('--help')
+          .wrap(null)
+          .commandDir('fixtures/cmddir', {
+            recurse: true,
+            exclude: fileName => {
+              if (/^dream\.js/.test(fileName)) {
+                return true;
+              } else {
+                return false;
+              }
+            },
+          })
+          .parse()
+      );
+      r.exit.should.equal(true);
+      r.errors.length.should.equal(0);
+      r.logs
+        .join('\n')
+        .split(/\n+/)
+        .should.deep.equal([
+          'usage [command]',
+          'Commands:',
+          '  usage within-a-dream [command] [opts]  Dream within a dream',
+          '  usage inception [command] [opts]       Enter another dream, where inception is possible',
+          '  usage limbo [opts]                     Get lost in pure subconscious',
+          'Options:',
+          '  --help     Show help  [boolean]',
+          '  --version  Show version number  [boolean]',
+        ]);
+    });
+
+    it('files can be excluded with a regex', () => {
+      const r = checkOutput(() =>
+        yargs('--help')
+          .wrap(null)
+          .commandDir('fixtures/cmddir', {
+            recurse: true,
+            exclude: /^dream\.js/,
+          })
+          .parse()
+      );
+      r.exit.should.equal(true);
+      r.errors.length.should.equal(0);
+      r.logs
+        .join('\n')
+        .split(/\n+/)
+        .should.deep.equal([
+          'usage [command]',
+          'Commands:',
+          '  usage within-a-dream [command] [opts]  Dream within a dream',
+          '  usage inception [command] [opts]       Enter another dream, where inception is possible',
+          '  usage limbo [opts]                     Get lost in pure subconscious',
+          'Options:',
+          '  --help     Show help  [boolean]',
+          '  --version  Show version number  [boolean]',
+        ]);
+    });
+
+    it('files can be included with a regex', () => {
+      const r = checkOutput(() =>
+        yargs('--help')
+          .wrap(null)
+          .commandDir('fixtures/cmddir', {
+            recurse: true,
+            include: /^dream\.js/,
+          })
+          .parse()
+      );
+      r.exit.should.equal(true);
+      r.errors.length.should.equal(0);
+      r.logs
+        .join('\n')
+        .split(/\n+/)
+        .should.deep.equal([
+          'usage [command]',
+          'Commands:',
+          '  usage dream [command] [opts]  Go to sleep and dream',
+          'Options:',
+          '  --help     Show help  [boolean]',
+          '  --version  Show version number  [boolean]',
+        ]);
+    });
+
+    it('files can be included with a callback', () => {
+      const r = checkOutput(() =>
+        yargs('--help')
+          .wrap(null)
+          .commandDir('fixtures/cmddir', {
+            recurse: true,
+            include: fileName => {
+              return /^dream\.js/.test(fileName);
+            },
+          })
+          .parse()
+      );
+      r.exit.should.equal(true);
+      r.errors.length.should.equal(0);
+      r.logs
+        .join('\n')
+        .split(/\n+/)
+        .should.deep.equal([
+          'usage [command]',
+          'Commands:',
+          '  usage dream [command] [opts]  Go to sleep and dream',
+          'Options:',
+          '  --help     Show help  [boolean]',
+          '  --version  Show version number  [boolean]',
+        ]);
+    });
   });
 });

@@ -73,6 +73,27 @@ export class CommandInstance {
     const visit = typeof opts.visit === 'function' ? opts.visit : (o: any) => o;
     for (const fileb of files) {
       const file = fileb.toString('utf8');
+
+      // Support include / exclude logic from require-directory.
+      if (opts.exclude) {
+        let exclude = false;
+        if (typeof opts.exclude === 'function') {
+          exclude = opts.exclude(file);
+        } else {
+          exclude = opts.exclude.test(file);
+        }
+        if (exclude) continue;
+      }
+      if (opts.include) {
+        let include = false;
+        if (typeof opts.include === 'function') {
+          include = opts.include(file);
+        } else {
+          include = opts.include.test(file);
+        }
+        if (!include) continue;
+      }
+
       let supportedExtension = false;
       for (const ext of opts.extensions) {
         if (file.endsWith(ext)) supportedExtension = true;

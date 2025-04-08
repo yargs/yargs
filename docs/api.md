@@ -259,9 +259,9 @@ Apply command modules from a directory relative to the module calling this metho
 `commandObject`, `pathToFile`, and `filename` as arguments. Returns `commandObject`
 to include the command; any falsy value to exclude/skip it.
 
-`include`: Allow list certain modules. See [`require-directory`](https://www.npmjs.com/package/require-directory) for details.
+`include`: Allow list certain modules. Either a regex or callback can be provided. `true` = load the file.
 
-`exclude`: Block list certain modules. See [`require-directory`](https://www.npmjs.com/package/require-directory) for details.
+`exclude`: Block list certain modules. Either a regex or callback can be provided. `false` = do not load the file.
 
 <a name="command"></a>
 .command(cmd, desc, [builder], [handler])
