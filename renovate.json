@@ -4,6 +4,5 @@
   ],
   "pinVersions": false,
   "rebaseStalePrs": true,
-  "gitAuthor": null,
-  "ignoreDeps": ["string-width"]
+  "gitAuthor": null
 }

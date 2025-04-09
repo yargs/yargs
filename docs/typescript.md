@@ -26,7 +26,7 @@ The following `.options()` definition:
 
 ```typescript
 #!/usr/bin/env node
-import yargs from 'yargs/yargs';
+import yargs from 'yargs';
 
 const argv = yargs(process.argv.slice(2)).options({
   a: { type: 'boolean', default: false },

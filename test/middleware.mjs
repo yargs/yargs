@@ -1,16 +1,12 @@
 'use strict';
-/* global describe, it, beforeEach, afterEach */
+/* global describe, it */
 /* eslint-disable no-unused-vars */
 
-const assert = require('assert');
-const {expect} = require('chai');
-let yargs;
-require('chai').should();
+import assert from 'assert';
+import {expect, should} from 'chai';
+import yargs from '../index.mjs';
 
-function clearRequireCache() {
-  delete require.cache[require.resolve('../index.cjs')];
-  delete require.cache[require.resolve('../build/index.cjs')];
-}
+should();
 
 async function wait() {
   return new Promise(resolve => {
@@ -19,13 +15,6 @@ async function wait() {
 }
 
 describe('middleware', () => {
-  beforeEach(() => {
-    yargs = require('../index.cjs');
-  });
-  afterEach(() => {
-    clearRequireCache();
-  });
-
   it('runs the middleware before reaching the handler', done => {
     yargs(['mw'])
       .middleware(argv => {
