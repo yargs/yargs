@@ -644,3 +644,47 @@ try {
 }
 console.info('finish')
 ```
+
+### Using Inquirer to make interactive tools
+
+Using Inquirer or a similar package with yargs is a powerful way to make your CLI tools more interactive and responsive to the user.
+
+One example would be to use `input` to ensure the user inputs required arguments.
+
+```js
+import yargs from 'yargs/yargs';
+import { hideBin } from 'yargs/helpers';
+import { input } from '@inquirer/prompts';
+
+await yargs(hideBin(process.argv))
+  .command({
+    command: 'login [username]',
+    describe: 'Log in with defined username',
+    builder: (yargs) => {
+      yargs.positional('username', {
+        describe: 'The username used to log in',
+        type: 'string',
+      });
+    },
+    handler: async (argv) => {
+      if (!argv.username) {
+        argv.username = await input({ message: 'Please enter your username' });
+      }
+
+      console.log(`Welcome back, ${argv.username}!`);
+    },
+  })
+  .help()
+  .parse();
+```
+
+If username is not given as an argument, inquirer will prompt the user with an input.
+
+```
+$ ./app.js login
+? Please enter your username: yargs
+Welcome back, yargs!
+
+$ ./app.js login yargs
+Welcome back, yargs!
+```
