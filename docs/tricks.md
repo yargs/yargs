@@ -59,8 +59,14 @@ This lets you organize arguments into nested objects.
       foo: { bar: { baz: 33 }, quux: 5 },
       '$0': 'examples/reflect.js' }
 
-<a name="quotes"></a>
+This also works when loading from ENV variables (configurable with `.env('MYPREFIX')` using double underscores:
 
+    $ MYPREFIX_FOO__BAR__BAZ=33 MYPREFIX_FOO__QUUX=5 node examples/reflect.js
+    { _: [],
+      foo: { bar: { baz: 33 }, quux: 5 },
+      '$0': 'examples/reflect.js' }
+
+<a name="quotes"></a>
 Quotes
 ------------
 
@@ -81,4 +87,3 @@ $ node examples/reflect.js --foo "\"--hello -x=yes -v\""
 { _: [], foo: '--hello -x=yes -v',
   '$0': 'examples/reflect.js' }
 ```
-
