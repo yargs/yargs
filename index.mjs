@@ -6,3 +6,5 @@ import {YargsFactory} from './build/lib/yargs-factory.js';
 
 const Yargs = YargsFactory(esmPlatformShim);
 export default Yargs;
+
+export {Yargs as 'module.exports'};

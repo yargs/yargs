@@ -1,6 +1,6 @@
 /* global describe, it */
-const {expect} = require('chai');
-const {parseCommand} = require('../build/index.cjs');
+import {expect} from 'chai';
+import {parseCommand} from '../build/lib/parse-command.js';
 
 describe('parseCommand', () => {
   it('should throw if no command is specified', () => {

@@ -2,31 +2,16 @@
   "name": "yargs",
   "version": "17.7.2",
   "description": "yargs the modern, pirate-themed, successor to optimist.",
-  "main": "./index.cjs",
+  "main": "./index.mjs",
   "exports": {
     "./package.json": "./package.json",
-    ".": [
-      {
-        "import": "./index.mjs",
-        "require": "./index.cjs"
-      },
-      "./index.cjs"
-    ],
-    "./helpers": {
-      "import": "./helpers/helpers.mjs",
-      "require": "./helpers/index.js"
-    },
+    "./helpers": "./helpers/helpers.mjs",
     "./browser": {
       "import": "./browser.mjs",
       "types": "./browser.d.ts"
     },
-    "./yargs": [
-      {
-        "import": "./yargs.mjs",
-        "require": "./yargs"
-      },
-      "./yargs"
-    ]
+    ".": "./index.mjs",
+    "./yargs": "./index.mjs"
   },
   "type": "module",
   "module": "./index.mjs",
@@ -39,12 +24,9 @@
   "files": [
     "browser.mjs",
     "browser.d.ts",
-    "index.cjs",
     "helpers/*.js",
     "helpers/*",
     "index.mjs",
-    "yargs",
-    "yargs.mjs",
     "build",
     "locales",
     "LICENSE",
@@ -53,58 +35,51 @@
     "!**/*.d.ts"
   ],
   "dependencies": {
-    "cliui": "^8.0.1",
+    "cliui": "^9.0.1",
     "escalade": "^3.1.1",
     "get-caller-file": "^2.0.5",
-    "require-directory": "^2.1.1",
-    "string-width": "^4.2.3",
+    "string-width": "^7.2.0",
     "y18n": "^5.0.5",
     "yargs-parser": "^21.1.1"
   },
   "devDependencies": {
-    "@rollup/plugin-terser": "^0.4.4",
-    "@rollup/plugin-typescript": "^12.1.2",
+    "@babel/eslint-parser": "^7.26.10",
+    "@babel/preset-typescript": "^7.26.0",
     "@types/chai": "^4.2.11",
     "@types/mocha": "^9.0.0",
     "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.26.1",
     "browserslist-generator": "^2.0.1",
     "c8": "^9.1.0",
     "chai": "^4.2.0",
     "chalk": "^4.0.0",
-    "concurrently": "^7.6.0",
     "cpr": "^3.0.1",
     "cross-env": "^7.0.2",
-    "cross-spawn": "^7.0.0",
-    "eslint": "^8.56.0",
+    "cross-spawn": "^7.0.6",
+    "eslint": "^8.57.1",
     "eslint-plugin-prettier": "^5.1.2",
     "gts": "^5.2.0",
     "hashish": "0.0.4",
-    "mocha": "^9.0.0",
+    "mocha": "^10.8.2",
     "rimraf": "^3.0.2",
-    "rollup": "^3.29.4",
-    "rollup-plugin-cleanup": "^3.2.1",
-    "typescript": "^5.7.2",
+    "typescript": "^5.8.3",
     "which": "^2.0.0",
     "yargs-test-extends": "^1.0.1"
   },
   "scripts": {
     "fix": "gts fix && npm run fix:js",
-    "fix:js": "eslint . --ext cjs --ext mjs --ext js --fix",
+    "fix:js": "eslint . --ext mjs --ext js --fix",
     "posttest": "npm run check",
-    "test": "c8 mocha --enable-source-maps ./test/*.cjs --require ./test/before.cjs --timeout=12000 --check-leaks",
+    "test": "c8 mocha --enable-source-maps ./test/*.mjs --require ./test/before.mjs --timeout=24000 --check-leaks",
     "test:esm": "c8 mocha --enable-source-maps ./test/esm/*.mjs --check-leaks",
     "coverage": "c8 report --check-coverage",
     "prepare": "npm run compile",
-    "pretest": "npm run compile -- -p tsconfig.test.json && cross-env NODE_ENV=test npm run build:cjs",
+    "pretest": "npm run compile -- -p tsconfig.test.json",
     "compile": "rimraf build && tsc",
-    "postcompile": "npm run build:cjs",
-    "build:cjs": "rollup -c rollup.config.cjs",
-    "postbuild:cjs": "rimraf ./build/index.cjs.d.ts",
     "check": "gts lint && npm run check:js",
-    "check:js": "eslint . --ext cjs --ext mjs --ext js",
+    "check:js": "eslint . --ext mjs --ext js",
     "clean": "gts clean",
-    "watch": "rimraf build && tsc && concurrently npm:watch:tsc npm:watch:cjs",
-    "watch:cjs": "rollup -w -c rollup.config.cjs",
+    "watch": "rimraf build && npm:watch:tsc",
     "watch:tsc": "tsc --watch"
   },
   "repository": {
@@ -123,6 +98,6 @@
   ],
   "license": "MIT",
   "engines": {
-    "node": ">=16.15.1"
+    "node": "^20.19.0 || ^22.12.0 || >=23"
   }
 }
