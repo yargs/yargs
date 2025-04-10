@@ -87,4 +87,3 @@ $ node examples/reflect.js --foo "\"--hello -x=yes -v\""
 { _: [], foo: '--hello -x=yes -v',
   '$0': 'examples/reflect.js' }
 ```
-

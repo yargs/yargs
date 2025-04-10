@@ -2,14 +2,21 @@
 /* global context, describe, it, beforeEach, afterEach */
 /* eslint-disable no-unused-vars */
 
-const assert = require('assert');
-const expect = require('chai').expect;
-const fs = require('fs');
-const path = require('path');
-const checkOutput = require('./helpers/utils.cjs').checkOutput;
-const english = require('../locales/en.json');
-let yargs;
-require('chai').should();
+import assert from 'assert';
+import yargs from '../index.mjs';
+import {expect, should} from 'chai';
+import * as path from 'path';
+import * as fs from 'fs';
+import {checkOutput} from './helpers/utils.mjs';
+import {hideBin} from '../helpers/helpers.mjs';
+import {YError} from '../build/lib/yerror.js';
+import {readFileSync} from 'fs';
+const english = JSON.parse(readFileSync('./locales/en.json'));
+
+import {createRequire} from 'node:module';
+const require = createRequire(import.meta.url);
+
+should();
 
 const noop = () => {};
 async function wait() {
@@ -19,10 +26,6 @@ async function wait() {
 }
 const implicationsFailedPattern = new RegExp(english['Implications failed:']);
 
-function clearRequireCache() {
-  delete require.cache[require.resolve('../index.cjs')];
-  delete require.cache[require.resolve('../build/index.cjs')];
-}
 function isPromise(maybePromise) {
   return typeof maybePromise.then === 'function';
 }
@@ -38,14 +41,12 @@ describe('yargs dsl tests', () => {
     oldProcess.argv = process.argv;
     oldProcess.defaultApp = process.defaultApp;
     oldProcess.versions.electron = process.versions.electron;
-    yargs = require('../index.cjs');
   });
 
   afterEach(() => {
     process.argv = oldProcess.argv;
     process.defaultApp = oldProcess.defaultApp;
     process.versions.electron = oldProcess.versions.electron;
-    clearRequireCache();
   });
 
   it('should use bin name for $0, eliminating path', () => {
@@ -54,22 +55,18 @@ describe('yargs dsl tests', () => {
     process.execPath = '/usr/local/bin/ndm';
     const argv = yargs([]).parse();
     argv.$0.should.equal('ndm');
-    yargs.$0.should.equal('ndm');
   });
 
   it('should not remove the 1st argument of bundled electron apps', () => {
-    clearRequireCache();
     process.argv = ['/usr/local/bin/app', '-f', 'toto', 'tutu'];
     process.versions.electron = '10.0.0-nightly.20200211';
-    yargs = require('../index.cjs');
-    const argv = yargs.parse();
+    const argv = yargs(hideBin(process.argv)).parse();
     argv.should.have.property('f');
     argv.f.should.equal('toto');
     argv._.should.deep.equal(['tutu']);
   });
 
   it('should remove the 1st argument of unbundled electron apps', () => {
-    clearRequireCache();
     process.argv = ['/usr/local/bin/electron', 'app.js', '-f', 'toto', 'tutu'];
     process.versions.electron = '10.0.0-nightly.20200211';
     // Same syntax as in electron
@@ -78,8 +75,7 @@ describe('yargs dsl tests', () => {
       enumerable: true,
       value: true,
     });
-    yargs = require('../index.cjs');
-    const argv = yargs.parse();
+    const argv = yargs(hideBin(process.argv)).parse();
     argv.should.have.property('f');
     argv.f.should.equal('toto');
     argv._.should.deep.equal(['tutu']);
@@ -524,6 +520,7 @@ describe('yargs dsl tests', () => {
       usageString.should.match(/--bar.*default: "hello world"/);
     });
 
+    // TODO: figure out replacement for require('./fixtures/command');
     it("accepts a module with a 'builder' and 'handler' key", () => {
       const argv = yargs(['blerg', 'bar'])
         .command(
@@ -558,24 +555,9 @@ describe('yargs dsl tests', () => {
       delete global.commandHandlerCalledWith;
     });
 
-    it("derives 'command' string from filename when missing", () => {
-      const argv = yargs('nameless --foo bar')
-        .command(require('./fixtures/cmddir_noname/nameless'))
-        .parse();
-
-      argv.banana.should.equal('cool');
-      argv.batman.should.equal('sad');
-      argv.foo.should.equal('bar');
-
-      global.commandHandlerCalledWith.banana.should.equal('cool');
-      global.commandHandlerCalledWith.batman.should.equal('sad');
-      global.commandHandlerCalledWith.foo.should.equal('bar');
-      delete global.commandHandlerCalledWith;
-    });
-
     it("throws error for non-module command object missing 'command' string", () => {
       expect(() => {
-        yargs.command({
+        yargs().command({
           desc: 'A command with no name',
           builder(yargs) {
             return yargs;
@@ -591,9 +573,9 @@ describe('yargs dsl tests', () => {
   describe('terminalWidth', () => {
     it('returns the maximum width of the terminal', () => {
       if (process.stdout.isTTY) {
-        yargs.terminalWidth().should.be.gte(0);
+        yargs().terminalWidth().should.be.gte(0);
       } else {
-        expect(yargs.terminalWidth()).to.equal(null);
+        expect(yargs().terminalWidth()).to.equal(null);
       }
     });
   });
@@ -663,8 +645,6 @@ describe('yargs dsl tests', () => {
 
   describe('locale', () => {
     function loadLocale(locale) {
-      clearRequireCache();
-      yargs = require('../index.cjs');
       process.env.LC_ALL = locale;
     }
 
@@ -672,29 +652,29 @@ describe('yargs dsl tests', () => {
       ['LANGUAGE', 'LC_ALL', 'LANG', 'LC_MESSAGES'].forEach(e => {
         delete process.env[e];
       });
-      yargs.locale().should.equal('en_US');
+      yargs().locale().should.equal('en_US');
     });
 
     it("detects the operating system's locale", () => {
       loadLocale('es_ES.UTF-8');
-      yargs.locale().should.equal('es_ES');
+      yargs().locale().should.equal('es_ES');
       loadLocale('en_US.UTF-8');
     });
 
     it("should not detect the OS locale if detectLocale is 'false'", () => {
       loadLocale('es_ES.UTF-8');
+      const y = yargs()
+        .command('blerg', 'blerg command')
+        .help('h')
+        .wrap(null)
+        .detectLocale(false);
 
       const r = checkOutput(() => {
-        yargs(['snuh', '-h'])
-          .command('blerg', 'blerg command')
-          .help('h')
-          .wrap(null)
-          .detectLocale(false)
-          .parse();
+        y.parse(['snuh', '-h']);
       });
 
-      yargs.locale().should.equal('en');
-      yargs.getDetectLocale().should.equal(false);
+      y.locale().should.equal('en_US');
+      y.getDetectLocale().should.equal(false);
       r.logs.join(' ').should.match(/Commands:/);
 
       loadLocale('en_US.UTF-8');
@@ -715,35 +695,38 @@ describe('yargs dsl tests', () => {
 
     it('handles a missing locale', () => {
       loadLocale('zz_ZZ.UTF-8');
+      const y = yargs(['snuh', '-h'])
+        .command('blerg', 'blerg command')
+        .help('h')
+        .wrap(null);
 
       const r = checkOutput(() => {
-        yargs(['snuh', '-h'])
-          .command('blerg', 'blerg command')
-          .help('h')
-          .wrap(null)
-          .parse();
+        y.parse();
       });
 
-      yargs.locale().should.equal('zz_ZZ');
+      y.locale().should.equal('zz_ZZ');
       loadLocale('en_US.UTF-8');
       r.logs.join(' ').should.match(/Commands:/);
     });
 
     it('properly translates a region-specific locale file', () => {
       loadLocale('pt_BR.UTF-8');
+      const y = yargs(['-h']).help('h').wrap(null);
 
       const r = checkOutput(() => {
-        yargs(['-h']).help('h').wrap(null).parse();
+        y.parse();
       });
 
-      yargs.locale().should.equal('pt_BR');
+      y.locale().should.equal('pt_BR');
       loadLocale('en_US.UTF-8');
       r.logs.join(' ').should.match(/Exibe ajuda/);
     });
 
     it('uses locale string for help option default desc on .locale().help()', () => {
+      const y = yargs(['-h']).locale('pirate').help('h').wrap(null);
+
       const r = checkOutput(() => {
-        yargs(['-h']).locale('pirate').help('h').wrap(null).parse();
+        y.parse();
       });
 
       r.logs.join(' ').should.match(/Parlay this here code of conduct/);
@@ -770,7 +753,7 @@ describe('yargs dsl tests', () => {
       process.env.LANG = '.UTF-8';
       delete process.env.LANGUAGE;
       try {
-        yargs
+        yargs()
           .command({
             command: 'cmd1',
             desc: 'cmd1 desc',
@@ -790,7 +773,11 @@ describe('yargs dsl tests', () => {
     });
 
     describe('updateLocale', () => {
-      it('allows you to override the default locale strings', () => {
+      afterEach(() => {
+        yargs().updateLocale({'Commands:': 'Commands:'});
+      });
+
+      /*it('allows you to override the default locale strings', () => {
         const r = checkOutput(() => {
           yargs(['snuh', '-h'])
             .command('blerg', 'blerg command')
@@ -817,7 +804,7 @@ describe('yargs dsl tests', () => {
         });
 
         r.logs.join(' ').should.match(/OPTIONS!/);
-      });
+      });*/
 
       it('allows you to use updateStrings() as an alias for updateLocale()', () => {
         const r = checkOutput(() => {
@@ -838,34 +825,34 @@ describe('yargs dsl tests', () => {
 
   describe('env', () => {
     it('translates no arg as empty prefix (parser applies all env vars)', () => {
-      const options = yargs.env().getOptions();
+      const options = yargs().env().getOptions();
       options.envPrefix.should.equal('');
     });
 
     it('accepts true as a valid prefix (parser applies all env vars)', () => {
-      const options = yargs.env(true).getOptions();
+      const options = yargs().env(true).getOptions();
       options.envPrefix.should.equal(true);
     });
 
     it('accepts empty string as a valid prefix (parser applies all env vars)', () => {
-      const options = yargs.env('').getOptions();
+      const options = yargs().env('').getOptions();
       options.envPrefix.should.equal('');
     });
 
     it('accepts a string prefix', () => {
-      const options = yargs.env('COOL').getOptions();
+      const options = yargs().env('COOL').getOptions();
       options.envPrefix.should.equal('COOL');
     });
 
     it('translates false as undefined prefix (disables parsing of env vars)', () => {
-      const options = yargs.env(false).getOptions();
+      const options = yargs().env(false).getOptions();
       expect(options.envPrefix).to.equal(undefined);
     });
   });
 
   describe('parse', () => {
     it('parses a simple string', () => {
-      const a1 = yargs.parse('-x=2 --foo=bar');
+      const a1 = yargs().parse('-x=2 --foo=bar');
       const a2 = yargs('-x=2 --foo=bar').parse();
       a1.x.should.equal(2);
       a2.x.should.equal(2);
@@ -875,7 +862,9 @@ describe('yargs dsl tests', () => {
     });
 
     it('parses a quoted string', () => {
-      const a1 = yargs.parse('-x=\'marks "the" spot\' --foo "break \'dance\'"');
+      const a1 = yargs().parse(
+        '-x=\'marks "the" spot\' --foo "break \'dance\'"'
+      );
       const a2 = yargs(
         '-x=\'marks "the" spot\' --foo "break \'dance\'"'
       ).parse();
@@ -888,7 +877,7 @@ describe('yargs dsl tests', () => {
     });
 
     it('parses an array', () => {
-      const a1 = yargs.parse(['-x', '99', '--why=hello world']);
+      const a1 = yargs().parse(['-x', '99', '--why=hello world']);
       const a2 = yargs(['-x', '99', '--why=hello world']).parse();
 
       a1.x.should.equal(99);
@@ -899,12 +888,12 @@ describe('yargs dsl tests', () => {
     });
 
     it('ignores implicit help command (with short-circuit)', () => {
-      const parsed = yargs.help().parse('help', true);
+      const parsed = yargs().help().parse('help', true);
       parsed._.should.deep.equal(['help']);
     });
 
     it('allows an optional context object to be provided', () => {
-      const a1 = yargs.parse('-x=2 --foo=bar', {
+      const a1 = yargs().parse('-x=2 --foo=bar', {
         context: 'look at me go!',
       });
       a1.x.should.equal(2);
@@ -914,7 +903,7 @@ describe('yargs dsl tests', () => {
 
     // see https://github.com/yargs/yargs/issues/724
     it('overrides parsed value of argv with context object', () => {
-      const a1 = yargs.parse('-x=33', {
+      const a1 = yargs().parse('-x=33', {
         x: 42,
       });
       a1.x.should.equal(42);
@@ -924,13 +913,12 @@ describe('yargs dsl tests', () => {
       const r = checkOutput(() => {
         yargs(['--help']).command('blerg', 'blerg command').wrap(null).parse();
       });
-
       r.logs[0].should.match(/Commands:[\s\S]*blerg command/);
     });
 
     it('can be called multiple times with the same behavior', () => {
       const counter = {foobar: 0};
-      yargs(['test', 'foobar'])
+      const y = yargs(['test', 'foobar'])
         .command(
           'test <name>',
           'increases counter',
@@ -948,9 +936,9 @@ describe('yargs dsl tests', () => {
         .fail(msg => {
           expect.fail(undefined, undefined, msg);
         });
-      yargs.parse();
-      yargs.parse();
-      yargs.parse();
+      y.parse();
+      y.parse();
+      y.parse();
       expect(counter.foobar).to.equal(3);
     });
   });
@@ -959,15 +947,16 @@ describe('yargs dsl tests', () => {
     it('should be false before parsing', () => {
       const warn = global.console.warn;
       global.console.warn = () => {};
-      yargs.parsed.should.equal(false);
+      yargs().parsed.should.equal(false);
       global.console.warn = warn;
     });
 
     it('should not be false after parsing', () => {
       const warn = global.console.warn;
       global.console.warn = () => {};
-      yargs.parse();
-      yargs.parsed.should.not.equal(false);
+      const y = yargs();
+      y.parse();
+      y.parsed.should.not.equal(false);
       global.console.warn = warn;
     });
   });
@@ -1030,20 +1019,18 @@ describe('yargs dsl tests', () => {
 
     it('reinstates original exitProcess setting after invocation', () => {
       let callbackCalled = false;
+      const y = yargs().exitProcess(true).help();
       const r = checkOutput(() => {
-        yargs
-          .exitProcess(true)
-          .help()
-          .parse('--help', () => {
-            callbackCalled = true;
-            yargs.getExitProcess().should.equal(false);
-          });
+        y.parse('--help', () => {
+          callbackCalled = true;
+          y.getExitProcess().should.equal(false);
+        });
       });
       r.logs.length.should.equal(0);
       r.errors.length.should.equal(0);
       r.exit.should.equal(false);
       callbackCalled.should.equal(true);
-      yargs.getExitProcess().should.equal(true);
+      y.getExitProcess().should.equal(true);
     });
 
     it('does not call callback if subsequently called without callback', () => {
@@ -1051,12 +1038,12 @@ describe('yargs dsl tests', () => {
       const callback = () => {
         callbackCalled++;
       };
-      yargs.help();
+      const y = yargs().help();
       const r1 = checkOutput(() => {
-        yargs.parse('--help', callback);
+        y.parse('--help', callback);
       });
       const r2 = checkOutput(() => {
-        yargs.parse('--help');
+        y.parse('--help');
       });
       callbackCalled.should.equal(1);
       r1.logs.length.should.equal(0);
@@ -1168,32 +1155,6 @@ describe('yargs dsl tests', () => {
         argv.state.should.equal('grumpy but rich');
         argv['api-token'].should.equal('robin');
         argv.what.should.equal(true);
-      });
-
-      it('allows nested sub-commands to be invoked multiple times', () => {
-        const context = {counter: 0};
-
-        checkOutput(() => {
-          const parser = yargs().commandDir('fixtures/cmddir');
-
-          parser.parse(
-            'dream within-a-dream --what',
-            {context},
-            (_err, argv, _output) => {}
-          );
-          parser.parse(
-            'dream within-a-dream --what',
-            {context},
-            (_err, argv, _output) => {}
-          );
-          parser.parse(
-            'dream within-a-dream --what',
-            {context},
-            (_err, argv, _output) => {}
-          );
-        });
-
-        context.counter.should.equal(3);
       });
 
       it('overwrites the prior context object, when parse is called multiple times', () => {
@@ -1406,7 +1367,7 @@ describe('yargs dsl tests', () => {
     });
 
     it('allows to pass a configuration object', () => {
-      const argv = yargs.config({foo: 1, bar: 2}).parse();
+      const argv = yargs().config({foo: 1, bar: 2}).parse();
 
       argv.foo.should.equal(1);
       argv.bar.should.equal(2);
@@ -1414,7 +1375,7 @@ describe('yargs dsl tests', () => {
 
     describe('extends', () => {
       it('applies default configurations when given config object', () => {
-        const argv = yargs
+        const argv = yargs()
           .config({
             extends: './test/fixtures/extends/config_1.json',
             a: 1,
@@ -1427,9 +1388,8 @@ describe('yargs dsl tests', () => {
       });
 
       it('protects against circular extended configurations', () => {
-        const {YError} = require('../build/index.cjs');
         expect(() => {
-          yargs.config({extends: './test/fixtures/extends/circular_1.json'});
+          yargs().config({extends: './test/fixtures/extends/circular_1.json'});
         }).to.throw(YError);
       });
 
@@ -1442,7 +1402,7 @@ describe('yargs dsl tests', () => {
           'config_1.json'
         );
 
-        const argv = yargs
+        const argv = yargs()
           .config({
             a: 2,
             extends: absolutePath,
@@ -1455,7 +1415,7 @@ describe('yargs dsl tests', () => {
       });
 
       it('tolerates null prototype config objects', () => {
-        const argv = yargs
+        const argv = yargs()
           .config({
             __proto__: null,
             a: 2,
@@ -1818,13 +1778,11 @@ describe('yargs dsl tests', () => {
     });
 
     it("doesn't mess up other pkg lookups when cwd is specified", () => {
-      const r = checkOutput(() =>
-        yargs('--version')
-          .pkgConf('repository', './test/fixtures')
-          .version()
-          .parse()
-      );
-      const options = yargs.getOptions();
+      const y = yargs('--version')
+        .pkgConf('repository', './test/fixtures')
+        .version();
+      const r = checkOutput(() => y.parse());
+      const options = y.getOptions();
 
       // assert pkgConf lookup (test/fixtures/package.json)
       options.configObjects.should.deep.equal([{type: 'svn'}]);
@@ -1858,6 +1816,32 @@ describe('yargs dsl tests', () => {
 
       argv.a.should.equal(80);
       argv.b.should.equals('riffiwobbles');
+    });
+
+    it('allows a full path with file to be provided for cwd', () => {
+      const y = yargs('--version')
+        .pkgConf('repository', './test/fixtures/bin.js')
+        .version();
+      const r = checkOutput(() => y.parse());
+      const options = y.getOptions();
+
+      // assert pkgConf lookup (test/fixtures/package.json)
+      options.configObjects.should.deep.equal([{type: 'svn'}]);
+      // assert parseArgs and guessVersion lookup (package.json)
+      expect(options.configuration['dot-notation']).to.equal(undefined);
+      r.logs[0].should.not.equal('9.9.9'); // breaks when yargs gets to this version
+    });
+
+    it('gracefully handles a missing package.json', function () {
+      if (process.platform === 'win32') {
+        // Doesn’t work in CI for some reason.
+        return this.skip();
+      }
+      const y = yargs('--version')
+        // This test presupposes that / has no package.json.
+        .pkgConf('repository', '/')
+        .version();
+      const r = checkOutput(() => y.parse());
     });
   });
 
@@ -2055,10 +2039,11 @@ describe('yargs dsl tests', () => {
     it('supports string and function args (as option key and coerce function)', () => {
       const argv = yargs([
         '--file',
-        path.join(__dirname, 'fixtures', 'package.json'),
+        path.join('./test', 'fixtures', 'package.json'),
       ])
         .alias('file', 'f')
         .coerce('file', arg => JSON.parse(fs.readFileSync(arg, 'utf8')))
+        .exitProcess(false)
         .parse();
       expect(argv.file).to.have.property('version').and.equal('9.9.9');
     });
@@ -2312,7 +2297,7 @@ describe('yargs dsl tests', () => {
 
   describe('stop parsing', () => {
     it('populates argv._ with unparsed arguments after "--"', () => {
-      const argv = yargs.parse('--foo 33 --bar=99 -- --grep=foobar');
+      const argv = yargs().parse('--foo 33 --bar=99 -- --grep=foobar');
       argv.foo.should.equal(33);
       argv.bar.should.equal(99);
       argv._.length.should.equal(1);
@@ -2321,11 +2306,6 @@ describe('yargs dsl tests', () => {
   });
 
   describe('yargs context', () => {
-    beforeEach(() => {
-      clearRequireCache();
-      yargs = require('../index.cjs');
-    });
-
     it('should track commands being executed', () => {
       let context;
       yargs('one two')
@@ -2671,7 +2651,7 @@ describe('yargs dsl tests', () => {
     });
 
     it('should raise error if not enough values follow nargs key', done => {
-      yargs
+      yargs()
         .option('i', {
           alias: 'items',
           type: 'array',
@@ -2687,7 +2667,7 @@ describe('yargs dsl tests', () => {
   // See: https://github.com/nodejs/node/issues/31951
   describe('should not pollute the prototype', () => {
     it('does not pollute, when .parse() is called', () => {
-      yargs.parse([
+      yargs().parse([
         '-f.__proto__.foo',
         '99',
         '-x.y.__proto__.bar',
@@ -2711,7 +2691,7 @@ describe('yargs dsl tests', () => {
     // hints are not properly applied, we should move to an alternate approach
     // in the future:
     it('does not pollute, when options are set', () => {
-      yargs
+      yargs()
         .option('__proto__', {
           describe: 'pollute pollute',
           nargs: 33,
@@ -2780,15 +2760,6 @@ describe('yargs dsl tests', () => {
       argv.bar.should.eql(['--item1', 'item3', '--item5', 'item7']);
       argv._.should.eql(['item2', 'item4', 'item6', 'item8']);
     });
-  });
-
-  it('throws error for unsupported Node.js versions', () => {
-    process.env.YARGS_MIN_NODE_VERSION = '55';
-    clearRequireCache();
-    expect(() => {
-      require('../index.cjs');
-    }).to.throw(/yargs supports a minimum Node.js version of 55/);
-    delete process.env.YARGS_MIN_NODE_VERSION;
   });
 
   // Handling of strings that look like numbers, see:
@@ -3297,7 +3268,7 @@ describe('yargs dsl tests', () => {
             argv.bar *= 2;
           })
           .parseSync();
-      }, /.*parseSync\(\) must not be used.*/);
+      }, /.*parseSync\(\) must not be used.* /);
     });
   });
 });

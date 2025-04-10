@@ -1,22 +1,19 @@
 'use strict';
-/* global describe, it, beforeEach */
+/* global describe, it */
 /* eslint-disable no-unused-vars */
 
-const checkUsage = require('./helpers/utils.cjs').checkOutput;
-const expect = require('chai').expect;
-const english = require('../locales/en.json');
-let yargs = require('../index.cjs');
+import {checkOutput} from './helpers/utils.mjs';
+import yargs from '../index.mjs';
+import {expect, should} from 'chai';
+import {readFileSync} from 'fs';
+const english = JSON.parse(readFileSync('./locales/en.json'));
 
-require('chai').should();
+should();
 
 describe('validation tests', () => {
-  beforeEach(() => {
-    yargs.getInternalMethods().reset();
-  });
-
   describe('check', () => {
     it('fails if error is thrown in check callback', done => {
-      yargs
+      yargs()
         .command(
           '$0',
           'default command desc',
@@ -45,7 +42,7 @@ describe('validation tests', () => {
     });
 
     it('does not fail if error is not thrown in check callback, and true is returned', () => {
-      yargs
+      yargs()
         .command(
           '$0',
           'default command desc',
@@ -72,7 +69,7 @@ describe('validation tests', () => {
     });
 
     it('callback has access to options', () => {
-      yargs
+      yargs()
         .command(
           '$0',
           'default command desc',
@@ -418,8 +415,6 @@ describe('validation tests', () => {
     });
 
     function loadLocale(locale) {
-      delete require.cache[require.resolve('../')];
-      yargs = require('../');
       process.env.LC_ALL = locale;
     }
 
@@ -457,7 +452,7 @@ describe('validation tests', () => {
 
     // addresses: https://github.com/yargs/yargs/issues/1861
     it('fails in strict mode when no commands defined but command is passed', done => {
-      yargs
+      yargs()
         .strict()
         .fail(msg => {
           msg.should.equal('Unknown argument: foo');
@@ -468,7 +463,7 @@ describe('validation tests', () => {
     });
 
     it('fails because of undefined command and not because of argument after --', done => {
-      yargs
+      yargs()
         .strict()
         .fail(msg => {
           msg.should.equal('Unknown argument: foo');
@@ -916,7 +911,7 @@ describe('validation tests', () => {
     });
 
     it('should be displayed in the help message', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs(['--help'])
           .config('settings')
           .help('help')
@@ -936,8 +931,7 @@ describe('validation tests', () => {
     });
 
     it('should be displayed in the help message with its default name', () => {
-      const checkUsage = require('./helpers/utils.cjs').checkOutput;
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs(['--help'])
           .config()
           .help('help')
@@ -957,8 +951,7 @@ describe('validation tests', () => {
     });
 
     it('should allow help message to be overridden', () => {
-      const checkUsage = require('./helpers/utils.cjs').checkOutput;
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs(['--help'])
           .config('settings', 'pork chop sandwiches')
           .help('help')
@@ -978,8 +971,7 @@ describe('validation tests', () => {
     });
 
     it('outputs an error returned by the parsing function', () => {
-      const checkUsage = require('./helpers/utils.cjs').checkOutput;
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs(['--settings=./package.json'])
           .config('settings', 'path to config file', configPath =>
             Error('someone set us up the bomb')
@@ -1002,8 +994,7 @@ describe('validation tests', () => {
     });
 
     it('outputs an error if thrown by the parsing function', () => {
-      const checkUsage = require('./helpers/utils.cjs').checkOutput;
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs(['--settings=./package.json'])
           .config('settings', 'path to config file', configPath => {
             throw Error('someone set us up the bomb');
@@ -1113,7 +1104,7 @@ describe('validation tests', () => {
     });
 
     it('does not fail when options are defined using array/boolean/count/number/string', () => {
-      yargs
+      yargs()
         .command({
           command: 'cmd',
           desc: 'cmd desc',
@@ -1179,7 +1170,7 @@ describe('validation tests', () => {
 
   describe('demandCommand', () => {
     it('should return a custom failure message when too many non-hyphenated arguments are found after a demand count', () => {
-      const r = checkUsage(() =>
+      const r = checkOutput(() =>
         yargs(['src', 'dest'])
           .usage(
             'Usage: $0 [x] [y] [z] {OPTIONS} <src> <dest> [extra_files...]'
