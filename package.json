@@ -7,8 +7,8 @@
     "./package.json": "./package.json",
     "./helpers": "./helpers/helpers.mjs",
     "./browser": {
-      "import": "./browser.mjs",
-      "types": "./browser.d.ts"
+      "types": "./browser.d.ts",
+      "import": "./browser.mjs"
     },
     ".": "./index.mjs",
     "./yargs": "./index.mjs"

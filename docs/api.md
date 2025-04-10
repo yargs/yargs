@@ -683,7 +683,7 @@ yargs(process.argv.slice(2))
   .command({
     command: 'configure <key> [value]',
     aliases: ['config', 'cfg'],
-    desc: 'Set a config variable',
+    describe: 'Set a config variable',
     builder: (yargs) => yargs.default('value', 'true'),
     handler: (argv) => {
       console.log(`setting ${argv.key} to ${argv.value}`)
