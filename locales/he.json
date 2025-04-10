@@ -1,0 +1,55 @@
+{
+  "Commands:": "פקודות:",
+  "Options:": "אופציות:",
+  "Examples:": "דוגמות:",
+  "boolean": "בוליאני",
+  "count": "ספירה",
+  "string": "מחרוזת",
+  "number": "מספר",
+  "array": "מערך",
+  "required": "דרוש",
+  "default": "ברירת מחדל",
+  "default:": "ברירת מחדל:",
+  "choices:": "בחירות:",
+  "aliases:": "כינויים:",
+  "generated-value": "ערך-שנוצר",
+  "Not enough non-option arguments: got %s, need at least %s": {
+    "one": "אין מספיק טיעונים שאינם אופציונלים: קיבל %s, צריך לפחות %s",
+    "other": "אין מספיק טיעונים שאינם אופציונלים: קיבל %s, צריך לפחות %s"
+  },
+  "Too many non-option arguments: got %s, maximum of %s": {
+    "one": "יותר מדי טיעונים שאינם אופציונלים: קיבל %s, מקסימום של %s",
+    "other": "יותר מדי טיעונים שאינם אופציונלים: קיבל %s, מקסימום של %s"
+  },
+  "Missing argument value: %s": {
+    "one": "חסר ערך הטענה: %s",
+    "other": "חסרים ערכי הטענה: %s"
+  },
+  "Missing required argument: %s": {
+    "one": "חסר טענה דרושה: %s",
+    "other": "חסרות טענות דרושות: %s"
+  },
+  "Unknown argument: %s": {
+    "one": "טענה לא ידוע: %s",
+    "other": "טענות לא ידועות: %s"
+  },
+  "Unknown command: %s": {
+    "one": "פקודת לא ידועה: %s",
+    "other": "פקודות לא ידועות: %s"
+  },
+  "Invalid values:": "ערכים לא חוקיים:",
+  "Argument: %s, Given: %s, Choices: %s": "טענות: %s, ניתנו: %s, בחירות: %s",
+  "Argument check failed: %s": "בדיקת הטענה נכשלה: %s",
+  "Implications failed:": "חסרים טיעונים תלויים:",
+  "Not enough arguments following: %s": "אין מספיק טיעונים לאחר: %s",
+  "Invalid JSON config file: %s": "קובץ תצורה לא תקין של JSON: %s",
+  "Path to JSON config file": "נתיב לקובץ התצורה של JSON",
+  "Show help": "הצג עזרה",
+  "Show version number": "הצג מספר גרסה",
+  "Did you mean %s?": "האם התכוונת ל- %s?",
+  "Arguments %s and %s are mutually exclusive" : "טענות %s ו- %s סותרים זה את זה",
+  "Positionals:": "עמדות:",
+  "command": "פקודה",
+  "deprecated": "הוצא משימוש",
+  "deprecated: %s": "הוצא משימוש: %s"
+}

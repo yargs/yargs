@@ -2,7 +2,7 @@
 var argv = require('yargs/yargs')(process.argv.slice(2))
     .count('verbose')
     .alias('v', 'verbose')
-    .argv;
+    .parse();
 
 VERBOSE_LEVEL = argv.verbose;
 

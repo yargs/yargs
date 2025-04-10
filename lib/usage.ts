@@ -363,8 +363,8 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
                         ? '-'
                         : '--'
                       : sw.length > 1
-                      ? '--'
-                      : '-') + sw
+                        ? '--'
+                        : '-') + sw
                   );
                 }
               })
@@ -373,8 +373,8 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
                 isLongSwitch(sw1) === isLongSwitch(sw2)
                   ? 0
                   : isLongSwitch(sw1)
-                  ? 1
-                  : -1
+                    ? 1
+                    : -1
               )
               .join(', ');
 
