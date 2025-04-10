@@ -1,6 +1,7 @@
 /* global describe, it */
-const {objFilter} = require('../build/index.cjs');
-const {expect} = require('chai');
+
+import {expect} from 'chai';
+import {objFilter} from '../build/lib/utils/obj-filter.js';
 
 describe('ObjFilter', () => {
   it('returns a new reference to the original object if no filter function is given', () => {

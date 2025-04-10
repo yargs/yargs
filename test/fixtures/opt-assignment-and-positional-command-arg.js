@@ -1,7 +1,11 @@
 #!/usr/bin/env node
 /* eslint-disable node/shebang */
 /* eslint-disable no-undef */
-require('../../')
+
+const yargs = require('../../');
+const {hideBin} = require('../../helpers/helpers.mjs')
+
+yargs(hideBin(process.argv))
   .option('foo', {
     nargs: 1,
   })

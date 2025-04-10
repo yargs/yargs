@@ -128,12 +128,14 @@ const kRunYargsParserAndExecuteCommands = Symbol(
 const kRunValidation = Symbol('runValidation');
 const kSetHasOutput = Symbol('setHasOutput');
 const kTrackManuallySetKeys = Symbol('kTrackManuallySetKeys');
+const DEFAULT_LOCALE = 'en_US';
+
 export interface YargsInternalMethods {
   getCommandInstance(): CommandInstance;
   getContext(): Context;
   getHasOutput(): boolean;
   getLoggerInstance(): LoggerInstance;
-  getParseContext(): Object;
+  getParseContext(): object;
   getParserConfiguration(): Configuration;
   getUsageConfiguration(): UsageConfiguration;
   getUsageInstance(): UsageInstance;
@@ -227,6 +229,11 @@ export class YargsInstance {
     this.#options = this!.#options;
     this.#options.showHiddenOpt = this.#defaultShowHiddenOpt;
     this.#logger = this[kCreateLogger]();
+    // y18n is a singleton intentionally, to prevent locales
+    // from being loaded multiple times off disk. We reset
+    // the language code whenever a new YargsInstance
+    // is created mainly for unit tests.
+    this.#shim.y18n.setLocale(DEFAULT_LOCALE);
   }
   addHelpOpt(opt?: string | false, msg?: string): YargsInstance {
     const defaultHelpOpt = 'help';
@@ -1615,11 +1622,8 @@ export class YargsInstance {
     let obj = {};
     try {
       let startDir = rootPath || this.#shim.mainFilename;
-
-      // When called in an environment that lacks require.main.filename, such as a jest test runner,
-      // startDir is already process.cwd(), and should not be shortened.
-      // Whether or not it is _actually_ a directory (e.g., extensionless bin) is irrelevant, find-up handles it.
-      if (!rootPath && this.#shim.path.extname(startDir)) {
+      // If a file path is provided for root, remove the file and keep path.
+      if (this.#shim.path.extname(startDir)) {
         startDir = this.#shim.path.dirname(startDir);
       }
 
@@ -1656,11 +1660,11 @@ export class YargsInstance {
       | Exclude<DictionaryKeyof<Options>, DictionaryKeyof<Options, any[]>>
       | 'default',
     K extends keyof Options[T] & string = keyof Options[T] & string,
-    V extends ValueOf<Options[T]> = ValueOf<Options[T]>
+    V extends ValueOf<Options[T]> = ValueOf<Options[T]>,
   >(
     builder: (key: K, value: V, ...otherArgs: any[]) => YargsInstance,
     type: T,
-    key: K | K[] | {[key in K]: V},
+    key: K | K[] | {[key in K]: V | undefined},
     value?: V
   ) {
     this[kPopulateParserHintDictionary]<T, K, V>(
@@ -1678,7 +1682,7 @@ export class YargsInstance {
     K extends keyof Options[T] & string = keyof Options[T] & string,
     V extends ValueOf<ValueOf<Options[T]>> | ValueOf<ValueOf<Options[T]>>[] =
       | ValueOf<ValueOf<Options[T]>>
-      | ValueOf<ValueOf<Options[T]>>[]
+      | ValueOf<ValueOf<Options[T]>>[],
   >(
     builder: (key: K, value: V, ...otherArgs: any[]) => YargsInstance,
     type: T,
@@ -1700,11 +1704,11 @@ export class YargsInstance {
   [kPopulateParserHintDictionary]<
     T extends keyof Options,
     K extends keyof Options[T],
-    V
+    V,
   >(
     builder: (key: K, value: V, ...otherArgs: any[]) => YargsInstance,
     type: T,
-    key: K | K[] | {[key in K]: V},
+    key: K | K[] | {[key in K]: V | undefined},
     value: V | undefined,
     singleKeyHandler: (type: T, key: K, value?: V) => void
   ) {
@@ -1813,7 +1817,7 @@ export class YargsInstance {
   [kGetLoggerInstance](): LoggerInstance {
     return this.#logger;
   }
-  [kGetParseContext](): Object {
+  [kGetParseContext](): object {
     return this.#parseContext || {};
   }
   [kGetUsageInstance](): UsageInstance {
@@ -1876,15 +1880,18 @@ export class YargsInstance {
     // add all groups not set to local to preserved groups
     Object.assign(
       this.#preservedGroups,
-      Object.keys(this.#groups).reduce((acc, groupName) => {
-        const keys = this.#groups[groupName].filter(
-          key => !(key in localLookup)
-        );
-        if (keys.length > 0) {
-          acc[groupName] = keys;
-        }
-        return acc;
-      }, {} as Dictionary<string[]>)
+      Object.keys(this.#groups).reduce(
+        (acc, groupName) => {
+          const keys = this.#groups[groupName].filter(
+            key => !(key in localLookup)
+          );
+          if (keys.length > 0) {
+            acc[groupName] = keys;
+          }
+          return acc;
+        },
+        {} as Dictionary<string[]>
+      )
     );
     // groups can now be reset
     this.#groups = {};

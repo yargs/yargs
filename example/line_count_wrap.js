@@ -13,7 +13,7 @@ var argv = require('yargs/yargs')(process.argv.slice(2))
     .default('b', 10)
     .describe('x', 'Super-secret optional parameter which is secret')
     .default('x', '')
-    .argv
+    .parse()
 ;
 
 var fs = require('fs');

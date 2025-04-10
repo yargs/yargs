@@ -1,10 +1,12 @@
 'use strict';
-const Hash = require('hashish');
-const {format} = require('util');
+import * as HashModule from 'hashish';
+import {format} from 'util';
+
+const Hash = HashModule.default;
 
 // capture terminal output, so that we might
 // assert against it.
-exports.checkOutput = function checkOutput(f, argv, cb) {
+export function checkOutput(f, argv, cb) {
   let exit = false;
   let exitCode = 0;
   const _exit = process.exit;
@@ -15,6 +17,7 @@ exports.checkOutput = function checkOutput(f, argv, cb) {
   const _error = console.error;
   const _log = console.log;
   const _warn = console.warn;
+
 
   process.exit = code => {
     exit = true;
