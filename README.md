@@ -59,8 +59,8 @@ npm i yargs@next
 
 ```javascript
 #!/usr/bin/env node
-const yargs = require('yargs/yargs')
-const { hideBin } = require('yargs/helpers')
+import yargs from 'yargs';
+import { hideBin } from 'yargs/helpers';
 const argv = yargs(hideBin(process.argv)).parse()
 
 if (argv.ships > 3 && argv.distance < 53.5) {
@@ -84,8 +84,8 @@ Retreat from the xupptumblers!
 
 ```javascript
 #!/usr/bin/env node
-const yargs = require('yargs/yargs')
-const { hideBin } = require('yargs/helpers')
+import yargs from 'yargs';
+import { hideBin } from 'yargs/helpers';
 
 yargs(hideBin(process.argv))
   .command('serve [port]', 'start the server', (yargs) => {
@@ -125,8 +125,8 @@ See usage examples in [docs](/docs/typescript.md).
 As of `v16`, `yargs` supports [Deno](https://github.com/denoland/deno):
 
 ```typescript
-import yargs from 'https://deno.land/x/yargs/deno.ts'
-import { Arguments } from 'https://deno.land/x/yargs/deno-types.ts'
+import yargs from 'https://deno.land/x/yargs@v17.7.2-deno/deno.ts'
+import { Arguments } from 'https://deno.land/x/yargs@v17.7.2-deno/deno-types.ts'
 
 yargs(Deno.args)
   .command('download <files...>', 'download a list of files', (yargs: any) => {
@@ -141,21 +141,7 @@ yargs(Deno.args)
   .parse()
 ```
 
-### ESM
-
-As of `v16`,`yargs` supports ESM imports:
-
-```js
-import yargs from 'yargs'
-import { hideBin } from 'yargs/helpers'
-
-yargs(hideBin(process.argv))
-  .command('curl <url>', 'fetch the contents of the URL', () => {}, (argv) => {
-    console.info(argv)
-  })
-  .demandCommand(1)
-  .parse()
-```
+> Note: If you use version tags in url then you also have to add `-deno` flag on the end, like `@17.7.2-deno`
 
 ### Usage in Browser
 
@@ -182,7 +168,6 @@ Having problems? want to contribute? join our [community slack](http://devtoolsc
   * [Composing Your App Using Commands](/docs/advanced.md#commands)
   * [Building Configurable CLI Apps](/docs/advanced.md#configuration)
   * [Customizing Yargs' Parser](/docs/advanced.md#customizing)
-  * [Bundling yargs](/docs/bundling.md)
 * [Contributing](/contributing.md)
 
 ## Supported Node.js Versions
