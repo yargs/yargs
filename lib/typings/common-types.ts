@@ -117,6 +117,10 @@ export interface PlatformShim {
     stdColumns: number | null;
   };
   readFileSync: (path: string, encoding: string) => string;
+  readdirSync: (
+    path: string,
+    opts: object
+  ) => Array<string | Buffer<ArrayBufferLike>>[];
   require: RequireType;
   y18n: Y18N;
 }

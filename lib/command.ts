@@ -25,7 +25,6 @@ import {
   DetailedArguments,
 } from './yargs-factory.js';
 import {maybeAsyncResult} from './utils/maybe-async-result.js';
-import {readdirSync} from 'node:fs';
 import {join, dirname} from 'node:path';
 
 const DEFAULT_MARKER = /(^\*)|(^\$0)/;
@@ -64,7 +63,7 @@ export class CommandInstance {
     opts = opts || {};
     this.requireCache.add(callerFile);
     const fullDirPath = join(dirname(callerFile), dir);
-    const files = readdirSync(fullDirPath, {
+    const files = this.shim.readdirSync(fullDirPath, {
       recursive: opts.recurse ? true : false,
     });
     // exclude 'json', 'coffee' from require-directory defaults
@@ -72,7 +71,7 @@ export class CommandInstance {
     // allow consumer to define their own visitor function
     const visit = typeof opts.visit === 'function' ? opts.visit : (o: any) => o;
     for (const fileb of files) {
-      const file = fileb.toString('utf8');
+      const file = fileb.toString();
 
       // Support include / exclude logic from require-directory.
       if (opts.exclude) {

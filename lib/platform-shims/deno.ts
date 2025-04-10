@@ -94,6 +94,9 @@ export default {
     stdColumns: columns ?? null,
   },
   readFileSync: Deno.readTextFileSync,
+  readdirSync: () => {
+    return [];
+  },
   require: () => {
     throw new YError(REQUIRE_ERROR);
   },
