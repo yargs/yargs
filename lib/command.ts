@@ -25,7 +25,6 @@ import {
   DetailedArguments,
 } from './yargs-factory.js';
 import {maybeAsyncResult} from './utils/maybe-async-result.js';
-import {join, dirname} from 'node:path';
 
 const DEFAULT_MARKER = /(^\*)|(^\$0)/;
 export type DefinitionOrCommandName = string | CommandHandlerDefinition;
@@ -62,7 +61,10 @@ export class CommandInstance {
   ): void {
     opts = opts || {};
     this.requireCache.add(callerFile);
-    const fullDirPath = join(dirname(callerFile), dir);
+    const fullDirPath = this.shim.path.join(
+      this.shim.path.dirname(callerFile),
+      dir
+    );
     const files = this.shim.readdirSync(fullDirPath, {
       recursive: opts.recurse ? true : false,
     });
@@ -98,7 +100,7 @@ export class CommandInstance {
         if (file.endsWith(ext)) supportedExtension = true;
       }
       if (supportedExtension) {
-        const joined = join(fullDirPath, file);
+        const joined = this.shim.path.join(fullDirPath, file);
         const module = req(joined);
         const visited = visit(module, joined, file);
         if (visited) {

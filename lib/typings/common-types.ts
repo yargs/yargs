@@ -106,6 +106,7 @@ export interface PlatformShim {
     dirname: (path: string) => string;
     relative: (p1: string, p2: string) => string;
     resolve: (p1: string, p2: string) => string;
+    join: (p1: string, p2: string) => string;
   };
   process: {
     argv: () => string[];

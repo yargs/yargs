@@ -9,6 +9,7 @@ import {
   dirname,
   extname,
   posix,
+  join,
 } from 'https://deno.land/std/path/mod.ts';
 
 import cliui from 'https://deno.land/x/cliui@v7.0.4-deno/deno.ts';
@@ -54,6 +55,7 @@ const path = {
     }
   },
   resolve: posix.resolve,
+  join,
 };
 
 // TODO: replace with Deno.consoleSize(Deno.stdout.rid)

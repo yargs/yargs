@@ -6,7 +6,7 @@ the browser:
 
 ```html
 <script type="module">
-  import Yargs from 'https://unpkg.com/yargs@16.0.0-beta.1/browser.mjs';
+  import Yargs from 'https://unpkg.com/yargs@18.0.0-browser.2/browser.mjs';
   const yargs = Yargs()
     .scriptName('>')
     .command('clear', 'clear the output window', () => {}, () => {
@@ -23,4 +23,4 @@ the browser:
 ```
 
 A full example can be found in [example/yargs.html](/example/yargs.html), or
-on [jsfiddle](https://jsfiddle.net/bencoe/m9fv2oet/3/).
+on [jsfiddle](https://jsfiddle.net/juL5zonp/).
