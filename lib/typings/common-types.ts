@@ -106,6 +106,7 @@ export interface PlatformShim {
     dirname: (path: string) => string;
     relative: (p1: string, p2: string) => string;
     resolve: (p1: string, p2: string) => string;
+    join: (p1: string, p2: string) => string;
   };
   process: {
     argv: () => string[];
@@ -117,6 +118,10 @@ export interface PlatformShim {
     stdColumns: number | null;
   };
   readFileSync: (path: string, encoding: string) => string;
+  readdirSync: (
+    path: string,
+    opts: object
+  ) => Array<string | Buffer<ArrayBufferLike>>[];
   require: RequireType;
   y18n: Y18N;
 }
