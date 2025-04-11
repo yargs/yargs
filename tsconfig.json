@@ -7,14 +7,13 @@
     "target": "es2019",
     "lib": ["es2019", "es2020.bigint", "es2020.string", "es2020.symbol.wellknown"],
     "moduleResolution": "node",
-    "module": "es2015",
+    "module": "es2020",
     "removeComments": true
   },
   "include": [
     "lib/**/*.ts"
   ],
   "exclude": [
-    "lib/cjs.ts",
     "lib/platform-shims/*.ts"
   ]
 }

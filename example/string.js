@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 var argv = require('yargs/yargs')(process.argv.slice(2))
     .string('x', 'y')
-    .argv
+    .parse()
 ;
 console.dir([ argv.x, argv.y ]);
 

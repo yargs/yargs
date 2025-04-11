@@ -2,6 +2,6 @@
 var argv = require('yargs/yargs')(process.argv.slice(2))
     .default('x', 10)
     .default('y', 10)
-    .argv
+    .parse()
 ;
 console.log(argv.x + argv.y);

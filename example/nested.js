@@ -43,7 +43,7 @@ const argv = require('yargs/yargs')(process.argv.slice(2)).command(
           console.log(`The sum of numbers is ${sum}`);
         }
       )
-).argv;
+).parse();
 
 console.log(argv);
 
@@ -51,4 +51,4 @@ function isArrayOfNumbers(arr) {
   return Array.isArray(arr) && arr.every(n => typeof n === 'number');
 }
 
-// NOTE: ".argv" and ".parse()" should only be used at top level, not inside builder functions.
+// NOTE: ".parse()" should only be used at top level, not inside builder functions.
