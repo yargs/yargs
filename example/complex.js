@@ -27,7 +27,7 @@ var argv = require('yargs/yargs')(process.argv.slice(2))
   // disable showing help on failures, provide a final message
   // to display for errors.
   .showHelpOnFail(false, 'whoops, something went wrong! run with --help')
-  .argv;
+  .parse();
 
 // the parsed data is stored in argv.
 console.log(argv);

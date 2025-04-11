@@ -69,6 +69,8 @@ export interface RequireDirectoryOptions {
   extensions?: ReadonlyArray<string>;
   visit?: (commandObject: any, pathToFile: string, filename?: string) => any;
   recurse?: boolean;
+  include?: RegExp | ((fileName: string) => boolean);
+  exclude?: RegExp | ((fileName: string) => boolean);
 }
 
 // Dependencies that might vary between CJS, ESM, and Deno are isolated:

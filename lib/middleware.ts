@@ -119,9 +119,10 @@ export function applyMiddleware(
 }
 
 export interface MiddlewareCallback {
-  (argv: Arguments, yargs: YargsInstance):
-    | Partial<Arguments>
-    | Promise<Partial<Arguments>>;
+  (
+    argv: Arguments,
+    yargs: YargsInstance
+  ): Partial<Arguments> | Promise<Partial<Arguments>>;
 }
 
 export interface Middleware extends MiddlewareCallback {
