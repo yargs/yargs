@@ -314,13 +314,13 @@ Directory structure:
 
 ```
 myapp/
-├─ cli.js
+├─ cli.mjs
 └─ cmds/
-   ├─ init.js
-   ├─ remote.js
+   ├─ init.mjs
+   ├─ remote.mjs
    └─ remote_cmds/
-      ├─ add.js
-      └─ prune.js
+      ├─ add.mjs
+      └─ prune.mjs
 ```
 
 cli.mjs:
@@ -402,7 +402,7 @@ export const commands = [a, b];
 
 This index will then be imported and registered with your CLI:
 
-cli.js:
+cli.mjs:
 
 ```js
 #!/usr/bin/env node
