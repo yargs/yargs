@@ -290,11 +290,12 @@ can either move your module to a different directory or use the `exclude` or
 
 - `include`: RegExp or function
 
-    Allow list certain modules. See [`require-directory`](https://www.npmjs.com/package/require-directory) for details.
+
+    Allow list certain modules. Either a regex or callback can be provided. `true` = load the file.
 
 - `exclude`: RegExp or function
 
-    Block list certain modules. See [`require-directory`](https://www.npmjs.com/package/require-directory) for details.
+    Block list certain modules. Either a regex or callback can be provided. `false` = do not load the file.
 
 ### Example command hierarchy using `.commandDir()`
 
@@ -322,7 +323,7 @@ myapp/
       └─ prune.js
 ```
 
-cli.js:
+cli.mjs:
 
 ```js
 #!/usr/bin/env node
@@ -335,51 +336,50 @@ yargs(hideBin(process.argv))
   .parse()
 ```
 
-cmds/init.js:
+cmds/init.mjs:
 
 ```js
-exports.command = 'init [dir]'
-exports.desc = 'Create an empty repo'
-exports.builder = {
+export const command = 'init [dir]'
+export const desc = 'Create an empty repo'
+export const builder = {
   dir: {
     default: '.'
   }
 }
-exports.handler = function (argv) {
+export function handler (argv) {
   console.log('init called for dir', argv.dir)
 }
 ```
 
-cmds/remote.js:
+cmds/remote.mjs:
 
 ```js
-import yargs from 'yargs';
-exports.command = 'remote <command>'
-exports.desc = 'Manage set of tracked repos'
-exports.builder = function (yargs) {
+export const command = 'remote <command>'
+export const desc = 'Manage set of tracked repos'
+export const builder = function (yargs) {
   return yargs().commandDir('remote_cmds')
 }
-exports.handler = function (argv) {}
+export function handler (argv) {}
 ```
 
-cmds/remote_cmds/add.js:
+cmds/remote_cmds/add.mjs:
 
 ```js
-exports.command = 'add <name> <url>'
-exports.desc = 'Add remote named <name> for repo at url <url>'
-exports.builder = {}
-exports.handler = function (argv) {
+export const command = 'add <name> <url>'
+export const desc = 'Add remote named <name> for repo at url <url>'
+export const builder = {}
+export function handler (argv) {
   console.log('adding remote %s at url %s', argv.name, argv.url)
 }
 ```
 
-cmds/remote_cmds/prune.js:
+cmds/remote_cmds/prune.mjs:
 
 ```js
-exports.command = 'prune <name> [names..]'
-exports.desc = 'Delete tracked branches gone stale for remotes'
-exports.builder = {}
-exports.handler = function (argv) {
+export const command = 'prune <name> [names..]'
+export const desc = 'Delete tracked branches gone stale for remotes'
+export const builder = {}
+export function handler (argv) {
   console.log('pruning remotes %s', [].concat(argv.name).concat(argv.names).join(', '))
 }
 ```

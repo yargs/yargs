@@ -2452,5 +2452,29 @@ describe('Command', () => {
           '  --version  Show version number  [boolean]',
         ]);
     });
+
+    it('allows commands files to be written as ESM modules', () => {
+      const r = checkOutput(() =>
+        yargs('remote --help')
+          .wrap(null)
+          .commandDir('fixtures/esm-command')
+          .parse()
+      );
+      r.exit.should.equal(true);
+      r.errors.length.should.equal(0);
+      r.logs
+        .join('\n')
+        .split(/\n+/)
+        .should.deep.equal([
+          'usage remote <command>',
+          'Manage set of tracked repos',
+          'Commands:',
+          '  usage remote add <name> <url>        Add remote named <name> for repo at url <url>',
+          '  usage remote prune <name> [names..]  Delete tracked branches gone stale for remotes',
+          'Options:',
+          '  --help     Show help  [boolean]',
+          '  --version  Show version number  [boolean]',
+        ]);
+    });
   });
 });
