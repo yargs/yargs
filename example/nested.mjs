@@ -1,7 +1,7 @@
-const argv = require('yargs/yargs')(process.argv.slice(2)).command(
-  'math',
-  'math description',
-  yargs =>
+import yargs from 'yargs';
+
+const argv = yargs(process.argv.slice(2))
+  .command('math', 'math description', yargs =>
     yargs
       .command(
         'add <a> <b>',
@@ -43,7 +43,8 @@ const argv = require('yargs/yargs')(process.argv.slice(2)).command(
           console.log(`The sum of numbers is ${sum}`);
         }
       )
-).parse();
+  )
+  .parse();
 
 console.log(argv);
 
