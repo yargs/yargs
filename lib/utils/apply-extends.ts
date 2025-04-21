@@ -1,7 +1,5 @@
 import {Dictionary, PlatformShim} from '../typings/common-types.js';
 import {YError} from '../yerror.js';
-import {createRequire} from 'node:module';
-const require = createRequire(import.meta.url);
 
 let previouslyVisitedConfigs: string[] = [];
 let shim: PlatformShim;
@@ -36,7 +34,7 @@ export function applyExtends(
 
     defaultConfig = isPath
       ? JSON.parse(shim.readFileSync(pathToDefault, 'utf8'))
-      : require(config.extends);
+      : _shim.require(config.extends);
     delete config.extends;
     defaultConfig = applyExtends(
       defaultConfig,
