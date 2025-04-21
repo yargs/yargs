@@ -1,21 +1,25 @@
 #!/usr/bin/env node
-var yargs = require('yargs/yargs')(process.argv.slice(2));
+import yargs from 'yargs';
 
-var argv = yargs.usage('This is my awesome program')
+const y = yargs(process.argv.slice(2));
+
+const argv = y
+  .usage('This is my awesome program')
   .options({
-    'about': {
+    about: {
       description: 'Provide some details about the author of this program',
       required: true,
       alias: 'a',
     },
-    'info': {
+    info: {
       description: 'Provide some information about the node.js agains!!!!!!',
       boolean: true,
-      alias: 'i'
-    }
-  }).parse();
+      alias: 'i',
+    },
+  })
+  .parse();
 
-yargs.showHelp();
+y.showHelp();
 
 console.log('\n\nInspecting options');
 console.dir(argv);
