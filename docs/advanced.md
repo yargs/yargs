@@ -291,11 +291,11 @@ can either move your module to a different directory or use the `exclude` or
 - `include`: RegExp or function
 
 
-    Allow list certain modules. Either a regex or callback can be provided. `true` = load the file.
+    Allow list certain modules. Either a regex or callback can be provided. Return `true` from the callback to load the file.
 
 - `exclude`: RegExp or function
 
-    Block list certain modules. Either a regex or callback can be provided. `false` = do not load the file.
+    Block list certain modules. Either a regex or callback can be provided. Return `true` from the callback to skip the file.
 
 ### Example command hierarchy using `.commandDir()`
 
