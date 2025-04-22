@@ -252,7 +252,7 @@ This example uses [jest](https://github.com/facebook/jest) as a test runner, but
 .commandDir(directory, [opts])
 ------------------------------
 
-_Note: `commandDir()` does not work with Deno, see [hierarchy using index.mjs](/docs/advanced.md#esm-hierarchy) for an example of building a complex nested CLI using ESM._
+_Note: `commandDir()` does not work with Deno, see [hierarchy using index.mjs](/docs/advanced.md#esm-hierarchy) for an example of building a complex nested CLI using an array of modules._
 
 Apply command modules from a directory relative to the module calling this method.
 
@@ -290,11 +290,12 @@ can either move your module to a different directory or use the `exclude` or
 
 - `include`: RegExp or function
 
-    Allow list certain modules. See [`require-directory`](https://www.npmjs.com/package/require-directory) for details.
+
+    Allow list certain modules. Either a regex or callback can be provided. Return `true` from the callback to load the file.
 
 - `exclude`: RegExp or function
 
-    Block list certain modules. See [`require-directory`](https://www.npmjs.com/package/require-directory) for details.
+    Block list certain modules. Either a regex or callback can be provided. Return `true` from the callback to skip the file.
 
 ### Example command hierarchy using `.commandDir()`
 
@@ -313,16 +314,16 @@ Directory structure:
 
 ```
 myapp/
-├─ cli.js
+├─ cli.mjs
 └─ cmds/
-   ├─ init.js
-   ├─ remote.js
+   ├─ init.mjs
+   ├─ remote.mjs
    └─ remote_cmds/
-      ├─ add.js
-      └─ prune.js
+      ├─ add.mjs
+      └─ prune.mjs
 ```
 
-cli.js:
+cli.mjs:
 
 ```js
 #!/usr/bin/env node
@@ -335,51 +336,50 @@ yargs(hideBin(process.argv))
   .parse()
 ```
 
-cmds/init.js:
+cmds/init.mjs:
 
 ```js
-exports.command = 'init [dir]'
-exports.desc = 'Create an empty repo'
-exports.builder = {
+export const command = 'init [dir]'
+export const desc = 'Create an empty repo'
+export const builder = {
   dir: {
     default: '.'
   }
 }
-exports.handler = function (argv) {
+export function handler (argv) {
   console.log('init called for dir', argv.dir)
 }
 ```
 
-cmds/remote.js:
+cmds/remote.mjs:
 
 ```js
-import yargs from 'yargs';
-exports.command = 'remote <command>'
-exports.desc = 'Manage set of tracked repos'
-exports.builder = function (yargs) {
+export const command = 'remote <command>'
+export const desc = 'Manage set of tracked repos'
+export function builder (yargs) {
   return yargs().commandDir('remote_cmds')
 }
-exports.handler = function (argv) {}
+export function handler (argv) {}
 ```
 
-cmds/remote_cmds/add.js:
+cmds/remote_cmds/add.mjs:
 
 ```js
-exports.command = 'add <name> <url>'
-exports.desc = 'Add remote named <name> for repo at url <url>'
-exports.builder = {}
-exports.handler = function (argv) {
+export const command = 'add <name> <url>'
+export const desc = 'Add remote named <name> for repo at url <url>'
+export const builder = {}
+export function handler (argv) {
   console.log('adding remote %s at url %s', argv.name, argv.url)
 }
 ```
 
-cmds/remote_cmds/prune.js:
+cmds/remote_cmds/prune.mjs:
 
 ```js
-exports.command = 'prune <name> [names..]'
-exports.desc = 'Delete tracked branches gone stale for remotes'
-exports.builder = {}
-exports.handler = function (argv) {
+export const command = 'prune <name> [names..]'
+export const desc = 'Delete tracked branches gone stale for remotes'
+export const builder = {}
+export function handler (argv) {
   console.log('pruning remotes %s', [].concat(argv.name).concat(argv.names).join(', '))
 }
 ```
@@ -387,8 +387,8 @@ exports.handler = function (argv) {
 <a name="esm-hierarchy"></a>
 ### Example command hierarchy using index.mjs
 
-To support creating a complex nested CLI when using ESM, the method
-`.command()` was extended to accept an array of command modules.
+The method
+`.command()` accepts an array of command modules.
 Rather than using `.commandDir()`, create an `index.mjs` in each command
 directory with a list of the commands:
 
@@ -402,7 +402,7 @@ export const commands = [a, b];
 
 This index will then be imported and registered with your CLI:
 
-cli.js:
+cli.mjs:
 
 ```js
 #!/usr/bin/env node
