@@ -252,7 +252,7 @@ This example uses [jest](https://github.com/facebook/jest) as a test runner, but
 .commandDir(directory, [opts])
 ------------------------------
 
-_Note: `commandDir()` does not work with Deno, see [hierarchy using index.mjs](/docs/advanced.md#esm-hierarchy) for an example of building a complex nested CLI using ESM._
+_Note: `commandDir()` does not work with Deno, see [hierarchy using index.mjs](/docs/advanced.md#esm-hierarchy) for an example of building a complex nested CLI using an array of modules._
 
 Apply command modules from a directory relative to the module calling this method.
 
@@ -387,8 +387,8 @@ export function handler (argv) {
 <a name="esm-hierarchy"></a>
 ### Example command hierarchy using index.mjs
 
-To support creating a complex nested CLI when using ESM, the method
-`.command()` was extended to accept an array of command modules.
+The method
+`.command()` accepts an array of command modules.
 Rather than using `.commandDir()`, create an `index.mjs` in each command
 directory with a list of the commands:
 
