@@ -49,6 +49,10 @@ _{{app_name}}_yargs_completions()
     _default
   fi
 }
-compdef _{{app_name}}_yargs_completions {{app_name}}
+if [[ "'\${zsh_eval_context[-1]}" == "loadautofunc" ]]; then
+  _{{app_name}}_yargs_completions "$@"
+else
+  compdef _{{app_name}}_yargs_completions {{app_name}}
+fi
 ###-end-{{app_name}}-completions-###
 `;
