@@ -13,7 +13,6 @@
 [![js-standard-style][standard-image]][standard-url]
 [![Coverage][coverage-image]][coverage-url]
 [![Conventional Commits][conventional-commits-image]][conventional-commits-url]
-[![Slack][slack-image]][slack-url]
 
 ## Description
 Yargs helps you build interactive command line tools, by parsing arguments and generating an elegant user interface.
@@ -147,10 +146,6 @@ yargs(Deno.args)
 
 See examples of using yargs in the browser in [docs](/docs/browser.md).
 
-## Community
-
-Having problems? want to contribute? join our [community slack](http://devtoolscommunity.herokuapp.com).
-
 ## Documentation
 
 ### Table of Contents
@@ -182,8 +177,6 @@ post on why we think this is important](https://medium.com/the-node-js-collectio
 [standard-url]: http://standardjs.com/
 [conventional-commits-image]: https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg
 [conventional-commits-url]: https://conventionalcommits.org/
-[slack-image]: http://devtoolscommunity.herokuapp.com/badge.svg
-[slack-url]: http://devtoolscommunity.herokuapp.com
 [type-definitions]: https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/yargs
 [coverage-image]: https://img.shields.io/nycrc/yargs/yargs
 [coverage-url]: https://github.com/yargs/yargs/blob/main/.nycrc
