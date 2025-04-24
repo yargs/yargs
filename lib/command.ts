@@ -61,7 +61,7 @@ export class CommandInstance {
   ): void {
     opts = opts || {};
     this.requireCache.add(callerFile);
-    const fullDirPath = this.shim.path.join(
+    const fullDirPath = this.shim.path.resolve(
       this.shim.path.dirname(callerFile),
       dir
     );

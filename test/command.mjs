@@ -5,7 +5,7 @@ import * as assert from 'assert';
 import yargs from '../index.mjs';
 import {expect, should} from 'chai';
 import {checkOutput} from './helpers/utils.mjs';
-import {join} from 'node:path';
+import {join, resolve} from 'node:path';
 
 should();
 
@@ -2185,6 +2185,28 @@ describe('Command', () => {
   });
 
   describe('commandDir', () => {
+    it('supports absolute dirs', () => {
+      const absoluteDir = resolve('test/fixtures/cmddir');
+      const r = checkOutput(() => {
+        yargs('--help').wrap(null).commandDir(absoluteDir).parse();
+      });
+      r.exit.should.equal(true);
+      r.exitCode.should.equal(0);
+      r.errors.length.should.equal(0);
+      r.should.have.property('logs');
+      r.logs
+        .join('\n')
+        .split(/\n+/)
+        .should.deep.equal([
+          'usage [command]',
+          'Commands:',
+          '  usage dream [command] [opts]  Go to sleep and dream',
+          'Options:',
+          '  --help     Show help  [boolean]',
+          '  --version  Show version number  [boolean]',
+        ]);
+    });
+
     it('supports relative dirs', () => {
       const r = checkOutput(() =>
         yargs('--help').wrap(null).commandDir('fixtures/cmddir').parse()
