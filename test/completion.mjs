@@ -1200,7 +1200,7 @@ describe('Completion', () => {
       it(`should support ${Object.keys(configuration).join(' ')}`, () => {
         process.env.SHELL = '/bin/bash';
 
-        const r = checkUsage(
+        const r = checkOutput(
           () =>
             yargs(['--get-yargs-completions', 'a'])
               .parserConfiguration(configuration)
