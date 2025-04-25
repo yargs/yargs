@@ -1189,4 +1189,26 @@ describe('Completion', () => {
       });
     });
   });
+
+  describe('parser-configuration', () => {
+    const configurations = [
+      {'strip-dashed': true},
+      {'camel-case-expansion': true, 'strip-aliased': true},
+    ];
+
+    for (const configuration of configurations) {
+      it(`should support ${Object.keys(configuration).join(' ')}`, () => {
+        process.env.SHELL = '/bin/bash';
+
+        const r = checkOutput(
+          () =>
+            yargs(['--get-yargs-completions', 'a'])
+              .parserConfiguration(configuration)
+              .command('apple', 'banana').argv
+        );
+
+        r.logs.should.include('apple');
+      });
+    }
+  });
 });
