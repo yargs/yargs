@@ -102,18 +102,19 @@ export class CommandInstance {
       if (supportedExtension) {
         const joined = this.shim.path.join(fullDirPath, file);
         const module = req(joined);
-        const visited = visit(module, joined, file);
+        const extendableModule = {...module};
+        const visited = visit(extendableModule, joined, file);
         if (visited) {
           if (this.requireCache.has(joined)) continue;
           else this.requireCache.add(joined);
           // Infer command from directory structure if none is given:
-          if (!module.command) {
-            module.command = this.shim.path.basename(
+          if (!extendableModule.command) {
+            extendableModule.command = this.shim.path.basename(
               joined,
               this.shim.path.extname(joined)
             );
           }
-          this.addHandler(module);
+          this.addHandler(extendableModule);
         }
       }
     }
