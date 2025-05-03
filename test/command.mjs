@@ -2297,15 +2297,15 @@ describe('Command', () => {
           })
           .parse()
       );
-      Object.setPrototypeOf(commandObject, Object.prototype);
-      commandObject.should.have
-        .property('command')
+
+      expect(commandObject)
+        .to.have.property('command')
         .and.equal('dream [command] [opts]');
-      commandObject.should.have
-        .property('desc')
+      expect(commandObject)
+        .to.have.property('desc')
         .and.equal('Go to sleep and dream');
-      commandObject.should.have.property('builder');
-      commandObject.should.have.property('handler');
+      expect(commandObject).to.have.property('builder');
+      expect(commandObject).to.have.property('handler');
       pathToFile.should.contain(join('test', 'fixtures', 'cmddir', 'dream.js'));
       filename.should.equal('dream.js');
       r.exit.should.equal(true);
