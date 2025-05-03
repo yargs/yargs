@@ -102,7 +102,10 @@ export class CommandInstance {
       if (supportedExtension) {
         const joined = this.shim.path.join(fullDirPath, file);
         const module = req(joined);
-        const extendableModule = {...module};
+        const extendableModule = Object.create(
+          null,
+          Object.getOwnPropertyDescriptors({...module})
+        );
         const visited = visit(extendableModule, joined, file);
         if (visited) {
           if (this.requireCache.has(joined)) continue;

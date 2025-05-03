@@ -2297,6 +2297,7 @@ describe('Command', () => {
           })
           .parse()
       );
+      Object.setPrototypeOf(commandObject, Object.prototype);
       commandObject.should.have
         .property('command')
         .and.equal('dream [command] [opts]');
