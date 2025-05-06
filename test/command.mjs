@@ -2297,14 +2297,15 @@ describe('Command', () => {
           })
           .parse()
       );
-      commandObject.should.have
-        .property('command')
+
+      expect(commandObject)
+        .to.have.property('command')
         .and.equal('dream [command] [opts]');
-      commandObject.should.have
-        .property('desc')
+      expect(commandObject)
+        .to.have.property('desc')
         .and.equal('Go to sleep and dream');
-      commandObject.should.have.property('builder');
-      commandObject.should.have.property('handler');
+      expect(commandObject).to.have.property('builder');
+      expect(commandObject).to.have.property('handler');
       pathToFile.should.contain(join('test', 'fixtures', 'cmddir', 'dream.js'));
       filename.should.equal('dream.js');
       r.exit.should.equal(true);
@@ -2480,6 +2481,37 @@ describe('Command', () => {
         yargs('remote --help')
           .wrap(null)
           .commandDir('fixtures/esm-command')
+          .parse()
+      );
+      r.exit.should.equal(true);
+      r.errors.length.should.equal(0);
+      r.logs
+        .join('\n')
+        .split(/\n+/)
+        .should.deep.equal([
+          'usage remote <command>',
+          'Manage set of tracked repos',
+          'Commands:',
+          '  usage remote add <name> <url>        Add remote named <name> for repo at url <url>',
+          '  usage remote prune <name> [names..]  Delete tracked branches gone stale for remotes',
+          'Options:',
+          '  --help     Show help  [boolean]',
+          '  --version  Show version number  [boolean]',
+        ]);
+    });
+
+    it('allows ESM modules commands to be extensible using visit option', () => {
+      const r = checkOutput(() =>
+        yargs('remote --help')
+          .wrap(null)
+          .commandDir('fixtures/esm-command', {
+            visit(_commandObject, _pathToFile, _filename) {
+              if (!_commandObject.middlewares) {
+                _commandObject.middlewares = [];
+              }
+              return true;
+            },
+          })
           .parse()
       );
       r.exit.should.equal(true);
