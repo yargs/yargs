@@ -40,7 +40,7 @@
     "get-caller-file": "^2.0.5",
     "string-width": "^7.2.0",
     "y18n": "^5.0.5",
-    "yargs-parser": "^21.1.1"
+    "yargs-parser": "^22.0.0"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.26.10",
