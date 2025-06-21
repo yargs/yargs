@@ -1552,7 +1552,9 @@ export class YargsInstance {
     // ignore the node bin, specify this in your
     // bin file with #!/usr/bin/env node
     let default$0: string[];
-    if (/\b(node|iojs|electron|bun)(\.exe)?$/.test(this.#shim.process.argv()[0])) {
+    if (
+      /\b(node|iojs|electron|bun)(\.exe)?$/.test(this.#shim.process.argv()[0])
+    ) {
       default$0 = this.#shim.process.argv().slice(1, 2);
     } else {
       default$0 = this.#shim.process.argv().slice(0, 1);
