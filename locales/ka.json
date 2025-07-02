@@ -1,0 +1,55 @@
+{
+  "Commands:": "ბრძანებები:",
+  "Options:": "მორგება:",
+  "Examples:": "მაგალითები:",
+  "boolean": "ლოგიკური",
+  "count": "დათვლა",
+  "string": "სტრიქონი",
+  "number": "რიცხვი",
+  "array": "მასივი",
+  "required": "აუცილებელია",
+  "default": "ნაგულისხმევი",
+  "default:": "ნაგულისხმევი:",
+  "choices:": "არჩევნები:",
+  "aliases:": "ფსევდონიმები:",
+  "generated-value": "დაგენერირებული-მნიშვნელობა",
+  "Not enough non-option arguments: got %s, need at least %s": {
+    "one": "არასაკმარისი არაპარამეტრული არგუმენტი: მაქვს %s, საჭიროა სულ ცოტა %s",
+    "other": "არასაკმარისი არაპარამეტრული არგუმენტები: მაქვს %s, საჭიროა სულ ცოტა %s"
+  },
+  "Too many non-option arguments: got %s, maximum of %s": {
+    "one": "მეტისმეტად ბევრი არაპარამეტრული არგუმენტი: მაქვს %s, მაქსიმუმია %s",
+    "other": "მეტისმეტად ბევრი არაპარამეტრული არგუმენტები: მაქვს %s, მაქსიმუმია %s"
+  },
+  "Missing argument value: %s": {
+    "one": "აკლია არგუმენტის მნიშვნელობა: %s",
+    "other": "აკლია არგუმენტის მნიშვნელობა: %s"
+  },
+  "Missing required argument: %s": {
+    "one": "აკლია აუცილებელი არგუმენტი: %s",
+    "other": "აკლია აუცილებელი არგუმენტი: %s"
+  },
+  "Unknown argument: %s": {
+    "one": "უცნობი არგუმენტი: %s",
+    "other": "უცნობი არგუმენტები: %s"
+  },
+  "Unknown command: %s": {
+    "one": "უცნობი ბრძანება: %s",
+    "other": "უცნობი ბრძანებები: %s"
+  },
+  "Invalid values:": "არასწორი მნიშვნელობები:",
+  "Argument: %s, Given: %s, Choices: %s": "არგუმენტი: %s, მითითებულია: %s, არჩევანი: %s",
+  "Argument check failed: %s": "არგუმენტის შემოწმება ჩავარდა: %s",
+  "Implications failed:": "ამ არგუმენტს დამატებითი არგუმენტი სჭირდება:",
+  "Not enough arguments following: %s": "არასაკმარისი არგუმენტები მოჰყვება: %s",
+  "Invalid JSON config file: %s": "არასწორი JSON კონფიგურაციის ფაილი: %s",
+  "Path to JSON config file": "ბილიკი JSON კონფიგურაციის ფაილამდე",
+  "Show help": "დახმარების ჩვენება",
+  "Show version number": "ვერსიის ნომრის ჩვენება",
+  "Did you mean %s?": "გულისხმობდით %s?",
+  "Arguments %s and %s are mutually exclusive": "არგუმენტები %s და %s ურთიერთგამომრიცხავია",
+  "Positionals:": "პოზიციური არგუმენტები:",
+  "command": "ბრძანება",
+  "deprecated": "მოძველებულია",
+  "deprecated: %s": "მოძველებულია: %s"
+}
