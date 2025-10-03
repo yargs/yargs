@@ -18,7 +18,8 @@ export function applyExtends(
     let pathToDefault: string | null = null;
     if (!isPath) {
       try {
-        pathToDefault = import.meta.resolve(config.extends);
+        const {resolve} = import.meta;
+        pathToDefault = resolve(config.extends);
       } catch (_err) {
         // maybe the module uses key for some other reason,
         // err on side of caution.
