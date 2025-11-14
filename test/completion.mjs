@@ -1339,6 +1339,45 @@ describe('Completion', () => {
         '--bar\tbar flag',
       ]);
     });
+
+    it('completes choices if previous option requires a choice', () => {
+      process.env.SHELL = '/usr/bin/fish';
+      const r = checkOutput(() => {
+        return yargs(['./completion', '--get-yargs-completions', '--fruit'])
+          .options({
+            fruit: {
+              describe: 'fruit option',
+              choices: ['apple', 'banana', 'pear'],
+            },
+            amount: {describe: 'amount', type: 'number'},
+          })
+          .completion().argv;
+      });
+
+      r.logs.should.include('apple');
+      r.logs.should.include('banana');
+      r.logs.should.include('pear');
+    });
+
+    it('completes positional choices', () => {
+      process.env.SHELL = '/usr/bin/fish';
+      const r = checkOutput(() => {
+        return yargs(['./completion', '--get-yargs-completions', 'cmd', 'ap'])
+          .help(false)
+          .version(false)
+          .command('cmd [fruit]', 'fruit command', subYargs => {
+            subYargs.positional('fruit', {
+              describe: 'choose a fruit',
+              choices: ['apple', 'banana', 'pear'],
+            });
+          })
+          .completion().argv;
+      });
+
+      r.logs.should.include('apple');
+      r.logs.should.not.include('banana');
+      r.logs.should.not.include('pear');
+    });
   });
 
   describe('async', () => {
