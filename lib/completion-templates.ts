@@ -56,3 +56,13 @@ else
 fi
 ###-end-{{app_name}}-completions-###
 `;
+
+export const completionFishTemplate = `###-begin-{{app_name}}-completions-###
+#
+# yargs command completion script
+#
+# Installation: {{app_path}} {{completion_command}} > $XDG_CONFIG_HOME/fish/completions/{{app_name}}.fish
+#
+complete -f -c {{app_name}} -a '({{app_path}} --get-yargs-completions (commandline -o)[2..-1])'
+###-end-{{app_name}}-completions-###
+`;
