@@ -1594,7 +1594,7 @@ export class YargsInstance {
       this.#shim.getEnv('LC_MESSAGES') ||
       this.#shim.getEnv('LANG') ||
       this.#shim.getEnv('LANGUAGE') ||
-      'en_US';
+      'en';
     this.locale(locale.replace(/[.:].*/, ''));
   }
   [kGuessVersion](): string {
