@@ -130,12 +130,7 @@ export class Completion implements CompletionInstance {
           !options.hiddenOptions.includes(key) &&
           !this.argsContainKey(args, key, negable)
         ) {
-          this.completeOptionKey(
-            key,
-            completions,
-            current,
-            negable && !!options.default[key]
-          );
+          this.completeOptionKey(key, completions, current, negable);
         }
       });
     }
