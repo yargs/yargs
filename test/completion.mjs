@@ -157,7 +157,7 @@ describe('Completion', () => {
           r.logs.should.include('--bar');
         });
 
-        it('includes flags that have default', () => {
+        it('includes negated flags for all boolean options when boolean-negation is set', () => {
           const r = checkOutput(
             () =>
               yargs([
@@ -193,6 +193,7 @@ describe('Completion', () => {
           r.logs
             .sort()
             .should.deep.eq([
+              '--no-somebool',
               '--no-somebool2',
               '--somebool',
               '--somebool2',
@@ -1136,7 +1137,7 @@ describe('Completion', () => {
       r.logs.should.include('--foo:bar');
     });
 
-    it('completes with no- prefix flags defaulting to true when boolean-negation is set', () => {
+    it('completes with no- prefix flags for all boolean options when boolean-negation is set', () => {
       process.env.SHELL = '/bin/zsh';
 
       const r = checkOutput(
@@ -1151,10 +1152,13 @@ describe('Completion', () => {
 
       r.logs.should.eql([
         '--help:Show help',
+        '--no-help:Show help',
         '--version:Show version number',
+        '--no-version:Show version number',
         '--foo:foo flag',
         '--no-foo:foo flag',
         '--bar:bar flag',
+        '--no-bar:bar flag',
       ]);
     });
   });
