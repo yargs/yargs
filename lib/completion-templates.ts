@@ -56,3 +56,22 @@ else
 fi
 ###-end-{{app_name}}-completions-###
 `;
+
+export const completionFishTemplate = `###-begin-{{app_name}}-completions-###
+#
+# yargs command completion script
+#
+# Installation: {{app_path}} {{completion_command}} | source
+#    or {{app_path}} {{completion_command}} > ~/.config/fish/completions/{{app_name}}.fish
+#
+function _{{app_name}}_yargs_completions
+  set -l args (commandline -opc)
+  set -l cur (commandline -ct)
+  set -l completions ({{app_path}} --get-yargs-completions $args)
+  for completion in $completions
+    echo $completion
+  end
+end
+complete -c {{app_name}} -f -a '(_{{app_name}}_yargs_completions)'
+###-end-{{app_name}}-completions-###
+`;

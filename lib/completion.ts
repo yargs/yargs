@@ -34,6 +34,7 @@ export class Completion implements CompletionInstance {
   private customCompletionFunction: CompletionFunction | null = null;
   private indexAfterLastReset = 0;
   private readonly zshShell: boolean;
+  private readonly fishShell: boolean;
 
   constructor(
     private readonly yargs: YargsInstance,
@@ -44,6 +45,10 @@ export class Completion implements CompletionInstance {
     this.zshShell =
       (this.shim.getEnv('SHELL')?.includes('zsh') ||
         this.shim.getEnv('ZSH_NAME')?.includes('zsh')) ??
+      false;
+    this.fishShell =
+      (this.shim.getEnv('SHELL')?.includes('fish') ||
+        !!this.shim.getEnv('FISH_VERSION')) ??
       false;
   }
 
@@ -346,7 +351,9 @@ export class Completion implements CompletionInstance {
 
   // generate the completion script to add to your .bashrc.
   generateCompletionScript($0: string, cmd: string): string {
-    let script = this.zshShell
+    let script = this.fishShell
+      ? templates.completionFishTemplate
+      : this.zshShell
       ? templates.completionZshTemplate
       : templates.completionShTemplate;
     const name = this.shim.path.basename($0);
