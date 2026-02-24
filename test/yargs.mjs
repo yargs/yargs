@@ -641,6 +641,17 @@ describe('yargs dsl tests', () => {
         gender: ['male', 'female'],
       });
     });
+
+    it('deduplicates choices when the same value is added more than once', () => {
+      const optChoices = yargs([])
+        .choices('color', ['red', 'green', 'blue'])
+        .choices('color', ['blue', 'rainbow'])
+        .getOptions().choices;
+
+      optChoices.should.deep.equal({
+        color: ['red', 'green', 'blue', 'rainbow'],
+      });
+    });
   });
 
   describe('locale', () => {
