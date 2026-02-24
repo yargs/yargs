@@ -120,7 +120,7 @@ export class Completion implements CompletionInstance {
 
       Object.keys(options.key).forEach(key => {
         const negable =
-          !!options.configuration['boolean-negation'] &&
+          !!(options.configuration['boolean-negation'] ?? true) &&
           options.boolean.includes(key);
         const isPositionalKey = positionalKeys.includes(key);
 
