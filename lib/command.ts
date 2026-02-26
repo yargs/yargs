@@ -791,13 +791,9 @@ export function command(
   return new CommandInstance(usage, validation, globalMiddleware, shim);
 }
 
-export interface CommandHandlerDefinition
-  extends Partial<
-    Pick<
-      CommandHandler,
-      'deprecated' | 'description' | 'handler' | 'middlewares'
-    >
-  > {
+export interface CommandHandlerDefinition extends Partial<
+  Pick<CommandHandler, 'deprecated' | 'description' | 'handler' | 'middlewares'>
+> {
   aliases?: string[];
   builder?: CommandBuilder | CommandBuilderDefinition;
   command?: string | string[];
