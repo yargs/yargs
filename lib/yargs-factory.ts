@@ -1697,13 +1697,11 @@ export class YargsInstance {
       key,
       value,
       (type, key, value) => {
-        this.#options[type][key] = [
-          ...new Set(
-            (
-              this.#options[type][key] || ([] as Options[T][keyof Options[T]])
-            ).concat(value)
-          ),
-        ] as Options[T][K];
+        const existing = (this.#options[type][key] || []) as unknown[];
+        for (const v of ([] as unknown[]).concat(value)) {
+          if (!existing.includes(v)) existing.push(v);
+        }
+        this.#options[type][key] = existing as Options[T][K];
       }
     );
   }
@@ -2381,23 +2379,22 @@ export interface OptionDefinition {
   type?: 'array' | 'boolean' | 'count' | 'number' | 'string';
 }
 
-interface PositionalDefinition
-  extends Pick<
-    OptionDefinition,
-    | 'alias'
-    | 'array'
-    | 'coerce'
-    | 'choices'
-    | 'conflicts'
-    | 'default'
-    | 'defaultDescription'
-    | 'demand'
-    | 'desc'
-    | 'describe'
-    | 'description'
-    | 'implies'
-    | 'normalize'
-  > {
+interface PositionalDefinition extends Pick<
+  OptionDefinition,
+  | 'alias'
+  | 'array'
+  | 'coerce'
+  | 'choices'
+  | 'conflicts'
+  | 'default'
+  | 'defaultDescription'
+  | 'demand'
+  | 'desc'
+  | 'describe'
+  | 'description'
+  | 'implies'
+  | 'normalize'
+> {
   type?: 'boolean' | 'number' | 'string';
 }
 
