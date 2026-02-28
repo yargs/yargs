@@ -43,6 +43,7 @@
     "helpers/*.js",
     "helpers/*",
     "index.mjs",
+    "yargs",
     "yargs.cjs",
     "yargs.mjs",
     "build",
