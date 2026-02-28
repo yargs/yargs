@@ -23,9 +23,9 @@
     "./yargs": [
       {
         "import": "./yargs.mjs",
-        "require": "./yargs"
+        "require": "./yargs.cjs"
       },
-      "./yargs"
+      "./yargs.cjs"
     ]
   },
   "type": "module",
@@ -43,7 +43,7 @@
     "helpers/*.js",
     "helpers/*",
     "index.mjs",
-    "yargs",
+    "yargs.cjs",
     "yargs.mjs",
     "build",
     "locales",
