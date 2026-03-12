@@ -6,6 +6,7 @@ import {YargsInstance} from './yargs-factory.js';
 import {YError} from './yerror.js';
 import {DetailedArguments} from './typings/yargs-parser-types.js';
 import setBlocking from './utils/set-blocking.js';
+import {optionIsPresent} from './utils/option-presence.js';
 
 function isBoolean(fail: FailureFunction | boolean): fail is boolean {
   return typeof fail === 'boolean';
@@ -612,7 +613,13 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
   function filterHiddenOptions(key: string) {
     return (
       yargs.getOptions().hiddenOptions.indexOf(key) < 0 ||
-      (yargs.parsed as DetailedArguments).argv[yargs.getOptions().showHiddenOpt]
+      optionIsPresent({
+        argv: (yargs.parsed as DetailedArguments).argv,
+        key: yargs.getOptions().showHiddenOpt,
+        aliases: yargs.getAliases()[yargs.getOptions().showHiddenOpt] || [],
+        configuration: yargs.getInternalMethods().getParserConfiguration(),
+        parser: shim.Parser,
+      })
     );
   }
 

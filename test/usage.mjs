@@ -4470,6 +4470,113 @@ describe('usage tests', () => {
           '  --custom-show-hidden  Show hidden options                            [boolean]',
         ]);
     });
+    it('--help should display all options with --show-hidden under strip-dashed', () => {
+      const r = checkOutput(() =>
+        yargs('--help --show-hidden')
+          .parserConfiguration({'strip-dashed': true})
+          .options({
+            foo: {
+              describe: 'FOO',
+            },
+            bar: {},
+            baz: {
+              describe: 'BAZ',
+              hidden: true,
+            },
+          })
+          .parse()
+      );
+
+      r.logs[0]
+        .split('\n')
+        .should.deep.equal([
+          'Options:',
+          '  --help     Show help                                                 [boolean]',
+          '  --version  Show version number                                       [boolean]',
+          '  --foo      FOO',
+          '  --bar',
+          '  --baz      BAZ',
+        ]);
+    });
+    it('--help should display all options with --custom-show-hidden under strip-dashed', () => {
+      const r = checkOutput(() =>
+        yargs('--help --custom-show-hidden')
+          .parserConfiguration({'strip-dashed': true})
+          .options({
+            foo: {
+              describe: 'FOO',
+            },
+            bar: {},
+            baz: {
+              describe: 'BAZ',
+              hidden: true,
+            },
+          })
+          .showHidden('custom-show-hidden')
+          .parse()
+      );
+
+      r.logs[0]
+        .split('\n')
+        .should.deep.equal([
+          'Options:',
+          '  --help                Show help                                      [boolean]',
+          '  --version             Show version number                            [boolean]',
+          '  --foo                 FOO',
+          '  --bar',
+          '  --baz                 BAZ',
+          '  --custom-show-hidden  Show hidden options                            [boolean]',
+        ]);
+    });
+    it('--help should display all options with an alias for --custom-show-hidden under strip-dashed', () => {
+      const r = checkOutput(() =>
+        yargs('--help --csh')
+          .parserConfiguration({'strip-dashed': true})
+          .options({
+            foo: {
+              describe: 'FOO',
+            },
+            bar: {},
+            baz: {
+              describe: 'BAZ',
+              hidden: true,
+            },
+          })
+          .showHidden('custom-show-hidden')
+          .alias('custom-show-hidden', 'csh')
+          .parse()
+      );
+
+      r.logs[0]
+        .split('\n')
+        .should.deep.equal([
+          'Options:',
+          '  --help                       Show help                               [boolean]',
+          '  --version                    Show version number                     [boolean]',
+          '  --foo                        FOO',
+          '  --bar',
+          '  --baz                        BAZ',
+          '  --custom-show-hidden, --csh  Show hidden options                     [boolean]',
+        ]);
+    });
+    // This regression intentionally stays within usage/validation call sites; lib/yargs-factory.ts remains out of scope.
+    it('reports conflicts under strip-dashed for dashed option names', () => {
+      const r = checkOutput(() =>
+        yargs('--foo-bar --bar-baz')
+          .parserConfiguration({'strip-dashed': true})
+          .conflicts('foo-bar', 'bar-baz')
+          .wrap(null)
+          .parse()
+      );
+
+      r.errors
+        .join('\n')
+        .split(/\n+/)
+        .filter(Boolean)
+        .pop()
+        .should.equal('Arguments foo-bar and bar-baz are mutually exclusive');
+      r.exit.should.equal(true);
+    });
   });
 
   describe('help message caching', () => {

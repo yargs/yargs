@@ -6,6 +6,7 @@ import {
 } from './typings/common-types.js';
 import {levenshtein as distance} from './utils/levenshtein.js';
 import {objFilter} from './utils/obj-filter.js';
+import {optionIsPresent} from './utils/option-presence.js';
 import {UsageInstance} from './usage.js';
 import {YargsInstance, Arguments} from './yargs-factory.js';
 import {DetailedArguments} from './typings/yargs-parser-types.js';
@@ -398,12 +399,32 @@ export function validation(
   self.getConflicting = () => conflicting;
 
   self.conflicting = function conflictingFn(argv) {
-    Object.keys(argv).forEach(key => {
+    Object.keys(conflicting).forEach(key => {
       if (conflicting[key]) {
         conflicting[key].forEach(value => {
           // we default keys to 'undefined' that have been configured, we should not
           // apply conflicting check unless they are a value other than 'undefined'.
-          if (value && argv[key] !== undefined && argv[value] !== undefined) {
+          if (
+            value &&
+            optionIsPresent({
+              argv,
+              key,
+              aliases: yargs.getAliases()[key] || [],
+              configuration: yargs
+                .getInternalMethods()
+                .getParserConfiguration(),
+              parser: shim.Parser,
+            }) &&
+            optionIsPresent({
+              argv,
+              key: value,
+              aliases: yargs.getAliases()[value] || [],
+              configuration: yargs
+                .getInternalMethods()
+                .getParserConfiguration(),
+              parser: shim.Parser,
+            })
+          ) {
             usage.fail(
               __('Arguments %s and %s are mutually exclusive', key, value)
             );
@@ -411,24 +432,6 @@ export function validation(
         });
       }
     });
-
-    // When strip-dashed is true, match conflicts (kebab) with argv (camel)
-    // Addresses: https://github.com/yargs/yargs/issues/1952
-    if (yargs.getInternalMethods().getParserConfiguration()['strip-dashed']) {
-      Object.keys(conflicting).forEach(key => {
-        conflicting[key].forEach(value => {
-          if (
-            value &&
-            argv[shim.Parser.camelCase(key)] !== undefined &&
-            argv[shim.Parser.camelCase(value)] !== undefined
-          ) {
-            usage.fail(
-              __('Arguments %s and %s are mutually exclusive', key, value)
-            );
-          }
-        });
-      });
-    }
   };
 
   self.recommendCommands = function recommendCommands(cmd, potentialCommands) {
