@@ -180,3 +180,41 @@ post on why we think this is important](https://medium.com/the-node-js-collectio
 [type-definitions]: https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/yargs
 [coverage-image]: https://img.shields.io/nycrc/yargs/yargs
 [coverage-url]: https://github.com/yargs/yargs/blob/main/.nycrc
+## Example: Basic CLI Tool
+
+```js
+#!/usr/bin/env node
+import yargs from 'yargs'
+import { hideBin } from 'yargs/helpers'
+
+yargs(hideBin(process.argv))
+  .command(
+    'serve [port]',
+    'start a local server',
+    (yargs) => {
+      return yargs
+        .positional('port', {
+          describe: 'port to bind on',
+          type: 'number',
+          default: 3000
+        })
+        .option('host', {
+          alias: 'H',
+          describe: 'host name',
+          type: 'string',
+          default: 'localhost'
+        })
+    },
+    (argv) => {
+      console.log(`Server running at http://${argv.host}:${argv.port}`)
+    }
+  )
+  .option('verbose', {
+    alias: 'v',
+    type: 'boolean',
+    description: 'Run with verbose logging'
+  })
+  .demandCommand(1, 'You must specify a command')
+  .help()
+  .completion()
+  .parse()
