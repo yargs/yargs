@@ -175,6 +175,47 @@ post on why we think this is important](https://medium.com/the-node-js-collectio
 [npm-image]: https://img.shields.io/npm/v/yargs.svg
 [standard-image]: https://img.shields.io/badge/code%20style-standard-brightgreen.svg
 [standard-url]: http://standardjs.com/
+## Example: Basic CLI Tool
+
+The following example demonstrates how to build a simple CLI tool using yargs.
+
+```js
+#!/usr/bin/env node
+import yargs from 'yargs'
+import { hideBin } from 'yargs/helpers'
+
+yargs(hideBin(process.argv))
+  .command(
+    'serve [port]',
+    'start a local server',
+    (yargs) => {
+      return yargs
+        .positional('port', {
+          describe: 'port to bind on',
+          type: 'number',
+          default: 3000
+        })
+        .option('host', {
+          alias: 'H',
+          describe: 'host name',
+          type: 'string',
+          default: 'localhost'
+        })
+    },
+    (argv) => {
+      console.log(`Server running at http://${argv.host}:${argv.port}`)
+    }
+  )
+  .option('verbose', {
+    alias: 'v',
+    type: 'boolean',
+    description: 'Run with verbose logging'
+  })
+  .demandCommand(1, 'You must specify a command')
+  .help()
+  .completion()
+  .parse()
+
 [conventional-commits-image]: https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg
 [conventional-commits-url]: https://conventionalcommits.org/
 [type-definitions]: https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/yargs
