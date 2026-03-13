@@ -1,18 +1,5 @@
-// This file gets hit before node 12.17.0 when require('yargs/yargs') from CommonJS
-// because conditional exports not processed successfully.
+// This file gets hit in node versions below node 12.17.0
+// when require('yargs/yargs') from CommonJS
+// because conditional exports not fully supported and treats as filename.
 
-// TODO: consolidate on using a helpers file at some point in the future, which
-// is the approach currently used to export Parser and applyExtends for ESM:
-const {
-  applyExtends,
-  cjsPlatformShim,
-  Parser,
-  Yargs,
-  processArgv,
-} = require('./build/index.cjs');
-Yargs.applyExtends = (config, cwd, mergeExtends) => {
-  return applyExtends(config, cwd, mergeExtends, cjsPlatformShim);
-};
-Yargs.hideBin = processArgv.hideBin;
-Yargs.Parser = Parser;
-module.exports = Yargs;
+module.exports = require('./yargs.cjs');
