@@ -456,6 +456,69 @@ const argv = yargs(hideBin(process.argv))
   .parse();
 ```
 
+You can also combine command-aware completions with file path suggestions.
+
+```js
+import fs from 'node:fs'
+import path from 'node:path'
+import yargs from 'yargs'
+import { hideBin } from 'yargs/helpers'
+
+const commands = ['sync', 'download']
+
+function listFiles(current) {
+  return fs
+    .readdirSync(process.cwd())
+    .filter(entry => entry.startsWith(current))
+    .map(entry => {
+      const fullPath = path.join(process.cwd(), entry)
+      return fs.statSync(fullPath).isDirectory() ? `${entry}/` : entry
+    })
+}
+
+yargs(hideBin(process.argv))
+  .command('sync', 'sync pages')
+  .command('download', 'download pages')
+  .option('source', {
+    alias: 's',
+    type: 'string',
+  })
+  .option('destination', {
+    alias: 'd',
+    type: 'string',
+  })
+  .completion('completion', function (current, argv, completionFilter, done) {
+    const [command] = argv._
+
+    if (!command) {
+      done(commands.filter(entry => entry.startsWith(current)))
+      return
+    }
+
+    if (
+      (command === 'sync' && ('destination' in argv || 'd' in argv)) ||
+      (command === 'download' && ('source' in argv || 's' in argv))
+    ) {
+      done(listFiles(current))
+      return
+    }
+
+    completionFilter((err, defaultCompletions) => {
+      if (err) {
+        done([])
+        return
+      }
+
+      done(defaultCompletions)
+    })
+  })
+  .parse()
+```
+
+In this example, typing `confluence-sync sync --destination <TAB>` suggests file
+paths from the current working directory, while other positions fall back to the
+default yargs completion behavior.
+
 <a name="config"></a>.config([key], [description], [parseFn])
 -------------------------------------------------------------
 .config(object)
