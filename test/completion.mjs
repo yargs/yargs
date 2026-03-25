@@ -622,6 +622,18 @@ describe('Completion', () => {
         /Installation: \/path\/to\/my\/app show-completions-script/
       );
     });
+
+    it('generates a valid bash function name when scriptName contains spaces', () => {
+      process.env.SHELL = '/bin/bash';
+      const r = checkOutput(
+        () => yargs([]).scriptName('my tool').showCompletionScript()
+      );
+
+      // The shell function name must use underscores, not spaces
+      r.logs[0].should.match(/_my_tool_yargs_completions\(\)/);
+      // The complete built-in should still reference the original name with spaces
+      r.logs[0].should.match(/complete -o bashdefault -o default -F _my_tool_yargs_completions my tool/);
+    });
   });
 
   describe('completion()', () => {
@@ -918,6 +930,18 @@ describe('Completion', () => {
 
         r.logs[0].should.match(/bashrc/);
         r.logs[0].should.match(/ndm --get-yargs-completions/);
+      });
+
+      it('generates a valid zsh function name when scriptName contains spaces', () => {
+        process.env.SHELL = '/bin/zsh';
+        const r = checkOutput(
+          () => yargs([]).scriptName('my tool').showCompletionScript()
+        );
+
+        // The shell function name must use underscores, not spaces
+        r.logs[0].should.match(/_my_tool_yargs_completions\(\)/);
+        // compdef should still reference the original name with spaces
+        r.logs[0].should.match(/compdef _my_tool_yargs_completions my tool/);
       });
     });
 

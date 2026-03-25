@@ -350,10 +350,16 @@ export class Completion implements CompletionInstance {
       ? templates.completionZshTemplate
       : templates.completionShTemplate;
     const name = this.shim.path.basename($0);
+    // Sanitize the name for use as a shell function identifier: replace any
+    // character that is not alphanumeric or underscore with an underscore.
+    // The unsanitized name is still used where the literal command is needed
+    // (e.g. the `complete` built-in's command-match argument).
+    const functionName = name.replace(/[^a-zA-Z0-9_]/g, '_');
 
     // add ./ to applications not yet installed as bin.
     if ($0.match(/\.js$/)) $0 = `./${$0}`;
 
+    script = script.replace(/{{app_function_name}}/g, functionName);
     script = script.replace(/{{app_name}}/g, name);
     script = script.replace(/{{completion_command}}/g, cmd);
     return script.replace(/{{app_path}}/g, $0);
