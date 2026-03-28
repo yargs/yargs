@@ -303,6 +303,25 @@ describe('Command', () => {
         })
         .parse('--numbers 0 1 2');
     });
+
+    // see: https://github.com/yargs/yargs/issues/2423
+    it('populates positional arguments when halt-at-non-option is set', () => {
+      const argv = yargs(['my-host', 'ls'])
+        .command(
+          '$0 <host> [cmd..]',
+          'run command via ssh',
+          yargs =>
+            yargs
+              .positional('host', {type: 'string', demandOption: true})
+              .positional('cmd', {array: true, type: 'string'})
+        )
+        .strict()
+        .parserConfiguration({'halt-at-non-option': true})
+        .parse();
+
+      argv.host.should.equal('my-host');
+      argv.cmd.should.deep.equal(['ls']);
+    });
   });
 
   describe('variadic', () => {
