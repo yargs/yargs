@@ -548,6 +548,17 @@ export class CommandInstance {
     yargs: YargsInstance
   ) {
     argv._ = argv._.slice(context.commands.length); // nuke the current commands
+    // When halt-at-non-option is configured, yargs-parser places positional
+    // arguments in argv['--'] instead of argv._. Move them into argv._ so
+    // positional validation and mapping work correctly.
+    if (
+      yargs.getOptions().configuration['halt-at-non-option'] &&
+      argv['--'] &&
+      argv['--'].length
+    ) {
+      argv._ = argv._.concat(argv['--'] as string[]);
+      argv['--'] = [];
+    }
     const demanded = commandHandler.demanded.slice(0);
     const optional = commandHandler.optional.slice(0);
     const positionalMap: Dictionary<string[]> = {};
