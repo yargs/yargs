@@ -22,7 +22,7 @@ exports.handler = function (argv) {
     if (!argv.shared)
       throw new Error('Dream is not shared, there is no one to extract from!');
     if (!chancesLevel1()) throw new Error('Extraction failed!');
-    if (!argv._msg) argv._msg = 'Extraction succesful';
+    if (!argv._msg) argv._msg = 'Extraction successful';
   }
   if (argv._msg) console.log(argv._msg);
   else
