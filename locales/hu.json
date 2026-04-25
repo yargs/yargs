@@ -42,5 +42,11 @@
   "Path to JSON config file": "JSON konfigurációs file helye",
   "Show help": "Súgo megjelenítése",
   "Show version number": "Verziószám megjelenítése",
-  "Did you mean %s?": "Erre gondoltál %s?"
+  "Did you mean %s?": "Erre gondoltál %s?",
+  "Arguments %s and %s are mutually exclusive": "A(z) %s és %s argumentumok kölcsönösen kizárják egymást",
+  "Positionals:": "Pozicionális argumentumok:",
+  "command": "parancs",
+  "deprecated": "elavult",
+  "deprecated: %s": "elavult: %s",
+  "Unknown command: %s": "Ismeretlen parancs: %s"
 }
