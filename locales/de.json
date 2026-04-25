@@ -42,5 +42,11 @@
   "Path to JSON config file": "Pfad zur JSON-Config Datei",
   "Show help": "Hilfe anzeigen",
   "Show version number": "Version anzeigen",
-  "Did you mean %s?": "Meintest du %s?"
+  "Did you mean %s?": "Meintest du %s?",
+  "Arguments %s and %s are mutually exclusive": "Argumente %s und %s schließen sich gegenseitig aus",
+  "Positionals:": "Positionsargumente:",
+  "command": "Befehl",
+  "deprecated": "veraltet",
+  "deprecated: %s": "veraltet: %s",
+  "Unknown command: %s": "Unbekannter Befehl: %s"
 }
