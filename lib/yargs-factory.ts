@@ -62,6 +62,19 @@ import {isPromise} from './utils/is-promise.js';
 import {maybeAsyncResult} from './utils/maybe-async-result.js';
 import setBlocking from './utils/set-blocking.js';
 
+function stripMatchingQuotes(value: string | number): string | number {
+  if (
+    typeof value === 'string' &&
+    value.length >= 2 &&
+    (value[0] === '"' || value[0] === "'") &&
+    value[0] === value[value.length - 1]
+  ) {
+    return value.slice(1, -1);
+  }
+
+  return value;
+}
+
 export function YargsFactory(_shim: PlatformShim) {
   return (
     processArgs: string | string[] = [],
@@ -1998,6 +2011,10 @@ export class YargsInstance {
       })
     ) as DetailedArguments;
 
+    if (typeof args === 'string') {
+      parsed.argv._ = parsed.argv._.map(stripMatchingQuotes);
+    }
+
     const argv: Arguments = Object.assign(
       parsed.argv,
       this.#parseContext
@@ -2377,23 +2394,22 @@ export interface OptionDefinition {
   type?: 'array' | 'boolean' | 'count' | 'number' | 'string';
 }
 
-interface PositionalDefinition
-  extends Pick<
-    OptionDefinition,
-    | 'alias'
-    | 'array'
-    | 'coerce'
-    | 'choices'
-    | 'conflicts'
-    | 'default'
-    | 'defaultDescription'
-    | 'demand'
-    | 'desc'
-    | 'describe'
-    | 'description'
-    | 'implies'
-    | 'normalize'
-  > {
+interface PositionalDefinition extends Pick<
+  OptionDefinition,
+  | 'alias'
+  | 'array'
+  | 'coerce'
+  | 'choices'
+  | 'conflicts'
+  | 'default'
+  | 'defaultDescription'
+  | 'demand'
+  | 'desc'
+  | 'describe'
+  | 'description'
+  | 'implies'
+  | 'normalize'
+> {
   type?: 'boolean' | 'number' | 'string';
 }
 
