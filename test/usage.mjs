@@ -1635,6 +1635,40 @@ describe('usage tests', () => {
 
         r.should.have.property('emittedWarnings').with.length(0);
       });
+
+      it('does not print the built-in version for a defaulted version option', () => {
+        const r = checkOutput(() =>
+          yargs()
+            .option('version', {
+              type: 'string',
+              default: '0.0.1',
+              describe: 'Version string',
+            })
+            .parse()
+        );
+
+        r.result.version.should.equal('0.0.1');
+        r.logs.should.deep.equal([]);
+        r.exit.should.equal(false);
+        r.emittedWarnings.should.have.length(1);
+      });
+
+      it('does not print the built-in version for a defaulted version positional', () => {
+        const r = checkOutput(() =>
+          yargs()
+            .command(
+              'install [version]',
+              'Install a thing',
+              yargs => yargs.positional('version', {default: 'hello'}),
+              argv => argv.version
+            )
+            .parse('install')
+        );
+
+        r.result.version.should.equal('hello');
+        r.logs.should.deep.equal([]);
+        r.exit.should.equal(false);
+      });
     });
 
     describe('when exitProcess is false', () => {
@@ -2882,7 +2916,8 @@ describe('usage tests', () => {
       const r = checkOutput(() =>
         yargs(['-h'])
           .help('h')
-          .default('f', function randomNumber() { // eslint-disable-line
+          .default('f', function randomNumber() {
+            // eslint-disable-line
             return Math.random() * 256;
           })
           .wrap(null)

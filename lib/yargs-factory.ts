@@ -2010,7 +2010,11 @@ export class YargsInstance {
     Object.keys(argv).forEach(key => {
       if (key === this.#helpOpt && argv[key]) {
         helpOptSet = true;
-      } else if (key === this.#versionOpt && argv[key]) {
+      } else if (
+        key === this.#versionOpt &&
+        argv[key] &&
+        !parsed.defaulted[key]
+      ) {
         versionOptSet = true;
       }
     });
@@ -2377,23 +2381,22 @@ export interface OptionDefinition {
   type?: 'array' | 'boolean' | 'count' | 'number' | 'string';
 }
 
-interface PositionalDefinition
-  extends Pick<
-    OptionDefinition,
-    | 'alias'
-    | 'array'
-    | 'coerce'
-    | 'choices'
-    | 'conflicts'
-    | 'default'
-    | 'defaultDescription'
-    | 'demand'
-    | 'desc'
-    | 'describe'
-    | 'description'
-    | 'implies'
-    | 'normalize'
-  > {
+interface PositionalDefinition extends Pick<
+  OptionDefinition,
+  | 'alias'
+  | 'array'
+  | 'coerce'
+  | 'choices'
+  | 'conflicts'
+  | 'default'
+  | 'defaultDescription'
+  | 'demand'
+  | 'desc'
+  | 'describe'
+  | 'description'
+  | 'implies'
+  | 'normalize'
+> {
   type?: 'boolean' | 'number' | 'string';
 }
 
