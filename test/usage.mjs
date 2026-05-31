@@ -1591,7 +1591,7 @@ describe('usage tests', () => {
 
     // Addresses: https://github.com/yargs/yargs/issues/1979
     describe('when an option or alias "version" is set', () => {
-      it('emits warning if version is not disabled', () => {
+      it('uses an explicit version alias value and emits warning', () => {
         const r = checkOutput(() =>
           yargs()
             .command('cmd1', 'cmd1 desc', yargs =>
@@ -1607,6 +1607,67 @@ describe('usage tests', () => {
             .wrap(null)
             .parse('cmd1 --version 0.25.10')
         );
+        r.should.have.property('result');
+        r.result.should.have.property('version').and.equal('0.25.10');
+        r.result.should.have.property('v').and.equal('0.25.10');
+        r.should.have.property('logs').with.length(0);
+        r.should.have.property('exit').and.equal(false);
+        r.should.have.property('emittedWarnings').with.length(1);
+        r.emittedWarnings[0].should.match(/reserved word/);
+      });
+
+      it('uses an explicit version option value and emits warning', () => {
+        const r = checkOutput(() =>
+          yargs()
+            .option('version', {
+              describe: 'version desc',
+              type: 'string',
+            })
+            .wrap(null)
+            .parse('--version 0.25.10')
+        );
+
+        r.should.have.property('result');
+        r.result.should.have.property('version').and.equal('0.25.10');
+        r.should.have.property('logs').with.length(0);
+        r.should.have.property('exit').and.equal(false);
+        r.should.have.property('emittedWarnings').with.length(1);
+        r.emittedWarnings[0].should.match(/reserved word/);
+      });
+
+      it('uses an explicit version positional value and emits warning', () => {
+        const r = checkOutput(() =>
+          yargs()
+            .command('install [version]', 'install desc', yargs =>
+              yargs.positional('version', {type: 'string'})
+            )
+            .wrap(null)
+            .parse('install 0.25.10')
+        );
+
+        r.should.have.property('result');
+        r.result.should.have.property('version').and.equal('0.25.10');
+        r.should.have.property('logs').with.length(0);
+        r.should.have.property('exit').and.equal(false);
+        r.should.have.property('emittedWarnings').with.length(1);
+        r.emittedWarnings[0].should.match(/reserved word/);
+      });
+
+      it('uses an explicit boolean version option and emits warning', () => {
+        const r = checkOutput(() =>
+          yargs()
+            .option('version', {
+              describe: 'version desc',
+              type: 'boolean',
+            })
+            .wrap(null)
+            .parse('--version')
+        );
+
+        r.should.have.property('result');
+        r.result.should.have.property('version').and.equal(true);
+        r.should.have.property('logs').with.length(0);
+        r.should.have.property('exit').and.equal(false);
         r.should.have.property('emittedWarnings').with.length(1);
         r.emittedWarnings[0].should.match(/reserved word/);
       });
@@ -1634,6 +1695,44 @@ describe('usage tests', () => {
         );
 
         r.should.have.property('emittedWarnings').with.length(0);
+      });
+
+      it('does not display version for option default', () => {
+        const r = checkOutput(() =>
+          yargs()
+            .option({
+              version: {
+                type: 'string',
+                default: '0.0.1',
+                describe: 'version desc',
+              },
+            })
+            .wrap(null)
+            .parse()
+        );
+
+        r.should.have.property('result');
+        r.result.should.have.property('version').and.equal('0.0.1');
+        r.should.have.property('logs').with.length(0);
+        r.should.have.property('exit').and.equal(false);
+        r.should.have.property('emittedWarnings').with.length(1);
+      });
+
+      it('does not display version for positional default', () => {
+        const r = checkOutput(() =>
+          yargs()
+            .command('install [version]', 'install desc', yargs =>
+              yargs.positional('version', {default: '0.0.1'})
+            )
+            .wrap(null)
+            .parse('install')
+        );
+
+        r.should.have.property('result');
+        r.result.should.have.property('version').and.equal('0.0.1');
+        r.should.have.property('logs').with.length(0);
+        r.should.have.property('exit').and.equal(false);
+        r.should.have.property('emittedWarnings').with.length(1);
       });
     });
 

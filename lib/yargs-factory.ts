@@ -939,9 +939,18 @@ export class YargsInstance {
 
       this[kTrackManuallySetKeys](key);
 
+      const aliases = Array.isArray(opt.alias)
+        ? opt.alias
+        : opt.alias
+          ? [opt.alias]
+          : [];
+
       // Warn about version name collision
       // Addresses: https://github.com/yargs/yargs/issues/1979
-      if (this.#versionOpt && (key === 'version' || opt?.alias === 'version')) {
+      if (
+        this.#versionOpt &&
+        (key === 'version' || aliases.includes('version'))
+      ) {
         this[kEmitWarning](
           [
             '"version" is a reserved word.',
@@ -954,6 +963,11 @@ export class YargsInstance {
           undefined,
           'versionWarning' // TODO: better dedupeId
         );
+        if (this.#versionOpt === 'version') {
+          this[kDeleteFromParserHintObject](this.#versionOpt);
+          this.#usage.version(undefined);
+          this.#versionOpt = null;
+        }
       }
 
       this.#options.key[key] = true; // track manually set keys.
@@ -2010,7 +2024,11 @@ export class YargsInstance {
     Object.keys(argv).forEach(key => {
       if (key === this.#helpOpt && argv[key]) {
         helpOptSet = true;
-      } else if (key === this.#versionOpt && argv[key]) {
+      } else if (
+        key === this.#versionOpt &&
+        argv[key] &&
+        !parsed.defaulted[key]
+      ) {
         versionOptSet = true;
       }
     });
