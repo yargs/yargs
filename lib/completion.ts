@@ -354,7 +354,11 @@ export class Completion implements CompletionInstance {
     // add ./ to applications not yet installed as bin.
     if ($0.match(/\.js$/)) $0 = `./${$0}`;
 
-    script = script.replace(/{{app_name}}/g, name);
+    // sanitize app name for use in bash/zsh function names
+    // replaces non-alphanumeric, non-underscore chars with '_'
+    const sanitizedName = name.replace(/[^a-zA-Z0-9_]/g, '_');
+
+    script = script.replace(/{{app_name}}/g, sanitizedName);
     script = script.replace(/{{completion_command}}/g, cmd);
     return script.replace(/{{app_path}}/g, $0);
   }
