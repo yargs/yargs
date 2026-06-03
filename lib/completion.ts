@@ -355,6 +355,10 @@ export class Completion implements CompletionInstance {
     if ($0.match(/\.js$/)) $0 = `./${$0}`;
 
     script = script.replace(/{{app_name}}/g, name);
+    script = script.replace(
+      /{{completion_function_name}}/g,
+      sanitizeCompletionFunctionName(name)
+    );
     script = script.replace(/{{completion_command}}/g, cmd);
     return script.replace(/{{app_path}}/g, $0);
   }
@@ -413,4 +417,8 @@ function isFallbackCompletionFunction(
   completionFunction: CompletionFunction
 ): completionFunction is FallbackCompletionFunction {
   return completionFunction.length > 3;
+}
+
+function sanitizeCompletionFunctionName(name: string): string {
+  return name.replace(/[^A-Za-z0-9_]/g, '_');
 }

@@ -622,6 +622,25 @@ describe('Completion', () => {
         /Installation: \/path\/to\/my\/app show-completions-script/
       );
     });
+
+    it('sanitizes application name for completion function names', () => {
+      process.env.SHELL = '/bin/bash';
+      const r = checkOutput(() =>
+        yargs([])
+          .scriptName('yarn whatever')
+          .completion()
+          .showCompletionScript()
+      );
+
+      r.logs[0].should.include('_yarn_whatever_yargs_completions()');
+      r.logs[0].should.include(
+        '-F _yarn_whatever_yargs_completions yarn whatever'
+      );
+      r.logs[0].should.include(
+        'yarn whatever --get-yargs-completions "${args[@]}"'
+      );
+      r.logs[0].should.not.include('_yarn whatever_yargs_completions');
+    });
   });
 
   describe('completion()', () => {

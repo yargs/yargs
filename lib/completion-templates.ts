@@ -5,7 +5,7 @@ export const completionShTemplate = `###-begin-{{app_name}}-completions-###
 # Installation: {{app_path}} {{completion_command}} >> ~/.bashrc
 #    or {{app_path}} {{completion_command}} >> ~/.bash_profile on OSX.
 #
-_{{app_name}}_yargs_completions()
+_{{completion_function_name}}_yargs_completions()
 {
     local cur_word args type_list
 
@@ -25,7 +25,7 @@ _{{app_name}}_yargs_completions()
 
     return 0
 }
-complete -o bashdefault -o default -F _{{app_name}}_yargs_completions {{app_name}}
+complete -o bashdefault -o default -F _{{completion_function_name}}_yargs_completions {{app_name}}
 ###-end-{{app_name}}-completions-###
 `;
 
@@ -37,7 +37,7 @@ export const completionZshTemplate = `#compdef {{app_name}}
 # Installation: {{app_path}} {{completion_command}} >> ~/.zshrc
 #    or {{app_path}} {{completion_command}} >> ~/.zprofile on OSX.
 #
-_{{app_name}}_yargs_completions()
+_{{completion_function_name}}_yargs_completions()
 {
   local reply
   local si=$IFS
@@ -50,9 +50,9 @@ _{{app_name}}_yargs_completions()
   fi
 }
 if [[ "'\${zsh_eval_context[-1]}" == "loadautofunc" ]]; then
-  _{{app_name}}_yargs_completions "$@"
+  _{{completion_function_name}}_yargs_completions "$@"
 else
-  compdef _{{app_name}}_yargs_completions {{app_name}}
+  compdef _{{completion_function_name}}_yargs_completions {{app_name}}
 fi
 ###-end-{{app_name}}-completions-###
 `;
