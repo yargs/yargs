@@ -115,13 +115,17 @@ export class Completion implements CompletionInstance {
       !this.previousArgHasChoices(args)
     ) {
       const options = this.yargs.getOptions();
+      const descriptions = this.usage.getDescriptions();
       const positionalKeys =
         this.yargs.getGroups()[this.usage.getPositionalGroupName()] || [];
 
       Object.keys(options.key).forEach(key => {
         const negable =
-          !!options.configuration['boolean-negation'] &&
-          options.boolean.includes(key);
+          options.configuration['boolean-negation'] !== false &&
+          options.boolean.includes(key) &&
+          descriptions[key] !== this.usage.deferY18nLookup('Show help') &&
+          descriptions[key] !==
+            this.usage.deferY18nLookup('Show version number');
         const isPositionalKey = positionalKeys.includes(key);
 
         // If the key is not positional and its aliases aren't in 'args', add the key to 'completions'
@@ -130,12 +134,7 @@ export class Completion implements CompletionInstance {
           !options.hiddenOptions.includes(key) &&
           !this.argsContainKey(args, key, negable)
         ) {
-          this.completeOptionKey(
-            key,
-            completions,
-            current,
-            negable && !!options.default[key]
-          );
+          this.completeOptionKey(key, completions, current, negable);
         }
       });
     }

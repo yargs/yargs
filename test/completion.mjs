@@ -94,20 +94,18 @@ describe('Completion', () => {
           r.logs.should.not.include('-1');
         });
 
-        it('completes with no- prefix flags defaulting to true when boolean-negation is set', () => {
+        it('completes with no- prefix flags when boolean-negation is enabled by default', () => {
           const r = checkOutput(
             () =>
-              yargs([...firstArguments, './completion', ''])
-                .options({
-                  foo: {describe: 'foo flag', type: 'boolean', default: true},
-                  bar: {describe: 'bar flag', type: 'boolean'},
-                })
-                .parserConfiguration({'boolean-negation': true}).argv
+              yargs([...firstArguments, './completion', '']).options({
+                foo: {describe: 'foo flag', type: 'boolean', default: true},
+                bar: {describe: 'bar flag', type: 'boolean'},
+              }).argv
           );
 
           r.logs.should.include('--no-foo');
           r.logs.should.include('--foo');
-          r.logs.should.not.include('--no-bar');
+          r.logs.should.include('--no-bar');
           r.logs.should.include('--bar');
         });
 
@@ -136,18 +134,15 @@ describe('Completion', () => {
           r.logs.should.include('--baz');
         });
 
-        it('ignores no- prefix flags when boolean-negation is not set', () => {
+        it('ignores no- prefix flags when boolean-negation is disabled', () => {
           const r = checkOutput(
             () =>
-              yargs([
-                ...firstArguments,
-                './completion',
-                '--no-bar',
-                '',
-              ]).options({
-                foo: {describe: 'foo flag', type: 'boolean', default: true},
-                bar: {describe: 'bar flag', type: 'boolean'},
-              }).argv
+              yargs([...firstArguments, './completion', '--no-bar', ''])
+                .options({
+                  foo: {describe: 'foo flag', type: 'boolean', default: true},
+                  bar: {describe: 'bar flag', type: 'boolean'},
+                })
+                .parserConfiguration({'boolean-negation': false}).argv
           );
 
           r.logs.should.not.include('--no-foo');
@@ -192,6 +187,7 @@ describe('Completion', () => {
           r.logs
             .sort()
             .should.deep.eq([
+              '--no-somebool',
               '--no-somebool2',
               '--somebool',
               '--somebool2',
@@ -1135,17 +1131,15 @@ describe('Completion', () => {
       r.logs.should.include('--foo:bar');
     });
 
-    it('completes with no- prefix flags defaulting to true when boolean-negation is set', () => {
+    it('completes with no- prefix flags when boolean-negation is enabled by default', () => {
       process.env.SHELL = '/bin/zsh';
 
       const r = checkOutput(
         () =>
-          yargs(['./completion', '--get-yargs-completions', '--'])
-            .options({
-              foo: {describe: 'foo flag', type: 'boolean', default: true},
-              bar: {describe: 'bar flag', type: 'boolean'},
-            })
-            .parserConfiguration({'boolean-negation': true}).argv
+          yargs(['./completion', '--get-yargs-completions', '--']).options({
+            foo: {describe: 'foo flag', type: 'boolean', default: true},
+            bar: {describe: 'bar flag', type: 'boolean'},
+          }).argv
       );
 
       r.logs.should.eql([
@@ -1154,6 +1148,7 @@ describe('Completion', () => {
         '--foo:foo flag',
         '--no-foo:foo flag',
         '--bar:bar flag',
+        '--no-bar:bar flag',
       ]);
     });
   });
