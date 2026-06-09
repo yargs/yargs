@@ -552,6 +552,16 @@ export class CommandInstance {
     const optional = commandHandler.optional.slice(0);
     const positionalMap: Dictionary<string[]> = {};
 
+    if (
+      yargs.getOptions().configuration['halt-at-non-option'] &&
+      argv._.length === 0 &&
+      Array.isArray(argv['--']) &&
+      argv['--'].length > 0
+    ) {
+      argv._ = argv['--'].slice();
+      delete argv['--'];
+    }
+
     this.validation.positionalCount(demanded.length, argv._.length);
 
     while (demanded.length) {
