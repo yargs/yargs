@@ -149,6 +149,26 @@ describe('validation tests', () => {
         .parse();
     });
 
+    it('redacts hidden options from implication failures', done => {
+      yargs(['--remote-debugging-port', '9222'])
+        .option('hidden-debug', {
+          type: 'boolean',
+          hidden: true,
+        })
+        .option('remote-debugging-port', {
+          hidden: true,
+        })
+        .implies('remote-debugging-port', 'hidden-debug')
+        .fail(msg => {
+          msg.should.match(implicationsFailedPattern);
+          msg.should.not.include('remote-debugging-port');
+          msg.should.not.include('hidden-debug');
+          msg.should.include('[hidden] -> [hidden]');
+          return done();
+        })
+        .parse();
+    });
+
     it("fails if --no-foo's implied argument is not set", done => {
       yargs([])
         .implies({
