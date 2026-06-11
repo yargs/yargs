@@ -350,11 +350,12 @@ export class Completion implements CompletionInstance {
       ? templates.completionZshTemplate
       : templates.completionShTemplate;
     const name = this.shim.path.basename($0);
+    const sanitizedName = name.replace(/[^a-zA-Z0-9_-]/g, '_');
 
     // add ./ to applications not yet installed as bin.
     if ($0.match(/\.js$/)) $0 = `./${$0}`;
 
-    script = script.replace(/{{app_name}}/g, name);
+    script = script.replace(/{{app_name}}/g, sanitizedName);
     script = script.replace(/{{completion_command}}/g, cmd);
     return script.replace(/{{app_path}}/g, $0);
   }
