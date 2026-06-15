@@ -17,7 +17,7 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
       - run: node --version
-      - run: npm install --engine-strict
+      - run: npm install
       - run: npm test
   windows:
     runs-on: windows-latest
@@ -39,7 +39,7 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
       - run: node --version
-      - run: npm install --engine-strict
+      - run: npm install
       - run: npm run test:esm
   deno:
     runs-on: ubuntu-latest
