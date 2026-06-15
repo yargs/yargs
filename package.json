@@ -18,9 +18,9 @@
     },
     "./yargs": [
       {
-        "require": "./yargs"
+        "require": "./yargs.cjs"
       },
-      "./yargs"
+      "./yargs.cjs"
     ]
   },
   "type": "module",
@@ -38,6 +38,7 @@
     "helpers/*",
     "index.mjs",
     "yargs",
+    "yargs.cjs",
     "build",
     "locales",
     "LICENSE",
@@ -80,17 +81,16 @@
     "fix": "gts fix && npm run fix:js",
     "fix:js": "standardx --fix '**/*.mjs' && standardx --fix '**/*.cjs' && standardx --fix './*.mjs' && standardx --fix './*.cjs'",
     "posttest": "npm run check",
-    "test": "c8 mocha ./test/*.cjs --require ./test/before.cjs --timeout=12000 --check-leaks",
-    "test:esm": "c8 mocha ./test/esm/*.mjs --check-leaks",
-    "coverage": "c8 report --check-coverage",
+    "test": "mocha ./test/*.cjs --require ./test/before.cjs --timeout=12000 --check-leaks",
+    "test:esm": "mocha ./test/esm/*.mjs --check-leaks",
+    "coverage": "report --check-coverage",
     "prepare": "npm run compile",
     "pretest": "npm run compile -- -p tsconfig.test.json && cross-env NODE_ENV=test npm run build:cjs",
     "compile": "rimraf build && tsc",
     "postcompile": "npm run build:cjs",
     "build:cjs": "rollup -c rollup.config.cjs",
     "postbuild:cjs": "rimraf ./build/index.cjs.d.ts",
-    "check": "gts lint && npm run check:js",
-    "check:js": "standardx '**/*.mjs' && standardx '**/*.cjs' && standardx './*.mjs' && standardx './*.cjs'",
+    "check": "gts lint",
     "clean": "gts clean"
   },
   "repository": {

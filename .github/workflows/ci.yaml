@@ -3,14 +3,14 @@ on:
     branches:
       - master
   pull_request:
-    types: [ assigned, opened, synchronize, reopened, labeled ]
+    types: [assigned, opened, synchronize, reopened, labeled]
 name: ci
 jobs:
   test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: [10, 12, 13, 14]
+        node: [10, 12, 14, 24]
     steps:
       - uses: actions/checkout@v1
       - uses: actions/setup-node@v1
