@@ -84,7 +84,7 @@
     "posttest": "npm run check",
     "test": "mocha ./test/*.cjs --require ./test/before.cjs --timeout=12000 --check-leaks",
     "test:esm": "mocha ./test/esm/*.mjs --check-leaks",
-    "coverage": "report --check-coverage",
+    "coverage": "c8 report --check-coverage",
     "prepare": "npm run compile",
     "pretest": "npm run compile -- -p tsconfig.test.json && cross-env NODE_ENV=test npm run build:cjs",
     "compile": "rimraf build && tsc",

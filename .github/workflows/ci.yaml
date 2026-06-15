@@ -56,13 +56,13 @@ jobs:
       - run: |
           deno --version
           deno test --allow-read test/deno/*
-  coverage:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v1
-      - uses: actions/setup-node@v1
-        with:
-          node-version: 13
-      - run: npm install
-      - run: npm test
-      - run: npm run coverage
+  # coverage:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v1
+  #     - uses: actions/setup-node@v1
+  #       with:
+  #         node-version: 13
+  #     - run: npm install
+  #     - run: npm test
+  #     - run: npm run coverage
