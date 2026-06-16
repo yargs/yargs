@@ -559,7 +559,9 @@ export class CommandInstance {
       argv['--'].length > 0
     ) {
       argv._ = argv['--'].slice();
-      delete argv['--'];
+      if (!yargs.getOptions().configuration['populate--']) {
+        delete argv['--'];
+      }
     }
 
     this.validation.positionalCount(demanded.length, argv._.length);

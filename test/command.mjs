@@ -237,6 +237,36 @@ describe('Command', () => {
       called.should.equal(true);
     });
 
+    it('preserves populate-- while counting halt-at-non-option default command positionals', () => {
+      let called = false;
+      const argv = yargs('my-host ls')
+        .usage(
+          '$0 <host> [cmd...]',
+          'Run command via ssh',
+          yargs =>
+            yargs
+              .positional('host', {type: 'string', demandOption: true})
+              .positional('cmd', {array: true, type: 'string'}),
+          argv2 => {
+            argv2.host.should.equal('my-host');
+            argv2.cmd.should.eql(['ls']);
+            argv2['--'].should.eql(['my-host', 'ls']);
+            called = true;
+          }
+        )
+        .strict()
+        .parserConfiguration({
+          'halt-at-non-option': true,
+          'populate--': true,
+        })
+        .parse();
+
+      argv.host.should.equal('my-host');
+      argv.cmd.should.eql(['ls']);
+      argv['--'].should.eql(['my-host', 'ls']);
+      called.should.equal(true);
+    });
+
     // Addresses: https://github.com/yargs/yargs/issues/1637
     it('does not overwrite options in argv if variadic', () => {
       yargs()
