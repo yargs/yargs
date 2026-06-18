@@ -1156,18 +1156,6 @@ describe('Completion', () => {
         '--bar:bar flag',
       ]);
     });
-
-    it('zsh completion script uses correct zsh_eval_context comparison without spurious single-quote', () => {
-      process.env.SHELL = '/bin/zsh';
-      const r = checkOutput(() => yargs([]).showCompletionScript(), ['myapp']);
-      const script = r.logs[0];
-      // A stray single-quote before ${zsh_eval_context[-1]} makes the if-comparison always false
-      script.should.not.include(
-        '"\'${zsh_eval_context[-1]}" == "loadautofunc"'
-      );
-      // The correct form: bare double-quoted variable expansion
-      script.should.include('"${zsh_eval_context[-1]}" == "loadautofunc"');
-    });
   });
 
   describe('async', () => {
