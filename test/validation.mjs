@@ -169,6 +169,44 @@ describe('validation tests', () => {
         .parse();
     });
 
+    it('redacts hidden implied options from implication failures', done => {
+      yargs(['--debug-mode'])
+        .option('debug-mode', {
+          type: 'boolean',
+        })
+        .option('hidden-debug', {
+          type: 'boolean',
+          hidden: true,
+        })
+        .implies('debug-mode', 'hidden-debug')
+        .fail(msg => {
+          msg.should.match(implicationsFailedPattern);
+          msg.should.include('debug-mode -> [hidden]');
+          msg.should.not.include('hidden-debug');
+          return done();
+        })
+        .parse();
+    });
+
+    it('redacts hidden implying options from implication failures', done => {
+      yargs(['--hidden-debug'])
+        .option('hidden-debug', {
+          type: 'boolean',
+          hidden: true,
+        })
+        .option('debug-mode', {
+          type: 'boolean',
+        })
+        .implies('hidden-debug', 'debug-mode')
+        .fail(msg => {
+          msg.should.match(implicationsFailedPattern);
+          msg.should.include('[hidden] -> debug-mode');
+          msg.should.not.include('hidden-debug');
+          return done();
+        })
+        .parse();
+    });
+
     it("fails if --no-foo's implied argument is not set", done => {
       yargs([])
         .implies({
