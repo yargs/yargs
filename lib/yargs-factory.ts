@@ -2377,23 +2377,22 @@ export interface OptionDefinition {
   type?: 'array' | 'boolean' | 'count' | 'number' | 'string';
 }
 
-interface PositionalDefinition
-  extends Pick<
-    OptionDefinition,
-    | 'alias'
-    | 'array'
-    | 'coerce'
-    | 'choices'
-    | 'conflicts'
-    | 'default'
-    | 'defaultDescription'
-    | 'demand'
-    | 'desc'
-    | 'describe'
-    | 'description'
-    | 'implies'
-    | 'normalize'
-  > {
+interface PositionalDefinition extends Pick<
+  OptionDefinition,
+  | 'alias'
+  | 'array'
+  | 'coerce'
+  | 'choices'
+  | 'conflicts'
+  | 'default'
+  | 'defaultDescription'
+  | 'demand'
+  | 'desc'
+  | 'describe'
+  | 'description'
+  | 'implies'
+  | 'normalize'
+> {
   type?: 'boolean' | 'number' | 'string';
 }
 
