@@ -859,4 +859,23 @@ describe('middleware', () => {
       );
     });
   });
+
+  describe('coerce on a reused instance', () => {
+    it('applies coerce on every parse of the same instance', () => {
+      let callCount = 0;
+      const y = yargs().coerce('bar', v => {
+        callCount++;
+        return 'C(' + v + ')';
+      });
+
+      const r1 = y.parse('--bar one');
+      const r2 = y.parse('--bar two');
+      const r3 = y.parse('--bar three');
+
+      r1.bar.should.equal('C(one)');
+      r2.bar.should.equal('C(two)');
+      r3.bar.should.equal('C(three)');
+      callCount.should.equal(3);
+    });
+  });
 });

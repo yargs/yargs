@@ -70,6 +70,13 @@ export class GlobalMiddleware {
   reset() {
     this.globalMiddleware = this.globalMiddleware.filter(m => m.global);
   }
+  // Reset the "applied" guard on mutating (coerce) middleware so they run
+  // again on the next top-level parse of a reused yargs instance.
+  resetApplied() {
+    for (const m of this.globalMiddleware) {
+      if (m.mutates) m.applied = false;
+    }
+  }
 }
 
 export function commandMiddlewareFactory(
