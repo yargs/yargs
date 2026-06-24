@@ -1235,7 +1235,20 @@ const argv = yargs()
   .parse(['--token', '-my-token']);
 ```
 
-parses as:
+By default, values that look like options are not consumed by `.nargs()`, so
+this produces a "Not enough arguments following: token" error. If the value
+should consume option-like arguments, enable the yargs-parser
+`nargs-eats-options` configuration:
+
+```js
+import yargs from 'yargs'
+const argv = yargs()
+  .nargs('token', 1)
+  .parserConfiguration({'nargs-eats-options': true})
+  .parse(['--token', '-my-token']);
+```
+
+This parses as:
 
 `{ _: [], token: '-my-token', '$0': 'node test' }`
 
