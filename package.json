@@ -56,7 +56,7 @@
     "cpr": "^3.0.1",
     "cross-env": "^10.0.0",
     "cross-spawn": "^7.0.6",
-    "eslint": "^8.57.1",
+    "eslint": "^10.0.0",
     "eslint-plugin-prettier": "^5.1.2",
     "gts": "^5.2.0",
     "hashish": "0.0.4",
