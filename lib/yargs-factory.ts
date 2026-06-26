@@ -1697,9 +1697,11 @@ export class YargsInstance {
       key,
       value,
       (type, key, value) => {
-        this.#options[type][key] = (
-          this.#options[type][key] || ([] as Options[T][keyof Options[T]])
-        ).concat(value);
+        const existing = (this.#options[type][key] || []) as unknown[];
+        for (const v of ([] as unknown[]).concat(value)) {
+          if (!existing.includes(v)) existing.push(v);
+        }
+        this.#options[type][key] = existing as Options[T][K];
       }
     );
   }
