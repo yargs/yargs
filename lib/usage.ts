@@ -240,7 +240,7 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
     // If there's only a single command, and it's the default command
     // (represented by commands[0][2]) don't show command stanza:
     //
-    // TODO(@bcoe): why isnt commands[0][2] an object with a named property?
+    // TODO(@bcoe): why isn't commands[0][2] an object with a named property?
     if (commands.length > 1 || (commands.length === 1 && !commands[0][2])) {
       ui.div(__('Commands:'));
 
