@@ -51,7 +51,7 @@
     "@typescript-eslint/eslint-plugin": "^8.26.1",
     "browserslist-generator": "^2.0.1",
     "c8": "^9.1.0",
-    "chai": "^4.2.0",
+    "chai": "^6.0.0",
     "chalk": "^4.0.0",
     "cpr": "^3.0.1",
     "cross-env": "^10.0.0",
