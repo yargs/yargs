@@ -4470,6 +4470,35 @@ describe('usage tests', () => {
           '  --custom-show-hidden  Show hidden options                            [boolean]',
         ]);
     });
+    // Refs: https://github.com/yargs/yargs/issues/2356
+    it('--help should display hidden options with --show-hidden when strip-dashed is enabled', () => {
+      const r = checkOutput(() =>
+        yargs('--help --show-hidden')
+          .options({
+            foo: {
+              describe: 'FOO',
+            },
+            bar: {},
+            baz: {
+              describe: 'BAZ',
+              hidden: true,
+            },
+          })
+          .parserConfiguration({'strip-dashed': true})
+          .parse()
+      );
+
+      r.logs[0]
+        .split('\n')
+        .should.deep.equal([
+          'Options:',
+          '  --help     Show help                                                 [boolean]',
+          '  --version  Show version number                                       [boolean]',
+          '  --foo      FOO',
+          '  --bar',
+          '  --baz      BAZ',
+        ]);
+    });
   });
 
   describe('help message caching', () => {
