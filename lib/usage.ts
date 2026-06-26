@@ -15,7 +15,7 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
   const __ = shim.y18n.__;
   const self = {} as UsageInstance;
 
-  // methods for ouputting/building failure message.
+  // methods for outputting/building failure message.
   const fails: (FailureFunction | boolean)[] = [];
   self.failFn = function failFn(f) {
     fails.push(f);
@@ -84,7 +84,7 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
     }
   };
 
-  // methods for ouputting/building help (usage) message.
+  // methods for outputting/building help (usage) message.
   let usages: [string, string][] = [];
   let usageDisabled = false;
   self.usage = (msg, description) => {

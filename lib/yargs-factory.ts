@@ -1275,7 +1275,7 @@ export class YargsInstance {
     return this.demand(keys, max, msg);
   }
   requiresArg(keys: string | string[] | Dictionary): YargsInstance {
-    // the 2nd paramter [number] in the argsert the assertion is mandatory
+    // the 2nd parameter [number] in the argsert the assertion is mandatory
     // as populateParserHintSingleValueDictionary recursively calls requiresArg
     // with Nan as a 2nd parameter, although we ignore it
     argsert('<array|string|object> [number]', [keys], arguments.length);
@@ -2393,23 +2393,22 @@ export interface OptionDefinition {
   type?: 'array' | 'boolean' | 'count' | 'number' | 'string';
 }
 
-interface PositionalDefinition
-  extends Pick<
-    OptionDefinition,
-    | 'alias'
-    | 'array'
-    | 'coerce'
-    | 'choices'
-    | 'conflicts'
-    | 'default'
-    | 'defaultDescription'
-    | 'demand'
-    | 'desc'
-    | 'describe'
-    | 'description'
-    | 'implies'
-    | 'normalize'
-  > {
+interface PositionalDefinition extends Pick<
+  OptionDefinition,
+  | 'alias'
+  | 'array'
+  | 'coerce'
+  | 'choices'
+  | 'conflicts'
+  | 'default'
+  | 'defaultDescription'
+  | 'demand'
+  | 'desc'
+  | 'describe'
+  | 'description'
+  | 'implies'
+  | 'normalize'
+> {
   type?: 'boolean' | 'number' | 'string';
 }
 

@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [17.7.3](https://github.com/yargs/yargs/compare/v17.7.2...v17.7.3) (2026-06-19)
+
+### Bug Fixes
+
+* fix: use entry point with file extension for anything that supports exports ([#2514](https://github.com/yargs/yargs/issues/2514)) ([c7597e3](https://github.com/yargs/yargs/commit/c7597e34a0ff27b4c2f3fdf6f3e1c137fe2212ed))
+
+## [16.2.2](https://github.com/yargs/yargs/compare/v16.2.0...v16.2.2) (2026-06-19)
+
+### Bug Fixes
+
+* fix: use entry point with .cjs file extension for yargs export ([#2546](https://github.com/yargs/yargs/issues/2546)) ([6feb819](https://github.com/yargs/yargs/commit/6feb81902ee4fa2fded5554d299b86aabd5bd5d2))
+
 ## [18.0.0](https://github.com/yargs/yargs/compare/v17.7.2...v18.0.0) (2025-05-26)
 
 

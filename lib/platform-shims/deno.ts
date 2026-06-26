@@ -46,7 +46,7 @@ const path = {
     try {
       return posix.relative(p1, p2);
     } catch (err) {
-      // Some yargs featuers require read access to the file system,
+      // Some yargs features require read access to the file system,
       // e.g., support for multiple locales.
       if (err.name !== 'PermissionDenied') {
         throw err;
