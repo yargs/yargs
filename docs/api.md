@@ -351,10 +351,10 @@ discussion of the advanced features exposed in the Command API.
 .completion([cmd], [description], [fn])
 ---------------------------------------
 
-Enable bash/zsh-completion shortcuts for commands and options.
+Enable bash/zsh/fish-completion shortcuts for commands and options.
 
-`cmd`: When present in `argv._`, will result in the `.bashrc` or `.zshrc` completion script
-being outputted.
+`cmd`: When present in `argv._`, will result in the `.bashrc`, `.zshrc`, or fish
+completion script being outputted.
 
 To enable bash/zsh completions, you can either: 
 1. Concat the generated script to your
@@ -373,6 +373,11 @@ To enable bash/zsh completions, you can either:
    command name.
 
    e.g. `./command completion > /usr/local/share/zsh/site-functions/_command_yargs_completions`
+
+For Fish, write it to a file in your fish completions directory (`$XDG_CONFIG_HOME/fish/completions`),
+   with the same name as the command.
+
+   e.g. `./command completion > ~/.config/fish/completions/command.fish`
 
 `description`: Provide a description in your usage instructions for the command
 that generates the completion scripts.
@@ -1563,9 +1568,9 @@ const yargs = yargs()
 .showCompletionScript()
 ----------------------
 
-Generate a bash completion script. Users of your application can install this
-script in their `.bashrc`, and yargs will provide completion shortcuts for
-commands and options.
+Generate a completion script for bash, zsh, or fish (depending on the current shell).
+Users of your application can install this script in their `.bashrc`, `.zshrc`, or fish
+completions directory, and yargs will provide completion shortcuts for commands and options.
 
 <a name="show-help">.showHelp([consoleLevel | printCallback])
 ---------------------------

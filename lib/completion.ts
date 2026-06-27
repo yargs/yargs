@@ -34,6 +34,7 @@ export class Completion implements CompletionInstance {
   private customCompletionFunction: CompletionFunction | null = null;
   private indexAfterLastReset = 0;
   private readonly zshShell: boolean;
+  private readonly fishShell: boolean;
 
   constructor(
     private readonly yargs: YargsInstance,
@@ -45,6 +46,7 @@ export class Completion implements CompletionInstance {
       (this.shim.getEnv('SHELL')?.includes('zsh') ||
         this.shim.getEnv('ZSH_NAME')?.includes('zsh')) ??
       false;
+    this.fishShell = this.shim.getEnv('SHELL')?.includes('fish') ?? false;
   }
 
   private defaultCompletion(
@@ -92,11 +94,13 @@ export class Completion implements CompletionInstance {
       this.usage.getCommands().forEach(usageCommand => {
         const commandName = parseCommand(usageCommand[0]).cmd;
         if (args.indexOf(commandName) === -1) {
-          if (!this.zshShell) {
-            completions.push(commandName);
-          } else {
-            const desc = usageCommand[1] || '';
+          const desc = usageCommand[1] || '';
+          if (this.fishShell) {
+            completions.push(commandName + '\t' + desc);
+          } else if (this.zshShell) {
             completions.push(commandName.replace(/:/g, '\\:') + ':' + desc);
+          } else {
+            completions.push(commandName);
           }
         }
       });
@@ -150,7 +154,11 @@ export class Completion implements CompletionInstance {
     if (this.previousArgHasChoices(args)) {
       const choices = this.getPreviousArgChoices(args);
       if (choices && choices.length > 0) {
-        completions.push(...choices.map(c => c.replace(/:/g, '\\:')));
+        if (this.fishShell) {
+          completions.push(...choices);
+        } else {
+          completions.push(...choices.map(c => c.replace(/:/g, '\\:')));
+        }
       }
     }
   }
@@ -185,7 +193,11 @@ export class Completion implements CompletionInstance {
     const choices = this.yargs.getOptions().choices[positionalKey] || [];
     for (const choice of choices) {
       if (choice.startsWith(current)) {
-        completions.push(choice.replace(/:/g, '\\:'));
+        if (this.fishShell) {
+          completions.push(choice);
+        } else {
+          completions.push(choice.replace(/:/g, '\\:'));
+        }
       }
     }
   }
@@ -255,7 +267,7 @@ export class Completion implements CompletionInstance {
     negable: boolean
   ) {
     let keyWithDesc = key;
-    if (this.zshShell) {
+    if (this.zshShell || this.fishShell) {
       const descs = this.usage.getDescriptions();
       const aliasKey = this?.aliases?.[key]?.find(alias => {
         const desc = descs[alias];
@@ -263,9 +275,14 @@ export class Completion implements CompletionInstance {
       });
       const descFromAlias = aliasKey ? descs[aliasKey] : undefined;
       const desc = descs[key] ?? descFromAlias ?? '';
-      keyWithDesc = `${key.replace(/:/g, '\\:')}:${desc
+      const cleanedDesc = desc
         .replace('__yargsString__:', '')
-        .replace(/(\r\n|\n|\r)/gm, ' ')}`;
+        .replace(/(\r\n|\n|\r)/gm, ' ');
+      if (this.fishShell) {
+        keyWithDesc = `${key}\t${cleanedDesc}`;
+      } else {
+        keyWithDesc = `${key.replace(/:/g, '\\:')}:${cleanedDesc}`;
+      }
     }
 
     const startsByTwoDashes = (s: string) => /^--/.test(s);
@@ -348,7 +365,9 @@ export class Completion implements CompletionInstance {
   generateCompletionScript($0: string, cmd: string): string {
     let script = this.zshShell
       ? templates.completionZshTemplate
-      : templates.completionShTemplate;
+      : this.fishShell
+        ? templates.completionFishTemplate
+        : templates.completionShTemplate;
     const name = this.shim.path.basename($0);
 
     // add ./ to applications not yet installed as bin.
