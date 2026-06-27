@@ -1240,7 +1240,7 @@ parses as:
 `{ _: [], files: ['src/index.js', 'test/index.js'], '$0': 'node test' }`
 
 By default, values that look like options are not consumed by `.nargs()`. If
-the value should consume option-like arguments, enable the yargs-parser
+the option should consume option-like arguments, enable the yargs-parser
 `nargs-eats-options` configuration:
 
 ```js
