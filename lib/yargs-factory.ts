@@ -130,6 +130,18 @@ const kSetHasOutput = Symbol('setHasOutput');
 const kTrackManuallySetKeys = Symbol('kTrackManuallySetKeys');
 const DEFAULT_LOCALE = 'en_US';
 
+function stripMatchingQuotes(value: string | number): string | number {
+  if (
+    typeof value === 'string' &&
+    value.length >= 2 &&
+    (value[0] === '"' || value[0] === "'") &&
+    value[0] === value[value.length - 1]
+  ) {
+    return value.slice(1, -1);
+  }
+  return value;
+}
+
 export interface YargsInternalMethods {
   getCommandInstance(): CommandInstance;
   getContext(): Context;
@@ -1997,6 +2009,10 @@ export class YargsInstance {
         configuration: {'parse-positional-numbers': false, ...config},
       })
     ) as DetailedArguments;
+
+    if (typeof args === 'string') {
+      parsed.argv._ = parsed.argv._.map(stripMatchingQuotes);
+    }
 
     const argv: Arguments = Object.assign(
       parsed.argv,
