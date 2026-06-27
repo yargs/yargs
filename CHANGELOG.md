@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [18.1.0](https://github.com/yargs/yargs/compare/v18.0.0...v18.1.0) (2026-06-27)
+
+
+### Features
+
+* ignore bun when getting bin name ([b77831c](https://github.com/yargs/yargs/commit/b77831c13c6abc9f896cac5e3ff1effe844d8cbe))
+
+
+### Bug Fixes
+
+* **lang:** 'count' for de locale ([#2476](https://github.com/yargs/yargs/issues/2476)) ([971e351](https://github.com/yargs/yargs/commit/971e351705f0fbc5566c6ed1dfd707fa65e11c0d))
+* **locale:** add Georgian translation ([#2474](https://github.com/yargs/yargs/issues/2474)) ([086aeaa](https://github.com/yargs/yargs/commit/086aeaa7d6793e7f369aa0aaa3e4f962ad878469))
+* prototype pollution vulnerability in apply-extends ([#2498](https://github.com/yargs/yargs/issues/2498)) ([437f3a4](https://github.com/yargs/yargs/commit/437f3a4e0f4166e1f1a3ce023b0331159582746d))
+
 ## [17.7.3](https://github.com/yargs/yargs/compare/v17.7.2...v17.7.3) (2026-06-19)
 
 ### Bug Fixes
