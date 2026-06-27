@@ -644,9 +644,18 @@ export class CommandInstance {
 
     const unparsed: string[] = [];
     Object.keys(positionalMap).forEach(key => {
-      positionalMap[key].map(value => {
-        if (options.configuration['unknown-options-as-args'])
-          options.key[key] = true;
+      if (options.configuration['unknown-options-as-args'])
+        options.key[key] = true;
+
+      if (parseOptions.array.includes(key)) {
+        if (positionalMap[key].length) {
+          unparsed.push(`--${key}`);
+          unparsed.push(...positionalMap[key]);
+        }
+        return;
+      }
+
+      positionalMap[key].forEach(value => {
         unparsed.push(`--${key}`);
         unparsed.push(value);
       });
