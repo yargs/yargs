@@ -2739,7 +2739,7 @@ describe('usage tests', () => {
         ]);
     });
 
-    it('allows a builder to disable usage with null after mutiple usage calls', () => {
+    it('allows a builder to disable usage with null after multiple usage calls', () => {
       const r = checkOutput(() =>
         yargs('upload --help')
           .command(

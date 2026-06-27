@@ -1358,7 +1358,7 @@ Valid `opt` keys include:
 - `demandOption`: boolean or string, demand the option be given, with optional error message, see [`demandOption()`](#demandOption)
 - `deprecate`/`deprecated`: boolean or string, mark option as deprecated, see [`deprecateOption()`](#deprecateOption)
 - `desc`/`describe`/`description`: string, the option description for help content, see [`describe()`](#describe)
-- `global`: boolean, indicate that this key should not be [reset](#reset) when a command is invoked, see [`global()`](#global)
+- `global`: boolean, indicate that this key should not be [reset](#global) when a command is invoked, see [`global()`](#global)
 - `group`: string, when displaying usage instructions place the option under an alternative group heading, see [`group()`](#group)
 - `hidden`: don't display option in help output.
 - `implies`: string or array of strings, require certain keys to be set, see [`implies()`](#implies)
@@ -1763,7 +1763,7 @@ present script similar to how `$0` works in bash or perl.
 
 If the optional `desc`/`builder`/`handler` are provided, `.usage()`
 acts an an alias for [`.command()`](#command). This allows you to use
-`.usage()` to configure the [default command](/docs/advanced.md#default-commands) that will be run as an entry-point to your application and allows you
+`.usage()` to configure the [default command](https://github.com/yargs/yargs/blob/main/docs/advanced.md#default-commands) that will be run as an entry-point to your application and allows you
 to provide configuration for the positional arguments accepted by your program:
 
 ```js
@@ -1799,5 +1799,6 @@ If the boolean argument `false` is provided, it will disable `--version`.
 Format usage output to wrap at `columns` many columns.
 
 By default wrap will be set to `Math.min(80, windowWidth)`. Use `.wrap(null)` to
-specify no column limit (no right-align). Use `.wrap(yargs.terminalWidth())` to
-maximize the width of yargs' usage instructions.
+specify no column limit (no right-align). Use `.wrap(y.terminalWidth())` (where
+`y` is your instance of `yargs()`) to maximize the width of yargs' usage
+instructions.
