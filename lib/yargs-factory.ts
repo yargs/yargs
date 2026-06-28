@@ -1683,8 +1683,7 @@ export class YargsInstance {
     T extends DictionaryKeyof<Options, any[]>,
     K extends keyof Options[T] & string = keyof Options[T] & string,
     V extends ValueOf<ValueOf<Options[T]>> | ValueOf<ValueOf<Options[T]>>[] =
-      | ValueOf<ValueOf<Options[T]>>
-      | ValueOf<ValueOf<Options[T]>>[],
+      ValueOf<ValueOf<Options[T]>> | ValueOf<ValueOf<Options[T]>>[],
   >(
     builder: (key: K, value: V, ...otherArgs: any[]) => YargsInstance,
     type: T,
