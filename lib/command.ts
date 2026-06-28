@@ -835,8 +835,7 @@ export interface CommandHandler {
 
 // To be completed later with other CommandBuilder flavours
 export type CommandBuilder =
-  | CommandBuilderCallback
-  | Dictionary<OptionDefinition>;
+  CommandBuilderCallback | Dictionary<OptionDefinition>;
 
 interface CommandBuilderCallback {
   (y: YargsInstance, helpOrVersionSet: boolean): YargsInstance | void;
