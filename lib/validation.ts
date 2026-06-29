@@ -44,7 +44,7 @@ export function validation(
             demandedCommands._.minMsg
               ? demandedCommands._.minMsg
                   .replace(/\$0/g, _s.toString())
-                  .replace(/\$1/, demandedCommands._.min.toString())
+                  .replace(/\$1/g, demandedCommands._.min.toString())
               : null
           );
         } else {
@@ -65,7 +65,7 @@ export function validation(
             demandedCommands._.maxMsg
               ? demandedCommands._.maxMsg
                   .replace(/\$0/g, _s.toString())
-                  .replace(/\$1/, demandedCommands._.max.toString())
+                  .replace(/\$1/g, demandedCommands._.max.toString())
               : null
           );
         } else {
