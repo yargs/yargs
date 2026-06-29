@@ -2282,6 +2282,31 @@ describe('usage tests', () => {
         ]);
     });
 
+    // See https://github.com/yargs/yargs/issues/2204
+    it('does not wrap command column at half of wrap() when no command has a description', () => {
+      const longCommand = 'deploy <region> <environment> <service-name>';
+
+      const help = checkOutput(() =>
+        yargs('--help').command(longCommand).wrap(80).parse()
+      );
+
+      // The command is 50 columns wide and fits comfortably within wrap(80);
+      // because there are no descriptions, the left column should be allowed
+      // to use the full width rather than being capped at half of wrap().
+      help.logs[0]
+        .split('\n')
+        .should.deep.equal([
+          'usage [command]',
+          '',
+          'Commands:',
+          '  usage deploy <region> <environment> <service-name>',
+          '',
+          'Options:',
+          '  --help     Show help                                                 [boolean]',
+          '  --version  Show version number                                       [boolean]',
+        ]);
+    });
+
     it('resets groups for a command handler, respecting order', () => {
       const r = checkOutput(() =>
         yargs(['upload', '-h'])

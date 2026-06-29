@@ -519,6 +519,13 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
   ) {
     let width = 0;
 
+    // the half-width cap below only makes sense when there is a right-hand
+    // (description) column to reserve space for. The array form carries that
+    // column in v[1]; the dict form (e.g. options) is rendered with separate
+    // descriptions, so always treat it as having a right-hand column.
+    const hasRightColumn =
+      !Array.isArray(table) || table.some(v => getText(v[1] ?? '') !== '');
+
     // table might be of the form [leftColumn],
     // or {key: leftColumn}
     if (!Array.isArray(table)) {
@@ -536,9 +543,10 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
       );
     });
 
-    // if we've enabled 'wrap' we should limit
-    // the max-width of the left-column.
-    if (theWrap)
+    // if we've enabled 'wrap' we should limit the max-width of the
+    // left-column, but only when there is a right-hand column to make
+    // room for; otherwise the left column may use the full width.
+    if (theWrap && hasRightColumn)
       width = Math.min(width, parseInt((theWrap * 0.5).toString(), 10));
 
     return width;
