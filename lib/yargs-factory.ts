@@ -2024,6 +2024,7 @@ export class YargsInstance {
     // need to clear the cached help message from the previous parse:
     if (commandIndex === 0) {
       this.#usage.clearCachedHelpMessage();
+      this.#globalMiddleware.resetApplied();
     }
 
     try {
