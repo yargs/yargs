@@ -4470,6 +4470,36 @@ describe('usage tests', () => {
           '  --custom-show-hidden  Show hidden options                            [boolean]',
         ]);
     });
+    it('--show-hidden should display hidden options when strip-dashed is enabled', () => {
+      const r = checkOutput(() =>
+        yargs('--help --show-hidden')
+          .options({
+            foo: {
+              describe: 'FOO',
+            },
+            bar: {},
+            baz: {
+              describe: 'BAZ',
+              hidden: true,
+            },
+          })
+          .showHidden('show-hidden', 'Show hidden options')
+          .parserConfiguration({'strip-dashed': true})
+          .parse()
+      );
+
+      r.logs[0]
+        .split('\n')
+        .should.deep.equal([
+          'Options:',
+          '  --help         Show help                                             [boolean]',
+          '  --version      Show version number                                   [boolean]',
+          '  --foo          FOO',
+          '  --bar',
+          '  --baz          BAZ',
+          '  --show-hidden  Show hidden options                                   [boolean]',
+        ]);
+    });
   });
 
   describe('help message caching', () => {
