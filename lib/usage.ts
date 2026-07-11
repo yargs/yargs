@@ -512,8 +512,7 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
   // in the left-hand column of a table.
   function maxWidth(
     table:
-      | [string | IndentedText, ...any[]][]
-      | Dictionary<string | IndentedText>,
+      [string | IndentedText, ...any[]][] | Dictionary<string | IndentedText>,
     theWrap?: number | null,
     modifier?: string
   ) {
