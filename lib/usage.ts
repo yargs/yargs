@@ -609,9 +609,14 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
   }
 
   function filterHiddenOptions(key: string) {
+    const argv = (yargs.parsed as DetailedArguments).argv;
+    const showHiddenOpt = yargs.getOptions().showHiddenOpt;
+    // With `strip-dashed`, the dashed key is removed from argv, so also check
+    // the camel-cased form to detect whether --show-hidden was passed.
     return (
       yargs.getOptions().hiddenOptions.indexOf(key) < 0 ||
-      (yargs.parsed as DetailedArguments).argv[yargs.getOptions().showHiddenOpt]
+      argv[showHiddenOpt] ||
+      argv[shim.Parser.camelCase(showHiddenOpt)]
     );
   }
 

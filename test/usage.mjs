@@ -4376,6 +4376,22 @@ describe('usage tests', () => {
           '  --baz      BAZ',
         ]);
     });
+    // See https://github.com/yargs/yargs/issues/2356
+    it('--help should display hidden options with --show-hidden even when strip-dashed is set', () => {
+      const r = checkOutput(() =>
+        yargs('--help --show-hidden')
+          .options({
+            foo: {
+              describe: 'FOO',
+              hidden: true,
+            },
+          })
+          .parserConfiguration({'strip-dashed': true})
+          .parse()
+      );
+
+      r.logs[0].should.match(/--foo\s+FOO/);
+    });
     it('--help should display all groups (including ones with only hidden options) with --show-hidden', () => {
       const r = checkOutput(
         () =>
