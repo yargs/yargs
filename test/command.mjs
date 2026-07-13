@@ -1895,6 +1895,21 @@ describe('Command', () => {
         .parse();
     });
 
+    // addresses https://github.com/yargs/yargs/issues/1797
+    it('fails when a synchronous command handler throws', done => {
+      const error = new Error('sync handler error');
+      yargs('foo')
+        .command('foo', 'foo command', noop, () => {
+          throw error;
+        })
+        .fail((msg, err) => {
+          expect(msg).to.equal(null);
+          expect(err).to.equal(error);
+          done();
+        })
+        .parse();
+    });
+
     it('returns promise that resolves arguments once handler succeeds', async () => {
       let complete = false;
       const handler = new Promise((resolve, reject) => {

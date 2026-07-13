@@ -25,6 +25,7 @@ import {
   DetailedArguments,
 } from './yargs-factory.js';
 import {maybeAsyncResult} from './utils/maybe-async-result.js';
+import {YError} from './yerror.js';
 
 const DEFAULT_MARKER = /(^\*)|(^\$0)/;
 export type DefinitionOrCommandName = string | CommandHandlerDefinition;
@@ -448,12 +449,27 @@ export class CommandInstance {
         .postProcess(innerArgv, populateDoubleDash, false, false);
 
       innerArgv = applyMiddleware(innerArgv, yargs, middlewares, false);
-      innerArgv = maybeAsyncResult<Arguments>(innerArgv, result => {
-        const handlerResult = commandHandler.handler(result as Arguments);
-        return isPromise(handlerResult)
-          ? handlerResult.then(() => result)
-          : result;
-      });
+      try {
+        innerArgv = maybeAsyncResult<Arguments>(innerArgv, result => {
+          const handlerResult = commandHandler.handler(result as Arguments);
+          return isPromise(handlerResult)
+            ? handlerResult.then(() => result)
+            : result;
+        });
+      } catch (error) {
+        // A synchronous command handler that throws should be routed through
+        // .fail() just like a command handler that rejects a promise (below).
+        if (yargs.getInternalMethods().hasParseCallback()) throw error;
+        try {
+          yargs
+            .getInternalMethods()
+            .getUsageInstance()
+            .fail(null, error as YError);
+        } catch (_err) {
+          // If .fail(false) is not set, and no parse cb() has been
+          // registered, run usage's default fail method.
+        }
+      }
 
       if (!isDefaultCommand) {
         yargs.getInternalMethods().getUsageInstance().cacheHelpMessage();
