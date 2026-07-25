@@ -340,7 +340,7 @@ cmds/init.mjs:
 
 ```js
 export const command = 'init [dir]'
-export const desc = 'Create an empty repo'
+export const describe = 'Create an empty repo'
 export const builder = {
   dir: {
     default: '.'
@@ -355,7 +355,7 @@ cmds/remote.mjs:
 
 ```js
 export const command = 'remote <command>'
-export const desc = 'Manage set of tracked repos'
+export const describe = 'Manage set of tracked repos'
 export function builder (yargs) {
   return yargs().commandDir('remote_cmds')
 }
@@ -366,7 +366,7 @@ cmds/remote_cmds/add.mjs:
 
 ```js
 export const command = 'add <name> <url>'
-export const desc = 'Add remote named <name> for repo at url <url>'
+export const describe = 'Add remote named <name> for repo at url <url>'
 export const builder = {}
 export function handler (argv) {
   console.log('adding remote %s at url %s', argv.name, argv.url)
@@ -377,7 +377,7 @@ cmds/remote_cmds/prune.mjs:
 
 ```js
 export const command = 'prune <name> [names..]'
-export const desc = 'Delete tracked branches gone stale for remotes'
+export const describe = 'Delete tracked branches gone stale for remotes'
 export const builder = {}
 export function handler (argv) {
   console.log('pruning remotes %s', [].concat(argv.name).concat(argv.names).join(', '))
