@@ -1231,11 +1231,27 @@ useful hint to prevent parsing ambiguity. For example:
 ```js
 import yargs from 'yargs'
 const argv = yargs()
-  .nargs('token', 1)
-  .parse(['--token', '-my-token']);
+  .nargs('files', 2)
+  .parse(['--files', 'src/index.js', 'test/index.js']);
 ```
 
 parses as:
+
+`{ _: [], files: ['src/index.js', 'test/index.js'], '$0': 'node test' }`
+
+By default, values that look like options are not consumed by `.nargs()`. If
+the option should consume option-like arguments, enable the yargs-parser
+`nargs-eats-options` configuration:
+
+```js
+import yargs from 'yargs'
+const argv = yargs()
+  .nargs('token', 1)
+  .parserConfiguration({'nargs-eats-options': true})
+  .parse(['--token', '-my-token']);
+```
+
+This parses as:
 
 `{ _: [], token: '-my-token', '$0': 'node test' }`
 
