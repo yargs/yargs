@@ -68,6 +68,7 @@ function mergeDeep(config1: Dictionary, config2: Dictionary) {
   }
   Object.assign(target, config1);
   for (const key of Object.keys(config2)) {
+    if (key === '__proto__') continue;
     if (isObject(config2[key]) && isObject(target[key])) {
       target[key] = mergeDeep(config1[key], config2[key]);
     } else {

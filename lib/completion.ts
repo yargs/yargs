@@ -401,9 +401,7 @@ export function completion(
 }
 
 export type CompletionFunction =
-  | SyncCompletionFunction
-  | AsyncCompletionFunction
-  | FallbackCompletionFunction;
+  SyncCompletionFunction | AsyncCompletionFunction | FallbackCompletionFunction;
 
 interface SyncCompletionFunction {
   (current: string, argv: Arguments): string[] | Promise<string[]>;
