@@ -356,6 +356,16 @@ Enable bash/zsh/fish-completion shortcuts for commands and options.
 `cmd`: When present in `argv._`, will result in the `.bashrc`, `.zshrc`, or fish
 completion script being outputted.
 
+`description`: Provide a description in your usage instructions for the command
+that generates the completion scripts.
+
+`fn`: Rather than relying on yargs' default completion functionality, which
+shiver me timbers is pretty awesome, you can provide your own completion
+method.
+
+If invoked without parameters, `.completion()` will make `completion` the command to output
+the completion script.
+
 To enable bash/zsh completions, you can either: 
 1. Concat the generated script to your
    `.bashrc` or `.bash_profile` (or `.zshrc` for zsh).
@@ -374,20 +384,10 @@ To enable bash/zsh completions, you can either:
 
    e.g. `./command completion > /usr/local/share/zsh/site-functions/_command_yargs_completions`
 
-For Fish, write it to a file in your fish completions directory (`$XDG_CONFIG_HOME/fish/completions`),
+For Fish, write it to a file in your fish completions directory (`~/.config/fish/completions`),
    with the same name as the command.
 
    e.g. `./command completion > ~/.config/fish/completions/command.fish`
-
-`description`: Provide a description in your usage instructions for the command
-that generates the completion scripts.
-
-`fn`: Rather than relying on yargs' default completion functionality, which
-shiver me timbers is pretty awesome, you can provide your own completion
-method.
-
-If invoked without parameters, `.completion()` will make `completion` the command to output
-the completion script.
 
 ```js
 import yargs from 'yargs'

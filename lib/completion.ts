@@ -363,11 +363,14 @@ export class Completion implements CompletionInstance {
 
   // generate the completion script to add to your .bashrc.
   generateCompletionScript($0: string, cmd: string): string {
-    let script = this.zshShell
-      ? templates.completionZshTemplate
-      : this.fishShell
-        ? templates.completionFishTemplate
-        : templates.completionShTemplate;
+    let script;
+    if (this.zshShell) {
+      script = templates.completionZshTemplate;
+    } else if (this.fishShell) {
+      script = templates.completionFishTemplate;
+    } else {
+      script = templates.completionShTemplate;
+    }
     const name = this.shim.path.basename($0);
 
     // add ./ to applications not yet installed as bin.
