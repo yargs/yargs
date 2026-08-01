@@ -68,6 +68,21 @@ describe('Command', () => {
       argv.should.have.property('awesome', 'world');
     });
 
+    it('strips shell quotes from string positionals', () => {
+      const argv = yargs()
+        .command('echo [pos]')
+        .parse('echo "a b" --opt "a b"');
+
+      argv.opt.should.equal('a b');
+      argv.pos.should.equal('a b');
+    });
+
+    it('preserves literal quotes in array positionals', () => {
+      const argv = yargs().command('echo [pos]').parse(['echo', '"a b"']);
+
+      argv.pos.should.equal('"a b"');
+    });
+
     it('populates argv with camel-case variants of arguments when possible', () => {
       const argv = yargs('foo hello world')
         .command('foo <foo-bar> [baz-qux]')
