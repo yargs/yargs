@@ -324,6 +324,18 @@ describe('Command', () => {
       argv.files.should.deep.equal(['file1', 'file2', 'file3']);
     });
 
+    it('keeps every variadic positional when duplicate argument arrays are disabled', () => {
+      const argv = yargs('test name key1 value1 key2 value2')
+        .parserConfiguration({'duplicate-arguments-array': false})
+        .command('test <name> <key> <value> [extras...]')
+        .parse();
+
+      argv.name.should.equal('name');
+      argv.key.should.equal('key1');
+      argv.value.should.equal('value1');
+      argv.extras.should.deep.equal(['key2', 'value2']);
+    });
+
     it('fails if required arguments are missing', done => {
       yargs('foo /root')
         .command('foo <root> <files..>')
