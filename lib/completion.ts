@@ -124,7 +124,7 @@ export class Completion implements CompletionInstance {
 
       Object.keys(options.key).forEach(key => {
         const negable =
-          !!options.configuration['boolean-negation'] &&
+          options.configuration['boolean-negation'] !== false &&
           options.boolean.includes(key);
         const isPositionalKey = positionalKeys.includes(key);
 
@@ -134,12 +134,7 @@ export class Completion implements CompletionInstance {
           !options.hiddenOptions.includes(key) &&
           !this.argsContainKey(args, key, negable)
         ) {
-          this.completeOptionKey(
-            key,
-            completions,
-            current,
-            negable && !!options.default[key]
-          );
+          this.completeOptionKey(key, completions, current, negable);
         }
       });
     }
