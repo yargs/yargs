@@ -184,6 +184,11 @@ simply needs to export:
 * `exports.builder`: object declaring the options the command accepts, or a function accepting and returning a yargs instance
 * `exports.handler`: a function which will be passed the parsed argv.
 * `exports.deprecated`: a boolean (or string) to show deprecation notice.
+* `exports.middlewares`: an array of middleware functions applied only to this command.
+
+The same keys (`command`, `aliases`, `describe`/`desc`/`description`, `builder`,
+`handler`, `deprecated`, `middlewares`) can be passed to `.command({ ... })`
+instead of loading a module. See the [`.command()` API](./api.md#command).
 
 ```js
 // my-module.js

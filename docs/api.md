@@ -264,8 +264,8 @@ to include the command; any falsy value to exclude/skip it.
 `exclude`: Block list certain modules. Either a regex or callback can be provided. Return `true` from the callback to skip the file.
 
 <a name="command"></a>
-.command(cmd, desc, [builder], [handler])
------------------------------------------
+.command(cmd, desc, [builder], [handler], [middlewares], [deprecated])
+----------------------------------------------------------------------
 .command(cmd, desc, [module])
 -----------------------------
 .command(module)
@@ -341,6 +341,53 @@ yargs()
   )
   .help()
   .parse(hideBin(process.argv))
+```
+
+You can also pass command-scoped middleware and mark a command as deprecated.
+When using positional arguments, provide an empty middleware array if you only
+need to set `deprecated`:
+
+```js
+import yargs from 'yargs'
+import { hideBin } from 'yargs/helpers'
+yargs()
+  .command('legacy', 'old command', {}, (argv) => {
+    console.log(argv)
+  }, [], true)
+  .help()
+  .parse(hideBin(process.argv))
+```
+
+The object form of `.command()` accepts the same fields (and is the recommended
+way to set them):
+
+* `command`: string (or array of strings) for the command and optional aliases
+* `aliases`: array of strings (or a single string) with additional aliases
+* `describe` / `desc` / `description`: description shown in help; use `false` for a hidden command
+* `builder`: options object, or a function that receives a `yargs` instance
+* `handler`: function executed with the parsed `argv`
+* `middlewares`: array of middleware functions for this command only (see [`.middleware()`](#middleware))
+* `deprecated`: boolean, or a string message, to show a `[deprecated]` notice in help
+
+```js
+import yargs from 'yargs'
+import { hideBin } from 'yargs/helpers'
+yargs()
+  .command({
+    command: 'legacy',
+    describe: 'old command',
+    deprecated: 'use modern instead',
+    handler: (argv) => {
+      console.log(argv)
+    }
+  })
+  .help()
+  .parse(hideBin(process.argv))
+```
+
+```
+Commands:
+  legacy  old command               [deprecated: use modern instead]
 ```
 
 ***Note:*** `.parse()` should only be used at the top level, not inside a command's builder function.
