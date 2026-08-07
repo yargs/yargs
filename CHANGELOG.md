@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [18.2.0](https://github.com/yargs/yargs/compare/v18.1.0...v18.2.0) (2026-08-07)
+
+
+### Features
+
+* support creating completions for fish shell ([#2568](https://github.com/yargs/yargs/issues/2568)) ([34d833a](https://github.com/yargs/yargs/commit/34d833aab18553aedee4b6cf5c1ad752eb8b8427))
+
 ## [18.1.0](https://github.com/yargs/yargs/compare/v18.0.0...v18.1.0) (2026-07-26)
 
 
