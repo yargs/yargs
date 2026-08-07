@@ -31,11 +31,15 @@ describe('validation tests', () => {
                 }
                 return true;
               }),
-          () => {
-            expect.fail();
-          }
+          // A failing check routes the error to .fail() but (as with the
+          // asynchronous handler path) does not prevent the handler from
+          // running, so keep the handler side-effect free here.
+          () => {}
         )
-        .fail(() => {
+        .fail((msg, err) => {
+          expect(err.message).to.equal(
+            'Option "name" must be a non-empty string'
+          );
           return done();
         })
         .parse('--name');
