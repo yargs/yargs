@@ -1294,6 +1294,26 @@ describe('validation tests', () => {
         .parse();
     });
 
+    // See: https://github.com/yargs/yargs/issues/2481
+    it('reports unknown command after a reused instance failed validation', () => {
+      const parser = yargs()
+        .strictCommands()
+        .command('build <prompt>', 'build command', yargs =>
+          yargs.positional('prompt', {type: 'string'})
+        )
+        .fail(msg => {
+          throw new Error(msg);
+        });
+
+      // Fails inside the "build" command, which used to leave the command
+      // context and demanded positionals applied to the shared instance.
+      expect(() => parser.parse(['build'])).to.throw();
+
+      expect(() => parser.parse(['fly', 'away'])).to.throw(
+        'Unknown commands: fly, away'
+      );
+    });
+
     it('does not apply implicit strictCommands to inner commands', () => {
       const parse = yargs('foo blarg --cool beans')
         .demandCommand()

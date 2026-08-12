@@ -1113,10 +1113,16 @@ export class YargsInstance {
 
     if (this.#parseFn) this.#exitProcess = false;
 
-    const parsed = this[kRunYargsParserAndExecuteCommands](
-      args,
-      !!shortCircuit
-    );
+    let parsed: Arguments | Promise<Arguments>;
+    try {
+      parsed = this[kRunYargsParserAndExecuteCommands](args, !!shortCircuit);
+    } catch (err) {
+      // A custom .fail() handler (or a command handler) may throw. Pop the
+      // stack anyway, otherwise state applied by a command builder leaks into
+      // subsequent parses of the same instance.
+      this[kUnfreeze]();
+      throw err;
+    }
     const tmpParsed = this.parsed;
     this.#completion!.setParsed(this.parsed as DetailedArguments);
     if (isPromise(parsed)) {
@@ -1541,6 +1547,7 @@ export class YargsInstance {
       parsed: this.parsed,
       parseFn: this.#parseFn!,
       parseContext: this.#parseContext,
+      contextDepth: this.#context.commands.length,
     });
     this.#usage.freeze();
     this.#validation.freeze();
@@ -1765,6 +1772,10 @@ export class YargsInstance {
       parseFn: this.#parseFn,
       parseContext: this.#parseContext,
     } = frozen);
+    // A command that fails validation never pops itself off the context, so
+    // truncate rather than assuming the pops were balanced.
+    this.#context.commands.length = frozen.contextDepth;
+    this.#context.fullCommands.length = frozen.contextDepth;
     this.#options.configObjects = configObjects;
     this.#usage.unfreeze();
     this.#validation.unfreeze();
@@ -2410,6 +2421,7 @@ interface FrozenYargsInstance {
   parsed: DetailedArguments | false;
   parseFn: ParseCallback | null;
   parseContext: object | null;
+  contextDepth: number;
 }
 
 interface ParseCallback {
