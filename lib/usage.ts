@@ -608,10 +608,20 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
     return groupedKeys;
   }
 
+  function isShowHiddenSet() {
+    const argv = (yargs.parsed as DetailedArguments).argv;
+    const showHiddenOpt = yargs.getOptions().showHiddenOpt;
+    if (argv[showHiddenOpt]) return true;
+    // strip-dashed stores kebab keys as camelCase on argv (see issues/2356).
+    if (yargs.getInternalMethods().getParserConfiguration()['strip-dashed']) {
+      return !!argv[shim.Parser.camelCase(showHiddenOpt)];
+    }
+    return false;
+  }
+
   function filterHiddenOptions(key: string) {
     return (
-      yargs.getOptions().hiddenOptions.indexOf(key) < 0 ||
-      (yargs.parsed as DetailedArguments).argv[yargs.getOptions().showHiddenOpt]
+      yargs.getOptions().hiddenOptions.indexOf(key) < 0 || isShowHiddenSet()
     );
   }
 
