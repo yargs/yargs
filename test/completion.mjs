@@ -111,6 +111,34 @@ describe('Completion', () => {
           r.logs.should.include('--bar');
         });
 
+        it('completes negated boolean options after a --no- prefix', () => {
+          process.env.SHELL = '/bin/bash';
+          const r = checkOutput(
+            () =>
+              yargs([...firstArguments, './completion', '--no-']).options({
+                foo: {describe: 'foo flag', type: 'boolean'},
+                bar: {describe: 'bar flag', type: 'boolean', default: true},
+              }).argv
+          );
+
+          r.logs.should.include('--no-foo');
+          r.logs.should.include('--no-bar');
+          r.logs.should.not.include('--no-help');
+          r.logs.should.not.include('--no-version');
+        });
+
+        it('does not complete negated boolean options when boolean-negation is disabled', () => {
+          process.env.SHELL = '/bin/bash';
+          const r = checkOutput(
+            () =>
+              yargs([...firstArguments, './completion', '--no-'])
+                .option('foo', {describe: 'foo flag', type: 'boolean'})
+                .parserConfiguration({'boolean-negation': false}).argv
+          );
+
+          r.logs.should.not.include('--no-foo');
+        });
+
         it('avoids repeating flags whose negated counterparts are already included', () => {
           const r = checkOutput(
             () =>
@@ -1156,6 +1184,23 @@ describe('Completion', () => {
         '--bar:bar flag',
       ]);
     });
+
+    it('completes negated boolean options after a --no- prefix', () => {
+      process.env.SHELL = '/bin/zsh';
+
+      const r = checkOutput(
+        () =>
+          yargs(['./completion', '--get-yargs-completions', '--no-']).options({
+            foo: {describe: 'foo flag', type: 'boolean'},
+            bar: {describe: 'bar flag', type: 'boolean', default: true},
+          }).argv
+      );
+
+      r.logs.should.include('--no-foo:foo flag');
+      r.logs.should.include('--no-bar:bar flag');
+      r.logs.should.not.include('--no-help:Show help');
+      r.logs.should.not.include('--no-version:Show version number');
+    });
   });
 
   describe('fish', () => {
@@ -1338,6 +1383,23 @@ describe('Completion', () => {
         '--no-foo\tfoo flag',
         '--bar\tbar flag',
       ]);
+    });
+
+    it('completes negated boolean options after a --no- prefix', () => {
+      process.env.SHELL = '/usr/bin/fish';
+
+      const r = checkOutput(
+        () =>
+          yargs(['./completion', '--get-yargs-completions', '--no-']).options({
+            foo: {describe: 'foo flag', type: 'boolean'},
+            bar: {describe: 'bar flag', type: 'boolean', default: true},
+          }).argv
+      );
+
+      r.logs.should.include('--no-foo\tfoo flag');
+      r.logs.should.include('--no-bar\tbar flag');
+      r.logs.should.not.include('--no-help\tShow help');
+      r.logs.should.not.include('--no-version\tShow version number');
     });
 
     it('completes choices if previous option requires a choice', () => {

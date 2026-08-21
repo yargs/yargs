@@ -123,9 +123,16 @@ export class Completion implements CompletionInstance {
         this.yargs.getGroups()[this.usage.getPositionalGroupName()] || [];
 
       Object.keys(options.key).forEach(key => {
+        const booleanNegation = options.configuration['boolean-negation'];
         const negable =
-          !!options.configuration['boolean-negation'] &&
-          options.boolean.includes(key);
+          booleanNegation === true && options.boolean.includes(key);
+        const completeNegated =
+          booleanNegation !== false &&
+          options.boolean.includes(key) &&
+          ((booleanNegation === true && !!options.default[key]) ||
+            (current.startsWith('--no-') &&
+              key !== 'help' &&
+              key !== 'version'));
         const isPositionalKey = positionalKeys.includes(key);
 
         // If the key is not positional and its aliases aren't in 'args', add the key to 'completions'
@@ -134,12 +141,7 @@ export class Completion implements CompletionInstance {
           !options.hiddenOptions.includes(key) &&
           !this.argsContainKey(args, key, negable)
         ) {
-          this.completeOptionKey(
-            key,
-            completions,
-            current,
-            negable && !!options.default[key]
-          );
+          this.completeOptionKey(key, completions, current, completeNegated);
         }
       });
     }
