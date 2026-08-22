@@ -1299,6 +1299,24 @@ describe('Completion', () => {
         r.logs.should.include('apple\tbanana');
         r.logs.should.include('foo\tbar');
       });
+
+      it('escapes tabs in choice values so fish does not treat them as description separators', () => {
+        process.env.SHELL = '/usr/bin/fish';
+        const r = checkOutput(() => {
+          yargs()
+            .option('env', {choices: ['dev:test', 'pro\tduction']})
+            .completion()
+            .getCompletion(['--env', ''], (_err, completions) => {
+              (completions || []).forEach(completion => {
+                console.log(completion);
+              });
+            });
+        });
+
+        r.logs.should.include('dev:test');
+        // a literal tab would make fish read "duction" as the description
+        r.logs.should.include('pro\\tduction');
+      });
     });
 
     it('does not apply validation when --get-yargs-completions is passed in', () => {

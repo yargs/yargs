@@ -155,7 +155,9 @@ export class Completion implements CompletionInstance {
       const choices = this.getPreviousArgChoices(args);
       if (choices && choices.length > 0) {
         if (this.fishShell) {
-          completions.push(...choices);
+          // fish splits completions on the first tab, so a literal tab inside
+          // a choice would be read as the start of the description
+          completions.push(...choices.map(c => c.replace(/\t/g, '\\t')));
         } else {
           completions.push(...choices.map(c => c.replace(/:/g, '\\:')));
         }
@@ -194,7 +196,7 @@ export class Completion implements CompletionInstance {
     for (const choice of choices) {
       if (choice.startsWith(current)) {
         if (this.fishShell) {
-          completions.push(choice);
+          completions.push(choice.replace(/\t/g, '\\t'));
         } else {
           completions.push(choice.replace(/:/g, '\\:'));
         }
