@@ -2711,6 +2711,54 @@ describe('usage tests', () => {
         ]);
     });
 
+    it('does not wrap commands without descriptions at half width', () => {
+      const r = checkOutput(() =>
+        yargs('help')
+          .command('obliterate <city|country|continent>')
+          .wrap(80)
+          .parse()
+      );
+
+      r.logs[0]
+        .split('\n')
+        .should.deep.equal([
+          'usage [command]',
+          '',
+          'Commands:',
+          '  usage obliterate <city|country|continent>',
+          '',
+          'Options:',
+          '  --help     Show help                                                 [boolean]',
+          '  --version  Show version number                                       [boolean]',
+        ]);
+    });
+
+    it('moves descriptions below commands that would wrap at half width', () => {
+      const r = checkOutput(() =>
+        yargs('help')
+          .command(
+            'encabulate <problem> <chaos> [maxdepth]',
+            'recursively encabulate a problem over an arbitrary chaos manifold'
+          )
+          .wrap(80)
+          .parse()
+      );
+
+      r.logs[0]
+        .split('\n')
+        .should.deep.equal([
+          'usage [command]',
+          '',
+          'Commands:',
+          '  usage encabulate <problem> <chaos> [maxdepth]',
+          '      recursively encabulate a problem over an arbitrary chaos manifold',
+          '',
+          'Options:',
+          '  --help     Show help                                                 [boolean]',
+          '  --version  Show version number                                       [boolean]',
+        ]);
+    });
+
     it('allows a builder to add more than one usage with multiple usage calls', () => {
       const r = checkOutput(() =>
         yargs('upload --help')

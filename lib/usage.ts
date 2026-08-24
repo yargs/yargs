@@ -257,21 +257,36 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
       }
 
       const prefix = base$0 ? `${base$0} ` : '';
+      const commandWidth =
+        maxWidth(commands, theWrap, `${base$0}${parentCommands}`) + 4;
 
       commands.forEach(command => {
         const commandString = `${prefix}${parentCommands}${command[0].replace(
           /^\$0 ?/,
           ''
         )}`; // drop $0 from default commands.
-        ui.span(
-          {
-            text: commandString,
-            padding: [0, 2, 0, 2],
-            width:
-              maxWidth(commands, theWrap, `${base$0}${parentCommands}`) + 4,
-          },
-          {text: command[1]}
-        );
+        const commandStringWidth = shim.stringWidth(commandString) + 4;
+        const commandHasDescription = Boolean(command[1]);
+        let renderedCommandWithSpan = false;
+        if (
+          !commandHasDescription ||
+          (theWrap && commandStringWidth > commandWidth)
+        ) {
+          ui.div({text: commandString, padding: [0, 0, 0, 2]});
+          if (commandHasDescription) {
+            ui.div({text: command[1], padding: [0, 0, 0, 6]});
+          }
+        } else {
+          ui.span(
+            {
+              text: commandString,
+              padding: [0, 2, 0, 2],
+              width: commandWidth,
+            },
+            {text: command[1]}
+          );
+          renderedCommandWithSpan = true;
+        }
         const hints = [];
         if (command[2]) hints.push(`[${__('default')}]`);
         if (command[3] && command[3].length) {
@@ -291,7 +306,7 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
             align: 'right',
           });
         } else {
-          ui.div();
+          if (renderedCommandWithSpan) ui.div();
         }
       });
 
