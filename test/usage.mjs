@@ -1611,6 +1611,26 @@ describe('usage tests', () => {
         r.emittedWarnings[0].should.match(/reserved word/);
       });
 
+      it('does not show version for a default option value', () => {
+        const r = checkOutput(() =>
+          yargs()
+            .option('version', {
+              default: '0.0.1',
+              describe: 'version desc',
+              type: 'string',
+            })
+            .wrap(null)
+            .parse()
+        );
+
+        r.should.have.property('result');
+        r.result.should.have.property('version').and.equal('0.0.1');
+        r.should.have.property('logs').with.length(0);
+        r.should.have.property('exit').and.equal(false);
+        r.should.have.property('emittedWarnings').with.length(1);
+        r.emittedWarnings[0].should.match(/reserved word/);
+      });
+
       it('does not emit warning if version is disabled', () => {
         const r = checkOutput(() =>
           yargs

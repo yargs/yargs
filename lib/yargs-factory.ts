@@ -130,6 +130,33 @@ const kSetHasOutput = Symbol('setHasOutput');
 const kTrackManuallySetKeys = Symbol('kTrackManuallySetKeys');
 const DEFAULT_LOCALE = 'en_US';
 
+function isVersionOptionExplicitlySet(
+  args: string | string[],
+  versionOpt: string,
+  aliases: Dictionary<string[]>
+): boolean {
+  const versionKeys = new Set([versionOpt, ...(aliases[versionOpt] || [])]);
+  const rawArgs = Array.isArray(args)
+    ? args
+    : args.split(/\s+/).filter(Boolean);
+
+  return rawArgs.some(arg => {
+    if (arg.startsWith('--')) {
+      const key = arg.slice(2).split('=')[0];
+      return versionKeys.has(key);
+    }
+
+    if (arg.startsWith('-') && arg.length > 1) {
+      const keys = arg.slice(1).split('=')[0];
+      return [...versionKeys].some(
+        key => key.length === 1 && keys.includes(key)
+      );
+    }
+
+    return false;
+  });
+}
+
 export interface YargsInternalMethods {
   getCommandInstance(): CommandInstance;
   getContext(): Context;
@@ -2009,10 +2036,15 @@ export class YargsInstance {
     Object.keys(argv).forEach(key => {
       if (key === this.#helpOpt && argv[key]) {
         helpOptSet = true;
-      } else if (key === this.#versionOpt && argv[key]) {
-        versionOptSet = true;
       }
     });
+    if (this.#versionOpt) {
+      versionOptSet = isVersionOptionExplicitlySet(
+        args,
+        this.#versionOpt,
+        aliases
+      );
+    }
 
     argv.$0 = this.$0;
     this.parsed = parsed;
