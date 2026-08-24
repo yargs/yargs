@@ -500,7 +500,8 @@ export class CommandInstance {
         commandHandler,
         innerArgv as Arguments,
         currentContext,
-        yargs
+        yargs,
+        isDefaultCommand
       );
     }
     const middlewares = this.globalMiddleware
@@ -545,9 +546,18 @@ export class CommandInstance {
     commandHandler: CommandHandler,
     argv: Arguments,
     context: Context,
-    yargs: YargsInstance
+    yargs: YargsInstance,
+    isDefaultCommand: boolean
   ) {
     argv._ = argv._.slice(context.commands.length); // nuke the current commands
+    if (
+      isDefaultCommand &&
+      !yargs.getOptions().configuration['populate--'] &&
+      Array.isArray(argv['--'])
+    ) {
+      argv._.push(...argv['--']);
+      delete argv['--'];
+    }
     const demanded = commandHandler.demanded.slice(0);
     const optional = commandHandler.optional.slice(0);
     const positionalMap: Dictionary<string[]> = {};

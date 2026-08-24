@@ -243,6 +243,30 @@ describe('Command', () => {
         .parse('--foods apples cherries grapes');
     });
 
+    it('populates default command variadic positionals after double dash', () => {
+      yargs()
+        .command({
+          command: '$0 [files..]',
+          desc: 'default desc',
+          builder: yargs =>
+            yargs
+              .positional('files', {
+                desc: 'files desc',
+                type: 'string',
+              })
+              .option('variadic', {
+                desc: 'variadic desc',
+                type: 'array',
+                default: [],
+              }),
+          handler: argv => {
+            argv.variadic.should.deep.equal([1, 2, 3]);
+            argv.files.should.deep.equal(['file1', 'file2']);
+          },
+        })
+        .parse('--variadic 1 2 3 -- file1 file2');
+    });
+
     it('does not combine positional default and provided values', () => {
       yargs()
         .command({
