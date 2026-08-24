@@ -57,6 +57,20 @@ describe('yargs dsl tests', () => {
     argv.$0.should.equal('ndm');
   });
 
+  it('does not require Error.captureStackTrace', () => {
+    const originalCaptureStackTrace = Error.captureStackTrace;
+
+    try {
+      Error.captureStackTrace = undefined;
+
+      expect(() => {
+        throw new YError('strict mode failed');
+      }).to.throw(YError, 'strict mode failed');
+    } finally {
+      Error.captureStackTrace = originalCaptureStackTrace;
+    }
+  });
+
   it('should not remove the 1st argument of bundled electron apps', () => {
     process.argv = ['/usr/local/bin/app', '-f', 'toto', 'tutu'];
     process.versions.electron = '10.0.0-nightly.20200211';
