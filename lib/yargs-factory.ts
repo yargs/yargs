@@ -2009,7 +2009,7 @@ export class YargsInstance {
     Object.keys(argv).forEach(key => {
       if (key === this.#helpOpt && argv[key]) {
         helpOptSet = true;
-      } else if (key === this.#versionOpt && argv[key]) {
+      } else if (key === this.#versionOpt && !parsed.defaulted[key]) {
         versionOptSet = true;
       }
     });

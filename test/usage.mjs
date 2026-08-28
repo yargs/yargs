@@ -1591,6 +1591,36 @@ describe('usage tests', () => {
 
     // Addresses: https://github.com/yargs/yargs/issues/1979
     describe('when an option or alias "version" is set', () => {
+      // Addresses: https://github.com/yargs/yargs/issues/2199
+      it('does not show the built-in version for a defaulted version option', () => {
+        const r = checkOutput(() =>
+          yargs()
+            .option('version', {
+              default: '0.0.1',
+              type: 'string',
+            })
+            .wrap(null)
+            .parse()
+        );
+        r.result.version.should.equal('0.0.1');
+        r.exit.should.equal(false);
+        r.logs.should.have.length(0);
+      });
+
+      it('shows the built-in version when --version is explicit', () => {
+        const r = checkOutput(() =>
+          yargs(['--version'])
+            .option('version', {
+              default: '0.0.1',
+              type: 'string',
+            })
+            .wrap(null)
+            .parse()
+        );
+        r.exit.should.equal(true);
+        r.logs.should.have.length(1);
+      });
+
       it('emits warning if version is not disabled', () => {
         const r = checkOutput(() =>
           yargs()
