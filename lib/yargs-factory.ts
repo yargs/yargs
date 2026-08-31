@@ -263,7 +263,13 @@ export class YargsInstance {
 
   addShowHiddenOpt(opt?: string | false, msg?: string): YargsInstance {
     argsert('[string|boolean] [string]', [opt, msg], arguments.length);
-    if (opt === false && msg === undefined) return this;
+    if (opt === false && msg === undefined) {
+      // filterHiddenOptions() reveals the hidden keys by looking up
+      // argv[showHiddenOpt], so dropping the name is what makes them
+      // permanently hidden.
+      this.#options.showHiddenOpt = '';
+      return this;
+    }
     const showHiddenOpt =
       typeof opt === 'string' ? opt : this.#defaultShowHiddenOpt;
     this.boolean(showHiddenOpt);
