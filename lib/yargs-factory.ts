@@ -1113,20 +1113,26 @@ export class YargsInstance {
 
     if (this.#parseFn) this.#exitProcess = false;
 
+    // A short-circuited parse (e.g. completion.ts re-parsing internally to
+    // build out completions) is not the call the user's callback belongs to:
+    // #parseFn is call-site-scoped in spirit, but stored as instance state,
+    // so it's still set here. Only the parse that owns firing it should.
+    const isShortCircuited = !!shortCircuit;
     const parsed = this[kRunYargsParserAndExecuteCommands](
       args,
-      !!shortCircuit
+      isShortCircuited
     );
     const tmpParsed = this.parsed;
     this.#completion!.setParsed(this.parsed as DetailedArguments);
     if (isPromise(parsed)) {
       return parsed
         .then(argv => {
-          if (this.#parseFn) this.#parseFn(this.#exitError, argv, this.#output);
+          if (this.#parseFn && !isShortCircuited)
+            this.#parseFn(this.#exitError, argv, this.#output);
           return argv;
         })
         .catch(err => {
-          if (this.#parseFn) {
+          if (this.#parseFn && !isShortCircuited) {
             this.#parseFn!(
               err,
               (this.parsed as DetailedArguments).argv,
@@ -1140,7 +1146,8 @@ export class YargsInstance {
           this.parsed = tmpParsed;
         });
     } else {
-      if (this.#parseFn) this.#parseFn(this.#exitError, parsed, this.#output);
+      if (this.#parseFn && !isShortCircuited)
+        this.#parseFn(this.#exitError, parsed, this.#output);
       this[kUnfreeze](); // Pop the stack.
       this.parsed = tmpParsed;
     }

@@ -1412,6 +1412,30 @@ describe('Completion', () => {
     });
   });
 
+  // See: https://github.com/yargs/yargs/issues/1857
+  describe('parse()', () => {
+    it('calls the parse callback exactly once for --get-yargs-completions', () => {
+      const _log = console.log;
+      console.log = () => {};
+
+      let callCount = 0;
+      let lastArgv;
+      try {
+        yargs()
+          .completion()
+          .parse(['--get-yargs-completions'], (_err, argv) => {
+            callCount++;
+            lastArgv = argv;
+          });
+      } finally {
+        console.log = _log;
+      }
+
+      callCount.should.equal(1);
+      lastArgv.getYargsCompletions.should.equal(true);
+    });
+  });
+
   describe('parser-configuration', () => {
     const configurations = [
       {'strip-dashed': true},
