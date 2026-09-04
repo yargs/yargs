@@ -368,7 +368,10 @@ export class CommandInstance {
             parentCommands,
             commandHandler
           ),
-          commandHandler.description
+          this.maybeAddDeprecatedDescription(
+            commandHandler.description,
+            commandHandler.deprecated
+          )
         );
     }
     const innerArgv = innerYargs
@@ -397,6 +400,18 @@ export class CommandInstance {
       yargs.getInternalMethods().getUsageInstance().getUsage().length === 0
     );
   }
+
+  private maybeAddDeprecatedDescription(
+    description: string | false | undefined,
+    deprecated?: string | boolean
+  ) {
+    if (!description || !deprecated) return description;
+
+    return typeof deprecated === 'string'
+      ? `${description} [deprecated: ${deprecated}]`
+      : `${description} [deprecated]`;
+  }
+
   private usageFromParentCommandsCommandHandler(
     parentCommands: string[],
     commandHandler: CommandHandler
