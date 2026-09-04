@@ -1226,6 +1226,16 @@ describe('validation tests', () => {
         .parse();
     });
 
+    it('replaces every $0 and $1 in a custom message', done => {
+      yargs('-a 10 marsupial mammal bro')
+        .demandCommand(1, 2, '', 'got $0 ($0), max $1 ($1)')
+        .fail(msg => {
+          msg.should.equal('got 3 (3), max 2 (2)');
+          return done();
+        })
+        .parse();
+    });
+
     it('defaults to demanding 1 command', done => {
       yargs('-a 10')
         .demandCommand()
