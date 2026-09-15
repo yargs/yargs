@@ -1346,7 +1346,7 @@ describe('Command', () => {
       });
 
       // address regression introduced in #766, thanks @nexdrew!
-      it('does not fail strict check due to postional command arguments', done => {
+      it('does not fail strict check due to positional command arguments', done => {
         yargs()
           .strict()
           .command('hi <name>', 'The hi command')
@@ -1357,7 +1357,7 @@ describe('Command', () => {
       });
 
       // address https://github.com/yargs/yargs/issues/795
-      it('does not fail strict check due to postional command arguments in nested commands', done => {
+      it('does not fail strict check due to positional command arguments in nested commands', done => {
         yargs()
           .strict()
           .command('hi', 'The hi command', yargs => {

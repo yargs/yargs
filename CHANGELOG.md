@@ -2,6 +2,32 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [18.1.0](https://github.com/yargs/yargs/compare/v18.0.0...v18.1.0) (2026-07-26)
+
+
+### Features
+
+* ignore bun when getting bin name ([b77831c](https://github.com/yargs/yargs/commit/b77831c13c6abc9f896cac5e3ff1effe844d8cbe))
+
+
+### Bug Fixes
+
+* **lang:** 'count' for de locale ([#2476](https://github.com/yargs/yargs/issues/2476)) ([971e351](https://github.com/yargs/yargs/commit/971e351705f0fbc5566c6ed1dfd707fa65e11c0d))
+* local prototype pollution vulnerability in apply-extends ([437f3a4](https://github.com/yargs/yargs/commit/437f3a4e0f4166e1f1a3ce023b0331159582746d))
+* **locale:** add Georgian translation ([#2474](https://github.com/yargs/yargs/issues/2474)) ([086aeaa](https://github.com/yargs/yargs/commit/086aeaa7d6793e7f369aa0aaa3e4f962ad878469))
+
+## [17.7.3](https://github.com/yargs/yargs/compare/v17.7.2...v17.7.3) (2026-06-19)
+
+### Bug Fixes
+
+* fix: use entry point with file extension for anything that supports exports ([#2514](https://github.com/yargs/yargs/issues/2514)) ([c7597e3](https://github.com/yargs/yargs/commit/c7597e34a0ff27b4c2f3fdf6f3e1c137fe2212ed))
+
+## [16.2.2](https://github.com/yargs/yargs/compare/v16.2.0...v16.2.2) (2026-06-19)
+
+### Bug Fixes
+
+* fix: use entry point with .cjs file extension for yargs export ([#2546](https://github.com/yargs/yargs/issues/2546)) ([6feb819](https://github.com/yargs/yargs/commit/6feb81902ee4fa2fded5554d299b86aabd5bd5d2))
+
 ## [18.0.0](https://github.com/yargs/yargs/compare/v17.7.2...v18.0.0) (2025-05-26)
 
 

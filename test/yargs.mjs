@@ -399,7 +399,7 @@ describe('yargs dsl tests', () => {
       r.errors[2].should.match(/Did you mean goat/);
     });
 
-    it('does not recommend a similiar command if no similar command exists', () => {
+    it('does not recommend a similar command if no similar command exists', () => {
       const r = checkOutput(() => {
         yargs(['foo']).command('nothingSimilar').recommendCommands().parse();
       });

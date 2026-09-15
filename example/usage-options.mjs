@@ -12,7 +12,7 @@ const argv = y
       alias: 'a',
     },
     info: {
-      description: 'Provide some information about the node.js agains!!!!!!',
+      description: 'Provide some information about the node.js against!!!!!!',
       boolean: true,
       alias: 'i',
     },

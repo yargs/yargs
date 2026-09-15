@@ -791,13 +791,9 @@ export function command(
   return new CommandInstance(usage, validation, globalMiddleware, shim);
 }
 
-export interface CommandHandlerDefinition
-  extends Partial<
-    Pick<
-      CommandHandler,
-      'deprecated' | 'description' | 'handler' | 'middlewares'
-    >
-  > {
+export interface CommandHandlerDefinition extends Partial<
+  Pick<CommandHandler, 'deprecated' | 'description' | 'handler' | 'middlewares'>
+> {
   aliases?: string[];
   builder?: CommandBuilder | CommandBuilderDefinition;
   command?: string | string[];
@@ -839,8 +835,7 @@ export interface CommandHandler {
 
 // To be completed later with other CommandBuilder flavours
 export type CommandBuilder =
-  | CommandBuilderCallback
-  | Dictionary<OptionDefinition>;
+  CommandBuilderCallback | Dictionary<OptionDefinition>;
 
 interface CommandBuilderCallback {
   (y: YargsInstance, helpOrVersionSet: boolean): YargsInstance | void;

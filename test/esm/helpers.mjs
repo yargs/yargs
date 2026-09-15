@@ -12,7 +12,7 @@ describe('helpers', () => {
         process.cwd(),
         true
       );
-      assert.strictEqual(conf.name, 'yargs'); // loads packge.json.
+      assert.strictEqual(conf.name, 'yargs'); // loads package.json.
       assert.strictEqual(conf.apple, 'red'); // keeps config with extends.
     });
   });
