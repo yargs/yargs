@@ -609,10 +609,16 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
   }
 
   function filterHiddenOptions(key: string) {
-    return (
-      yargs.getOptions().hiddenOptions.indexOf(key) < 0 ||
-      (yargs.parsed as DetailedArguments).argv[yargs.getOptions().showHiddenOpt]
-    );
+    // With strip-dashed, argv keys are camelCased so show-hidden becomes
+    // showHidden. Check both forms so --show-hidden still reveals hidden opts.
+    // Addresses: https://github.com/yargs/yargs/issues/2356
+    const argv = (yargs.parsed as DetailedArguments).argv;
+    const showHiddenOpt = yargs.getOptions().showHiddenOpt;
+    const showHidden =
+      argv[showHiddenOpt] ||
+      argv[shim.Parser.camelCase(showHiddenOpt)] ||
+      argv[shim.Parser.decamelize(showHiddenOpt, '-')];
+    return yargs.getOptions().hiddenOptions.indexOf(key) < 0 || !!showHidden;
   }
 
   self.showHelp = (level: 'error' | 'log' | ((message: string) => void)) => {
