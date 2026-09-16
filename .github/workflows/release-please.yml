@@ -10,6 +10,7 @@ jobs:
     permissions:
       contents: write # to create release commit (google-github-actions/release-please-action)
       pull-requests: write # to create release PR (google-github-actions/release-please-action)
+      id-token: write # to publish with npm provenance
 
     runs-on: ubuntu-latest
     steps:
@@ -43,7 +44,7 @@ jobs:
         if: ${{ steps.release.outputs.release_created }}
       - run: npm ci
         if: ${{ steps.release.outputs.release_created }}
-      - run: npm publish
+      - run: npm publish --provenance
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
         if: ${{ steps.release.outputs.release_created }}
