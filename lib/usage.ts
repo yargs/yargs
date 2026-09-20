@@ -1,6 +1,7 @@
 // this file handles outputting usage instructions,
 // failures, etc. keeps logging in one place.
 import {Dictionary, PlatformShim, nil} from './typings/common-types.js';
+import {lookupArgv} from './utils/lookup-argv.js';
 import {objFilter} from './utils/obj-filter.js';
 import {YargsInstance} from './yargs-factory.js';
 import {YError} from './yerror.js';
@@ -611,7 +612,11 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
   function filterHiddenOptions(key: string) {
     return (
       yargs.getOptions().hiddenOptions.indexOf(key) < 0 ||
-      (yargs.parsed as DetailedArguments).argv[yargs.getOptions().showHiddenOpt]
+      !!lookupArgv(
+        (yargs.parsed as DetailedArguments).argv,
+        yargs.getOptions().showHiddenOpt,
+        yargs.getAliases()
+      )
     );
   }
 
