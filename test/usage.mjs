@@ -4504,8 +4504,8 @@ describe('usage tests', () => {
           'Options:',
           '  --help                   Show help                                   [boolean]',
           '  --version                Show version number                         [boolean]',
-          '  --show-hidden, --reveal  Show hidden options                         [boolean]',
           '  --foo                    FOO',
+          '  --show-hidden, --reveal  Show hidden options                         [boolean]',
         ]);
     });
     it('--help should display all groups (including ones with only hidden options) with --show-hidden', () => {
