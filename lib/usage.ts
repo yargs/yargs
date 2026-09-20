@@ -608,10 +608,21 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
     return groupedKeys;
   }
 
+  // Look up an option in parsed argv under any name yargs-parser may have
+  // stored it as. parserConfiguration (e.g. strip-dashed) can drop the
+  // configured kebab-case key while leaving a camelCase or alias key.
+  function optionIsSet(name: string): boolean {
+    const parsed = yargs.parsed as DetailedArguments;
+    const names = [name]
+      .concat(parsed.aliases[name] || [])
+      .concat(shim.Parser.camelCase(name));
+    return names.some(n => parsed.argv[n]);
+  }
+
   function filterHiddenOptions(key: string) {
     return (
       yargs.getOptions().hiddenOptions.indexOf(key) < 0 ||
-      (yargs.parsed as DetailedArguments).argv[yargs.getOptions().showHiddenOpt]
+      optionIsSet(yargs.getOptions().showHiddenOpt)
     );
   }
 
