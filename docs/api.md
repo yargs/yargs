@@ -152,7 +152,7 @@ const argv = yargs(process.argv.slice(2))
 ```
 
 If this method is called multiple times, all enumerated values will be merged
-together. Choices are generally strings or numbers, and value matching is
+together, with duplicate values removed. Choices are generally strings or numbers, and value matching is
 case-sensitive.
 
 Optionally `.choices()` can take an object that maps multiple keys to their
