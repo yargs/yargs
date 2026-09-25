@@ -36,6 +36,70 @@ describe('Command', () => {
       });
     });
 
+    it('carries examples from a command module', () => {
+      const examples = [{title: 'Basic', content: 'foo bar'}];
+      const y = yargs([]).command({
+        command: 'foo <bar>',
+        describe: 'my awesome command',
+        examples,
+        handler: () => {},
+      });
+      y.getInternalMethods()
+        .getCommandInstance()
+        .getCommandHandlers()
+        .foo.examples.should.equal(examples);
+    });
+
+    it('renders command module examples in help output', () => {
+      const r = checkOutput(() =>
+        yargs('foo --help')
+          .scriptName('cli')
+          .command({
+            command: 'foo <bar>',
+            describe: 'my awesome command',
+            examples: [
+              {title: 'Basic', content: '$0 foo hello'},
+              {content: '$0 foo world'},
+              '$0 foo plain',
+            ],
+            handler: () => {},
+          })
+          .wrap(null)
+          .parse()
+      );
+      r.logs
+        .join('\n')
+        .split(/\n+/)
+        .should.deep.equal([
+          'cli foo <bar>',
+          'my awesome command',
+          'Options:',
+          '  --help     Show help  [boolean]',
+          '  --version  Show version number  [boolean]',
+          'Examples:',
+          '  cli foo hello  Basic',
+          '  cli foo world',
+          '  cli foo plain',
+        ]);
+    });
+
+    it('does not render examples of other commands', () => {
+      const r = checkOutput(() =>
+        yargs('bar --help')
+          .scriptName('cli')
+          .command({
+            command: 'foo',
+            describe: 'foo command',
+            examples: [{content: '$0 foo'}],
+            handler: () => {},
+          })
+          .command({command: 'bar', describe: 'bar command', handler: () => {}})
+          .wrap(null)
+          .parse()
+      );
+      r.logs.join('\n').should.not.match(/Examples:/);
+    });
+
     it('populates inner argv with positional arguments', done => {
       yargs('foo hello world')
         .command('foo <bar> [awesome]', 'my awesome command', noop, argv => {
