@@ -4376,6 +4376,32 @@ describe('usage tests', () => {
           '  --baz      BAZ',
         ]);
     });
+    it('--help should display hidden options with --show-hidden and strip-dashed', () => {
+      const r = checkOutput(() =>
+        yargs('--help --show-hidden')
+          .showHidden('show-hidden')
+          .options({
+            foo: {
+              describe: 'FOO',
+              hidden: true,
+            },
+          })
+          .parserConfiguration({
+            'strip-dashed': true,
+          })
+          .parse()
+      );
+
+      r.logs[0]
+        .split('\n')
+        .should.deep.equal([
+          'Options:',
+          '  --help         Show help                                             [boolean]',
+          '  --version      Show version number                                   [boolean]',
+          '  --show-hidden  Show hidden options                                   [boolean]',
+          '  --foo          FOO',
+        ]);
+    });
     it('--help should display all groups (including ones with only hidden options) with --show-hidden', () => {
       const r = checkOutput(
         () =>

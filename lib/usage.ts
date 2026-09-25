@@ -609,9 +609,14 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
   }
 
   function filterHiddenOptions(key: string) {
+    const options = yargs.getOptions();
+    const showHiddenOpt = options.showHiddenOpt;
+    const argv = (yargs.parsed as DetailedArguments).argv;
+
     return (
-      yargs.getOptions().hiddenOptions.indexOf(key) < 0 ||
-      (yargs.parsed as DetailedArguments).argv[yargs.getOptions().showHiddenOpt]
+      options.hiddenOptions.indexOf(key) < 0 ||
+      argv[showHiddenOpt] ||
+      argv[shim.Parser.camelCase(showHiddenOpt)]
     );
   }
 
