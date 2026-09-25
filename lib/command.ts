@@ -128,7 +128,8 @@ export class CommandInstance {
     builder?: CommandBuilderDefinition | CommandBuilder,
     handler?: CommandHandlerCallback,
     commandMiddleware?: Middleware[],
-    deprecated?: boolean
+    deprecated?: boolean,
+    examples?: CommandExample[]
   ): void {
     let aliases: string[] = [];
     const middlewares = commandMiddlewareFactory(commandMiddleware);
@@ -162,7 +163,8 @@ export class CommandInstance {
         cmd.builder,
         cmd.handler,
         cmd.middlewares,
-        cmd.deprecated
+        cmd.deprecated,
+        cmd.examples
       );
       return;
     } else if (isCommandBuilderDefinition(builder)) {
@@ -173,7 +175,8 @@ export class CommandInstance {
         builder.builder,
         builder.handler,
         builder.middlewares,
-        builder.deprecated
+        builder.deprecated,
+        builder.examples
       );
       return;
     }
@@ -223,6 +226,7 @@ export class CommandInstance {
         builder: (builder as CommandBuilder) || {},
         middlewares,
         deprecated,
+        examples,
         demanded: parsedCommand.demanded,
         optional: parsedCommand.optional,
       };
@@ -371,6 +375,14 @@ export class CommandInstance {
           commandHandler.description
         );
     }
+    commandHandler.examples?.forEach(example => {
+      const {title, content} =
+        typeof example === 'string' ? {content: example} : example;
+      innerYargs
+        .getInternalMethods()
+        .getUsageInstance()
+        .example(content, title);
+    });
     const innerArgv = innerYargs
       .getInternalMethods()
       .runYargsParserAndExecuteCommands(
@@ -791,8 +803,17 @@ export function command(
   return new CommandInstance(usage, validation, globalMiddleware, shim);
 }
 
+export type CommandExample = string | {title?: string; content: string};
+
 export interface CommandHandlerDefinition extends Partial<
-  Pick<CommandHandler, 'deprecated' | 'description' | 'handler' | 'middlewares'>
+  Pick<
+    CommandHandler,
+    | 'deprecated'
+    | 'description'
+    | 'examples'
+    | 'handler'
+    | 'middlewares'
+  >
 > {
   aliases?: string[];
   builder?: CommandBuilder | CommandBuilderDefinition;
@@ -804,6 +825,7 @@ export interface CommandHandlerDefinition extends Partial<
 export interface CommandBuilderDefinition {
   builder?: CommandBuilder;
   deprecated?: boolean;
+  examples?: CommandExample[];
   handler: CommandHandlerCallback;
   middlewares?: Middleware[];
 }
@@ -827,6 +849,7 @@ export interface CommandHandler {
   demanded: Positional[];
   deprecated?: boolean;
   description?: string | false;
+  examples?: CommandExample[];
   handler: CommandHandlerCallback;
   middlewares: Middleware[];
   optional: Positional[];
