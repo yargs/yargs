@@ -404,6 +404,10 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
         });
     }
 
+    const optionLayout = theWrap
+      ? shim.cliui({width: theWrap, wrap: true})
+      : undefined;
+
     // display 'Options:' table along with any custom tables:
     displayedGroups.forEach(({groupName, normalizedKeys, switches}) => {
       ui.div(groupName);
@@ -444,21 +448,60 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
           .filter(Boolean)
           .join(' ');
 
-        ui.span(
-          {
-            text: getText(kswitch),
-            padding: [0, 2, 0, 2 + getIndentation(kswitch)],
-            width: maxWidth(switches, theWrap) + 4,
-          },
-          desc
-        );
-
         const shouldHideOptionExtras =
           yargs.getInternalMethods().getUsageConfiguration()['hide-types'] ===
           true;
+        const optionColumn = {
+          text: getText(kswitch),
+          padding: [0, 2, 0, 2 + getIndentation(kswitch)],
+          width: maxWidth(switches, theWrap) + 4,
+        };
+        const extraColumn = {
+          text: extra,
+          padding: [0, 0, 0, 2],
+          align: 'right',
+        };
+        let canInlineExtras = true;
 
-        if (extra && !shouldHideOptionExtras)
-          ui.div({text: extra, padding: [0, 0, 0, 2], align: 'right'});
+        // Printable ASCII occupies one column per character. If both columns
+        // fit with a gap, no wrapping or character-width check is needed.
+        const fitsOnOneLine =
+          theWrap &&
+          [optionColumn.text, desc, extra].every(text =>
+            /^[\x20-\x7e]*$/.test(text)
+          ) &&
+          desc.trim() === desc &&
+          optionColumn.text.length <=
+            optionColumn.width -
+              optionColumn.padding[1] -
+              optionColumn.padding[3] &&
+          optionColumn.width + desc.length + extra.length < theWrap;
+
+        if (
+          optionLayout &&
+          extra &&
+          !shouldHideOptionExtras &&
+          !fitsOnOneLine
+        ) {
+          // Let cliui handle wrapping and character widths, but keep extras on
+          // a separate line if it joins them without a separating space.
+          optionLayout.resetOutput();
+          optionLayout.span(optionColumn, desc);
+          const optionLines = optionLayout.toString().split('\n');
+          const lastOptionLine = optionLines[optionLines.length - 1];
+          optionLayout.div(extraColumn);
+          const combinedLine = optionLayout.toString().split('\n')[
+            optionLines.length - 1
+          ];
+          canInlineExtras =
+            combinedLine === lastOptionLine ||
+            combinedLine.startsWith(`${lastOptionLine.trimEnd()} `);
+        }
+
+        if (canInlineExtras) ui.span(optionColumn, desc);
+        else ui.div(optionColumn, desc);
+
+        if (extra && !shouldHideOptionExtras) ui.div(extraColumn);
         else ui.div();
       });
 

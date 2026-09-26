@@ -1869,6 +1869,104 @@ describe('usage tests', () => {
   });
 
   describe('wrap', () => {
+    describe('option metadata separation', () => {
+      for (const [length, separator] of [
+        [58, ' '],
+        [59, '\n          '],
+        [60, '\n         '],
+      ]) {
+        it(`keeps a gap before a default description of ${length} characters`, async () => {
+          const value = 'x'.repeat(length);
+          const help = await yargs([])
+            .default('option', 'description', value)
+            .wrap(80)
+            .getHelp();
+
+          help.should.include(`  --option${separator}[default: ${value}]`);
+        });
+      }
+
+      it('keeps a one-space gap after an ASCII option description', async () => {
+        const value = 'x'.repeat(51);
+        const help = await yargs([])
+          .option('option', {description: 'port', defaultDescription: value})
+          .wrap(80)
+          .getHelp();
+
+        help.should.include(`  --option   port [default: ${value}]`);
+      });
+
+      for (const [name, description] of [
+        ['plain', 'port'],
+        ['ANSI-colored', '\u001b[31mport\u001b[39m'],
+        ['wide-character', '接口'],
+        ['emoji', '👩‍💻👍🏽'],
+        ['ANSI-reset', '\u001b[31mport\u001b[0m'],
+        ['copyright-symbol', '©©'],
+      ]) {
+        it(`separates extras from an option with ${name} text`, async () => {
+          const value = 'x'.repeat(52);
+          const help = await yargs([])
+            .option('option', {description, defaultDescription: value})
+            .wrap(80)
+            .getHelp();
+
+          help.should.include(
+            `  --option   ${description}\n${' '.repeat(17)}[default: ${value}]`
+          );
+        });
+      }
+
+      it('separates extras from the last line of a wrapped description', async () => {
+        const value = 'x'.repeat(53);
+        const help = await yargs([])
+          .option('option', {
+            description: 'x'.repeat(70),
+            defaultDescription: value,
+          })
+          .wrap(80)
+          .getHelp();
+
+        help.should.include(
+          `  --option   ${'x'.repeat(67)}\n${' '.repeat(13)}xxx\n${' '.repeat(16)}[default: ${value}]`
+        );
+      });
+
+      it('measures wide option names in terminal columns', async () => {
+        const value = 'x'.repeat(61);
+        const help = await yargs([])
+          .default('界界', 'description', value)
+          .wrap(80)
+          .getHelp();
+
+        help.should.include(`  --界界\n        [default: ${value}]`);
+      });
+
+      it('keeps extras on the same line when wrapping is disabled', async () => {
+        const value = 'x'.repeat(59);
+        const help = await yargs([])
+          .default('option', 'description', value)
+          .wrap(null)
+          .getHelp();
+
+        help
+          .split('\n')
+          .find(line => line.includes('--option'))
+          .should.include(`[default: ${value}]`);
+      });
+
+      it('does not render hidden extras or add an empty line', async () => {
+        const help = await yargs([])
+          .default('option', 'description', 'x'.repeat(59))
+          .usageConfiguration({'hide-types': true})
+          .wrap(80)
+          .getHelp();
+
+        help.split('\n').pop().should.equal('  --option');
+        help.should.not.include('[default:');
+      });
+    });
+
     it('should wrap argument descriptions onto multiple lines', () => {
       const r = checkOutput(() =>
         yargs([])
