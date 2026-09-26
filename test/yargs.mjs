@@ -1777,6 +1777,50 @@ describe('yargs dsl tests', () => {
       argv.dotNotation.should.equal(false);
     });
 
+    for (const [name, cwd] of [
+      ['relative', './test/fixtures/pkg.conf'],
+      ['absolute', path.resolve('./test/fixtures/pkg.conf')],
+      ['trailing separator', './test/fixtures/pkg.conf' + path.sep],
+    ]) {
+      it(`reads package.json in a dotted directory (${name})`, () => {
+        const argv = yargs([]).pkgConf('repository', cwd).parseSync();
+
+        argv.type.should.equal('dotted-directory');
+      });
+    }
+
+    it('reads a file path inside a dotted directory', () => {
+      const argv = yargs([])
+        .pkgConf('repository', './test/fixtures/pkg.conf/package.json')
+        .parseSync();
+
+      argv.type.should.equal('dotted-directory');
+    });
+
+    it('keeps the parent lookup for a missing file path', () => {
+      const argv = yargs([])
+        .pkgConf('repository', './test/fixtures/pkg.conf/missing.js')
+        .parseSync();
+
+      argv.type.should.equal('dotted-directory');
+    });
+
+    it('ignores a missing extensionless path', () => {
+      const argv = yargs([])
+        .pkgConf('repository', './test/fixtures/pkg.conf/missing')
+        .parseSync();
+
+      expect(argv.type).to.equal(undefined);
+    });
+
+    it('finds package.json above a directory that has none', () => {
+      const argv = yargs([])
+        .pkgConf('repository', './test/fixtures/cmddir')
+        .parseSync();
+
+      argv.type.should.equal('svn');
+    });
+
     it("doesn't mess up other pkg lookups when cwd is specified", () => {
       const y = yargs('--version')
         .pkgConf('repository', './test/fixtures')

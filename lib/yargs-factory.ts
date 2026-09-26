@@ -1623,22 +1623,24 @@ export class YargsInstance {
 
     let obj = {};
     try {
-      let startDir = rootPath || this.#shim.mainFilename;
-      // If a file path is provided for root, remove the file and keep path.
-      if (this.#shim.path.extname(startDir)) {
-        startDir = this.#shim.path.dirname(startDir);
-      }
-
-      const pkgJsonPath = this.#shim.findUp(
-        startDir,
-        (dir: string[], names: string[]) => {
+      const startDir = rootPath || this.#shim.mainFilename;
+      const findPackageJson = (start: string) =>
+        this.#shim.findUp(start, (dir: string[], names: string[]) => {
           if (names.includes('package.json')) {
             return 'package.json';
           } else {
             return undefined;
           }
-        }
-      );
+        });
+      let pkgJsonPath: string;
+      try {
+        // A directory can have an extension too; let findUp inspect the path.
+        pkgJsonPath = findPackageJson(startDir);
+      } catch (err) {
+        // Preserve the parent lookup when a file path does not exist.
+        if (!this.#shim.path.extname(startDir)) throw err;
+        pkgJsonPath = findPackageJson(this.#shim.path.dirname(startDir));
+      }
       assertNotStrictEqual(pkgJsonPath, undefined, this.#shim);
       obj = JSON.parse(this.#shim.readFileSync(pkgJsonPath, 'utf8'));
       // eslint-disable-next-line no-empty
