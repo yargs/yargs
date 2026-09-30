@@ -1696,9 +1696,11 @@ export class YargsInstance {
       key,
       value,
       (type, key, value) => {
-        this.#options[type][key] = (
+        const merged = (
           this.#options[type][key] || ([] as Options[T][keyof Options[T]])
         ).concat(value);
+        this.#options[type][key] =
+          type === 'choices' ? [...new Set(merged)] : merged;
       }
     );
   }
