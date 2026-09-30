@@ -1796,6 +1796,36 @@ describe('Command', () => {
         });
         r.logs.should.match(/\[deprecated: deprecated\]/);
       });
+
+      it('shows deprecated notice in sub-command help with boolean', () => {
+        const command = 'command';
+        const description = 'description';
+        const deprecated = true;
+        const r = checkOutput(() => {
+          yargs(`${command} --help`)
+            .command({command, description, deprecated})
+            .wrap(null)
+            .parse();
+        });
+
+        r.logs[0].split(/\n+/)[1].should.equal('description [deprecated]');
+      });
+
+      it('shows deprecated notice in sub-command help with string', () => {
+        const command = 'command';
+        const description = 'description';
+        const deprecated = 'deprecated';
+        const r = checkOutput(() => {
+          yargs(`${command} --help`)
+            .command({command, description, deprecated})
+            .wrap(null)
+            .parse();
+        });
+
+        r.logs[0]
+          .split(/\n+/)[1]
+          .should.equal('description [deprecated: deprecated]');
+      });
     });
   });
 
