@@ -1034,6 +1034,112 @@ describe('validation tests', () => {
   });
 
   describe('strict mode', () => {
+    describe('per-source strict() configuration', () => {
+      it('does not fail on unknown env argument if env is excluded from strict', () => {
+        process.env.MY_SCRIPT_SOURCE_DIR = '/a/path';
+        try {
+          const args = yargs('build')
+            .env('MY_SCRIPT')
+            .strict({env: false})
+            .command('build', 'builds something')
+            .fail(msg => {
+              expect.fail(msg);
+            })
+            .parse();
+          args.sourceDir.should.equal('/a/path');
+        } finally {
+          delete process.env.MY_SCRIPT_SOURCE_DIR;
+        }
+      });
+
+      it('still fails on unknown env argument by default', () => {
+        process.env.MY_SCRIPT_SOURCE_DIR = '/a/path';
+        try {
+          yargs('build')
+            .env('MY_SCRIPT')
+            .strict()
+            .command('build', 'builds something')
+            .fail(msg => {
+              msg.should.equal('Unknown argument: sourceDir');
+            })
+            .parse();
+        } finally {
+          delete process.env.MY_SCRIPT_SOURCE_DIR;
+        }
+      });
+
+      it('env: false still fails on a genuine unknown command-line argument', () => {
+        yargs('build --bogus')
+          .strict({env: false})
+          .command('build', 'builds something')
+          .fail(msg => {
+            msg.should.equal('Unknown argument: bogus');
+          })
+          .parse();
+      });
+
+      it('does not fail on unknown config argument if config is excluded from strict', () => {
+        const args = yargs('build')
+          .config({sourceDir: '/a/path'})
+          .strict({config: false})
+          .command('build', 'builds something')
+          .fail(msg => {
+            expect.fail(msg);
+          })
+          .parse();
+        args.sourceDir.should.equal('/a/path');
+      });
+
+      it('still fails on unknown config argument by default', () => {
+        yargs('build')
+          .config({sourceDir: '/a/path'})
+          .strict()
+          .command('build', 'builds something')
+          .fail(msg => {
+            msg.should.equal('Unknown argument: sourceDir');
+          })
+          .parse();
+      });
+
+      it('config: false still fails on a genuine unknown command-line argument', () => {
+        yargs('build --bogus')
+          .config({sourceDir: '/a/path'})
+          .strict({config: false})
+          .command('build', 'builds something')
+          .fail(msg => {
+            msg.should.equal('Unknown argument: bogus');
+          })
+          .parse();
+      });
+
+      it('does not fail on unknown argv argument if argv is excluded from strict', () => {
+        const args = yargs('build --sourceDir=/a/path')
+          .strict({argv: false})
+          .command('build', 'builds something')
+          .fail(msg => {
+            expect.fail(msg);
+          })
+          .parse();
+        args.sourceDir.should.equal('/a/path');
+      });
+
+      it('argv: false still enforces strict for unknown env arguments', () => {
+        process.env.MY_SCRIPT_SOURCE_DIR = '/a/path';
+        try {
+          yargs('build')
+            .env('MY_SCRIPT')
+            .strict({argv: false})
+            .command('build', 'builds something')
+            .fail(msg => {
+              msg.should.equal('Unknown argument: sourceDir');
+            })
+            .parse();
+        } finally {
+          delete process.env.MY_SCRIPT_SOURCE_DIR;
+        }
+      });
+    });
+
     it('does not fail when command with subcommands called', () => {
       yargs('one')
         .command(

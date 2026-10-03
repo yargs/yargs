@@ -165,6 +165,15 @@ export interface YargsInternalMethods {
   setHasOutput(): void;
 }
 
+export interface StrictOptions {
+  /** Fail on unknown options supplied on the command line. Defaults to `true`. */
+  argv?: boolean;
+  /** Fail on unknown options read from environment variables. Defaults to `true`. */
+  env?: boolean;
+  /** Fail on unknown options read from config files/objects. Defaults to `true`. */
+  config?: boolean;
+}
+
 export class YargsInstance {
   $0: string;
   argv?: Arguments;
@@ -204,6 +213,10 @@ export class YargsInstance {
   #strict = false;
   #strictCommands = false;
   #strictOptions = false;
+  #strictArgv = true;
+  #strictEnv = true;
+  #strictConfig = true;
+  #strictIgnoreKeys: string[] = [];
   #usage: UsageInstance;
   #usageConfig: UsageConfiguration = {};
   #versionOpt: string | null = null;
@@ -832,6 +845,15 @@ export class YargsInstance {
   getStrictOptions(): boolean {
     return this.#strictOptions;
   }
+  getStrictArgv(): boolean {
+    return this.#strictArgv;
+  }
+  getStrictEnv(): boolean {
+    return this.#strictEnv;
+  }
+  getStrictConfig(): boolean {
+    return this.#strictConfig;
+  }
   global(globals: string | string[], global?: boolean): YargsInstance {
     argsert('<string|array> [boolean]', [globals, global], arguments.length);
     globals = ([] as string[]).concat(globals);
@@ -1352,9 +1374,20 @@ export class YargsInstance {
     this[kPopulateParserHintArray]('skipValidation', keys);
     return this;
   }
-  strict(enabled?: boolean): YargsInstance {
+  strict(enabled?: boolean | StrictOptions): YargsInstance {
+    if (typeof enabled === 'object' && enabled !== null) {
+      if (typeof enabled.argv === 'boolean') this.#strictArgv = enabled.argv;
+      if (typeof enabled.env === 'boolean') this.#strictEnv = enabled.env;
+      if (typeof enabled.config === 'boolean')
+        this.#strictConfig = enabled.config;
+      this.#strict = true;
+      return this;
+    }
     argsert('[boolean]', [enabled], arguments.length);
     this.#strict = enabled !== false;
+    this.#strictArgv = true;
+    this.#strictEnv = true;
+    this.#strictConfig = true;
     return this;
   }
   strictCommands(enabled?: boolean): YargsInstance {
@@ -1534,6 +1567,9 @@ export class YargsInstance {
       strict: this.#strict,
       strictCommands: this.#strictCommands,
       strictOptions: this.#strictOptions,
+      strictArgv: this.#strictArgv,
+      strictEnv: this.#strictEnv,
+      strictConfig: this.#strictConfig,
       completionCommand: this.#completionCommand,
       output: this.#output,
       exitError: this.#exitError!,
@@ -1761,6 +1797,9 @@ export class YargsInstance {
       strict: this.#strict,
       strictCommands: this.#strictCommands,
       strictOptions: this.#strictOptions,
+      strictArgv: this.#strictArgv,
+      strictEnv: this.#strictEnv,
+      strictConfig: this.#strictConfig,
       completionCommand: this.#completionCommand,
       parseFn: this.#parseFn,
       parseContext: this.#parseContext,
@@ -1990,17 +2029,23 @@ export class YargsInstance {
     const config = Object.assign({}, this.#options.configuration, {
       'populate--': true,
     });
+    const parserOptions = Object.assign({}, this.#options, {
+      configuration: {'parse-positional-numbers': false, ...config},
+    });
     const parsed = this.#shim.Parser.detailed(
       args,
-      Object.assign({}, this.#options, {
-        configuration: {'parse-positional-numbers': false, ...config},
-      })
+      parserOptions
     ) as DetailedArguments;
 
     const argv: Arguments = Object.assign(
       parsed.argv,
       this.#parseContext
     ) as Arguments;
+
+    // strict() can be told to ignore unknown options based on where they
+    // came from (argv, env, config). Resolve those keys up front, so both
+    // this parse and any command validation can excuse them:
+    this.#strictIgnoreKeys = this.#resolveStrictIgnoreKeys(args, argv, config);
     let argvPromise: Arguments | Promise<Arguments> | undefined = undefined;
     const aliases = parsed.aliases;
 
@@ -2241,6 +2286,56 @@ export class YargsInstance {
       true
     );
   }
+  #resolveStrictIgnoreKeys(
+    args: string | string[],
+    fullArgv: Arguments,
+    configuration: Configuration
+  ): string[] {
+    const ignore: string[] = [];
+    if (this.#strictArgv && this.#strictEnv && this.#strictConfig) {
+      return ignore;
+    }
+    const baseOptions = Object.assign({}, this.#options, {
+      configuration: {'parse-positional-numbers': false, ...configuration},
+    });
+    const addKeysMissingFrom = (without: Dictionary) => {
+      Object.keys(fullArgv).forEach(key => {
+        if (!(key in without) && ignore.indexOf(key) === -1) {
+          ignore.push(key);
+        }
+      });
+    };
+    // An option is attributed to a source when it disappears from argv if
+    // that source is switched off, and stays when the source is present.
+    // This reuses yargs-parser's own precedence rules instead of trying to
+    // reconstruct camelCase/prefix handling by hand.
+    if (!this.#strictEnv && typeof this.#options.envPrefix !== 'undefined') {
+      addKeysMissingFrom(
+        this.#shim.Parser.detailed(args, {
+          ...baseOptions,
+          envPrefix: undefined,
+        }).argv as Dictionary
+      );
+    }
+    const hasConfig =
+      (this.#options.configObjects || []).length > 0 ||
+      Object.keys(this.#options.config || {}).length > 0;
+    if (!this.#strictConfig && hasConfig) {
+      addKeysMissingFrom(
+        this.#shim.Parser.detailed(args, {
+          ...baseOptions,
+          configObjects: [],
+          config: {},
+        }).argv as Dictionary
+      );
+    }
+    if (!this.#strictArgv) {
+      addKeysMissingFrom(
+        this.#shim.Parser.detailed([], baseOptions).argv as Dictionary
+      );
+    }
+    return ignore;
+  }
   [kRunValidation](
     aliases: Dictionary<string[]>,
     positionalMap: Dictionary<string[]>,
@@ -2248,6 +2343,7 @@ export class YargsInstance {
     isDefaultCommand?: boolean
   ): (argv: Arguments) => void {
     const demandedOptions = {...this.getDemandedOptions()};
+    const ignoreUnknownKeys = this.#strictIgnoreKeys;
     return (argv: Arguments) => {
       if (parseErrors) throw new YError(parseErrors.message);
       this.#validation.nonOptionCount(argv);
@@ -2256,15 +2352,24 @@ export class YargsInstance {
       if (this.#strictCommands) {
         failedStrictCommands = this.#validation.unknownCommands(argv);
       }
+      const strictArgv = ignoreUnknownKeys.length
+        ? objFilter(argv, key => ignoreUnknownKeys.indexOf(String(key)) === -1)
+        : argv;
       if (this.#strict && !failedStrictCommands) {
         this.#validation.unknownArguments(
-          argv,
+          strictArgv,
           aliases,
           positionalMap,
           !!isDefaultCommand
         );
       } else if (this.#strictOptions) {
-        this.#validation.unknownArguments(argv, aliases, {}, false, false);
+        this.#validation.unknownArguments(
+          strictArgv,
+          aliases,
+          {},
+          false,
+          false
+        );
       }
       this.#validation.limitedChoices(argv);
       this.#validation.implications(argv);
@@ -2403,6 +2508,9 @@ interface FrozenYargsInstance {
   strict: boolean;
   strictCommands: boolean;
   strictOptions: boolean;
+  strictArgv: boolean;
+  strictEnv: boolean;
+  strictConfig: boolean;
   completionCommand: string | null;
   output: string;
   exitError: YError | string | nil;
