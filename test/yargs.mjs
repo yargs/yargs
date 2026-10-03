@@ -5,6 +5,7 @@
 import assert from 'assert';
 import yargs from '../index.mjs';
 import {expect, should} from 'chai';
+import * as os from 'os';
 import * as path from 'path';
 import * as fs from 'fs';
 import {checkOutput} from './helpers/utils.mjs';
@@ -1816,6 +1817,24 @@ describe('yargs dsl tests', () => {
 
       argv.a.should.equal(80);
       argv.b.should.equals('riffiwobbles');
+    });
+
+    it('reads package.json from a directory whose name contains a dot', () => {
+      const root = fs.mkdtempSync(path.join(os.tmpdir(), 'yargs-pkgconf-'));
+      const child = path.join(root, 'release.v1');
+      fs.mkdirSync(child);
+      fs.writeFileSync(
+        path.join(root, 'package.json'),
+        JSON.stringify({settings: {picked: 'parent'}})
+      );
+      fs.writeFileSync(
+        path.join(child, 'package.json'),
+        JSON.stringify({settings: {picked: 'child'}})
+      );
+
+      const argv = yargs([]).pkgConf('settings', child).parse();
+
+      argv.picked.should.equal('child');
     });
 
     it('allows a full path with file to be provided for cwd', () => {

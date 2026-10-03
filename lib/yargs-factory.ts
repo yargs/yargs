@@ -1624,9 +1624,22 @@ export class YargsInstance {
     let obj = {};
     try {
       let startDir = rootPath || this.#shim.mainFilename;
-      // If a file path is provided for root, remove the file and keep path.
+      // A file path should start the search in its parent. A directory whose
+      // name contains a dot (release.v1) also has an extension; keep that
+      // directory when it has its own package.json (#2600).
       if (this.#shim.path.extname(startDir)) {
-        startDir = this.#shim.path.dirname(startDir);
+        let packageInPlace = false;
+        try {
+          this.#shim.readFileSync(
+            this.#shim.path.join(startDir, 'package.json'),
+            'utf8'
+          );
+          packageInPlace = true;
+          // eslint-disable-next-line no-empty
+        } catch (_err) {}
+        if (!packageInPlace) {
+          startDir = this.#shim.path.dirname(startDir);
+        }
       }
 
       const pkgJsonPath = this.#shim.findUp(
