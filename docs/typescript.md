@@ -150,3 +150,68 @@ const argv = yargs.option('difficulty', {
 ```
 
 `argv.difficulty` will get  type `'normal' | 'nightmare' | 'hell'`.
+
+# Typed parent and child commands
+
+A `CommandModule` describes a command's input and parsed arguments. Define the
+child command's positional argument in its builder so its handler receives a
+required `string`. Register the child in the parent builder and use
+`.demandCommand(1)` at both levels to require a parent and a child command.
+
+This example uses ES modules: set `"type": "module"` in `package.json`, install
+`typescript`, `@types/node`, and `@types/yargs`, and use this `tsconfig.json`:
+
+```json
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "outDir": "dist"
+  },
+  "include": ["cli.ts"]
+}
+```
+
+```typescript
+// cli.ts
+import yargs from 'yargs';
+import type { ArgumentsCamelCase, Argv, CommandModule } from 'yargs';
+import { hideBin } from 'yargs/helpers';
+
+interface GreetArguments {
+  name: string;
+}
+
+const greet: CommandModule<{}, GreetArguments> = {
+  command: 'greet <name>',
+  describe: 'Greet someone',
+  builder: (parser: Argv<{}>): Argv<GreetArguments> => parser.positional('name', {
+    type: 'string',
+    demandOption: true,
+    describe: 'The person to greet'
+  }),
+  handler: (argv: ArgumentsCamelCase<GreetArguments>): void => {
+    console.log(`Hello, ${argv.name}!`);
+  }
+};
+
+const user: CommandModule<{}, {}> = {
+  command: 'user',
+  describe: 'Manage users',
+  builder: (parser: Argv<{}>): Argv<{}> => parser.command(greet).demandCommand(1),
+  handler: (): void => {}
+};
+
+yargs(hideBin(process.argv))
+  .command(user)
+  .demandCommand(1)
+  .strict()
+  .help()
+  .parseSync();
+```
+
+Compile with `npx tsc`, then run `node dist/cli.js user greet Alice`.
+`node dist/cli.js user --help` lists the child command, and
+`node dist/cli.js user greet --help` describes its required positional argument.
