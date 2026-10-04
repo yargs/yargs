@@ -18,6 +18,24 @@ async function wait() {
 
 describe('Command', () => {
   describe('positional arguments', () => {
+    // https://github.com/yargs/yargs/issues/2423
+    it('populates positionals from operands collected by halt-at-non-option', () => {
+      const argv = yargs(['my-host', 'ls'])
+        .command(
+          '$0 <host> [cmd..]',
+          'ssh-like command',
+          yargs =>
+            yargs
+              .positional('host', {type: 'string'})
+              .positional('cmd', {array: true, type: 'string'}),
+          noop
+        )
+        .parserConfiguration({'halt-at-non-option': true})
+        .exitProcess(false)
+        .parse();
+      argv.host.should.equal('my-host');
+      argv.cmd.should.deep.equal(['ls']);
+    });
     it('parses command string and populates optional and required positional arguments', () => {
       const y = yargs([]).command(
         'foo <bar> [awesome]',

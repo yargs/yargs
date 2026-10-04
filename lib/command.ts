@@ -548,6 +548,24 @@ export class CommandInstance {
     yargs: YargsInstance
   ) {
     argv._ = argv._.slice(context.commands.length); // nuke the current commands
+
+    // Under `halt-at-non-option`, operands after the first non-option are
+    // collected into `argv['--']`. When the user has not opted into
+    // `populate--`, treat those operands as positionals for this command
+    // (consistent with how `--` is otherwise merged back into `_`).
+    const {configuration} = yargs.getOptions();
+    if (
+      configuration['halt-at-non-option'] &&
+      !configuration['populate--'] &&
+      Array.isArray(argv['--']) &&
+      argv['--'].length
+    ) {
+      argv._ = argv._.concat(
+        (argv['--'] as (string | number)[]).map(a => '' + a)
+      );
+      argv['--'] = [];
+    }
+
     const demanded = commandHandler.demanded.slice(0);
     const optional = commandHandler.optional.slice(0);
     const positionalMap: Dictionary<string[]> = {};
