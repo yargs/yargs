@@ -143,10 +143,10 @@ const args = yargsInstance
 To improve the `choices` option typing you can also specify it as const:
 
 ```typescript
-const argv = yargs.option('difficulty', {
+const argv = yargs().option('difficulty', {
   choices: ["normal", "nightmare", "hell"] as const,
   demandOption: true
-}).parse();
+}).parseSync(process.argv.slice(2));
 ```
 
 `argv.difficulty` will get  type `'normal' | 'nightmare' | 'hell'`.
