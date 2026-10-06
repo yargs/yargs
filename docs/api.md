@@ -371,7 +371,7 @@ To enable bash/zsh completions, you can either:
 1. Concat the generated script to your
    `.bashrc` or `.bash_profile` (or `.zshrc` for zsh).
 
-   e.g. `./command completion > ~/.bashrc`
+   e.g. `./command completion >> ~/.bashrc`
 
 2. If you have `bash-completion` installed, write it to a file in
    `$XDG_DATA_HOME/bash-completion` (or `~/.local/share/bash-completion`),
