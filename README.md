@@ -141,7 +141,7 @@ See examples of using yargs in the browser in [docs](/docs/browser.md).
   - [Composing Your App Using Commands](/docs/advanced.md#commands)
   - [Building Configurable CLI Apps](/docs/advanced.md#configuration)
   - [Customizing Yargs' Parser](/docs/advanced.md#customizing)
-- [Contributing](/contributing.md)
+- [Contributing](/CONTRIBUTING.md)
 
 ## Supported Node.js Versions
 
