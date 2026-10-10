@@ -4376,6 +4376,33 @@ describe('usage tests', () => {
           '  --baz      BAZ',
         ]);
     });
+    it('--help should keep hidden options hidden with --show-hidden when showHidden is disabled', () => {
+      const r = checkOutput(() =>
+        yargs('--help --show-hidden')
+          .options({
+            foo: {
+              describe: 'FOO',
+            },
+            bar: {},
+            baz: {
+              describe: 'BAZ',
+              hidden: true,
+            },
+          })
+          .showHidden(false)
+          .parse()
+      );
+
+      r.logs[0]
+        .split('\n')
+        .should.deep.equal([
+          'Options:',
+          '  --help     Show help                                                 [boolean]',
+          '  --version  Show version number                                       [boolean]',
+          '  --foo      FOO',
+          '  --bar',
+        ]);
+    });
     it('--help should display all groups (including ones with only hidden options) with --show-hidden', () => {
       const r = checkOutput(
         () =>

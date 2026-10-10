@@ -216,6 +216,11 @@ describe('yargs dsl tests', () => {
       options.should.have.property('showHiddenOpt');
       options.showHiddenOpt.should.eql('custom-show-hidden');
     });
+    it('should clear the show-hidden private option when disabled', () => {
+      const options = yargs('').showHidden(false).getOptions();
+      options.key.should.not.have.property('show-hidden');
+      options.showHiddenOpt.should.eql('');
+    });
   });
 
   describe('showHelpOnFail', () => {
