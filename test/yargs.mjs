@@ -641,6 +641,18 @@ describe('yargs dsl tests', () => {
         gender: ['male', 'female'],
       });
     });
+
+    // See: https://github.com/yargs/yargs/issues/2454
+    it('does not create duplicate choices on multiple calls', () => {
+      const optChoices = yargs([])
+        .choices('team', ['ahmed', 'shady', 'amro'])
+        .choices('team', ['ahmed', 'shady', 'amro', 'seif'])
+        .getOptions().choices;
+
+      optChoices.should.deep.equal({
+        team: ['ahmed', 'shady', 'amro', 'seif'],
+      });
+    });
   });
 
   describe('locale', () => {
