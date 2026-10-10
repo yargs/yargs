@@ -184,6 +184,7 @@ simply needs to export:
 * `exports.builder`: object declaring the options the command accepts, or a function accepting and returning a yargs instance
 * `exports.handler`: a function which will be passed the parsed argv.
 * `exports.deprecated`: a boolean (or string) to show deprecation notice.
+* `exports.examples`: optional array of usage examples, each either a string or `{ title?, content }`, rendered in the command's `--help` output (`$0` is replaced with the script name).
 
 ```js
 // my-module.js
