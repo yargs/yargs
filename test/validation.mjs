@@ -1138,6 +1138,35 @@ describe('validation tests', () => {
           delete process.env.MY_SCRIPT_SOURCE_DIR;
         }
       });
+
+      it('exposes the per-source strict state through getters', () => {
+        const allOn = yargs('build').strict();
+        allOn.getStrictArgv().should.equal(true);
+        allOn.getStrictEnv().should.equal(true);
+        allOn.getStrictConfig().should.equal(true);
+
+        const envOff = yargs('build').strict({env: false});
+        envOff.getStrictArgv().should.equal(true);
+        envOff.getStrictEnv().should.equal(false);
+        envOff.getStrictConfig().should.equal(true);
+
+        const argvOff = yargs('build').strict({argv: false});
+        argvOff.getStrictArgv().should.equal(false);
+        argvOff.getStrictEnv().should.equal(true);
+        argvOff.getStrictConfig().should.equal(true);
+
+        const configOff = yargs('build').strict({config: false});
+        configOff.getStrictArgv().should.equal(true);
+        configOff.getStrictEnv().should.equal(true);
+        configOff.getStrictConfig().should.equal(false);
+
+        const reset = yargs('build')
+          .strict({argv: false, env: false, config: false})
+          .strict(false);
+        reset.getStrictArgv().should.equal(true);
+        reset.getStrictEnv().should.equal(true);
+        reset.getStrictConfig().should.equal(true);
+      });
     });
 
     it('does not fail when command with subcommands called', () => {
