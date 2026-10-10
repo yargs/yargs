@@ -1158,6 +1158,228 @@ describe('Completion', () => {
     });
   });
 
+  describe('fish', () => {
+    it('returns a list of commands as completion suggestions', () => {
+      process.env.SHELL = '/usr/bin/fish';
+      const r = checkOutput(
+        () =>
+          yargs(['./completion', '--get-yargs-completions', ''])
+            .command('foo', 'bar')
+            .command('apple', 'banana')
+            .completion().argv
+      );
+
+      r.logs.should.include('apple\tbanana');
+      r.logs.should.include('foo\tbar');
+    });
+
+    it('avoids interruption from command recommendations', () => {
+      process.env.SHELL = '/usr/bin/fish';
+      const r = checkOutput(
+        () =>
+          yargs([
+            './completion',
+            '--get-yargs-completions',
+            './completion',
+            'a',
+          ])
+            .command('apple', 'fruit')
+            .command('aardvark', 'animal')
+            .recommendCommands()
+            .completion().argv
+      );
+
+      r.errors.should.deep.equal([]);
+      r.logs.should.include('apple\tfruit');
+      r.logs.should.include('aardvark\tanimal');
+    });
+
+    it('avoids interruption from default command', () => {
+      process.env.SHELL = '/usr/bin/fish';
+      const r = checkOutput(
+        () =>
+          yargs(['./usage', '--get-yargs-completions', './usage', ''])
+            .usage('$0 [thing]', 'skipped', subYargs => {
+              subYargs.command('aardwolf', 'is a thing according to google');
+            })
+            .command('aardvark', 'animal')
+            .completion().argv
+      );
+
+      r.errors.should.deep.equal([]);
+      r.logs.should.not.include('aardwolf');
+      r.logs.should.include('aardvark\tanimal');
+    });
+
+    it('completes options for a command', () => {
+      process.env.SHELL = '/usr/bin/fish';
+      const r = checkOutput(
+        () =>
+          yargs(['./completion', '--get-yargs-completions', 'foo', '--b'])
+            .command('foo', 'foo command', subYargs =>
+              subYargs
+                .options({
+                  bar: {
+                    describe: 'bar option',
+                  },
+                })
+                .help(true)
+                .version(false)
+            )
+            .completion().argv
+      );
+
+      r.logs.should.have.length(2);
+      r.logs.should.include('--bar\tbar option');
+      r.logs.should.include('--help\tShow help');
+    });
+
+    it('completes options and aliases with the same description', () => {
+      process.env.SHELL = '/usr/bin/fish';
+      const r = checkOutput(
+        () =>
+          yargs(['./completion', '--get-yargs-completions', '-'])
+            .options({
+              foo: {describe: 'Foo option', alias: 'f', type: 'string'},
+              bar: {describe: 'Bar option', alias: ['b', 'B'], type: 'string'},
+            })
+            .help(false)
+            .version(false)
+            .completion().argv
+      );
+
+      r.logs.should.have.length(5);
+      r.logs.should.include('--foo\tFoo option');
+      r.logs.should.include('-f\tFoo option');
+      r.logs.should.include('--bar\tBar option');
+      r.logs.should.include('-b\tBar option');
+      r.logs.should.include('-B\tBar option');
+    });
+
+    it('completes options with line break', () => {
+      process.env.SHELL = '/usr/bin/fish';
+      const r = checkOutput(
+        () =>
+          yargs(['./completion', '--get-yargs-completions', '-'])
+            .options({
+              foo: {describe: 'Foo option\nFoo option', type: 'string'},
+            })
+            .help(false)
+            .version(false)
+            .completion().argv
+      );
+
+      r.logs.should.have.length(1);
+      r.logs.should.include('--foo\tFoo option Foo option');
+    });
+
+    it('replaces application variable with $0 in script', () => {
+      process.env.SHELL = '/usr/bin/fish';
+      const r = checkOutput(() => yargs([]).showCompletionScript(), ['ndm']);
+
+      r.logs[0].should.match(/fish\/completions/);
+      r.logs[0].should.match(/ndm --get-yargs-completions/);
+    });
+
+    describe('getCompletion()', () => {
+      it('returns default completion to callback', () => {
+        process.env.SHELL = '/usr/bin/fish';
+        const r = checkOutput(() => {
+          yargs()
+            .command('foo', 'bar')
+            .command('apple', 'banana')
+            .completion()
+            .getCompletion([''], (_err, completions) => {
+              (completions || []).forEach(completion => {
+                console.log(completion);
+              });
+            });
+        });
+
+        r.logs.should.include('apple\tbanana');
+        r.logs.should.include('foo\tbar');
+      });
+    });
+
+    it('does not apply validation when --get-yargs-completions is passed in', () => {
+      process.env.SHELL = '/usr/bin/fish';
+      const r = checkOutput(() => {
+        try {
+          return yargs(['./completion', '--get-yargs-completions', '--'])
+            .option('foo', {describe: 'bar'})
+            .completion()
+            .strict().argv;
+        } catch (e) {
+          console.log(e.message);
+        }
+      });
+
+      r.errors.length.should.equal(0);
+      r.logs.should.include('--foo\tbar');
+    });
+
+    it('completes with no- prefix flags defaulting to true when boolean-negation is set', () => {
+      process.env.SHELL = '/usr/bin/fish';
+
+      const r = checkOutput(
+        () =>
+          yargs(['./completion', '--get-yargs-completions', '--'])
+            .options({
+              foo: {describe: 'foo flag', type: 'boolean', default: true},
+              bar: {describe: 'bar flag', type: 'boolean'},
+            })
+            .parserConfiguration({'boolean-negation': true}).argv
+      );
+
+      r.logs.should.eql([
+        '--help\tShow help',
+        '--version\tShow version number',
+        '--foo\tfoo flag',
+        '--no-foo\tfoo flag',
+        '--bar\tbar flag',
+      ]);
+    });
+
+    it('completes choices if previous option requires a choice', () => {
+      process.env.SHELL = '/usr/bin/fish';
+      const r = checkOutput(() => {
+        return yargs(['./completion', '--get-yargs-completions', '--fruit'])
+          .options({
+            fruit: {
+              describe: 'fruit option',
+              choices: ['apple', 'banana', 'pear'],
+            },
+            amount: {describe: 'amount', type: 'number'},
+          })
+          .completion().argv;
+      });
+
+      r.logs.should.include('apple');
+      r.logs.should.include('banana');
+      r.logs.should.include('pear');
+    });
+
+    it('completes positional choices', () => {
+      process.env.SHELL = '/usr/bin/fish';
+      const r = checkOutput(() => {
+        return yargs(['./completion', '--get-yargs-completions', 'cmd', 'ap'])
+          .help(false)
+          .version(false)
+          .command('cmd [fruit]', 'fruit command', subYargs => {
+            subYargs.positional('fruit', {
+              describe: 'choose a fruit',
+              choices: ['apple', 'banana', 'pear'],
+            });
+          })
+          .completion().argv;
+      });
+
+      r.logs.should.include('apple');
+      r.logs.should.not.include('banana');
+      r.logs.should.not.include('pear');
+    });
+  });
+
   describe('async', () => {
     before(() => {
       process.env.SHELL = '/bin/bash';
