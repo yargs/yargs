@@ -1,5 +1,5 @@
 export const command = 'init [dir]';
-export const desc = 'Create an empty repo';
+export const describe = 'Create an empty repo';
 export const builder = {
   dir: {
     default: '.',
