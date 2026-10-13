@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [18.2.1](https://github.com/yargs/yargs/compare/v18.2.0...v18.2.1) (2026-10-13)
+
+
+### Bug Fixes
+
+* complete negated boolean options ([#2572](https://github.com/yargs/yargs/issues/2572)) ([fe733ba](https://github.com/yargs/yargs/commit/fe733ba76094c0e9317913c2387fe193d1e23d01))
+* dedupe choices on multiple calls ([#2590](https://github.com/yargs/yargs/issues/2590)) ([8021675](https://github.com/yargs/yargs/commit/8021675da05763e13d9744aef953be65c0fd878f))
+* make showHidden(false) permanently hide hidden options ([#2583](https://github.com/yargs/yargs/issues/2583)) ([68bc734](https://github.com/yargs/yargs/commit/68bc734db6e1071830e8df6938236f86ff889329))
+* replace every $1 in demandCommand min/max messages ([#2556](https://github.com/yargs/yargs/issues/2556)) ([8764a26](https://github.com/yargs/yargs/commit/8764a2620fde59c5475301cb5b12eefeadfa0f4c))
+
 ## [18.2.0](https://github.com/yargs/yargs/compare/v18.1.0...v18.2.0) (2026-09-20)
 
 
