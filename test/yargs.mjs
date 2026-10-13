@@ -216,6 +216,11 @@ describe('yargs dsl tests', () => {
       options.should.have.property('showHiddenOpt');
       options.showHiddenOpt.should.eql('custom-show-hidden');
     });
+    it('should clear the show-hidden private option when disabled', () => {
+      const options = yargs('').showHidden(false).getOptions();
+      options.key.should.not.have.property('show-hidden');
+      options.showHiddenOpt.should.eql('');
+    });
   });
 
   describe('showHelpOnFail', () => {
@@ -639,6 +644,18 @@ describe('yargs dsl tests', () => {
 
       optChoices.should.deep.equal({
         gender: ['male', 'female'],
+      });
+    });
+
+    // See: https://github.com/yargs/yargs/issues/2454
+    it('does not create duplicate choices on multiple calls', () => {
+      const optChoices = yargs([])
+        .choices('team', ['ahmed', 'shady', 'amro'])
+        .choices('team', ['ahmed', 'shady', 'amro', 'seif'])
+        .getOptions().choices;
+
+      optChoices.should.deep.equal({
+        team: ['ahmed', 'shady', 'amro', 'seif'],
       });
     });
   });
