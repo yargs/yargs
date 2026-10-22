@@ -1449,4 +1449,50 @@ describe('Completion', () => {
       });
     }
   });
+
+  // Completion works out its suggestions by running a nested parse, which
+  // inherited the callback the outer parse() was given. The callback therefore
+  // ran twice, and the first of the two carried an argv without the completion
+  // flag and an empty output -- so a caller acting on the first one it received
+  // acted on the wrong argv. See https://github.com/yargs/yargs/issues/1857
+  describe('parse callback', () => {
+    it('is called exactly once for --get-yargs-completions', () => {
+      const calls = [];
+      checkOutput(() => {
+        yargs()
+          .completion()
+          .parse(['--get-yargs-completions'], (err, argv, output) => {
+            calls.push({err, argv, output});
+          });
+      });
+      calls.length.should.equal(1);
+    });
+
+    it('is called with the completion argv and output, not the parse before it', () => {
+      const calls = [];
+      checkOutput(() => {
+        yargs()
+          .completion()
+          .command('apple', 'fruit')
+          .parse(['--get-yargs-completions', ''], (err, argv, output) => {
+            calls.push({err, argv, output});
+          });
+      });
+      calls.length.should.equal(1);
+      // The flag is present on the argv the callback receives; its value is
+      // whatever followed it on the line, so only its presence is pinned here.
+      calls[0].argv.should.have.property('get-yargs-completions');
+      calls[0].output.should.include('apple');
+    });
+
+    it('is still called once when no completion is registered', () => {
+      const calls = [];
+      checkOutput(() => {
+        yargs().parse(['--get-yargs-completions'], (err, argv, output) => {
+          calls.push({err, argv, output});
+        });
+      });
+      calls.length.should.equal(1);
+    });
+  });
 });

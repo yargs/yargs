@@ -2166,13 +2166,25 @@ export class YargsInstance {
         const completionArgs = args.slice(
           args.indexOf(`--${this.#completion!.completionKey}`) + 1
         );
-        this.#completion!.getCompletion(completionArgs, (err, completions) => {
-          if (err) throw new YError(err.message);
-          (completions || []).forEach(completion => {
-            this.#logger.log(completion);
+        // Completion works out its suggestions by running a nested parse, and
+        // #parseFn is instance state that the nested call inherits. Without
+        // clearing it, the callback given to the outer parse() ran twice: once
+        // from inside completion, with an argv that has no completion flag and
+        // an empty output, and once more when this parse finished. The two also
+        // disagreed on the first argument, null then undefined. #1857
+        const parseFn = this.#parseFn;
+        this.#parseFn = null;
+        try {
+          this.#completion!.getCompletion(completionArgs, (err, completions) => {
+            if (err) throw new YError(err.message);
+            (completions || []).forEach(completion => {
+              this.#logger.log(completion);
+            });
+            this.exit(0);
           });
-          this.exit(0);
-        });
+        } finally {
+          this.#parseFn = parseFn;
+        }
         return this[kPostProcess](
           argv,
           !populateDoubleDash,
