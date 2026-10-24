@@ -1835,6 +1835,12 @@ describe('yargs dsl tests', () => {
       argv.b.should.equals('riffiwobbles');
     });
 
+    it('allows a directory containing a dot to be provided for cwd', () => {
+      const y = yargs([]).pkgConf('settings', './test/fixtures/dotted.dir');
+      const options = y.getOptions();
+      options.configObjects.should.deep.equal([{picked: 'dotted-dir'}]);
+    });
+
     it('allows a full path with file to be provided for cwd', () => {
       const y = yargs('--version')
         .pkgConf('repository', './test/fixtures/bin.js')
