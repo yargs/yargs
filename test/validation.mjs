@@ -99,6 +99,116 @@ describe('validation tests', () => {
         })
         .parse('--name Itachi');
     });
+
+    // See: https://github.com/yargs/yargs/issues/1975
+    describe('with a parse callback', () => {
+      const checkN = argv => {
+        if (argv.n !== 1) throw new Error('n must be 1');
+        return true;
+      };
+
+      it('does not run the command handler if a command check fails', () => {
+        let ran = false;
+        let error;
+        yargs()
+          .command(
+            'go',
+            'go desc',
+            yargs => yargs.option('n', {type: 'number'}).check(checkN),
+            () => {
+              ran = true;
+            }
+          )
+          .parse(['go', '--n', '2'], {}, err => {
+            error = err;
+          });
+        error.message.should.equal('n must be 1');
+        ran.should.equal(false);
+      });
+
+      it('does not run the command handler if an async command check resolves to an error', async () => {
+        let ran = false;
+        let error;
+        await yargs()
+          .command(
+            'go',
+            'go desc',
+            yargs =>
+              yargs
+                .option('n', {type: 'number'})
+                .check(async argv =>
+                  argv.n === 1 ? true : new Error('n must be 1')
+                ),
+            () => {
+              ran = true;
+            }
+          )
+          .parseAsync(['go', '--n', '2'], {}, err => {
+            error = err;
+          });
+        error.message.should.equal('n must be 1');
+        ran.should.equal(false);
+      });
+
+      it('does not run the command handler if a global check fails', () => {
+        let ran = false;
+        let error;
+        yargs()
+          .option('n', {type: 'number'})
+          .check(checkN)
+          .command(
+            'go',
+            'go desc',
+            noop => noop,
+            () => {
+              ran = true;
+            }
+          )
+          .parse(['go', '--n', '2'], {}, err => {
+            error = err;
+          });
+        error.message.should.equal('n must be 1');
+        ran.should.equal(false);
+      });
+
+      it('does not run the default command handler if its check fails', () => {
+        let ran = false;
+        let error;
+        yargs()
+          .command(
+            '$0',
+            'default desc',
+            yargs => yargs.option('n', {type: 'number'}).check(checkN),
+            () => {
+              ran = true;
+            }
+          )
+          .parse(['--n', '2'], {}, err => {
+            error = err;
+          });
+        error.message.should.equal('n must be 1');
+        ran.should.equal(false);
+      });
+
+      it('runs the command handler if the check passes', () => {
+        let ran = false;
+        let error;
+        yargs()
+          .command(
+            'go',
+            'go desc',
+            yargs => yargs.option('n', {type: 'number'}).check(checkN),
+            () => {
+              ran = true;
+            }
+          )
+          .parse(['go', '--n', '1'], {}, err => {
+            error = err;
+          });
+        expect(error).to.equal(null);
+        ran.should.equal(true);
+      });
+    });
   });
 
   describe('implies', () => {

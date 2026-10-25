@@ -449,6 +449,9 @@ export class CommandInstance {
 
       innerArgv = applyMiddleware(innerArgv, yargs, middlewares, false);
       innerArgv = maybeAsyncResult<Arguments>(innerArgv, result => {
+        // check() runs as middleware, inside the getHasOutput() guard above.
+        // If it failed without throwing (parse callback given), skip handler.
+        if (yargs.getInternalMethods().getExitError()) return result;
         const handlerResult = commandHandler.handler(result as Arguments);
         return isPromise(handlerResult)
           ? handlerResult.then(() => result)

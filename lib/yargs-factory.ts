@@ -112,6 +112,7 @@ const kUnfreeze = Symbol('unfreeze');
 const kValidateAsync = Symbol('validateAsync');
 const kGetCommandInstance = Symbol('getCommandInstance');
 const kGetContext = Symbol('getContext');
+const kGetExitError = Symbol('getExitError');
 const kGetHasOutput = Symbol('getHasOutput');
 const kGetLoggerInstance = Symbol('getLoggerInstance');
 const kGetParseContext = Symbol('getParseContext');
@@ -133,6 +134,7 @@ const DEFAULT_LOCALE = 'en_US';
 export interface YargsInternalMethods {
   getCommandInstance(): CommandInstance;
   getContext(): Context;
+  getExitError(): YError | string | nil;
   getHasOutput(): boolean;
   getLoggerInstance(): LoggerInstance;
   getParseContext(): object;
@@ -1797,6 +1799,7 @@ export class YargsInstance {
     return {
       getCommandInstance: this[kGetCommandInstance].bind(this),
       getContext: this[kGetContext].bind(this),
+      getExitError: this[kGetExitError].bind(this),
       getHasOutput: this[kGetHasOutput].bind(this),
       getLoggerInstance: this[kGetLoggerInstance].bind(this),
       getParseContext: this[kGetParseContext].bind(this),
@@ -1819,6 +1822,9 @@ export class YargsInstance {
   }
   [kGetContext](): Context {
     return this.#context;
+  }
+  [kGetExitError](): YError | string | nil {
+    return this.#exitError;
   }
   [kGetHasOutput](): boolean {
     return this.#hasOutput;
