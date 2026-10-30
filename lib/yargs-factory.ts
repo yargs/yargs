@@ -1631,8 +1631,17 @@ export class YargsInstance {
     try {
       let startDir = rootPath || this.#shim.mainFilename;
       // If a file path is provided for root, remove the file and keep path.
+      // Directory names can also contain a dot (e.g. release.v1), so only
+      // treat the path as a file when it does not contain a package.json.
       if (this.#shim.path.extname(startDir)) {
-        startDir = this.#shim.path.dirname(startDir);
+        try {
+          this.#shim.readFileSync(
+            this.#shim.path.join(startDir, 'package.json'),
+            'utf8'
+          );
+        } catch {
+          startDir = this.#shim.path.dirname(startDir);
+        }
       }
 
       const pkgJsonPath = this.#shim.findUp(

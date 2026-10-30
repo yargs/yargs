@@ -1849,6 +1849,15 @@ describe('yargs dsl tests', () => {
       r.logs[0].should.not.equal('9.9.9'); // breaks when yargs gets to this version
     });
 
+    // see https://github.com/yargs/yargs/issues/2600
+    it('does not skip a directory whose name contains a dot', () => {
+      const argv = yargs([])
+        .pkgConf('settings', './test/fixtures/release.v1')
+        .parseSync();
+
+      argv.picked.should.equal('child');
+    });
+
     it('gracefully handles a missing package.json', function () {
       if (process.platform === 'win32') {
         // Doesn’t work in CI for some reason.
