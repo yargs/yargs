@@ -20,10 +20,14 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           release-type: node
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        if: ${{ steps.release.outputs.release_created }}
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 24
+        if: ${{ steps.release.outputs.release_created }}
       - run: npm ci
+        if: ${{ steps.release.outputs.release_created }}
       - run: npm run compile
+        if: ${{ steps.release.outputs.release_created }}
       - run: npm stage publish --provenance
         if: ${{ steps.release.outputs.release_created }}
