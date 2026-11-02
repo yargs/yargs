@@ -143,11 +143,17 @@ See examples of using yargs in the browser in [docs](/docs/browser.md).
   - [Customizing Yargs' Parser](/docs/advanced.md#customizing)
 - [Contributing](/contributing.md)
 
-## Supported Node.js Versions
+## Support
 
 Libraries in this ecosystem make a best effort to track
 [Node.js' release schedule](https://nodejs.org/en/about/releases/). Here's [a
 post on why we think this is important](https://medium.com/the-node-js-collection/maintainers-should-consider-following-node-js-release-schedule-ab08ed4de71a).
+
+The current version of `yargs` is fully supported on Long Term Support versions of Node.js, and requires at least v20.19.0.
+
+Older major versions of `yargs` receive security updates for 12 months. For more see: [Release Policy](./docs/release-policy.md).
+
+The main forum for free and community support is the project [Issues](https://github.com/yargs/yargs/issues) on GitHub.
 
 [npm-url]: https://www.npmjs.com/package/yargs
 [npm-image]: https://img.shields.io/npm/v/yargs.svg
