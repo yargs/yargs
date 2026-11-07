@@ -313,7 +313,7 @@ export function validation(
       });
     } else {
       yargs.global(key);
-      if (!implied[key]) {
+      if (!Object.prototype.hasOwnProperty.call(implied, key)) {
         implied[key] = [];
       }
       if (Array.isArray(value)) {
@@ -385,7 +385,7 @@ export function validation(
       });
     } else {
       yargs.global(key);
-      if (!conflicting[key]) {
+      if (!Object.prototype.hasOwnProperty.call(conflicting, key)) {
         conflicting[key] = [];
       }
       if (Array.isArray(value)) {
@@ -399,11 +399,17 @@ export function validation(
 
   self.conflicting = function conflictingFn(argv) {
     Object.keys(argv).forEach(key => {
-      if (conflicting[key]) {
+      if (Object.prototype.hasOwnProperty.call(conflicting, key)) {
         conflicting[key].forEach(value => {
           // we default keys to 'undefined' that have been configured, we should not
           // apply conflicting check unless they are a value other than 'undefined'.
-          if (value && argv[key] !== undefined && argv[value] !== undefined) {
+          if (
+            value &&
+            Object.prototype.hasOwnProperty.call(argv, key) &&
+            Object.prototype.hasOwnProperty.call(argv, value) &&
+            argv[key] !== undefined &&
+            argv[value] !== undefined
+          ) {
             usage.fail(
               __('Arguments %s and %s are mutually exclusive', key, value)
             );
@@ -417,14 +423,19 @@ export function validation(
     if (yargs.getInternalMethods().getParserConfiguration()['strip-dashed']) {
       Object.keys(conflicting).forEach(key => {
         conflicting[key].forEach(value => {
-          if (
-            value &&
-            argv[shim.Parser.camelCase(key)] !== undefined &&
-            argv[shim.Parser.camelCase(value)] !== undefined
-          ) {
-            usage.fail(
-              __('Arguments %s and %s are mutually exclusive', key, value)
-            );
+          if (value) {
+            const camelKey = shim.Parser.camelCase(key);
+            const camelValue = shim.Parser.camelCase(value);
+            if (
+              Object.prototype.hasOwnProperty.call(argv, camelKey) &&
+              Object.prototype.hasOwnProperty.call(argv, camelValue) &&
+              argv[camelKey] !== undefined &&
+              argv[camelValue] !== undefined
+            ) {
+              usage.fail(
+                __('Arguments %s and %s are mutually exclusive', key, value)
+              );
+            }
           }
         });
       });

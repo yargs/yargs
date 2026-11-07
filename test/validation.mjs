@@ -262,6 +262,16 @@ describe('validation tests', () => {
         })
         .parse();
     });
+
+    it('allows configuring implies on Object prototype properties', done => {
+      yargs(['--toString'])
+        .implies('toString', 'foo')
+        .fail(msg => {
+          msg.should.match(implicationsFailedPattern);
+          return done();
+        })
+        .parse();
+    });
   });
 
   describe('conflicts', () => {
@@ -433,6 +443,30 @@ describe('validation tests', () => {
       } finally {
         loadLocale('en_US.UTF-8');
       }
+    });
+
+    it('does not throw when argument name matches Object prototype properties', () => {
+      const argv = yargs([
+        '--constructor',
+        'foo',
+        '--toString',
+        'bar',
+        '--valueOf',
+        'baz',
+      ]).parse();
+      argv.constructor.should.equal('foo');
+      argv.toString.should.equal('bar');
+      argv.valueOf.should.equal('baz');
+    });
+
+    it('allows configuring conflicts on Object prototype properties', done => {
+      yargs(['--toString', 'bar', '--foo', 'baz'])
+        .conflicts('toString', 'foo')
+        .fail(msg => {
+          msg.should.match(/Arguments toString and foo are mutually exclusive/);
+          return done();
+        })
+        .parse();
     });
   });
 
