@@ -657,6 +657,12 @@ export class CommandInstance {
 
     const config: Configuration = Object.assign({}, options.configuration, {
       'populate--': false,
+      // Positionals are distinct arguments rather than duplicates of the
+      // same option, so a variadic positional should collect every value
+      // even when the user disabled 'duplicate-arguments-array' (that
+      // configuration is intended for repeated occurrences of a flag):
+      // https://github.com/yargs/yargs/issues/2011
+      'duplicate-arguments-array': true,
     });
 
     const parsed = this.shim.Parser.detailed(

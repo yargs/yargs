@@ -208,6 +208,24 @@ describe('Command', () => {
       called.should.equal(true);
     });
 
+    // Addresses: https://github.com/yargs/yargs/issues/2011
+    it('collects all values for variadic positional even when duplicate-arguments-array is false', () => {
+      const argv = yargs('test name key1 value1 key2 value2')
+        .parserConfiguration({'duplicate-arguments-array': false})
+        .command(
+          'test <name> <key> <value> [extras...]',
+          'test desc',
+          () => {},
+          argv => argv
+        )
+        .parse();
+
+      argv.should.have.property('name', 'name');
+      argv.should.have.property('key', 'key1');
+      argv.should.have.property('value', 'value1');
+      argv.extras.should.deep.equal(['key2', 'value2']);
+    });
+
     // Addresses: https://github.com/yargs/yargs/issues/1637
     it('does not overwrite options in argv if variadic', () => {
       yargs()
