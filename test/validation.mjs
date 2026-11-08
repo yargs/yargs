@@ -262,6 +262,13 @@ describe('validation tests', () => {
         })
         .parse();
     });
+
+    it('allows implies for prototype property keys without throwing', () => {
+      const y = yargs([]).implies('constructor', 'foo');
+      expect(
+        y.getInternalMethods().getValidationInstance().getImplied().constructor
+      ).to.deep.equal(['foo']);
+    });
   });
 
   describe('conflicts', () => {
@@ -433,6 +440,31 @@ describe('validation tests', () => {
       } finally {
         loadLocale('en_US.UTF-8');
       }
+    });
+
+    it('does not crash when parsing flags named after Object.prototype properties', () => {
+      const argv = yargs([
+        '--constructor',
+        'x',
+        '--toString',
+        'y',
+        '--valueOf',
+        'z',
+        '--hasOwnProperty',
+        'w',
+      ]).parse();
+      argv.constructor.should.equal('x');
+      argv.toString.should.equal('y');
+      argv.valueOf.should.equal('z');
+      argv.hasOwnProperty.should.equal('w');
+    });
+
+    it('allows conflicts for prototype property keys without throwing', () => {
+      const y = yargs([]).conflicts('constructor', 'foo');
+      expect(
+        y.getInternalMethods().getValidationInstance().getConflicting()
+          .constructor
+      ).to.deep.equal(['foo']);
     });
   });
 
