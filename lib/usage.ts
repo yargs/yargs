@@ -609,9 +609,19 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
   }
 
   function filterHiddenOptions(key: string) {
+    const showHiddenOpt = yargs.getOptions().showHiddenOpt;
+    if (!showHiddenOpt) {
+      return yargs.getOptions().hiddenOptions.indexOf(key) < 0;
+    }
+    const parsed = yargs.parsed as DetailedArguments;
+    const argv = parsed.argv;
+    const keysToCheck = [
+      showHiddenOpt,
+      shim.Parser.camelCase(showHiddenOpt),
+    ].concat(parsed.aliases?.[showHiddenOpt] || []);
     return (
       yargs.getOptions().hiddenOptions.indexOf(key) < 0 ||
-      (yargs.parsed as DetailedArguments).argv[yargs.getOptions().showHiddenOpt]
+      keysToCheck.some(k => argv[k] || argv[shim.Parser.camelCase(k)])
     );
   }
 

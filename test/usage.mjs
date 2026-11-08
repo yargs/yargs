@@ -4497,6 +4497,70 @@ describe('usage tests', () => {
           '  --custom-show-hidden  Show hidden options                            [boolean]',
         ]);
     });
+    it('--help should display all options with --show-hidden when strip-dashed is true (#2356)', () => {
+      const r = checkOutput(() =>
+        yargs('--help --show-hidden')
+          .options({
+            foo: {
+              describe: 'FOO',
+            },
+            bar: {},
+            baz: {
+              describe: 'BAZ',
+              hidden: true,
+            },
+          })
+          .parserConfiguration({
+            'strip-dashed': true,
+          })
+          .showHidden()
+          .parse()
+      );
+
+      r.logs[0]
+        .split('\n')
+        .should.deep.equal([
+          'Options:',
+          '  --help         Show help                                             [boolean]',
+          '  --version      Show version number                                   [boolean]',
+          '  --foo          FOO',
+          '  --bar',
+          '  --baz          BAZ',
+          '  --show-hidden  Show hidden options                                   [boolean]',
+        ]);
+    });
+    it('--help should display all options with --show-hidden when strip-camel-case is true (#2356)', () => {
+      const r = checkOutput(() =>
+        yargs('--help --show-hidden')
+          .options({
+            foo: {
+              describe: 'FOO',
+            },
+            bar: {},
+            baz: {
+              describe: 'BAZ',
+              hidden: true,
+            },
+          })
+          .parserConfiguration({
+            'strip-camel-case': true,
+          })
+          .showHidden()
+          .parse()
+      );
+
+      r.logs[0]
+        .split('\n')
+        .should.deep.equal([
+          'Options:',
+          '  --help         Show help                                             [boolean]',
+          '  --version      Show version number                                   [boolean]',
+          '  --foo          FOO',
+          '  --bar',
+          '  --baz          BAZ',
+          '  --show-hidden  Show hidden options                                   [boolean]',
+        ]);
+    });
   });
 
   describe('help message caching', () => {
