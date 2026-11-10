@@ -1806,7 +1806,7 @@ Set a usage message to show which commands to use. Inside `message`, the string
 present script similar to how `$0` works in bash or perl.
 
 If the optional `desc`/`builder`/`handler` are provided, `.usage()`
-acts an an alias for [`.command()`](#command). This allows you to use
+acts as an alias for [`.command()`](#command). This allows you to use
 `.usage()` to configure the [default command](https://github.com/yargs/yargs/blob/main/docs/advanced.md#default-commands) that will be run as an entry-point to your application and allows you
 to provide configuration for the positional arguments accepted by your program:
 

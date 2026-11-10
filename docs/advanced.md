@@ -515,7 +515,7 @@ for detailed documentation of this feature.
 Sometimes you might want to transform arguments before they reach the command handler.
 For example, perhaps you want to validate that credentials have been provided and otherwise load credentials from a file.
 
-Middleware is simply a stack of functions, each of which is passed the the current parsed arguments, which it can in turn update by adding values, removing values, or overwriting values.
+Middleware is simply a stack of functions, each of which is passed the current parsed arguments, which it can in turn update by adding values, removing values, or overwriting values.
 
 Diagram:
 

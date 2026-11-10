@@ -3600,7 +3600,7 @@ describe('usage tests', () => {
   });
 
   describe('group', () => {
-    it('allows an an option to be placed in an alternative group', () => {
+    it('allows an option to be placed in an alternative group', () => {
       const r = checkOutput(() =>
         yargs(['--help'])
           .option('batman', {
