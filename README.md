@@ -149,6 +149,11 @@ Libraries in this ecosystem make a best effort to track
 [Node.js' release schedule](https://nodejs.org/en/about/releases/). Here's [a
 post on why we think this is important](https://medium.com/the-node-js-collection/maintainers-should-consider-following-node-js-release-schedule-ab08ed4de71a).
 
+## Special Thanks
+
+[HeroDevs](https://www.herodevs.com) sponsored the yargs projects with a donation from
+its Open Source Sustainability Fund in 2026.
+
 [npm-url]: https://www.npmjs.com/package/yargs
 [npm-image]: https://img.shields.io/npm/v/yargs.svg
 [standard-image]: https://img.shields.io/badge/code%20style-standard-brightgreen.svg
