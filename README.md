@@ -155,6 +155,11 @@ Older major versions of `yargs` receive security updates for 12 months. For more
 
 The main forum for free and community support is the project [Issues](https://github.com/yargs/yargs/issues) on GitHub.
 
+## Special Thanks
+
+[HeroDevs](https://www.herodevs.com) sponsored the yargs projects with a donation from
+its Open Source Sustainability Fund in 2026.
+
 [npm-url]: https://www.npmjs.com/package/yargs
 [npm-image]: https://img.shields.io/npm/v/yargs.svg
 [standard-image]: https://img.shields.io/badge/code%20style-standard-brightgreen.svg
