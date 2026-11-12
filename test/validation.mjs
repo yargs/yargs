@@ -265,6 +265,24 @@ describe('validation tests', () => {
   });
 
   describe('conflicts', () => {
+    it('treats prototype property names as ordinary options', () => {
+      for (const key of ['constructor', 'toString', 'valueOf']) {
+        const argv = yargs([`--${key}`, 'value']).parse();
+        expect(argv[key]).to.equal('value');
+      }
+    });
+
+    it('allows a prototype property name to declare a conflict', () => {
+      yargs()
+        .conflicts('constructor', 'other')
+        .parse('--constructor value --other value', error => {
+          expect(error).to.not.equal(null);
+          expect(error.message).to.match(
+            /Arguments constructor and other are mutually exclusive/
+          );
+        });
+    });
+
     it('fails if both arguments are supplied', done => {
       yargs(['-f', '-b'])
         .conflicts('f', 'b')

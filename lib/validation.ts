@@ -375,7 +375,7 @@ export function validation(
     }
   };
 
-  let conflicting: Dictionary<(string | undefined)[]> = {};
+  let conflicting: Dictionary<(string | undefined)[]> = Object.create(null);
   self.conflicts = function conflicts(key, value) {
     argsert('<string|object> [array|string]', [key, value], arguments.length);
 
@@ -385,7 +385,7 @@ export function validation(
       });
     } else {
       yargs.global(key);
-      if (!conflicting[key]) {
+      if (!Object.prototype.hasOwnProperty.call(conflicting, key)) {
         conflicting[key] = [];
       }
       if (Array.isArray(value)) {
@@ -399,7 +399,7 @@ export function validation(
 
   self.conflicting = function conflictingFn(argv) {
     Object.keys(argv).forEach(key => {
-      if (conflicting[key]) {
+      if (Object.prototype.hasOwnProperty.call(conflicting, key)) {
         conflicting[key].forEach(value => {
           // we default keys to 'undefined' that have been configured, we should not
           // apply conflicting check unless they are a value other than 'undefined'.
