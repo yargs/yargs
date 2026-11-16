@@ -4,4 +4,8 @@ example/
 helpers/
 lib/platform-shims/esm.mjs
 test/fixtures/
-example.mjs
+.nycrc
+// Ignore JSON and Markdown files for now, keep focus on code.
+// (Especially CHANGELOG.md, which is maintained by release-please.)
+*.json
+*.md

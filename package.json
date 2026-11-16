@@ -67,7 +67,12 @@
     "yargs-test-extends": "^1.0.1"
   },
   "scripts": {
-    "fix": "npm run lint -- --fix && npm run format",
+    "check": "npm run check:lint && npm run check:format",
+    "check:format": "prettier --check .",
+    "check:lint": "eslint .",
+    "fix": "npm run fix:lint && npm run fix:format",
+    "fix:lint": "eslint . --fix",
+    "fix:format": "prettier --write .",
     "posttest": "npm run check",
     "test": "c8 mocha --enable-source-maps ./test/*.mjs --require ./test/before.mjs --timeout=24000 --check-leaks",
     "test:esm": "c8 mocha --enable-source-maps ./test/esm/*.mjs --check-leaks",
@@ -75,12 +80,8 @@
     "prepare": "npm run compile",
     "pretest": "npm run compile -- -p tsconfig.test.json",
     "compile": "rimraf build && tsc",
-    "check": "npm run lint && npm run format:check",
-    "lint": "eslint .",
-    "format": "prettier --write \"**/*.{ts,js,mjs,cjs}\"",
-    "format:check": "prettier --check \"**/*.{ts,js,mjs,cjs}\"",
     "clean": "rimraf build",
-    "watch": "rimraf build && npm:watch:tsc",
+    "watch": "rimraf build && npm run watch:tsc",
     "watch:tsc": "tsc --watch"
   },
   "repository": {
