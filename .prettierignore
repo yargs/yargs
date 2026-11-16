@@ -1,6 +1,7 @@
 build/
+coverage/
 example/
 helpers/
 lib/platform-shims/esm.mjs
-test/fixtures/**/**
+test/fixtures/
 example.mjs
