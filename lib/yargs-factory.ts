@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 // Platform agnostic entrypoint for yargs, i.e., this factory is used to
 // create an instance of yargs for CJS, ESM, Deno.
 //

@@ -2882,7 +2882,8 @@ describe('usage tests', () => {
       const r = checkOutput(() =>
         yargs(['-h'])
           .help('h')
-          .default('f', function randomNumber() { // eslint-disable-line
+          // eslint-disable-next-line prefer-arrow-callback
+          .default('f', function randomNumber() {
             return Math.random() * 256;
           })
           .wrap(null)
