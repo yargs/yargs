@@ -576,7 +576,7 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
   };
 
   // however this snapshot must be cleared afterwards
-  // not to be be used by next calls to parse
+  // not to be used by next calls to parse
   self.clearCachedHelpMessage = function () {
     cachedHelpMessage = undefined;
   };
