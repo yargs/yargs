@@ -375,7 +375,9 @@ export function validation(
     }
   };
 
-  let conflicting: Dictionary<(string | undefined)[]> = {};
+  // Option names may be inherited Object.prototype properties (for example
+  // `constructor`), so this lookup must not inherit from Object.prototype.
+  let conflicting: Dictionary<(string | undefined)[]> = Object.create(null);
   self.conflicts = function conflicts(key, value) {
     argsert('<string|object> [array|string]', [key, value], arguments.length);
 
@@ -453,7 +455,14 @@ export function validation(
 
   self.reset = function reset(localLookup) {
     implied = objFilter(implied, k => !localLookup[k]);
-    conflicting = objFilter(conflicting, k => !localLookup[k]);
+    const remainingConflicting: Dictionary<(string | undefined)[]> =
+      Object.create(null);
+    Object.keys(conflicting).forEach(key => {
+      if (!localLookup[key]) {
+        remainingConflicting[key] = conflicting[key];
+      }
+    });
+    conflicting = remainingConflicting;
     return self;
   };
 

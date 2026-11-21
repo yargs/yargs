@@ -265,6 +265,14 @@ describe('validation tests', () => {
   });
 
   describe('conflicts', () => {
+    it('does not treat inherited object properties as configured conflicts', () => {
+      yargs(['--constructor', 'value'])
+        .fail(() => {
+          expect.fail();
+        })
+        .parse();
+    });
+
     it('fails if both arguments are supplied', done => {
       yargs(['-f', '-b'])
         .conflicts('f', 'b')
