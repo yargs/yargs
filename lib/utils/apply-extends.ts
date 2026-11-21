@@ -18,7 +18,11 @@ export function applyExtends(
     let pathToDefault: string | null = null;
     if (!isPath) {
       try {
-        pathToDefault = import.meta.resolve(config.extends);
+        // Resolve with the require that loads the module below, so the
+        // result is a file path that a nested relative extends can use.
+        // import.meta.resolve() returns a file:// URL, which path.dirname()
+        // would treat as a relative path and break nested extends (#2628).
+        pathToDefault = _shim.require.resolve(config.extends);
       } catch (_err) {
         // maybe the module uses key for some other reason,
         // err on side of caution.

@@ -1431,6 +1431,28 @@ describe('yargs dsl tests', () => {
         argv.z.should.equal(15);
       });
 
+      // see: https://github.com/yargs/yargs/issues/2628
+      it('resolves nested relative extends inside an absolute .cjs config', () => {
+        const absolutePath = path.join(
+          process.cwd(),
+          'test',
+          'fixtures',
+          'extends',
+          'config_cjs.cjs'
+        );
+
+        const argv = yargs()
+          .config({
+            a: 2,
+            extends: absolutePath,
+          })
+          .parse();
+
+        argv.a.should.equal(2);
+        argv.c.should.equal(201);
+        argv.z.should.equal(15);
+      });
+
       it('tolerates null prototype config objects', () => {
         const argv = yargs()
           .config({
