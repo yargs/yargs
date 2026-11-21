@@ -94,6 +94,7 @@ export interface PlatformShim {
   getCallerFile: () => string;
   getEnv: (key: string) => string | undefined;
   getProcessArgvBin: () => string;
+  getProcessArgvUserArgs: () => string[];
   inspect: (obj: object) => string;
   mainFilename: string;
   requireDirectory: Function;
