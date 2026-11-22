@@ -1,6 +1,6 @@
 import yargs from 'yargs';
 
-const argv = yargs(process.argv.slice(2))
+const argv = yargs()
   .command('math', 'math description', yargs =>
     yargs
       .command(

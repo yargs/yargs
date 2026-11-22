@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import yargs from 'yargs';
 
-const argv = yargs(process.argv.slice(2)).string(['x', 'y']).parse();
+const argv = yargs().string(['x', 'y']).parse();
 console.dir([argv.x, argv.y]);
 
 /* Turns off numeric coercion:

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import yargs from 'yargs';
 
-const argv = yargs(process.argv.slice(2))
+const argv = yargs()
   .usage('This is my awesome program\n\nUsage: $0 [options]')
   .help('help')
   .alias('help', 'h')

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import yargs from 'yargs';
 
-const y = yargs(process.argv.slice(2));
+const y = yargs();
 
 const argv = y
   .usage('This is my awesome program')

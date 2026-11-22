@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import yargs from 'yargs';
 
-const argv = yargs(process.argv.slice(2))
+const argv = yargs()
   .default('x', 10)
   .default('y', 10)
   .parse();
