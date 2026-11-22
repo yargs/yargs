@@ -4,8 +4,7 @@ import {
   assertEquals,
   assertMatch,
 } from 'https://deno.land/std/testing/asserts.ts';
-import yargs from '../../deno.ts';
-import {Arguments} from '../../deno-types.ts';
+import yargs, {type Arguments, type YargsInstance} from '../../deno.ts';
 import {commands} from '../esm/fixtures/commands/index.mjs';
 
 Deno.test('demandCommand(1) throw error if no command provided', () => {
@@ -36,7 +35,7 @@ Deno.test(
   'does not drop .0 if positional is configured as string',
   async () => {
     const argv = (await yargs(['cmd', '33.0'])
-      .command('cmd [str]', 'a command', (yargs: any) => {
+      .command('cmd [str]', 'a command', (yargs: YargsInstance) => {
         return yargs.positional('str', {
           type: 'string',
         });
