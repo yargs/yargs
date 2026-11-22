@@ -1630,7 +1630,13 @@ export class YargsInstance {
     try {
       let startDir = rootPath || this.#shim.mainFilename;
       // If a file path is provided for root, remove the file and keep path.
-      if (this.#shim.path.extname(startDir)) {
+      let isDir = false;
+      try {
+        this.#shim.readdirSync(startDir, {});
+        isDir = true;
+        // eslint-disable-next-line no-empty
+      } catch (_err) {}
+      if (!isDir && this.#shim.path.extname(startDir)) {
         startDir = this.#shim.path.dirname(startDir);
       }
 
