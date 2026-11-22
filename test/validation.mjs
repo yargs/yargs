@@ -434,6 +434,12 @@ describe('validation tests', () => {
         loadLocale('en_US.UTF-8');
       }
     });
+
+    it('does not crash when option name matches an Object.prototype property', () => {
+      const argv = yargs(['--constructor', 'x', '--toString', 'y']).parse();
+      argv.should.have.property('constructor', 'x');
+      argv.should.have.property('toString', 'y');
+    });
   });
 
   describe('demand', () => {
