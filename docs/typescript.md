@@ -125,11 +125,10 @@ If you need to use [`.wrap()`](https://yargs.js.org/docs/#api-reference-wrapcolu
 
 ```ts
 import yargs from 'yargs';
-import { hideBin } from 'yargs/helpers';
 
 // ...
 
-const yargsInstance = yargs(hideBin(process.argv));
+const yargsInstance = yargs();
 
 const args = yargsInstance
   .wrap(yargsInstance.terminalWidth())

@@ -10,12 +10,20 @@ This document is the Yargs API reference. There are other documentation files in
 API reference
 ===
 
-You can pass Yargs the `process.argv` without any additional configuration
+You can pass Yargs the user args from `process.argv` without any additional configuration
 and it will do its best to parse it into an object:
 
 ```javascript
 import yargs from 'yargs';
 yargs(process.argv.slice(2)).parse();
+```
+
+Since this is the most common usage, the command-line arguments are used by default when
+you do not explicitly supply the arguments to parse:
+
+```javascript
+import yargs from 'yargs';
+yargs().parse(); // yargs() is same as calling yargs(hideBin(process.argv))
 ```
 
 You can also pass in an arbitrary array of arguments:
@@ -49,7 +57,7 @@ import {hideBin} from 'yargs/helpers';
 const argv = yargs(hideBin(process.argv)).parse();
 ```
 
-The rest of these methods below come in just before the terminating
+The rest of these methods below come in just before the
 terminating `.parse()`.
 
 <a name="alias"></a>.alias(key, alias)
@@ -283,7 +291,6 @@ options that your command accepts:
 
 ```js
 import yargs from 'yargs';
-import {hideBin} from 'yargs/helpers';
 yargs()
   .command('get', 'make a get HTTP request', {
     url: {
@@ -292,7 +299,7 @@ yargs()
     },
   })
   .help()
-  .parse(hideBin(process.argv));
+  .parse();
 ```
 
 `builder` can also be a function. This function is executed
@@ -303,7 +310,6 @@ builder.
 
 ```js
 import yargs from 'yargs';
-import {hideBin} from 'yargs/helpers';
 yargs()
   .command(
     'get',
@@ -316,7 +322,7 @@ yargs()
     }
   )
   .help()
-  .parse(hideBin(process.argv));
+  .parse();
 ```
 
 You can also provide a handler function, which will be executed with the
@@ -324,7 +330,6 @@ parsed `argv` object:
 
 ```js
 import yargs from 'yargs';
-import {hideBin} from 'yargs/helpers';
 yargs()
   .command(
     'get',
@@ -340,7 +345,7 @@ yargs()
     }
   )
   .help()
-  .parse(hideBin(process.argv));
+  .parse();
 ```
 
 _**Note:**_ `.parse()` should only be used at the top level, not inside a command's builder function.
@@ -392,8 +397,7 @@ e.g. `./command completion > ~/.config/fish/completions/command.fish`
 
 ```js
 import yargs from 'yargs';
-import {hideBin} from 'yargs/helpers';
-const argv = yargs(hideBin(process.argv))
+const argv = yargs()
   .completion('completion', function (current, argv) {
     // 'current' is the current command being completed.
     // 'argv' is the parsed arguments so far.
@@ -407,8 +411,7 @@ You can also provide asynchronous completions.
 
 ```js
 import yargs from 'yargs';
-import {hideBin} from 'yargs/helpers';
-const argv = yargs(hideBin(process.argv))
+const argv = yargs()
   .completion('completion', function (current, argv, done) {
     setTimeout(function () {
       done(['apple', 'banana']);
@@ -421,8 +424,7 @@ But wait, there's more! You can return an asynchronous promise.
 
 ```js
 import yargs from 'yargs';
-import {hideBin} from 'yargs/helpers';
-const argv = yargs(hideBin(process.argv))
+const argv = yargs()
   .completion('completion', function (current, argv) {
     return new Promise(function (resolve, reject) {
       setTimeout(function () {
@@ -437,8 +439,7 @@ Using default completions in a custom implementation. When invoked with no argum
 
 ```js
 import yargs from 'yargs';
-import {hideBin} from 'yargs/helpers';
-const argv = yargs(hideBin(process.argv))
+const argv = yargs()
   .completion('completion', function (current, argv, completionFilter, done) {
     // if 'apple' present return default completions
     if (argv._.includes('apple')) {

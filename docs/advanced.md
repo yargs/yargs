@@ -15,8 +15,7 @@ application using a similar API to subcommands.
 
 ```js
 import yargs from 'yargs';
-import { hideBin } from 'yargs/helpers';
-const argv = yargs(hideBin(process.argv))
+const argv = yargs()
   .command('$0', 'the default command', () => {}, (argv) => {
     console.log('this command will be run by default')
   })
@@ -30,8 +29,7 @@ Default commands can also be used as a command alias, like so:
 
 ```js
 import yargs from 'yargs';
-import { hideBin } from 'yargs/helpers';
-const argv = yargs(hideBin(process.argv))
+const argv = yargs()
   .command(['serve', '$0'], 'the serve command', () => {}, (argv) => {
     console.log('this command will be run by default')
   })
@@ -50,10 +48,9 @@ take the form `[bar]`. The parsed positional arguments will be populated in
 
 ```js
 import yargs from 'yargs';
-import { hideBin } from 'yargs/helpers';
 yargs().command('get <source> [proxy]', 'make a get HTTP request')
   .help()
-  .parse(hideBin(process.argv));
+  .parse();
 ```
 
 #### Positional Argument Aliases
@@ -64,10 +61,9 @@ an email as the first argument:
 
 ```js
 import yargs from 'yargs';
-import { hideBin } from 'yargs/helpers';
 yargs().command('get <username|email> [password]', 'fetch a user by username or email.')
   .help()
-  .parse(hideBin(process.argv));
+  .parse();
 ```
 
 In this way, both `argv.username` and `argv.email` would be populated with the
@@ -80,10 +76,9 @@ values, by using the `..` operator:
 
 ```js
 import yargs from 'yargs';
-import { hideBin } from 'yargs/helpers';
 yargs().command('download <url> [files..]', 'download several files')
   .help()
-  .parse(hideBin(process.argv));
+  .parse();
 ```
 
 #### Describing Positional Arguments
@@ -92,7 +87,6 @@ You can use the method [`.positional()`](/docs/api.md#positionalkey-opt) in a co
 
 ```js
 import yargs from 'yargs';
-import { hideBin } from 'yargs/helpers';
 yargs().command('get <source> [proxy]', 'make a get HTTP request', (yargs) => {
   yargs.positional('source', {
     describe: 'URL to fetch content from',
@@ -103,7 +97,7 @@ yargs().command('get <source> [proxy]', 'make a get HTTP request', (yargs) => {
   })
 })
 .help()
-.parse(hideBin(process.argv));
+.parse();
 ```
 
 ### Command Execution
@@ -137,8 +131,7 @@ line, the command will be executed.
 ```js
 #!/usr/bin/env node
 import yargs from 'yargs';
-import { hideBin } from 'yargs/helpers';
-yargs(hideBin(process.argv))
+yargs()
   .command(['start [app]', 'run', 'up'], 'Start up an app', {}, (argv) => {
     console.log('starting up the', argv.app || 'default', 'app')
   })
@@ -328,8 +321,7 @@ cli.mjs:
 ```js
 #!/usr/bin/env node
 import yargs from 'yargs';
-import { hideBin } from 'yargs/helpers';
-yargs(hideBin(process.argv))
+yargs()
   .commandDir('cmds')
   .demandCommand()
   .help()
@@ -408,10 +400,9 @@ cli.mjs:
 #!/usr/bin/env node
 
 import yargs from 'yargs';
-import { hideBin } from 'yargs/helpers';
 import { commands } from './cmds/index.mjs';
 
-yargs(hideBin(process.argv))
+yargs()
   .command(commands)
   .parse();
 ```
@@ -438,10 +429,9 @@ implement `.rc` functionality:
 import { findUpSync } from 'find-up';
 import * as fs from 'node:fs';
 import yargs from 'yargs';
-import { hideBin } from 'yargs/helpers';
 const configPath = findUpSync(['.myapprc', '.myapprc.json']);
 const config = configPath ? JSON.parse(fs.readFileSync(configPath)) : {}
-const argv = yargs(hideBin(process.argv))
+const argv = yargs()
   .config(config)
   .parse();
 ```
@@ -470,8 +460,7 @@ method:
 
 ```js
 import yargs from 'yargs';
-import { hideBin } from 'yargs/helpers';
-const argv = yargs(hideBin(process.argv))
+const argv = yargs()
   .pkgConf('nyc')
   .parse();
 ```
@@ -568,8 +557,7 @@ yargs().middleware(normalizeCredentials)
 
 ```js
 import yargs from 'yargs';
-import { hideBin } from 'yargs/helpers';
-const argv = yargs(hideBin(process.argv))
+const argv = yargs()
   .usage('Usage: $0 <command> [options]')
   .command('login', 'Authenticate user', (yargs) =>{
         return yargs.option('username')
@@ -590,7 +578,6 @@ parsed arguments object will be returned after the handler completes:
 
 ```js
 import yargs from 'yargs'
-import { hideBin } from 'yargs/helpers'
 
 async function processValue(value) {
   return new Promise((resolve) => {
@@ -602,7 +589,7 @@ async function processValue(value) {
 }
 
 console.info('start')
-await yargs(hideBin(process.argv))
+await yargs()
   .command('add <x> <y>', 'add two eventual values', () => {}, async (argv) => {
     const sum = await processValue(argv.x) + await processValue(argv.y)
     console.info(`x + y = ${sum}`)
@@ -619,7 +606,6 @@ Use `try`/`catch` to perform error handling, you can do so by setting
 
 ```js
 import yargs from 'yargs'
-import { hideBin } from 'yargs/helpers'
 
 async function processValue(value) {
   return new Promise((resolve, reject) => {
@@ -631,7 +617,7 @@ async function processValue(value) {
 }
 
 console.info('start')
-const parser = yargs(hideBin(process.argv))
+const parser = yargs()
   .command('add <x> <y>', 'add two eventual values', () => {}, async (argv) => {
     const sum = await processValue(argv.x) + await processValue(argv.y)
     console.info(`x + y = ${sum}`)
@@ -653,10 +639,9 @@ One example would be to use `input` to ensure the user inputs required arguments
 
 ```js
 import yargs from 'yargs/yargs';
-import { hideBin } from 'yargs/helpers';
 import { input } from '@inquirer/prompts';
 
-await yargs(hideBin(process.argv))
+await yargs()
   .command({
     command: 'login [username]',
     describe: 'Log in with defined username',
