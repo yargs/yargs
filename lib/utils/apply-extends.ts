@@ -1,5 +1,6 @@
 import {Dictionary, PlatformShim} from '../typings/common-types.js';
 import {YError} from '../yerror.js';
+import {fileURLToPath} from 'node:url';
 
 let previouslyVisitedConfigs: string[] = [];
 let shim: PlatformShim;
@@ -19,6 +20,9 @@ export function applyExtends(
     if (!isPath) {
       try {
         pathToDefault = import.meta.resolve(config.extends);
+        if (pathToDefault.startsWith('file:')) {
+          pathToDefault = fileURLToPath(pathToDefault);
+        }
       } catch (_err) {
         // maybe the module uses key for some other reason,
         // err on side of caution.

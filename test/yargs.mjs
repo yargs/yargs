@@ -1458,6 +1458,47 @@ describe('yargs dsl tests', () => {
         argv.c.should.equal(201);
       });
 
+      it('allows a module with a relative extends to be extended', () => {
+        const pkgDir = './node_modules/yargs-test-nested-extends';
+        fs.mkdirSync(pkgDir, {recursive: true});
+        fs.writeFileSync(
+          `${pkgDir}/package.json`,
+          JSON.stringify({
+            name: 'yargs-test-nested-extends',
+            version: '1.0.0',
+            main: 'index.json',
+          })
+        );
+        fs.writeFileSync(
+          `${pkgDir}/index.json`,
+          JSON.stringify({
+            extends: './base.json',
+            b: 22,
+          })
+        );
+        fs.writeFileSync(
+          `${pkgDir}/base.json`,
+          JSON.stringify({
+            c: 33,
+          })
+        );
+
+        try {
+          const argv = yargs()
+            .config({
+              a: 1,
+              extends: 'yargs-test-nested-extends',
+            })
+            .parse();
+
+          argv.a.should.equal(1);
+          argv.b.should.equal(22);
+          argv.c.should.equal(33);
+        } finally {
+          fs.rmSync(pkgDir, {recursive: true, force: true});
+        }
+      });
+
       it('ignores an extends key that does not look like a path or module', () => {
         const argv = yargs()
           .config({
