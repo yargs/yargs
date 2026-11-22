@@ -202,20 +202,18 @@ You then register the module like so:
 
 ```js
 import yargs from 'yargs';
-import { hideBin } from 'yargs/helpers';
 yargs().command(require('my-module'))
   .help()
-  .parse(hideBin(process.argv));
+  .parse();
 ```
 
 Or if the module does not export `command` and `describe` (or if you just want to override them):
 
 ```js
 import yargs from 'yargs';
-import { hideBin } from 'yargs/helpers';
 yargs().command('get <source> [proxy]', 'make a get HTTP request', require('my-module'))
   .help()
-  .parse(hideBin(process.argv));
+  .parse();
 ```
 
 #### Testing a Command Module
@@ -349,7 +347,7 @@ cmds/remote.mjs:
 export const command = 'remote <command>'
 export const describe = 'Manage set of tracked repos'
 export function builder (yargs) {
-  return yargs().commandDir('remote_cmds')
+  return yargs.commandDir('remote_cmds')
 }
 export function handler (argv) {}
 ```

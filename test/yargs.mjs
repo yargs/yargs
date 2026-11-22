@@ -80,7 +80,7 @@ describe('yargs dsl tests', () => {
     argv._.should.deep.equal(['tutu']);
   });
 
-  it('factory should not remove the 1st argument of bundled electron apps when using default process.arg', () => {
+  it('factory should not remove the 1st argument of bundled electron apps when using default process.argv', () => {
     // Basically testing that using hideBin() to extract user args.
     process.argv = ['/usr/local/bin/app', '-f', 'toto', 'tutu'];
     process.versions.electron = '10.0.0-nightly.20200211';

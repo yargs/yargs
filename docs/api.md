@@ -45,8 +45,7 @@ to contain only the arguments after the program name, while `process.argv`
 usually starts with extra elements. For example, [Node’s
 `process.argv`](https://nodejs.org/api/process.html#process_process_argv) array
 starts with two extra elements:`process.execPath` and the path to the JavaScript
-file being executed. So if you’re getting your arguments from `process.argv` in
-Node, pass `process.argv.slice(2)` to Yargs.
+file being executed.
 
 _**Note:**_ Yargs exposes the helper `hideBin`, which handles the
 `process.argv.slice` logic for you.
@@ -1404,8 +1403,8 @@ Valid `opt` keys include:
 .parse([args], [context], [parseCallback])
 ------------
 
-Returns the `argv` object. `args` may either be a pre-processed argv array, or a raw argument string. The `args` are optional and if omitted the parse
-uses the args supplied to the factory function.
+Returns the `argv` object. `args` may either be a pre-processed argv array, or a raw argument string. `args` is optional, as `.parse()`
+defaults to using the args supplied to the factory function (which defaults to using the command-line args).
 
 A `context` object can optionally be given as the second argument to `parse()`, providing a
 useful mechanism for passing state information to commands:
