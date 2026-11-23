@@ -1374,5 +1374,31 @@ describe('validation tests', () => {
         expect(err).to.match(/Unknown arguments: cool, awesome/);
       });
     });
+
+    it('accepts nested object config keys when dotted options are registered under strict mode', () => {
+      const parsed = yargs()
+        .option('auth.username', {type: 'string'})
+        .option('auth.password', {type: 'string'})
+        .config({auth: {username: 'test', password: 'secret'}})
+        .strict()
+        .fail(msg => {
+          throw new Error(msg);
+        })
+        .parse([]);
+
+      parsed.auth.should.deep.equal({username: 'test', password: 'secret'});
+    });
+
+    it('rejects nested object config keys containing unknown dotted options under strict mode', done => {
+      yargs()
+        .option('auth.username', {type: 'string'})
+        .config({auth: {username: 'test', extra: 'bad'}})
+        .strict()
+        .fail(msg => {
+          expect(msg).to.match(/Unknown argument: auth/);
+          return done();
+        })
+        .parse([]);
+    });
   });
 });

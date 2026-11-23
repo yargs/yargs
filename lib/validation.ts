@@ -152,6 +152,24 @@ export function validation(
     const unknown: string[] = [];
     const currentContext = yargs.getInternalMethods().getContext();
 
+    const isKnownNestedObject = (prefix: string, obj: unknown): boolean => {
+      if (typeof obj !== 'object' || obj === null || Array.isArray(obj)) {
+        return false;
+      }
+      const entries = Object.entries(obj as Record<string, unknown>);
+      if (entries.length === 0) {
+        return false;
+      }
+      return entries.every(([childKey, childVal]) => {
+        const fullKey = `${prefix}.${childKey}`;
+        return (
+          Object.prototype.hasOwnProperty.call(positionalMap, fullKey) ||
+          self.isValidAndSomeAliasIsNotNew(fullKey, aliases) ||
+          isKnownNestedObject(fullKey, childVal)
+        );
+      });
+    };
+
     Object.keys(argv).forEach(key => {
       if (
         !specialKeys.includes(key) &&
@@ -160,7 +178,8 @@ export function validation(
           yargs.getInternalMethods().getParseContext(),
           key
         ) &&
-        !self.isValidAndSomeAliasIsNotNew(key, aliases)
+        !self.isValidAndSomeAliasIsNotNew(key, aliases) &&
+        !isKnownNestedObject(key, argv[key])
       ) {
         unknown.push(key);
       }
