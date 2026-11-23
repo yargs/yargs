@@ -128,6 +128,7 @@ export interface PlatformShim {
 
 export interface RequireType {
   (path: string): Function;
+  resolve?: (id: string) => string;
   main: MainType;
 }
 

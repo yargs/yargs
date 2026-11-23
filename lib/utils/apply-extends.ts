@@ -18,7 +18,14 @@ export function applyExtends(
     let pathToDefault: string | null = null;
     if (!isPath) {
       try {
-        pathToDefault = import.meta.resolve(config.extends);
+        pathToDefault =
+          typeof _shim.require.resolve === 'function'
+            ? _shim.require.resolve(config.extends)
+            : import.meta.resolve(config.extends);
+        if (pathToDefault.startsWith('file://')) {
+          const pathname = decodeURIComponent(new URL(pathToDefault).pathname);
+          pathToDefault = /^\/[A-Za-z]:/.test(pathname) ? pathname.slice(1) : pathname;
+        }
       } catch (_err) {
         // maybe the module uses key for some other reason,
         // err on side of caution.
