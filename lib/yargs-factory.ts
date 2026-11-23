@@ -1630,8 +1630,14 @@ export class YargsInstance {
     try {
       let startDir = rootPath || this.#shim.mainFilename;
       // If a file path is provided for root, remove the file and keep path.
+      // Check whether startDir is a directory first so dot-containing directory
+      // names (e.g. "release.v1") are not treated as files.
       if (this.#shim.path.extname(startDir)) {
-        startDir = this.#shim.path.dirname(startDir);
+        try {
+          this.#shim.readdirSync(startDir, {});
+        } catch (_err) {
+          startDir = this.#shim.path.dirname(startDir);
+        }
       }
 
       const pkgJsonPath = this.#shim.findUp(
