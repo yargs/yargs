@@ -1629,11 +1629,7 @@ export class YargsInstance {
 
     let obj = {};
     try {
-      let startDir = rootPath || this.#shim.mainFilename;
-      // If a file path is provided for root, remove the file and keep path.
-      if (this.#shim.path.extname(startDir)) {
-        startDir = this.#shim.path.dirname(startDir);
-      }
+      const startDir = rootPath || this.#shim.mainFilename;
 
       const pkgJsonPath = this.#shim.findUp(
         startDir,

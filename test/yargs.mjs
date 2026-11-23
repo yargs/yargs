@@ -1849,6 +1849,27 @@ describe('yargs dsl tests', () => {
       r.logs[0].should.not.equal('9.9.9'); // breaks when yargs gets to this version
     });
 
+    it('reads package.json from a directory whose name contains a dot', () => {
+      const parentDir = fs.mkdtempSync(path.resolve('yargs-pkgconf-'));
+      const dottedDir = path.join(parentDir, 'release.v1');
+      try {
+        fs.mkdirSync(dottedDir);
+        fs.writeFileSync(
+          path.join(parentDir, 'package.json'),
+          JSON.stringify({settings: {picked: 'parent'}})
+        );
+        fs.writeFileSync(
+          path.join(dottedDir, 'package.json'),
+          JSON.stringify({settings: {picked: 'child'}})
+        );
+
+        const argv = yargs([]).pkgConf('settings', dottedDir).parseSync();
+        expect(argv.picked).to.equal('child');
+      } finally {
+        fs.rmSync(parentDir, {recursive: true, force: true});
+      }
+    });
+
     it('gracefully handles a missing package.json', function () {
       if (process.platform === 'win32') {
         // Doesn’t work in CI for some reason.
