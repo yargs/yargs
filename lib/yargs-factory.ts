@@ -1994,8 +1994,9 @@ export class YargsInstance {
     this.#options.configuration = this[kGetParserConfiguration]();
 
     const populateDoubleDash = !!this.#options.configuration['populate--'];
+    const haltAtNonOption = !!this.#options.configuration['halt-at-non-option'];
     const config = Object.assign({}, this.#options.configuration, {
-      'populate--': true,
+      'populate--': haltAtNonOption ? populateDoubleDash : true,
     });
     const parsed = this.#shim.Parser.detailed(
       args,

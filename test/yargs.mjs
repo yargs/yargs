@@ -3295,4 +3295,31 @@ describe('yargs dsl tests', () => {
       }, /.*parseSync\(\) must not be used.* /);
     });
   });
+  describe('halt-at-non-option', () => {
+    it('populates positional arguments when halt-at-non-option is enabled', () => {
+      let handled;
+      yargs(['-v', 'my-host', 'ls', 'arg1'])
+        .usage(
+          '$0 <host> [<cmd>...]',
+          'Run command via ssh',
+          y =>
+            y
+              .positional('host', {type: 'string', demandOption: true})
+              .positional('cmd', {array: true, type: 'string'})
+              .options({
+                verbose: {type: 'boolean', alias: 'v', count: true},
+              }),
+          args => {
+            handled = args;
+          }
+        )
+        .strict()
+        .parserConfiguration({'halt-at-non-option': true})
+        .parseSync();
+
+      assert.strictEqual(handled.verbose, 1);
+      assert.strictEqual(handled.host, 'my-host');
+      assert.deepStrictEqual(handled.cmd, ['ls', 'arg1']);
+    });
+  });
 });
