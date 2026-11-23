@@ -321,6 +321,23 @@ describe('validation tests', () => {
         .parse();
     });
 
+    it('should not crash when Object.prototype property names are passed as flags', () => {
+      const argv = yargs([
+        '--constructor',
+        'x',
+        '--toString',
+        'y',
+        '--valueOf',
+        'z',
+        '--hasOwnProperty',
+        'w',
+      ]).parseSync();
+      expect(argv.constructor).to.equal('x');
+      expect(argv.toString).to.equal('y');
+      expect(argv.valueOf).to.equal('z');
+      expect(argv.hasOwnProperty).to.equal('w');
+    });
+
     it('should not fail if argument with conflict is provided, but not the argument it conflicts with', () => {
       yargs(['command', '-f', '-c'])
         .command('command')
