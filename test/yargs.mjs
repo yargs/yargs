@@ -3234,6 +3234,19 @@ describe('yargs dsl tests', () => {
       help.should.match(/default: "hello"/);
       help.should.match(/foo command/);
     });
+    it('should support args as string or array for subcommand help', async () => {
+      const y = yargs()
+        .command('alpha', 'alpha command', y => y.option('a-opt', {describe: 'alpha option'}))
+        .command('beta', 'beta command', y => y.option('b-opt', {describe: 'beta option'}));
+
+      const alphaHelp = await y.getHelp('alpha');
+      alphaHelp.should.match(/alpha command/);
+      alphaHelp.should.match(/--a-opt/);
+
+      const betaHelp = await y.getHelp(['beta']);
+      betaHelp.should.match(/beta command/);
+      betaHelp.should.match(/--b-opt/);
+    });
   });
   describe('getters', () => {
     it('has getter for strict commands', () => {

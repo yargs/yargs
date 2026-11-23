@@ -796,34 +796,41 @@ export class YargsInstance {
   getGroups(): Dictionary<string[]> {
     return Object.assign({}, this.#groups, this.#preservedGroups);
   }
-  getHelp(): Promise<string> {
+  getHelp(args?: string | string[]): Promise<string> {
+    argsert('[string|array]', [args], arguments.length);
     this.#hasOutput = true;
-    if (!this.#usage.hasCachedHelpMessage()) {
-      if (!this.parsed) {
+    const hasExplicitArgs = typeof args !== 'undefined';
+    if (hasExplicitArgs) {
+      this[kFreeze]();
+    }
+    const finish = (helpText: string) => {
+      if (hasExplicitArgs) {
+        this[kUnfreeze]();
+      }
+      return helpText;
+    };
+    if (!this.#usage.hasCachedHelpMessage() || hasExplicitArgs) {
+      if (!this.parsed || hasExplicitArgs) {
         // Run the parser as if --help was passed to it (this is what
         // the last parameter `true` indicates).
         const parse = this[kRunYargsParserAndExecuteCommands](
-          this.#processArgs,
+          hasExplicitArgs ? args : this.#processArgs,
           undefined,
           undefined,
           0,
           true
         );
         if (isPromise(parse)) {
-          return parse.then(() => {
-            return this.#usage.help();
-          });
+          return parse.then(() => finish(this.#usage.help()));
         }
       }
       // Ensure top level options/positionals have been configured:
       const builderResponse = this.#command.runDefaultBuilderOn(this);
       if (isPromise(builderResponse)) {
-        return builderResponse.then(() => {
-          return this.#usage.help();
-        });
+        return builderResponse.then(() => finish(this.#usage.help()));
       }
     }
-    return Promise.resolve(this.#usage.help());
+    return Promise.resolve(finish(this.#usage.help()));
   }
   getOptions(): Options {
     return this.#options;
