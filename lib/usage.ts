@@ -216,7 +216,19 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
       if (usages.length) {
         // user-defined usage.
         usages.forEach(usage => {
-          ui.div({text: `${usage[0].replace(/\$0/g, base$0)}`});
+          const usageText = `${usage[0].replace(/\$0/g, base$0)}`;
+          if (theWrap) {
+            // cliui trims the start of every line it wraps, so pass each
+            // line's indentation as left padding to keep it.
+            usageText.split('\n').forEach(line => {
+              ui.div({
+                text: line,
+                padding: [0, 0, 0, getLeadingWhitespaceWidth(line, theWrap)],
+              });
+            });
+          } else {
+            ui.div({text: usageText});
+          }
           if (usage[1]) {
             ui.div({text: `${usage[1]}`, padding: [1, 0, 0, 0]});
           }
@@ -832,4 +844,14 @@ function getIndentation(text: string | IndentedText): number {
 
 function getText(text: string | IndentedText): string {
   return isIndentedText(text) ? text.text : text;
+}
+
+// Width of a line's leading whitespace, skipping ANSI styles before it.
+// Blank lines, and indentation that leaves no room for text, get none.
+function getLeadingWhitespaceWidth(line: string, maxWidth: number): number {
+  // eslint-disable-next-line no-control-regex
+  const match = /^(?:\u001b\[[\d;]*m)*(\s*)/.exec(line);
+  const width = match ? match[1].length : 0;
+  if (line.trim() === '' || width >= maxWidth) return 0;
+  return width;
 }

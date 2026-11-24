@@ -2070,6 +2070,74 @@ describe('usage tests', () => {
       // the leading whitespaces on the first line should not cause indentation to usage string
       r.logs[0].split('\n').should.deep.equal(expected);
     });
+
+    it('should keep leading whitespace in usage when a wrap is specified', () => {
+      const r = checkOutput(() =>
+        yargs('--help')
+          .usage(
+            [
+              '                              My greatest CLI App',
+              'Hello, world',
+            ].join('\n')
+          )
+          .wrap(100)
+          .parse()
+      );
+
+      r.logs[0]
+        .split('\n')
+        .slice(0, 3)
+        .should.deep.equal([
+          '                              My greatest CLI App',
+          'Hello, world',
+          '',
+        ]);
+    });
+
+    it('should indent wrapped rows of an indented usage line', () => {
+      const r = checkOutput(() =>
+        yargs('--help')
+          .usage('    a long indented line that should wrap onto more rows')
+          .wrap(30)
+          .parse()
+      );
+
+      r.logs[0]
+        .split('\n')
+        .slice(0, 3)
+        .should.deep.equal([
+          '    a long indented line that',
+          '    should wrap onto more rows',
+          '',
+        ]);
+    });
+
+    it('should keep leading whitespace after ansi codes in usage when a wrap is specified', () => {
+      // explicit escape codes, since chalk may not emit colors in tests.
+      const title = '\u001b[1mMy greatest CLI App\u001b[22m';
+      const r = checkOutput(() =>
+        yargs('--help').usage(`    ${title}\nHello, world`).wrap(100).parse()
+      );
+
+      r.logs[0]
+        .split('\n')
+        .slice(0, 2)
+        .should.deep.equal([`    ${title}`, 'Hello, world']);
+    });
+
+    it('should drop usage indentation that leaves no room for text', () => {
+      const r = checkOutput(() =>
+        yargs('--help')
+          .usage(`${' '.repeat(40)}deep\n   \nHello`)
+          .wrap(20)
+          .parse()
+      );
+
+      r.logs[0]
+        .split('\n')
+        .slice(0, 3)
+        .should.deep.equal(['deep', '', 'Hello']);
+    });
   });
 
   describe('commands', () => {
