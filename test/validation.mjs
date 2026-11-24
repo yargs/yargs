@@ -161,6 +161,14 @@ describe('validation tests', () => {
         .parse();
     });
 
+    // Addresses: https://github.com/yargs/yargs/issues/2623
+    it('supports implies on arguments named after Object.prototype properties', () => {
+      const argv = yargs(['--constructor', 'x', '--bar', 'y'])
+        .implies('constructor', 'bar')
+        .parse();
+      argv.constructor.should.equal('x');
+    });
+
     it('fails if a key is set, along with a key that it implies should not be set', done => {
       yargs(['--bar', '--foo'])
         .implies({
@@ -433,6 +441,32 @@ describe('validation tests', () => {
       } finally {
         loadLocale('en_US.UTF-8');
       }
+    });
+
+    // Addresses: https://github.com/yargs/yargs/issues/2623
+    it('does not throw for arguments named after Object.prototype properties', () => {
+      const argv = yargs(['--constructor', 'x']).parse();
+      argv.constructor.should.equal('x');
+    });
+
+    it('does not throw for prototype property arguments after reset', () => {
+      const argv = yargs(['cmd', '--constructor', 'x'])
+        .command('cmd', 'a command')
+        .conflicts('f', 'b')
+        .parse();
+      argv.constructor.should.equal('x');
+    });
+
+    it('supports conflicts on arguments named after Object.prototype properties', done => {
+      yargs(['--constructor', 'x', '--toString', 'y'])
+        .conflicts('constructor', 'toString')
+        .fail(msg => {
+          msg.should.equal(
+            'Arguments constructor and toString are mutually exclusive'
+          );
+          return done();
+        })
+        .parse();
     });
   });
 

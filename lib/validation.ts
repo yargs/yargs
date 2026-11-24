@@ -299,7 +299,7 @@ export function validation(
   };
 
   // check implications, argument foo implies => argument bar.
-  let implied: Dictionary<KeyOrPos[]> = {};
+  let implied: Dictionary<KeyOrPos[]> = Object.create(null);
   self.implies = function implies(key, value) {
     argsert(
       '<string|object> [array|number|string]',
@@ -313,7 +313,7 @@ export function validation(
       });
     } else {
       yargs.global(key);
-      if (!implied[key]) {
+      if (!Object.prototype.hasOwnProperty.call(implied, key)) {
         implied[key] = [];
       }
       if (Array.isArray(value)) {
@@ -375,7 +375,7 @@ export function validation(
     }
   };
 
-  let conflicting: Dictionary<(string | undefined)[]> = {};
+  let conflicting: Dictionary<(string | undefined)[]> = Object.create(null);
   self.conflicts = function conflicts(key, value) {
     argsert('<string|object> [array|string]', [key, value], arguments.length);
 
@@ -385,7 +385,7 @@ export function validation(
       });
     } else {
       yargs.global(key);
-      if (!conflicting[key]) {
+      if (!Object.prototype.hasOwnProperty.call(conflicting, key)) {
         conflicting[key] = [];
       }
       if (Array.isArray(value)) {
@@ -399,7 +399,7 @@ export function validation(
 
   self.conflicting = function conflictingFn(argv) {
     Object.keys(argv).forEach(key => {
-      if (conflicting[key]) {
+      if (Object.prototype.hasOwnProperty.call(conflicting, key)) {
         conflicting[key].forEach(value => {
           // we default keys to 'undefined' that have been configured, we should not
           // apply conflicting check unless they are a value other than 'undefined'.
