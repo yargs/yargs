@@ -80,7 +80,7 @@ Retreat from the xupptumblers!
 import yargs from 'yargs';
 import {hideBin} from 'yargs/helpers';
 
-yargs(hideBin(process.argv))
+yargs(hideBin(process.argv)) // can supply args explicitly
   .command(
     'serve [port]',
     'start the server',
@@ -103,7 +103,8 @@ yargs(hideBin(process.argv))
   .parse();
 ```
 
-> Note: `hideBin` is a shorthand for `process.argv.slice(2)`. It has the benefit that it takes into account variations in some environments, e.g., [Electron](https://github.com/electron/electron/issues/4690).
+> Note: `hideBin` is a shorthand for `process.argv.slice(2)`. It has the benefit that it takes into account variations in some environments (e.g. Electron).
+> It is not often needed explicitly since the factory function defaults to using it to find the user arguments from command-line.
 
 
 Run the example above with `--help` to see the help for the application.
