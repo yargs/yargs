@@ -49,6 +49,20 @@ describe('yargs dsl tests', () => {
     process.versions.electron = oldProcess.versions.electron;
   });
 
+  it('factory should use user args from process.argv by default', () => {
+    process.argv = ['node', 'script.js', '--foo', 'FOO', 'ARG'];
+    const argv = yargs().parse();
+    expect(argv.foo).to.equal('FOO');
+    expect(argv._).to.deep.equal(['ARG']);
+  });
+
+  it('factory should ignore process.argv when passed explicit arguments', () => {
+    process.argv = ['node', 'script.js', '--foo', 'FOO', 'ARG'];
+    const argv = yargs(['bar']).parse();
+    expect(argv._).to.deep.equal(['bar']);
+    expect(argv.foo).to.equal(undefined);
+  });
+
   it('should use bin name for $0, eliminating path', () => {
     process.argv[1] = '/usr/local/bin/ndm';
     process.env._ = '/usr/local/bin/ndm';
@@ -61,6 +75,16 @@ describe('yargs dsl tests', () => {
     process.argv = ['/usr/local/bin/app', '-f', 'toto', 'tutu'];
     process.versions.electron = '10.0.0-nightly.20200211';
     const argv = yargs(hideBin(process.argv)).parse();
+    argv.should.have.property('f');
+    argv.f.should.equal('toto');
+    argv._.should.deep.equal(['tutu']);
+  });
+
+  it('factory should not remove the 1st argument of bundled electron apps when using default process.argv', () => {
+    // Basically testing that using hideBin() to extract user args.
+    process.argv = ['/usr/local/bin/app', '-f', 'toto', 'tutu'];
+    process.versions.electron = '10.0.0-nightly.20200211';
+    const argv = yargs().parse();
     argv.should.have.property('f');
     argv.f.should.equal('toto');
     argv._.should.deep.equal(['tutu']);

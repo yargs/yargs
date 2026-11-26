@@ -77,6 +77,10 @@ export default {
   getProcessArgvBin: () => {
     return 'deno';
   },
+  getProcessArgvUserArgs: () => {
+    // Deno.args already excludes the runtime and script:
+    return [...Deno.args];
+  },
   mainFilename: cwd,
   Parser: Parser,
   path: path,

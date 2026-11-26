@@ -63,7 +63,7 @@ import setBlocking from './utils/set-blocking.js';
 
 export function YargsFactory(_shim: PlatformShim) {
   return (
-    processArgs: string | string[] = [],
+    processArgs: string | string[] = _shim.getProcessArgvUserArgs(),
     cwd = _shim.process.cwd(),
     parentRequire?: RequireType
   ): YargsInstance => {

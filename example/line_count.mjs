@@ -2,7 +2,7 @@
 import yargs from 'yargs';
 import fs from 'node:fs';
 
-const argv = yargs(process.argv.slice(2))
+const argv = yargs()
   .usage('Count the lines in a file.\nUsage: $0')
   .demand('f')
   .alias('f', 'file')

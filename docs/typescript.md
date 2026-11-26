@@ -28,7 +28,7 @@ The following `.options()` definition:
 #!/usr/bin/env node
 import yargs from 'yargs';
 
-const argv = yargs(process.argv.slice(2)).options({
+const argv = yargs().options({
   a: { type: 'boolean', default: false },
   b: { type: 'string', demandOption: true },
   c: { type: 'number', alias: 'chill' },
@@ -72,7 +72,7 @@ The reason it's a union is because when you call `.parse()`, yargs typing doesn'
 This might result in some errors when accessing the properties:
 
 ```typescript
-const argv = yargs(process.argv.slice(2)).options({
+const argv = yargs().options({
   a: { type: 'boolean', default: false },
   ...
 }).parse();
@@ -83,7 +83,7 @@ argv.a // => Property 'a' does not exist on type...
 If you know your program is not using any asynchronous commands, you can simply use [`#parseSync`](https://yargs.js.org/docs/#api-reference-parsesyncargs-context-parsecallback)
 
 ```typescript
-const argv = yargs(process.argv.slice(2)).options({
+const argv = yargs().options({
   a: { type: 'boolean', default: false },
   ...
 }).parseSync();
@@ -94,7 +94,7 @@ argv.a // => No error, type: boolean
 If you do have asynchronous commands, you will need to use `await`:
 
 ```typescript
-const parser = yargs(process.argv.slice(2)).options({
+const parser = yargs().options({
   a: { type: 'boolean', default: false },
   ...
 });
@@ -125,11 +125,10 @@ If you need to use [`.wrap()`](https://yargs.js.org/docs/#api-reference-wrapcolu
 
 ```ts
 import yargs from 'yargs';
-import { hideBin } from 'yargs/helpers';
 
 // ...
 
-const yargsInstance = yargs(hideBin(process.argv));
+const yargsInstance = yargs();
 
 const args = yargsInstance
   .wrap(yargsInstance.terminalWidth())
